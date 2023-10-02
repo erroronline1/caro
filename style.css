@@ -1,0 +1,268 @@
+:root{
+    --background:rgb(229, 233, 240);
+    --foreground:rgb(46, 52, 64);
+    --protrusion:rgb(229, 233, 240);
+    --green:rgb(153, 179, 132);
+    --3d-border:rgba(255, 255, 255, .3);
+    --lightshadow:rgba(255, 255, 255, .9);
+    --darkshadow:rgba(76, 86, 106, .5);
+}
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+    color: var(--foreground);
+}
+
+::-webkit-scrollbar {
+    width: 3px;
+    height: 3px
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+    background: var(--foreground);
+}
+
+/*************************** layout ******************************/
+body {
+    margin: 0 0 1em 0;
+    font-size: 16px;
+    height: 100vh;
+    color: var(--foreground);
+    background: var(--background);
+    background-attachment: fixed;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+header {
+    margin: 1em auto;
+    width: 70%;
+    text-align: center;
+}
+
+main {
+    margin: 0 auto;
+    width: 95%;
+}
+
+/*************************** section elements******************************/
+input,
+a,
+textarea,
+select,
+input[type=file]+label {
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    width: 92%;
+    outline: 0;
+    display: inline-block;
+    font-size: 1em;
+}
+
+fieldset>input,
+fieldset>textarea,
+fieldset>select,
+fieldset>input[type=file]+label {
+    width: 100%
+}
+
+ul {
+    margin: 0;
+    padding-left: 1em
+}
+
+fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+fieldset,
+section>div:not(.container) {
+    display: inline-block;
+    width: 92%;
+}
+
+section,
+main>div {
+    padding: 1em;
+    margin: 0 1em 1em 1em;
+    border: 1px solid var(--3d-border);
+    border-radius: 2em;
+    background-color: var(--protrusion);
+    box-shadow:
+        -2px -2px 6px var(--lightshadow),
+        3px 3px 6px var(--darkshadow);
+}
+.container>section {
+    width: 100%;
+    margin: 0 1em;
+    padding:1em 0;
+    scroll-snap-align: center;
+    flex: none;
+    overflow: auto;
+    box-shadow: none;
+    border:none;
+    background: none;
+}
+
+.collapsed {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.expanded {
+    white-space: unset;
+    overflow: auto;
+}
+
+section>svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: top;
+    width: 6%;
+}
+
+.inset
+/*.element:has(input[type=button]:active, input[type=text]:focus, input[type=date]:focus, input[type=number]:focus,
+.section:has(input[type=button]:active, input[type=text]:focus, input[type=date]:focus, input[type=number]:focus,
+    a:active,
+    textarea:focus,
+    input[type=file]:active+label)*/ {
+    box-shadow:
+        inset 3px 3px 5px var(--darkshadow);
+}
+
+.container {
+    border: 1px solid var(--3d-border);
+    border-radius: 1em;
+    display: flex;
+    flex-direction: row;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overflow: scroll;
+    padding: 0 .1em;
+    margin: 0 .1em;
+}
+
+.containerindicator {
+    text-align: center;
+    width: 100%;
+    margin: 0;
+}
+
+/*************************** general elements ******************************/
+svg {
+    fill: var(--foreground)
+}
+
+h1 {
+    color: var(--foreground)
+}
+
+a:active,
+input[type=button]:active {
+    transform: translate(1px, 1px);
+}
+
+input[type=file] {
+    display: none;
+}
+
+a,
+a:active,
+a:visited {
+    color: inherit
+}
+
+legend {
+    font-size: small;
+}
+
+textarea {
+    text-align: left;
+}
+
+input[type=number] {
+    appearance: textfield
+}
+
+fieldset>label {
+    line-height: 2.5em;
+}
+
+.button {
+    float: left;
+    margin: auto 1em 0 0;
+}
+
+.button>svg {
+    width: 1.25em;
+    height: 1em;
+}
+
+/*************************** decorators ******************************/
+
+.custominput {
+    display: inline-block;
+    position: relative;
+    padding-left: 4em;
+    min-width: 10em;
+}
+.custominput input {
+    /* hide default checkbox */
+    display: none;
+}
+.checkmark {
+    /* create a custom checkbox */
+    position: absolute;
+    top: .5em;
+    left: 0;
+    height: 1.5em;
+    width: 3em;
+    border-radius: 1.5em;
+    border: none;
+    box-shadow: inset -1px -1px 3px var(--lightshadow),
+        inset 1px 1px 3px var(--darkshadow);
+    transition: ease .2s;
+}
+.checkmark::after {
+    transition: ease .3s;
+    position: absolute;
+    content: '';
+    top: -10%;
+    left: -5%;
+    display: block;
+    width: 60%;
+    height: 120%;
+    border: 1px solid var(--3d-border);
+    border-radius: 50%;
+    background-color: var(--protrusion);
+    box-shadow: inset -2px -2px 8px var(--lightshadow),
+        inset 2px 2px 8px var(--darkshadow),
+        2px 2px 5px var(--darkshadow);
+}
+.custominput input:checked~.checkmark:after {
+    left: 55%;
+}
+.custominput input:checked~.checkmark {
+    background-color: var(--green);
+}
+
+.sectionindicator {
+    stroke: var(--foreground);
+    stroke-width: 1px;
+    fill: none;
+    width: 10px;
+    height: 10px;
+}
+
+.sectionactive {
+    fill: var(--foreground);
+}

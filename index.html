@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<script type="text/javascript" src="scripts.js"></script>
+	<script type="text/javascript" src="assembly.js"></script>
+	<link type="text/css" href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+	<header>
+		<h1>draft</h1>
+	</header>
+	<main id="main">
+
+	</main>
+	<script>
+		new Assembly([{
+			type: 'text',
+			icon: 'read',
+			collapsed: true,
+			items: [
+				'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+			]
+		}, {
+			type: 'text',
+			icon: 'read',
+			collapsed: true,
+			items: [
+				'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+			]
+		}]);
+		new Assembly([{
+			type: 'input',
+			icon: 'text',
+			fieldset: 'Textfeld',
+			attributes: {
+				type: 'text',
+				placeholder: 'Textfeld'
+			}
+		}]);
+		new Assembly([{
+			type: 'input',
+			icon: 'number',
+			fieldset: 'Nummernfeld',
+			attributes: {
+				type: 'number'
+			}
+		}]);
+		new Assembly([{
+			type: 'input',
+			icon: 'date',
+			fieldset: 'Datumfeld',
+			attributes: {
+				type: 'date'
+			}
+		}]);
+		new Assembly([{
+			type: 'file',
+			icon: 'upload',
+			fieldset: 'Dateiupload',
+			attributes: {
+				id: 'fileupload',
+				name: 'files[]',
+				multiple: true
+			}
+		}]);
+		new Assembly([{
+			type: 'links',
+			icon: 'link',
+			//fieldset:'Links',
+			items: {
+				'Link 1': {
+					href: '#'
+				},
+				'Link 2': {
+					href: '#',
+					onpointerdown: 'alert(\'hello\')'
+				}
+			}
+		}]);
+		new Assembly([{
+			type: 'input',
+			icon: 'button',
+			attributes: {
+				type: 'button',
+				value: 'Button',
+				//onpointerdown: 'alert(\'pressed\')'
+			}
+		}]);
+		new Assembly([{
+			type: 'checkbox',
+			icon: 'checkbox',
+			fieldset: 'Checkboxes',
+			items: {
+				'Checkbox 1': {
+					name: 'ch1'
+				},
+				'checkbox 2': {
+					name: 'ch2'
+				},
+				'Checkbox 3': {
+					name: 'ch3'
+				},
+				'checkbox 4': {
+					name: 'ch4'
+				}
+			}
+		}, {
+			type: 'radio',
+			icon: 'radio',
+			fieldset: 'radiobuttons',
+			items: {
+				'Radio 1': {
+					name: 'rd1'
+				},
+				'Radio 2': {
+					name: 'rd1'
+				}
+			}
+		}]);
+		new Assembly([{
+			type: 'select',
+			icon: 'select',
+			fieldset: 'Liste',
+			items: {
+				'Listeneintrag1': {
+					value: 'eins'
+				},
+				'Listeneintrag2': {
+					value: 'zwei',
+					selected: true
+				}
+			}
+		}, {
+			type: 'textarea',
+			icon: 'text',
+			fieldset: 'Textarea',
+			attributes: {
+				rows: 8,
+				value: 'werte werden auf diese weise übergeben'
+			}
+		}]);
+	</script>
+
+</body>
+
+</html>
