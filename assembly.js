@@ -33,6 +33,7 @@ class Assembly {
 		this.multipleContainers = [];
 		let container = null;
 
+
 		if (setup.form) {
 			container = document.createElement('form');
 			Object.keys(setup.form).forEach(key => {
@@ -47,6 +48,9 @@ class Assembly {
 		document.getElementById('main').insertAdjacentElement('beforeend', container);
 		for (let i = 0; i < this.multipleContainers.length; i++) {
 			document.getElementById(this.multipleContainers[i]).addEventListener('scroll', scroller);
+		}
+		if (this.signaturePad) {
+			initialize_SignaturePad();
 		}
 	}
 
@@ -149,10 +153,12 @@ class Assembly {
 			}
 		}*/
 		const input = document.createElement('input');
+		let execute;
 		Object.keys(this.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+				execute=this.attributes[key];
 				input[key] = () => {
-					eval(this.attributes[key])
+					eval(execute)
 				};
 			} else input[key] = this.attributes[key];
 		});
@@ -201,10 +207,12 @@ class Assembly {
 			}
 		}*/
 		const select = document.createElement('select');
+		let execute;
 		if (this.attributes !== undefined) Object.keys(this.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+				execute=this.attributes[key];
 				select[key] = () => {
-					eval(this.attributes[key])
+					eval(execute)
 				};
 			} else select[key] = this.attributes[key];
 		});
@@ -213,8 +221,9 @@ class Assembly {
 			Object.keys(this.items[key]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
+							execute=this.items[key][attribute];
 					option[attribute] = () => {
-						eval(this.items[key][attribute])
+						eval(execute)
 					};
 				} else option[attribute] = this.items[key][attribute];
 			});
@@ -234,10 +243,12 @@ class Assembly {
 			}
 		}*/
 		const textarea = document.createElement('textarea');
+		let execute;
 		Object.keys(this.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+				execute = this.attributes[key];
 				textarea[key] = () => {
-					eval(this.attributes[key])
+					eval(execute)
 				};
 			} else if (key !== 'value') textarea[key] = this.attributes[key];
 		});
@@ -261,7 +272,8 @@ class Assembly {
 		Object.keys(this.items).forEach(checkbox => {
 			let label = document.createElement('label'),
 				input = document.createElement('input'),
-				span = document.createElement('span');
+				span = document.createElement('span'),
+				execute;
 			input.type = radio ? 'radio' : 'checkbox';
 			label.classList = 'custominput';
 			span.classList = 'checkmark';
@@ -269,8 +281,9 @@ class Assembly {
 			Object.keys(this.items[checkbox]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
+					execute = this.items[checkbox][attribute];
 					input[attribute] = () => {
-						eval(this.items[checkbox][attribute])
+						eval(execute)
 					};
 				} else input[attribute] = this.items[checkbox][attribute];
 			});
@@ -301,12 +314,14 @@ class Assembly {
 			ul = document.createElement('ul');
 		Object.keys(this.items).forEach(link => {
 			let li = document.createElement('li'),
-				a = document.createElement('a');
+				a = document.createElement('a'),
+				execute;
 			Object.keys(this.items[link]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
+					execute = this.items[link][attribute]
 					a[attribute] = () => {
-						eval(this.items[link][attribute])
+						eval(execute);
 					};
 				} else a[attribute] = this.items[link][attribute];
 			})
@@ -316,5 +331,11 @@ class Assembly {
 		});
 		div.appendChild(ul)
 		this.elements.add(div);
+	}
+	signature() {
+		const canvas = document.createElement('canvas');
+		canvas.id = 'canvas',
+			this.elements.add(canvas);
+		this.signaturePad = true;
 	}
 }
