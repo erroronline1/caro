@@ -1,31 +1,83 @@
-class Assembly {
-	constructor(setup) {
-		this.multipletiles = new Set();
-		this.multiplecontainerID = null;
-		for (let i = 0; i < setup.length; i++) {
-			this.elements = new Set();
-			this.icon = setup[i].icon;
-			this.fieldset = setup[i].fieldset;
-			this.collapsed = setup[i].collapsed;
-			this.attributes = setup[i].attributes;
-			this.items = setup[i].items;
-			this[setup[i].type]();
-			if (setup.length < 2) {
-				document.getElementById('main').insertAdjacentElement('beforeend', this.single());
-				return;
-			}
-			this.multipletiles.add(this.single())
+var multiplecontainerID = 0
+
+function getNextContainerID() {
+	return "containerID" + ++multiplecontainerID;
+}
+
+const scroller = (e) => {
+	/* event handler for horizontal scrolling of multiple panels */
+	setTimeout(() => {
+		let indicator = document.getElementById(e.target.attributes.id.value + "indicator");
+		for (let panel = 0; panel < e.target.children.length; panel++) {
+			if (panel == Math.floor(e.target.scrollLeft / e.target.clientWidth)) indicator.children[
+				panel].firstChild.classList.add('sectionactive');
+			else indicator.children[panel].firstChild.classList.remove('sectionactive');
 		}
-		document.getElementById('main').insertAdjacentElement('beforeend', this.multiple());
-		document.getElementById(this.multiplecontainerID).addEventListener('scroll', scroller);
+	}, 500)
+};
+
+class Assembly {
+	/* 
+	assembles forms and screen elements.
+	deepest nesting of input object is three levels
+	form:null or {attributes}
+	items:[
+		[card
+			{element0},
+			{element1}
+		],
+	]
+	*/
+	constructor(setup) {
+		this.tiles = setup.tiles;
+		this.multipleContainers = [];
+		let container = null;
+
+		if (setup.form) {
+			container = document.createElement('form');
+			Object.keys(setup.form).forEach(key => {
+				container[key] = setup.form[key];
+			});
+		} else container = document.createElement('div');
+
+		this.assembledTiles = new Set();
+		this.processItems();
+
+		container.append(...this.assembledTiles);
+		document.getElementById('main').insertAdjacentElement('beforeend', container);
+		for (let i = 0; i < this.multipleContainers.length; i++) {
+			document.getElementById(this.multipleContainers[i]).addEventListener('scroll', scroller);
+		}
 	}
 
+	processItems() {
+		this.multiplecontainerID = null;
+
+		this.tiles.forEach(tile => {
+			this.multipletiles = new Set();
+			for (let i = 0; i < tile.length; i++) {
+				this.elements = new Set();
+				this.icon = tile[i].icon;
+				this.fieldset = tile[i].fieldset;
+				this.collapsed = tile[i].collapsed;
+				this.attributes = tile[i].attributes;
+				this.items = tile[i].items;
+				this[tile[i].type]();
+				if (tile.length < 2) {
+					this.assembledTiles.add(this.single());
+					continue;
+				}
+				this.multipletiles.add(this.single())
+			}
+			if (this.multipletiles.size) this.assembledTiles.add(this.multiple());
+		});
+	}
 	single(classList = null) {
 		const section = document.createElement('section'),
 			icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 			use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
 		if (classList) section.classList = classList;
-		use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'media/sprite.svg#'+this.icon);
+		use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'media/sprite.svg#' + this.icon);
 		icon.appendChild(use);
 		section.appendChild(icon);
 		if (this.fieldset === undefined) {
@@ -41,18 +93,17 @@ class Assembly {
 		section.appendChild(fieldset);
 		return section;
 	}
-
 	multiple(classList = null) {
 		const section = document.createElement('section'),
 			container = document.createElement('div'),
 			indicators = document.createElement('div');
 		this.multiplecontainerID = getNextContainerID();
+		this.multipleContainers.push(this.multiplecontainerID);
 		if (classList) section.classList = classList;
 		container.classList = 'container inset';
 		container.id = this.multiplecontainerID;
 		container.append(...this.multipletiles);
 		section.appendChild(container);
-
 		indicators.classList = 'containerindicator';
 		indicators.id = this.multiplecontainerID + 'indicator';
 		for (let i = 0; i < this.multipletiles.size; i++) {
@@ -127,6 +178,7 @@ class Assembly {
 		};
 		Object.keys(this.attributes).forEach(key => {
 			input[key] = this.attributes[key];
+			if (this.attributes[key].indexOf('[]') > 0) input.multiple = true;
 		});
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode('Datei auswählen...'));
