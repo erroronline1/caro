@@ -36,6 +36,7 @@ class Assembly {
 
 		if (setup.form) {
 			container = document.createElement('form');
+			container.method='post';
 			Object.keys(setup.form).forEach(key => {
 				container[key] = setup.form[key];
 			});

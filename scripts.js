@@ -17,12 +17,13 @@ const api = {
 		} else _.el('growlNotif').classList.remove('show');*/
 	},
 
-	getForm: (request='init') => {
+	getForm: (which='template') => {
 		let successFn = function (data) {
 			new Assembly(data);
 		}
 		api.send('get', {
-			'request': request
+			'request': 'getForm',
+			'content': which
 		}, successFn);
 	},
 	signIn: () => {
