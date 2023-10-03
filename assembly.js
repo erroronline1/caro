@@ -125,7 +125,7 @@ class Assembly {
 	text() {
 		/* {
 			type: 'text',
-			icon: '#read',
+			icon: 'read',
 			collapsed: true,
 			items: [
 				'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
@@ -145,7 +145,7 @@ class Assembly {
 	input() {
 		/*{
 			type: 'input',
-			icon: '#text',
+			icon: 'text',
 			fieldset: 'Textfeld',
 			attributes: {
 				type: 'text',
@@ -156,7 +156,7 @@ class Assembly {
 		let execute;
 		Object.keys(this.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute=this.attributes[key];
+				execute = this.attributes[key]; // because of this scope
 				input[key] = () => {
 					eval(execute)
 				};
@@ -167,12 +167,11 @@ class Assembly {
 	file() {
 		/*{
 			type: 'file',
-			icon: '#upload',
+			icon: 'upload',
 			fieldset: 'Dateiupload',
 			attributes: {
 				id: 'fileupload',
-				name: 'files[]',
-				multiple: true
+				name: 'files[]' [] or not decides for multiple
 			}
 		}*/
 		const input = document.createElement('input'),
@@ -191,10 +190,38 @@ class Assembly {
 		this.elements.add(input)
 		this.elements.add(label);
 	}
+	photo() {
+		/*{
+			type: 'file',
+			icon: 'camera',
+			fieldset: 'Kamera',
+			attributes: {
+				id: 'camera',
+				name: 'photo'
+			}
+		}*/
+		const input = document.createElement('input'),
+			label = document.createElement('label');
+		input.type = 'file';
+		input.accept = 'image/*';
+		input.capture = true;
+		input.onchange = function () {
+			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
+				', ') + ' oder ändern...' : 'Photo aufnehmen...'
+		};
+		Object.keys(this.attributes).forEach(key => {
+			input[key] = this.attributes[key];
+			if (this.attributes[key].indexOf('[]') > 0) input.multiple = true;
+		});
+		label.htmlFor = input.id;
+		label.appendChild(document.createTextNode('Photo aufnehmen...'));
+		this.elements.add(input)
+		this.elements.add(label);
+	}
 	select() {
 		/*{
 			type: 'select',
-			icon: '#select',
+			icon: 'select',
 			fieldset: 'Liste',
 			items: {
 				'Listeneintrag1': {
@@ -210,7 +237,7 @@ class Assembly {
 		let execute;
 		if (this.attributes !== undefined) Object.keys(this.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute=this.attributes[key];
+				execute = this.attributes[key]; // because of this scope
 				select[key] = () => {
 					eval(execute)
 				};
@@ -221,7 +248,7 @@ class Assembly {
 			Object.keys(this.items[key]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-							execute=this.items[key][attribute];
+					execute = this.items[key][attribute];
 					option[attribute] = () => {
 						eval(execute)
 					};
@@ -235,7 +262,7 @@ class Assembly {
 	textarea() {
 		/*{
 			type: 'textarea',
-			icon: '#text',
+			icon: 'text',
 			fieldset: 'Textarea',
 			attributes: {
 				rows:8,
@@ -246,7 +273,7 @@ class Assembly {
 		let execute;
 		Object.keys(this.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.attributes[key];
+				execute = this.attributes[key]; // because of this scope
 				textarea[key] = () => {
 					eval(execute)
 				};
@@ -258,7 +285,7 @@ class Assembly {
 	checkbox(radio = null) {
 		/*{
 			type: 'checkbox', or 'radio'
-			icon: '#checkbox',
+			icon: 'checkbox',
 			//fieldset:'Checkboxes',
 			items: {
 				'Checkbox 1': {
@@ -281,7 +308,7 @@ class Assembly {
 			Object.keys(this.items[checkbox]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.items[checkbox][attribute];
+					execute = this.items[checkbox][attribute]; // because of this scope
 					input[attribute] = () => {
 						eval(execute)
 					};
@@ -298,7 +325,7 @@ class Assembly {
 	links() {
 		/*{
 			type: 'links',
-			icon: '#link',
+			icon: 'link',
 			//fieldset:'Links',
 			items: {
 				'Link 1': {
@@ -319,7 +346,7 @@ class Assembly {
 			Object.keys(this.items[link]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.items[link][attribute]
+					execute = this.items[link][attribute] // because of this scope
 					a[attribute] = () => {
 						eval(execute);
 					};
@@ -333,6 +360,11 @@ class Assembly {
 		this.elements.add(div);
 	}
 	signature() {
+		/*{
+			type: 'signature',
+			icon:'signature',
+			fieldset:'Unterschrift'
+		} */
 		const canvas = document.createElement('canvas');
 		canvas.id = 'canvas',
 			this.elements.add(canvas);

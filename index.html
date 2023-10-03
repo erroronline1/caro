@@ -21,9 +21,7 @@
 	</main>
 	<script>
 		new Assembly({
-			form: {
-				name: 'testform'
-			},
+			//form: { name: 'testform'},
 			tiles: [
 				[{
 					type: 'text',
@@ -72,6 +70,15 @@
 					attributes: {
 						id: 'fileupload',
 						name: 'files'
+					}
+				}],
+				[{
+					type: 'photo',
+					icon: 'camera',
+					fieldset: 'Photo',
+					attributes: {
+						id: 'photoupload',
+						name: 'photos'
 					}
 				}],
 				[{
