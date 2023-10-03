@@ -5,7 +5,7 @@ ini_set('display_errors', 1); error_reporting(E_ERROR);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 //database connection
-include_once('dbcredentials.php'); // contains just $pdo = new PDO('mysql:host=localhost;dbname=databasename;charset=utf8', 'username', 'password');
+include_once('dbcredentials.php'); // contains just $pdo = new PDO('mysql:host=127.0.0.1;dbname=databasename;charset=utf8', 'username', 'password');
 
 // always security logout
 if ($_SESSION["user"]){
