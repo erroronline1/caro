@@ -1,14 +1,6 @@
-/*const wrapper = document.getElementById("signature-pad");
-const clearButton = wrapper.querySelector("[data-action=clear]");
-const savePNGButton = wrapper.querySelector("[data-action=save-png]");
-const canvas = wrapper.querySelector("canvas");
-const signaturePad = new SignaturePad(canvas, {
-  // It's Necessary to use an opaque color when saving image as JPEG;
-  // this option can be omitted if only saving as PNG or SVG
-  //backgroundColor: 'rgb(255, 255, 255)'
-});*/
-var canvas= signaturePad=null;
-async function initialize_SignaturePad() {
+var canvas = signaturePad = null;
+
+function initialize_SignaturePad() {
   canvas = document.getElementById("canvas");
   signaturePad = new SignaturePad(canvas, {
     // It's Necessary to use an opaque color when saving image as JPEG;
@@ -21,6 +13,7 @@ async function initialize_SignaturePad() {
   resizeCanvas();
 
 }
+
 // Adjust canvas coordinate space taking into account pixel ratio,
 // to make it look crisp on mobile devices.
 // This also causes canvas to be cleared.
@@ -46,21 +39,6 @@ function resizeCanvas() {
   signaturePad.fromData(signaturePad.toData());
 }
 
-function download(dataURL, filename) {
-  const blob = dataURLToBlob(dataURL);
-  const url = window.URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.style = "display: none";
-  a.href = url;
-  a.download = filename;
-
-  document.body.appendChild(a);
-  a.click();
-
-  window.URL.revokeObjectURL(url);
-}
-
 // One could simply use Canvas#toBlob method instead, but it's just to show
 // that it can be done using result of SignaturePad#toDataURL.
 function dataURLToBlob(dataURL) {
@@ -79,17 +57,3 @@ function dataURLToBlob(dataURL) {
     type: contentType
   });
 }
-/*
-clearButton.addEventListener("click", () => {
-  signaturePad.clear();
-});
-
-savePNGButton.addEventListener("click", () => {
-  if (signaturePad.isEmpty()) {
-    alert("Please provide a signature first.");
-  } else {
-    const dataURL = signaturePad.toDataURL();
-    download(dataURL, "signature.png");
-  }
-});
-*/
