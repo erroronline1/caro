@@ -20,8 +20,8 @@ class Assembly {
 	/* 
 	assembles forms and screen elements.
 	deepest nesting of input object is three levels
-	form:null or {attributes}
-	items:[
+	form:null or {attributes} / nothing creates just a div e.g. just for text and links
+	content:[
 		[card
 			{element0},
 			{element1}
@@ -29,23 +29,31 @@ class Assembly {
 	]
 	*/
 	constructor(setup) {
-		this.tiles = setup.tiles;
+		this.content = setup.content;
 		this.multipleContainers = [];
-		let container = null;
-
+		this.multiplecontainerID = null;
+		let container;
 
 		if (setup.form) {
 			container = document.createElement('form');
-			container.method='post';
+			container.method = 'post';
+			container.enctype = "multipart/form-data";
 			Object.keys(setup.form).forEach(key => {
 				container[key] = setup.form[key];
 			});
+			this.content.push([{
+				type: 'submit',
+				attributes: {
+					value: 'absenden'
+				}
+			}]);
 		} else container = document.createElement('div');
 
 		this.assembledTiles = new Set();
-		this.processItems();
+		this.processContent();
 
 		container.append(...this.assembledTiles);
+
 		document.getElementById('main').insertAdjacentElement('beforeend', container);
 		for (let i = 0; i < this.multipleContainers.length; i++) {
 			document.getElementById(this.multipleContainers[i]).addEventListener('scroll', scroller);
@@ -55,18 +63,12 @@ class Assembly {
 		}
 	}
 
-	processItems() {
-		this.multiplecontainerID = null;
-
-		this.tiles.forEach(tile => {
+	processContent() {
+		this.content.forEach(tile => {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
 				this.elements = new Set();
-				this.icon = tile[i].icon;
-				this.fieldset = tile[i].fieldset;
-				this.collapsed = tile[i].collapsed;
-				this.attributes = tile[i].attributes;
-				this.items = tile[i].items;
+				this.tile = tile[i];
 				this[tile[i].type]();
 				if (tile.length < 2) {
 					this.assembledTiles.add(this.single());
@@ -77,23 +79,15 @@ class Assembly {
 			if (this.multipletiles.size) this.assembledTiles.add(this.multiple());
 		});
 	}
-	single(classList = null) {
-		const section = document.createElement('section'),
-			icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-			use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-		if (classList) section.classList = classList;
-		use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'media/sprite.svg#' + this.icon);
-		icon.appendChild(use);
-		section.appendChild(icon);
-		if (this.fieldset === undefined) {
+	single() {
+		const section = document.createElement('section');
+		section.setAttribute('data-type', this.tile.type);
+
+		if ([undefined, null, false].indexOf(this.tile.description) > -1) {
 			section.append(...this.elements);
 			return section;
 		}
-		const fieldset = document.createElement('fieldset'),
-			legend = document.createElement('legend'),
-			title = document.createTextNode(this.fieldset);
-		legend.appendChild(title);
-		fieldset.appendChild(legend);
+		const fieldset = this.fieldset();
 		fieldset.append(...this.elements);
 		section.appendChild(fieldset);
 		return section;
@@ -112,30 +106,38 @@ class Assembly {
 		indicators.classList = 'containerindicator';
 		indicators.id = this.multiplecontainerID + 'indicator';
 		for (let i = 0; i < this.multipletiles.size; i++) {
-			let icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-				use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-			icon.classList = 'sectionindicator';
-			use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', 'media/sprite.svg#sectionindicator');
-			icon.appendChild(use);
-			indicators.appendChild(icon);
+			let indicator = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+				circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			indicator.classList = 'sectionindicator';
+			indicator.setAttributeNS(null, "viewbox", "0 0 10 10");
+			circle.setAttributeNS(null, "cx", "5");
+			circle.setAttributeNS(null, "cy", "5");
+			circle.setAttributeNS(null, "r", "4");
+			indicator.appendChild(circle);
+			indicators.appendChild(indicator);
 		}
 		section.appendChild(indicators);
 		return section;
 	}
 
+	fieldset() {
+		const fieldset = document.createElement('fieldset'),
+			legend = document.createElement('legend'),
+			title = document.createTextNode(this.tile.description);
+		legend.appendChild(title);
+		fieldset.appendChild(legend);
+		return fieldset
+	}
 	text() {
 		/* {
 			type: 'text',
-			icon: 'read',
 			collapsed: true,
-			items: [
-				'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
-			]
+			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
 		const div = document.createElement('div'),
-			content = document.createTextNode(this.items[0]);
+			content = document.createTextNode(this.tile.content);
 		div.appendChild(content);
-		if (this.collapsed) {
+		if (this.tile.collapsed) {
 			div.classList = "collapsed";
 			div.onpointerdown = function () {
 				this.classList.toggle('expanded')
@@ -143,36 +145,60 @@ class Assembly {
 		}
 		this.elements.add(div);
 	}
-	input() {
+	input(type) {
 		/*{
-			type: 'input',
-			icon: 'text',
-			fieldset: 'Textfeld',
+			type: "textinput",
+			description: 'text input',
 			attributes: {
-				type: 'text',
-				placeholder: 'Textfeld'
+				placeholder: 'text input'
 			}
 		}*/
 		const input = document.createElement('input');
+		input.type = type;
+
+
+		/////////////// todo: sanitation of names
+		input.name = this.tile.description;
+		/////////////////////
+		/*
+		todo: icons via css (data-type selector) reattempt
+		read form (erroronline1,js)
+		backend...
+		blockchain
+		js qr-code reader
+
+		*/
+
 		let execute;
-		Object.keys(this.attributes).forEach(key => {
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.attributes[key]; // because of this scope
+				execute = this.tile.attributes[key]; // because of this scope
 				input[key] = () => {
 					eval(execute)
 				};
-			} else input[key] = this.attributes[key];
+			} else input[key] = this.tile.attributes[key];
 		});
 		this.elements.add(input);
 	}
+	textinput() {
+		this.input('text');
+	}
+	numberinput() {
+		this.input('number');
+	}
+	dateinput() {
+		this.input('date');
+	}
+	submit() {
+		this.input('submit');
+	}
+
 	file() {
 		/*{
 			type: 'file',
-			icon: 'upload',
-			fieldset: 'Dateiupload',
+			description: 'file upload',
 			attributes: {
-				id: 'fileupload',
-				name: 'files[]' [] or not decides for multiple
+				multiple: true
 			}
 		}*/
 		const input = document.createElement('input'),
@@ -182,9 +208,8 @@ class Assembly {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' oder ändern...' : 'Datei auswählen...'
 		};
-		Object.keys(this.attributes).forEach(key => {
-			input[key] = this.attributes[key];
-			if (this.attributes[key].indexOf('[]') > 0) input.multiple = true;
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
+			input[key] = this.tile.attributes[key];
 		});
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode('Datei auswählen...'));
@@ -193,11 +218,9 @@ class Assembly {
 	}
 	photo() {
 		/*{
-			type: 'file',
-			icon: 'camera',
-			fieldset: 'Kamera',
+			type: 'photo',
+			description: 'photo upload',
 			attributes: {
-				id: 'camera',
 				name: 'photo'
 			}
 		}*/
@@ -210,9 +233,8 @@ class Assembly {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' oder ändern...' : 'Photo aufnehmen...'
 		};
-		Object.keys(this.attributes).forEach(key => {
-			input[key] = this.attributes[key];
-			if (this.attributes[key].indexOf('[]') > 0) input.multiple = true;
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
+			input[key] = this.tile.attributes[key];
 		});
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode('Photo aufnehmen...'));
@@ -222,38 +244,37 @@ class Assembly {
 	select() {
 		/*{
 			type: 'select',
-			icon: 'select',
-			fieldset: 'Liste',
-			items: {
-				'Listeneintrag1': {
-					value: 'eins'
+			description: 'list',
+			content: {
+				'entry one': {
+					value: '1'
 				},
-				'Listeneintrag2': {
-					value: 'zwei',
+				'entry two': {
+					value: '2',
 					selected: true
 				}
 			}
 		}*/
 		const select = document.createElement('select');
 		let execute;
-		if (this.attributes !== undefined) Object.keys(this.attributes).forEach(key => {
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.attributes[key]; // because of this scope
+				execute = this.tile.attributes[key]; // because of this scope
 				select[key] = () => {
 					eval(execute)
 				};
-			} else select[key] = this.attributes[key];
+			} else select[key] = this.tile.attributes[key];
 		});
-		Object.keys(this.items).forEach(key => {
+		Object.keys(this.tile.content).forEach(key => {
 			let option = document.createElement('option');
-			Object.keys(this.items[key]).forEach(attribute => {
+			Object.keys(this.tile.content[key]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.items[key][attribute];
+					execute = this.tile.content[key][attribute];
 					option[attribute] = () => {
 						eval(execute)
 					};
-				} else option[attribute] = this.items[key][attribute];
+				} else option[attribute] = this.tile.content[key][attribute];
 			});
 			option.appendChild(document.createTextNode(key));
 			select.appendChild(option)
@@ -263,32 +284,30 @@ class Assembly {
 	textarea() {
 		/*{
 			type: 'textarea',
-			icon: 'text',
-			fieldset: 'Textarea',
+			description: 'textarea',
 			attributes: {
 				rows:8,
-				value:'werte werden auf diese weise übergeben'
+				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
 		const textarea = document.createElement('textarea');
 		let execute;
-		Object.keys(this.attributes).forEach(key => {
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.attributes[key]; // because of this scope
+				execute = this.tile.attributes[key]; // because of this scope
 				textarea[key] = () => {
 					eval(execute)
 				};
-			} else if (key !== 'value') textarea[key] = this.attributes[key];
+			} else if (key !== 'value') textarea[key] = this.tile.attributes[key];
 		});
-		if ('value' in this.attributes) textarea.appendChild(document.createTextNode(this.attributes.value));
+		if ('value' in this.tile.attributes) textarea.appendChild(document.createTextNode(this.tile.attributes.value));
 		this.elements.add(textarea);
 	}
 	checkbox(radio = null) {
 		/*{
 			type: 'checkbox', or 'radio'
-			icon: 'checkbox',
-			//fieldset:'Checkboxes',
-			items: {
+			description:'checkboxes',
+			content: {
 				'Checkbox 1': {
 					name: 'ch1'
 				},
@@ -297,7 +316,7 @@ class Assembly {
 				}
 			}
 		}*/
-		Object.keys(this.items).forEach(checkbox => {
+		Object.keys(this.tile.content).forEach(checkbox => {
 			let label = document.createElement('label'),
 				input = document.createElement('input'),
 				span = document.createElement('span'),
@@ -306,14 +325,14 @@ class Assembly {
 			label.classList = 'custominput';
 			span.classList = 'checkmark';
 			label.appendChild(document.createTextNode(checkbox));
-			Object.keys(this.items[checkbox]).forEach(attribute => {
+			Object.keys(this.tile.content[checkbox]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.items[checkbox][attribute]; // because of this scope
+					execute = this.tile.content[checkbox][attribute]; // because of this scope
 					input[attribute] = () => {
 						eval(execute)
 					};
-				} else input[attribute] = this.items[checkbox][attribute];
+				} else input[attribute] = this.tile.content[checkbox][attribute];
 			});
 			label.appendChild(input);
 			label.appendChild(span);
@@ -326,9 +345,8 @@ class Assembly {
 	links() {
 		/*{
 			type: 'links',
-			icon: 'link',
-			//fieldset:'Links',
-			items: {
+			description:'links',
+			content: {
 				'Link 1': {
 					href: '#'
 				},
@@ -340,18 +358,18 @@ class Assembly {
 		}*/
 		const div = document.createElement('div'),
 			ul = document.createElement('ul');
-		Object.keys(this.items).forEach(link => {
+		Object.keys(this.tile.content).forEach(link => {
 			let li = document.createElement('li'),
 				a = document.createElement('a'),
 				execute;
-			Object.keys(this.items[link]).forEach(attribute => {
+			Object.keys(this.tile.content[link]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.items[link][attribute] // because of this scope
+					execute = this.tile.content[link][attribute] // because of this scope
 					a[attribute] = () => {
 						eval(execute);
 					};
-				} else a[attribute] = this.items[link][attribute];
+				} else a[attribute] = this.tile.content[link][attribute];
 			})
 			a.appendChild(document.createTextNode(link));
 			li.appendChild(a);
@@ -363,12 +381,17 @@ class Assembly {
 	signature() {
 		/*{
 			type: 'signature',
-			icon:'signature',
-			fieldset:'Unterschrift'
+			description:'signature'
 		} */
 		const canvas = document.createElement('canvas');
 		canvas.id = 'canvas',
 			this.elements.add(canvas);
+		//this tile does not process attributes, therefore they can be reassigned
+		this.tile.attributes = {
+			"value": "Unterschrift löschen",
+			"onpointerdown": "signaturePad.clear()"
+		};
+		this.input('button');
 		this.signaturePad = true;
 	}
 }
