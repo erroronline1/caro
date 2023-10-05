@@ -67,8 +67,9 @@ canvas {
 	display: inline-block;
 	font-size: 1em;
 }
-canvas{
-	height:13em;
+
+canvas {
+	height: 13em;
 }
 
 
@@ -109,13 +110,22 @@ section {
 
 .container>section {
 	width: 100%;
-	padding: 1em .5em;
+	padding-top: 1em;
+	padding-bottom: 1em;
 	scroll-snap-align: center;
 	flex: none;
 	overflow: auto;
 	box-shadow: none;
 	border: none;
 	background: none;
+}
+
+[data-type] {
+	padding-left: 2em;
+}
+
+div>[data-type] {
+	padding-left: 1.5em;
 }
 
 .collapsed {
@@ -271,4 +281,62 @@ fieldset>label {
 
 .sectionactive {
 	fill: var(--foreground);
+}
+
+[data-type]::before {
+	content: "";
+	display: inline-block;
+	height: 1em;
+	width: 1em;
+	vertical-align: top;
+	background-size: cover;
+	margin-right: 1em;
+}
+
+[data-type=text]::before {
+	background-image: url("media/book-reader.svg");
+}
+
+[data-type=textinput]::before {
+	background-image: url("media/pencil.svg");
+}
+
+[data-type=numberinput]::before {
+	background-image: url("media/hashtag.svg");
+}
+
+[data-type=dateinput]::before {
+	background-image: url("media/calendar-alt.svg");
+}
+
+[data-type=file]::before {
+	background-image: url("media/upload.svg");
+}
+
+[data-type=photo]::before {
+	background-image: url("media/camera.svg");
+}
+
+[data-type=select]::before {
+	background-image: url("media/list.svg");
+}
+
+[data-type=textarea]::before {
+	background-image: url("media/pencil.svg");
+}
+
+[data-type=checkbox]::before {
+	background-image: url("media/check-double.svg");
+}
+
+[data-type=radio]::before {
+	background-image: url("media/check.svg");
+}
+
+[data-type=links]::before {
+	background-image: url("media/link.svg");
+}
+
+[data-type=signature]::before {
+	background-image: url("media/signature.svg");
 }
