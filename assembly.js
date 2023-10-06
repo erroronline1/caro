@@ -1,19 +1,29 @@
-var multiplecontainerID = 0
+var multiplecontainerID = 0;
+var ElementID=0;
 
 function getNextContainerID() {
-	return "containerID" + ++multiplecontainerID;
+	return 'containerID' + ++multiplecontainerID;
+}
+function getNextElementID() {
+	return 'elementID' + ++ElementID;
 }
 
 const scroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
 	setTimeout(() => {
-		let indicator = document.getElementById(e.target.attributes.id.value + "indicator");
+		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
 		for (let panel = 0; panel < e.target.children.length; panel++) {
 			if (panel == Math.floor(e.target.scrollLeft / e.target.clientWidth)) indicator.children[
 				panel].firstChild.classList.add('sectionactive');
 			else indicator.children[panel].firstChild.classList.remove('sectionactive');
 		}
 	}, 500)
+};
+
+
+const input_required = () => {
+	/* check non typical input fields for presence of required content */
+	console.log(signaturePad.isEmpty());
 };
 
 class Assembly {
@@ -27,6 +37,11 @@ class Assembly {
 			{element1}
 		],
 	]
+
+	elements are assembled by default but input elements can be assigned common attributes
+	names and ids are set according to description. 
+	
+	TODO: sanitation of specialchars
 	*/
 	constructor(setup) {
 		this.content = setup.content;
@@ -37,7 +52,7 @@ class Assembly {
 		if (setup.form) {
 			container = document.createElement('form');
 			container.method = 'post';
-			container.enctype = "multipart/form-data";
+			container.enctype = 'multipart/form-data';
 			Object.keys(setup.form).forEach(key => {
 				container[key] = setup.form[key];
 			});
@@ -67,6 +82,7 @@ class Assembly {
 		this.content.forEach(tile => {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
+				console.log(tile[i]);
 				this.elements = new Set();
 				this.tile = tile[i];
 				this[tile[i].type]();
@@ -109,10 +125,10 @@ class Assembly {
 			let indicator = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 				circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 			indicator.classList = 'sectionindicator';
-			indicator.setAttributeNS(null, "viewbox", "0 0 10 10");
-			circle.setAttributeNS(null, "cx", "5");
-			circle.setAttributeNS(null, "cy", "5");
-			circle.setAttributeNS(null, "r", "4");
+			indicator.setAttributeNS(null, 'viewbox', '0 0 10 10');
+			circle.setAttributeNS(null, 'cx', '5');
+			circle.setAttributeNS(null, 'cy', '5');
+			circle.setAttributeNS(null, 'r', '4');
 			indicator.appendChild(circle);
 			indicators.appendChild(indicator);
 		}
@@ -138,7 +154,7 @@ class Assembly {
 			content = document.createTextNode(this.tile.content);
 		div.appendChild(content);
 		if (this.tile.collapsed) {
-			div.classList = "collapsed";
+			div.classList = 'collapsed';
 			div.onpointerdown = function () {
 				this.classList.toggle('expanded')
 			};
@@ -147,7 +163,7 @@ class Assembly {
 	}
 	input(type) {
 		/*{
-			type: "textinput",
+			type: 'textinput',
 			description: 'text input',
 			attributes: {
 				placeholder: 'text input'
@@ -155,19 +171,7 @@ class Assembly {
 		}*/
 		const input = document.createElement('input');
 		input.type = type;
-
-
-		/////////////// todo: sanitation of names
-		input.name = this.tile.description;
-		/////////////////////
-		/*
-		todo: icons via css (data-type selector) reattempt
-		read form (erroronline1,js)
-		backend...
-		blockchain
-		js qr-code reader
-
-		*/
+		if(this.tile.description) input.name = this.tile.description;
 
 		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
@@ -204,6 +208,8 @@ class Assembly {
 		const input = document.createElement('input'),
 			label = document.createElement('label');
 		input.type = 'file';
+		input.id = getNextElementID();
+		input.name = this.tile.description;
 		input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' oder ändern...' : 'Datei auswählen...'
@@ -227,6 +233,8 @@ class Assembly {
 		const input = document.createElement('input'),
 			label = document.createElement('label');
 		input.type = 'file';
+		input.id = getNextElementID();
+		input.name = this.tile.description;
 		input.accept = 'image/*';
 		input.capture = true;
 		input.onchange = function () {
@@ -256,6 +264,7 @@ class Assembly {
 			}
 		}*/
 		const select = document.createElement('select');
+		select.name = this.tile.description;
 		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
@@ -291,6 +300,7 @@ class Assembly {
 			}
 		}*/
 		const textarea = document.createElement('textarea');
+		textarea.name = this.tile.description;
 		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
@@ -309,10 +319,10 @@ class Assembly {
 			description:'checkboxes',
 			content: {
 				'Checkbox 1': {
-					name: 'ch1'
+					optional attributes
 				},
 				'Checkbox 2': {
-					name: 'ch1'
+					optional attributes
 				}
 			}
 		}*/
@@ -321,7 +331,15 @@ class Assembly {
 				input = document.createElement('input'),
 				span = document.createElement('span'),
 				execute;
-			input.type = radio ? 'radio' : 'checkbox';
+			if (radio) {
+				input.type = 'radio';
+				input.name = this.tile.description;
+				input.value = checkbox;
+			} else {
+				input.type = 'checkbox';
+				input.name = checkbox;
+			}
+
 			label.classList = 'custominput';
 			span.classList = 'checkmark';
 			label.appendChild(document.createTextNode(checkbox));
@@ -388,10 +406,17 @@ class Assembly {
 			this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
 		this.tile.attributes = {
-			"value": "Unterschrift löschen",
-			"onpointerdown": "signaturePad.clear()"
+			'name':'',
+			'value': 'Unterschrift löschen',
+			'onpointerdown': 'signaturePad.clear()'
 		};
 		this.input('button');
+		this.tile.attributes = {
+			'id': 'signature',
+			'name': 'signature'
+		};
+		this.input('hidden');
 		this.signaturePad = true;
 	}
+
 }
