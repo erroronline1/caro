@@ -6,6 +6,7 @@
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
 	--darkshadow: rgba(76, 86, 106, .5);
+	--red:rgb(191, 97, 106);
 }
 
 * {
@@ -219,6 +220,10 @@ fieldset>label {
 }
 
 /*************************** decorators ******************************/
+
+.alert{
+	border:1px solid var(--red);
+}
 
 .custominput {
 	display: inline-block;

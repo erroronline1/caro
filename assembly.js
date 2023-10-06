@@ -1,9 +1,10 @@
 var multiplecontainerID = 0;
-var ElementID=0;
+var ElementID = 0;
 
 function getNextContainerID() {
 	return 'containerID' + ++multiplecontainerID;
 }
+
 function getNextElementID() {
 	return 'elementID' + ++ElementID;
 }
@@ -21,9 +22,24 @@ const scroller = (e) => {
 };
 
 
-const input_required = () => {
+function prepareForm() {
 	/* check non typical input fields for presence of required content */
-	console.log(signaturePad.isEmpty());
+
+	const signature = document.getElementById('signaturecanvas');
+	if (signature) {
+		if (signaturePad.isEmpty()) {
+			signature.classList.add("alert");
+			return false;
+		}
+		let file = new File([dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
+			type: "image/png",
+			lastModified: new Date().getTime()
+		});
+		let container = new DataTransfer();
+		container.items.add(file);
+		document.getElementById('signature').files = container.files;
+	}
+	return;
 };
 
 class Assembly {
@@ -38,11 +54,9 @@ class Assembly {
 		],
 	]
 
-	elements are assembled by default but input elements can be assigned common attributes
-	names and ids are set according to description. 
-	
-	TODO: sanitation of specialchars
-	*/
+	elements are assembled by default but input elements can be assigned common html attributes
+	names are set according to description. 
+		*/
 	constructor(setup) {
 		this.content = setup.content;
 		this.multipleContainers = [];
@@ -53,6 +67,9 @@ class Assembly {
 			container = document.createElement('form');
 			container.method = 'post';
 			container.enctype = 'multipart/form-data';
+			container.onsubmit = () => {
+				return prepareForm()
+			};
 			Object.keys(setup.form).forEach(key => {
 				container[key] = setup.form[key];
 			});
@@ -82,7 +99,6 @@ class Assembly {
 		this.content.forEach(tile => {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
-				console.log(tile[i]);
 				this.elements = new Set();
 				this.tile = tile[i];
 				this[tile[i].type]();
@@ -171,7 +187,7 @@ class Assembly {
 		}*/
 		const input = document.createElement('input');
 		input.type = type;
-		if(this.tile.description) input.name = this.tile.description;
+		if (this.tile.description) input.name = this.tile.description;
 
 		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
@@ -197,7 +213,7 @@ class Assembly {
 		this.input('submit');
 	}
 
-	file() {
+	file(hidden = false) {
 		/*{
 			type: 'file',
 			description: 'file upload',
@@ -210,17 +226,19 @@ class Assembly {
 		input.type = 'file';
 		input.id = getNextElementID();
 		input.name = this.tile.description;
-		input.onchange = function () {
-			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
-				', ') + ' oder ändern...' : 'Datei auswählen...'
-		};
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			input[key] = this.tile.attributes[key];
 		});
-		label.htmlFor = input.id;
-		label.appendChild(document.createTextNode('Datei auswählen...'));
+		if (!hidden) {
+			input.onchange = function () {
+				this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
+					', ') + ' oder ändern...' : 'Datei auswählen...'
+				label.htmlFor = input.id;
+				label.appendChild(document.createTextNode('Datei auswählen...'));
+			};
+		}
 		this.elements.add(input)
-		this.elements.add(label);
+		if (!hidden) this.elements.add(label);
 	}
 	photo() {
 		/*{
@@ -402,11 +420,11 @@ class Assembly {
 			description:'signature'
 		} */
 		const canvas = document.createElement('canvas');
-		canvas.id = 'canvas',
+		canvas.id = 'signaturecanvas',
 			this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
 		this.tile.attributes = {
-			'name':'',
+			'name': '',
 			'value': 'Unterschrift löschen',
 			'onpointerdown': 'signaturePad.clear()'
 		};
@@ -415,7 +433,7 @@ class Assembly {
 			'id': 'signature',
 			'name': 'signature'
 		};
-		this.input('hidden');
+		this.file('hidden');
 		this.signaturePad = true;
 	}
 
