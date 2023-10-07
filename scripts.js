@@ -20,13 +20,17 @@ export const api = {
 		} else _.el('growlNotif').classList.remove('show');*/
 	},
 
-	getForm: (which='template') => {
+	getForms: (which='template', ...andMore) => {
+		/*
+		get form elements from database.
+		notice only the first requested form will appear. later duplicates will be ignored.
+		*/
 		let successFn = function (data) {
 			new Assembly(data);
 		}
 		api.send('get', {
-			'request': 'getForm',
-			'content': which
+			'request': 'getForms',
+			'content': [which, ...andMore].join(',')
 		}, successFn);
 	},
 	signIn: () => {

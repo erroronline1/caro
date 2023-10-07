@@ -22,12 +22,33 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE'){
 
 elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 	switch ($payload->request){
-		case 'getForm':
-			$statement = $pdo->prepare("SELECT * FROM forms WHERE terms = :terms AND active=1 ORDER BY id DESC LIMIT 1");
-			$statement->execute(['terms'=>$payload->content]);
-			$row = $statement->fetch(PDO::FETCH_ASSOC);
-			echo $row['content'];
-		//else echo http_response_code(401);
+		case 'getForms':
+			// retrieve latest active entries according to requested names
+			$requestedNames = explode(',',dbSanitize($payload->content));
+			$statement = $pdo->prepare("SELECT * FROM forms WHERE id IN (SELECT MAX(id) FROM forms WHERE name IN ('". implode("','", $requestedNames)."') AND active=1 GROUP BY name)");
+			$statement->execute();
+			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+			// order by $payload->content sequence with anonymous function passing $payload into scope
+			usort($result, function ($a, $b) use ($requestedNames){
+				if (array_search($a['name'], $requestedNames) <= array_search($b['name'], $requestedNames)) return -1;
+				return 1;
+				});
+			// rebuild result array
+			$form = false;
+			$content = [];
+			foreach($result as $key => $val) {
+				$currentcontent=json_decode($val['content'], true);
+				if (array_key_exists('form', $currentcontent)) $form = array_merge(gettype($form)==='boolean'? []: $form, $currentcontent['form']);
+				array_push($content, ...$currentcontent['content']);
+			}
+			// reassign $result
+			$result=[];
+			if ($form!==false) $result['form'] = $form;
+			$result['content'] = $content;
+			echo json_encode($result);
+			break;
+		default:
+			echo http_response_code(400);
 		}
 	//	else echo http_response_code(401);
 }
