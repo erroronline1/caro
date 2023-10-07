@@ -6,7 +6,7 @@
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
 	--darkshadow: rgba(76, 86, 106, .5);
-	--red:rgb(191, 97, 106);
+	--red: rgb(191, 97, 106);
 }
 
 * {
@@ -59,7 +59,8 @@ a,
 textarea,
 select,
 input[type=file]+label,
-canvas {
+canvas,
+video {
 	text-decoration: none;
 	background-color: transparent;
 	border: none;
@@ -69,7 +70,13 @@ canvas {
 	font-size: 1em;
 }
 
-canvas {
+video {
+	height: 0;
+	transition: ease .3s;
+}
+
+canvas,
+video.active {
 	height: 13em;
 }
 
@@ -221,8 +228,8 @@ fieldset>label {
 
 /*************************** decorators ******************************/
 
-.alert{
-	border:1px solid var(--red);
+.alert {
+	border: 1px solid var(--red);
 }
 
 .custominput {
@@ -344,4 +351,8 @@ fieldset>label {
 
 [data-type=signature]::before {
 	background-image: url("media/signature.svg");
+}
+
+[data-type=qr]::before {
+	background-image: url("media/qrcode.svg");
 }
