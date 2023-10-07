@@ -1,3 +1,6 @@
+import QrScanner from './libraries/qr-scanner.min.js';
+import SignaturePad from './libraries/signature_pad.umd.js';
+
 var multiplecontainerID = 0;
 var ElementID = 0;
 
@@ -42,7 +45,7 @@ function prepareForm() {
 	return;
 };
 
-class Assembly {
+export default class Assembly {
 	/* 
 	assembles forms and screen elements.
 	deepest nesting of input object is three levels
@@ -187,6 +190,7 @@ class Assembly {
 		}*/
 		const input = document.createElement('input');
 		input.type = type;
+		input.id = getNextElementID();
 		if (this.tile.description) input.name = this.tile.description;
 
 		let execute;
@@ -199,6 +203,7 @@ class Assembly {
 			} else input[key] = this.tile.attributes[key];
 		});
 		this.elements.add(input);
+		return input.id;
 	}
 	textinput() {
 		this.input('text');
@@ -420,8 +425,8 @@ class Assembly {
 			description:'signature'
 		} */
 		const canvas = document.createElement('canvas');
-		canvas.id = 'signaturecanvas',
-			this.elements.add(canvas);
+		canvas.id = 'signaturecanvas';
+		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
 		this.tile.attributes = {
 			'name': '',
@@ -436,5 +441,104 @@ class Assembly {
 		this.file('hidden');
 		this.signaturePad = true;
 	}
+	qr() {
+		/*{
+			type: 'qr',
+			description:'access credentials' (e.g.)
+		} */
+		const stream = document.createElement('video');
+		stream.id = 'qrscanner';
 
+		this.elements.add(stream);
+
+		const inputid = this.input('text');
+		//attributes are processed already, therefore they can be reassigned
+		this.tile.attributes = {
+			'name': '',
+			'value': 'start scan',
+			'onpointerdown': "initialize_qrScanner('" + stream.id + "','" + inputid + "')"
+		};
+		this.input('button');
+	}
+}
+
+
+var canvas = null,
+	signaturePad = null;
+
+function initialize_SignaturePad() {
+	canvas = document.getElementById("signaturecanvas");
+	signaturePad = new SignaturePad(canvas, {
+		// It's Necessary to use an opaque color when saving image as JPEG;
+		// this option can be omitted if only saving as PNG or SVG
+		//backgroundColor: 'rgb(255, 255, 255)'
+	});
+	// On mobile devices it might make more sense to listen to orientation change,
+	// rather than window resize events.
+	window.onresize = resizeSignatureCanvas;
+	resizeSignatureCanvas();
+
+}
+
+// Adjust canvas coordinate space taking into account pixel ratio,
+// to make it look crisp on mobile devices.
+// This also causes canvas to be cleared.
+function resizeSignatureCanvas() {
+	// When zoomed out to less than 100%, for some very strange reason,
+	// some browsers report devicePixelRatio as less than 1
+	// and only part of the canvas is cleared then.
+	const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+	// This part causes the canvas to be cleared
+	canvas.width = canvas.offsetWidth * ratio;
+	canvas.height = canvas.offsetHeight * ratio;
+	canvas.getContext("2d").scale(ratio, ratio);
+
+	// This library does not listen for canvas changes, so after the canvas is automatically
+	// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+	// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+	// that the state of this library is consistent with visual state of the canvas, you
+	// have to clear it manually.
+	signaturePad.clear();
+
+	// If you want to keep the drawing on resize instead of clearing it you can reset the data.
+	signaturePad.fromData(signaturePad.toData());
+}
+
+// One could simply use Canvas#toBlob method instead, but it's just to show
+// that it can be done using result of SignaturePad#toDataURL.
+function dataURLToBlob(dataURL) {
+	// Code taken from https://github.com/ebidel/filer.js
+	const parts = dataURL.split(';base64,');
+	const contentType = parts[0].split(":")[1];
+	const raw = window.atob(parts[1]);
+	const rawLength = raw.length;
+	const uInt8Array = new Uint8Array(rawLength);
+
+	for (let i = 0; i < rawLength; ++i) {
+		uInt8Array[i] = raw.charCodeAt(i);
+	}
+
+	return new Blob([uInt8Array], {
+		type: contentType
+	});
+}
+
+function initialize_qrScanner(videostream, resultTo) {
+	const stream = document.getElementById(videostream);
+	stream.classList.add('active');
+	const scanner = new QrScanner(
+		stream,
+		result => {
+			document.getElementById(resultTo).value = result.data;
+			scanner.stop();
+			scanner.destroy();
+			stream.classList.remove('active');
+		}, {
+			highlightScanRegion: true
+			/* your options or returnDetailedScanResult: true if you're not specifying any other options */
+		},
+	);
+	alert(JSON.stringify(scanner));
+	scanner.start();//.then((r)=>{alert(r);stream.classList.add('active');});
 }
