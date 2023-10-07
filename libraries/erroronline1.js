@@ -8,7 +8,7 @@ String.prototype.contains = function (values) {
 	return _.contains(this, values);
 } // to use intitive with string
 
-const _ = {
+export const _ = {
 	el: function (x) { // shortcut for readabilities sake: _.el('element')
 		return document.getElementById(x);
 	},

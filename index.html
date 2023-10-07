@@ -4,11 +4,6 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-	<script type="text/javascript" src="libraries/signature_pad.umd.js"></script>
-	<script type="text/javascript" src="libraries/signature_pad.stripped_handler.js"></script>
-	<script type="text/javascript" src="libraries/erroronline1.js"></script>
-	<script type="text/javascript" src="scripts.js"></script>
-	<script type="text/javascript" src="assembly.js"></script>
 	<link type="text/css" href="style.css" rel="stylesheet" />
 </head>
 
@@ -19,7 +14,8 @@
 	<main id="main">
 
 	</main>
-	<script>
+	<script type="module">
+		import {api} from './scripts.js';
 		api.getForm('template');
 	</script>
 

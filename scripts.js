@@ -1,4 +1,7 @@
-const api = {
+import Assembly from './assembly.js';
+import {_} from './libraries/erroronline1.js';
+
+export const api = {
 	send: (method, payload, successFn, errorFn = null, form_data = false) => {
 		_.api(method, 'api/api.php', payload, form_data)
 			.then(data => {
