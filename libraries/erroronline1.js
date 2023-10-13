@@ -55,13 +55,13 @@ export const _ = {
 	},
 	dragNdrop: {
 		// add following to draggable elements:
-		// draggable="true" ondragstart="dragndrop.drag(event)" ondragover="dragndrop.allowDrop(event)" ondrop="dragndrop.drop(event,this)"
+		// draggable="true" ondragstart="_.dragNdrop.drag(event)" ondragover="_.dragNdrop.allowDrop(event)" ondrop="_.dragNdrop.drop(event,this)"
 		// or call following method passing the object itself (not just the id)
 		add2DragCollection: function (element) {
 			element.setAttribute('draggable', 'true');
-			element.setAttribute('ondragstart', '_.dragndrop.drag(event)');
-			element.setAttribute('ondragover', '_.dragndrop.allowDrop(event)');
-			element.setAttribute('ondrop', '_.dragndrop.drop(event,this)');
+			element.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
+			element.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
+			element.setAttribute('ondrop', '_.dragNdrop.drop(event,this)');
 		},
 		allowDrop: function (evnt) {
 			evnt.preventDefault();
