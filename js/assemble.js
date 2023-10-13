@@ -1,8 +1,8 @@
-import QrScanner from './libraries/qr-scanner.min.js';
-import SignaturePad from './libraries/signature_pad.umd.js';
+import QrScanner from '../libraries/qr-scanner.min.js';
+import SignaturePad from '../libraries/signature_pad.umd.js';
 import {
 	_
-} from './libraries/erroronline1.js';
+} from '../libraries/erroronline1.js';
 
 export var multiplecontainerID = 0;
 export var ElementID = 0;
@@ -46,7 +46,7 @@ function prepareForm() {
 	return;
 };
 
-export class Assembly {
+export class Assemble {
 	/* 
 	assembles forms and screen elements.
 	deepest nesting of input object is three levels
@@ -104,7 +104,10 @@ export class Assembly {
 		if (this.signaturePad) {
 			initialize_SignaturePad();
 		}
-
+		return {
+			id: this.container.id,
+			content: this.content
+		};
 	}
 
 	processContent() {
@@ -396,14 +399,14 @@ export class Assembly {
 			ul = document.createElement('ul');
 		Object.keys(this.tile.content).forEach(link => {
 			let li = document.createElement('li'),
-				a = document.createElement('a'),
-				execute;
+				a = document.createElement('a');
 			Object.keys(this.tile.content[link]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
 					a[attribute] = new Function(this.tile.content[link][attribute]);
 				} else a[attribute] = this.tile.content[link][attribute];
 			})
+			if (!Object.keys(a).includes('href')) a.href=link;
 			a.appendChild(document.createTextNode(link));
 			li.appendChild(a);
 			ul.appendChild(li);
