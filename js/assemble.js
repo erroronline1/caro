@@ -15,6 +15,8 @@ export function getNextElementID() {
 	return 'elementID' + ++ElementID;
 }
 
+const events=['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'];
+
 export const scroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
 	setTimeout(() => {
@@ -70,7 +72,7 @@ export class Assemble {
 		this.container = null;
 	}
 
- initializeContainer() {
+	initializeContainer() {
 		if (this.form) {
 			this.container = document.createElement('form');
 			this.container.method = 'post';
@@ -79,7 +81,7 @@ export class Assemble {
 				return prepareForm()
 			};
 			Object.keys(this.form).forEach(key => {
-				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+				if (events.includes(key)) {
 					this.container[key] = new Function(this.form[key]);
 				} else this.container.setAttribute(key, this.form[key]);
 			});
@@ -207,7 +209,7 @@ export class Assemble {
 		if (this.tile.description) input.name = this.tile.description;
 
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+			if (events.includes(key)) {
 				input[key] = new Function(this.tile.attributes[key]);
 			} else input.setAttribute(key, this.tile.attributes[key]);
 		});
@@ -299,15 +301,14 @@ export class Assemble {
 		const select = document.createElement('select');
 		select.name = this.tile.description;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+			if (events.includes(key)) {
 				select[key] = new Function(this.tile.attributes[key]);
 			} else select[key] = this.tile.attributes[key];
 		});
 		Object.keys(this.tile.content).forEach(key => {
 			let option = document.createElement('option');
 			Object.keys(this.tile.content[key]).forEach(attribute => {
-				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
-						attribute) > -1) {
+				if (events.includes(attribute)) {
 					option[attribute] = new Function(this.tile.content[key][attribute]);
 				} else option[attribute] = this.tile.content[key][attribute];
 			});
@@ -329,7 +330,7 @@ export class Assemble {
 		const textarea = document.createElement('textarea');
 		textarea.name = this.tile.description;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+			if (events.includes(key)) {
 				textarea[key] = new Function(this.tile.attributes[key]);
 			} else if (key !== 'value') textarea[key] = this.tile.attributes[key];
 		});
@@ -368,8 +369,7 @@ export class Assemble {
 			span.classList = 'checkmark';
 			label.appendChild(document.createTextNode(checkbox));
 			Object.keys(this.tile.content[checkbox]).forEach(attribute => {
-				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
-						attribute) > -1) {
+				if (events.includes(attribute)) {
 					input[attribute] = new Function(this.tile.content[checkbox][attribute]);
 				} else input[attribute] = this.tile.content[checkbox][attribute];
 			});
@@ -401,12 +401,11 @@ export class Assemble {
 			let li = document.createElement('li'),
 				a = document.createElement('a');
 			Object.keys(this.tile.content[link]).forEach(attribute => {
-				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
-						attribute) > -1) {
+				if (events.includes(attribute)) {
 					a[attribute] = new Function(this.tile.content[link][attribute]);
 				} else a[attribute] = this.tile.content[link][attribute];
 			})
-			if (!Object.keys(a).includes('href')) a.href=link;
+			if (!a.href)				a.href = link;
 			a.appendChild(document.createTextNode(link));
 			li.appendChild(a);
 			ul.appendChild(li);
