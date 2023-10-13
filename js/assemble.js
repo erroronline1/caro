@@ -15,7 +15,7 @@ export function getNextElementID() {
 	return 'elementID' + ++ElementID;
 }
 
-const events=['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'];
+const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'];
 
 export const scroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
@@ -140,11 +140,8 @@ export class Assemble {
 		fieldset.append(...this.elements);
 		section.appendChild(fieldset);
 
-		if (this.tile.type==='trash'){
-			section.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
-			section.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
-			section.setAttribute('ondrop', '_.dragNdrop.dropdelete(event)');
-		}
+		this.composer_trash(section);
+
 		return section;
 	}
 	multiple(classList = null) {
@@ -411,7 +408,7 @@ export class Assemble {
 					a[attribute] = new Function(this.tile.content[link][attribute]);
 				} else a[attribute] = this.tile.content[link][attribute];
 			})
-			if (!a.href)				a.href = link;
+			if (!a.href) a.href = link;
 			a.appendChild(document.createTextNode(link));
 			li.appendChild(a);
 			ul.appendChild(li);
@@ -465,7 +462,12 @@ export class Assemble {
 		this.input('button');
 	}
 
-	trash(){}
+	trash() {
+		// empty method but necessary to display the delete-area
+	}
+	composer_trash(section) {
+		// empty here, overwritten by extending class. don't know how to implement this cleaner. 
+	}
 }
 
 

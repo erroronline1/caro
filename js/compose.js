@@ -1,7 +1,4 @@
 import {
-	multiplecontainerID,
-	ElementID,
-	getNextContainerID,
 	getNextElementID,
 	Assemble
 } from './assemble.js';
@@ -9,7 +6,7 @@ import {
 	_
 } from '../libraries/erroronline1.js';
 
-var newFormElements = [];
+export var newFormElements = [];
 const cloneItems = "for (let i = 0; i < 2; i++){let clone = this.previousElementSibling.previousElementSibling.cloneNode(); clone.value=''; clone.id = getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
 const assembleNewElementCallback = (e) => {
@@ -117,6 +114,23 @@ export class Compose extends Assemble {
 		}
 	}
 
+	composer_trash(section){
+		if (this.tile.type === 'trash') {
+			section.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
+			section.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
+			section.addEventListener('drop', (evnt) => {
+				const data = evnt.dataTransfer.getData("text");
+				document.getElementById(data).remove();
+				for (let i = 0; i < newFormElements.length; i++) {
+					if (newFormElements[i].container.id === data) {
+						newFormElements.splice(i, 1);
+						break;
+					}
+				}
+			});
+		}
+		return section;
+	}
 
 	compose_text() {
 		this.tile = {
