@@ -1,18 +1,21 @@
 import QrScanner from './libraries/qr-scanner.min.js';
 import SignaturePad from './libraries/signature_pad.umd.js';
+import {
+	_
+} from './libraries/erroronline1.js';
 
-var multiplecontainerID = 0;
-var ElementID = 0;
+export var multiplecontainerID = 0;
+export var ElementID = 0;
 
-function getNextContainerID() {
+export function getNextContainerID() {
 	return 'containerID' + ++multiplecontainerID;
 }
 
-function getNextElementID() {
+export function getNextElementID() {
 	return 'elementID' + ++ElementID;
 }
 
-const scroller = (e) => {
+export const scroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
 	setTimeout(() => {
 		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
@@ -24,10 +27,8 @@ const scroller = (e) => {
 	}, 500)
 };
 
-
 function prepareForm() {
 	/* check non typical input fields for presence of required content */
-
 	const signature = document.getElementById('signaturecanvas');
 	if (signature) {
 		if (signaturePad.isEmpty()) {
@@ -45,7 +46,7 @@ function prepareForm() {
 	return;
 };
 
-export default class Assembly {
+export class Assembly {
 	/* 
 	assembles forms and screen elements.
 	deepest nesting of input object is three levels
@@ -61,41 +62,49 @@ export default class Assembly {
 	names are set according to description. 
 		*/
 	constructor(setup) {
+		this.setup = setup;
 		this.content = setup.content;
+		this.form = setup.form;
 		this.multipleContainers = [];
 		this.multiplecontainerID = null;
-		let container;
+		this.container = null;
+	}
 
-		if (setup.form) {
-			container = document.createElement('form');
-			container.method = 'post';
-			container.enctype = 'multipart/form-data';
-			container.onsubmit = () => {
+ initializeContainer() {
+		if (this.form) {
+			this.container = document.createElement('form');
+			this.container.method = 'post';
+			this.container.enctype = 'multipart/form-data';
+			this.container.onsubmit = () => {
 				return prepareForm()
 			};
-			Object.keys(setup.form).forEach(key => {
-				container[key] = setup.form[key];
+			Object.keys(this.form).forEach(key => {
+				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
+					this.container[key] = new Function(this.form[key]);
+				} else this.container.setAttribute(key, this.form[key]);
 			});
+
 			this.content.push([{
 				type: 'submit',
 				attributes: {
 					value: 'absenden'
 				}
 			}]);
-		} else container = document.createElement('div');
+		} else this.container = document.createElement('div');
 
 		this.assembledTiles = new Set();
 		this.processContent();
 
-		container.append(...this.assembledTiles);
-
-		document.getElementById('main').insertAdjacentElement('beforeend', container);
+		this.container.append(...this.assembledTiles);
+		document.getElementById('main').insertAdjacentElement('beforeend', this.container);
 		for (let i = 0; i < this.multipleContainers.length; i++) {
 			document.getElementById(this.multipleContainers[i]).addEventListener('scroll', scroller);
 		}
+
 		if (this.signaturePad) {
 			initialize_SignaturePad();
 		}
+
 	}
 
 	processContent() {
@@ -180,6 +189,7 @@ export default class Assembly {
 		}
 		this.elements.add(div);
 	}
+
 	input(type) {
 		/*{
 			type: 'textinput',
@@ -193,14 +203,10 @@ export default class Assembly {
 		input.id = getNextElementID();
 		if (this.tile.description) input.name = this.tile.description;
 
-		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.tile.attributes[key]; // because of this scope
-				input[key] = () => {
-					eval(execute)
-				};
-			} else input[key] = this.tile.attributes[key];
+				input[key] = new Function(this.tile.attributes[key]);
+			} else input.setAttribute(key, this.tile.attributes[key]);
 		});
 		this.elements.add(input);
 		return input.id;
@@ -218,7 +224,7 @@ export default class Assembly {
 		this.input('submit');
 	}
 
-	file(hidden = false) {
+	file() {
 		/*{
 			type: 'file',
 			description: 'file upload',
@@ -234,17 +240,17 @@ export default class Assembly {
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			input[key] = this.tile.attributes[key];
 		});
-		if (!hidden) {
-			input.onchange = function () {
-				this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
-					', ') + ' oder ändern...' : 'Datei auswählen...'
-				label.htmlFor = input.id;
-				label.appendChild(document.createTextNode('Datei auswählen...'));
-			};
+		input.onchange = function () {
+			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
+				', ') + ' oder ändern...' : 'Datei auswählen...'
 		}
+		label.htmlFor = input.id;
+		label.appendChild(document.createTextNode('Datei auswählen...'));
+
 		this.elements.add(input)
-		if (!hidden) this.elements.add(label);
+		this.elements.add(label);
 	}
+
 	photo() {
 		/*{
 			type: 'photo',
@@ -272,6 +278,7 @@ export default class Assembly {
 		this.elements.add(input)
 		this.elements.add(label);
 	}
+
 	select() {
 		/*{
 			type: 'select',
@@ -288,13 +295,9 @@ export default class Assembly {
 		}*/
 		const select = document.createElement('select');
 		select.name = this.tile.description;
-		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.tile.attributes[key]; // because of this scope
-				select[key] = () => {
-					eval(execute)
-				};
+				select[key] = new Function(this.tile.attributes[key]);
 			} else select[key] = this.tile.attributes[key];
 		});
 		Object.keys(this.tile.content).forEach(key => {
@@ -302,10 +305,7 @@ export default class Assembly {
 			Object.keys(this.tile.content[key]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.tile.content[key][attribute];
-					option[attribute] = () => {
-						eval(execute)
-					};
+					option[attribute] = new Function(this.tile.content[key][attribute]);
 				} else option[attribute] = this.tile.content[key][attribute];
 			});
 			option.appendChild(document.createTextNode(key));
@@ -313,6 +313,7 @@ export default class Assembly {
 		});
 		this.elements.add(select)
 	}
+
 	textarea() {
 		/*{
 			type: 'textarea',
@@ -324,18 +325,15 @@ export default class Assembly {
 		}*/
 		const textarea = document.createElement('textarea');
 		textarea.name = this.tile.description;
-		let execute;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(key) > -1) {
-				execute = this.tile.attributes[key]; // because of this scope
-				textarea[key] = () => {
-					eval(execute)
-				};
+				textarea[key] = new Function(this.tile.attributes[key]);
 			} else if (key !== 'value') textarea[key] = this.tile.attributes[key];
 		});
-		if ('value' in this.tile.attributes) textarea.appendChild(document.createTextNode(this.tile.attributes.value));
+		if (this.tile.attributes && 'value' in this.tile.attributes) textarea.appendChild(document.createTextNode(this.tile.attributes.value));
 		this.elements.add(textarea);
 	}
+
 	checkbox(radio = null) {
 		/*{
 			type: 'checkbox', or 'radio'
@@ -369,10 +367,7 @@ export default class Assembly {
 			Object.keys(this.tile.content[checkbox]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.tile.content[checkbox][attribute]; // because of this scope
-					input[attribute] = () => {
-						eval(execute)
-					};
+					input[attribute] = new Function(this.tile.content[checkbox][attribute]);
 				} else input[attribute] = this.tile.content[checkbox][attribute];
 			});
 			label.appendChild(input);
@@ -406,10 +401,7 @@ export default class Assembly {
 			Object.keys(this.tile.content[link]).forEach(attribute => {
 				if (['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'].indexOf(
 						attribute) > -1) {
-					execute = this.tile.content[link][attribute] // because of this scope
-					a[attribute] = () => {
-						eval(execute);
-					};
+					a[attribute] = new Function(this.tile.content[link][attribute]);
 				} else a[attribute] = this.tile.content[link][attribute];
 			})
 			a.appendChild(document.createTextNode(link));
@@ -419,6 +411,7 @@ export default class Assembly {
 		div.appendChild(ul)
 		this.elements.add(div);
 	}
+
 	signature() {
 		/*{
 			type: 'signature',
@@ -435,12 +428,15 @@ export default class Assembly {
 		};
 		this.input('button');
 		this.tile.attributes = {
+			'type': 'file',
 			'id': 'signature',
-			'name': 'signature'
+			'name': 'signature',
+			'hidden': true
 		};
-		this.file('hidden');
+		this.input('file');
 		this.signaturePad = true;
 	}
+
 	qr() {
 		/*{
 			type: 'qr',
@@ -539,6 +535,5 @@ function initialize_qrScanner(videostream, resultTo) {
 			/* your options or returnDetailedScanResult: true if you're not specifying any other options */
 		},
 	);
-	alert(JSON.stringify(scanner));
-	scanner.start();//.then((r)=>{alert(r);stream.classList.add('active');});
+	scanner.start();
 }
