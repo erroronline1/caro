@@ -10,10 +10,12 @@ import {
 } from '../libraries/erroronline1.js';
 
 var newFormElements = [];
+const cloneItems = "for (let i = 0; i < 2; i++){let clone = this.previousElementSibling.previousElementSibling.cloneNode(); clone.value=''; clone.id = getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
 const assembleNewElementCallback = (e) => {
 	let sibling = e.target.previousElementSibling,
-		property, value, element = {};
+		property, value, element = {},
+		attributes = {};
 	do {
 		if (sibling.type === 'button') {
 			sibling = sibling.previousElementSibling;
@@ -27,28 +29,36 @@ const assembleNewElementCallback = (e) => {
 			element['type'] = sibling.name.match(/(_(.+)-)/)[2];
 			property = sibling.name.match(/(-(.+)$)/)[2];
 			value = sibling.value;
-			if (['links','checkbox', 'radio','select'].includes(element['type'])) {
+			if (['links', 'checkbox', 'radio', 'select'].includes(element['type'])) {
 				if (property === 'description')
 					if (value) element[property] = value;
 					else return;
+				if (property === 'attributes' && value) {
+					try {
+						attributes = JSON.parse(value);
+					} catch (err) {
+						return
+					};
+					sibling = sibling.previousElementSibling;
+					continue;
+				}
 				if (property === 'content' && value) {
 					if (element.content === undefined) element.content = {};
-					element.content[value] = {};
+					element.content[value] = attributes;
 				}
 			} else {
 				if (property === 'attributes' && value.length) try {
 					value = JSON.parse(value);
 				} catch {
-					return
+					return;
 				};
 				if (value) element[property] = value;
 			}
 		}
-		console.log(element);
 		sibling = sibling.previousElementSibling;
 	} while (sibling !== undefined && sibling != null && sibling.localName !== 'legend');
 
-	if (element.content) {
+	if (typeof element.content === 'object') {
 		// this is really bad. reverses the object order. this is not supposed to be done, but whatever. 
 		let contentClone = {},
 			keys = Object.keys(element.content);
@@ -158,7 +168,7 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_" + type.replace(/\s+/g, '') + "-attributes",
-				"placeholder": "add advanced attributes (json)"
+				"placeholder": "add advanced attributes {json}"
 			}
 		};
 		this.textinput();
@@ -243,10 +253,18 @@ export class Compose extends Assemble {
 		};
 		this.textinput();
 		this.tile = {
+			"type": "textinput",
+			"attributes": {
+				"name": "compose_select-attributes",
+				"placeholder": "add advanced attributes {json}"
+			}
+		};
+		this.textinput();
+		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
 				"value": "➕ add selection item",
-				"onpointerdown": "let clone=this.previousElementSibling.cloneNode(); clone.id=getNextElementID(); this.parentNode.insertBefore(clone, this)"
+				"onpointerdown": cloneItems
 			}
 		};
 		this.input('button');
@@ -274,7 +292,7 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_textarea-attributes",
-				"placeholder": "add advanced attributes (json)"
+				"placeholder": "add advanced attributes {json}"
 			}
 		};
 		this.textinput();
@@ -307,10 +325,18 @@ export class Compose extends Assemble {
 		};
 		this.textinput();
 		this.tile = {
+			"type": "textinput",
+			"attributes": {
+				"name": "compose_checkbox-attributs",
+				"placeholder": "add advanced attributes {json}"
+			}
+		};
+		this.textinput();
+		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
 				"value": "➕ add selection item",
-				"onpointerdown": "let clone=this.previousElementSibling.cloneNode(); clone.id=getNextElementID(); this.parentNode.insertBefore(clone, this)"
+				"onpointerdown": cloneItems
 			}
 		};
 		this.input('button');
@@ -343,10 +369,18 @@ export class Compose extends Assemble {
 		};
 		this.textinput();
 		this.tile = {
+			"type": "textinput",
+			"attributes": {
+				"name": "compose_radio-attributes",
+				"placeholder": "add advanced attributes {json}"
+			}
+		};
+		this.textinput();
+		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
 				"value": "➕ add selection item",
-				"onpointerdown": "let clone=this.previousElementSibling.cloneNode(); clone.id=getNextElementID(); this.parentNode.insertBefore(clone, this)"
+				"onpointerdown": cloneItems
 			}
 		};
 		this.input('button');
@@ -379,10 +413,18 @@ export class Compose extends Assemble {
 		};
 		this.textinput();
 		this.tile = {
+			"type": "textinput",
+			"attributes": {
+				"name": "compose_links-attributes",
+				"placeholder": "add advanced attributes {json}"
+			}
+		};
+		this.textinput();
+		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
 				"value": "➕ add link",
-				"onpointerdown": "let clone=this.previousElementSibling.cloneNode(); clone.id=getNextElementID(); this.parentNode.insertBefore(clone, this)"
+				"onpointerdown": cloneItems
 			}
 		};
 		this.input('button');
