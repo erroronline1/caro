@@ -100,12 +100,13 @@ fieldset {
 }
 
 fieldset,
-section>div:not(.container) {
+section>div:not(.container),
+[data-type=addButton]{
 	display: inline-block;
 	width: 92%;
 }
 
-section {
+section,[data-type=addButton] {
 	padding: 1em;
 	margin: 0 1em 1em 1em;
 	border: 1px solid var(--3d-border);
@@ -114,6 +115,7 @@ section {
 	box-shadow:
 		-2px -2px 6px var(--lightshadow),
 		3px 3px 6px var(--darkshadow);
+	transition: ease .2s;
 }
 
 .container>section {
@@ -185,11 +187,6 @@ h1 {
 	color: var(--foreground)
 }
 
-a:active,
-input[type=button]:active {
-	transform: translate(1px, 1px);
-}
-
 input[type=file] {
 	display: none;
 }
@@ -230,6 +227,11 @@ fieldset>label {
 
 .alert {
 	border: 1px solid var(--red);
+}
+
+input[type=text],
+input[type=number] {
+	border-bottom: 1px solid var(--foreground);
 }
 
 .custominput {
@@ -295,6 +297,16 @@ fieldset>label {
 	fill: var(--foreground);
 }
 
+
+[data-type=addButton] {
+	margin-top: 2em;
+	margin-left:4em;
+}
+[data-type=addButton]:active {
+	box-shadow:
+		-1px -1px 2px var(--lightshadow),
+		0px 0px 2px var(--darkshadow);
+}
 [data-type]::before {
 	content: "";
 	display: inline-block;
@@ -355,4 +367,8 @@ fieldset>label {
 
 [data-type=qr]::before {
 	background-image: url("media/qrcode.svg");
+}
+
+[data-type=trash]::before {
+	background-image: url("media/trash-alt.svg");
 }
