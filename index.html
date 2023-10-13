@@ -15,8 +15,19 @@
 
 	</main>
 	<script type="module">
-		import {api} from './scripts.js';
-		api.getForms('qr','template', 'qr');
+		import {_} from './libraries/erroronline1.js'; 
+		window._=_;
+		import{getNextElementID} from './js/assemble.js';
+		window.getNextElementID=getNextElementID;
+		//test assembling
+		//import {api} from './scripts.js';
+		//api.getForms('qr','template', 'qr');
+
+		//test composing
+		import {assembleNewForm} from './js/compose.js';
+		window.assembleNewForm=assembleNewForm;
+		import {create} from './scripts.js';
+		create();
 	</script>
 
 </body>
