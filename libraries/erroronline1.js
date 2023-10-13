@@ -71,9 +71,12 @@ export const _ = {
 		},
 		drop: function (evnt, that) {
 			evnt.preventDefault();
-			var data = evnt.dataTransfer.getData("text");
+			const data = evnt.dataTransfer.getData("text");
 			document.getElementById(data).parentNode.insertBefore(document.getElementById(data), that);
-		}
+		},
+		dropdelete: function(evnt){
+			const data = evnt.dataTransfer.getData("text");
+			document.getElementById(data).remove();}
 	},
 	getInputs: function (usecase, form_data = false) {
 		let fields;

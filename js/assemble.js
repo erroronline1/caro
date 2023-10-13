@@ -139,6 +139,12 @@ export class Assemble {
 		const fieldset = this.fieldset();
 		fieldset.append(...this.elements);
 		section.appendChild(fieldset);
+
+		if (this.tile.type==='trash'){
+			section.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
+			section.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
+			section.setAttribute('ondrop', '_.dragNdrop.dropdelete(event)');
+		}
 		return section;
 	}
 	multiple(classList = null) {
@@ -458,6 +464,8 @@ export class Assemble {
 		};
 		this.input('button');
 	}
+
+	trash(){}
 }
 
 
