@@ -146,12 +146,12 @@ export class Assemble {
 	}
 	multiple(classList = null) {
 		const section = document.createElement('section'),
-			container = document.createElement('div'),
+			container = document.createElement('article'),
 			indicators = document.createElement('div');
 		this.multiplecontainerID = getNextContainerID();
 		this.multipleContainers.push(this.multiplecontainerID);
 		if (classList) section.classList = classList;
-		container.classList = 'container inset';
+		container.classList = 'inset';
 		container.id = this.multiplecontainerID;
 		container.append(...this.multipletiles);
 		section.appendChild(container);

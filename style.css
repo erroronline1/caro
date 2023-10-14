@@ -100,13 +100,15 @@ fieldset {
 }
 
 fieldset,
-section>div:not(.container),
-[data-type=addButton]{
+section>div,
+fieldset>div,
+[data-type=addButton] {
 	display: inline-block;
 	width: 92%;
 }
 
-section,[data-type=addButton] {
+section,
+[data-type=addButton] {
 	padding: 1em;
 	margin: 0 1em 1em 1em;
 	border: 1px solid var(--3d-border);
@@ -118,7 +120,7 @@ section,[data-type=addButton] {
 	transition: ease .2s;
 }
 
-.container>section {
+article>section {
 	width: 100%;
 	padding-top: 1em;
 	padding-bottom: 1em;
@@ -138,12 +140,6 @@ div>[data-type] {
 	padding-left: 1.5em;
 }
 
-.collapsed {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
 .expanded {
 	white-space: unset;
 	overflow: auto;
@@ -161,7 +157,7 @@ section>svg {
 		inset 3px 3px 5px var(--darkshadow);
 }
 
-.container {
+article {
 	border: 1px solid var(--3d-border);
 	border-radius: 1.5em;
 	display: flex;
@@ -299,14 +295,15 @@ input[type=number] {
 
 
 [data-type=addButton] {
-	margin-top: 2em;
-	margin-left:4em;
+	margin: 1em 0 0 0;
 }
+
 [data-type=addButton]:active {
 	box-shadow:
 		-1px -1px 2px var(--lightshadow),
 		0px 0px 2px var(--darkshadow);
 }
+
 [data-type]::before {
 	content: "";
 	display: inline-block;
@@ -315,6 +312,10 @@ input[type=number] {
 	vertical-align: top;
 	background-size: cover;
 	margin-right: 1em;
+}
+
+[draggable=true]:active {
+	cursor: move;
 }
 
 [data-type=text]::before {
