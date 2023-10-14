@@ -114,7 +114,7 @@ export class Compose extends Assemble {
 		}
 	}
 
-	composer_trash(section){
+	composer_add_trash(section){
 		if (this.tile.type === 'trash') {
 			section.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
 			section.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
@@ -128,6 +128,7 @@ export class Compose extends Assemble {
 					}
 				}
 			});
+			section.classList.add('inset');
 		}
 		return section;
 	}
@@ -151,13 +152,6 @@ export class Compose extends Assemble {
 			}
 		};
 		this.textarea();
-		this.tile = {
-			"type": "checkbox",
-			"content": {
-				"collapsed": {}
-			}
-		}
-		this.checkbox();
 		// due to the assembler, description and type (for icon) has to be in the last element
 		this.tile = {
 			"description": "create an informative text block",
@@ -249,11 +243,14 @@ export class Compose extends Assemble {
 		};
 		this.createButtons.push(this.input('button'));
 	}
-	compose_select() {
+
+	compose_multilist(type){
+		/*
+		type{type, description, additem, addblock}*/
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_select-description",
+				"name": "compose_"+type.type+"-description",
 				"placeholder": "add description"
 			}
 		};
@@ -261,7 +258,7 @@ export class Compose extends Assemble {
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_select-content",
+				"name": "compose_"+type.type+"-content",
 				"placeholder": "add item"
 			}
 		};
@@ -269,7 +266,7 @@ export class Compose extends Assemble {
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_select-attributes",
+				"name": "compose_"+type.type+"-attributes",
 				"placeholder": "add advanced attributes {json}"
 			}
 		};
@@ -277,22 +274,36 @@ export class Compose extends Assemble {
 		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add selection item",
+				"value": "➕ add "+type.additem+" item",
 				"onpointerdown": cloneItems
 			}
 		};
 		this.input('button');
 		// due to the assembler, description and type (for icon) has to be in the last element
 		this.tile = {
-			"description": "create a dropdown block",
-			"type": "checkbox",
+			"description": type.description,
+			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add dropdown block"
+				"value": "➕ add "+type.addblock+" block"
 			}
 		};
 		this.createButtons.push(this.input('button'));
+
 	}
+	compose_select() {
+		this.compose_multilist({type:'select', description:'create a dropdown block', additem:'selection', addblock:'dropdown'});
+	}
+	compose_checkbox() {
+		this.compose_multilist({type:'checkbox', description:'create a multiple selection block', additem:'selection', addblock:'multiple selection'});
+	}
+	compose_radio() {
+		this.compose_multilist({type:'radio', description:'create a single selection block', additem:'selection', addblock:'single selection'});
+	}
+	compose_links() {
+		this.compose_multilist({type:'links', description:'create a link block', additem:'link', addblock:'link'});
+	}
+
 	compose_textarea() {
 		this.tile = {
 			"type": "textinput",
@@ -317,138 +328,6 @@ export class Compose extends Assemble {
 			"attributes": {
 				"data-type": "addButton",
 				"value": "➕ add multi line text input"
-			}
-		};
-		this.createButtons.push(this.input('button'));
-	}
-	compose_checkbox() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_checkbox-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_checkbox-content",
-				"placeholder": "add item"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_checkbox-attributs",
-				"placeholder": "add advanced attributes {json}"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add selection item",
-				"onpointerdown": cloneItems
-			}
-		};
-		this.input('button');
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a multiple selection block",
-			"type": "checkbox",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add multiple selection block"
-			}
-		};
-		this.createButtons.push(this.input('button'));
-	}
-	compose_radio() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_radio-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_radio-content",
-				"placeholder": "add item"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_radio-attributes",
-				"placeholder": "add advanced attributes {json}"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add selection item",
-				"onpointerdown": cloneItems
-			}
-		};
-		this.input('button');
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a single selection block",
-			"type": "radio",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add single selection block"
-			}
-		};
-		this.createButtons.push(this.input('button'));
-	}
-	compose_links() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_links-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_links-content",
-				"placeholder": "add link"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_links-attributes",
-				"placeholder": "add advanced attributes {json}"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add link",
-				"onpointerdown": cloneItems
-			}
-		};
-		this.input('button');
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a link block",
-			"type": "links",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add link block"
 			}
 		};
 		this.createButtons.push(this.input('button'));
