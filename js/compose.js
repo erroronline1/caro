@@ -163,11 +163,14 @@ export class Compose extends Assemble {
 		};
 		this.createButtons.push(this.input('button'));
 	}
-	compose_input(type, description) {
+
+	compose_input(type) {
+		/* type{type, description, addblock} */
+
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_" + type.replace(/\s+/g, '') + "-description",
+				"name": "compose_" + type.type + "-description",
 				"placeholder": "add description"
 			}
 		};
@@ -175,78 +178,41 @@ export class Compose extends Assemble {
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_" + type.replace(/\s+/g, '') + "-attributes",
+				"name": "compose_" + type.type + "-attributes",
 				"placeholder": "add advanced attributes {json}"
 			}
 		};
 		this.textinput();
 		// due to the assembler, description and type (for icon) has to be in the last element
 		this.tile = {
-			"description": description,
-			"type": type.replace(/\s+/g, ''),
+			"description": type.description,
+			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add " + type
+				"value": "➕ add " + type.addblock
 			}
 		};
 		this.createButtons.push(this.input('button'));
 	}
 	compose_textinput() {
-		this.compose_input('text input', 'create a single line text input');
+		this.compose_input({type:'text', description:'create a single line text input', addblock:'text input'});
 	}
 	compose_numberinput() {
-		this.compose_input('number input', 'create a number input');
+		this.compose_input({type:'number', description:'create a number input',addblock:'number input'});
 	}
 	compose_dateinput() {
-		this.compose_input('date input', 'create a date input');
+		this.compose_input({type:'date', description:'create a date input',addblock:'date input'});
 	}
 	compose_submit() {
-		this.compose_input('submit');
+		this.compose_input({type:'submit'});
 	}
-	compose_file() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_file-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a file upload",
-			"type": "file",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add file upload"
-			}
-		};
-		this.createButtons.push(this.input('button'));
-	}
-	compose_photo() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_photo-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a photo upload",
-			"type": "photo",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add photo upload"
-			}
-		};
-		this.createButtons.push(this.input('button'));
+	compose_textarea(){
+		this.compose_input({type:'textarea', description:'create a multi line text input',addblock:'multiline text input'});
+
 	}
 
 	compose_multilist(type){
-		/*
-		type{type, description, additem, addblock}*/
+		/* type{type, description, additem, addblock} */
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
@@ -304,72 +270,37 @@ export class Compose extends Assemble {
 		this.compose_multilist({type:'links', description:'create a link block', additem:'link', addblock:'link'});
 	}
 
-	compose_textarea() {
+	compose_simpleElement(type){
+		/* type{type, description, addblock} */
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_textarea-description",
+				"name": "compose_"+type.type+"-description",
 				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_textarea-attributes",
-				"placeholder": "add advanced attributes {json}"
 			}
 		};
 		this.textinput();
 		// due to the assembler, description and type (for icon) has to be in the last element
 		this.tile = {
-			"description": "create a multi line text input",
-			"type": "textarea",
+			"description": type.description,
+			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add multi line text input"
+				"value": "➕ add "+type.addblock
 			}
 		};
 		this.createButtons.push(this.input('button'));
+	}
+	compose_file() {
+		this.compose_simpleElement({type:'file', description:'create a file upload',addblock:'file upload'});
+	}
+	compose_photo() {
+		this.compose_simpleElement({type:'photo', description:'create a photo upload',addblock:'photo upload'});
 	}
 	compose_signature() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_signature-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a signature pad",
-			"type": "signature",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add signature pad"
-			}
-		};
-		this.createButtons.push(this.input('button'));
+		this.compose_simpleElement({type:'signature', description:'create a signature pad',addblock:'signature pad'});
 	}
 	compose_qr() {
-		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_qr-description",
-				"placeholder": "add description"
-			}
-		};
-		this.textinput();
-		// due to the assembler, description and type (for icon) has to be in the last element
-		this.tile = {
-			"description": "create a qr-scanner field",
-			"type": "qr",
-			"attributes": {
-				"data-type": "addButton",
-				"value": "➕ add qr-scanner"
-			}
-		};
-		this.createButtons.push(this.input('button'));
+		this.compose_simpleElement({type:'qr', description:'create a qr-scanner field',addblock:'signature qr-scanner'});
 	}
 }
