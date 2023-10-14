@@ -106,10 +106,6 @@ export class Assemble {
 		if (this.signaturePad) {
 			initialize_SignaturePad();
 		}
-		return {
-			id: this.container.id,
-			content: this.content
-		};
 	}
 
 	processContent() {

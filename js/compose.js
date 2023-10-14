@@ -96,6 +96,31 @@ export function assembleNewForm() {
 	console.log(JSON.stringify(form));
 }
 
+
+export const dragNdrop = {
+	allowDrop: function (evnt) {
+		evnt.preventDefault();
+	},
+	drag: function (evnt) {
+		evnt.dataTransfer.setData("text", evnt.currentTarget.id)
+	},
+	drop_insertbefore: function (evnt, that) {
+		evnt.preventDefault();
+		const data = evnt.dataTransfer.getData("text");
+		document.getElementById(data).parentNode.insertBefore(document.getElementById(data), that);
+	},
+	drop_delete: function (evnt) {
+		const data = evnt.dataTransfer.getData("text");
+		for (let i = 0; i < newFormElements.length; i++) {
+			if (newFormElements[i].id === data) {
+				newFormElements.splice(i, 1);
+				break;
+			}
+		}
+		document.getElementById(data).remove();
+	}
+};
+
 export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
@@ -105,29 +130,28 @@ export class Compose extends Assemble {
 		this.initializeContainer();
 		if (this.createDraggable) {
 			this.container.id = getNextElementID();
-			_.dragNdrop.add2DragCollection(this.container);
+			this.container.setAttribute('draggable', 'true');
+			this.container.setAttribute('ondragstart', 'dragNdrop.drag(event)');
+			this.container.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
+			this.container.setAttribute('ondrop', 'dragNdrop.drop_insertbefore(event,this)');
 		}
 		if (this.createButtons.length) {
 			for (let i = 0; i < this.createButtons.length; i++) {
 				document.getElementById(this.createButtons[i]).addEventListener('pointerdown', assembleNewElementCallback);
 			}
 		}
+		return {
+			id: this.container.id,
+			content: this.content
+		};
+
 	}
 
-	composer_add_trash(section){
+	composer_add_trash(section) {
 		if (this.tile.type === 'trash') {
-			section.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
-			section.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
-			section.addEventListener('drop', (evnt) => {
-				const data = evnt.dataTransfer.getData("text");
-				document.getElementById(data).remove();
-				for (let i = 0; i < newFormElements.length; i++) {
-					if (newFormElements[i].container.id === data) {
-						newFormElements.splice(i, 1);
-						break;
-					}
-				}
-			});
+			section.setAttribute('ondragstart', 'dragNdrop.drag(event)');
+			section.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
+			section.setAttribute('ondrop', 'dragNdrop.drop_delete(event)');
 			section.classList.add('inset');
 		}
 		return section;
@@ -195,28 +219,46 @@ export class Compose extends Assemble {
 		this.createButtons.push(this.input('button'));
 	}
 	compose_textinput() {
-		this.compose_input({type:'text', description:'create a single line text input', addblock:'text input'});
+		this.compose_input({
+			type: 'textinput',
+			description: 'create a single line text input',
+			addblock: 'text input'
+		});
 	}
 	compose_numberinput() {
-		this.compose_input({type:'number', description:'create a number input',addblock:'number input'});
+		this.compose_input({
+			type: 'numberinput',
+			description: 'create a number input',
+			addblock: 'number input'
+		});
 	}
 	compose_dateinput() {
-		this.compose_input({type:'date', description:'create a date input',addblock:'date input'});
+		this.compose_input({
+			type: 'dateinput',
+			description: 'create a date input',
+			addblock: 'date input'
+		});
 	}
 	compose_submit() {
-		this.compose_input({type:'submit'});
+		this.compose_input({
+			type: 'submit'
+		});
 	}
-	compose_textarea(){
-		this.compose_input({type:'textarea', description:'create a multi line text input',addblock:'multiline text input'});
+	compose_textarea() {
+		this.compose_input({
+			type: 'textarea',
+			description: 'create a multi line text input',
+			addblock: 'multiline text input'
+		});
 
 	}
 
-	compose_multilist(type){
+	compose_multilist(type) {
 		/* type{type, description, additem, addblock} */
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_"+type.type+"-description",
+				"name": "compose_" + type.type + "-description",
 				"placeholder": "add description"
 			}
 		};
@@ -224,7 +266,7 @@ export class Compose extends Assemble {
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_"+type.type+"-content",
+				"name": "compose_" + type.type + "-content",
 				"placeholder": "add item"
 			}
 		};
@@ -232,7 +274,7 @@ export class Compose extends Assemble {
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_"+type.type+"-attributes",
+				"name": "compose_" + type.type + "-attributes",
 				"placeholder": "add advanced attributes {json}"
 			}
 		};
@@ -240,7 +282,7 @@ export class Compose extends Assemble {
 		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add "+type.additem+" item",
+				"value": "➕ add " + type.additem + " item",
 				"onpointerdown": cloneItems
 			}
 		};
@@ -251,31 +293,51 @@ export class Compose extends Assemble {
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add "+type.addblock+" block"
+				"value": "➕ add " + type.addblock + " block"
 			}
 		};
 		this.createButtons.push(this.input('button'));
 
 	}
 	compose_select() {
-		this.compose_multilist({type:'select', description:'create a dropdown block', additem:'selection', addblock:'dropdown'});
+		this.compose_multilist({
+			type: 'select',
+			description: 'create a dropdown block',
+			additem: 'selection',
+			addblock: 'dropdown'
+		});
 	}
 	compose_checkbox() {
-		this.compose_multilist({type:'checkbox', description:'create a multiple selection block', additem:'selection', addblock:'multiple selection'});
+		this.compose_multilist({
+			type: 'checkbox',
+			description: 'create a multiple selection block',
+			additem: 'selection',
+			addblock: 'multiple selection'
+		});
 	}
 	compose_radio() {
-		this.compose_multilist({type:'radio', description:'create a single selection block', additem:'selection', addblock:'single selection'});
+		this.compose_multilist({
+			type: 'radio',
+			description: 'create a single selection block',
+			additem: 'selection',
+			addblock: 'single selection'
+		});
 	}
 	compose_links() {
-		this.compose_multilist({type:'links', description:'create a link block', additem:'link', addblock:'link'});
+		this.compose_multilist({
+			type: 'links',
+			description: 'create a link block',
+			additem: 'link',
+			addblock: 'link'
+		});
 	}
 
-	compose_simpleElement(type){
+	compose_simpleElement(type) {
 		/* type{type, description, addblock} */
 		this.tile = {
 			"type": "textinput",
 			"attributes": {
-				"name": "compose_"+type.type+"-description",
+				"name": "compose_" + type.type + "-description",
 				"placeholder": "add description"
 			}
 		};
@@ -286,21 +348,38 @@ export class Compose extends Assemble {
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add "+type.addblock
+				"value": "➕ add " + type.addblock
 			}
 		};
 		this.createButtons.push(this.input('button'));
 	}
+
 	compose_file() {
-		this.compose_simpleElement({type:'file', description:'create a file upload',addblock:'file upload'});
+		this.compose_simpleElement({
+			type: 'file',
+			description: 'create a file upload',
+			addblock: 'file upload'
+		});
 	}
 	compose_photo() {
-		this.compose_simpleElement({type:'photo', description:'create a photo upload',addblock:'photo upload'});
+		this.compose_simpleElement({
+			type: 'photo',
+			description: 'create a photo upload',
+			addblock: 'photo upload'
+		});
 	}
 	compose_signature() {
-		this.compose_simpleElement({type:'signature', description:'create a signature pad',addblock:'signature pad'});
+		this.compose_simpleElement({
+			type: 'signature',
+			description: 'create a signature pad',
+			addblock: 'signature pad'
+		});
 	}
 	compose_qr() {
-		this.compose_simpleElement({type:'qr', description:'create a qr-scanner field',addblock:'signature qr-scanner'});
+		this.compose_simpleElement({
+			type: 'qr',
+			description: 'create a qr-scanner field',
+			addblock: 'signature qr-scanner'
+		});
 	}
 }
