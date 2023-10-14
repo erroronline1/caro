@@ -140,7 +140,7 @@ export class Assemble {
 		fieldset.append(...this.elements);
 		section.appendChild(fieldset);
 
-		this.composer_trash(section);
+		this.composer_add_trash(section);
 
 		return section;
 	}
@@ -183,18 +183,12 @@ export class Assemble {
 	text() {
 		/* {
 			type: 'text',
-			collapsed: true,
+			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
 		const div = document.createElement('div'),
 			content = document.createTextNode(this.tile.content);
 		div.appendChild(content);
-		if (this.tile.collapsed) {
-			div.classList = 'collapsed';
-			div.onpointerdown = function () {
-				this.classList.toggle('expanded')
-			};
-		}
 		this.elements.add(div);
 	}
 
@@ -357,8 +351,7 @@ export class Assemble {
 		Object.keys(this.tile.content).forEach(checkbox => {
 			let label = document.createElement('label'),
 				input = document.createElement('input'),
-				span = document.createElement('span'),
-				execute;
+				span = document.createElement('span');
 			if (radio) {
 				input.type = 'radio';
 				input.name = this.tile.description;
@@ -465,7 +458,7 @@ export class Assemble {
 	trash() {
 		// empty method but necessary to display the delete-area
 	}
-	composer_trash(section) {
+	composer_add_trash(section) {
 		// empty here, overwritten by extending class. don't know how to implement this cleaner. 
 	}
 }
