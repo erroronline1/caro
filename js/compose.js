@@ -6,7 +6,7 @@ import {
 	_
 } from '../libraries/erroronline1.js';
 
-export var newFormElements = [];
+export var newFormElements = {};
 const cloneItems = "for (let i = 0; i < 2; i++){let clone = this.previousElementSibling.previousElementSibling.cloneNode(); clone.value=''; clone.id = getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
 const assembleNewElementCallback = (e) => {
@@ -57,6 +57,7 @@ const assembleNewElementCallback = (e) => {
 
 	if (typeof element.content === 'object') {
 		// this is really bad. reverses the object order. this is not supposed to be done, but whatever. 
+		// needed for lists etc for being processed in reverse
 		let contentClone = {},
 			keys = Object.keys(element.content);
 		for (let i = keys.length - 1; i > -1; i--) {
@@ -65,59 +66,100 @@ const assembleNewElementCallback = (e) => {
 		element.content = contentClone;
 	}
 
-	if (Object.keys(element).length > 1) newFormElements.push(new Compose({
-		"draggable": true,
-		"content": [
-			[element]
-		]
-	}));
-}
-
-export function assembleNewForm() {
-	const order = [],
-		nodes = document.getElementById('main').childNodes,
-		form = {
-			"form": {},
-			"content": []
-		};
-	// set dragged/dropped order of elements 
-	for (let i = 0; i < nodes.length; i++) {
-		if (nodes[i].id) order.push(nodes[i].id);
+	if (Object.keys(element).length > 1) {
+		const newElement = new Compose({
+			"draggable": true,
+			"content": [
+				[element]
+			]
+		});
+		newFormElements[newElement.id] = newElement.content;
 	}
-	// reorder array of new elements (settings temporary saved during creation)
-	newFormElements = newFormElements.sort((a, b) => {
-		if (order.indexOf(a.id) <= order.indexOf(b.id)) return -1;
-		return 1;
-	});
-	// create json format
-	newFormElements.forEach(element => {
-		form.content.push(element.content[0])
-	});
-	console.log(JSON.stringify(form));
 }
 
+export function constructNewForm() {
+	// set dragged/dropped order of elements - wohoo, recursion!
+	function nodechildren(node) {
+		const nodes = node.childNodes;
+		let content = [],
+			isContainer;
+		for (let i = 0; i < nodes.length; i++) {
+			if (nodes[i].draggable) {
+				isContainer = nodes[i].children.item(1).firstChild;
+				if (isContainer.localName === 'article') {
+					content.push(nodechildren(isContainer));
+					continue;
+				}
+				content.push(newFormElements[nodes[i].id][0]);
+			}
+		}
+		return content;
+	}
+	return JSON.stringify({
+		"form": {},
+		"content": nodechildren(document.getElementById('main'))
+	});
+}
 
 export const dragNdrop = {
+	stopParentDropEvent: false,
 	allowDrop: function (evnt) {
 		evnt.preventDefault();
 	},
 	drag: function (evnt) {
-		evnt.dataTransfer.setData("text", evnt.currentTarget.id)
+		evnt.dataTransfer.setData("text", evnt.target.id);
+		this.stopParentDropEvent = false;
 	},
-	drop_insertbefore: function (evnt, that) {
+	drop_insert: function (evnt, droppedUpon) {
 		evnt.preventDefault();
-		const data = evnt.dataTransfer.getData("text");
-		document.getElementById(data).parentNode.insertBefore(document.getElementById(data), that);
+		const draggedTile = document.getElementById(evnt.dataTransfer.getData("text")),
+			newtile = draggedTile.cloneNode(true), // cloned for most likely descendant issues
+			originParent = draggedTile.parentNode;
+		//console.log("dragged", draggedTile.id, "dropped on", droppedUpon.id);
+		if (!draggedTile || this.stopParentDropEvent || draggedTile.id === droppedUpon.id) return;
+		if (evnt.target.localName === 'hr') {
+			// handle only if dropped within the reorder area
+			droppedUpon.parentNode.insertBefore(newtile, droppedUpon);
+			droppedUpon.firstChild.classList.remove('hrhover');
+			this.stopParentDropEvent = true;
+			// sanitize multiple container on lack of elements
+			if (originParent.children.length < 2) {
+				const container = originParent.parentNode.parentNode; // adapt to changes in container creation!
+				container.parentNode.insertBefore(originParent.children[0], container);
+				container.remove();
+			}
+			draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
+			return;
+		}
+		if (droppedUpon.parentNode.localName === 'main' && draggedTile.parentNode.localName === 'main' &&
+			!(droppedUpon.children.item(1).firstChild.localName === 'article' || draggedTile.children.item(1).firstChild.localName === 'article')) { // avoid recursive multiples
+			// create a multiple container tile if dropped on a tile
+			const container = document.createElement('div'),
+				section = document.createElement('section'),
+				article = document.createElement('article'),
+				insertionarea = document.createElement('hr'),
+				previousSibling = droppedUpon.previousElementSibling;
+			container.id = getNextElementID();
+			container.setAttribute('draggable', 'true');
+			container.setAttribute('ondragstart', 'dragNdrop.drag(event)');
+			container.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
+			container.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
+
+			article.classList = 'inset';
+			article.append(newtile, droppedUpon);
+			section.append(article);
+			container.append(section);
+
+			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+			container.insertBefore(insertionarea, container.firstChild);
+			previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
+			draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
+			return;
+		}
 	},
 	drop_delete: function (evnt) {
-		const data = evnt.dataTransfer.getData("text");
-		for (let i = 0; i < newFormElements.length; i++) {
-			if (newFormElements[i].id === data) {
-				newFormElements.splice(i, 1);
-				break;
-			}
-		}
-		document.getElementById(data).remove();
+		document.getElementById(evnt.dataTransfer.getData("text")).remove();
 	}
 };
 
@@ -133,7 +175,11 @@ export class Compose extends Assemble {
 			this.container.setAttribute('draggable', 'true');
 			this.container.setAttribute('ondragstart', 'dragNdrop.drag(event)');
 			this.container.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
-			this.container.setAttribute('ondrop', 'dragNdrop.drop_insertbefore(event,this)');
+			this.container.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
+			const insertionarea = document.createElement('hr');
+			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+			this.container.insertBefore(insertionarea, this.container.firstChild);
 		}
 		if (this.createButtons.length) {
 			for (let i = 0; i < this.createButtons.length; i++) {
@@ -144,7 +190,6 @@ export class Compose extends Assemble {
 			id: this.container.id,
 			content: this.content
 		};
-
 	}
 
 	composer_add_trash(section) {

@@ -120,7 +120,8 @@ section,
 	transition: ease .2s;
 }
 
-article>section {
+article>section,
+article>div[draggable] {
 	width: 100%;
 	padding-top: 1em;
 	padding-bottom: 1em;
@@ -223,6 +224,18 @@ fieldset>label {
 
 .alert {
 	border: 1px solid var(--red);
+}
+
+hr {
+	margin: 1em;
+	height: 1em;
+	width: 95%;
+	border-color: var(--foreground);
+	border-radius: .5em;
+}
+
+.hrhover {
+	background-color: var(--green);
 }
 
 input[type=text],

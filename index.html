@@ -24,8 +24,9 @@
 		//api.getForms('qr','template', 'qr');
 
 		//test composing
-		import {assembleNewForm, dragNdrop} from './js/compose.js';
-		window.assembleNewForm=assembleNewForm;
+		import {Compose, constructNewForm, dragNdrop} from './js/compose.js';
+		window.Compose=Compose;
+		window.constructNewForm=constructNewForm;
 		window.dragNdrop=dragNdrop;
 		import {create} from './scripts.js';
 		create();

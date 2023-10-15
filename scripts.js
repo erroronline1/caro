@@ -52,52 +52,41 @@ export const api = {
 const createForm = {
 	"content": [
 		[{
-				"type": "text",
-				"collapsed": true,
-				"content": "choose available elements from this panel. set your parameters and add fields. change your order by dragging the elements."
-			},
-			{
-				"type": "compose_links",
-				"description": "create a link block"
-			}, {
-				"type": "compose_radio",
-				"description": "create a single selection block"
-			}, {
-				"type": "compose_checkbox",
-				"description": "create a multiple selection block"
-			}, {
-				"type": "compose_select",
-				"description": "create a dropdown"
-			}, {
-				"type": "compose_text",
-				"description": "create an informative text block"
-			}, {
-				"type": "compose_textinput",
-				"description": "create a single line text input"
-			}, {
-				"type": "compose_textarea",
-				"description": "create a multi line text input"
-			}, {
-				"type": "compose_numberinput",
-				"description": "create a number input"
-			}, {
-				"type": "compose_dateinput",
-				"description": "create a date input"
-			}, {
-				"type": "compose_file",
-				"description": "create a file upload"
-			}, {
-				"type": "compose_photo",
-				"description": "create a photo upload"
-			}, {
-				"type": "compose_signature",
-				"description": "create a signature pad"
-			}, {
-				"type": "compose_qr",
-				"description": "create a qr-scanner field"
-			},
-
-		]
+			"type": "text",
+			"collapsed": true,
+			"description": "what to do",
+			"content": "choose available elements from this panel. set your parameters and add fields. advanced attributes (href, value, events, etc) have to be set in json-format with double-quotes. change your order by dragging the elements. during composing indicators for containers are not available."
+		}, {
+			"type": "compose_text",
+		}, {
+			"type": "compose_textinput",
+		}, {
+			"type": "compose_textarea",
+		}, {
+			"type": "compose_numberinput",
+		}, {
+			"type": "compose_dateinput",
+		}, {
+			"type": "compose_links",
+		}, {
+			"type": "compose_radio",
+		}, {
+			"type": "compose_checkbox",
+		}, {
+			"type": "compose_select",
+		}, {
+			"type": "compose_file",
+		}, {
+			"type": "compose_photo",
+		}, {
+			"type": "compose_signature",
+		}, {
+			"type": "compose_qr",
+		}, ],
+		[{
+			"type": "trash",
+			"description": "drop panel here to delete"
+		}]
 	]
 };
 
