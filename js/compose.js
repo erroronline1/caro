@@ -82,15 +82,15 @@ export function constructNewForm() {
 	function nodechildren(node) {
 		const nodes = node.childNodes;
 		let content = [],
-			isContainer;
+			isSection;
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].draggable) {
-				isContainer = nodes[i].children.item(1).firstChild;
-				if (isContainer.localName === 'article') {
-					content.push(nodechildren(isContainer));
+				isSection = nodes[i].children.item(1).firstChild;
+				if (isSection.localName === 'article') {
+					content.push(nodechildren(isSection));
 					continue;
 				}
-				content.push(newFormElements[nodes[i].id][0]);
+				content.push(newFormElements[nodes[i].id][0][0]);
 			}
 		}
 		return content;
@@ -122,21 +122,21 @@ export const dragNdrop = {
 			droppedUpon.parentNode.insertBefore(newtile, droppedUpon);
 			droppedUpon.firstChild.classList.remove('hrhover');
 			this.stopParentDropEvent = true;
-			// sanitize multiple container on lack of elements
+			// sanitize multiple section on lack of elements
 			if (originParent.children.length < 2) {
-				const container = originParent.parentNode.parentNode; // adapt to changes in container creation!
-				container.parentNode.insertBefore(originParent.children[0], container);
-				container.remove();
+				const section = originParent.parentNode.parentNode; // adapt to changes in section creation!
+				section.parentNode.insertBefore(originParent.children[0], section);
+				section.remove();
 			}
-			draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
+			draggedTile.remove(); // do not remove earlier! insertBefore might reference to this object by chance
 			return;
 		}
 		if (droppedUpon.parentNode.localName === 'main' && draggedTile.parentNode.localName === 'main' &&
-			!(droppedUpon.children.item(1).firstChild.localName === 'article' || draggedTile.children.item(1).firstChild.localName === 'article')) { // avoid recursive multiples
-			// create a multiple container tile if dropped on a tile
+			!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedTile.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
+			// create a multiple article tile if dropped on a tile
 			const container = document.createElement('div'),
-				section = document.createElement('section'),
-				article = document.createElement('article'),
+			article = document.createElement('article'),
+			section = document.createElement('section'),
 				insertionarea = document.createElement('hr'),
 				previousSibling = droppedUpon.previousElementSibling;
 			container.id = getNextElementID();
@@ -145,10 +145,10 @@ export const dragNdrop = {
 			container.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
 			container.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
 
-			article.classList = 'inset';
-			article.append(newtile, droppedUpon);
-			section.append(article);
-			container.append(section);
+			section.classList = 'inset';
+			section.append(newtile, droppedUpon);
+			article.append(section);
+			container.append(article);
 
 			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
 			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
@@ -169,17 +169,17 @@ export class Compose extends Assemble {
 		this.createButtons = [];
 		this.createDraggable = this.setup.draggable;
 
-		this.initializeContainer();
+		this.initializeSection();
 		if (this.createDraggable) {
-			this.container.id = getNextElementID();
-			this.container.setAttribute('draggable', 'true');
-			this.container.setAttribute('ondragstart', 'dragNdrop.drag(event)');
-			this.container.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
-			this.container.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
+			this.section.id = getNextElementID();
+			this.section.setAttribute('draggable', 'true');
+			this.section.setAttribute('ondragstart', 'dragNdrop.drag(event)');
+			this.section.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
+			this.section.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
 			const insertionarea = document.createElement('hr');
 			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
 			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-			this.container.insertBefore(insertionarea, this.container.firstChild);
+			this.section.insertBefore(insertionarea, this.section.firstChild);
 		}
 		if (this.createButtons.length) {
 			for (let i = 0; i < this.createButtons.length; i++) {
@@ -187,7 +187,7 @@ export class Compose extends Assemble {
 			}
 		}
 		return {
-			id: this.container.id,
+			id: this.section.id,
 			content: this.content
 		};
 	}

@@ -30,7 +30,7 @@ export const api = {
 		notice only the first requested form will appear. later duplicates will be ignored.
 		*/
 		let successFn = function (data) {
-			new Assemble(data).initializeContainer();
+			new Assemble(data).initializeSection();
 		}
 		api.send('get', {
 			'request': 'getForms',

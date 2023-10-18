@@ -4,11 +4,11 @@ import {
 	_
 } from '../libraries/erroronline1.js';
 
-export var multiplecontainerID = 0;
+export var multiplearticleID = 0;
 export var ElementID = 0;
 
-export function getNextContainerID() {
-	return 'containerID' + ++multiplecontainerID;
+export function getNextArticleID() {
+	return 'articleID' + ++multiplearticleID;
 }
 
 export function getNextElementID() {
@@ -23,8 +23,8 @@ export const scroller = (e) => {
 		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
 		for (let panel = 0; panel < e.target.children.length; panel++) {
 			if (panel == Math.floor(e.target.scrollLeft / e.target.clientWidth)) indicator.children[
-				panel].firstChild.classList.add('sectionactive');
-			else indicator.children[panel].firstChild.classList.remove('sectionactive');
+				panel].firstChild.classList.add('articleactive');
+			else indicator.children[panel].firstChild.classList.remove('articleactive');
 		}
 	}, 500)
 };
@@ -41,9 +41,9 @@ function prepareForm() {
 			type: "image/png",
 			lastModified: new Date().getTime()
 		});
-		let container = new DataTransfer();
-		container.items.add(file);
-		document.getElementById('signature').files = container.files;
+		let section = new DataTransfer();
+		section.items.add(file);
+		document.getElementById('signature').files = section.files;
 	}
 	return;
 };
@@ -67,23 +67,23 @@ export class Assemble {
 		this.setup = setup;
 		this.content = setup.content;
 		this.form = setup.form;
-		this.multipleContainers = [];
-		this.multiplecontainerID = null;
-		this.container = null;
+		this.multiplearticles = [];
+		this.multiplearticleID = null;
+		this.section = null;
 	}
 
-	initializeContainer() {
+	initializeSection() {
 		if (this.form) {
-			this.container = document.createElement('form');
-			this.container.method = 'post';
-			this.container.enctype = 'multipart/form-data';
-			this.container.onsubmit = () => {
+			this.section = document.createElement('form');
+			this.section.method = 'post';
+			this.section.enctype = 'multipart/form-data';
+			this.section.onsubmit = () => {
 				return prepareForm()
 			};
 			Object.keys(this.form).forEach(key => {
 				if (events.includes(key)) {
-					this.container[key] = new Function(this.form[key]);
-				} else this.container.setAttribute(key, this.form[key]);
+					this.section[key] = new Function(this.form[key]);
+				} else this.section.setAttribute(key, this.form[key]);
 			});
 
 			this.content.push([{
@@ -92,15 +92,15 @@ export class Assemble {
 					value: 'absenden'
 				}
 			}]);
-		} else this.container = document.createElement('div');
+		} else this.section = document.createElement('div');
 
 		this.assembledTiles = new Set();
 		this.processContent();
 
-		this.container.append(...this.assembledTiles);
-		document.getElementById('main').insertAdjacentElement('beforeend', this.container);
-		for (let i = 0; i < this.multipleContainers.length; i++) {
-			document.getElementById(this.multipleContainers[i]).addEventListener('scroll', scroller);
+		this.section.append(...this.assembledTiles);
+		document.getElementById('main').insertAdjacentElement('beforeend', this.section);
+		for (let i = 0; i < this.multiplearticles.length; i++) {
+			document.getElementById(this.multiplearticles[i]).addEventListener('scroll', scroller);
 		}
 
 		if (this.signaturePad) {
@@ -125,38 +125,38 @@ export class Assemble {
 		});
 	}
 	single() {
-		const section = document.createElement('section');
-		section.setAttribute('data-type', this.tile.type);
+		const article = document.createElement('article');
+		article.setAttribute('data-type', this.tile.type);
 
 		if ([undefined, null, false].indexOf(this.tile.description) > -1) {
-			section.append(...this.elements);
-			return section;
+			article.append(...this.elements);
+			return article;
 		}
 		const fieldset = this.fieldset();
 		fieldset.append(...this.elements);
-		section.appendChild(fieldset);
+		article.appendChild(fieldset);
 
-		this.composer_add_trash(section);
+		this.composer_add_trash(article);
 
-		return section;
+		return article;
 	}
 	multiple(classList = null) {
-		const section = document.createElement('section'),
-			container = document.createElement('article'),
+		const article = document.createElement('article'),
+		section = document.createElement('section'),
 			indicators = document.createElement('div');
-		this.multiplecontainerID = getNextContainerID();
-		this.multipleContainers.push(this.multiplecontainerID);
-		if (classList) section.classList = classList;
-		container.classList = 'inset';
-		container.id = this.multiplecontainerID;
-		container.append(...this.multipletiles);
-		section.appendChild(container);
-		indicators.classList = 'containerindicator';
-		indicators.id = this.multiplecontainerID + 'indicator';
+		this.multiplearticleID = getNextArticleID();
+		this.multiplearticles.push(this.multiplearticleID);
+		if (classList) article.classList = classList;
+		section.classList = 'inset';
+		section.id = this.multiplearticleID;
+		section.append(...this.multipletiles);
+		article.appendChild(section);
+		indicators.classList = 'sectionindicator';
+		indicators.id = this.multiplearticleID + 'indicator';
 		for (let i = 0; i < this.multipletiles.size; i++) {
 			let indicator = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 				circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-			indicator.classList = 'sectionindicator';
+			indicator.classList = 'articleindicator';
 			indicator.setAttributeNS(null, 'viewbox', '0 0 10 10');
 			circle.setAttributeNS(null, 'cx', '5');
 			circle.setAttributeNS(null, 'cy', '5');
@@ -164,8 +164,8 @@ export class Assemble {
 			indicator.appendChild(circle);
 			indicators.appendChild(indicator);
 		}
-		section.appendChild(indicators);
-		return section;
+		article.appendChild(indicators);
+		return article;
 	}
 
 	fieldset() {
@@ -200,6 +200,7 @@ export class Assemble {
 		input.type = type;
 		input.id = getNextElementID();
 		if (this.tile.description) input.name = this.tile.description;
+		input.title=JSON.stringify(this.tile.attributes);
 
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (events.includes(key)) {
@@ -454,8 +455,12 @@ export class Assemble {
 	trash() {
 		// empty method but necessary to display the delete-area
 	}
-	composer_add_trash(section) {
+	composer_add_trash(article) {
 		// empty here, overwritten by extending class. don't know how to implement this cleaner. 
+	}
+	composer_attributes_tooltip(){
+		// empty here, overwritten by extending class. don't know how to implement this cleaner. 
+		return false;
 	}
 }
 
