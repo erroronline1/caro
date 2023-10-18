@@ -200,7 +200,6 @@ export class Assemble {
 		input.type = type;
 		input.id = getNextElementID();
 		if (this.tile.description) input.name = this.tile.description;
-		input.title=JSON.stringify(this.tile.attributes);
 
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (events.includes(key)) {
@@ -221,6 +220,9 @@ export class Assemble {
 	}
 	submit() {
 		this.input('submit');
+	}
+	button() {
+		this.input('button');
 	}
 
 	file() {

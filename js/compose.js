@@ -86,7 +86,7 @@ export function constructNewForm() {
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].draggable) {
 				isSection = nodes[i].children.item(1).firstChild;
-				if (isSection.localName === 'article') {
+				if (isSection.localName === 'section') {
 					content.push(nodechildren(isSection));
 					continue;
 				}
@@ -101,6 +101,18 @@ export function constructNewForm() {
 	});
 }
 
+export function importForm(form) {
+	Object.keys(form.content).forEach(element => {
+		const newElement = new Compose({
+			"draggable": true,
+			"content": [
+				[form.content[element]]
+			]
+		});
+		newFormElements[newElement.id] = newElement.content;
+	});
+}
+
 export const dragNdrop = {
 	stopParentDropEvent: false,
 	allowDrop: function (evnt) {
@@ -112,6 +124,8 @@ export const dragNdrop = {
 	},
 	drop_insert: function (evnt, droppedUpon) {
 		evnt.preventDefault();
+		if (!evnt.dataTransfer.getData("text")) return;
+
 		const draggedTile = document.getElementById(evnt.dataTransfer.getData("text")),
 			newtile = draggedTile.cloneNode(true), // cloned for most likely descendant issues
 			originParent = draggedTile.parentNode;
@@ -135,8 +149,8 @@ export const dragNdrop = {
 			!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedTile.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
 			// create a multiple article tile if dropped on a tile
 			const container = document.createElement('div'),
-			article = document.createElement('article'),
-			section = document.createElement('section'),
+				article = document.createElement('article'),
+				section = document.createElement('section'),
 				insertionarea = document.createElement('hr'),
 				previousSibling = droppedUpon.previousElementSibling;
 			container.id = getNextElementID();
