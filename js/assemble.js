@@ -130,7 +130,6 @@ export class Assemble {
 		const article = document.createElement('article');
 		article.setAttribute('data-type', tileProperties.type);
 		article.append(...this.elements);
-		this.composer_add_trash(article);
 		return article;
 	}
 	multiple(classList = null) {
@@ -265,15 +264,25 @@ export class Assemble {
 		}*/
 		const input = document.createElement('input'),
 			label = document.createElement('label');
+
+		function changeEvent() {
+			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' oder ändern...' : 'Photo aufnehmen...';
+			if (this.files.length) {
+				const nextPhoto = this.parentNode.cloneNode(true);
+				nextPhoto.childNodes[1].id = nextPhoto.childNodes[2].htmlFor = getNextElementID();
+				nextPhoto.childNodes[1].files = null;
+				nextPhoto.childNodes[1].onchange = changeEvent;
+				nextPhoto.childNodes[2].innerHTML = 'Photo aufnehmen...';
+				this.parentNode.after(nextPhoto);
+			}
+		}
+
 		input.type = 'file';
 		input.id = getNextElementID();
-		input.name = this.tile.description;
+		input.name = this.tile.description + '[]';
 		input.accept = 'image/*';
 		input.capture = true;
-		input.onchange = function () {
-			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
-				', ') + ' oder ändern...' : 'Photo aufnehmen...'
-		};
+		input.onchange = changeEvent;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			input[key] = this.tile.attributes[key];
 		});
