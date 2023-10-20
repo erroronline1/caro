@@ -11,7 +11,8 @@ import {
     Compose,
     constructNewForm,
     dragNdrop,
-    importForm
+    importForm,
+    assembleNewElementCallback
 } from '../js/compose.js';
 import {
     getNextElementID
@@ -20,39 +21,65 @@ window.getNextElementID = getNextElementID;
 window.Compose = Compose;
 window.constructNewForm = constructNewForm;
 window.dragNdrop = dragNdrop;
+window.assembleNewElementCallback = assembleNewElementCallback;
 const createForm = {
     "content": [
         [{
             "type": "text",
-            "collapsed": true,
             "description": "what to do",
             "content": "choose available elements from this panel. set your parameters and add fields. advanced attributes (href, value, events, etc) have to be set in json-format with double-quotes. change your order by dragging the elements. during composing indicators for containers are not available. dragging is available on devies with mice only."
         }, {
+            "form": true,
             "type": "compose_text",
+            "description": "add an informative text"
         }, {
+            "form": true,
             "type": "compose_textinput",
+            "description": "add a single line text input"
         }, {
+            "form": true,
             "type": "compose_textarea",
+            "description": "add a multiline text input"
         }, {
+            "form": true,
             "type": "compose_numberinput",
+            "description": "add a number input"
         }, {
+            "form": true,
             "type": "compose_dateinput",
+            "description": "add a date input"
         }, {
+            "form": true,
             "type": "compose_links",
+            "description": "add a list of links"
         }, {
+            "form": true,
             "type": "compose_radio",
+            "description": "add a set of single selection options"
         }, {
+            "form": true,
             "type": "compose_checkbox",
+            "description": "add a set of multiple selection options"
         }, {
+            "form": true,
             "type": "compose_select",
+            "description": "add a dropdown"
         }, {
+            "form": true,
             "type": "compose_file",
+            "description": "add a file upload"
         }, {
+            "form": true,
             "type": "compose_photo",
+            "description": "add a photo upload"
         }, {
+            "form": true,
             "type": "compose_signature",
+            "description": "add a signature pad"
         }, {
+            "form": true,
             "type": "compose_qr",
+            "description": "add a qr scanner field"
         }, ],
         [{
             "type": "button",

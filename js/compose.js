@@ -7,64 +7,49 @@ import {
 } from '../libraries/erroronline1.js';
 
 export var newFormElements = {};
-const cloneItems = "for (let i = 0; i < 2; i++){let clone = this.previousElementSibling.previousElementSibling.cloneNode(); clone.value=''; clone.id = getNextElementID(); this.parentNode.insertBefore(clone, this);}";
+//chain as much previousElementSibling as iterations. every odd will be deep copied including nodes (aka labels)
+const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value=''; clone.id = getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
-const assembleNewElementCallback = (e) => {
-	let sibling = e.target.previousElementSibling,
+export const assembleNewElementCallback = (e) => {
+	e = document.getElementById(e).childNodes[0];
+	let sibling = e.nextSibling,
 		property, value, element = {},
 		attributes = {};
 	do {
-		if (sibling.type === 'button') {
-			sibling = sibling.previousElementSibling;
+		if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header'].includes(sibling.localName)) {
+			sibling = sibling.nextSibling;
 			continue;
 		}
-
-		if (sibling.localName === 'label') {
-			// collapsed text blocks
-			if (sibling.firstElementChild.name == 'collapsed' && sibling.firstElementChild.checked) element['collapsed'] = true
-		} else {
-			element['type'] = sibling.name.match(/(_(.+)-)/)[2];
-			property = sibling.name.match(/(-(.+)$)/)[2];
-			value = sibling.value;
-			if (['links', 'checkbox', 'radio', 'select'].includes(element['type'])) {
-				if (property === 'description')
-					if (value) element[property] = value;
-					else return;
-				if (property === 'attributes' && value) {
-					try {
-						attributes = JSON.parse(value);
-					} catch (err) {
-						return
-					};
-					sibling = sibling.previousElementSibling;
-					continue;
-				}
-				if (property === 'content' && value) {
-					if (element.content === undefined) element.content = {};
-					element.content[value] = attributes;
-				}
-			} else {
-				if (property === 'attributes' && value.length) try {
-					value = JSON.parse(value);
-				} catch {
-					return;
-				};
+		element['type'] = sibling.name.match(/(_(.+)-)/)[2];
+		property = sibling.name.match(/(-(.+)$)/)[2];
+		value = sibling.value;
+		if (['links', 'checkbox', 'radio', 'select'].includes(element['type'])) {
+			if (property === 'description')
 				if (value) element[property] = value;
+				else return;
+			if (property === 'attributes' && value) {
+				try {
+					attributes = JSON.parse(value);
+				} catch (err) {
+					return
+				};
+				sibling = sibling.nextSibling;
+				continue;
 			}
+			if (property === 'content' && value) {
+				if (element.content === undefined) element.content = {};
+				element.content[value] = attributes;
+			}
+		} else {
+			if (property === 'attributes' && value.length) try {
+				value = JSON.parse(value);
+			} catch {
+				return;
+			};
+			if (value) element[property] = value;
 		}
-		sibling = sibling.previousElementSibling;
-	} while (sibling !== undefined && sibling != null && sibling.localName !== 'legend');
-
-	if (typeof element.content === 'object') {
-		// this is really bad. reverses the object order. this is not supposed to be done, but whatever. 
-		// needed for lists etc for being processed in reverse
-		let contentClone = {},
-			keys = Object.keys(element.content);
-		for (let i = keys.length - 1; i > -1; i--) {
-			contentClone[keys[i]] = element.content[keys[i]];
-		}
-		element.content = contentClone;
-	}
+		sibling = sibling.nextSibling;
+	} while (sibling !== undefined && sibling != null);
 
 	if (Object.keys(element).length > 1) {
 		const newElement = new Compose({
@@ -180,7 +165,6 @@ export const dragNdrop = {
 export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
-		this.createButtons = [];
 		this.createDraggable = this.setup.draggable;
 
 		this.initializeSection();
@@ -195,15 +179,27 @@ export class Compose extends Assemble {
 			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
 			this.section.insertBefore(insertionarea, this.section.firstChild);
 		}
-		if (this.createButtons.length) {
-			for (let i = 0; i < this.createButtons.length; i++) {
-				document.getElementById(this.createButtons[i]).addEventListener('pointerdown', assembleNewElementCallback);
-			}
-		}
 		return {
 			id: this.section.id,
 			content: this.content
 		};
+	}
+
+	single(tileProperties) { // overriding parent method
+		const article = document.createElement('article'),
+			form = document.createElement('form');
+		article.setAttribute('data-type', this.tile.type);
+		article.id = getNextElementID();
+		form.action = "javascript:assembleNewElementCallback('" + article.id + "')";
+		article.append(...this.elements);
+		this.composer_add_trash(article);
+		form.append(article);
+		if (tileProperties.form) return form;
+		return article;
+	}
+
+	trash() {
+		// empty method but necessary to display the delete-area
 	}
 
 	composer_add_trash(section) {
@@ -235,16 +231,15 @@ export class Compose extends Assemble {
 			}
 		};
 		this.textarea();
-		// due to the assembler, description and type (for icon) has to be in the last element
+		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"description": "create an informative text block",
 			"type": "text",
 			"attributes": {
 				"data-type": "addButton",
 				"value": "✓ add text"
 			}
 		};
-		this.createButtons.push(this.input('button'));
+		this.input('submit');
 	}
 
 	compose_input(type) {
@@ -262,20 +257,21 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_" + type.type + "-attributes",
-				"placeholder": "add advanced attributes {json}"
+				"placeholder": "add advanced attributes {json}",
+				"pattern": "^\\{.+\\}$|^$",
+				"title": "json object with double quotes"
 			}
 		};
 		this.textinput();
-		// due to the assembler, description and type (for icon) has to be in the last element
+		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"description": type.description,
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
 				"value": "✓ add " + type.addblock
 			}
 		};
-		this.createButtons.push(this.input('button'));
+		this.input('submit');
 	}
 	compose_textinput() {
 		this.compose_input({
@@ -334,7 +330,9 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_" + type.type + "-attributes",
-				"placeholder": "add advanced attributes {json}"
+				"placeholder": "add advanced attributes {json}",
+				"pattern": "^\\{.+\\}$|^$",
+				"title": "json object with double quotes"
 			}
 		};
 		this.textinput();
@@ -346,16 +344,15 @@ export class Compose extends Assemble {
 			}
 		};
 		this.input('button');
-		// due to the assembler, description and type (for icon) has to be in the last element
+		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"description": type.description,
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
 				"value": "✓ add " + type.addblock + " block"
 			}
 		};
-		this.createButtons.push(this.input('button'));
+		this.input('submit');
 
 	}
 	compose_select() {
@@ -401,16 +398,15 @@ export class Compose extends Assemble {
 			}
 		};
 		this.textinput();
-		// due to the assembler, description and type (for icon) has to be in the last element
+		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"description": type.description,
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
 				"value": "✓ add " + type.addblock
 			}
 		};
-		this.createButtons.push(this.input('button'));
+		this.input('submit');
 	}
 
 	compose_file() {

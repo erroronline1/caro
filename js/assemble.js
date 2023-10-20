@@ -109,40 +109,33 @@ export class Assemble {
 	}
 
 	processContent() {
+		let originalTileProperties; // composer changes these, so originals mist be preserved
 		this.content.forEach(tile => {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
 				this.elements = new Set();
-				this.tile = tile[i];
+				this.tile = originalTileProperties = tile[i];
+				this.description();
 				this[tile[i].type]();
 				if (tile.length < 2) {
-					this.assembledTiles.add(this.single());
+					this.assembledTiles.add(this.single(originalTileProperties));
 					continue;
 				}
-				this.multipletiles.add(this.single())
+				this.multipletiles.add(this.single(originalTileProperties))
 			}
 			if (this.multipletiles.size) this.assembledTiles.add(this.multiple());
 		});
 	}
-	single() {
+	single(tileProperties) {
 		const article = document.createElement('article');
-		article.setAttribute('data-type', this.tile.type);
-
-		if ([undefined, null, false].indexOf(this.tile.description) > -1) {
-			article.append(...this.elements);
-			return article;
-		}
-		const fieldset = this.fieldset();
-		fieldset.append(...this.elements);
-		article.appendChild(fieldset);
-
+		article.setAttribute('data-type', tileProperties.type);
+		article.append(...this.elements);
 		this.composer_add_trash(article);
-
 		return article;
 	}
 	multiple(classList = null) {
 		const article = document.createElement('article'),
-		section = document.createElement('section'),
+			section = document.createElement('section'),
 			indicators = document.createElement('div');
 		this.multiplearticleID = getNextArticleID();
 		this.multiplearticles.push(this.multiplearticleID);
@@ -168,24 +161,21 @@ export class Assemble {
 		return article;
 	}
 
-	fieldset() {
-		const fieldset = document.createElement('fieldset'),
-			legend = document.createElement('legend'),
-			title = document.createTextNode(this.tile.description);
-		legend.appendChild(title);
-		fieldset.appendChild(legend);
-		return fieldset
-	}
+	description() {
+		if ([undefined, null, false].includes(this.tile.description)) return
+		const header = document.createElement('header');
+		header.appendChild(document.createTextNode(this.tile.description));
+		this.elements.add(header);
+	};
+
 	text() {
 		/* {
 			type: 'text',
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-		const div = document.createElement('div'),
-			content = document.createTextNode(this.tile.content);
-		div.appendChild(content);
-		this.elements.add(div);
+		const content = document.createTextNode(this.tile.content);
+		this.elements.add(content);
 	}
 
 	input(type) {
@@ -197,16 +187,26 @@ export class Assemble {
 			}
 		}*/
 		const input = document.createElement('input');
+		let label;
 		input.type = type;
 		input.id = getNextElementID();
 		if (this.tile.description) input.name = this.tile.description;
-
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (events.includes(key)) {
-				input[key] = new Function(this.tile.attributes[key]);
-			} else input.setAttribute(key, this.tile.attributes[key]);
-		});
+		input.classList.add('input-field');
+		if (this.tile.attributes !== undefined) {
+			if (this.tile.attributes.placeholder) {
+				label = document.createElement('label');
+				label.appendChild(document.createTextNode(this.tile.attributes.placeholder));
+				this.tile.attributes.placeholder = ' ';
+				label.classList.add('input-label');
+			}
+			Object.keys(this.tile.attributes).forEach(key => {
+				if (events.includes(key)) {
+					input[key] = new Function(this.tile.attributes[key]);
+				} else input.setAttribute(key, this.tile.attributes[key]);
+			});
+		}
 		this.elements.add(input);
+		if (label) this.elements.add(label);
 		return input.id;
 	}
 	textinput() {
@@ -393,8 +393,7 @@ export class Assemble {
 				}
 			}
 		}*/
-		const div = document.createElement('div'),
-			ul = document.createElement('ul');
+		const ul = document.createElement('ul');
 		Object.keys(this.tile.content).forEach(link => {
 			let li = document.createElement('li'),
 				a = document.createElement('a');
@@ -408,8 +407,7 @@ export class Assemble {
 			li.appendChild(a);
 			ul.appendChild(li);
 		});
-		div.appendChild(ul)
-		this.elements.add(div);
+		this.elements.add(ul);
 	}
 
 	signature() {
@@ -456,17 +454,6 @@ export class Assemble {
 			'onpointerdown': "initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.input('button');
-	}
-
-	trash() {
-		// empty method but necessary to display the delete-area
-	}
-	composer_add_trash(article) {
-		// empty here, overwritten by extending class. don't know how to implement this cleaner. 
-	}
-	composer_attributes_tooltip(){
-		// empty here, overwritten by extending class. don't know how to implement this cleaner. 
-		return false;
 	}
 }
 
