@@ -64,7 +64,7 @@ export const assembleNewElementCallback = (e) => {
 
 export function constructNewForm() {
 	// set dragged/dropped order of elements - wohoo, recursion!
-	function nodechildren(node, recursion=false) {
+	function nodechildren(node, recursion = false) {
 		const nodes = node.childNodes;
 		let content = [],
 			isSection;
@@ -218,7 +218,8 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_text-description",
-				"placeholder": "add information description"
+				"placeholder": "add information description",
+				"required": true
 			}
 		};
 		this.textinput();
@@ -250,7 +251,8 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_" + type.type + "-description",
-				"placeholder": "add description"
+				"placeholder": "add description",
+				"required": true
 			}
 		};
 		this.textinput();
@@ -315,7 +317,8 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_" + type.type + "-description",
-				"placeholder": "add description"
+				"placeholder": "add description",
+				"required": true
 			}
 		};
 		this.textinput();
@@ -395,7 +398,8 @@ export class Compose extends Assemble {
 			"type": "textinput",
 			"attributes": {
 				"name": "compose_" + type.type + "-description",
-				"placeholder": "add description"
+				"placeholder": "add description",
+				"required": true
 			}
 		};
 		this.textinput();
