@@ -130,7 +130,8 @@ section>div[draggable] {
 	background: none;
 }
 
-form>article {
+form>article,
+section>div>article {
 	box-shadow: none;
 	border: none;
 	background: none;
