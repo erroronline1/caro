@@ -87,6 +87,7 @@ ul {
 }
 
 article,
+main>form>article,
 [data-type=addButton] {
 	margin: 1em 0;
 	padding: 1em;
