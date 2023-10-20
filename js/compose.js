@@ -64,7 +64,7 @@ export const assembleNewElementCallback = (e) => {
 
 export function constructNewForm() {
 	// set dragged/dropped order of elements - wohoo, recursion!
-	function nodechildren(node) {
+	function nodechildren(node, recursion=false) {
 		const nodes = node.childNodes;
 		let content = [],
 			isSection;
@@ -72,10 +72,11 @@ export function constructNewForm() {
 			if (nodes[i].draggable) {
 				isSection = nodes[i].children.item(1).firstChild;
 				if (isSection.localName === 'section') {
-					content.push(nodechildren(isSection));
+					content.push(nodechildren(isSection, true));
 					continue;
 				}
-				content.push(newFormElements[nodes[i].id][0][0]);
+				if (recursion) content.push(newFormElements[nodes[i].id][0][0]);
+				else content.push([newFormElements[nodes[i].id][0][0]]);
 			}
 		}
 		return content;
@@ -91,7 +92,7 @@ export function importForm(form) {
 		const newElement = new Compose({
 			"draggable": true,
 			"content": [
-				[form.content[element]]
+				form.content[element]
 			]
 		});
 		newFormElements[newElement.id] = newElement.content;

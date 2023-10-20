@@ -99,22 +99,36 @@ new Compose(createForm);
 
 const oldform = {
     "form": {},
-    "content": [{
-        "type": "links",
-        "content": {
-            "xcvbxcvb": {},
-            "wertwert": {}
-        },
-        "description": "sdfg"
-    },{
-        "type": "searchinput",
-        "description": "lookup"
-    },{
-        "type": "qr",
-        "description": "login",
-        "attributes":{
-            "type":"password"
-        }
-    }]
+    "content": [
+        [{
+            "type": "radio",
+            "description": "strength",
+            "content": {
+                "1": {},
+                "2": {},
+                "3": {},
+                "4": {},
+                "5": {}
+            }
+        }],
+        [{
+            "type": "select",
+            "description": "strength",
+            "content": {
+                "1": {},
+                "2": {},
+                "3": {},
+                "4": {},
+                "5": {},
+                "6": {}
+            }
+        }, {
+            "type": "textinput",
+            "description": "comment",
+            "attributes": {
+                "placeholder": "enter comment here if categories do not fit"
+            }
+        }]
+    ]
 };
 importForm(oldform);
