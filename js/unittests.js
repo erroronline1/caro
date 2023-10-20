@@ -79,6 +79,15 @@ const oldform = {
             "wertwert": {}
         },
         "description": "sdfg"
+    },{
+        "type": "searchinput",
+        "description": "lookup"
+    },{
+        "type": "qr",
+        "description": "login",
+        "attributes":{
+            "type":"password"
+        }
     }]
 };
 importForm(oldform);

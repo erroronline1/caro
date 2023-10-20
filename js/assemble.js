@@ -224,6 +224,9 @@ export class Assemble {
 	button() {
 		this.input('button');
 	}
+	searchinput() {
+		this.input('search');
+	}
 
 	file() {
 		/*{
@@ -437,7 +440,8 @@ export class Assemble {
 	qr() {
 		/*{
 			type: 'qr',
-			description:'access credentials' (e.g.)
+			description:'access credentials' (e.g.),
+			attributes:{type:'password'} // to override e.g. for logins 
 		} */
 		const stream = document.createElement('video');
 		stream.id = 'qrscanner';
