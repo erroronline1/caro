@@ -1,13 +1,12 @@
-/*
 //test assembling
-import{getNextElementID} from '../js/assemble.js';
+import{getNextElementID, initialize_qrScanner} from '../js/assemble.js';
 window.getNextElementID=getNextElementID;
+window.initialize_qrScanner=initialize_qrScanner;
 import {api} from '../scripts.js';
 api.getForms('qr','template', 'qr');
-*/
 
 //test composing
-import {
+/*import {
     Compose,
     constructNewForm,
     dragNdrop,
@@ -131,4 +130,4 @@ const oldform = {
         }]
     ]
 };
-importForm(oldform);
+importForm(oldform);*/

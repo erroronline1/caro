@@ -528,7 +528,7 @@ function dataURLToBlob(dataURL) {
 	});
 }
 
-function initialize_qrScanner(videostream, resultTo) {
+export function initialize_qrScanner(videostream, resultTo) {
 	const stream = document.getElementById(videostream);
 	stream.classList.add('active');
 	const scanner = new QrScanner(
