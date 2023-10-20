@@ -239,7 +239,8 @@ hr {
 }
 
 input[type=text],
-input[type=number] {
+input[type=number],
+input[type=search] {
 	border-bottom: 1px solid var(--foreground);
 }
 
@@ -337,6 +338,10 @@ input[type=number] {
 
 [data-type=textinput]::before {
 	background-image: url("media/pencil.svg");
+}
+
+[data-type=searchinput]::before {
+	background-image: url("media/search.svg");
 }
 
 [data-type=numberinput]::before {
