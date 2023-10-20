@@ -241,7 +241,7 @@ export class Compose extends Assemble {
 			"type": "text",
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add text"
+				"value": "✓ add text"
 			}
 		};
 		this.createButtons.push(this.input('button'));
@@ -272,7 +272,7 @@ export class Compose extends Assemble {
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add " + type.addblock
+				"value": "✓ add " + type.addblock
 			}
 		};
 		this.createButtons.push(this.input('button'));
@@ -341,7 +341,7 @@ export class Compose extends Assemble {
 		this.tile = {
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add " + type.additem + " item",
+				"value": "✚ add " + type.additem + " item",
 				"onpointerdown": cloneItems
 			}
 		};
@@ -352,7 +352,7 @@ export class Compose extends Assemble {
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add " + type.addblock + " block"
+				"value": "✓ add " + type.addblock + " block"
 			}
 		};
 		this.createButtons.push(this.input('button'));
@@ -407,7 +407,7 @@ export class Compose extends Assemble {
 			"type": type.type,
 			"attributes": {
 				"data-type": "addButton",
-				"value": "➕ add " + type.addblock
+				"value": "✓ add " + type.addblock
 			}
 		};
 		this.createButtons.push(this.input('button'));
