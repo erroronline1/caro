@@ -217,6 +217,7 @@ export class Assemble {
 		if (this.tile.attributes !== undefined) {
 			if (this.tile.attributes.placeholder) {
 				label = document.createElement('label');
+				label.htmlFor = input.id;
 				label.appendChild(document.createTextNode(this.tile.attributes.placeholder));
 				this.tile.attributes.placeholder = ' ';
 				label.classList.add('input-label');
@@ -330,7 +331,7 @@ export class Assemble {
 			}
 		}*/
 		const select = document.createElement('select');
-		select.name = this.tile.description;
+		select.name = select.title = this.tile.description;
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (events.includes(key)) {
 				select[key] = new Function(this.tile.attributes[key]);
