@@ -1,3 +1,6 @@
+/*
+this module helps to assemble forms according to the passed simplified object notation.
+*/
 import QrScanner from '../libraries/qr-scanner.min.js';
 import SignaturePad from '../libraries/signature_pad.umd.js';
 import {
@@ -208,6 +211,7 @@ export class Assemble {
 		let label;
 		input.type = type;
 		input.id = getNextElementID();
+		input.autocomplete = 'off';
 		if (this.tile.description) input.name = this.tile.description;
 		input.classList.add('input-field');
 		if (this.tile.attributes !== undefined) {
@@ -356,6 +360,7 @@ export class Assemble {
 		}*/
 		const textarea = document.createElement('textarea');
 		textarea.name = this.tile.description;
+		textarea.autocomplete = 'off';
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			if (events.includes(key)) {
 				textarea[key] = new Function(this.tile.attributes[key]);
@@ -482,6 +487,10 @@ export class Assemble {
 			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.input('button');
+	}
+
+	trash() {
+		// empty method but necessary to display the delete-area for composer or other future use
 	}
 }
 

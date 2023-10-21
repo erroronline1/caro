@@ -142,7 +142,8 @@ section>div>article {
 	overflow: auto;
 }
 
-.inset {
+.inset,
+[data-type=trash] {
 	box-shadow:
 		inset 3px 3px 5px var(--darkshadow);
 }
@@ -228,7 +229,9 @@ hr {
 	border-radius: .5em;
 }
 
-section>div>hr{width:95%}
+section>div>hr {
+	width: 95%
+}
 
 .hrhover {
 	background-color: var(--green);
