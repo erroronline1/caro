@@ -38,8 +38,8 @@ body {
 	color: var(--foreground);
 	background: var(--background);
 	background-attachment: fixed;
-	user-select: none;
 	-webkit-user-select: none;
+	user-select: none;
 }
 
 header {
@@ -213,6 +213,15 @@ input[type=number] {
 .input-field:focus+.input-label {
 	top: -2.75rem;
 	font-size: x-small;
+}
+
+.photoupload{
+	margin-top:-3em;
+	float:right;
+	height:4em;
+	width:4em;
+	border-radius: 50%;
+	object-fit: cover;
 }
 
 /*************************** decorators ******************************/

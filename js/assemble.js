@@ -287,16 +287,19 @@ export class Assemble {
 			}
 		}*/
 		const input = document.createElement('input'),
-			label = document.createElement('label');
+			label = document.createElement('label'),
+			img = document.createElement('img');
 
 		function changeEvent() {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' oder ändern...' : 'Photo aufnehmen...';
+			this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
 			if (this.files.length) {
 				const nextPhoto = this.parentNode.cloneNode(true);
 				nextPhoto.childNodes[1].id = nextPhoto.childNodes[2].htmlFor = getNextElementID();
 				nextPhoto.childNodes[1].files = null;
 				nextPhoto.childNodes[1].onchange = changeEvent;
 				nextPhoto.childNodes[2].innerHTML = 'Photo aufnehmen...';
+				nextPhoto.childNodes[3].src = '';
 				this.parentNode.after(nextPhoto);
 			}
 		}
@@ -312,8 +315,10 @@ export class Assemble {
 		});
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode('Photo aufnehmen...'));
-		this.elements.add(input)
+		img.classList.add('photoupload');
+		this.elements.add(input);
 		this.elements.add(label);
+		this.elements.add(img);
 	}
 
 	select() {
