@@ -6,166 +6,169 @@ import {
 	_
 } from '../libraries/erroronline1.js';
 
-export var newFormElements = {};
 //chain as much previousElementSibling as iterations. every odd will be deep copied including nodes (aka labels)
-const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value=''; clone.id = getNextElementID(); this.parentNode.insertBefore(clone, this);}";
+const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value=''; clone.id = compose_helper.getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
-export const assembleNewElementCallback = (e) => {
-	e = document.getElementById(e).childNodes[0];
-	let sibling = e.nextSibling,
-		property, value, element = {},
-		attributes = {};
-	do {
-		if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header'].includes(sibling.localName)) {
-			sibling = sibling.nextSibling;
-			continue;
-		}
-		element['type'] = sibling.name.match(/(_(.+)-)/)[2];
-		property = sibling.name.match(/(-(.+)$)/)[2];
-		value = sibling.value;
-		if (['links', 'checkbox', 'radio', 'select'].includes(element['type'])) {
-			if (property === 'description')
-				if (value) element[property] = value;
-				else return;
-			if (property === 'attributes' && value) {
-				try {
-					attributes = JSON.parse(value);
-				} catch (err) {
-					return
-				};
+export const compose_helper = {
+	newFormElements: {},
+	getNextElementID: getNextElementID,
+	assembleNewElementCallback: function (e) {
+		e = document.getElementById(e).childNodes[0];
+		let sibling = e.nextSibling,
+			property, value, element = {},
+			attributes = {};
+		do {
+			if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header'].includes(sibling.localName)) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
-			if (property === 'content' && value) {
-				if (element.content === undefined) element.content = {};
-				element.content[value] = attributes;
-			}
-		} else {
-			if (property === 'attributes' && value.length) try {
-				value = JSON.parse(value);
-			} catch {
-				return;
-			};
-			if (value) element[property] = value;
-		}
-		sibling = sibling.nextSibling;
-	} while (sibling !== undefined && sibling != null);
-
-	if (Object.keys(element).length > 1) {
-		const newElements = new Compose({
-			"draggable": true,
-			"content": [
-				[element]
-			]
-		});
-		newElements.forEach(r_element => {
-			newFormElements[r_element.id] = r_element.content;
-		});
-	}
-}
-
-export function constructNewForm() {
-	// set dragged/dropped order of elements - wohoo, recursion!
-	function nodechildren(node, recursion = false) {
-		const nodes = node.childNodes;
-		let content = [],
-			isSection;
-		for (let i = 0; i < nodes.length; i++) {
-			if (nodes[i].draggable) {
-				isSection = nodes[i].children[1].firstChild;
-				if (isSection.localName === 'section') {
-					content.push(nodechildren(isSection, true));
+			element['type'] = sibling.name.match(/(_(.+)-)/)[2];
+			property = sibling.name.match(/(-(.+)$)/)[2];
+			value = sibling.value;
+			if (['links', 'checkbox', 'radio', 'select'].includes(element['type'])) {
+				if (property === 'description')
+					if (value) element[property] = value;
+					else return;
+				if (property === 'attributes' && value) {
+					try {
+						attributes = JSON.parse(value);
+					} catch (err) {
+						return
+					};
+					sibling = sibling.nextSibling;
 					continue;
 				}
-				if (nodes[i].children[1].id in newFormElements) {
-					if (recursion) content.push(newFormElements[nodes[i].children[1].id]);
-					else content.push([newFormElements[nodes[i].children[1].id]]);
+				if (property === 'content' && value) {
+					if (element.content === undefined) element.content = {};
+					element.content[value] = attributes;
+				}
+			} else {
+				if (property === 'attributes' && value.length) try {
+					value = JSON.parse(value);
+				} catch {
+					return;
+				};
+				if (value) element[property] = value;
+			}
+			sibling = sibling.nextSibling;
+		} while (sibling !== undefined && sibling != null);
+
+		if (Object.keys(element).length > 1) {
+			const newElements = new Compose({
+				"draggable": true,
+				"content": [
+					[element]
+				]
+			});
+			newElements.forEach(r_element => {
+				compose_helper.newFormElements[r_element.id] = r_element.content;
+			});
+		}
+	},
+
+	constructNewForm: function () {
+		// set dragged/dropped order of elements - wohoo, recursion!
+		function nodechildren(node, recursion = false) {
+			const nodes = node.childNodes;
+			let content = [],
+				isSection;
+			for (let i = 0; i < nodes.length; i++) {
+				if (nodes[i].draggable) {
+					isSection = nodes[i].children[1].firstChild;
+					if (isSection.localName === 'section') {
+						content.push(nodechildren(isSection, true));
+						continue;
+					}
+					if (nodes[i].children[1].id in compose_helper.newFormElements) {
+						if (recursion) content.push(compose_helper.newFormElements[nodes[i].children[1].id]);
+						else content.push([compose_helper.newFormElements[nodes[i].children[1].id]]);
+					}
 				}
 			}
+			return content;
 		}
-		return content;
-	}
-	return JSON.stringify({
-		"form": {},
-		"content": nodechildren(document.getElementById('main'))
-	});
-}
-
-export function importForm(form) {
-	Object.keys(form.content).forEach(element => {
-		const newElements = new Compose({
-			"draggable": true,
-			"content": [
-				form.content[element]
-			]
+		return JSON.stringify({
+			"form": {},
+			"content": nodechildren(document.getElementById('main'))
 		});
-		newElements.forEach(r_element => {
-			newFormElements[r_element.id] = r_element.content;
+	},
+
+	importForm: function (form) {
+		Object.keys(form.content).forEach(element => {
+			const newElements = new Compose({
+				"draggable": true,
+				"content": [
+					form.content[element]
+				]
+			});
+			newElements.forEach(r_element => {
+				compose_helper.newFormElements[r_element.id] = r_element.content;
+			});
 		});
-	});
-}
-
-export const dragNdrop = {
-	stopParentDropEvent: false,
-	allowDrop: function (evnt) {
-		evnt.preventDefault();
 	},
-	drag: function (evnt) {
-		evnt.dataTransfer.setData("text", evnt.target.id);
-		this.stopParentDropEvent = false;
-	},
-	drop_insert: function (evnt, droppedUpon) {
-		evnt.preventDefault();
-		if (!evnt.dataTransfer.getData("text")) return;
 
-		const draggedTile = document.getElementById(evnt.dataTransfer.getData("text")),
-			newtile = draggedTile.cloneNode(true), // cloned for most likely descendant issues
-			originParent = draggedTile.parentNode;
-		//console.log("dragged", draggedTile.id, "dropped on", droppedUpon.id);
-		if (!draggedTile || this.stopParentDropEvent || draggedTile.id === droppedUpon.id) return;
-		if (evnt.target.localName === 'hr') {
-			// handle only if dropped within the reorder area
-			droppedUpon.parentNode.insertBefore(newtile, droppedUpon);
-			droppedUpon.firstChild.classList.remove('hrhover');
-			this.stopParentDropEvent = true;
-			// sanitize multiple section on lack of elements
-			if (originParent.children.length < 2) {
-				const section = originParent.parentNode.parentNode; // adapt to changes in section creation!
-				section.parentNode.insertBefore(originParent.children[0], section);
-				section.remove();
+	dragNdrop: {
+		stopParentDropEvent: false,
+		allowDrop: function (evnt) {
+			evnt.preventDefault();
+		},
+		drag: function (evnt) {
+			evnt.dataTransfer.setData("text", evnt.target.id);
+			this.stopParentDropEvent = false;
+		},
+		drop_insert: function (evnt, droppedUpon) {
+			evnt.preventDefault();
+			if (!evnt.dataTransfer.getData("text")) return;
+
+			const draggedTile = document.getElementById(evnt.dataTransfer.getData("text")),
+				newtile = draggedTile.cloneNode(true), // cloned for most likely descendant issues
+				originParent = draggedTile.parentNode;
+			//console.log("dragged", draggedTile.id, "dropped on", droppedUpon.id);
+			if (!draggedTile || this.stopParentDropEvent || draggedTile.id === droppedUpon.id) return;
+			if (evnt.target.localName === 'hr') {
+				// handle only if dropped within the reorder area
+				droppedUpon.parentNode.insertBefore(newtile, droppedUpon);
+				droppedUpon.firstChild.classList.remove('hrhover');
+				this.stopParentDropEvent = true;
+				// sanitize multiple section on lack of elements
+				if (originParent.children.length < 2) {
+					const section = originParent.parentNode.parentNode; // adapt to changes in section creation!
+					section.parentNode.insertBefore(originParent.children[0], section);
+					section.remove();
+				}
+				draggedTile.remove(); // do not remove earlier! insertBefore might reference to this object by chance
+				return;
 			}
-			draggedTile.remove(); // do not remove earlier! insertBefore might reference to this object by chance
-			return;
-		}
-		if (droppedUpon.parentNode.localName === 'main' && draggedTile.parentNode.localName === 'main' &&
-			!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedTile.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
-			// create a multiple article tile if dropped on a tile
-			const container = document.createElement('div'),
-				article = document.createElement('article'),
-				section = document.createElement('section'),
-				insertionarea = document.createElement('hr'),
-				previousSibling = droppedUpon.previousElementSibling;
-			container.id = getNextElementID();
-			container.setAttribute('draggable', 'true');
-			container.setAttribute('ondragstart', 'dragNdrop.drag(event)');
-			container.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
-			container.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
+			if (droppedUpon.parentNode.localName === 'main' && draggedTile.parentNode.localName === 'main' &&
+				!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedTile.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
+				// create a multiple article tile if dropped on a tile
+				const container = document.createElement('div'),
+					article = document.createElement('article'),
+					section = document.createElement('section'),
+					insertionarea = document.createElement('hr'),
+					previousSibling = droppedUpon.previousElementSibling;
+				container.id = getNextElementID();
+				container.setAttribute('draggable', 'true');
+				container.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
+				container.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
+				container.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
 
-			section.classList = 'inset';
-			section.append(newtile, droppedUpon);
-			article.append(section);
-			container.append(article);
+				section.classList = 'inset';
+				section.append(newtile, droppedUpon);
+				article.append(section);
+				container.append(article);
 
-			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-			container.insertBefore(insertionarea, container.firstChild);
-			previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
-			draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
-			return;
+				insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+				insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+				container.insertBefore(insertionarea, container.firstChild);
+				previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
+				draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
+				return;
+			}
+		},
+		drop_delete: function (evnt) {
+			document.getElementById(evnt.dataTransfer.getData("text")).remove();
 		}
-	},
-	drop_delete: function (evnt) {
-		document.getElementById(evnt.dataTransfer.getData("text")).remove();
 	}
 };
 
@@ -188,7 +191,7 @@ export class Compose extends Assemble {
 			form = document.createElement('form');
 		article.setAttribute('data-type', this.tile.type);
 		article.id = getNextElementID();
-		form.action = "javascript:assembleNewElementCallback('" + article.id + "')";
+		form.action = "javascript:compose_helper.assembleNewElementCallback('" + article.id + "')";
 		article.append(...this.elements);
 		this.composer_add_trash(article);
 		form.append(article);
@@ -208,9 +211,9 @@ export class Compose extends Assemble {
 	create_draggable(element) {
 		element.id = getNextElementID();
 		element.setAttribute('draggable', 'true');
-		element.setAttribute('ondragstart', 'dragNdrop.drag(event)');
-		element.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
-		element.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
+		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
+		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
+		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
 		const insertionarea = document.createElement('hr');
 		insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
 		insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
@@ -224,9 +227,9 @@ export class Compose extends Assemble {
 
 	composer_add_trash(section) {
 		if (this.tile.type === 'trash') {
-			section.setAttribute('ondragstart', 'dragNdrop.drag(event)');
-			section.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
-			section.setAttribute('ondrop', 'dragNdrop.drop_delete(event)');
+			section.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
+			section.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
+			section.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_delete(event)');
 			section.classList.add('inset');
 		}
 		return section;

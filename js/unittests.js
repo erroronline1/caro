@@ -1,26 +1,20 @@
 //test assembling
-/*import{getNextElementID, initialize_qrScanner} from '../js/assemble.js';
-window.getNextElementID=getNextElementID;
-window.initialize_qrScanner=initialize_qrScanner;
-import {api} from '../scripts.js';
-api.getForms('qr','template', 'qr');
-*/
-//test composing
 import {
-    Compose,
-    constructNewForm,
-    dragNdrop,
-    importForm,
-    assembleNewElementCallback
-} from '../js/compose.js';
-import {
-    getNextElementID
+    assemble_helper
 } from '../js/assemble.js';
-window.getNextElementID = getNextElementID;
+window.assemble_helper = assemble_helper;
+import {
+    api
+} from '../scripts.js';
+api.getForms('qr', 'template', 'qr');
+
+//test composing
+/*import {
+    Compose,
+    compose_helper
+} from '../js/compose.js';
 window.Compose = Compose;
-window.constructNewForm = constructNewForm;
-window.dragNdrop = dragNdrop;
-window.assembleNewElementCallback = assembleNewElementCallback;
+window.compose_helper = compose_helper;
 const createForm = {
     "content": [
         [{
@@ -84,7 +78,7 @@ const createForm = {
             "type": "button",
             "attributes": {
                 "value": "♺ generate/update form object",
-                "onclick": "console.log(constructNewForm())"
+                "onclick": "console.log(compose_helper.constructNewForm())"
             }
         }],
         [{
@@ -137,4 +131,4 @@ const oldform = {
     ]
 };
 
-importForm(oldform);
+compose_helper.importForm(oldform);*/

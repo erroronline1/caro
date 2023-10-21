@@ -4,12 +4,7 @@ import {
 	_
 } from '../libraries/erroronline1.js';
 
-export var multiplearticleID = 0;
-export var ElementID = 0;
-
-export function getNextArticleID() {
-	return 'articleID' + ++multiplearticleID;
-}
+var ElementID = 0;
 
 export function getNextElementID() {
 	return 'elementID' + ++ElementID;
@@ -17,7 +12,28 @@ export function getNextElementID() {
 
 const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'];
 
-export const scroller = (e) => {
+export const assemble_helper = {
+	getNextElementID: getNextElementID,
+	initialize_qrScanner: function (videostream, resultTo) {
+		const stream = document.getElementById(videostream);
+		stream.classList.add('active');
+		const scanner = new QrScanner(
+			stream,
+			result => {
+				document.getElementById(resultTo).value = result.data;
+				scanner.stop();
+				scanner.destroy();
+				stream.classList.remove('active');
+			}, {
+				highlightScanRegion: true
+				/* your options or returnDetailedScanResult: true if you're not specifying any other options */
+			},
+		);
+		scanner.start();
+	}
+}
+
+const sectionScroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
 	setTimeout(() => {
 		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
@@ -104,7 +120,7 @@ export class Assemble {
 		this.section.append(...this.assembledTiles);
 		document.getElementById('main').insertAdjacentElement('beforeend', this.section);
 		for (let i = 0; i < this.multiplearticles.length; i++) {
-			document.getElementById(this.multiplearticles[i]).addEventListener('scroll', scroller);
+			document.getElementById(this.multiplearticles[i]).addEventListener('scroll', sectionScroller);
 		}
 
 		if (this.signaturePad) {
@@ -140,7 +156,7 @@ export class Assemble {
 		const article = document.createElement('article'),
 			section = document.createElement('section'),
 			indicators = document.createElement('div');
-		this.multiplearticleID = getNextArticleID();
+		this.multiplearticleID = getNextElementID();
 		this.multiplearticles.push(this.multiplearticleID);
 		section.classList = 'inset';
 		section.id = this.multiplearticleID;
@@ -463,12 +479,11 @@ export class Assemble {
 		this.tile.attributes = {
 			'name': '',
 			'value': 'start scan',
-			'onpointerdown': "initialize_qrScanner('" + stream.id + "','" + inputid + "')"
+			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.input('button');
 	}
 }
-
 
 var canvas = null,
 	signaturePad = null;
@@ -486,7 +501,6 @@ function initialize_SignaturePad() {
 	resizeSignatureCanvas();
 
 }
-
 // Adjust canvas coordinate space taking into account pixel ratio,
 // to make it look crisp on mobile devices.
 // This also causes canvas to be cleared.
@@ -511,7 +525,6 @@ function resizeSignatureCanvas() {
 	// If you want to keep the drawing on resize instead of clearing it you can reset the data.
 	signaturePad.fromData(signaturePad.toData());
 }
-
 // One could simply use Canvas#toBlob method instead, but it's just to show
 // that it can be done using result of SignaturePad#toDataURL.
 function dataURLToBlob(dataURL) {
@@ -529,22 +542,4 @@ function dataURLToBlob(dataURL) {
 	return new Blob([uInt8Array], {
 		type: contentType
 	});
-}
-
-export function initialize_qrScanner(videostream, resultTo) {
-	const stream = document.getElementById(videostream);
-	stream.classList.add('active');
-	const scanner = new QrScanner(
-		stream,
-		result => {
-			document.getElementById(resultTo).value = result.data;
-			scanner.stop();
-			scanner.destroy();
-			stream.classList.remove('active');
-		}, {
-			highlightScanRegion: true
-			/* your options or returnDetailedScanResult: true if you're not specifying any other options */
-		},
-	);
-	scanner.start();
 }
