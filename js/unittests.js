@@ -1,5 +1,5 @@
 //test assembling
-import {
+/*import {
     assemble_helper
 } from '../js/assemble.js';
 window.assemble_helper = assemble_helper;
@@ -7,14 +7,18 @@ import {
     api
 } from '../scripts.js';
 api.getForms('qr', 'template', 'qr');
-
+*/
 //test composing
-/*import {
+import {
     Compose,
+    MetaCompose,
     compose_helper
 } from '../js/compose.js';
-window.Compose = Compose;
+import { Assemble } from './assemble.js';
+window.MetaCompose = MetaCompose;
 window.compose_helper = compose_helper;
+/*
+window.Compose = Compose;
 const createForm = {
     "content": [
         [{
@@ -73,12 +77,12 @@ const createForm = {
             "form": true,
             "type": "compose_qr",
             "description": "add a qr scanner field"
-        }, ],
+        }],
         [{
             "type": "button",
             "attributes": {
                 "value": "♺ generate/update form object",
-                "onclick": "console.log(compose_helper.constructNewForm())"
+                "onclick": "console.log(compose_helper.composeNewForm())"
             }
         }],
         [{
@@ -87,11 +91,10 @@ const createForm = {
         }]
     ]
 };
-
 new Compose(createForm);
-
+*/
 const oldform = {
-    "form": {},
+    "name":"oldform",
     "content": [
         [{
             "type": "radio",
@@ -130,5 +133,40 @@ const oldform = {
         }]
     ]
 };
+//compose_helper.importForm(oldform);
 
-compose_helper.importForm(oldform);*/
+const oldform2 = {
+    "name":"oldform2",
+    "content": [
+        [{
+            "type": "text",
+            "description": "dfhgdfgh1398172693876123",
+            "content": "dfghdfghdfhg349871239487 123874 237641 723872o 3479817234871t234 87129873 4"
+        }]
+    ]
+};
+
+const createForm = {
+    "content": [
+        [{
+            "type": "text",
+            "description": "what to do",
+            "content": "choose available form elements from this panel. change your order by dragging the elements. during composing indicators for containers are not available. dragging is available on devies with mice only."
+        }],
+        [{
+            "type": "button",
+            "attributes": {
+                "value": "♺ generate/update form object",
+                "onclick": "console.log(compose_helper.composeNewMetaForm())"
+            }
+        }],
+        [{
+            "type": "trash",
+            "description": "drop form element here to delete"
+        }]
+    ]
+};
+
+new Compose(createForm);
+compose_helper.importMetaForm(oldform);
+compose_helper.importMetaForm(oldform2);

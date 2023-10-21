@@ -1,3 +1,6 @@
+/*
+this module helps to compose and edit forms according to the passed simplified object notation. it makes use of the assemble library.
+*/
 import {
 	getNextElementID,
 	Assemble
@@ -7,12 +10,13 @@ import {
 } from '../libraries/erroronline1.js';
 
 //chain as much previousElementSibling as iterations. every odd will be deep copied including nodes (aka labels)
-const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value=''; clone.id = compose_helper.getNextElementID(); this.parentNode.insertBefore(clone, this);}";
+const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value = ''; clone.id = compose_helper.getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
 export const compose_helper = {
 	newFormElements: {},
+	newMetaFormElements: new Set(),
 	getNextElementID: getNextElementID,
-	assembleNewElementCallback: function (e) {
+	composeNewElementCallback: function (e) {
 		e = document.getElementById(e).childNodes[0];
 		let sibling = e.nextSibling,
 			property, value, element = {},
@@ -66,7 +70,7 @@ export const compose_helper = {
 		}
 	},
 
-	constructNewForm: function () {
+	composeNewForm: function () {
 		// set dragged/dropped order of elements - wohoo, recursion!
 		function nodechildren(node, recursion = false) {
 			const nodes = node.childNodes;
@@ -88,8 +92,18 @@ export const compose_helper = {
 			return content;
 		}
 		return JSON.stringify({
-			"form": {},
 			"content": nodechildren(document.getElementById('main'))
+		});
+	},
+	composeNewMetaForm: function () {
+		// set dragged/dropped order of elements
+		const nodes = document.getElementById('main').childNodes;
+		let content = [];
+		for (let i = 0; i < nodes.length; i++) {
+			if ('dataset' in nodes[i] && 'name' in nodes[i].dataset) content.push(nodes[i].dataset.name);
+		}
+		return JSON.stringify({
+			"forms": content
 		});
 	},
 
@@ -105,6 +119,11 @@ export const compose_helper = {
 				compose_helper.newFormElements[r_element.id] = r_element.content;
 			});
 		});
+	},
+	importMetaForm: function (form) {
+		form.draggable = true;
+		new MetaCompose(form);
+		compose_helper.newMetaFormElements.add(form.name);
 	},
 
 	dragNdrop: {
@@ -169,6 +188,22 @@ export const compose_helper = {
 		drop_delete: function (evnt) {
 			document.getElementById(evnt.dataTransfer.getData("text")).remove();
 		}
+	},
+	create_draggable: function (element) {
+		element.id = getNextElementID();
+		element.setAttribute('draggable', 'true');
+		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
+		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
+		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
+		const insertionarea = document.createElement('hr');
+		insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+		insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+		element.insertBefore(insertionarea, element.firstChild);
+	},
+	composer_add_trash: function (section) {
+		section.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
+		section.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
+		section.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_delete(event)');
 	}
 };
 
@@ -179,9 +214,7 @@ export class Compose extends Assemble {
 		this.createdArticles = [];
 
 		this.initializeSection();
-		if (this.createDraggable) {
-			this.section = this.create_draggable(this.section);
-		}
+		if (this.createDraggable) compose_helper.create_draggable(this.section);
 		return this.createdArticles;
 	}
 
@@ -191,9 +224,9 @@ export class Compose extends Assemble {
 			form = document.createElement('form');
 		article.setAttribute('data-type', this.tile.type);
 		article.id = getNextElementID();
-		form.action = "javascript:compose_helper.assembleNewElementCallback('" + article.id + "')";
+		form.action = "javascript:compose_helper.composeNewElementCallback('" + article.id + "')";
 		article.append(...this.elements);
-		this.composer_add_trash(article);
+		if (this.tile.type === 'trash') compose_helper.composer_add_trash(article);
 		form.append(article);
 		this.createdArticles.push({
 			id: article.id,
@@ -201,38 +234,11 @@ export class Compose extends Assemble {
 		});
 		if (tileProperties.form) return form;
 		if (this.createDraggable && oneOfFew) {
-			dragContainer = this.create_draggable(dragContainer);
+			compose_helper.create_draggable(dragContainer);
 			dragContainer.append(article);
 			return dragContainer;
 		}
 		return article;
-	}
-
-	create_draggable(element) {
-		element.id = getNextElementID();
-		element.setAttribute('draggable', 'true');
-		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
-		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
-		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
-		const insertionarea = document.createElement('hr');
-		insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-		insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-		element.insertBefore(insertionarea, element.firstChild);
-		return element;
-	}
-
-	trash() {
-		// empty method but necessary to display the delete-area
-	}
-
-	composer_add_trash(section) {
-		if (this.tile.type === 'trash') {
-			section.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
-			section.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
-			section.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_delete(event)');
-			section.classList.add('inset');
-		}
-		return section;
 	}
 
 	compose_text() {
@@ -463,5 +469,15 @@ export class Compose extends Assemble {
 			description: 'create a qr-scanner field',
 			addblock: 'signature qr-scanner'
 		});
+	}
+}
+
+export class MetaCompose extends Assemble {
+	constructor(setup) {
+		super(setup);
+
+		this.initializeSection();
+		if (setup.draggable) compose_helper.create_draggable(this.section);
+		this.section.setAttribute('data-name', setup.name);
 	}
 }
