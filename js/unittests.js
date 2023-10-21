@@ -1,12 +1,12 @@
 //test assembling
-import{getNextElementID, initialize_qrScanner} from '../js/assemble.js';
+/*import{getNextElementID, initialize_qrScanner} from '../js/assemble.js';
 window.getNextElementID=getNextElementID;
 window.initialize_qrScanner=initialize_qrScanner;
 import {api} from '../scripts.js';
 api.getForms('qr','template', 'qr');
-
+*/
 //test composing
-/*import {
+import {
     Compose,
     constructNewForm,
     dragNdrop,
@@ -125,9 +125,16 @@ const oldform = {
             "type": "textinput",
             "description": "comment",
             "attributes": {
-                "placeholder": "enter comment here if categories do not fit"
+                "placeholder": " ",
+                "onclick": "alert('hello')"
             }
+        }],
+        [{
+            "type": "text",
+            "description": "dfhgdfgh",
+            "content": "dfghdfghdfhg"
         }]
     ]
 };
-importForm(oldform);*/
+
+importForm(oldform);

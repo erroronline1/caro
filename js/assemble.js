@@ -22,9 +22,13 @@ export const scroller = (e) => {
 	setTimeout(() => {
 		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
 		for (let panel = 0; panel < e.target.children.length; panel++) {
-			if (panel == Math.floor(e.target.scrollLeft / e.target.clientWidth)) indicator.children[
-				panel].firstChild.classList.add('articleactive');
-			else indicator.children[panel].firstChild.classList.remove('articleactive');
+			try {
+				if (panel == Math.floor(e.target.scrollLeft / e.target.clientWidth)) indicator.children[
+					panel].firstChild.classList.add('articleactive');
+				else indicator.children[panel].firstChild.classList.remove('articleactive');
+			} catch {
+				return;
+			}
 		}
 	}, 500)
 };
@@ -109,7 +113,7 @@ export class Assemble {
 	}
 
 	processContent() {
-		let originalTileProperties; // composer changes these, so originals mist be preserved
+		let originalTileProperties; // composer changes these, so originals must be preserved
 		this.content.forEach(tile => {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
@@ -121,24 +125,23 @@ export class Assemble {
 					this.assembledTiles.add(this.single(originalTileProperties));
 					continue;
 				}
-				this.multipletiles.add(this.single(originalTileProperties))
+				this.multipletiles.add(this.single(originalTileProperties, true))
 			}
 			if (this.multipletiles.size) this.assembledTiles.add(this.multiple());
 		});
 	}
-	single(tileProperties) {
+	single(tileProperties, oneOfFew = false) { // parameters are required by composer method
 		const article = document.createElement('article');
 		article.setAttribute('data-type', tileProperties.type);
 		article.append(...this.elements);
 		return article;
 	}
-	multiple(classList = null) {
+	multiple() {
 		const article = document.createElement('article'),
 			section = document.createElement('section'),
 			indicators = document.createElement('div');
 		this.multiplearticleID = getNextArticleID();
 		this.multiplearticles.push(this.multiplearticleID);
-		if (classList) article.classList = classList;
 		section.classList = 'inset';
 		section.id = this.multiplearticleID;
 		section.append(...this.multipletiles);
