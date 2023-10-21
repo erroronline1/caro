@@ -72,6 +72,8 @@ export const compose_helper = {
 
 	composeNewForm: function () {
 		// set dragged/dropped order of elements - wohoo, recursion!
+		let isForm = false;
+
 		function nodechildren(node, recursion = false) {
 			const nodes = node.childNodes;
 			let content = [],
@@ -86,14 +88,17 @@ export const compose_helper = {
 					if (nodes[i].children[1].id in compose_helper.newFormElements) {
 						if (recursion) content.push(compose_helper.newFormElements[nodes[i].children[1].id]);
 						else content.push([compose_helper.newFormElements[nodes[i].children[1].id]]);
+						if ('dataset' in nodes[i].children[1] && 'type' in nodes[i].children[1].dataset && nodes[i].children[1].dataset.type != 'text') isForm = true;
 					}
 				}
 			}
 			return content;
 		}
-		return JSON.stringify({
+		const answer = {
 			"content": nodechildren(document.getElementById('main'))
-		});
+		};
+		if (isForm) answer.form = {};
+		return JSON.stringify(answer);
 	},
 	composeNewMetaForm: function () {
 		// set dragged/dropped order of elements
