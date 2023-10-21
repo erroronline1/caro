@@ -52,13 +52,15 @@ export const assembleNewElementCallback = (e) => {
 	} while (sibling !== undefined && sibling != null);
 
 	if (Object.keys(element).length > 1) {
-		const newElement = new Compose({
+		const newElements = new Compose({
 			"draggable": true,
 			"content": [
 				[element]
 			]
 		});
-		newFormElements[newElement.id] = newElement.content;
+		newElements.forEach(r_element => {
+			newFormElements[r_element.id] = r_element.content;
+		});
 	}
 }
 
@@ -70,13 +72,15 @@ export function constructNewForm() {
 			isSection;
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].draggable) {
-				isSection = nodes[i].children.item(1).firstChild;
+				isSection = nodes[i].children[1].firstChild;
 				if (isSection.localName === 'section') {
 					content.push(nodechildren(isSection, true));
 					continue;
 				}
-				if (recursion) content.push(newFormElements[nodes[i].id][0][0]);
-				else content.push([newFormElements[nodes[i].id][0][0]]);
+				if (nodes[i].children[1].id in newFormElements) {
+					if (recursion) content.push(newFormElements[nodes[i].children[1].id]);
+					else content.push([newFormElements[nodes[i].children[1].id]]);
+				}
 			}
 		}
 		return content;
@@ -89,13 +93,15 @@ export function constructNewForm() {
 
 export function importForm(form) {
 	Object.keys(form.content).forEach(element => {
-		const newElement = new Compose({
+		const newElements = new Compose({
 			"draggable": true,
 			"content": [
 				form.content[element]
 			]
 		});
-		newFormElements[newElement.id] = newElement.content;
+		newElements.forEach(r_element => {
+			newFormElements[r_element.id] = r_element.content;
+		});
 	});
 }
 
@@ -167,26 +173,17 @@ export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
 		this.createDraggable = this.setup.draggable;
+		this.createdArticles = [];
 
 		this.initializeSection();
 		if (this.createDraggable) {
-			this.section.id = getNextElementID();
-			this.section.setAttribute('draggable', 'true');
-			this.section.setAttribute('ondragstart', 'dragNdrop.drag(event)');
-			this.section.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
-			this.section.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
-			const insertionarea = document.createElement('hr');
-			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-			this.section.insertBefore(insertionarea, this.section.firstChild);
+			this.section = this.create_draggable(this.section);
 		}
-		return {
-			id: this.section.id,
-			content: this.content
-		};
+		return this.createdArticles;
 	}
 
-	single(tileProperties) { // overriding parent method
+	single(tileProperties, oneOfFew = false) { // overriding parent method
+		let dragContainer = document.createElement('div');
 		const article = document.createElement('article'),
 			form = document.createElement('form');
 		article.setAttribute('data-type', this.tile.type);
@@ -195,8 +192,30 @@ export class Compose extends Assemble {
 		article.append(...this.elements);
 		this.composer_add_trash(article);
 		form.append(article);
+		this.createdArticles.push({
+			id: article.id,
+			content: tileProperties
+		});
 		if (tileProperties.form) return form;
+		if (this.createDraggable && oneOfFew) {
+			dragContainer = this.create_draggable(dragContainer);
+			dragContainer.append(article);
+			return dragContainer;
+		}
 		return article;
+	}
+
+	create_draggable(element) {
+		element.id = getNextElementID();
+		element.setAttribute('draggable', 'true');
+		element.setAttribute('ondragstart', 'dragNdrop.drag(event)');
+		element.setAttribute('ondragover', 'dragNdrop.allowDrop(event)');
+		element.setAttribute('ondrop', 'dragNdrop.drop_insert(event,this)');
+		const insertionarea = document.createElement('hr');
+		insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+		insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+		element.insertBefore(insertionarea, element.firstChild);
+		return element;
 	}
 
 	trash() {
