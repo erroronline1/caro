@@ -221,12 +221,14 @@ input[type=number] {
 }
 
 hr {
-	margin: 1em 0;
+	margin: 1em auto;
 	height: 1em;
 	width: 100%;
 	border-color: var(--foreground);
 	border-radius: .5em;
 }
+
+section>div>hr{width:95%}
 
 .hrhover {
 	background-color: var(--green);
