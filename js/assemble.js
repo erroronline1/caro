@@ -140,6 +140,7 @@ export class Assemble {
 				this.tile = originalTileProperties = tile[i];
 				this.description();
 				this[tile[i].type]();
+				if (tile[i].type === 'hiddeninput' && !this.setup.visible) continue;
 				if (tile.length < 2) {
 					this.assembledTiles.add(this.single(originalTileProperties));
 					continue;
@@ -249,6 +250,25 @@ export class Assemble {
 	}
 	searchinput() {
 		this.input('search');
+	}
+	hiddeninput() {
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = this.tile.description;
+		input.id = getNextElementID();
+		input.value = this.tile.value;
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
+			if (events.includes(key)) {
+				input[key] = new Function(this.tile.attributes[key]);
+			} else input.setAttribute(key, this.tile.attributes[key]);
+		});
+		if (!this.setup.visible) this.assembledTiles.add(input);
+		else {
+			const value = document.createTextNode(input.value);
+			this.elements.add(value);
+			this.elements.add(input);
+		}
+		return input.id;
 	}
 
 	file() {

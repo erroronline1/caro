@@ -1,5 +1,5 @@
 //test assembling
-/*import {
+import {
     assemble_helper
 } from '../js/assemble.js';
 window.assemble_helper = assemble_helper;
@@ -7,19 +7,18 @@ import {
     api
 } from '../scripts.js';
 api.getForms('qr', 'template', 'qr');
-*/
+
 //test composing
-import {
+/*import {
     Compose,
     MetaCompose,
     compose_helper
 } from '../js/compose.js';
-import { Assemble } from './assemble.js';
 window.MetaCompose = MetaCompose;
 window.compose_helper = compose_helper;
-/*
+
 window.Compose = Compose;
-const createForm = {
+/*const createForm = {
     "content": [
         [{
             "type": "text",
@@ -92,7 +91,7 @@ const createForm = {
     ]
 };
 new Compose(createForm);
-*/
+
 const oldform = {
     "name":"oldform",
     "content": [
@@ -152,6 +151,10 @@ const createForm = {
             "type": "text",
             "description": "what to do",
             "content": "choose available form elements from this panel. change your order by dragging the elements. during composing indicators for containers are not available. dragging is available on devies with mice only."
+        },{
+            "form":true,
+            "type": "compose_hiddeninput",
+            "description": "create a hidden field",
         }],
         [{
             "type": "button",
@@ -169,4 +172,4 @@ const createForm = {
 
 new Compose(createForm);
 compose_helper.importMetaForm(oldform);
-compose_helper.importMetaForm(oldform2);
+compose_helper.importMetaForm(oldform2);*/

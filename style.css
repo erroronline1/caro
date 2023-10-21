@@ -400,3 +400,7 @@ input[type=search] {
 [data-type=trash]::before {
 	background-image: url("media/trash-alt.svg");
 }
+
+[data-type=hiddeninput]::before {
+	background-image: url("media/user-secret.svg");
+}

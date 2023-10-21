@@ -59,6 +59,7 @@ export const compose_helper = {
 
 		if (Object.keys(element).length > 1) {
 			const newElements = new Compose({
+				"visible": true,
 				"draggable": true,
 				"content": [
 					[element]
@@ -103,11 +104,14 @@ export const compose_helper = {
 	composeNewMetaForm: function () {
 		// set dragged/dropped order of elements
 		const nodes = document.getElementById('main').childNodes;
-		let content = [];
+		let content = [],
+			hidden = {};
 		for (let i = 0; i < nodes.length; i++) {
 			if ('dataset' in nodes[i] && 'name' in nodes[i].dataset) content.push(nodes[i].dataset.name);
+			if (nodes[i].childNodes.length && nodes[i].childNodes[1].dataset.type === 'hiddeninput') hidden[nodes[i].childNodes[1].childNodes[2].name] = nodes[i].childNodes[1].childNodes[2].value;
 		}
 		return JSON.stringify({
+			"hidden": hidden,
 			"forms": content
 		});
 	},
@@ -298,6 +302,7 @@ export class Compose extends Assemble {
 				"title": "json object with double quotes"
 			}
 		};
+		if (type.attributes) this.tile.attributes.value = type.attributes;
 		this.textinput();
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
@@ -341,7 +346,14 @@ export class Compose extends Assemble {
 			description: 'create a multi line text input',
 			addblock: 'multiline text input'
 		});
-
+	}
+	compose_hiddeninput() {
+		this.compose_input({
+			type: 'hiddeninput',
+			description: 'create a hidden field',
+			addblock: 'hidden field',
+			attributes: "{\"value\":\"usecase\"}"
+		});
 	}
 
 	compose_multilist(type) {
