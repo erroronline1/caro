@@ -411,8 +411,7 @@ export class Assemble {
 		}*/
 		Object.keys(this.tile.content).forEach(checkbox => {
 			let label = document.createElement('label'),
-				input = document.createElement('input'),
-				span = document.createElement('span');
+				input = document.createElement('input');
 			if (radio) {
 				input.type = 'radio';
 				input.name = this.tile.description;
@@ -422,16 +421,14 @@ export class Assemble {
 				input.name = checkbox;
 			}
 
-			label.classList = 'custominput';
-			span.classList = 'checkmark';
-			label.appendChild(document.createTextNode(checkbox));
+			label.classList.add('check');
 			Object.keys(this.tile.content[checkbox]).forEach(attribute => {
 				if (events.includes(attribute)) {
 					input[attribute] = new Function(this.tile.content[checkbox][attribute]);
 				} else input[attribute] = this.tile.content[checkbox][attribute];
 			});
 			label.appendChild(input);
-			label.appendChild(span);
+			label.appendChild(document.createTextNode(checkbox));
 			this.elements.add(label);
 		});
 	}

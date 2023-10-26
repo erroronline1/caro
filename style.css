@@ -2,6 +2,7 @@
 	--background: rgb(229, 233, 240);
 	--foreground: rgb(46, 52, 64);
 	--protrusion: rgb(229, 233, 240);
+	--menu: rgb(216, 222, 233);
 	--green: rgb(153, 179, 132);
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
@@ -144,8 +145,7 @@ section>div>article {
 
 .inset,
 [data-type=trash] {
-	box-shadow:
-		inset 3px 3px 5px var(--darkshadow);
+	box-shadow: inset 3px 3px 5px var(--darkshadow);
 }
 
 section {
@@ -215,11 +215,11 @@ input[type=number] {
 	font-size: x-small;
 }
 
-.photoupload{
-	margin-top:-3em;
-	float:right;
-	height:4em;
-	width:4em;
+.photoupload {
+	margin-top: -3em;
+	float: right;
+	height: 4em;
+	width: 4em;
 	border-radius: 50%;
 	object-fit: cover;
 }
@@ -252,56 +252,39 @@ input[type=search] {
 	border-bottom: 1px solid var(--foreground);
 }
 
-.custominput {
+
+.check {
 	display: inline-block;
 	position: relative;
-	padding-left: 4em;
 	min-width: 10em;
+	padding-left: 1em;
 	margin: 0 1em 1em 0;
 }
 
-.custominput input {
-	/* hide default checkbox */
-	display: none;
+.check input {
+	appearance: none;
+	width: auto;
 }
 
-.checkmark {
-	/* create a custom checkbox */
-	position: absolute;
-	top: -.25em;
-	left: 0;
-	height: 1.5em;
-	width: 3em;
-	border-radius: 1.5em;
-	border: none;
-	box-shadow: inset -1px -1px 3px var(--lightshadow),
-		inset 1px 1px 3px var(--darkshadow);
-	transition: ease .2s;
-}
-
-.checkmark::after {
-	transition: ease .3s;
+.check input::before {
 	position: absolute;
 	content: '';
-	top: -10%;
+	top: -12.5%;
 	left: -5%;
 	display: block;
-	width: 60%;
-	height: 120%;
-	border: 1px solid var(--3d-border);
+	width: 1.5em;
+	height: 1.5em;
+	color: var(--background);
+	border: 1px solid var(--foreground);
 	border-radius: 50%;
-	background-color: var(--protrusion);
-	box-shadow: inset -2px -2px 8px var(--lightshadow),
-		inset 2px 2px 8px var(--darkshadow),
-		2px 2px 5px var(--darkshadow);
+	transition: ease .2s;
+	text-align: center;
 }
 
-.custominput input:checked~.checkmark:after {
-	left: 55%;
-}
-
-.custominput input:checked~.checkmark {
+.check input:checked::before {
 	background-color: var(--green);
+	content: '✔';
+	box-shadow: 0 0 5px 1px var(--green);
 }
 
 .articleindicator {
@@ -327,7 +310,10 @@ input[type=search] {
 		0px 0px 2px var(--darkshadow);
 }
 
-[data-type]::before {
+/*************************** decorators ******************************/
+
+[data-type]::before,
+[data-menu]~label::before {
 	content: "";
 	display: inline-block;
 	height: 1em;
