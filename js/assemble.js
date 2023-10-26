@@ -245,11 +245,29 @@ export class Assemble {
 	submit() {
 		this.input('submit');
 	}
-	button() {
-		this.input('button');
-	}
 	searchinput() {
 		this.input('search');
+	}
+	button() {
+		/*{
+			type: 'textinput',
+			description: 'text input',
+			attributes: {
+				placeholder: 'text input'
+			}
+		}*/
+		const button = document.createElement('button');
+		button.id = getNextElementID();
+		if (this.tile.description) button.appendChild(document.createTextNode(this.tile.description));
+		if (this.tile.attributes !== undefined) {
+			Object.keys(this.tile.attributes).forEach(key => {
+				if (events.includes(key)) {
+					button[key] = new Function(this.tile.attributes[key]);
+				} else button.setAttribute(key, this.tile.attributes[key]);
+			});
+		}
+		this.elements.add(button);
+		return button.id;
 	}
 	hiddeninput() {
 		const input = document.createElement('input');
@@ -280,7 +298,8 @@ export class Assemble {
 			}
 		}*/
 		const input = document.createElement('input'),
-			label = document.createElement('label');
+			label = document.createElement('label'),
+			button = document.createElement('button');
 		input.type = 'file';
 		input.id = getNextElementID();
 		input.name = this.tile.description;
@@ -294,8 +313,12 @@ export class Assemble {
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode('Datei auswählen...'));
 
+		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		button.appendChild(document.createTextNode('Reset'));
+		button.classList.add('trash');
 		this.elements.add(input)
 		this.elements.add(label);
+		this.elements.add(button);
 	}
 
 	photo() {
@@ -308,12 +331,13 @@ export class Assemble {
 		}*/
 		const input = document.createElement('input'),
 			label = document.createElement('label'),
-			img = document.createElement('img');
+			img = document.createElement('img'),
+			button = document.createElement('button');
 
 		function changeEvent() {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' oder ändern...' : 'Photo aufnehmen...';
-			this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
 			if (this.files.length) {
+				this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
 				const nextPhoto = this.parentNode.cloneNode(true);
 				nextPhoto.childNodes[1].id = nextPhoto.childNodes[2].htmlFor = getNextElementID();
 				nextPhoto.childNodes[1].files = null;
@@ -321,7 +345,7 @@ export class Assemble {
 				nextPhoto.childNodes[2].innerHTML = 'Photo aufnehmen...';
 				nextPhoto.childNodes[3].src = '';
 				this.parentNode.after(nextPhoto);
-			}
+			} else this.nextSibling.nextSibling.src = '';
 		}
 
 		input.type = 'file';
@@ -336,9 +360,15 @@ export class Assemble {
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode('Photo aufnehmen...'));
 		img.classList.add('photoupload');
+
+		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		button.appendChild(document.createTextNode('Reset'));
+		button.classList.add('trash');
+
 		this.elements.add(input);
 		this.elements.add(label);
 		this.elements.add(img);
+		this.elements.add(button);
 	}
 
 	select() {
