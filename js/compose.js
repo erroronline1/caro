@@ -273,12 +273,13 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			"type": "text",
+			"description": "add text",
 			"attributes": {
-				"data-type": "addButton",
-				"value": "✓ add text"
+				"data-type": "addblock",
+				"type": "submit"
 			}
 		};
-		this.input('submit');
+		this.button();
 	}
 
 	compose_input(type) {
@@ -307,12 +308,13 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			"type": type.type,
+			"description": "add " + type.addblock,
 			"attributes": {
-				"data-type": "addButton",
-				"value": "✓ add " + type.addblock
+				"data-type": "addblock",
+				"type": "submit"
 			}
 		};
-		this.input('submit');
+		this.button();
 	}
 	compose_textinput() {
 		this.compose_input({
@@ -386,23 +388,24 @@ export class Compose extends Assemble {
 		};
 		this.textinput();
 		this.tile = {
+			"type": type.type,
+			"description": "add " + type.additem + " item",
 			"attributes": {
-				"data-type": "addButton",
-				"value": "✚ add " + type.additem + " item",
+				"data-type": "additem",
 				"onpointerdown": cloneItems
 			}
 		};
-		this.input('button');
+		this.button();
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			"type": type.type,
+			"description": "add " + type.addblock + " block",
 			"attributes": {
-				"data-type": "addButton",
-				"value": "✓ add " + type.addblock + " block"
+				"data-type": "addblock",
+				"type": "submit"
 			}
 		};
-		this.input('submit');
-
+		this.button();
 	}
 	compose_select() {
 		this.compose_multilist({
@@ -451,12 +454,13 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			"type": type.type,
+			"description": "add " + type.addblock,
 			"attributes": {
-				"data-type": "addButton",
-				"value": "✓ add " + type.addblock
+				"data-type": "addblock",
+				"type": "submit"
 			}
 		};
-		this.input('submit');
+		this.button();
 	}
 
 	compose_file() {
@@ -484,7 +488,7 @@ export class Compose extends Assemble {
 		this.compose_simpleElement({
 			type: 'qr',
 			description: 'create a qr-scanner field',
-			addblock: 'signature qr-scanner'
+			addblock: 'qr-scanner'
 		});
 	}
 }

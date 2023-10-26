@@ -6,7 +6,7 @@
 	--green: rgb(153, 179, 132);
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
-	--darkshadow: rgba(76, 86, 106, .5);
+	--darkshadow: rgba(76, 86, 106, .3);
 	--red: rgb(191, 97, 106);
 }
 
@@ -216,7 +216,7 @@ input[type=number] {
 }
 
 .photoupload {
-	margin-top: -3em;
+	margin-top: -4em;
 	float: right;
 	height: 4em;
 	width: 4em;
@@ -251,7 +251,6 @@ input[type=number],
 input[type=search] {
 	border-bottom: 1px solid var(--foreground);
 }
-
 
 .check {
 	display: inline-block;
@@ -299,6 +298,28 @@ input[type=search] {
 	fill: var(--foreground);
 }
 
+button {
+	margin: 1em 0;
+	padding: 1em;
+	width: 100%;
+	display: block;
+	border: 1px solid var(--darkshadow);
+	border-radius: 2em;
+	background-color: var(--protrusion);
+	transition: ease .15s;
+}
+
+.trash {
+	width: fit-content;
+	padding-left: 4em;
+	margin-bottom: 0;
+	float: right;
+}
+
+button:active {
+	box-shadow: inset 2px 2px 3px var(--darkshadow),
+		inset -2px -2px 3px var(--lightshadow);
+}
 
 [data-type=addButton] {
 	margin: 1em 0 0 0;
@@ -312,6 +333,7 @@ input[type=search] {
 
 /*************************** decorators ******************************/
 
+.trash::before,
 [data-type]::before,
 [data-menu]~label::before {
 	content: "";
@@ -383,10 +405,23 @@ input[type=search] {
 	background-image: url("media/qrcode.svg");
 }
 
+.trash::before,
 [data-type=trash]::before {
 	background-image: url("media/trash-alt.svg");
 }
 
 [data-type=hiddeninput]::before {
 	background-image: url("media/user-secret.svg");
+}
+
+[data-type=additem]::before {
+	background-image: url("media/plus-circle.svg");
+}
+
+[data-type=addblock]::before {
+	background-image: url("media/arrow-alt-from-top.svg");
+}
+
+[data-type=generateupdate]::before {
+	background-image: url("media/repeat-alt.svg");
 }
