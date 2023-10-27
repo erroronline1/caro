@@ -110,9 +110,10 @@ export class Assemble {
 			});
 
 			this.content.push([{
-				type: 'submit',
+				type: 'button',
+				description:'absenden',
 				attributes: {
-					value: 'absenden'
+					type:'submit',
 				}
 			}]);
 		} else this.section = document.createElement('div');
@@ -315,7 +316,7 @@ export class Assemble {
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
-		button.classList.add('trash');
+		button.classList.add('reset');
 		this.elements.add(input)
 		this.elements.add(label);
 		this.elements.add(button);
@@ -332,20 +333,38 @@ export class Assemble {
 		const input = document.createElement('input'),
 			label = document.createElement('label'),
 			img = document.createElement('img'),
-			button = document.createElement('button');
+			resetbutton = document.createElement('button'),
+			addbutton = document.createElement('button');
 
 		function changeEvent() {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' oder ändern...' : 'Photo aufnehmen...';
-			if (this.files.length) {
-				this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
-				const nextPhoto = this.parentNode.cloneNode(true);
-				nextPhoto.childNodes[1].id = nextPhoto.childNodes[2].htmlFor = getNextElementID();
-				nextPhoto.childNodes[1].files = null;
-				nextPhoto.childNodes[1].onchange = changeEvent;
-				nextPhoto.childNodes[2].innerHTML = 'Photo aufnehmen...';
-				nextPhoto.childNodes[3].src = '';
-				this.parentNode.after(nextPhoto);
-			} else this.nextSibling.nextSibling.src = '';
+			if (this.files.length) this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
+			else this.nextSibling.nextSibling.src = '';
+		}
+
+		function cloneNode() {
+			const nextPhoto = this.parentNode.cloneNode(true);
+			// input type file
+			nextPhoto.childNodes[1].id = nextPhoto.childNodes[2].htmlFor = getNextElementID();
+			nextPhoto.childNodes[1].files = null;
+			nextPhoto.childNodes[1].onchange = changeEvent;
+			// label
+			nextPhoto.childNodes[2].innerHTML = 'Photo aufnehmen...';
+			// preview image
+			nextPhoto.childNodes[3].src = '';
+			// delete button
+			if (nextPhoto.childNodes.length < 7) {
+				const deletebutton = document.createElement('button');
+				deletebutton.classList.add('delete');
+				nextPhoto.insertBefore(deletebutton,nextPhoto.childNodes[4]);
+			}
+			nextPhoto.childNodes[4].onpointerdown=new Function('this.parentNode.remove();');
+			// add button
+			nextPhoto.childNodes[5].onpointerdown=cloneNode;
+			// reset button
+			nextPhoto.childNodes[6].onpointerdown=new Function("let e=document.getElementById('" + nextPhoto.childNodes[1].id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+
+			this.parentNode.after(nextPhoto);
 		}
 
 		input.type = 'file';
@@ -361,14 +380,18 @@ export class Assemble {
 		label.appendChild(document.createTextNode('Photo aufnehmen...'));
 		img.classList.add('photoupload');
 
-		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
-		button.appendChild(document.createTextNode('Reset'));
-		button.classList.add('trash');
+		resetbutton.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		resetbutton.appendChild(document.createTextNode('Reset'));
+		resetbutton.classList.add('reset');
+
+		addbutton.onpointerdown = cloneNode;
+		addbutton.classList.add('add');
 
 		this.elements.add(input);
 		this.elements.add(label);
 		this.elements.add(img);
-		this.elements.add(button);
+		this.elements.add(addbutton);
+		this.elements.add(resetbutton);
 	}
 
 	select() {

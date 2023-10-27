@@ -309,11 +309,12 @@ button {
 	transition: ease .15s;
 }
 
-.trash {
+.reset,.add,.delete {
 	width: fit-content;
 	padding-left: 4em;
 	margin-bottom: 0;
 	float: right;
+	margin-left:1em;
 }
 
 button:active {
@@ -333,7 +334,9 @@ button:active {
 
 /*************************** decorators ******************************/
 
-.trash::before,
+.reset::before,
+.add::before,
+.delete::before,
 [data-type]::before,
 [data-menu]~label::before {
 	content: "";
@@ -405,7 +408,7 @@ button:active {
 	background-image: url("media/qrcode.svg");
 }
 
-.trash::before,
+.delete:before,
 [data-type=trash]::before {
 	background-image: url("media/trash-alt.svg");
 }
@@ -414,6 +417,7 @@ button:active {
 	background-image: url("media/user-secret.svg");
 }
 
+.add::before,
 [data-type=additem]::before {
 	background-image: url("media/plus-circle.svg");
 }
@@ -422,6 +426,7 @@ button:active {
 	background-image: url("media/arrow-alt-from-top.svg");
 }
 
+.reset::before,
 [data-type=generateupdate]::before {
 	background-image: url("media/repeat-alt.svg");
 }
