@@ -6,6 +6,7 @@
 	--green: rgb(153, 179, 132);
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
+	--lightershadow: rgba(255, 255, 255, .5);
 	--darkshadow: rgba(76, 86, 106, .3);
 	--red: rgb(191, 97, 106);
 }
@@ -224,6 +225,56 @@ input[type=number] {
 	object-fit: cover;
 }
 
+/*************************** menu ******************************/
+
+body>label {
+	position: fixed;
+	z-index: 99;
+	top: 1em;
+	left: 1em;
+	border-radius: 50%;
+	border: 1px solid var(--lightershadow);
+	backdrop-filter: blur(10px);
+	box-shadow: 2px 2px 10px var(--darkshadow);
+}
+
+body>label::before {
+	content: "";
+	display: block;
+	height: 1.5em;
+	width: 1.5em;
+	background-size: cover;
+	margin: 1em;
+	background-image: url("media/bars.svg");
+}
+
+body>input {
+	display: none;
+}
+
+nav {
+	position: fixed;
+	z-index: 99;
+	margin-top: 4em;
+	width: 0;
+	height: 0;
+	border: none;
+	border-radius: 1em;
+	backdrop-filter: blur(10px);
+	transition: ease .3s;
+	overflow: hidden;
+}
+
+input:checked~nav {
+	border: 1px solid var(--lightershadow);
+	padding: 1em;
+	width: calc(100% - 2em);
+	height: calc(100% - 6em);
+	overflow: auto;
+	box-shadow: 2px 2px 10px var(--darkshadow);
+}
+
+
 /*************************** decorators ******************************/
 
 .alert {
@@ -309,12 +360,14 @@ button {
 	transition: ease .15s;
 }
 
-.reset,.add,.delete {
+.reset,
+.add,
+.delete {
 	width: fit-content;
 	padding-left: 4em;
 	margin-bottom: 0;
 	float: right;
-	margin-left:1em;
+	margin-left: 1em;
 }
 
 button:active {
