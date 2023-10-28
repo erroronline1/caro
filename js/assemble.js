@@ -3,6 +3,8 @@ this module helps to assemble forms according to the passed simplified object no
 */
 import QrScanner from '../libraries/qr-scanner.min.js';
 import SignaturePad from '../libraries/signature_pad.umd.js';
+import QrCreator from '../libraries/qr-creator.js';
+
 import {
 	_
 } from '../libraries/erroronline1.js';
@@ -33,6 +35,14 @@ export const assemble_helper = {
 			},
 		);
 		scanner.start();
+	},
+	exportQRCode:function(name){
+		document.getElementById('qrcodecanvas').toBlob(function(blob){
+			const blobUrl = URL.createObjectURL(blob), link = document.createElement('a'); // Or maybe get it from the current document
+			link.href = blobUrl;
+			link.download = name + '.png';
+			link.click();
+		  }, 'image/png', 1)
 	}
 }
 
@@ -129,6 +139,18 @@ export class Assemble {
 
 		if (this.signaturePad) {
 			initialize_SignaturePad();
+		}
+		if (this.qrCode) {
+			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
+			console.log(this.qrCode);
+			QrCreator.render({
+				text: this.qrCode,
+				size: 512,
+				ecLevel: 'H',
+				background: null,
+				fill:'#000000',
+				radius:0
+			}, document.getElementById('qrcodecanvas'));
 		}
 	}
 
@@ -546,11 +568,12 @@ export class Assemble {
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
 		this.tile.attributes = {
+			'type':'button',
 			'name': '',
 			'value': 'Unterschrift löschen',
 			'onpointerdown': 'signaturePad.clear()'
 		};
-		this.input('button');
+		this.button();
 		this.tile.attributes = {
 			'type': 'file',
 			'id': 'signature',
@@ -561,9 +584,9 @@ export class Assemble {
 		this.signaturePad = true;
 	}
 
-	qr() {
+	qrscanner() {
 		/*{
-			type: 'qr',
+			type: 'qrscanner',
 			description:'access credentials' (e.g.),
 			attributes:{type:'password'} // to override e.g. for logins 
 		} */
@@ -580,6 +603,24 @@ export class Assemble {
 			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.input('button');
+	}
+	qrcode() {
+		/*{
+			type: 'qrcode',
+			description:'export qrcode' (e.g.),
+			attributes:{name: 'exportname', value:'e.g. token'} // atypical use of generic attributes on this one
+		} */
+		const canvas = document.createElement('canvas');
+		canvas.id = 'qrcodecanvas';
+		this.qrCode = this.tile.attributes.value;
+		this.elements.add(canvas);
+		//this tile does not process attributes, therefore they can be reassigned
+		this.tile.type='qr';
+		this.tile.attributes = {
+			'type': 'button',
+			'onpointerdown': 'assemble_helper.exportQRCode("' + this.tile.attributes.name + '")'
+		};
+		this.button();
 	}
 
 	trash() {

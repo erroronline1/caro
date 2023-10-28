@@ -83,6 +83,11 @@ video.active {
 	height: 13em;
 }
 
+#qrcodecanvas{
+	width:5em;
+	height:5em;
+}
+
 ul {
 	margin: 0;
 	padding-left: 1em

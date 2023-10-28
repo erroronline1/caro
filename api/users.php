@@ -144,7 +144,14 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					['type' => 'checkbox',
 					'description' => 'access token',
 					'content' => ['renew on save' => []]
-					],['type' => 'button',
+					],
+					['type' => 'qrcode',
+					'description' => 'export qr token',
+					'attributes' => [
+						'name' => $result['name'],
+						'value' => $result['token']]
+					],
+					['type' => 'button',
 					'description' => 'delete user',
 					'attributes' => [
 						'type'=>'button', // apparently defaults to submit otherwise
