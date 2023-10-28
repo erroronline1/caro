@@ -484,9 +484,9 @@ export class Compose extends Assemble {
 			addblock: 'signature pad'
 		});
 	}
-	compose_qr() {
+	compose_qrscanner() {
 		this.compose_simpleElement({
-			type: 'qr',
+			type: 'qrscanner',
 			description: 'create a qr-scanner field',
 			addblock: 'qr-scanner'
 		});
