@@ -111,9 +111,9 @@ export class Assemble {
 
 			this.content.push([{
 				type: 'button',
-				description:'absenden',
+				description: 'absenden',
 				attributes: {
-					type:'submit',
+					type: 'submit',
 				}
 			}]);
 		} else this.section = document.createElement('div');
@@ -141,7 +141,7 @@ export class Assemble {
 				this.tile = originalTileProperties = tile[i];
 				this.description();
 				this[tile[i].type]();
-				if (tile[i].type === 'hiddeninput' && !this.setup.visible) continue;
+				if (tile[i].type === 'hiddeninput' && !this.setup.visible || tile[i].type === 'datalist') continue;
 				if (tile.length < 2) {
 					this.assembledTiles.add(this.single(originalTileProperties));
 					continue;
@@ -289,6 +289,23 @@ export class Assemble {
 		}
 		return input.id;
 	}
+	datalist() {
+		const datalist = document.createElement('datalist');
+		let option;
+		datalist.id = getNextElementID();
+		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
+			if (events.includes(key)) {
+				datalist[key] = new Function(this.tile.attributes[key]);
+			} else datalist.setAttribute(key, this.tile.attributes[key]);
+		});
+		this.tile.content.forEach(key => {
+			option = document.createElement('option');
+			option.value = key;
+			datalist.appendChild(option);
+		});
+		this.assembledTiles.add(datalist);
+		return datalist.id;
+	}
 
 	file() {
 		/*{
@@ -356,13 +373,13 @@ export class Assemble {
 			if (nextPhoto.childNodes.length < 7) {
 				const deletebutton = document.createElement('button');
 				deletebutton.classList.add('delete');
-				nextPhoto.insertBefore(deletebutton,nextPhoto.childNodes[4]);
+				nextPhoto.insertBefore(deletebutton, nextPhoto.childNodes[4]);
 			}
-			nextPhoto.childNodes[4].onpointerdown=new Function('this.parentNode.remove();');
+			nextPhoto.childNodes[4].onpointerdown = new Function('this.parentNode.remove();');
 			// add button
-			nextPhoto.childNodes[5].onpointerdown=cloneNode;
+			nextPhoto.childNodes[5].onpointerdown = cloneNode;
 			// reset button
-			nextPhoto.childNodes[6].onpointerdown=new Function("let e=document.getElementById('" + nextPhoto.childNodes[1].id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+			nextPhoto.childNodes[6].onpointerdown = new Function("let e=document.getElementById('" + nextPhoto.childNodes[1].id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 
 			this.parentNode.after(nextPhoto);
 		}
