@@ -61,7 +61,7 @@ export const _ = {
 			element.setAttribute('draggable', 'true');
 			element.setAttribute('ondragstart', '_.dragNdrop.drag(event)');
 			element.setAttribute('ondragover', '_.dragNdrop.allowDrop(event)');
-			element.setAttribute('ondrop', '_.dragNdrop.drop(event,this)');
+			element.setAttribute('ondrop', '_.dragNdrop.drop_insertbefore(event,this)');
 		},
 		allowDrop: function (evnt) {
 			evnt.preventDefault();
@@ -69,45 +69,39 @@ export const _ = {
 		drag: function (evnt) {
 			evnt.dataTransfer.setData("text", evnt.currentTarget.id)
 		},
-		drop: function (evnt, that) {
+		drop_insertbefore: function (evnt, that) {
 			evnt.preventDefault();
 			const data = evnt.dataTransfer.getData("text");
 			document.getElementById(data).parentNode.insertBefore(document.getElementById(data), that);
 		},
-		dropdelete: function(evnt){
+		drop_delete: function (evnt) {
 			const data = evnt.dataTransfer.getData("text");
-			document.getElementById(data).remove();}
+			document.getElementById(data).remove();
+		},
+
 	},
-	getInputs: function (usecase, form_data = false) {
+	getInputs: function (querySelector, form_data = false) {
 		let fields;
 		if (form_data) {
-			fields = new FormData(_.el(usecase));
+			fields = new FormData(document.querySelector(querySelector));
 		} else {
 			fields = {};
-			let inputs = document.getElementsByTagName('input');
+			let inputs = document.querySelector(querySelector);
 			Object.keys(inputs).forEach(input => {
-				if (inputs[input].getAttribute('usecase') == usecase) {
-					if (inputs[input].type == 'radio' && inputs[input].checked)
-						fields[inputs[input].name] = inputs[input].value;
-					else if (inputs[input].type == 'checkbox') {
-						if (inputs[input].name.contains('[]')) {
-							inputs[input].name = inputs[input].name.replace('[]', '');
-							if (typeof fields[inputs[input].name] === 'object' && inputs[input].value) fields[inputs[input].name].push(inputs[input].checked ? inputs[input].value : 0)
-							else if (inputs[input].value) fields[inputs[input].name] = [inputs[input].checked ? inputs[input].value : 0];
-						} else fields[inputs[input].name] = inputs[input].checked ? inputs[input].value : 0;
-					} else if (['text', 'tel', 'date', 'number', 'hidden', 'email'].contains(inputs[input].type)) {
-						if (inputs[input].name.contains('[]')) {
-							inputs[input].name = inputs[input].name.replace('[]', '');
-							if (typeof fields[inputs[input].name] === 'object' && inputs[input].value) fields[inputs[input].name].push(inputs[input].value)
-							else if (inputs[input].value) fields[inputs[input].name] = [inputs[input].value];
-						} else fields[inputs[input].name] = inputs[input].value;
-					}
-				}
-			});
-			inputs = document.getElementsByTagName('textarea');
-			Object.keys(document.getElementsByTagName('textarea')).forEach(input => {
-				if (inputs[input].getAttribute('usecase') == usecase) {
+				if (inputs[input].type == 'radio' && inputs[input].checked)
 					fields[inputs[input].name] = inputs[input].value;
+				else if (inputs[input].type == 'checkbox') {
+					if (inputs[input].name.contains('[]')) {
+						inputs[input].name = inputs[input].name.replace('[]', '');
+						if (typeof fields[inputs[input].name] === 'object' && inputs[input].value) fields[inputs[input].name].push(inputs[input].checked ? inputs[input].value : 0)
+						else if (inputs[input].value) fields[inputs[input].name] = [inputs[input].checked ? inputs[input].value : 0];
+					} else fields[inputs[input].name] = inputs[input].checked ? inputs[input].value : 0;
+				} else if (['text', 'tel', 'date', 'number', 'hidden', 'email'].contains(inputs[input].type)) {
+					if (inputs[input].name.contains('[]')) {
+						inputs[input].name = inputs[input].name.replace('[]', '');
+						if (typeof fields[inputs[input].name] === 'object' && inputs[input].value) fields[inputs[input].name].push(inputs[input].value)
+						else if (inputs[input].value) fields[inputs[input].name] = [inputs[input].value];
+					} else fields[inputs[input].name] = inputs[input].value;
 				}
 			});
 		}
