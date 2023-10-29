@@ -121,7 +121,7 @@ export class Assemble {
 
 			this.content.push([{
 				type: 'button',
-				description: 'absenden',
+				description: 'submit',
 				attributes: {
 					type: 'submit',
 				}
@@ -142,7 +142,6 @@ export class Assemble {
 		}
 		if (this.qrCode) {
 			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
-			console.log(this.qrCode);
 			QrCreator.render({
 				text: this.qrCode,
 				size: 512,
@@ -160,7 +159,8 @@ export class Assemble {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
 				this.elements = new Set();
-				this.tile = originalTileProperties = tile[i];
+				this.tile = tile[i];
+				originalTileProperties = JSON.parse(JSON.stringify(this.tile)); // deepcopy; this has been a wild hour :/
 				this.description();
 				this[tile[i].type]();
 				if (tile[i].type === 'hiddeninput' && !this.setup.visible || tile[i].type === 'datalist') continue;
@@ -273,10 +273,10 @@ export class Assemble {
 	}
 	button() {
 		/*{
-			type: 'textinput',
-			description: 'text input',
+			type: 'button',
+			description: 'some button',
 			attributes: {
-				placeholder: 'text input'
+				onpointerdown: 'alert("hello")'
 			}
 		}*/
 		const button = document.createElement('button');
@@ -293,6 +293,12 @@ export class Assemble {
 		return button.id;
 	}
 	hiddeninput() {
+		/*{
+			type: 'hiddeninput',
+			description: 'value of pi',
+			attributes: {value: '3.14'}
+			}
+		}*/
 		const input = document.createElement('input');
 		input.type = 'hidden';
 		input.name = this.tile.description;
@@ -348,10 +354,10 @@ export class Assemble {
 		});
 		input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
-				', ') + ' oder ändern...' : 'Datei auswählen...'
+				', ') + ' or rechoose file...' : 'choose file...'
 		}
 		label.htmlFor = input.id;
-		label.appendChild(document.createTextNode('Datei auswählen...'));
+		label.appendChild(document.createTextNode('choose file...'));
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
@@ -376,7 +382,7 @@ export class Assemble {
 			addbutton = document.createElement('button');
 
 		function changeEvent() {
-			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' oder ändern...' : 'Photo aufnehmen...';
+			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' or retake a photo...' : 'take a photo...';
 			if (this.files.length) this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
 			else this.nextSibling.nextSibling.src = '';
 		}
@@ -388,7 +394,7 @@ export class Assemble {
 			nextPhoto.childNodes[1].files = null;
 			nextPhoto.childNodes[1].onchange = changeEvent;
 			// label
-			nextPhoto.childNodes[2].innerHTML = 'Photo aufnehmen...';
+			nextPhoto.childNodes[2].innerHTML = 'take a photo...';
 			// preview image
 			nextPhoto.childNodes[3].src = '';
 			// delete button
@@ -416,7 +422,7 @@ export class Assemble {
 			input[key] = this.tile.attributes[key];
 		});
 		label.htmlFor = input.id;
-		label.appendChild(document.createTextNode('Photo aufnehmen...'));
+		label.appendChild(document.createTextNode('take a photo...'));
 		img.classList.add('photoupload');
 
 		resetbutton.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
@@ -567,10 +573,10 @@ export class Assemble {
 		canvas.id = 'signaturecanvas';
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
+		this.tile.description='clear signature';
 		this.tile.attributes = {
 			'type':'button',
 			'name': '',
-			'value': 'Unterschrift löschen',
 			'onpointerdown': 'signaturePad.clear()'
 		};
 		this.button();
@@ -599,7 +605,7 @@ export class Assemble {
 		//attributes are processed already, therefore they can be reassigned
 		this.tile.attributes = {
 			'name': '',
-			'value': 'start scan',
+			'value': 'scan a qr code',
 			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.input('button');
@@ -615,7 +621,7 @@ export class Assemble {
 		this.qrCode = this.tile.attributes.value;
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
-		this.tile.type='qr';
+		this.tile.type='qrcode';
 		this.tile.attributes = {
 			'type': 'button',
 			'onpointerdown': 'assemble_helper.exportQRCode("' + this.tile.attributes.name + '")'

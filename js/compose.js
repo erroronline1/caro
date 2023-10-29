@@ -13,8 +13,8 @@ import {
 const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value = ''; clone.id = compose_helper.getNextElementID(); this.parentNode.insertBefore(clone, this);}";
 
 export const compose_helper = {
-	newFormElements: {},
-	newMetaFormElements: new Set(),
+	newFormComponents: {},
+	newFormElements: new Set(),
 	getNextElementID: getNextElementID,
 	composeNewElementCallback: function (e) {
 		e = document.getElementById(e).childNodes[0];
@@ -59,21 +59,23 @@ export const compose_helper = {
 
 		if (Object.keys(element).length > 1) {
 			const newElements = new Compose({
-				"visible": true,
-				"draggable": true,
-				"content": [
+				'visible': true,
+				'draggable': true,
+				'content': [
 					[element]
 				]
 			});
 			newElements.forEach(r_element => {
-				compose_helper.newFormElements[r_element.id] = r_element.content;
+				compose_helper.newFormComponents[r_element.id] = r_element.content;
 			});
 		}
 	},
 
-	composeNewForm: function () {
+	composeNewComponent: function () {
 		// set dragged/dropped order of elements - wohoo, recursion!
-		let isForm = false;
+		let isForm = false,
+			componentContent,
+			name = document.getElementById('ComponentName').value;
 
 		function nodechildren(node, recursion = false) {
 			const nodes = node.childNodes;
@@ -86,53 +88,60 @@ export const compose_helper = {
 						content.push(nodechildren(isSection, true));
 						continue;
 					}
-					if (nodes[i].children[1].id in compose_helper.newFormElements) {
-						if (recursion) content.push(compose_helper.newFormElements[nodes[i].children[1].id]);
-						else content.push([compose_helper.newFormElements[nodes[i].children[1].id]]);
+					if (nodes[i].children[1].id in compose_helper.newFormComponents) {
+						if (recursion) content.push(compose_helper.newFormComponents[nodes[i].children[1].id]);
+						else content.push([compose_helper.newFormComponents[nodes[i].children[1].id]]);
 						if ('dataset' in nodes[i].children[1] && 'type' in nodes[i].children[1].dataset && nodes[i].children[1].dataset.type != 'text') isForm = true;
 					}
 				}
 			}
 			return content;
 		}
+		componentContent = nodechildren(document.getElementById('main'));
 		const answer = {
-			"content": nodechildren(document.getElementById('main'))
+			'name': name,
+			'content': componentContent
 		};
 		if (isForm) answer.form = {};
-		return JSON.stringify(answer);
+		if (name && componentContent) return answer;
+		return null;
 	},
-	composeNewMetaForm: function () {
+	composeNewForm: function () {
 		// set dragged/dropped order of elements
-		const nodes = document.getElementById('main').childNodes;
+		const nodes = document.getElementById('main').childNodes,
+			name = document.getElementById('ComponentName').value;
 		let content = [],
 			hidden = {};
 		for (let i = 0; i < nodes.length; i++) {
 			if ('dataset' in nodes[i] && 'name' in nodes[i].dataset) content.push(nodes[i].dataset.name);
 			if (nodes[i].childNodes.length && nodes[i].childNodes[1].dataset.type === 'hiddeninput') hidden[nodes[i].childNodes[1].childNodes[2].name] = nodes[i].childNodes[1].childNodes[2].value;
 		}
-		return JSON.stringify({
-			"hidden": hidden,
-			"forms": content
-		});
+		if (name && content.length) return {
+			'hidden': hidden,
+			'forms': content,
+			'name': name
+		};
+		return null;
 	},
 
-	importForm: function (form) {
+	importComponent: function (form) {
+		compose_helper.newFormComponents = {};
 		Object.keys(form.content).forEach(element => {
 			const newElements = new Compose({
-				"draggable": true,
-				"content": [
+				'draggable': true,
+				'content': [
 					form.content[element]
 				]
 			});
 			newElements.forEach(r_element => {
-				compose_helper.newFormElements[r_element.id] = r_element.content;
+				compose_helper.newFormComponents[r_element.id] = r_element.content;
 			});
 		});
 	},
-	importMetaForm: function (form) {
+	importForm: function (form) {
 		form.draggable = true;
 		new MetaCompose(form);
-		compose_helper.newMetaFormElements.add(form.name);
+		compose_helper.newFormElements.add(form.name);
 	},
 
 	dragNdrop: {
@@ -141,17 +150,17 @@ export const compose_helper = {
 			evnt.preventDefault();
 		},
 		drag: function (evnt) {
-			evnt.dataTransfer.setData("text", evnt.target.id);
+			evnt.dataTransfer.setData('text', evnt.target.id);
 			this.stopParentDropEvent = false;
 		},
 		drop_insert: function (evnt, droppedUpon) {
 			evnt.preventDefault();
-			if (!evnt.dataTransfer.getData("text")) return;
+			if (!evnt.dataTransfer.getData('text')) return;
 
-			const draggedTile = document.getElementById(evnt.dataTransfer.getData("text")),
+			const draggedTile = document.getElementById(evnt.dataTransfer.getData('text')),
 				newtile = draggedTile.cloneNode(true), // cloned for most likely descendant issues
 				originParent = draggedTile.parentNode;
-			//console.log("dragged", draggedTile.id, "dropped on", droppedUpon.id);
+			//console.log('dragged', draggedTile.id, 'dropped on', droppedUpon.id);
 			if (!draggedTile || this.stopParentDropEvent || draggedTile.id === droppedUpon.id) return;
 			if (evnt.target.localName === 'hr') {
 				// handle only if dropped within the reorder area
@@ -195,7 +204,7 @@ export const compose_helper = {
 			}
 		},
 		drop_delete: function (evnt) {
-			document.getElementById(evnt.dataTransfer.getData("text")).remove();
+			document.getElementById(evnt.dataTransfer.getData('text')).remove();
 		}
 	},
 	create_draggable: function (element) {
@@ -252,31 +261,31 @@ export class Compose extends Assemble {
 
 	compose_text() {
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_text-description",
-				"placeholder": "add information description",
-				"required": true
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_text-description',
+				'placeholder': 'add information description',
+				'required': true
 			}
 		};
 		this.textinput();
 		this.tile = {
-			"type": "textarea",
-			"description": "compose_text-content",
-			"attributes": {
-				"name:": "compose_text-content",
-				"placeholder": "add information text",
-				"rows": 5
+			'type': 'textarea',
+			'description': 'compose_text-content',
+			'attributes': {
+				'name:': 'compose_text-content',
+				'placeholder': 'add information text',
+				'rows': 5
 			}
 		};
 		this.textarea();
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"type": "text",
-			"description": "add text",
-			"attributes": {
-				"data-type": "addblock",
-				"type": "submit"
+			'type': 'text',
+			'description': 'add text',
+			'attributes': {
+				'data-type': 'addblock',
+				'type': 'submit'
 			}
 		};
 		this.button();
@@ -286,32 +295,32 @@ export class Compose extends Assemble {
 		/* type{type, description, addblock} */
 
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_" + type.type + "-description",
-				"placeholder": "add description",
-				"required": true
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_' + type.type + '-description',
+				'placeholder': 'add description',
+				'required': true
 			}
 		};
 		this.textinput();
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_" + type.type + "-attributes",
-				"placeholder": "add advanced attributes {json}",
-				"pattern": "^\\{.+\\}$|^$",
-				"title": "json object with double quotes"
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_' + type.type + '-attributes',
+				'placeholder': 'add advanced attributes {json}',
+				'pattern': '^\\{.+\\}$|^$',
+				'title': 'json object with double quotes'
 			}
 		};
 		if (type.attributes) this.tile.attributes.value = type.attributes;
 		this.textinput();
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"type": type.type,
-			"description": "add " + type.addblock,
-			"attributes": {
-				"data-type": "addblock",
-				"type": "submit"
+			'type': type.type,
+			'description': 'add ' + type.addblock,
+			'attributes': {
+				'data-type': 'addblock',
+				'type': 'submit'
 			}
 		};
 		this.button();
@@ -354,55 +363,55 @@ export class Compose extends Assemble {
 			type: 'hiddeninput',
 			description: 'create a hidden field',
 			addblock: 'hidden field',
-			attributes: "{\"value\":\"usecase\"}"
+			attributes: '{"value":"usecase"}'
 		});
 	}
 
 	compose_multilist(type) {
 		/* type{type, description, additem, addblock} */
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_" + type.type + "-description",
-				"placeholder": "add description",
-				"required": true
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_' + type.type + '-description',
+				'placeholder': 'add description',
+				'required': true
 			}
 		};
 		this.textinput();
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_" + type.type + "-content",
-				"placeholder": "add item"
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_' + type.type + '-content',
+				'placeholder': 'add item'
 			}
 		};
 		this.textinput();
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_" + type.type + "-attributes",
-				"placeholder": "add advanced attributes {json}",
-				"pattern": "^\\{.+\\}$|^$",
-				"title": "json object with double quotes"
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_' + type.type + '-attributes',
+				'placeholder': 'add advanced attributes {json}',
+				'pattern': '^\\{.+\\}$|^$',
+				'title': 'json object with double quotes'
 			}
 		};
 		this.textinput();
 		this.tile = {
-			"type": type.type,
-			"description": "add " + type.additem + " item",
-			"attributes": {
-				"data-type": "additem",
-				"onpointerdown": cloneItems
+			'type': type.type,
+			'description': 'add ' + type.additem + ' item',
+			'attributes': {
+				'data-type': 'additem',
+				'onpointerdown': cloneItems
 			}
 		};
 		this.button();
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"type": type.type,
-			"description": "add " + type.addblock + " block",
-			"attributes": {
-				"data-type": "addblock",
-				"type": "submit"
+			'type': type.type,
+			'description': 'add ' + type.addblock + ' block',
+			'attributes': {
+				'data-type': 'addblock',
+				'type': 'submit'
 			}
 		};
 		this.button();
@@ -443,21 +452,21 @@ export class Compose extends Assemble {
 	compose_simpleElement(type) {
 		/* type{type, description, addblock} */
 		this.tile = {
-			"type": "textinput",
-			"attributes": {
-				"name": "compose_" + type.type + "-description",
-				"placeholder": "add description",
-				"required": true
+			'type': 'textinput',
+			'attributes': {
+				'name': 'compose_' + type.type + '-description',
+				'placeholder': 'add description',
+				'required': true
 			}
 		};
 		this.textinput();
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
-			"type": type.type,
-			"description": "add " + type.addblock,
-			"attributes": {
-				"data-type": "addblock",
-				"type": "submit"
+			'type': type.type,
+			'description': 'add ' + type.addblock,
+			'attributes': {
+				'data-type': 'addblock',
+				'type': 'submit'
 			}
 		};
 		this.button();
@@ -491,10 +500,46 @@ export class Compose extends Assemble {
 			addblock: 'qr-scanner'
 		});
 	}
+
+	compose_component(std = {
+		placeholder: 'component name',
+		description: 'save form component',
+		action: 'api.form("form_components_save")'
+	}) {
+		this.tile = {
+			'type': 'textinput',
+			'attributes': {
+				'id': 'ComponentName',
+				'name': 'setname',
+				'value': this.tile.value,
+				'placeholder': std.placeholder,
+				'required': true,
+			}
+		};
+		this.textinput();
+		// due to the assembler, type (for icon) has to be in the last element
+		this.tile = {
+			'type': 'save',
+			'description': std.description,
+			'attributes': {
+				'onpointerdown': std.action,
+				'type': 'button'
+			}
+		};
+		this.button();
+	}
+	compose_form() {
+		this.compose_component({
+			placeholder: 'form name',
+			description: 'save form',
+			action: 'api.form("form_save")'
+		});
+	}
 }
 
 export class MetaCompose extends Assemble {
 	constructor(setup) {
+		delete setup.form;
 		super(setup);
 
 		this.initializeSection();

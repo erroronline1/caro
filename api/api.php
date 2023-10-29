@@ -45,8 +45,7 @@ if ($_SERVER['REQUEST_METHOD']== 'POST' && $_POST){
 
 //var_dump($payload);
 if (preg_match('/user_/', $payload->request)) require_once('users.php');
-
-//require_once('requests.php');
+if (preg_match('/form_/', $payload->request)) require_once('forms.php');
 
 exit();
 ?>

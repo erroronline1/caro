@@ -8,11 +8,11 @@
 	<link rel="apple-touch-icon" sizes="180x180" href="./media/favicon/ios/180.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="./media/favicon/ios/32.png"">
 	<link rel=" icon" type="image/png" sizes="16x16" href="./media/favicon/ios/16.png">
-	<link rel="mask-icon" href="./media/favicon/favicon.svg" color="#f2b90d">
+	<link rel="mask-icon" href="./media/favicon/favicon.svg" color="#E5E9F0">
 	<link rel="shortcut icon" href="./media/favicon/favicon.ico">
-	<meta name="msapplication-TileColor" content="#F2B90D">
+	<meta name="msapplication-TileColor" content="#E5E9F0">
 	<meta name="msapplication-config" content="./assets/favicon/browserconfig.xml">
-	<meta name="theme-color" content="#F2B90D">
+	<meta name="theme-color" content="#E5E9F0">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="manifest" href="./site.webmanifest">
 	<title>
@@ -23,7 +23,10 @@
 <body>
 	<label for="openmenu"></label><input type="checkbox" id="openmenu" />
 	<nav id="menu">
-		<a href="javascript:api.user('user_edit');">Users</a>
+		<a href="javascript:api.user('user_edit');">Users</a><br>
+		<a href="javascript:api.form('form_components_edit')">Form Components</a><br>
+		<a href="javascript:api.form('form_edit')">Forms</a><br>
+		<!--a href="javascript:api.form('form_get', null, 'qr', 'template', 'qr')">Load Forms</a><br-->
 	</nav>
 	<header>
 		<h1>draft</h1>

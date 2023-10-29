@@ -304,7 +304,8 @@ section>div>hr {
 
 input[type=text],
 input[type=number],
-input[type=search] {
+input[type=search],
+input[type=password] {
 	border-bottom: 1px solid var(--foreground);
 }
 
@@ -462,7 +463,8 @@ button:active {
 	background-image: url("media/signature.svg");
 }
 
-[data-type=qr]::before {
+[data-type=qrscanner]::before,
+[data-type=qrcode]::before {
 	background-image: url("media/qrcode.svg");
 }
 
@@ -487,4 +489,8 @@ button:active {
 .reset::before,
 [data-type=generateupdate]::before {
 	background-image: url("media/repeat-alt.svg");
+}
+
+[data-type=save]::before {
+	background-image: url("media/save.svg");
 }
