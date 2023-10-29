@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 				"CURRENT_TIMESTAMP, '" .
 				addslashes(json_encode($content)) . "')");
 			if ($statement->execute()){
-					$result = ['id' => $pdo->lastInsertId()];
+					$result = ['name' => scriptFilter($payload->name)];
 					echo json_encode($result);
 			}
 		break;

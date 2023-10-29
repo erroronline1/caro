@@ -1,5 +1,5 @@
 <?php
-// populate $api_handler on post requests as a return to tell index.php what to do next
+// add, edit and delete users
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 	switch ($payload->request){
@@ -42,16 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 				implode(',', $auth) . "', '" . 
 				$token . "') ON DUPLICATE KEY UPDATE " . substr($update,2));
 			if ($statement->execute()){
-					$result = ['id' => $pdo->lastInsertId() ? : $payload->id];
+					$result = ['id' => $pdo->lastInsertId() ? : $payload->id, 'name' => scriptFilter($payload->name)];
 					echo json_encode($result);
 			}
 		break;
-	}
-	//	else echo http_response_code(401);
-}
-
-elseif ($_SERVER['REQUEST_METHOD'] == 'PUT'){
-	switch ($payload->request){
 	}
 	//	else echo http_response_code(401);
 }
@@ -60,9 +54,12 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE'){
 	switch ($payload->request){
 		case 'user_delete':
 			$payload->id = dbSanitize($payload->id);
-			$statement = $pdo->prepare("DELETE FROM users WHERE id = " . $payload->id . " LIMIT 1");
-			if ($statement->execute()) echo json_encode(['id' => false, 'success' => true]);
-			else echo json_encode(['id' => $payload->id, 'success' => false]);
+			$statement = $pdo->prepare("SELECT id, name FROM users WHERE id = " . $payload->id . " LIMIT 1");
+			$statement->execute();
+			$user = $statement->fetch(PDO::FETCH_ASSOC);
+			$statement = $pdo->prepare("DELETE FROM users WHERE id = " . $user['id'] . " LIMIT 1");
+			if ($statement->execute()) echo json_encode(['id' => false, 'name' => scriptFilter($user['name'])]);
+			else echo json_encode(['id' => $user['id'], 'name' => scriptFilter($user['name'])]);
 		break;
 	}
 	//	else echo http_response_code(401);
@@ -145,13 +142,13 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					'description' => 'access token',
 					'content' => ['renew on save' => []]
 					],
-					['type' => 'qrcode',
+					['type' => 'image',
 					'description' => 'export qr token',
 					'attributes' => [
 						'name' => $result['name'],
 						'value' => $result['token']]
 					],
-					['type' => 'button',
+					['type' => 'deletebutton',
 					'description' => 'delete user',
 					'attributes' => [
 						'type'=>'button', // apparently defaults to submit otherwise

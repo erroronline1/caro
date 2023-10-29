@@ -10,15 +10,15 @@ export const api = {
 			})
 			.catch((error) => {
 				if (errorFn != null) errorFn(error);
-				else api.notif(error);
+				else api.toast(error);
 			});
 	},
-	notif: function (error) {
-		/*if (typeof error !== 'undefined') {
-			_.el('growlNotif').innerHTML = error;
-			_.el('growlNotif').classList.add('show');
-			window.setTimeout(api.notif, 3000);
-		} else _.el('growlNotif').classList.remove('show');*/
+	toast: function (msg) {
+		if (typeof msg !== 'undefined') {
+			document.getElementById('toast').innerHTML = msg;
+			document.getElementById('toast').classList.add('show');
+			window.setTimeout(api.toast, 3000);
+		} else document.getElementById('toast').classList.remove('show');
 	},
 
 	form: (request, name = null, ...forms) => {
@@ -52,6 +52,9 @@ export const api = {
 			if (data.component) compose_helper.importComponent(data.component);
 		}
 		if (request === 'form_components_save') {
+			successFn = function (data) {
+				if (data) api.toast('component ' + data.name + ' has been saved');
+			}
 			if (!(payload = compose_helper.composeNewComponent())) return;
 			payload.request = 'form_components_save';
 		}
@@ -65,9 +68,12 @@ export const api = {
 			if (data.component) compose_helper.importForm(data.component);
 		}
 		if (request === 'form_save') {
-////////////////////////////////////////////
-// TO DO: implement usecases to select from, e.g. in setup.ini? 
-////////////////////////////////////////////
+			////////////////////////////////////////////
+			// TO DO: implement usecases to select from, e.g. in setup.ini? 
+			////////////////////////////////////////////
+			successFn = function (data) {
+				if (data) api.toast('form ' + data.name + ' has been saved');
+			}
 			if (!(payload = compose_helper.composeNewForm())) return;
 			payload.request = 'form_save';
 		}
@@ -86,6 +92,7 @@ export const api = {
 				document.getElementById('main').innerHTML = '';
 				new Assemble(data).initializeSection();
 			},
+			errorFn = null,
 			method,
 			payload = {
 				'request': request,
@@ -97,13 +104,28 @@ export const api = {
 				break;
 			}
 		}
-		if (method === 'post') payload = _.getInputs('[data-usecase=user]', true);
-		if (method === 'post' || method === 'delete') {
+		if (request === 'user_save') {
 			successFn = function (data) {
+				if (!data) {
+					api.toast('user could not be saved');
+					return;
+				}
+				api.toast('user ' + data.name + ' has been saved');
 				api.user('user_edit', data.id);
 			}
 		}
-		api.send(method, payload, successFn, null, method === 'post');
+		if (request === 'user_delete') {
+			successFn = function (data) {
+				if (data.id) {
+					api.toast('user ' + data.name + ' could not be deleted');
+					return;
+				}
+				api.toast('user ' + data.name + ' has been permanently deleted');
+				api.user('user_edit', data.id);
+			}
+		}
+		if (method === 'post') payload = _.getInputs('[data-usecase=user]', true);
+		api.send(method, payload, successFn, errorFn, method === 'post');
 	},
 	signIn: () => {
 
