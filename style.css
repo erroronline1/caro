@@ -46,7 +46,8 @@ body {
 
 header {
 	margin: 1em auto;
-	width: 70%;
+	width: 100%;
+	max-width: 50em;
 	text-align: center;
 }
 
@@ -61,7 +62,6 @@ input,
 a,
 textarea,
 select,
-input[type=file]+label,
 canvas,
 video {
 	text-decoration: none;
@@ -73,6 +73,7 @@ video {
 	font-size: 1em;
 }
 
+
 video {
 	height: 0;
 	transition: ease .3s;
@@ -81,11 +82,6 @@ video {
 canvas,
 video.active {
 	height: 13em;
-}
-
-#qrcodecanvas{
-	width:5em;
-	height:5em;
 }
 
 ul {
@@ -221,13 +217,40 @@ input[type=number] {
 	font-size: x-small;
 }
 
+.imagecanvas,
 .photoupload {
-	margin-top: -4em;
+	display:block;
+	margin-top:-2em;
+	margin-bottom:2em;
 	float: right;
 	height: 4em;
 	width: 4em;
-	border-radius: 50%;
 	object-fit: cover;
+}
+
+#toast {
+	z-index: 100;
+	position:fixed;
+	bottom:0;
+	left:calc(50% - 15em);
+	margin:0 auto;
+	padding:0 1em; 
+	height:0;
+	width: 30em;
+	border-radius: 1em;
+	border: 1px solid var(--lightershadow);
+	backdrop-filter: blur(10px);
+	box-shadow: 2px 2px 10px var(--darkshadow);
+	transition: ease .3s;
+	color:transparent;
+	overflow: hidden;
+}
+
+#toast.show{
+	margin:1em auto;
+	padding: 1em;
+	height:fit-content;
+	color:var(--foreground)
 }
 
 /*************************** menu ******************************/
@@ -268,6 +291,7 @@ nav {
 	backdrop-filter: blur(10px);
 	transition: ease .3s;
 	overflow: hidden;
+	color:transparent;
 }
 
 input:checked~nav {
@@ -277,6 +301,7 @@ input:checked~nav {
 	height: calc(100% - 6em);
 	overflow: auto;
 	box-shadow: 2px 2px 10px var(--darkshadow);
+	color:var(--foreground)
 }
 
 
@@ -366,13 +391,15 @@ button {
 	transition: ease .15s;
 }
 
-.reset,
-.add,
-.delete {
+button:disabled{
+	color:var(--red);
+}
+
+.inlinebutton {
 	width: fit-content;
+	display:inline-block;
 	padding-left: 4em;
 	margin-bottom: 0;
-	float: right;
 	margin-left: 1em;
 }
 
@@ -463,12 +490,11 @@ button:active {
 	background-image: url("media/signature.svg");
 }
 
-[data-type=qrscanner]::before,
-[data-type=qrcode]::before {
+[data-type=qrscanner]::before {
 	background-image: url("media/qrcode.svg");
 }
 
-.delete:before,
+[data-type=deletebutton]::before,
 [data-type=trash]::before {
 	background-image: url("media/trash-alt.svg");
 }
@@ -477,7 +503,6 @@ button:active {
 	background-image: url("media/user-secret.svg");
 }
 
-.add::before,
 [data-type=additem]::before {
 	background-image: url("media/plus-circle.svg");
 }
@@ -486,11 +511,20 @@ button:active {
 	background-image: url("media/arrow-alt-from-top.svg");
 }
 
-.reset::before,
+[data-type=reset]::before,
 [data-type=generateupdate]::before {
 	background-image: url("media/repeat-alt.svg");
 }
 
+[data-type=savebutton]::before,
 [data-type=save]::before {
 	background-image: url("media/save.svg");
+}
+
+[data-type=image]::before {
+	background-image: url("media/image.svg");
+}
+
+[data-type=submitbutton]::before {
+	background-image: url("media/paper-plane.svg");
 }

@@ -36,13 +36,14 @@ export const assemble_helper = {
 		);
 		scanner.start();
 	},
-	exportQRCode:function(name){
-		document.getElementById('qrcodecanvas').toBlob(function(blob){
-			const blobUrl = URL.createObjectURL(blob), link = document.createElement('a'); // Or maybe get it from the current document
+	exportCanvas: function (id, name) {
+		document.getElementById(id).toBlob(function (blob) {
+			const blobUrl = URL.createObjectURL(blob),
+				link = document.createElement('a'); // Or maybe get it from the current document
 			link.href = blobUrl;
 			link.download = name + '.png';
 			link.click();
-		  }, 'image/png', 1)
+		}, 'image/png', 1)
 	}
 }
 
@@ -120,7 +121,7 @@ export class Assemble {
 			});
 
 			this.content.push([{
-				type: 'button',
+				type: 'submitbutton',
 				description: 'submit',
 				attributes: {
 					type: 'submit',
@@ -140,16 +141,25 @@ export class Assemble {
 		if (this.signaturePad) {
 			initialize_SignaturePad();
 		}
-		if (this.qrCode) {
+		if (this.imageQrCode) {
 			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
 			QrCreator.render({
-				text: this.qrCode,
+				text: this.imageQrCode.content,
 				size: 512,
 				ecLevel: 'H',
 				background: null,
-				fill:'#000000',
-				radius:0
-			}, document.getElementById('qrcodecanvas'));
+				fill: '#000000',
+				radius: 0
+			}, document.getElementById(this.imageQrCode.id));
+		}
+		if (this.imageBase64) {
+			const imgcanvas = document.getElementById(this.imageBase64.id),
+				img = new Image();
+			img.src = this.imageBase64.content;
+			img.addEventListener('load', function (e) {
+				imgcanvas.getContext('2d').drawImage(this, 0, 0, imgcanvas.width, imgcanvas.height)
+			});
+			img.dispatchEvent(new Event('load'));
 		}
 	}
 
@@ -265,9 +275,6 @@ export class Assemble {
 	dateinput() {
 		this.input('date');
 	}
-	submit() {
-		this.input('submit');
-	}
 	searchinput() {
 		this.input('search');
 	}
@@ -292,6 +299,13 @@ export class Assemble {
 		this.elements.add(button);
 		return button.id;
 	}
+	deletebutton() { // to style it properly by adding data-type to article container
+		this.button();
+	}
+	submitbutton() {
+		this.button();
+	}
+
 	hiddeninput() {
 		/*{
 			type: 'hiddeninput',
@@ -344,7 +358,7 @@ export class Assemble {
 			}
 		}*/
 		const input = document.createElement('input'),
-			label = document.createElement('label'),
+			label = document.createElement('button'),
 			button = document.createElement('button');
 		input.type = 'file';
 		input.id = getNextElementID();
@@ -356,12 +370,17 @@ export class Assemble {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' or rechoose file...' : 'choose file...'
 		}
-		label.htmlFor = input.id;
+		label.onclick = "document.getElementById('" + input.id + "').click();";
+		label.type = 'button';
+		label.setAttribute('data-type', 'file');
+		label.classList.add('inlinebutton');
 		label.appendChild(document.createTextNode('choose file...'));
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
-		button.classList.add('reset');
+		button.setAttribute('data-type', 'reset');
+		button.classList.add('inlinebutton');
+
 		this.elements.add(input)
 		this.elements.add(label);
 		this.elements.add(button);
@@ -376,31 +395,34 @@ export class Assemble {
 			}
 		}*/
 		const input = document.createElement('input'),
-			label = document.createElement('label'),
+			label = document.createElement('button'),
 			img = document.createElement('img'),
 			resetbutton = document.createElement('button'),
 			addbutton = document.createElement('button');
 
 		function changeEvent() {
-			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' or retake a photo...' : 'take a photo...';
-			if (this.files.length) this.nextSibling.nextSibling.src = URL.createObjectURL(this.files[0]);
-			else this.nextSibling.nextSibling.src = '';
+			this.nextSibling.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' or retake a photo...' : 'take a photo...';
+			if (this.files.length) this.nextSibling.src = URL.createObjectURL(this.files[0]);
+			else this.nextSibling.src = '';
 		}
 
 		function cloneNode() {
 			const nextPhoto = this.parentNode.cloneNode(true);
 			// input type file
-			nextPhoto.childNodes[1].id = nextPhoto.childNodes[2].htmlFor = getNextElementID();
+			nextPhoto.childNodes[1].id = getNextElementID();
 			nextPhoto.childNodes[1].files = null;
 			nextPhoto.childNodes[1].onchange = changeEvent;
-			// label
-			nextPhoto.childNodes[2].innerHTML = 'take a photo...';
 			// preview image
-			nextPhoto.childNodes[3].src = '';
+			nextPhoto.childNodes[2].src = '';
+			// label
+			nextPhoto.childNodes[3].innerHTML = 'take a photo...';
+			nextPhoto.childNodes[3].onclick = new Function("document.getElementById('" + nextPhoto.childNodes[1].id + "').click();");
 			// delete button
 			if (nextPhoto.childNodes.length < 7) {
 				const deletebutton = document.createElement('button');
-				deletebutton.classList.add('delete');
+				deletebutton.setAttribute('data-type', 'deletebutton');
+				deletebutton.classList.add('inlinebutton');
+				deletebutton.type = 'button';
 				nextPhoto.insertBefore(deletebutton, nextPhoto.childNodes[4]);
 			}
 			nextPhoto.childNodes[4].onpointerdown = new Function('this.parentNode.remove();');
@@ -421,20 +443,28 @@ export class Assemble {
 		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
 			input[key] = this.tile.attributes[key];
 		});
-		label.htmlFor = input.id;
+		label.onclick = new Function("document.getElementById('" + input.id + "').click();");
+		label.type = 'button';
+		label.setAttribute('data-type', 'photo');
+		label.classList.add('inlinebutton');
 		label.appendChild(document.createTextNode('take a photo...'));
+
 		img.classList.add('photoupload');
 
 		resetbutton.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		resetbutton.appendChild(document.createTextNode('Reset'));
-		resetbutton.classList.add('reset');
+		resetbutton.setAttribute('data-type', 'reset');
+		resetbutton.classList.add('inlinebutton');
+		resetbutton.type = 'button';
 
 		addbutton.onpointerdown = cloneNode;
-		addbutton.classList.add('add');
+		addbutton.setAttribute('data-type', 'additem');
+		addbutton.classList.add('inlinebutton');
+		addbutton.type = 'button';
 
 		this.elements.add(input);
-		this.elements.add(label);
 		this.elements.add(img);
+		this.elements.add(label);
 		this.elements.add(addbutton);
 		this.elements.add(resetbutton);
 	}
@@ -573,9 +603,9 @@ export class Assemble {
 		canvas.id = 'signaturecanvas';
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
-		this.tile.description='clear signature';
+		this.tile.description = 'clear signature';
 		this.tile.attributes = {
-			'type':'button',
+			'type': 'button',
 			'name': '',
 			'onpointerdown': 'signaturePad.clear()'
 		};
@@ -603,29 +633,45 @@ export class Assemble {
 
 		const inputid = this.input('text');
 		//attributes are processed already, therefore they can be reassigned
+		this.tile.description = 'scan a qr code';
 		this.tile.attributes = {
-			'name': '',
-			'value': 'scan a qr code',
 			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};
-		this.input('button');
+		this.button();
 	}
-	qrcode() {
+	image() {
 		/*{
-			type: 'qrcode',
-			description:'export qrcode' (e.g.),
-			attributes:{name: 'exportname', value:'e.g. token'} // atypical use of generic attributes on this one
+			type: 'image',
+			description:'export image' (e.g.),
+			attributes:{
+				name: 'exportname', // atypical use of generic attributes on this one
+				qrcode:'e.g. token', // for display of a qrcode with this value
+				base64img: 'base64 encoded string' // for display of an image
+			}
 		} */
 		const canvas = document.createElement('canvas');
-		canvas.id = 'qrcodecanvas';
-		this.qrCode = this.tile.attributes.value;
+		canvas.id = getNextElementID();
+		canvas.classList.add('imagecanvas');
+		canvas.width = canvas.height = 512;
+		if (this.tile.attributes.qrcode) this.imageQrCode = {
+			id: canvas.id,
+			content: this.tile.attributes.qrcode
+		}
+		if (this.tile.attributes.base64img) this.imageBase64 = {
+			id: canvas.id,
+			content: this.tile.attributes.base64img
+		};
+
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
-		this.tile.type='qrcode';
 		this.tile.attributes = {
 			'type': 'button',
-			'onpointerdown': 'assemble_helper.exportQRCode("' + this.tile.attributes.name + '")'
+			'class': 'inlinebutton',
+			'data-type': this.tile.type,
+			'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
 		};
+		if(!(this.imageQrCode || this.imageBase64))this.tile.attributes.disabled=true;
+
 		this.button();
 	}
 
@@ -634,11 +680,11 @@ export class Assemble {
 	}
 }
 
-var canvas = null;
+var signaturecanvas = null;
 
 function initialize_SignaturePad() {
-	canvas = document.getElementById("signaturecanvas");
-	window.signaturePad = new SignaturePad(canvas, {
+	signaturecanvas = document.getElementById("signaturecanvas");
+	window.signaturePad = new SignaturePad(signaturecanvas, {
 		// It's Necessary to use an opaque color when saving image as JPEG;
 		// this option can be omitted if only saving as PNG or SVG
 		//backgroundColor: 'rgb(255, 255, 255)'
@@ -657,9 +703,9 @@ function resizeSignatureCanvas() {
 	// and only part of the canvas is cleared then.
 	const ratio = Math.max(window.devicePixelRatio || 1, 1);
 	// This part causes the canvas to be cleared
-	canvas.width = canvas.offsetWidth * ratio;
-	canvas.height = canvas.offsetHeight * ratio;
-	canvas.getContext("2d").scale(ratio, ratio);
+	signaturecanvas.width = signaturecanvas.offsetWidth * ratio;
+	signaturecanvas.height = signaturecanvas.offsetHeight * ratio;
+	signaturecanvas.getContext("2d").scale(ratio, ratio);
 	// This library does not listen for canvas changes, so after the canvas is automatically
 	// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
 	// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
