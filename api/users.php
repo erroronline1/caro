@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 		case 'user_save':
 			// initialize varaibles
 			$auth = [];
-			$update = $token = '';
+			$update = $token = $photo = '';
 			$payload->id = dbSanitize($payload->id);
 			// unset properties that would conflict with database column names
 			unset($payload->request);
@@ -35,12 +35,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			}
 			$update .= ", permissions='" . implode(',', $auth) . "' ";  
 
+			if ($_FILES['photo']['tmp_name']) {
+				$photo=base64_encode(resizeImage($_FILES['photo']['tmp_name'], 128));
+				$update .= ", image='" . $photo . "'";
+			}
+
 			$statement = $pdo->prepare("INSERT INTO `users` ".
-				"(`id`, `name`, `permissions`, `token`) VALUES (" . 
+				"(`id`, `name`, `permissions`, `token`, `image`) VALUES (" . 
 				($payload->id ? : 'NULL') . ", '" . 
 				dbSanitize($payload->name) . "', '" . 
 				implode(',', $auth) . "', '" . 
-				$token . "') ON DUPLICATE KEY UPDATE " . substr($update,2));
+				$token . "', '".
+				$photo . "') ON DUPLICATE KEY UPDATE " . substr($update,2));
 			if ($statement->execute()){
 					$result = ['id' => $pdo->lastInsertId() ? : $payload->id, 'name' => scriptFilter($payload->name)];
 					echo json_encode($result);
@@ -138,21 +144,33 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					'content' => $auth
 					]
 				],[
-					['type' => 'checkbox',
-					'description' => 'access token',
-					'content' => ['renew on save' => []]
+					['type' => 'image',
+					'description' => 'export user image',
+					'attributes' => [
+						'name' => $result['name'],
+						'base64img' => $result['image'] ? 'data:image/png;base64,' . $result['image'] : '']
 					],
+					['type' => 'photo',
+					'description' => 'take a photo',
+					'attributes' => [
+						'name' => 'photo'
+					]],
+				],[
 					['type' => 'image',
 					'description' => 'export qr token',
 					'attributes' => [
 						'name' => $result['name'],
-						'value' => $result['token']]
+						'qrcode' => $result['token']]
+					],
+					['type' => 'checkbox',
+					'description' => 'access token',
+					'content' => ['renew on save' => []]
 					],
 					['type' => 'deletebutton',
 					'description' => 'delete user',
 					'attributes' => [
 						'type'=>'button', // apparently defaults to submit otherwise
-						'onpointerdown' => 'if (confirm("delete permanently?")) {api.user("user_delete", ' . $result['id'] . ')}'
+						'onpointerdown' => $result['id'] ? 'if (confirm("delete permanently?")) {api.user("user_delete", ' . $result['id'] . ')}' : ''
 					]]
 				]],
 				'form' => [
