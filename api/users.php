@@ -6,49 +6,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 		case 'user_save':
 			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			// initialize varaibles
-			$auth = [];
-			$update = $token = $photo = '';
-			$payload->id = dbSanitize($payload->id);
-			// unset properties that would conflict with database column names
-			unset($payload->request);
-			unset($payload->edit_existing_users);
+			$permissions = [];
+			$payload->id = SQLQUERY::SANITIZE($payload->id);
 
-			// chain checked authorization levels
-			foreach($ini['authorization']['authorized'] as $level => $description){
-				if ($payload->{$description}) {
-					$auth[] = $level;
-					unset($payload->{$description});
-				}
-			}
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_save-get_by_id'));
+			$statement->execute([
+				':id' => $payload->id
+			]);
+			// prepare or create user-array to populate or update
+			if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $user = [
+					'id' => 0,
+					'name' => $payload->name,
+					'permissions' => '',
+					'token' => '',
+					'image' => ''
+				];
 
 			// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
 			// e.g. $payload->active = $payload->active ? 1 : 0;
 
+			$user['name'] = SQLQUERY::SANITIZE($payload->name);
+			// chain checked permission levels
+			foreach(INI['permissions'] as $level => $description){
+				if ($payload->{$description}) {
+					$permissions[] = $level;
+				}
+			}
+			$user['permissions'] = implode(',', $permissions);
 			// generate token
 			if($payload->renew_on_save){
-				$token = hash('sha256', dbSanitize($payload->name) . random_int(100000,999999) . time());
-				$update .= ", token='" . $token . "' ";  
-				unset($payload->renew_on_save);
+				$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 			}
-			// generate update pairs
-			foreach($payload as $key => $value){
-				$update .= ", " . dbSanitize($key) . "='" . dbSanitize($value) . "' ";
-			}
-			$update .= ", permissions='" . implode(',', $auth) . "' ";  
-
+			// convert image
 			if ($_FILES['photo']['tmp_name']) {
-				$photo = 'data:image/png;base64,' . base64_encode(resizeImage($_FILES['photo']['tmp_name'], 128));
-				$update .= ", image='" . $photo . "'";
+				$user['image'] = 'data:image/png;base64,' . base64_encode(resizeImage($_FILES['photo']['tmp_name'], 128));
 			}
 
-			$statement = $pdo->prepare("INSERT INTO `users` ".
-				"(`id`, `name`, `permissions`, `token`, `image`) VALUES (" . 
-				($payload->id ? : 'NULL') . ", '" . 
-				dbSanitize($payload->name) . "', '" . 
-				implode(',', $auth) . "', '" . 
-				$token . "', '".
-				$photo . "') ON DUPLICATE KEY UPDATE " . substr($update,2));
-			if ($statement->execute()){
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_save'));
+			if ($statement->execute([
+				':id' => $user['id'],
+				':name' => $user['name'],
+				':permissions' => $user['permissions'],
+				':token' => $user['token'],
+				':image' => $user['image']
+			])){
 					$result = ['id' => $pdo->lastInsertId() ? : $payload->id, 'name' => scriptFilter($payload->name)];
 					echo json_encode($result);
 			}
@@ -60,8 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 				break;
 			}
 
-			$statement = $pdo->prepare("SELECT * FROM users WHERE token = '" . $payload->Login . "' LIMIT 1");
-			$statement->execute();
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_current'));
+			$statement->execute([
+				':token' => SQLQUERY::SANITIZE($payload->Login)
+			]);
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
 			if ($result['token']){
 				$_SESSION['user'] = [
@@ -106,12 +109,16 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE'){
 	switch ($payload->request){
 		case 'user_delete':
 			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
-			$payload->id = dbSanitize($payload->id);
-			$statement = $pdo->prepare("SELECT id, name FROM users WHERE id = " . $payload->id . " LIMIT 1");
-			$statement->execute();
+			$payload->id = SQLQUERY::SANITIZE($payload->id);
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_delete-selected'));
+			$statement->execute([
+				':id' => $payload->id
+			]);
 			$user = $statement->fetch(PDO::FETCH_ASSOC);
-			$statement = $pdo->prepare("DELETE FROM users WHERE id = " . $user['id'] . " LIMIT 1");
-			if ($statement->execute()) echo json_encode(['id' => false, 'name' => scriptFilter($user['name'])]);
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_delete'));
+			if ($statement->execute([
+				':id' => $user['id']
+			])) echo json_encode(['id' => false, 'name' => scriptFilter($user['name'])]);
 			else echo json_encode(['id' => $user['id'], 'name' => scriptFilter($user['name'])]);
 		break;
 	}
@@ -123,11 +130,12 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 		case 'user_edit':
 			// form to add, edit and delete users. 
 			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
+			$payload->id = SQLQUERY::SANITIZE($payload->id);
 			$datalist=[];
 			$options=['...'=>[]];
 			
 			// prepare existing users lists
-			$statement = $pdo->prepare("SELECT name FROM users ORDER BY name ASC");
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_edit-datalist'));
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $key => $row) {
@@ -135,18 +143,17 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 				$options[$row['name']] = [];
 			}
 
-			$payload->id = dbSanitize($payload->id);
-			$payload->edit_existing_users = dbSanitize($payload->edit_existing_users);
-
 			// select single user based on id or name
-			$statement = $pdo->prepare("SELECT * FROM users WHERE id = '" . $payload->id . "' OR name LIKE '" . $payload->id . "' LIMIT 1");
-			$statement->execute();
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_edit-selected'));
+			$statement->execute([
+				':id' => $payload->id
+			]);
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
 
 			// display form for adding a new user with ini related permissions
-			$auth=[];
-			foreach($ini['authorization']['authorized'] as $level => $description){
-				$auth[$description] = ['checked' => in_array($level, explode(',', $result['permissions']))];
+			$permissions=[];
+			foreach(INI['permissions'] as $level => $description){
+				$permissions[$description] = ['checked' => in_array($level, explode(',', $result['permissions']))];
 			}
 			$form=['content' => [
 				[
@@ -189,7 +196,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 				],[
 					['type' => 'checkbox',
 					'description' => 'authorized',
-					'content' => $auth
+					'content' => $permissions
 					]
 				],[
 					['type' => 'image',
@@ -218,7 +225,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					'description' => 'delete user',
 					'attributes' => [
 						'type'=>'button', // apparently defaults to submit otherwise
-						'onpointerdown' => $result['id'] ? 'if (confirm("delete permanently?")) {api.user("user_delete", ' . $result['id'] . ')}' : ''
+						'onpointerdown' => $result['id'] ? 'if (confirm("delete '. $result['name'] .' permanently?")) {api.user("user_delete", ' . $result['id'] . ')}' : ''
 					]]
 				]],
 				'form' => [

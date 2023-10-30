@@ -4,12 +4,11 @@ session_start();
 ini_set('display_errors', 1); error_reporting(E_ERROR);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
+define ('INI', parse_ini_file("setup.ini", true));
 //database connection
-include_once('dbcredentials.php'); // contains just $pdo = new PDO('mysql:host=127.0.0.1;dbname=webqs;charset=utf8', 'username', 'password');
+include_once('sqlinterface.php');
 include_once('functions.php'); // general unities
-$pdo->exec("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
 
-$ini=parse_ini_file("setup.ini", true);
 //print_r($ini);
 
 // always security logout
@@ -21,13 +20,6 @@ if ($_SESSION["user"]){
 */
 }
 
-function validUser($pdo){
-	return;
-}
-
-function dbSanitize($text){
-	return addslashes(trim(str_replace(';', ',', $text)));
-}
 function scriptFilter($text){
 	return htmlspecialchars(trim($text));
 }

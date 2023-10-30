@@ -7,13 +7,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$content=['content' => $payload->content];
 			if ($payload->form) $content['form'] = $payload->form; 
-			$statement = $pdo->prepare("INSERT INTO `form_components` ".
+			/*$statement = $pdo->prepare("INSERT INTO `form_components` ".
 				"(`id`, `name`, `date`, `content`) VALUES (" . 
 				"NULL, '" . 
-				dbSanitize($payload->name) . "', " .
+				SQLQUERY::SANITIZE($payload->name) . "', " .
 				"CURRENT_TIMESTAMP, '" .
 				addslashes(json_encode($content)) . "')");
-			if ($statement->execute()){
+			*/	$statement = $pdo->prepare(SQLQUERY::PREPARE('form_components_save'));
+			if ($statement->execute([
+				':name' => SQLQUERY::SANITIZE($payload->name),
+				':content' => addslashes(json_encode($content))
+				])){
 					$result = ['name' => scriptFilter($payload->name)];
 					echo json_encode($result);
 			}
@@ -36,7 +40,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 			$options=['...'=>[]];
 			
 			// prepare existing component lists
-			$statement = $pdo->prepare("SELECT name FROM form_components GROUP BY name ORDER BY name ASC");
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_components_edit-datalist'));
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $key => $row) {
@@ -44,8 +48,10 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 				$options[$row['name']]=[];
 			}
 
-			$statement = $pdo->prepare("SELECT name, content FROM form_components WHERE name = '" . $payload->name . "' ORDER BY id DESC LIMIT 1");
-			$statement->execute();
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_components_edit-selected'));
+			$statement->execute([
+				':name' => SQLQUERY::SANITIZE($payload->name)
+			]);
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
 	
 			$creator = [
@@ -150,7 +156,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 			$componentoptions = ['...'=>[]];
 			
 			// prepare existing component lists
-			$statement = $pdo->prepare("SELECT name FROM forms GROUP BY name ORDER BY name ASC");
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_edit-datalist'));
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $key => $row) {
@@ -158,7 +164,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 				$formoptions[$row['name']]=[];
 			}
 
-			$statement = $pdo->prepare("SELECT name FROM form_components GROUP BY name ORDER BY name ASC");
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_edit-components_datalist'));
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $key => $row) {
@@ -167,8 +173,10 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 			}
 				
 
-			$statement = $pdo->prepare("SELECT name, content FROM forms WHERE name = '" . $payload->name . "' ORDER BY id DESC LIMIT 1");
-			$statement->execute();
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_edit-selected'));
+			$statement->execute([
+				':name' => SQLQUERY::SANITIZE($payload->name)
+			]);
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
 
 			$creator = [
@@ -239,15 +247,17 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 		case 'form_components_add':
 			// retrieve latest form component according to name
 			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
-			$statement = $pdo->prepare("SELECT name, content FROM form_components WHERE name='" . dbSanitize($payload->name) . "' ORDER BY id DESC");
-			$statement->execute();
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_components_add'));
+			$statement->execute([
+				':name' => SQLQUERY::SANITIZE($payload->name)
+			]);
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
 			$result['content'] = json_decode($result['content']);
 			echo json_encode($result);
 		break;
 		case 'form_get':
 			// retrieve latest active entries according to requested names
-			/*$requestedNames = explode(',',dbSanitize($payload->content));
+			/*$requestedNames = explode(',',SQLQUERY::SANITIZE($payload->content));
 			$statement = $pdo->prepare("SELECT * FROM form_components WHERE id IN (SELECT MAX(id) FROM forms WHERE name IN ('". implode("','", $requestedNames)."') GROUP BY name)");
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
