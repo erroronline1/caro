@@ -21,3 +21,5 @@ window.Compose = Compose;
 window.MetaCompose = MetaCompose;
 window.compose_helper = compose_helper;
 
+api.start();
+

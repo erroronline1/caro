@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$update .= ", permissions='" . implode(',', $auth) . "' ";  
 
 			if ($_FILES['photo']['tmp_name']) {
-				$photo=base64_encode(resizeImage($_FILES['photo']['tmp_name'], 128));
+				$photo = 'data:image/png;base64,' . base64_encode(resizeImage($_FILES['photo']['tmp_name'], 128));
 				$update .= ", image='" . $photo . "'";
 			}
 
@@ -52,6 +52,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 					echo json_encode($result);
 			}
 		break;
+		case 'user_current':
+			// select single user based on token
+			if (!$payload->Login && $_SESSION['user']){
+				echo json_encode($_SESSION['user']);
+				break;
+			}
+
+			$statement = $pdo->prepare("SELECT * FROM users WHERE token = '" . $payload->Login . "' LIMIT 1");
+			$statement->execute();
+			$result = $statement->fetch(PDO::FETCH_ASSOC);
+			if ($result['token']){
+				$_SESSION['user'] = [
+					'name' => $result['name'],
+					'permissions' => $result['permissions'],
+					'image' => $result['image']
+				];
+				echo json_encode($_SESSION['user']);
+				break;
+			}
+			$_SESSION = [];
+			echo json_encode(
+				[
+					'form' => [
+						'data-usecase' => 'user_current',
+						'action' => 'javascript:api.start()'
+					],
+					'content' => [
+						[[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => 'request',
+								'value' => 'user_current'
+							]
+						]],
+						[[
+							'type' => 'qrscanner',
+							'description' => 'Login',
+							'attributes' => [
+								'type' => 'password'
+							]
+						]]
+					]
+				]
+			);
+			break;
 	}
 	//	else echo http_response_code(401);
 }
@@ -83,8 +128,8 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($result as $key => $row) {
-				$datalist[]=$row['name'];
-				$options[$row['name']]=[];
+				$datalist[] = $row['name'];
+				$options[$row['name']] = [];
 			}
 
 			$payload->id = dbSanitize($payload->id);
@@ -148,7 +193,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					'description' => 'export user image',
 					'attributes' => [
 						'name' => $result['name'],
-						'base64img' => $result['image'] ? 'data:image/png;base64,' . $result['image'] : '']
+						'base64img' => $result['image'] ? : '']
 					],
 					['type' => 'photo',
 					'description' => 'take a photo',

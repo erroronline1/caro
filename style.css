@@ -221,7 +221,6 @@ input[type=number] {
 .photoupload {
 	display:block;
 	margin-top:-2em;
-	margin-bottom:2em;
 	float: right;
 	height: 4em;
 	width: 4em;
@@ -264,16 +263,12 @@ body>label {
 	border: 1px solid var(--lightershadow);
 	backdrop-filter: blur(10px);
 	box-shadow: 2px 2px 10px var(--darkshadow);
-}
-
-body>label::before {
-	content: "";
 	display: block;
-	height: 1.5em;
-	width: 1.5em;
+	height: 3em;
+	width: 3em;
 	background-size: cover;
-	margin: 1em;
 	background-image: url("media/bars.svg");
+	background-size:cover;
 }
 
 body>input {

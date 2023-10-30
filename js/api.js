@@ -127,10 +127,24 @@ export const api = {
 		if (method === 'post') payload = _.getInputs('[data-usecase=user]', true);
 		api.send(method, payload, successFn, errorFn, method === 'post');
 	},
-	signIn: () => {
-
-	},
-	signOut: () => {
+	start: (request = 'user_current', Login = null) => {
+		let payload = {
+				'request': request,
+			},
+			errorFn = function () {},
+			successFn = function (data) {
+				document.getElementById('main').innerHTML = '';
+				if (data.form) {
+					document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
+					new Assemble(data).initializeSection();
+					return;
+				}
+				document.querySelector('body>label').style.backgroundImage = "url('" + data.image + "')";
+				
+			};
+		if (Login) payload.Login = Login;
+		if (document.querySelector('[data-usecase=user_current]')) payload = _.getInputs('[data-usecase=user_current]', true);
+		api.send('post', payload, successFn, errorFn, document.querySelector('[data-usecase=user_current]'));
 
 	}
 }
