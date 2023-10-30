@@ -44,6 +44,23 @@ export const assemble_helper = {
 			link.download = name + '.png';
 			link.click();
 		}, 'image/png', 1)
+	},
+	userMenu: function (content) {
+		if (!content) return;
+		const elements = [];
+		Object.keys(content).forEach(group => {
+			const header = document.createElement('h3');
+			header.appendChild(document.createTextNode(group));
+			elements.push(header);
+			Object.keys(content[group]).forEach(item => {
+				const link = document.createElement('a');
+				link.href = content[group][item];
+				link.appendChild(document.createTextNode(item));
+				elements.push(link);
+			});
+		});
+		document.querySelector('nav').innerHTML = '';
+		document.querySelector('nav').append(...elements);
 	}
 }
 
@@ -145,11 +162,11 @@ export class Assemble {
 			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
 			QrCreator.render({
 				text: this.imageQrCode.content,
-				size: 512,
+				size: 1024,
 				ecLevel: 'H',
 				background: null,
 				fill: '#000000',
-				radius: 0
+				radius: 1
 			}, document.getElementById(this.imageQrCode.id));
 		}
 		if (this.imageBase64) {
@@ -245,7 +262,7 @@ export class Assemble {
 		let label;
 		input.type = type;
 		input.id = getNextElementID();
-		input.autocomplete = 'off';
+		input.autocomplete = this.tile.attributes.type === 'password' ? 'one-time-code' : 'off';
 		if (this.tile.description) input.name = this.tile.description;
 		input.classList.add('input-field');
 		if (this.tile.attributes !== undefined) {
@@ -652,7 +669,7 @@ export class Assemble {
 		const canvas = document.createElement('canvas');
 		canvas.id = getNextElementID();
 		canvas.classList.add('imagecanvas');
-		canvas.width = canvas.height = 512;
+		canvas.width = canvas.height = 1024;
 		if (this.tile.attributes.qrcode) this.imageQrCode = {
 			id: canvas.id,
 			content: this.tile.attributes.qrcode
@@ -670,7 +687,7 @@ export class Assemble {
 			'data-type': this.tile.type,
 			'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
 		};
-		if(!(this.imageQrCode || this.imageBase64))this.tile.attributes.disabled=true;
+		if (!(this.imageQrCode || this.imageBase64)) this.tile.attributes.disabled = true;
 
 		this.button();
 	}

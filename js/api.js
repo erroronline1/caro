@@ -1,6 +1,7 @@
 import {
 	_
 } from '../libraries/erroronline1.js';
+import { assemble_helper } from './assemble.js';
 
 export const api = {
 	send: (method, payload, successFn, errorFn = null, form_data = false) => {
@@ -128,23 +129,28 @@ export const api = {
 		api.send(method, payload, successFn, errorFn, method === 'post');
 	},
 	start: (request = 'user_current', Login = null) => {
+		// login and logout
 		let payload = {
 				'request': request,
 			},
-			errorFn = function () {},
 			successFn = function (data) {
 				document.getElementById('main').innerHTML = '';
+				api.menu();
 				if (data.form) {
 					document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
 					new Assemble(data).initializeSection();
 					return;
 				}
 				document.querySelector('body>label').style.backgroundImage = "url('" + data.image + "')";
-				
 			};
 		if (Login) payload.Login = Login;
 		if (document.querySelector('[data-usecase=user_current]')) payload = _.getInputs('[data-usecase=user_current]', true);
-		api.send('post', payload, successFn, errorFn, document.querySelector('[data-usecase=user_current]'));
-
+		api.send('post', payload, successFn, null, document.querySelector('[data-usecase=user_current]'));
+	},
+	menu:() => {
+		const successFn = function (data){
+			assemble_helper.userMenu(data);
+		}
+		api.send('get', {request:'user_menu'}, successFn);
 	}
 }

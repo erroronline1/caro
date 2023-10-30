@@ -4,6 +4,7 @@
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 	switch ($payload->request){
 		case 'user_save':
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			// initialize varaibles
 			$auth = [];
 			$update = $token = $photo = '';
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if ($result['token']){
 				$_SESSION['user'] = [
 					'name' => $result['name'],
-					'permissions' => $result['permissions'],
+					'permissions' => explode(',', $result['permissions']),
 					'image' => $result['image']
 				];
 				echo json_encode($_SESSION['user']);
@@ -104,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE'){
 	switch ($payload->request){
 		case 'user_delete':
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$payload->id = dbSanitize($payload->id);
 			$statement = $pdo->prepare("SELECT id, name FROM users WHERE id = " . $payload->id . " LIMIT 1");
 			$statement->execute();
@@ -120,6 +122,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 	switch ($payload->request){
 		case 'user_edit':
 			// form to add, edit and delete users. 
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$datalist=[];
 			$options=['...'=>[]];
 			
@@ -223,6 +226,22 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					'action' => 'javascript:api.user("user_save")'
 				]];
 			echo json_encode($form);
+			break;
+		case 'user_menu':
+			// get permission based menu items
+			if (!$_SESSION['user']) {echo json_encode(['please login' => []]); break;}
+			
+			$menu=[
+				'logout' => [$_SESSION['user']['name'] . ' logout' => "javascript:api.start('user_current', 'null')"]
+			];
+			if (in_array('admin', $_SESSION['user']['permissions'])){
+				$menu['admin'] = [
+					'Users' => "javascript:api.user('user_edit')",
+					'Form Components' => "javascript:api.form('form_components_edit')",
+					'Forms' => "javascript:api.form('form_edit')"
+				];
+			}
+			echo json_encode($menu);
 			break;
 		default:
 			echo http_response_code(400);

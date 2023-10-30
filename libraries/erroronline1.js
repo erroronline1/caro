@@ -8,6 +8,16 @@ String.prototype.contains = function (values) {
 	return _.contains(this, values);
 } // to use intitive with string
 
+var httpResponse = {
+	400: 'Bad Request',
+	401: 'Unauthorized',
+	403: 'Forbidden',
+	408: 'Request Timeout',
+	500: 'Internal Server Error',
+	503: 'Service Unavailable',
+	507: 'Insufficient Storage'
+};
+
 export const _ = {
 	el: function (x) { // shortcut for readabilities sake: _.el('element')
 		return document.getElementById(x);
@@ -32,7 +42,7 @@ export const _ = {
 			body: (method == 'GET' ? null : (form_data ? payload : JSON.stringify(payload))) // body data type must match "Content-Type" header
 		}).then(response => {
 			if (response.ok) return response.json();
-			else throw new Error('server error, response ' + response.status);
+			else throw new Error('server responded ' + response.status + ': ' + httpResponse[response.status]);
 		});
 		return response;
 		/* use like 

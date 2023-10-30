@@ -4,6 +4,7 @@
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 	switch ($payload->request){
 		case 'form_components_save':
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$content=['content' => $payload->content];
 			if ($payload->form) $content['form'] = $payload->form; 
 			$statement = $pdo->prepare("INSERT INTO `form_components` ".
@@ -30,6 +31,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 	switch ($payload->request){
 		case 'form_components_edit':
 			// form to add and edit form components. 
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$datalist=[];
 			$options=['...'=>[]];
 			
@@ -142,6 +144,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 		break;
 		case 'form_edit':
 			// form to add and edit form components. 
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$formdatalist = $componentdatalist = [];
 			$formoptions = ['...'=>[]];
 			$componentoptions = ['...'=>[]];
@@ -235,6 +238,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 		break;
 		case 'form_components_add':
 			// retrieve latest form component according to name
+			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$statement = $pdo->prepare("SELECT name, content FROM form_components WHERE name='" . dbSanitize($payload->name) . "' ORDER BY id DESC");
 			$statement->execute();
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
