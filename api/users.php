@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 			$user['name'] = SQLQUERY::SANITIZE($payload->name);
 			// chain checked permission levels
-			foreach(INI['permissions'] as $level => $description){
+			foreach(LANGUAGEFILE['permissions'] as $level => $description){
 				if ($payload->{$description}) {
 					$permissions[] = $level;
 				}
@@ -56,14 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 		break;
 		case 'user_current':
 			// select single user based on token
-			if (!$payload->Login && $_SESSION['user']){
+			if (!$payload->login && $_SESSION['user']){
 				echo json_encode($_SESSION['user']);
 				break;
 			}
 
 			$statement = $pdo->prepare(SQLQUERY::PREPARE('user_current'));
 			$statement->execute([
-				':token' => SQLQUERY::SANITIZE($payload->Login)
+				':token' => SQLQUERY::SANITIZE($payload->login)
 			]);
 			$result = $statement->fetch(PDO::FETCH_ASSOC);
 			if ($result['token']){
@@ -92,8 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 						]],
 						[[
 							'type' => 'qrscanner',
-							'description' => 'Login',
+							'description' => LANG::GET('user.login_description'),
 							'attributes' => [
+								'name' => 'login',
 								'type' => 'password'
 							]
 						]]
@@ -152,7 +153,7 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 
 			// display form for adding a new user with ini related permissions
 			$permissions=[];
-			foreach(INI['permissions'] as $level => $description){
+			foreach(LANGUAGEFILE['permissions'] as $level => $description){
 				$permissions[$description] = ['checked' => in_array($level, explode(',', $result['permissions']))];
 			}
 			$form=['content' => [
@@ -174,58 +175,59 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 					]]
 				],[
 					['type' => 'searchinput',
-					'description' => 'edit existing users',
+					'description' => LANG::GET('user.edit_existing_users'),
 					'attributes' => [
-						'placeholder' => 'search name',
+						'placeholder' => LANG::GET('user.edit_existing_users_label'),
 						'list' => 'users',
 						'onkeypress' => "if (event.key === 'Enter') {api.user('user_edit', this.value); return false;}"
 					]],
 					['type' => 'select',
-					'description' => 'edit existing users',
+					'description' => LANG::GET('user.edit_existing_users'),
 					'attributes' => [
 						'onchange' => "api.user('user_edit', this.value)"
 					],
 					'content' => $options]
 				],[
 					['type' => 'textinput',
-					'description' => 'name',
+					'description' => LANG::GET('user.edit_name'),
 					'attributes' => [
+						'name' => 'name',
 						'required' => true,
 						'value' => $result['name'] ? : ''
 					]]
 				],[
 					['type' => 'checkbox',
-					'description' => 'authorized',
+					'description' => LANG::GET('user.edit_permissions'),
 					'content' => $permissions
 					]
 				],[
 					['type' => 'image',
-					'description' => 'export user image',
+					'description' => LANG::GET('user.edit_export_user_image'),
 					'attributes' => [
 						'name' => $result['name'],
 						'base64img' => $result['image'] ? : '']
 					],
 					['type' => 'photo',
-					'description' => 'take a photo',
+					'description' => LANG::GET('user.edit_take_photo'),
 					'attributes' => [
 						'name' => 'photo'
 					]],
 				],[
 					['type' => 'image',
-					'description' => 'export qr token',
+					'description' => LANG::GET('user.edit_export_qr_token'),
 					'attributes' => [
 						'name' => $result['name'],
 						'qrcode' => $result['token']]
 					],
 					['type' => 'checkbox',
-					'description' => 'access token',
-					'content' => ['renew on save' => []]
+					'description' => LANG::GET('user.edit_token'),
+					'content' => [LANG::GET('user.edit_token_renew') => []]
 					],
 					['type' => 'deletebutton',
-					'description' => 'delete user',
+					'description' => LANG::GET('user.edit_delete_button'),
 					'attributes' => [
 						'type'=>'button', // apparently defaults to submit otherwise
-						'onpointerdown' => $result['id'] ? 'if (confirm("delete '. $result['name'] .' permanently?")) {api.user("user_delete", ' . $result['id'] . ')}' : ''
+						'onpointerdown' => $result['id'] ? 'if (confirm("'. LANG::GET('user.edit_delete_confirm', [':name' => $result['name']]) .'")) {api.user("user_delete", ' . $result['id'] . ')}' : ''
 					]]
 				]],
 				'form' => [
@@ -236,16 +238,16 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 			break;
 		case 'user_menu':
 			// get permission based menu items
-			if (!$_SESSION['user']) {echo json_encode(['please login' => []]); break;}
+			if (!$_SESSION['user']) {echo json_encode([LANG::GET('menu.signin_header') => []]); break;}
 			
 			$menu=[
-				'logout' => [$_SESSION['user']['name'] . ' logout' => "javascript:api.start('user_current', 'null')"]
+				'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => "javascript:api.start('user_current', 'null')"]
 			];
 			if (in_array('admin', $_SESSION['user']['permissions'])){
-				$menu['admin'] = [
-					'Users' => "javascript:api.user('user_edit')",
-					'Form Components' => "javascript:api.form('form_components_edit')",
-					'Forms' => "javascript:api.form('form_edit')"
+				$menu[LANG::GET('menu.admin_header')] = [
+					LANG::GET('menu.admin_users') => "javascript:api.user('user_edit')",
+					LANG::GET('menu.admin_form_components') => "javascript:api.form('form_components_edit')",
+					LANG::GET('menu.admin_forms') => "javascript:api.form('form_edit')"
 				];
 			}
 			echo json_encode($menu);

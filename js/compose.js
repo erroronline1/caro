@@ -264,7 +264,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_text-description',
-				'placeholder': 'add information description',
+				'placeholder': LANG.GET('assemble.compose_text_description_label'),
 				'required': true
 			}
 		};
@@ -274,7 +274,7 @@ export class Compose extends Assemble {
 			'description': 'compose_text-content',
 			'attributes': {
 				'name:': 'compose_text-content',
-				'placeholder': 'add information text',
+				'placeholder': LANG.GET('assemble.compose_text_content_label'),
 				'rows': 5
 			}
 		};
@@ -282,7 +282,9 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': 'text',
-			'description': 'add text',
+			'description': LANG.GET('assemble.compose_add_block', {
+				':type': 'text'
+			}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'
@@ -298,7 +300,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_' + type.type + '-description',
-				'placeholder': 'add description',
+				'placeholder': LANG.GET('assemble.compose_description_label'),
 				'required': true
 			}
 		};
@@ -307,7 +309,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_' + type.type + '-attributes',
-				'placeholder': 'add advanced attributes {json}',
+				'placeholder': LANG.GET('assemble.compose_attributes_label'),
 				'pattern': '^\\{.+\\}$|^$',
 				'title': 'json object with double quotes'
 			}
@@ -317,7 +319,7 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': type.type,
-			'description': 'add ' + type.addblock,
+			'description': LANG.GET('assemble.compose_add_block', {':type': type.addblock}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'
@@ -328,21 +330,21 @@ export class Compose extends Assemble {
 	compose_textinput() {
 		this.compose_input({
 			type: 'textinput',
-			description: 'create a single line text input',
+			description: LANG.GET('assemble.compose_textinput'),
 			addblock: 'text input'
 		});
 	}
 	compose_numberinput() {
 		this.compose_input({
 			type: 'numberinput',
-			description: 'create a number input',
+			description: LANG.GET('assemble.compose_numberinput'),
 			addblock: 'number input'
 		});
 	}
 	compose_dateinput() {
 		this.compose_input({
 			type: 'dateinput',
-			description: 'create a date input',
+			description: LANG.GET('assemble.compose_dateinput'),
 			addblock: 'date input'
 		});
 	}
@@ -354,14 +356,14 @@ export class Compose extends Assemble {
 	compose_textarea() {
 		this.compose_input({
 			type: 'textarea',
-			description: 'create a multi line text input',
+			description: LANG.GET('assemble.compose_textarea'),
 			addblock: 'multiline text input'
 		});
 	}
 	compose_hiddeninput() {
 		this.compose_input({
 			type: 'hiddeninput',
-			description: 'create a hidden field',
+			description: LANG.GET('assemble.compose_hiddeninput'),
 			addblock: 'hidden field',
 			attributes: '{"value":"usecase"}'
 		});
@@ -373,7 +375,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_' + type.type + '-description',
-				'placeholder': 'add description',
+				'placeholder': LANG.GET('assemble.compose_description_label'),
 				'required': true
 			}
 		};
@@ -382,7 +384,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_' + type.type + '-content',
-				'placeholder': 'add item'
+				'placeholder': LANG.GET('assemble.compose_multilist_add_item')
 			}
 		};
 		this.textinput();
@@ -390,7 +392,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_' + type.type + '-attributes',
-				'placeholder': 'add advanced attributes {json}',
+				'placeholder': LANG.GET('assemble.compose_attributes_label'),
 				'pattern': '^\\{.+\\}$|^$',
 				'title': 'json object with double quotes'
 			}
@@ -398,7 +400,7 @@ export class Compose extends Assemble {
 		this.textinput();
 		this.tile = {
 			'type': type.type,
-			'description': 'add ' + type.additem + ' item',
+			'description': LANG.GET('assemble.compose_multilist_add_item_button',{':type':type.additem}),
 			'attributes': {
 				'data-type': 'additem',
 				'onpointerdown': cloneItems
@@ -408,7 +410,7 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': type.type,
-			'description': 'add ' + type.addblock + ' block',
+			'description':  LANG.GET('assemble.compose_multilist_add_block_button',{':type':type.addblock}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'
@@ -419,7 +421,7 @@ export class Compose extends Assemble {
 	compose_select() {
 		this.compose_multilist({
 			type: 'select',
-			description: 'create a dropdown block',
+			description: LANG.GET('assemble.compose_select'),
 			additem: 'selection',
 			addblock: 'dropdown'
 		});
@@ -427,7 +429,7 @@ export class Compose extends Assemble {
 	compose_checkbox() {
 		this.compose_multilist({
 			type: 'checkbox',
-			description: 'create a multiple selection block',
+			description: LANG.GET('assemble.compose_checkbox'),
 			additem: 'selection',
 			addblock: 'multiple selection'
 		});
@@ -435,7 +437,7 @@ export class Compose extends Assemble {
 	compose_radio() {
 		this.compose_multilist({
 			type: 'radio',
-			description: 'create a single selection block',
+			description: LANG.GET('assemble.compose_radio'),
 			additem: 'selection',
 			addblock: 'single selection'
 		});
@@ -443,7 +445,7 @@ export class Compose extends Assemble {
 	compose_links() {
 		this.compose_multilist({
 			type: 'links',
-			description: 'create a link block',
+			description: LANG.GET('assemble.compose_links'),
 			additem: 'link',
 			addblock: 'link'
 		});
@@ -455,7 +457,7 @@ export class Compose extends Assemble {
 			'type': 'textinput',
 			'attributes': {
 				'name': 'compose_' + type.type + '-description',
-				'placeholder': 'add description',
+				'placeholder': LANG.GET('assemble.compose_description_label'),
 				'required': true
 			}
 		};
@@ -463,7 +465,7 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': type.type,
-			'description': 'add ' + type.addblock,
+			'description': LANG.GET('assemble.compose_simpleElement_add_button',{':type':type.addblock}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'
@@ -475,35 +477,35 @@ export class Compose extends Assemble {
 	compose_file() {
 		this.compose_simpleElement({
 			type: 'file',
-			description: 'create a file upload',
+			description: LANG.GET('assemble.compose_file'),
 			addblock: 'file upload'
 		});
 	}
 	compose_photo() {
 		this.compose_simpleElement({
 			type: 'photo',
-			description: 'create a photo upload',
+			description: LANG.GET('assemble.compose_photo'),
 			addblock: 'photo upload'
 		});
 	}
 	compose_signature() {
 		this.compose_simpleElement({
 			type: 'signature',
-			description: 'create a signature pad',
+			description: LANG.GET('assemble.compose_signature'),
 			addblock: 'signature pad'
 		});
 	}
 	compose_qrscanner() {
 		this.compose_simpleElement({
 			type: 'qrscanner',
-			description: 'create a qr-scanner field',
+			description: LANG.GET('assemble.compose_qrscanner'),
 			addblock: 'qr-scanner'
 		});
 	}
 
 	compose_component(std = {
-		placeholder: 'component name',
-		description: 'save form component',
+		placeholder: LANG.GET('assemble.compose_component_label'),
+		description: LANG.GET('assemble.compose_component'),
 		action: 'api.form("form_components_save")'
 	}) {
 		this.tile = {
@@ -530,8 +532,8 @@ export class Compose extends Assemble {
 	}
 	compose_form() {
 		this.compose_component({
-			placeholder: 'form name',
-			description: 'save form',
+			placeholder: LANG.GET('assemble.compose_form_label'),
+			description: LANG.GET('assemble.compose_form'),
 			action: 'api.form("form_save")'
 		});
 	}

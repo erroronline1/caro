@@ -139,7 +139,7 @@ export class Assemble {
 
 			this.content.push([{
 				type: 'submitbutton',
-				description: 'submit',
+				description: LANG.GET('general.submit_button'),
 				attributes: {
 					type: 'submit',
 				}
@@ -262,7 +262,7 @@ export class Assemble {
 		let label;
 		input.type = type;
 		input.id = getNextElementID();
-		input.autocomplete = this.tile.attributes.type === 'password' ? 'one-time-code' : 'off';
+		input.autocomplete = (this.tile.attributes && this.tile.attributes.type) === 'password' ? 'one-time-code' : 'off';
 		if (this.tile.description) input.name = this.tile.description;
 		input.classList.add('input-field');
 		if (this.tile.attributes !== undefined) {
@@ -385,13 +385,13 @@ export class Assemble {
 		});
 		input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
-				', ') + ' or rechoose file...' : 'choose file...'
+				', ') + ' ' + LANG.GET('assemble.file_rechoose') : LANG.GET('assemble.file_choose');
 		}
-		label.onclick = "document.getElementById('" + input.id + "').click();";
+		label.onclick = new Function("document.getElementById('" + input.id + "').click();");
 		label.type = 'button';
 		label.setAttribute('data-type', 'file');
 		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode('choose file...'));
+		label.appendChild(document.createTextNode(LANG.GET('assemble.file_choose')));
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
@@ -418,7 +418,7 @@ export class Assemble {
 			addbutton = document.createElement('button');
 
 		function changeEvent() {
-			this.nextSibling.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' or retake a photo...' : 'take a photo...';
+			this.nextSibling.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' ' +LANG.GET('assemble.photo_rechoose') : LANG.GET('assemble.photo_choose');
 			if (this.files.length) this.nextSibling.src = URL.createObjectURL(this.files[0]);
 			else this.nextSibling.src = '';
 		}
@@ -432,7 +432,7 @@ export class Assemble {
 			// preview image
 			nextPhoto.childNodes[2].src = '';
 			// label
-			nextPhoto.childNodes[3].innerHTML = 'take a photo...';
+			nextPhoto.childNodes[3].innerHTML = LANG.GET('assemble.photo_choose');
 			nextPhoto.childNodes[3].onclick = new Function("document.getElementById('" + nextPhoto.childNodes[1].id + "').click();");
 			// delete button
 			if (nextPhoto.childNodes.length < 7) {
@@ -464,12 +464,12 @@ export class Assemble {
 		label.type = 'button';
 		label.setAttribute('data-type', 'photo');
 		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode('take a photo...'));
+		label.appendChild(document.createTextNode(LANG.GET('assemble.photo_choose')));
 
 		img.classList.add('photoupload');
 
 		resetbutton.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
-		resetbutton.appendChild(document.createTextNode('Reset'));
+		resetbutton.appendChild(document.createTextNode(LANG.GET('assemble.reset')));
 		resetbutton.setAttribute('data-type', 'reset');
 		resetbutton.classList.add('inlinebutton');
 		resetbutton.type = 'button';
@@ -620,7 +620,7 @@ export class Assemble {
 		canvas.id = 'signaturecanvas';
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
-		this.tile.description = 'clear signature';
+		this.tile.description = LANG.GET('assemble.clear_signature');
 		this.tile.attributes = {
 			'type': 'button',
 			'name': '',
@@ -650,7 +650,7 @@ export class Assemble {
 
 		const inputid = this.input('text');
 		//attributes are processed already, therefore they can be reassigned
-		this.tile.description = 'scan a qr code';
+		this.tile.description = LANG.GET('assemble.scan_button');
 		this.tile.attributes = {
 			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
 		};

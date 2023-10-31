@@ -7,13 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if (!in_array('admin', $_SESSION['user']['permissions'])){echo http_response_code(401); break;}
 			$content=['content' => $payload->content];
 			if ($payload->form) $content['form'] = $payload->form; 
-			/*$statement = $pdo->prepare("INSERT INTO `form_components` ".
-				"(`id`, `name`, `date`, `content`) VALUES (" . 
-				"NULL, '" . 
-				SQLQUERY::SANITIZE($payload->name) . "', " .
-				"CURRENT_TIMESTAMP, '" .
-				addslashes(json_encode($content)) . "')");
-			*/	$statement = $pdo->prepare(SQLQUERY::PREPARE('form_components_save'));
+			$statement = $pdo->prepare(SQLQUERY::PREPARE('form_components_save'));
 			if ($statement->execute([
 				':name' => SQLQUERY::SANITIZE($payload->name),
 				':content' => addslashes(json_encode($content))
@@ -64,83 +58,83 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 						]]
 					],[
 						['type' => 'searchinput',
-						'description' => 'edit existing components',
+						'description' => LANG::GET('assemble.edit_existing_components'),
 						'attributes' => [
-							'placeholder' => 'search name',
+							'placeholder' => LANG::GET('assemble.edit_existing_components_label'),
 							'list' => 'components',
 							'onkeypress' => "if (event.key === 'Enter') {api.form('form_components_edit', this.value); return false;}"
 						]],
 						['type' => 'select',
-						'description' => 'edit existing components',
+						'description' => LANG::GET('assemble.edit_existing_components'),
 						'attributes' => [
 							'onchange' => "api.form('form_components_edit', this.value)"
 						],
 						'content' => $options]
 					],[[
 						'type' => 'text',
-						'description' => 'what to do',
-						'content' => 'choose available elements from this panel. set your parameters and add fields. advanced attributes (href, value, events, etc) have to be set in json-format with double-quotes. change your order by dragging the elements. during composing indicators for containers might not be available. dragging is available on devices with mice only.'
+						'description' => LANG::GET('assemble.edit_components_info_description'),
+						'content' => LANG::GET('assemble.edit_components_info_content')
 					], [
 						'form' => true,
 						'type' => 'compose_text',
-						'description' => 'add an informative text'
+						'description' => LANG::GET('assemble.compose_text')
 					], [
 						'form' => true,
 						'type' => 'compose_textinput',
-						'description' => 'add a single line text input'
+						'description' => LANG::GET('assemble.compose_textinput')
 					], [
 						'form' => true,
 						'type' => 'compose_textarea',
-						'description' => 'add a multiline text input'
+						'description' => LANG::GET('assemble.compose_textarea')
 					], [
 						'form' => true,
 						'type' => 'compose_numberinput',
-						'description' => 'add a number input'
+						'description' => LANG::GET('assemble.compose_numberinput')
 					], [
 						'form' => true,
 						'type' => 'compose_dateinput',
-						'description' => 'add a date input'
+						'description' => LANG::GET('assemble.compose_dateinput')
 					], [
 						'form' => true,
 						'type' => 'compose_links',
-						'description' => 'add a list of links'
+						'description' => LANG::GET('assemble.compose_links')
 					], [
 						'form' => true,
 						'type' => 'compose_radio',
-						'description' => 'add a set of single selection options'
+						'description' => LANG::GET('assemble.compose_radio')
 					], [
 						'form' => true,
 						'type' => 'compose_checkbox',
-						'description' => 'add a set of multiple selection options'
+						'description' => LANG::GET('assemble.compose_checkbox')
 					], [
 						'form' => true,
 						'type' => 'compose_select',
-						'description' => 'add a dropdown'
+						'description' => LANG::GET('assemble.compose_select')
 					], [
 						'form' => true,
 						'type' => 'compose_file',
-						'description' => 'add a file upload'
+						'description' => LANG::GET('assemble.compose_file')
 					], [
 						'form' => true,
 						'type' => 'compose_photo',
-						'description' => 'add a photo upload'
+						'description' => LANG::GET('assemble.compose_photo')
 					], [
 						'form' => true,
 						'type' => 'compose_signature',
-						'description' => 'add a signature pad'
+						'description' => LANG::GET('assemble.compose_signature')
 					], [
 						'form' => true,
 						'type' => 'compose_qrscanner',
-						'description' => 'add a qr scanner field'
+						'description' => LANG::GET('assemble.compose_qrscanner')
 					]],
 					[[
 						'type' => 'compose_component',
-						'description' => 'generate/update form component',
+						'description' => LANG::GET('assemble.compose_component'),
 						'value' => $result['name'] ? : ''
 					]],
 					[[
 						'type' => 'trash',
-						'description' => 'drop panel here to delete'
+						'description' => LANG::GET('assemble.edit_trash')
 					]]
 					]];
 
@@ -194,49 +188,49 @@ elseif ($_SERVER['REQUEST_METHOD'] == 'GET'){
 						]]
 					],[
 						['type' => 'searchinput',
-						'description' => 'edit existing forms',
+						'description' => LANG::GET('assemble.edit_existing_forms'),
 						'attributes' => [
-							'placeholder' => 'search name',
+							'placeholder' => LANG::GET('assemble.edit_existing_forms_label'),
 							'list' => 'forms',
 							'onkeypress' => "if (event.key === 'Enter') {api.form('form_edit', this.value); return false;}"
 						]],
 						['type' => 'select',
-						'description' => 'edit existing forms',
+						'description' => LANG::GET('assemble.edit_existing_forms'),
 						'attributes' => [
 							'onchange' => "api.form('form_edit', this.value)"
 						],
 						'content' => $formoptions]
 						],[[
 							"type" => "text",
-							"description" => "what to do",
-							"content" => "choose available form components from this panel. change your order by dragging the components. dragging is available on devices with mice only."
+							"description" => LANG::GET('assemble.edit_forms_info_description'),
+							"content" => LANG::GET('assemble.edit_forms_info_content')
 						],
 						['type' => 'searchinput',
-						'description' => 'add form component',
+						'description' => LANG::GET('assemble.edit_add_component'),
 						'attributes' => [
-							'placeholder' => 'search name',
+							'placeholder' => LANG::GET('assemble.edit_add_component_label'),
 							'list' => 'components',
 							'onkeypress' => "if (event.key === 'Enter') {api.form('form_components_add', this.value); return false;}"
 						]],
 						['type' => 'select',
-						'description' => 'add form component',
+						'description' => LANG::GET('assemble.edit_add_component'),
 						'attributes' => [
 							'onchange' => "api.form('form_components_add', this.value)"
 						],
 						'content' => $componentoptions],
 						[
-							"form" => true,
-							"type" => "compose_hiddeninput",
-							"description" => "create a hidden field",
+							'form' => true,
+							'type' => 'compose_hiddeninput',
+							'description' => LANG::GET('assemble.compose_hiddeninput'),
 						]],
 						[[
 							'type' => 'compose_form',
-							'description' => 'generate/update form',
+							'description' => LANG::GET('assemble.compose_form'),
 							'value' => $result['name'] ? : ''
 						]],
 						[[
 							'type' => 'trash',
-							'description' => 'drop panel here to delete'
+							'description' => LANG::GET('assemble.edit_trash')
 						]]
 					]];
 

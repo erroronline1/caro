@@ -128,7 +128,7 @@ export const api = {
 		if (method === 'post') payload = _.getInputs('[data-usecase=user]', true);
 		api.send(method, payload, successFn, errorFn, method === 'post');
 	},
-	start: (request = 'user_current', Login = null) => {
+	start: (request = 'user_current', login = null) => {
 		// login and logout
 		let payload = {
 				'request': request,
@@ -143,7 +143,7 @@ export const api = {
 				}
 				document.querySelector('body>label').style.backgroundImage = "url('" + data.image + "')";
 			};
-		if (Login) payload.Login = Login;
+		if (login) payload.login = login;
 		if (document.querySelector('[data-usecase=user_current]')) payload = _.getInputs('[data-usecase=user_current]', true);
 		api.send('post', payload, successFn, null, document.querySelector('[data-usecase=user_current]'));
 	},
