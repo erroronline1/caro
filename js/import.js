@@ -21,5 +21,9 @@ window.Compose = Compose;
 window.MetaCompose = MetaCompose;
 window.compose_helper = compose_helper;
 
-api.start();
+import {
+    LANG
+} from '../js/language.js';
+window.LANG = LANG;
 
+api.start();
