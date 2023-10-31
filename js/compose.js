@@ -126,17 +126,17 @@ export const compose_helper = {
 
 	importComponent: function (form) {
 		compose_helper.newFormComponents = {};
-		Object.keys(form.content).forEach(element => {
+		for (const [key, element] of Object.entries(form.content)) {
 			const newElements = new Compose({
 				'draggable': true,
 				'content': [
-					form.content[element]
+					element
 				]
 			});
 			newElements.forEach(r_element => {
 				compose_helper.newFormComponents[r_element.id] = r_element.content;
 			});
-		});
+		};
 	},
 	importForm: function (form) {
 		form.draggable = true;
@@ -319,7 +319,9 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': type.type,
-			'description': LANG.GET('assemble.compose_add_block', {':type': type.addblock}),
+			'description': LANG.GET('assemble.compose_add_block', {
+				':type': type.addblock
+			}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'
@@ -400,7 +402,9 @@ export class Compose extends Assemble {
 		this.textinput();
 		this.tile = {
 			'type': type.type,
-			'description': LANG.GET('assemble.compose_multilist_add_item_button',{':type':type.additem}),
+			'description': LANG.GET('assemble.compose_multilist_add_item_button', {
+				':type': type.additem
+			}),
 			'attributes': {
 				'data-type': 'additem',
 				'onpointerdown': cloneItems
@@ -410,7 +414,9 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': type.type,
-			'description':  LANG.GET('assemble.compose_multilist_add_block_button',{':type':type.addblock}),
+			'description': LANG.GET('assemble.compose_multilist_add_block_button', {
+				':type': type.addblock
+			}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'
@@ -465,7 +471,9 @@ export class Compose extends Assemble {
 		// due to the assembler, type (for icon) has to be in the last element
 		this.tile = {
 			'type': type.type,
-			'description': LANG.GET('assemble.compose_simpleElement_add_button',{':type':type.addblock}),
+			'description': LANG.GET('assemble.compose_simpleElement_add_button', {
+				':type': type.addblock
+			}),
 			'attributes': {
 				'data-type': 'addblock',
 				'type': 'submit'

@@ -48,17 +48,17 @@ export const assemble_helper = {
 	userMenu: function (content) {
 		if (!content) return;
 		const elements = [];
-		Object.keys(content).forEach(group => {
+		for (const [group, items] of Object.entries(content)) {
 			const header = document.createElement('h3');
 			header.appendChild(document.createTextNode(group));
 			elements.push(header);
-			Object.keys(content[group]).forEach(item => {
+			for (const [description, href] of Object.entries(items)) {
 				const link = document.createElement('a');
-				link.href = content[group][item];
-				link.appendChild(document.createTextNode(item));
+				link.href = href;
+				link.appendChild(document.createTextNode(description));
 				elements.push(link);
-			});
-		});
+			};
+		};
 		document.querySelector('nav').innerHTML = '';
 		document.querySelector('nav').append(...elements);
 	}
@@ -131,11 +131,7 @@ export class Assemble {
 			this.section.onsubmit = () => {
 				return prepareForm()
 			};
-			Object.keys(this.form).forEach(key => {
-				if (events.includes(key)) {
-					this.section[key] = new Function(this.form[key]);
-				} else this.section.setAttribute(key, this.form[key]);
-			});
+			this.apply_attributes(this.form, this.section);
 
 			this.content.push([{
 				type: 'submitbutton',
@@ -240,6 +236,15 @@ export class Assemble {
 		this.elements.add(header);
 	};
 
+	apply_attributes(setup, node) {
+		for (const [key, attribute] of Object.entries(setup)) {
+			if (events.includes(key)) {
+				node[key] = new Function(attribute);
+			} else node.setAttribute(key, attribute);
+		}
+		return node;
+	}
+
 	text() {
 		/* {
 			type: 'text',
@@ -258,7 +263,7 @@ export class Assemble {
 				placeholder: 'text input'
 			}
 		}*/
-		const input = document.createElement('input');
+		let input = document.createElement('input');
 		let label;
 		input.type = type;
 		input.id = getNextElementID();
@@ -273,11 +278,7 @@ export class Assemble {
 				this.tile.attributes.placeholder = ' ';
 				label.classList.add('input-label');
 			}
-			Object.keys(this.tile.attributes).forEach(key => {
-				if (events.includes(key)) {
-					input[key] = new Function(this.tile.attributes[key]);
-				} else input.setAttribute(key, this.tile.attributes[key]);
-			});
+			input = this.apply_attributes(this.tile.attributes, input);
 		}
 		this.elements.add(input);
 		if (label) this.elements.add(label);
@@ -303,16 +304,10 @@ export class Assemble {
 				onpointerdown: 'alert("hello")'
 			}
 		}*/
-		const button = document.createElement('button');
+		let button = document.createElement('button');
 		button.id = getNextElementID();
 		if (this.tile.description) button.appendChild(document.createTextNode(this.tile.description));
-		if (this.tile.attributes !== undefined) {
-			Object.keys(this.tile.attributes).forEach(key => {
-				if (events.includes(key)) {
-					button[key] = new Function(this.tile.attributes[key]);
-				} else button.setAttribute(key, this.tile.attributes[key]);
-			});
-		}
+		if (this.tile.attributes !== undefined) button = this.apply_attributes(this.tile.attributes, button);
 		this.elements.add(button);
 		return button.id;
 	}
@@ -330,16 +325,12 @@ export class Assemble {
 			attributes: {value: '3.14'}
 			}
 		}*/
-		const input = document.createElement('input');
+		let input = document.createElement('input');
 		input.type = 'hidden';
 		input.name = this.tile.description;
 		input.id = getNextElementID();
 		input.value = this.tile.value;
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (events.includes(key)) {
-				input[key] = new Function(this.tile.attributes[key]);
-			} else input.setAttribute(key, this.tile.attributes[key]);
-		});
+		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
 		if (!this.setup.visible) this.assembledTiles.add(input);
 		else {
 			const value = document.createTextNode(input.value);
@@ -349,14 +340,10 @@ export class Assemble {
 		return input.id;
 	}
 	datalist() {
-		const datalist = document.createElement('datalist');
+		let datalist = document.createElement('datalist');
 		let option;
 		datalist.id = getNextElementID();
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (events.includes(key)) {
-				datalist[key] = new Function(this.tile.attributes[key]);
-			} else datalist.setAttribute(key, this.tile.attributes[key]);
-		});
+		if (this.tile.attributes !== undefined) datalist = this.apply_attributes(this.tile.attributes, datalist);
 		this.tile.content.forEach(key => {
 			option = document.createElement('option');
 			option.value = key;
@@ -374,15 +361,13 @@ export class Assemble {
 				multiple: true
 			}
 		}*/
-		const input = document.createElement('input'),
+		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			button = document.createElement('button');
 		input.type = 'file';
 		input.id = getNextElementID();
 		input.name = this.tile.description;
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			input[key] = this.tile.attributes[key];
-		});
+		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
 		input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' ' + LANG.GET('assemble.file_rechoose') : LANG.GET('assemble.file_choose');
@@ -411,14 +396,14 @@ export class Assemble {
 				name: 'photo'
 			}
 		}*/
-		const input = document.createElement('input'),
+		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			img = document.createElement('img'),
 			resetbutton = document.createElement('button'),
 			addbutton = document.createElement('button');
 
 		function changeEvent() {
-			this.nextSibling.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' ' +LANG.GET('assemble.photo_rechoose') : LANG.GET('assemble.photo_choose');
+			this.nextSibling.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' ' + LANG.GET('assemble.photo_rechoose') : LANG.GET('assemble.photo_choose');
 			if (this.files.length) this.nextSibling.src = URL.createObjectURL(this.files[0]);
 			else this.nextSibling.src = '';
 		}
@@ -457,9 +442,7 @@ export class Assemble {
 		input.accept = 'image/*';
 		input.capture = true;
 		input.onchange = changeEvent;
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			input[key] = this.tile.attributes[key];
-		});
+		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
 		label.onclick = new Function("document.getElementById('" + input.id + "').click();");
 		label.type = 'button';
 		label.setAttribute('data-type', 'photo');
@@ -500,23 +483,15 @@ export class Assemble {
 				}
 			}
 		}*/
-		const select = document.createElement('select');
+		let select = document.createElement('select');
 		select.name = select.title = this.tile.description;
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (events.includes(key)) {
-				select[key] = new Function(this.tile.attributes[key]);
-			} else select[key] = this.tile.attributes[key];
-		});
-		Object.keys(this.tile.content).forEach(key => {
+		if (this.tile.attributes !== undefined) select = this.apply_attributes(this.tile.attributes, select);
+		for (const [key, element] of Object.entries(this.tile.content)) {
 			let option = document.createElement('option');
-			Object.keys(this.tile.content[key]).forEach(attribute => {
-				if (events.includes(attribute)) {
-					option[attribute] = new Function(this.tile.content[key][attribute]);
-				} else option[attribute] = this.tile.content[key][attribute];
-			});
+			option = this.apply_attributes(element, option);
 			option.appendChild(document.createTextNode(key));
 			select.appendChild(option)
-		});
+		}
 		this.elements.add(select)
 	}
 
@@ -529,14 +504,10 @@ export class Assemble {
 				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
-		const textarea = document.createElement('textarea');
+		let textarea = document.createElement('textarea');
 		textarea.name = this.tile.description;
 		textarea.autocomplete = 'off';
-		if (this.tile.attributes !== undefined) Object.keys(this.tile.attributes).forEach(key => {
-			if (events.includes(key)) {
-				textarea[key] = new Function(this.tile.attributes[key]);
-			} else if (key !== 'value') textarea[key] = this.tile.attributes[key];
-		});
+		if (this.tile.attributes !== undefined) textarea = this.apply_attributes(this.tile.attributes, textarea);
 		if (this.tile.attributes && 'value' in this.tile.attributes) textarea.appendChild(document.createTextNode(this.tile.attributes.value));
 		this.elements.add(textarea);
 	}
@@ -554,7 +525,7 @@ export class Assemble {
 				}
 			}
 		}*/
-		Object.keys(this.tile.content).forEach(checkbox => {
+		for (const [checkbox, attributes] of Object.entries(this.tile.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
 			if (radio) {
@@ -567,15 +538,11 @@ export class Assemble {
 			}
 
 			label.classList.add('check');
-			Object.keys(this.tile.content[checkbox]).forEach(attribute => {
-				if (events.includes(attribute)) {
-					input[attribute] = new Function(this.tile.content[checkbox][attribute]);
-				} else input[attribute] = this.tile.content[checkbox][attribute];
-			});
+			input = this.apply_attributes(attributes, input);
 			label.appendChild(input);
 			label.appendChild(document.createTextNode(checkbox));
 			this.elements.add(label);
-		});
+		}
 	}
 	radio() {
 		this.checkbox('radioinstead');
@@ -595,19 +562,15 @@ export class Assemble {
 			}
 		}*/
 		const ul = document.createElement('ul');
-		Object.keys(this.tile.content).forEach(link => {
+		for (const [link, attributes] of Object.entries(this.tile.content)) {
 			let li = document.createElement('li'),
 				a = document.createElement('a');
-			Object.keys(this.tile.content[link]).forEach(attribute => {
-				if (events.includes(attribute)) {
-					a[attribute] = new Function(this.tile.content[link][attribute]);
-				} else a[attribute] = this.tile.content[link][attribute];
-			})
+			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
 			a.appendChild(document.createTextNode(link));
 			li.appendChild(a);
 			ul.appendChild(li);
-		});
+		}
 		this.elements.add(ul);
 	}
 

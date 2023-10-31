@@ -21,9 +21,9 @@ class Lang {
             return 'undefined language';
         }
         let result = LANGUAGEFILE[request[0]][request[1]]
-        Object.keys(replace).forEach(pattern => {
-            result = result.replaceAll(pattern, replace[pattern]);
-        });
+        for (const [pattern, replacement] of Object.entries(replace)) {
+            result = result.replaceAll(pattern, replacement);
+        }
         return result;
     }
 }
