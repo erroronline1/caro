@@ -19,10 +19,11 @@ class PAYLOAD {
 				$this->_payload = $this->cleanInputs($_GET);
 				break;
 			case "DELETE":
-				$this->_payload = $this->cleanInputs($_GET);
+				$this->_payload = json_decode(file_get_contents("php://input"), true);
+				$this->_payload = $this->cleanInputs($this->_payload);
 				break;
 			case "PUT":
-				parse_str(file_get_contents("php://input"), $this->_payload);
+				$this->_payload = json_decode(file_get_contents("php://input"), true);
 				$this->_payload = $this->cleanInputs($this->_payload);
 				break;
 			default:

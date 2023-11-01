@@ -31,7 +31,7 @@ class USERS extends API {
 		$user['name'] = SQLQUERY::SANITIZE($this->_payload->name);
 		// chain checked permission levels
 		foreach(LANGUAGEFILE['permissions'] as $level => $description){
-			if ($this->_payload->{$description}) {
+			if (property_exists($this->_payload, $description)) {
 				$permissions[] = $level;
 			}
 		}
@@ -108,7 +108,7 @@ class USERS extends API {
 
 	public function user_delete(){
 		if (!($_SERVER['REQUEST_METHOD'] == 'DELETE' && in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
-		$this->_payload->id = SQLQUERY::SANITIZE($this->_payload->id);
+		$this->_payload->id = (property_exists($this->_payload, 'id') && boolval($this->_payload->id)) ? SQLQUERY::SANITIZE($this->_payload->id) : '';
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete-selected'));
 		$statement->execute([
 			':id' => $this->_payload->id
@@ -146,7 +146,7 @@ class USERS extends API {
 		// display form for adding a new user with ini related permissions
 		$permissions=[];
 		foreach(LANGUAGEFILE['permissions'] as $level => $description){
-			$permissions[$description] = ['checked' => in_array($level, explode(',', $result['permissions']))];
+			$permissions[$description] = in_array($level, explode(',', $result['permissions'])) ? ['checked' => true] : [];
 		}
 		$form=['content' => [
 			[
