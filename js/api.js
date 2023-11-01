@@ -15,12 +15,13 @@ export const api = {
 			});
 	},
 	toast: function (msg) {
+		const toast=document.querySelector('dialog');
 		if (typeof msg !== 'undefined') {
-			document.getElementById('toast').innerHTML = msg;
-			document.getElementById('toast').classList.add('show');
+			toast.innerHTML = msg;
+			toast.show();
 			window.setTimeout(api.toast, 3000);
-		} else document.getElementById('toast').classList.remove('show');
-	},
+		} else toast.close();
+},
 
 	form: (request, name = null, ...forms) => {
 		/*
@@ -79,6 +80,7 @@ export const api = {
 			payload.request = 'form_save';
 		}
 		api.send(method, payload, successFn);
+		document.getElementById('openmenu').checked = false;
 	},
 	user: (request, id = null) => {
 		/*
@@ -127,6 +129,7 @@ export const api = {
 		}
 		if (method === 'post') payload = _.getInputs('[data-usecase=user]', true);
 		api.send(method, payload, successFn, errorFn, method === 'post');
+		document.getElementById('openmenu').checked = false;
 	},
 	start: (request = 'user_current', login = null) => {
 		// login and logout
@@ -146,6 +149,7 @@ export const api = {
 		if (login) payload.login = login;
 		if (document.querySelector('[data-usecase=user_current]')) payload = _.getInputs('[data-usecase=user_current]', true);
 		api.send('post', payload, successFn, null, document.querySelector('[data-usecase=user_current]'));
+		document.getElementById('openmenu').checked = false;
 	},
 	menu:() => {
 		const successFn = function (data){

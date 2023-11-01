@@ -227,29 +227,26 @@ input[type=number] {
 	object-fit: cover;
 }
 
-#toast {
-	z-index: 100;
-	position: fixed;
-	bottom: 0;
-	left: calc(50% - 15em);
-	margin: 0 auto;
-	padding: 0 1em;
-	height: 0;
+dialog {
+	display: block;
+	bottom: 1em;
+	height: fit-content;
 	width: 30em;
 	border-radius: 1em;
 	border: 1px solid var(--lightershadow);
 	backdrop-filter: blur(10px);
-	box-shadow: 2px 2px 10px var(--darkshadow);
+	background-color: transparent;
+	box-shadow:
+		inset 0 0 5px var(--lightershadow),
+		2px 2px 10px var(--darkshadow);
+	color: var(--foreground);
+	opacity: 0;
 	transition: ease .3s;
-	color: transparent;
-	overflow: hidden;
 }
 
-#toast.show {
-	margin: 1em auto;
-	padding: 1em;
-	height: fit-content;
-	color: var(--foreground)
+dialog[open] {
+	opacity: 1;
+	pointer-events: none;
 }
 
 /*************************** menu ******************************/
@@ -269,6 +266,7 @@ body>label {
 	background-size: cover;
 	background-image: url("media/bars.svg");
 	background-size: cover;
+	cursor: pointer;
 }
 
 body>input {
@@ -277,14 +275,16 @@ body>input {
 
 nav {
 	position: fixed;
+	left: 0;
 	z-index: 99;
 	margin-top: 4em;
 	width: 0;
-	height: 0;
+	height: calc(100% - 6em);
+	padding: 1em 0;
 	border: none;
 	border-radius: 1em;
 	backdrop-filter: blur(10px);
-	transition: ease .3s;
+	transition: all ease .3s;
 	overflow: hidden;
 	color: transparent;
 }
@@ -293,9 +293,11 @@ input:checked~nav {
 	border: 1px solid var(--lightershadow);
 	padding: 1em;
 	width: calc(100% - 2em);
-	height: calc(100% - 6em);
-	overflow: auto;
-	box-shadow: 2px 2px 10px var(--darkshadow);
+	left: 1em;
+	overflow-y: auto;
+	box-shadow:
+		inset 0 0 5px var(--lightershadow),
+		2px 2px 10px var(--darkshadow);
 	color: var(--foreground)
 }
 
@@ -303,6 +305,7 @@ nav>a,
 nav>h3 {
 	display: block;
 	line-height: 2em;
+	white-space: nowrap;
 }
 
 /*************************** decorators ******************************/
