@@ -23,7 +23,7 @@ class LANG {
 	}
 
 	public static function GETALL(){
-		return json_encode(LANGUAGEFILE);
+		return LANGUAGEFILE;
 	}
 }
 

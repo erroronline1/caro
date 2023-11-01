@@ -5,42 +5,109 @@ ini_set('display_errors', 1); error_reporting(E_ERROR);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 define ('INI', parse_ini_file('setup.ini', true));
-//database connection
 include_once('sqlinterface.php');
 include_once('language.php');
 include_once('functions.php'); // general unities
 
-//print_r($ini);
+$payload = new PAYLOAD;
+$payload = (object) $payload->_payload;
 
-// always security logout
-if ($_SESSION["user"]){
-/*	if (!validUser()['id']) {
-		session_unset();
-		session_destroy();
+class API {
+
+	public $_payload = [];
+	public $_pdo;
+	
+	private $_httpResponse = 200;
+	
+	public function __construct($payload){
+		$this->_payload = $payload;
+		
+		$this->_pdo = new PDO( INI['sql']['driver'] . ':' . INI['sql']['host'] . ';dbname=webqs;charset=utf8mb4', INI['sql']['user'], INI['sql']['password']);
+		$this->_pdo->exec("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"); // intuitive group by
+		$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true); // reuse tokens in prepared statements
 	}
-*/
+		
+	public function response($data, $status = 200){
+		if(is_array($data)) {
+			$data = json_encode($data);
+			$this->_httpResponse = $status;
+		}
+		else {
+			$data = '';
+			$this->_httpResponse = 500;
+		}
+		$this->set_headers();
+		echo $data;
+		exit;
+	}
+	
+	private function get_status_message(){
+		$status = array(
+					100 => 'Continue',  
+					101 => 'Switching Protocols',  
+					200 => 'OK',
+					201 => 'Created',  
+					202 => 'Accepted',  
+					203 => 'Non-Authoritative Information',  
+					204 => 'No Content',  
+					205 => 'Reset Content',  
+					206 => 'Partial Content',  
+					300 => 'Multiple Choices',  
+					301 => 'Moved Permanently',  
+					302 => 'Found',  
+					303 => 'See Other',  
+					304 => 'Not Modified',  
+					305 => 'Use Proxy',  
+					306 => '(Unused)',  
+					307 => 'Temporary Redirect',  
+					400 => 'Bad Request',  
+					401 => 'Unauthorized',  
+					402 => 'Payment Required',  
+					403 => 'Forbidden',  
+					404 => 'Not Found',  
+					405 => 'Method Not Allowed',  
+					406 => 'Not Acceptable',  
+					407 => 'Proxy Authentication Required',  
+					408 => 'Request Timeout',  
+					409 => 'Conflict',  
+					410 => 'Gone',  
+					411 => 'Length Required',  
+					412 => 'Precondition Failed',  
+					413 => 'Request Entity Too Large',  
+					414 => 'Request-URI Too Long',  
+					415 => 'Unsupported Media Type',  
+					416 => 'Requested Range Not Satisfiable',  
+					417 => 'Expectation Failed',  
+					500 => 'Internal Server Error',  
+					501 => 'Not Implemented',  
+					502 => 'Bad Gateway',  
+					503 => 'Service Unavailable',  
+					504 => 'Gateway Timeout',  
+					505 => 'HTTP Version Not Supported');
+		return ($status[$this->_httpResponse])?$status[$this->_httpResponse]:$status[500];
+	}
+
+	private function set_headers(){
+		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
+		header("Content-Type:application/json");
+	}
+
+	public function processApi(){
+		$func = strtolower($this->_payload->request);
+		if(method_exists($this, $func))
+			$this->$func();
+		else
+			$this->response([], 404); // If the method not exist with in this class, response would be "Page not found".
+	}
+
+	public function lang_getall(){
+		$this->response(LANG::GETALL());
+	}
 }
 
-function scriptFilter($text){
-	return htmlspecialchars(trim($text));
-}
-
-// read incoming stream
-$payload = json_decode(file_get_contents('php://input'));
-
-if ($_SERVER['REQUEST_METHOD'] == 'GET'){
-	$payload = (object) $_GET;
-}
-if ($_SERVER['REQUEST_METHOD']== 'POST' && $_POST){
-	// in case of form_data used for file-uploads. otherwise request-parameter will not be processed
-	// this does NOT work with put!!!!
-	$payload = (object) $_POST;
-}
-
-//var_dump($payload);
 if (preg_match('/user_/', $payload->request)) require_once('users.php');
 if (preg_match('/form_/', $payload->request)) require_once('forms.php');
-if ($payload->request === 'lang_getall') echo LANG::GETALL();
 
-exit();
+$api = new API($payload);
+$api->processApi();
 ?>
