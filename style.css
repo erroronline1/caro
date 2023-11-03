@@ -228,6 +228,7 @@ input[type=number] {
 }
 
 dialog {
+	position:fixed;
 	display: block;
 	bottom: 1em;
 	height: fit-content;
@@ -242,6 +243,7 @@ dialog {
 	color: var(--foreground);
 	opacity: 0;
 	transition: ease .3s;
+	pointer-events: none;
 }
 
 dialog[open] {
