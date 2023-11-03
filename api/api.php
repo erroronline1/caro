@@ -8,7 +8,7 @@ define ('INI', parse_ini_file('setup.ini', true));
 define ('REQUEST', explode("/", substr(@$_SERVER['PATH_INFO'], 1)));
 include_once('sqlinterface.php');
 include_once('language.php');
-include_once('functions.php'); // general unities
+include_once('utility.php'); // general unities
 
 
 class API {
