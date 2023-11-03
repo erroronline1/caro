@@ -514,7 +514,7 @@ export class Compose extends Assemble {
 	compose_component(std = {
 		placeholder: LANG.GET('assemble.compose_component_label'),
 		description: LANG.GET('assemble.compose_component'),
-		action: 'api.form("form_components_save")'
+		action: 'api.form("post", "component")'
 	}) {
 		this.tile = {
 			'type': 'textinput',
@@ -542,7 +542,7 @@ export class Compose extends Assemble {
 		this.compose_component({
 			placeholder: LANG.GET('assemble.compose_form_label'),
 			description: LANG.GET('assemble.compose_form'),
-			action: 'api.form("form_save")'
+			action: 'api.form("post","form")'
 		});
 	}
 }

@@ -2,11 +2,7 @@ import {
     api
 } from '../js/api.js';
 
-api.send('get', {
-    request: 'lang_getall'
-}, (data) => {
-    window.LANGUAGEFILE = data;
-});
+api.application('get', 'language');
 
 class Lang {
     /*

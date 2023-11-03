@@ -26,4 +26,4 @@ import {
 } from '../js/language.js';
 window.LANG = LANG;
 
-api.start();
+api.application('get', 'login');

@@ -1,46 +1,64 @@
 <?php
 // add and edit form components and forms
+// Y U NO DELETE? because of audit safety, that's why!
 
 class FORMS extends API {
+   // processed parameters for readability
+   public $_requestedMethod = REQUEST[1];
+   private $_requestedName = REQUEST[2];
 
-	public function __construct($payload){
-		parent::__construct($payload);
+	public function __construct(){
+		parent::__construct();
 	}
 
-	public function form_components_save(){
-		if (!($_SERVER['REQUEST_METHOD'] == 'POST' && in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
-		$content=['content' => $payload->content];
-		if ($payload->form) $content['form'] = $payload->form; 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_components_save'));
-		if ($statement->execute([
-			':name' => SQLQUERY::SANITIZE($payload->name),
-			':content' => addslashes(json_encode($content))
-			])){
-				$result = ['name' => scriptFilter($payload->name)];
-				$this->response($result);
+
+	public function component(){
+		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$content=['content' => $this->_payload->content];
+				if (property_exists($this->_payload, 'form')) $content['form'] = $this->_payload->form; 
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-post'));
+				if ($statement->execute([
+					':name' => SQLQUERY::SANITIZE($this->_payload->name),
+					':content' => json_encode($content)
+					])){
+						$this->response(['name' => UTILITY::scriptFilter($this->_payload->name)]);
+				}
+				break;
+			case 'GET':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
+				$statement->execute([
+					':name' => SQLQUERY::SANITIZE($this->_requestedName)
+				]);
+				$component = $statement->fetch(PDO::FETCH_ASSOC);
+				$component['content'] = json_decode($component['content']);
+				$this->response($component);
+				break;
 		}
 	}
 
-	public function form_components_edit(){
-		if (!($_SERVER['REQUEST_METHOD'] == 'GET' && in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
-		// form to add and edit form components. 
+	public function component_editor(){
+		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+		$requestedComponent = SQLQUERY::SANITIZE($this->_requestedName);
 		$datalist=[];
 		$options=['...'=>[]];
 		
 		// prepare existing component lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_components_edit-datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
-		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($result as $key => $row) {
+		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($components as $key => $row) {
 			$datalist[]=$row['name'];
 			$options[$row['name']]=[];
 		}
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_components_edit-selected'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
 		$statement->execute([
-			':name' => SQLQUERY::SANITIZE($payload->name)
+			':name' => $requestedComponent
 		]);
-		$result = $statement->fetch(PDO::FETCH_ASSOC);
+		$component = $statement->fetch(PDO::FETCH_ASSOC);
 
 		$creator = [
 			'content' => [
@@ -56,12 +74,12 @@ class FORMS extends API {
 					'attributes' => [
 						'placeholder' => LANG::GET('assemble.edit_existing_components_label'),
 						'list' => 'components',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('form_components_edit', this.value); return false;}"
+						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component_editor', this.value); return false;}"
 					]],
 					['type' => 'select',
 					'description' => LANG::GET('assemble.edit_existing_components'),
 					'attributes' => [
-						'onchange' => "api.form('form_components_edit', this.value)"
+						'onchange' => "api.form('get', 'component_editor', this.value)"
 					],
 					'content' => $options]
 				],[[
@@ -124,7 +142,7 @@ class FORMS extends API {
 				[[
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
-					'value' => $result['name'] ? : ''
+					'value' => $component['name'] ? : ''
 				]],
 				[[
 					'type' => 'trash',
@@ -132,20 +150,21 @@ class FORMS extends API {
 				]]
 				]];
 
-		if ($result) $creator['component'] = json_decode($result['content']);
+		if ($component) $creator['component'] = json_decode($component['content']);
 
 		$this->response($creator);
 	}
 
-	public function form_edit(){
-		if (!($_SERVER['REQUEST_METHOD'] == 'GET' && in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+	public function form_editor(){
+		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+		$requestedForm = SQLQUERY::SANITIZE($this->_requestedName);
 		// form to add and edit form components. 
 		$formdatalist = $componentdatalist = [];
 		$formoptions = ['...'=>[]];
 		$componentoptions = ['...'=>[]];
 		
 		// prepare existing component lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_edit-datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_datalist'));
 		$statement->execute();
 		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($result as $key => $row) {
@@ -153,7 +172,7 @@ class FORMS extends API {
 			$formoptions[$row['name']]=[];
 		}
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_edit-components_datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($result as $key => $row) {
@@ -162,9 +181,9 @@ class FORMS extends API {
 		}
 			
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_edit-selected'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 		$statement->execute([
-			':name' => SQLQUERY::SANITIZE($payload->name)
+			':name' => SQLQUERY::SANITIZE($requestedForm)
 		]);
 		$result = $statement->fetch(PDO::FETCH_ASSOC);
 
@@ -187,12 +206,12 @@ class FORMS extends API {
 					'attributes' => [
 						'placeholder' => LANG::GET('assemble.edit_existing_forms_label'),
 						'list' => 'forms',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('form_edit', this.value); return false;}"
+						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'form_editor', this.value); return false;}"
 					]],
 					['type' => 'select',
 					'description' => LANG::GET('assemble.edit_existing_forms'),
 					'attributes' => [
-						'onchange' => "api.form('form_edit', this.value)"
+						'onchange' => "api.form('get', 'form_editor', this.value)"
 					],
 					'content' => $formoptions]
 					],[[
@@ -205,12 +224,12 @@ class FORMS extends API {
 					'attributes' => [
 						'placeholder' => LANG::GET('assemble.edit_add_component_label'),
 						'list' => 'components',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('form_components_add', this.value); return false;}"
+						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component', this.value); return false;}"
 					]],
 					['type' => 'select',
 					'description' => LANG::GET('assemble.edit_add_component'),
 					'attributes' => [
-						'onchange' => "api.form('form_components_add', this.value)"
+						'onchange' => "api.form('get', 'component', this.value)"
 					],
 					'content' => $componentoptions],
 					[
@@ -232,25 +251,19 @@ class FORMS extends API {
 		if ($result) $creator['component'] = json_decode($result['content']);
 		$this->response($creator);
 	}
-
-	public function form_components_add(){
-		if (!($_SERVER['REQUEST_METHOD'] == 'GET' && in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
-		// retrieve latest form component according to name
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_components_add'));
-		$statement->execute([
-			':name' => SQLQUERY::SANITIZE($payload->name)
-		]);
-		$result = $statement->fetch(PDO::FETCH_ASSOC);
-		$result['content'] = json_decode($result['content']);
-		$this->response($result);
-	}
-		//case 'form_get':
+	public function form(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+				
+				break;
+			case 'GET':
 			// retrieve latest active entries according to requested names
-			/*$requestedNames = explode(',',SQLQUERY::SANITIZE($payload->content));
+			/*$requestedNames = explode(',',SQLQUERY::SANITIZE($this->_payload->content));
 			$statement = $this->_pdo->prepare("SELECT * FROM form_components WHERE id IN (SELECT MAX(id) FROM forms WHERE name IN ('". implode("','", $requestedNames)."') GROUP BY name)");
 			$statement->execute();
 			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
-			// order by $payload->content sequence with anonymous function passing $payload into scope
+			// order by $this->_payload->content sequence with anonymous function passing $this->_payload into scope
 			usort($result, function ($a, $b) use ($requestedNames){
 				if (array_search($a['name'], $requestedNames) <= array_search($b['name'], $requestedNames)) return -1;
 				return 1;
@@ -269,9 +282,15 @@ class FORMS extends API {
 			if ($form!==false) $result['form'] = $form;
 			$result['content'] = $content;
 			echo json_encode($result);*/
+				break;
+		}
+
+	}
+		//case 'form_get':
+
 }
 
-$api = new FORMS($payload);
+$api = new FORMS();
 $api->processApi();
 
 exit;
