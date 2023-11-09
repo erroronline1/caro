@@ -13,7 +13,7 @@ class FORMS extends API {
 
 
 	public function component(){
-		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -40,7 +40,7 @@ class FORMS extends API {
 	}
 
 	public function component_editor(){
-		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$requestedComponent = SQLQUERY::SANITIZE($this->_requestedName);
 		$datalist=[];
 		$options=['...'=>[]];
@@ -156,7 +156,7 @@ class FORMS extends API {
 	}
 
 	public function form_editor(){
-		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$requestedForm = SQLQUERY::SANITIZE($this->_requestedName);
 		// form to add and edit form components. 
 		$formdatalist = $componentdatalist = [];
@@ -254,7 +254,7 @@ class FORMS extends API {
 	public function form(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				
 				break;
 			case 'GET':

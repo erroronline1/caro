@@ -10,7 +10,7 @@ class USERS extends API {
 	}
 
 	public function user(){
-		if (!(in_array('admin', $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -63,12 +63,13 @@ class USERS extends API {
 				// prepare or create user-array to populate or update
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $user = [
 						'id' => $requestedUserId,
-						'name' => $this->_payload->name,
+						'name' => '',
 						'permissions' => '',
 						'token' => '',
 						'image' => ''
 					];
 		
+				$user['name']=SQLQUERY::SANITIZE($this->_payload->name);
 				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
 				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
 		
