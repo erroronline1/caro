@@ -60,14 +60,8 @@ class USERS extends API {
 				$statement->execute([
 					':id' => $requestedUserId
 				]);
-				// prepare or create user-array to populate or update
-				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $user = [
-						'id' => $requestedUserId,
-						'name' => '',
-						'permissions' => '',
-						'token' => '',
-						'image' => ''
-					];
+				// prepare user-array to update, return error if not found
+				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
 		
 				$user['name']=SQLQUERY::SANITIZE($this->_payload->name);
 				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
@@ -97,7 +91,7 @@ class USERS extends API {
 					':token' => $user['token'],
 					':image' => $user['image']
 				])){
-					$this->response(['id' => $requestedUserId, 'name' => UTILITY::scriptFilter($this->_payload->name)]);
+					$this->response(['id' => $user['id'], 'name' => UTILITY::scriptFilter($this->_payload->name)]);
 				}
 				break;
 
