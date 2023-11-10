@@ -80,7 +80,7 @@ export const api = {
 				switch (request[1]) {
 					case 'component':
 						successFn = function (data) {
-							if (data) api.toast('component ' + data.name + ' has been saved');
+							if (data) api.toast(LANG.GET('assemble.api_component_saved', {':name': data.name}));
 						}
 						if (!(payload = compose_helper.composeNewComponent())) return;
 						break;
@@ -89,7 +89,7 @@ export const api = {
 						// TO DO: implement usecases to select from, e.g. in setup.ini? 
 						////////////////////////////////////////////
 						successFn = function (data) {
-							if (data) api.toast('form ' + data.name + ' has been saved');
+							if (data) api.toast(LANG.GET('assemble.api_form_saved', {':name': data.name}));
 						}
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;				
@@ -120,10 +120,10 @@ export const api = {
 				payload = _.getInputs('[data-usecase=user]', true);
 				successFn = function (data) {
 					if (!data) {
-						api.toast('user could not be saved');
+						api.toast(LANG.GET('user.api_user_not_saved'));
 						return;
 					}
-					api.toast('user ' + data.name + ' has been saved');
+					api.toast(LANG.GET('user.api_user_saved', {':name': data.name}));
 					api.user('get', data.id);
 				}
 				break;
@@ -131,20 +131,20 @@ export const api = {
 				payload = _.getInputs('[data-usecase=user]', true);
 				successFn = function (data) {
 					if (!data) {
-						api.toast('user could not be saved');
+						api.toast(LANG.GET('user.api_user_not_saved'));
 						return;
 					}
-					api.toast('user ' + data.name + ' has been saved');
+					api.toast(LANG.GET('user.api_user_saved', {':name': data.name}));
 					api.user('get', data.id);
 				}
 				break;
 			case 'delete':
 				successFn = function (data) {
 					if (data.id) {
-						api.toast('user ' + data.name + ' could not be deleted');
+						api.toast(LANG.GET('user.api_user_not_deleted', {':name': data.name}));
 						return;
 					}
-					api.toast('user ' + data.name + ' has been permanently deleted');
+					api.toast(LANG.GET('user.api_user_deleted', {':name': data.name}));
 					api.user('get', data.id);
 				}
 				break;
@@ -180,10 +180,10 @@ export const api = {
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				successFn = function (data) {
 					if (!data) {
-						api.toast('distributor could not be saved');
+						api.toast(LANG.GET('purchase.api_distributor_not_saved', {':name': data.name}));
 						return;
 					}
-					api.toast('distributor ' + data.name + ' has been saved');
+					api.toast(LANG.GET('purchase.api_distributor_saved', {':name': data.name}));
 					api.purchase('get', request[1], data.id);
 				}
 				break;
@@ -191,20 +191,20 @@ export const api = {
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				successFn = function (data) {
 					if (!data) {
-						api.toast('distributor could not be saved');
+						api.toast(LANG.GET('purchase.api_distributor_not_saved'));
 						return;
 					}
-					api.toast('distributor ' + data.name + ' has been saved');
+					api.toast(LANG.GET('purchase.api_distributor_saved', {':name': data.name}));
 					api.purchase('get', request[1], data.id);
 				}
 				break;
 			case 'delete':
 				successFn = function (data) {
 					if (data.id) {
-						api.toast('distributor ' + data.name + ' could not be deleted');
+						api.toast(LANG.GET('purchase.api_distributor_not_deleted', {':name': data.name}));
 						return;
 					}
-					api.toast('distributor ' + data.name + ' has been permanently deleted');
+					api.toast(LANG.GET('purchase.api_distributor_deleted', {':name': data.name}));
 					api.purchase('get', request[1], data.id);
 				}
 				break;
