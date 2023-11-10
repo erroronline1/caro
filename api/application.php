@@ -64,13 +64,20 @@ class APPLICATION extends API {
 		$menu=[
 			'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => 'javascript:api.application("get","login", "null")']
 		];
-		if (in_array('admin', $_SESSION['user']['permissions'])){
+		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.admin_header')] = [
 				LANG::GET('menu.admin_users') => "javascript:api.user('get')",
 				LANG::GET('menu.admin_form_components') => "javascript:api.form('get', 'component_editor')",
 				LANG::GET('menu.admin_forms') => "javascript:api.form('get', 'form_editor')"
 			];
 		}
+		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.purchase_header')] = [
+				LANG::GET('menu.purchase_order') => "javascript:api.purchase('get', 'order')",
+				LANG::GET('menu.purchase_distributor') => "javascript:api.purchase('get', 'distributor')"
+			];
+		}
+
 		$this->response($menu);
 	}
 
