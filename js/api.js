@@ -32,12 +32,13 @@ export const api = {
 		get form elements from database.
 		notice only the first requested form will appear. later duplicates will be ignored.
 
-		get form/component/{name}
 		get form/component_editor/{name}
-		get form/form/{name}
 		get form/form_editor/{name}
 
+		get form/component/{name}
 		post form/component
+
+		get form/form/{name}
 		post form/form
 		*/
 		request = [...request];
@@ -127,7 +128,7 @@ export const api = {
 				}
 				break;
 			case 'put':
-				payload = _.getInputs('[data-usecase=user]', false);
+				payload = _.getInputs('[data-usecase=user]', true);
 				successFn = function (data) {
 					if (!data) {
 						api.toast('user could not be saved');
@@ -135,17 +136,6 @@ export const api = {
 					}
 					api.toast('user ' + data.name + ' has been saved');
 					api.user('get', data.id);
-				}
-				let image = document.querySelector('[type=file]');
-				if (image.files[0]) {
-					let reader = new FileReader();
-					reader.onloadend = function () {
-						payload.photo = reader.result;
-						api.send(method, request, successFn, null, payload, false);
-						document.getElementById('openmenu').checked = false;
-					}
-					reader.readAsDataURL(image.files[0]);
-					return;
 				}
 				break;
 			case 'delete':
@@ -161,7 +151,67 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === 'post');
+		api.send(method, request, successFn, null, payload, (method === 'post' || method ==='put'));
+		document.getElementById('openmenu').checked = false;
+	},
+	purchase: (method, ...request) => {
+		/*
+		get purchase/distributor/{id}
+		post purchase/distributor
+		put purchase/distributor/{id}
+		delete purchase/distributor/{id}
+
+		get purchase/order/{id}
+		post purchase/order
+		put purchase/order/{id}
+		delete purchase/order/{id}
+		*/
+		request = [...request];
+		request.splice(0, 0, 'purchase');
+		let successFn, payload;
+		switch (method) {
+			case 'get':
+				successFn = function (data) {
+					document.getElementById('main').innerHTML = '';
+					new Assemble(data).initializeSection();
+				};
+				break;
+			case 'post':
+				payload = _.getInputs('[data-usecase=purchase]', true);
+				successFn = function (data) {
+					if (!data) {
+						api.toast('distributor could not be saved');
+						return;
+					}
+					api.toast('distributor ' + data.name + ' has been saved');
+					api.purchase('get', request[1], data.id);
+				}
+				break;
+			case 'put':
+				payload = _.getInputs('[data-usecase=purchase]', true);
+				successFn = function (data) {
+					if (!data) {
+						api.toast('distributor could not be saved');
+						return;
+					}
+					api.toast('distributor ' + data.name + ' has been saved');
+					api.purchase('get', request[1], data.id);
+				}
+				break;
+			case 'delete':
+				successFn = function (data) {
+					if (data.id) {
+						api.toast('distributor ' + data.name + ' could not be deleted');
+						return;
+					}
+					api.toast('distributor ' + data.name + ' has been permanently deleted');
+					api.purchase('get', request[1], data.id);
+				}
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
 		document.getElementById('openmenu').checked = false;
 	},
 	application: (method, ...request) => {
