@@ -100,6 +100,14 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM webqs_distributors WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
+		'purchase_delete-purchase-items' => [
+			'mysql' => "DELETE FROM webqs_purchase_items WHERE distributor_id = :id",
+			'sqlsrv' => ""
+		],
+		'purchase_insert-purchase-items' => [
+			'mysql' => "INSERT INTO webqs_purchase_items (distributor_id, article_no, article_name, article_unit) VALUES (:distributor_id, :article_no, :article_name, :article_unit)",
+			'sqlsrv' => ""
+		],
 
 	];
 

@@ -1,12 +1,65 @@
 <?php
 // add, edit and delete distributors and orders
+include_once('csvprocessor.php');
+
 class PURCHASE extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = REQUEST[2];
+	private $filtersample = <<<'END'
+	{
+		"filesettings": {
+			"headerrowindex": 0,
+			"dialect": {
+				"separator": ";",
+				"enclosure": "\"",
+				"escape": ""
+			},
+			"columns": [
+				"ArticleNo",
+				"Name",
+				"Unit"
+			]
+		},
+		"modify": {
+			"rewrite": {
+				"article_no": ["ArticleNo"],
+				"article_name": ["Name"],
+				"article_unit": ["Unit"]
+			}
+		}
+	}
+	END;
 
 	public function __construct(){
 		parent::__construct();
+	}
+
+	private function update_pricelist($file, $filter, $distributorID){
+  		$filter='{    "filesetting": {     "headerrowindex": 0,     "dialect": {      "separator": ";",      "enclosure": "\"",      "escape": ""     },     "columns": [      "ArtNr",      "Bezeichnung",      "ME"     ]    },    "modify": {     "rewrite": [{      "article_no": ["ArtNr"],      "article_name": ["Bezeichnung"],      "article_unit": ["ME"]     }]    }   }';
+
+		$filter = json_decode($filter, true);
+		$filter['filesetting']['source'] = $file;
+		$pricelist = new Listprocessor($filter);
+		if (count($pricelist->_list)){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
+			$statement->execute([
+				':id' => $distributorID
+			]);
+			$insert = '';
+			foreach($pricelist->_list as $i => $row){
+				$insert .= strtr(SQLQUERY::PREPARE('purchase_insert-purchase-items'),
+					[
+						':distributor_id' => $distributorID,
+						':article_no' => "'" . SQLQUERY::SANITIZE($row['article_no']) . "'",
+						':article_name' => "'" . SQLQUERY::SANITIZE($row['article_name']) . "'",
+						':article_unit' => "'" . SQLQUERY::SANITIZE($row['article_unit']) . "'"
+					]) . '; ';
+			}
+			$statement = $this->_pdo->prepare($insert);
+			if ($statement->execute()) return date("d.m.Y");
+		}
+		return '';
 	}
 
 	public function distributor(){
@@ -32,7 +85,7 @@ class PURCHASE extends API {
 				}
 				// update pricelist
 				if ($_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist_validity'] = '';
+					$distributor['pricelist_validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-distributor'));
@@ -71,7 +124,7 @@ class PURCHASE extends API {
 				}
 				// update pricelist
 				if ($_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist_validity'] = '';
+					$distributor['pricelist_validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-distributor'));
@@ -172,12 +225,14 @@ class PURCHASE extends API {
 						"description" => LANG::GET('purchase.edit_distributor_pricelist_update'),
 						'attributes' => [
 							'name' => 'pricelist',
+							'accept' => '.csv'
 						]],
 						["type" => "textarea",
 						"description" => LANG::GET('purchase.edit_distributor_pricelist_filter'),
 						'attributes' => [
 							'name' => 'pricelist_filter',
-							'value' => $distributor['pricelist_filter'] ? : ''
+							'value' => $distributor['pricelist_filter'] ? : '',
+							'placeholder' => json_encode(json_decode($this->filtersample, true))
 						]]
 					],
 					[
@@ -200,7 +255,7 @@ class PURCHASE extends API {
 					'type' => 'links',
 					'description' => LANG::GET('purchase.edit_distributor_certificate_download'),
 					'content' => [
-						$distributor['certificate_path']=> ['target' => '_blank']
+						'api/'. $distributor['certificate_path'] => ['target' => '_blank']
 					]
 				  ]]
 				);
@@ -217,9 +272,16 @@ class PURCHASE extends API {
 					':id' => $passedID
 				]);
 				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response([], 406);
-
+				
+				// tidy up certificate file
 				if ($distributor['certificate_path']) unlink($distributor['certificate_path']);
 				
+				// tidy up purchase items database
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
+				$statement->execute([
+					':id' => $distributor['id']
+				]);
+					
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-distributor'));
 				if ($statement->execute([
 					':id' => $distributor['id']
