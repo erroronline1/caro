@@ -85,10 +85,8 @@ class USERS extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// convert image
-				if (UTILITY::propertySet($this->_payload, 'photo')) {
-					$protocol = substr($this->_payload->photo, 0, strpos($this->_payload->photo, ',') + 1);
-					$base64 = substr($this->_payload->photo, strpos($this->_payload->photo, ',') + 1);
-					$user['image'] = $protocol . base64_encode(UTILITY::resizeImage(base64_decode($base64), 128));
+				if ($_FILES['photo']['tmp_name']) {
+					$user['image'] = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['photo']['tmp_name'], 128));
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
