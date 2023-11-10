@@ -170,14 +170,15 @@ class UTILITY {
 		return htmlspecialchars(trim($text));
 	}
 
-	public static function storeUploadedFiles($_files, $files = []){
+	public static function storeUploadedFiles($_files, $files = [], $prefix = ''){
 		/* process $_FILES, store to folder and return an array of destination paths */
 		if (!file_exists('files')) mkdir('files', 0777, true);
 		$targets =[];
 		foreach ($files as $file) {
-			$target = 'files/' . $_files[$file]['name'];
-			move_uploaded_file( $_files[$file]['tmp_name'], $target);
-			$targets[] = $target;
+			$target = 'files/' . ($prefix ? $prefix . '_' : '') . $_files[$file]['name'];
+			// move_uploaded_file is for post only, else rename for put files
+			if (move_uploaded_file( $_files[$file]['tmp_name'], $target) ||	rename( $_files[$file]['tmp_name'], $target))
+				$targets[] = 'api/' . $target;
 		}
 		return $targets; // including path e.g. to store in database
 	}
