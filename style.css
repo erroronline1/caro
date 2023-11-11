@@ -228,7 +228,7 @@ input[type=number] {
 }
 
 dialog {
-	position:fixed;
+	position: fixed;
 	display: block;
 	bottom: 1em;
 	height: fit-content;
@@ -335,7 +335,8 @@ section>div>hr {
 input[type=text],
 input[type=number],
 input[type=search],
-input[type=password] {
+input[type=password],
+textarea {
 	border-bottom: 1px solid var(--foreground);
 }
 
@@ -425,11 +426,20 @@ button:active {
 
 /*************************** decorators ******************************/
 
+[data-type=links]>ul {
+	list-style-type: none;
+
+	li {
+		padding: .75em 0;
+	}
+}
+
 .reset::before,
 .add::before,
 .delete::before,
 [data-type]::before,
-[data-menu]~label::before {
+[data-menu]~label::before,
+[data-type=links]>ul>li::before {
 	content: "";
 	display: inline-block;
 	height: 1em;
@@ -441,6 +451,10 @@ button:active {
 
 [draggable=true]:active {
 	cursor: move;
+}
+
+[data-type=links]>ul>li::before {
+	background-image: url('media/external-link-alt.svg');
 }
 
 [data-type=text]::before {
