@@ -1,6 +1,11 @@
 <?php
 class UTILITY {
 
+	/**
+	 * prepares passed request parameters, mimics post data for put method
+	 * 
+	 * @return object with request parameters and their value
+	 */
 	public static function parsePayload(){
 		switch($_SERVER['REQUEST_METHOD']){
 			case "POST":
@@ -17,17 +22,10 @@ class UTILITY {
 				$payload = self::cleanInputs($payload);
 				break;
 			case "PUT":
-				//$payload = json_decode(file_get_contents("php://input"), true);
-				global $_PUT;
-
 				/* PUT data comes in on the stdin stream */
 				$putdata = fopen("php://input", "r");
 
-				/* Open a file for writing */
-				// $fp = fopen("myputfile.ext", "w");
-
 				$raw_data = '';
-
 				/* Read the data 1 KB at a time
 				and write to the file */
 				while ($chunk = fread($putdata, 1024))
@@ -41,79 +39,76 @@ class UTILITY {
 
 				if(empty($boundary)){
 					parse_str($raw_data,$data);
-					$GLOBALS[ '_PUT' ] = $data;
-					return;
 				}
+				else {
+					// Fetch each part
+					$parts = array_slice(explode($boundary, $raw_data), 1);
+					$data = array();
 
-				// Fetch each part
-				$parts = array_slice(explode($boundary, $raw_data), 1);
-				$data = array();
+					foreach ($parts as $part) {
+						// If this is the last part, break
+						if ($part == "--\r\n") break;
 
-				foreach ($parts as $part) {
-					// If this is the last part, break
-					if ($part == "--\r\n") break;
+						// Separate content from headers
+						$part = ltrim($part, "\r\n");
+						list($raw_headers, $body) = explode("\r\n\r\n", $part, 2);
 
-					// Separate content from headers
-					$part = ltrim($part, "\r\n");
-					list($raw_headers, $body) = explode("\r\n\r\n", $part, 2);
+						// Parse the headers list
+						$raw_headers = explode("\r\n", $raw_headers);
+						$headers = array();
+						foreach ($raw_headers as $header) {
+							list($name, $value) = explode(':', $header);
+							$headers[strtolower($name)] = ltrim($value, ' ');
+						}
 
-					// Parse the headers list
-					$raw_headers = explode("\r\n", $raw_headers);
-					$headers = array();
-					foreach ($raw_headers as $header) {
-						list($name, $value) = explode(':', $header);
-						$headers[strtolower($name)] = ltrim($value, ' ');
-					}
-
-					// Parse the Content-Disposition to get the field name, etc.
-					if (isset($headers['content-disposition'])) {
-						$filename = null;
-						$tmp_name = null;
-						preg_match(
-							'/^(.+); *name="([^"]+)"(; *filename="([^"]+)")?/',
-							$headers['content-disposition'],
-							$matches
-						);
-						list(, $type, $name) = $matches;
-
-						//Parse File
-						if( isset($matches[4]) )
-						{
-							//if labeled the same as previous, skip
-							if( isset( $_FILES[ $matches[ 2 ] ] ) )
-							{
-								continue;
-							}
-
-							//get filename
-							$filename = $matches[4];
-
-							//get tmp name
-							$filename_parts = pathinfo( $filename );
-							$tmp_name = tempnam( ini_get('upload_tmp_dir'), $filename_parts['filename']);
-
-							//populate $_FILES with information, size may be off in multibyte situation
-							$_FILES[ $matches[ 2 ] ] = array(
-								'error'=>0,
-								'name'=>$filename,
-								'tmp_name'=>$tmp_name,
-								'size'=>strlen( $body ),
-								'type'=>$value
+						// Parse the Content-Disposition to get the field name, etc.
+						if (isset($headers['content-disposition'])) {
+							$filename = null;
+							$tmp_name = null;
+							preg_match(
+								'/^(.+); *name="([^"]+)"(; *filename="([^"]+)")?/',
+								$headers['content-disposition'],
+								$matches
 							);
+							list(, $type, $name) = $matches;
 
-							//place in temporary directory
-							file_put_contents($tmp_name, $body);
-						}
-						//Parse Field
-						else
-						{
-							$data[$name] = substr($body, 0, strlen($body) - 2);
+							//Parse File
+							if( isset($matches[4]) )
+							{
+								//if labeled the same as previous, skip
+								if( isset( $_FILES[ $matches[ 2 ] ] ) )
+								{
+									continue;
+								}
+
+								//get filename
+								$filename = $matches[4];
+
+								//get tmp name
+								$filename_parts = pathinfo( $filename );
+								$tmp_name = tempnam( ini_get('upload_tmp_dir'), $filename_parts['filename']);
+
+								//populate $_FILES with information, size may be off in multibyte situation
+								$_FILES[ $matches[ 2 ] ] = array(
+									'error'=>0,
+									'name'=>$filename,
+									'tmp_name'=>$tmp_name,
+									'size'=>strlen( $body ),
+									'type'=>$value
+								);
+
+								//place in temporary directory
+								file_put_contents($tmp_name, $body);
+							}
+							//Parse Field
+							else
+							{
+								$data[$name] = substr($body, 0, strlen($body) - 2);
+							}
 						}
 					}
-
 				}
-				$GLOBALS[ '_PUT' ] = $data;
-				$payload = self::cleanInputs($_PUT);
+				$payload = self::cleanInputs($data);
 				break;
 			default:
 				return [];
@@ -134,6 +129,12 @@ class UTILITY {
 		return $clean_input;
 	}
 
+	/**
+	 * @param string $file filename
+	 * @param int $maxSize max pixels on longest side
+	 * 
+	 * @return object a GdImage ressource
+	 */
 	public static function resizeImage($file, $maxSize = 128){
 		if (is_file($file)){
 			$imgtype=getimagesize($file);
@@ -161,7 +162,14 @@ class UTILITY {
 			return $return;
 		}
 	}
-
+	/**
+	 * shorthand checking for a set property
+	 * 
+	 * @param object $object to look within
+	 * @param string $property to look for
+	 * 
+	 * @return string|bool property value or false
+	 */
 	public static function propertySet($object, $property){
 		return (property_exists($object, $property) && boolval($object->{$property})) ? $object->{$property} : false;
 	}
@@ -170,15 +178,26 @@ class UTILITY {
 		return htmlspecialchars(trim($text));
 	}
 
-	public static function storeUploadedFiles($_files, $files = [], $prefix = ''){
+	/**
+	 * moves uploaded files to folder according to input name, adds possible prefix
+	 * 
+	 * @param array $_files mandatory passed $_FILES object
+	 * @param array $name mandatory array of input names
+	 * @param string $folder where to store
+	 * @param array $prefix to add to filename, length according to $files
+	 * 
+	 * @return array paths of stored files
+	 */
+	public static function storeUploadedFiles($_files, $name = [], $folder = '', $prefix = []){
 		/* process $_FILES, store to folder and return an array of destination paths */
-		if (!file_exists('files')) mkdir('files', 0777, true);
-		$targets =[];
-		foreach ($files as $file) {
-			$target = 'files/' . ($prefix ? $prefix . '_' : '') . $_files[$file]['name'];
+		if (!file_exists($folder)) mkdir($folder, 0777, true);
+		$targets = [];
+		for ($i = 0; $i < count($name); $i++) {
+			$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
+			$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $_files[$name[$i]]['name'];
 			// move_uploaded_file is for post only, else rename for put files
-			if (move_uploaded_file( $_files[$file]['tmp_name'], $target) ||	rename( $_files[$file]['tmp_name'], $target))
-				$targets[] = 'api/' . $target;
+			if (move_uploaded_file( $_files[$name[$i]]['tmp_name'], $target) ||	rename( $_files[$name[$i]]['tmp_name'], $target))
+				$targets[] = $target;
 		}
 		return $targets; // including path e.g. to store in database
 	}
