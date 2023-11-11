@@ -69,11 +69,11 @@ class SQLQUERY {
 		],
 
 		'purchase_post-distributor' => [
-			'mysql' => "INSERT INTO webqs_distributors (id, name, info, certificate, pricelist) VALUES ( NULL, :name, :info, :certificate, :pricelist)",
+			'mysql' => "INSERT INTO webqs_distributors (id, active, name, info, certificate, pricelist) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist)",
 			'sqlsrv' => ""
 		],
 		'purchase_put-distributor' => [
-			'mysql' => "UPDATE webqs_distributors SET name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE webqs_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-distributor-datalist' => [
@@ -86,14 +86,6 @@ class SQLQUERY {
 		],
 		'purchase_get-distributor-id' => [
 			'mysql' => "SELECT * FROM webqs_distributors WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
-		],
-		'purchase_delete-distributor-prefetch' => [
-			'mysql' => "SELECT id, name FROM webqs_distributors WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
-		],
-		'purchase_delete-distributor' => [
-			'mysql' => "DELETE FROM webqs_distributors WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_delete-purchase-items' => [
