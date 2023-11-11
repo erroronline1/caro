@@ -201,5 +201,22 @@ class UTILITY {
 		}
 		return $targets; // including path e.g. to store in database
 	}
+
+	/**
+	 * scans a directory and returns files in reversed order
+	 * 
+	 * @param string $folder folder to scan
+	 * 
+	 * @return array file list 
+	 */
+	public static function listFiles($folder){
+		$result=[];
+		if (!file_exists($folder)) return $result;
+		$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+		foreach($dir as $i => $file){
+			if (is_file($folder . '/' . $file)) $result[] = $folder . '/' . $file;
+		}
+		return $result;
+	}
 }
 ?>
