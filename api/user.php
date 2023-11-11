@@ -16,7 +16,7 @@ class USERS extends API {
 			case 'POST':
 				$permissions = [];
 				$user = [
-					'name' => SQLQUERY::SANITIZE($this->_payload->name),
+					'name' => $this->_payload->name,
 					'permissions' => '',
 					'token' => '',
 					'image' => ''
@@ -53,7 +53,7 @@ class USERS extends API {
 				break;
 
 			case 'PUT':
-				$requestedUserId = SQLQUERY::SANITIZE($this->_requestedUserId);
+				$requestedUserId = $this->_requestedUserId;
 				$permissions = [];
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-id'));
@@ -63,7 +63,7 @@ class USERS extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
 		
-				$user['name']=SQLQUERY::SANITIZE($this->_payload->name);
+				$user['name']=$this->_payload->name;
 				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
 				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
 		
@@ -96,7 +96,7 @@ class USERS extends API {
 				break;
 
 			case 'GET':
-				$passedUserID = SQLQUERY::SANITIZE(REQUEST[1]);
+				$passedUserID = REQUEST[1];
 				$datalist=[];
 				$options=['...'=>[]];
 				
@@ -193,7 +193,7 @@ class USERS extends API {
 				break;
 
 			case 'DELETE':
-				$passedUserID = SQLQUERY::SANITIZE(REQUEST[1]);
+				$passedUserID = REQUEST[1];
 				// prefetch to return proper name after deletion
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete-prefetch'));
 				$statement->execute([

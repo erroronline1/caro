@@ -4,10 +4,6 @@ class SQLQUERY {
 		return self::QUERIES[$context][INI['sql']['driver']];
 	}
 
-	public static function SANITIZE($text){
-		return addslashes(trim($text));
-	}
-
 	public const QUERIES = [
 		/*'context' => [
 			'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",
