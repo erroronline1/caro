@@ -3,10 +3,11 @@
 class APPLICATION extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
-    private $_requestedToken = REQUEST[2];
+    private $_requestedToken = null;
 
 	public function __construct(){
 		parent::__construct();
+		$this->_requestedToken = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
     public function processApi(){ // endpoint-specific processing of request parameters
