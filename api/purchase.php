@@ -76,7 +76,7 @@ class PURCHASE extends API {
 					'name' => $this->_payload->name,
 					'active' => UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_distributor_active')) === LANG::GET('purchase.edit_distributor_isactive') ? 1 : 0,
 					'info' => $this->_payload->info,
-					'certificate' => ['validity' => $this->_payload->certificate_validity, 'path' => ''],
+					'certificate' => ['validity' => $this->_payload->certificate_validity],
 					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter]
 				];
 				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
@@ -84,7 +84,7 @@ class PURCHASE extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/documents', [$distributor['name'] . '_' . date('Ymd')])[0];
+					UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
@@ -124,7 +124,7 @@ class PURCHASE extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/documents', [$distributor['name'] . '_' . date('Ymd')])[0];
+					UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
@@ -176,7 +176,7 @@ class PURCHASE extends API {
 					'name' => '',
 					'active' => 0,
 					'info' => '',
-					'certificate' => '{"validity":"", "path": ""}',
+					'certificate' => '{"validity":""}',
 					'pricelist' => '{"validity":"", "filter": ""}'
 				];
 
@@ -185,6 +185,13 @@ class PURCHASE extends API {
 				$isactive = $distributor['active'] ? ['checked' => true] : [];
 				$isinactive = !$distributor['active'] ? ['checked' => true] : [];
 
+				$certificates = [];
+				if ($distributor['id']) {
+					$certfiles = UTILITY::listFiles('files/distributors/' . $distributor['name'] . '/certificates');
+					foreach($certfiles as $path){
+						$certificates['api/' . $path] = ['target' => '_blank'];
+					}
+				}
 				// display form for adding a new user with ini related permissions
 				$form=['content' => [
 					[
@@ -278,14 +285,14 @@ class PURCHASE extends API {
 				]
 				);
 
-				if ($distributor['certificate']['path'])
+				if ($certificates)
 					array_splice($form['content'][4], 1, 0,
 				[
 					['type' => 'links',
 					'description' => LANG::GET('purchase.edit_distributor_certificate_download'),
-					'content' => [
-						'api/'. $distributor['certificate']['path'] => ['target' => '_blank']
-					]]
+					'content' => 
+						$certificates
+					]
 				]
 				);
 
