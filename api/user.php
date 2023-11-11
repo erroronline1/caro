@@ -3,10 +3,11 @@
 class USER extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[0]; // method == api request
-	private $_requestedUserId = REQUEST[1];
+	private $_requestedUserId = null;
 
 	public function __construct(){
 		parent::__construct();
+		$this->_requestedUserId = array_key_exists(1, REQUEST) ? REQUEST[1] : null;
 	}
 
 	public function user(){
@@ -53,12 +54,11 @@ class USER extends API {
 				break;
 
 			case 'PUT':
-				$requestedUserId = $this->_requestedUserId;
 				$permissions = [];
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-id'));
 				$statement->execute([
-					':id' => $requestedUserId
+					':id' => $this->_requestedUserId
 				]);
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
@@ -96,7 +96,6 @@ class USER extends API {
 				break;
 
 			case 'GET':
-				$passedUserID = REQUEST[1];
 				$datalist=[];
 				$options=['...'=>[]];
 				
@@ -112,9 +111,15 @@ class USER extends API {
 				// select single user based on id or name
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
-					':id' => $passedUserID
+					':id' => $this->_requestedUserId
 				]);
-				$user = $statement->fetch(PDO::FETCH_ASSOC);
+				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)){$user = [
+					'id' => null,
+					'name' => '',
+					'permissions' => '',
+					'token' => '',
+					'image' => ''
+				];}
 		
 				// display form for adding a new user with ini related permissions
 				$permissions=[];
@@ -193,11 +198,10 @@ class USER extends API {
 				break;
 
 			case 'DELETE':
-				$passedUserID = REQUEST[1];
 				// prefetch to return proper name after deletion
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete-prefetch'));
 				$statement->execute([
-					':id' => $passedUserID
+					':id' => $this->_requestedUserId
 				]);
 				$user = $statement->fetch(PDO::FETCH_ASSOC);
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));

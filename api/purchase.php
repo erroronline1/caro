@@ -5,7 +5,7 @@ include_once('csvprocessor.php');
 class PURCHASE extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
-	private $_requestedID = REQUEST[2];
+	private $_requestedID = null;
 	private $filtersample = <<<'END'
 	{
 		"filesettings": {
@@ -33,6 +33,7 @@ class PURCHASE extends API {
 
 	public function __construct(){
 		parent::__construct();
+		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	private function update_pricelist($file, $filter, $distributorID){
@@ -170,7 +171,15 @@ class PURCHASE extends API {
 				$statement->execute([
 					':id' => $passedID
 				]);
-				$distributor = $statement->fetch(PDO::FETCH_ASSOC);
+				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $distributor = [
+					'id' => null,
+					'name' => '',
+					'active' => 0,
+					'info' => '',
+					'certificate' => '{"validity":"", "path": ""}',
+					'pricelist' => '{"validity":"", "filter": ""}'
+				];
+
 				$distributor['certificate'] = json_decode($distributor['certificate'], true);
 				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
 				$isactive = $distributor['active'] ? ['checked' => true] : [];

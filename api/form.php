@@ -5,10 +5,11 @@
 class FORMS extends API {
    // processed parameters for readability
    public $_requestedMethod = REQUEST[1];
-   private $_requestedName = REQUEST[2];
+   private $_requestedName = null;
 
 	public function __construct(){
 		parent::__construct();
+		$this->_requestedName = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 
@@ -186,7 +187,7 @@ class FORMS extends API {
 		$statement->execute([
 			':name' => $requestedForm
 		]);
-		$result = $statement->fetch(PDO::FETCH_ASSOC);
+		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => ''];
 
 		$creator = [
 			'content' => [
@@ -249,7 +250,7 @@ class FORMS extends API {
 					]]
 				]];
 
-		if ($result) $creator['component'] = json_decode($result['content']);
+		if (array_key_exists('content', $result)) $creator['component'] = json_decode($result['content']);
 		$this->response($creator);
 	}
 	public function form(){
