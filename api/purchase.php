@@ -68,34 +68,31 @@ class PURCHASE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				
 				$distributor = [
 					'name' => SQLQUERY::SANITIZE($this->_payload->name),
 					'info' => SQLQUERY::SANITIZE($this->_payload->info),
-					'certificate_validity' => SQLQUERY::SANITIZE($this->_payload->certificate_validity),
-					'certificate_path' => '',
-					'pricelist_validity' => '',
-					'pricelist_filter' => SQLQUERY::SANITIZE($this->_payload->pricelist_filter)
+					'certificate' => ['validity' => SQLQUERY::SANITIZE($this->_payload->certificate_validity), 'path' => ''],
+					'pricelist' => ['validity' => '', 'filter' => SQLQUERY::SANITIZE($this->_payload->pricelist_filter)]
 				];
 				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
 				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
 
 				// save certificate
 				if ($_FILES['certificate']['tmp_name']) {
-					$distributor['certificate_path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], $distributor['name'])[0];
+					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], $distributor['name'])[0];
 				}
 				// update pricelist
 				if ($_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist_validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
+					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-distributor'));
 				if ($statement->execute([
 					':name' => $distributor['name'],
 					':info' => $distributor['info'],
-					':certificate_validity' => $distributor['certificate_validity'],
-					':certificate_path' => $distributor['certificate_path'],
-					':pricelist_validity' => $distributor['pricelist_validity'],
-					':pricelist_filter' => $distributor['pricelist_filter']
+					':certificate' => json_encode($distributor['certificate']),
+					':pricelist' => json_encode($distributor['pricelist'])
 				])){
 					$this->response(['id' => $this->_pdo->lastInsertId(), 'name' => UTILITY::scriptFilter($this->_payload->name)]);
 				}
@@ -114,17 +111,19 @@ class PURCHASE extends API {
 
 				$distributor['name'] = SQLQUERY::SANITIZE($this->_payload->name);
 				$distributor['info'] = SQLQUERY::SANITIZE($this->_payload->info);
-				$distributor['certificate_validity'] = SQLQUERY::SANITIZE($this->_payload->certificate_validity);
-				$distributor['pricelist_filter'] = SQLQUERY::SANITIZE($this->_payload->pricelist_filter);
+				$distributor['certificate'] = json_decode($distributor['certificate']);
+				$distributor['certificate']['validity'] = SQLQUERY::SANITIZE($this->_payload->certificate_validity);
+				$distributor['pricelist'] = json_decode($distributor['pricelist']);
+				$distributor['pricelist']['filter'] = SQLQUERY::SANITIZE($this->_payload->pricelist_filter);
 
 				// save certificate
 				if ($_FILES['certificate']['tmp_name']) {
-					if ($distributor['certificate_path']) unlink($distributor['certificate_path']);
-					$distributor['certificate_path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], $distributor['name'])[0];
+					if ($distributor['certificate']['path']) unlink($distributor['certificate']['path']);
+					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], $distributor['name'])[0];
 				}
 				// update pricelist
 				if ($_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist_validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
+					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-distributor'));
@@ -132,10 +131,8 @@ class PURCHASE extends API {
 					':id' => $distributor['id'],
 					':name' => $distributor['name'],
 					':info' => $distributor['info'],
-					':certificate_validity' => $distributor['certificate_validity'],
-					':certificate_path' => $distributor['certificate_path'],
-					':pricelist_validity' => $distributor['pricelist_validity'],
-					':pricelist_filter' => $distributor['pricelist_filter']
+					':certificate' => json_encode($distributor['certificate']),
+					':pricelist' => json_encode($distributor['pricelist'])
 				])){
 					$this->response(['id' => $distributor['id'], 'name' => UTILITY::scriptFilter($this->_payload->name)]);
 				}
@@ -162,6 +159,8 @@ class PURCHASE extends API {
 					':id' => $passedID
 				]);
 				$distributor = $statement->fetch(PDO::FETCH_ASSOC);
+				$distributor['certificate'] = json_decode($distributor['certificate'], true);
+				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
 		
 				// display form for adding a new user with ini related permissions
 				$form=['content' => [
@@ -208,7 +207,7 @@ class PURCHASE extends API {
 						"description" => LANG::GET('purchase.edit_distributor_certificate_validity'),
 						'attributes' => [
 							'name' => 'certificate_validity',
-							'value' => $distributor['certificate_validity'] ? : ''
+							'value' => $distributor['certificate']['validity'] ? : ''
 						]],
 						["type" => "file",
 						"description" => LANG::GET('purchase.edit_distributor_certificate_update'),
@@ -217,10 +216,6 @@ class PURCHASE extends API {
 						]]
 					],
 					[
-						["type" => "text",
-						"description" => LANG::GET('purchase.edit_distributor_pricelist_validity'),
-						"content" => $distributor['pricelist_validity'] ? : ''
-						],
 						["type" => "file",
 						"description" => LANG::GET('purchase.edit_distributor_pricelist_update'),
 						'attributes' => [
@@ -231,7 +226,7 @@ class PURCHASE extends API {
 						"description" => LANG::GET('purchase.edit_distributor_pricelist_filter'),
 						'attributes' => [
 							'name' => 'pricelist_filter',
-							'value' => $distributor['pricelist_filter'] ? : '',
+							'value' => $distributor['pricelist']['filter'] ? : '',
 							'placeholder' => json_encode(json_decode($this->filtersample, true))
 						]]
 					],
@@ -249,15 +244,25 @@ class PURCHASE extends API {
 					'action' => $distributor['id'] ? 'javascript:api.purchase("put", "distributor", "' . $distributor['id'] . '")' : 'javascript:api.purchase("post", "distributor")'
 				]];
 
-				if ($distributor['certificate_path'])
+				if ($distributor['pricelist']['validity'])
+					array_splice($form['content'][5], 0, 0,
+				[
+					["type" => "text",
+					"description" => LANG::GET('purchase.edit_distributor_pricelist_validity'),
+					"content" => $distributor['pricelist']['validity']
+					]
+				]
+				);
+
+				if ($distributor['certificate']['path'])
 					array_splice($form['content'][4], 1, 0,
-				[[
-					'type' => 'links',
+				[
+					['type' => 'links',
 					'description' => LANG::GET('purchase.edit_distributor_certificate_download'),
 					'content' => [
-						'api/'. $distributor['certificate_path'] => ['target' => '_blank']
-					]
-				  ]]
+						'api/'. $distributor['certificate']['path'] => ['target' => '_blank']
+					]]
+				]
 				);
 
 				$this->response($form);
@@ -272,9 +277,10 @@ class PURCHASE extends API {
 					':id' => $passedID
 				]);
 				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response([], 406);
-				
+
 				// tidy up certificate file
-				if ($distributor['certificate_path']) unlink($distributor['certificate_path']);
+				$distributor['certificate'] = json_decode($distributor['certificate'], true);
+				if ($distributor['certificate']['path']) unlink($distributor['certificate']['path']);
 				
 				// tidy up purchase items database
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
@@ -289,6 +295,22 @@ class PURCHASE extends API {
 				else $this->response(['id' => $distributor['id'], 'name' => UTILITY::scriptFilter($distributor['name'])]);
 				break;
 		}
+	}
+	public function order(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				break;
+			case 'PUT':
+				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				break;
+			case 'GET':
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				break;
+			case 'DELETE':
+				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				break;
+			}
 	}
 }
 

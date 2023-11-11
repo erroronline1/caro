@@ -73,11 +73,11 @@ class SQLQUERY {
 		],
 
 		'purchase_post-distributor' => [
-			'mysql' => "INSERT INTO webqs_distributors (id, name, info, certificate_validity, certificate_path, pricelist_validity, pricelist_filter) VALUES ( NULL, :name, :info, :certificate_validity, :certificate_path, :pricelist_validity, :pricelist_filter)",
+			'mysql' => "INSERT INTO webqs_distributors (id, name, info, certificate, pricelist) VALUES ( NULL, :name, :info, :certificate, :pricelist)",
 			'sqlsrv' => ""
 		],
 		'purchase_put-distributor' => [
-			'mysql' => "UPDATE webqs_distributors SET name = :name, info = :info, certificate_validity = :certificate_validity, certificate_path = :certificate_path, pricelist_validity = :pricelist_validity, pricelist_filter = :pricelist_filter WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE webqs_distributors SET name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-distributor-datalist' => [
