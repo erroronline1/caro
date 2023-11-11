@@ -51,9 +51,9 @@ class PURCHASE extends API {
 				$insert .= strtr(SQLQUERY::PREPARE('purchase_insert-purchase-items'),
 					[
 						':distributor_id' => $distributorID,
-						':article_no' => "'" . SQLQUERY::SANITIZE($row['article_no']) . "'",
-						':article_name' => "'" . SQLQUERY::SANITIZE($row['article_name']) . "'",
-						':article_unit' => "'" . SQLQUERY::SANITIZE($row['article_unit']) . "'"
+						':article_no' => "'" . $row['article_no'] . "'",
+						':article_name' => "'" . $row['article_name'] . "'",
+						':article_unit' => "'" . $row['article_unit'] . "'"
 					]) . '; ';
 			}
 			$statement = $this->_pdo->prepare($insert);
@@ -63,6 +63,8 @@ class PURCHASE extends API {
 	}
 
 	public function distributor(){
+		// Y U NO DELETE? because of audit safety, that's why!
+
 		if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -70,26 +72,28 @@ class PURCHASE extends API {
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				
 				$distributor = [
-					'name' => SQLQUERY::SANITIZE($this->_payload->name),
-					'info' => SQLQUERY::SANITIZE($this->_payload->info),
-					'certificate' => ['validity' => SQLQUERY::SANITIZE($this->_payload->certificate_validity), 'path' => ''],
-					'pricelist' => ['validity' => '', 'filter' => SQLQUERY::SANITIZE($this->_payload->pricelist_filter)]
+					'name' => $this->_payload->name,
+					'active' => UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_distributor_active')) === LANG::GET('purchase.edit_distributor_isactive') ? 1 : 0,
+					'info' => $this->_payload->info,
+					'certificate' => ['validity' => $this->_payload->certificate_validity, 'path' => ''],
+					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter]
 				];
 				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
 				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
 
 				// save certificate
-				if ($_FILES['certificate']['tmp_name']) {
-					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], $distributor['name'])[0];
+				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
+					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/documents', [$distributor['name'] . '_' . date('Ymd')])[0];
 				}
 				// update pricelist
-				if ($_FILES['pricelist']['tmp_name']) {
+				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-distributor'));
 				if ($statement->execute([
 					':name' => $distributor['name'],
+					':active' => $distributor['active'],
 					':info' => $distributor['info'],
 					':certificate' => json_encode($distributor['certificate']),
 					':pricelist' => json_encode($distributor['pricelist'])
@@ -100,7 +104,7 @@ class PURCHASE extends API {
 
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$requestedID = SQLQUERY::SANITIZE($this->_requestedID);
+				$requestedID = $this->_requestedID;
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor-id'));
 				$statement->execute([
@@ -109,26 +113,34 @@ class PURCHASE extends API {
 				// prepare distributor-array to update, return error if not found
 				if (!($distributor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
 
-				$distributor['name'] = SQLQUERY::SANITIZE($this->_payload->name);
-				$distributor['info'] = SQLQUERY::SANITIZE($this->_payload->info);
-				$distributor['certificate'] = json_decode($distributor['certificate']);
-				$distributor['certificate']['validity'] = SQLQUERY::SANITIZE($this->_payload->certificate_validity);
-				$distributor['pricelist'] = json_decode($distributor['pricelist']);
-				$distributor['pricelist']['filter'] = SQLQUERY::SANITIZE($this->_payload->pricelist_filter);
+				$distributor['active'] = UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_distributor_active')) === LANG::GET('purchase.edit_distributor_isactive') ? 1 : 0;
+				$distributor['name'] = $this->_payload->name;
+				$distributor['info'] = $this->_payload->info;
+				$distributor['certificate'] = json_decode($distributor['certificate'], true);
+				$distributor['certificate']['validity'] = $this->_payload->certificate_validity;
+				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
+				$distributor['pricelist']['filter'] = $this->_payload->pricelist_filter;
 
 				// save certificate
-				if ($_FILES['certificate']['tmp_name']) {
-					if ($distributor['certificate']['path']) unlink($distributor['certificate']['path']);
-					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], $distributor['name'])[0];
+				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
+					$distributor['certificate']['path'] = UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/documents', [$distributor['name'] . '_' . date('Ymd')])[0];
 				}
 				// update pricelist
-				if ($_FILES['pricelist']['tmp_name']) {
+				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
-		
+				// tidy up purchase items database if inactive
+				if (!$distributor['active']){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
+					$statement->execute([
+						':id' => $distributor['id']
+					]);
+				}
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-distributor'));
 				if ($statement->execute([
 					':id' => $distributor['id'],
+					':active' => $distributor['active'],
 					':name' => $distributor['name'],
 					':info' => $distributor['info'],
 					':certificate' => json_encode($distributor['certificate']),
@@ -140,7 +152,7 @@ class PURCHASE extends API {
 
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$passedID = SQLQUERY::SANITIZE($this->_requestedID);
+				$passedID = $this->_requestedID;
 				$datalist=[];
 				$options=['...'=>[]];
 				
@@ -161,7 +173,9 @@ class PURCHASE extends API {
 				$distributor = $statement->fetch(PDO::FETCH_ASSOC);
 				$distributor['certificate'] = json_decode($distributor['certificate'], true);
 				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
-		
+				$isactive = $distributor['active'] ? ['checked' => true] : [];
+				$isinactive = !$distributor['active'] ? ['checked' => true] : [];
+
 				// display form for adding a new user with ini related permissions
 				$form=['content' => [
 					[
@@ -207,6 +221,7 @@ class PURCHASE extends API {
 						"description" => LANG::GET('purchase.edit_distributor_certificate_validity'),
 						'attributes' => [
 							'name' => 'certificate_validity',
+							'required' => true,
 							'value' => $distributor['certificate']['validity'] ? : ''
 						]],
 						["type" => "file",
@@ -231,11 +246,11 @@ class PURCHASE extends API {
 						]]
 					],
 					[
-						['type' => 'deletebutton',
-						'description' => LANG::GET('purchase.edit_distributor_delete_button'),
-						'attributes' => [
-							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerdown' => $distributor['id'] ? 'if (confirm("'. LANG::GET('purchase.edit_distributor_delete_confirm', [':name' => $distributor['name']]) .'")) {api.purchase("delete", "distributor", ' . $distributor['id'] . ')}' : ''
+						["type" => "radio",
+						"description" => LANG::GET('purchase.edit_distributor_active'),
+						"content" => [
+							LANG::GET('purchase.edit_distributor_isactive') => $isactive,
+							LANG::GET('purchase.edit_distributor_isinactive') => $isinactive
 						]]
 					]
 				],
@@ -266,33 +281,6 @@ class PURCHASE extends API {
 				);
 
 				$this->response($form);
-				break;
-
-			case 'DELETE':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$passedID = SQLQUERY::SANITIZE($this->_requestedID);
-				// prefetch to return proper name after deletion
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-distributor-prefetch'));
-				$statement->execute([
-					':id' => $passedID
-				]);
-				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response([], 406);
-
-				// tidy up certificate file
-				$distributor['certificate'] = json_decode($distributor['certificate'], true);
-				if ($distributor['certificate']['path']) unlink($distributor['certificate']['path']);
-				
-				// tidy up purchase items database
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
-				$statement->execute([
-					':id' => $distributor['id']
-				]);
-					
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-distributor'));
-				if ($statement->execute([
-					':id' => $distributor['id']
-				])) $this->response(['id' => false, 'name' => UTILITY::scriptFilter($distributor['name'])]);
-				else $this->response(['id' => $distributor['id'], 'name' => UTILITY::scriptFilter($distributor['name'])]);
 				break;
 		}
 	}
