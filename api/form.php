@@ -58,7 +58,8 @@ class FORMS extends API {
 		$statement->execute([
 			':name' => $requestedComponent
 		]);
-		$component = $statement->fetch(PDO::FETCH_ASSOC);
+		if (!$component = $statement->fetch(PDO::FETCH_ASSOC))
+		$component=['name' =>''];
 
 		$creator = [
 			'content' => [
@@ -142,7 +143,7 @@ class FORMS extends API {
 				[[
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
-					'value' => $component['name'] ? : ''
+					'value' => $component['name']
 				]],
 				[[
 					'type' => 'trash',
@@ -150,7 +151,7 @@ class FORMS extends API {
 				]]
 				]];
 
-		if ($component) $creator['component'] = json_decode($component['content']);
+		if (array_key_exists('content', $component)) $creator['component'] = json_decode($component['content']);
 
 		$this->response($creator);
 	}
