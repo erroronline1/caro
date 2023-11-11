@@ -1,6 +1,6 @@
 <?php
 // add, edit and delete users
-class USERS extends API {
+class USER extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[0]; // method == api request
 	private $_requestedUserId = REQUEST[1];
@@ -210,7 +210,7 @@ class USERS extends API {
 	}
 }
 
-$api = new USERS();
+$api = new USER();
 $api->processApi();
 
 exit;
