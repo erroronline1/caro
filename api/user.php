@@ -39,9 +39,9 @@ class USER extends API {
 				}
 				// save and convert image
 				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
-					$user['image'] = UTILITY::storeUploadedFiles(['photo'], 'files/users', [$user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles(['photo'], "../" . UTILITY::directory('user_photos'), [$user['name']])[0];
 					UTILITY::resizeImage($user['image'], 128, UTILITY_IMAGE_REPLACE);
-					$user['image'] = 'api/' . $user['image'];
+					$user['image'] = substr($user['image'], 3);
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_post'));
@@ -83,9 +83,9 @@ class USER extends API {
 				// convert image
 				// save and convert image
 				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
-					$user['image'] = UTILITY::storeUploadedFiles(['photo'], 'files/users', [$user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles(['photo'], "../" . UTILITY::directory('user_photos'), [$user['name']])[0];
 					UTILITY::resizeImage($user['image'], 128, UTILITY_IMAGE_REPLACE);
-					$user['image'] = 'api/' . $user['image'];
+					$user['image'] = substr($user['image'], 3);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));

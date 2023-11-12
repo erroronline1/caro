@@ -84,13 +84,12 @@ class PURCHASE extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], 'files/distributors/' . $distributor['name'] . '/documents', [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
-				// update pricelist
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
@@ -129,11 +128,11 @@ class PURCHASE extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], 'files/distributors/' . $distributor['name'] . '/documents', [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
@@ -197,13 +196,13 @@ class PURCHASE extends API {
 				$certificates = [];
 				$documents = [];
 				if ($distributor['id']) {
-					$certfiles = UTILITY::listFiles('files/distributors/' . $distributor['name'] . '/certificates');
+					$certfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['name']]));
 					foreach($certfiles as $path){
-						$certificates['api/' . $path] = ['target' => '_blank'];
+						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
-					$docfiles = UTILITY::listFiles('files/distributors/' . $distributor['name'] . '/documents');
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]));
 					foreach($docfiles as $path){
-						$documents['api/' . $path] = ['target' => '_blank'];
+						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
 				// display form for adding a new user with ini related permissions

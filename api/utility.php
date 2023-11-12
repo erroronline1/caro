@@ -294,5 +294,26 @@ class UTILITY {
 		}
 		return $result;
 	}
+
+	/**
+	 * returns folders defined in setup.ini
+	 * 
+	 * @param string $request key
+	 * @param array $replace named array with replacements
+	 * 
+	 * @return string directory
+	 */
+	public static function directory($request, $replace=[]){
+		if (!array_key_exists($request, INI['fileserver'])){
+			return '../files';
+		}
+		$patterns = [];
+		$replacements = [];
+		foreach($replace as $pattern => $replacement){
+			$patterns[] = '/' . $pattern . '/';
+			$replacements[] = $replacement;
+		}
+		return preg_replace($patterns, $replacements, INI['fileserver'][$request]);
+	}
 }
 ?>
