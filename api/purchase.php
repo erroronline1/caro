@@ -84,7 +84,7 @@ class PURCHASE extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
@@ -124,7 +124,11 @@ class PURCHASE extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles($_FILES, ['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
+				}
+				// save documents
+				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
+					UTILITY::storeUploadedFiles(['documents'], 'files/distributors/' . $distributor['name'] . '/documents', [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
@@ -186,10 +190,15 @@ class PURCHASE extends API {
 				$isinactive = !$distributor['active'] ? ['checked' => true] : [];
 
 				$certificates = [];
+				$documents = [];
 				if ($distributor['id']) {
 					$certfiles = UTILITY::listFiles('files/distributors/' . $distributor['name'] . '/certificates');
 					foreach($certfiles as $path){
 						$certificates['api/' . $path] = ['target' => '_blank'];
+					}
+					$docfiles = UTILITY::listFiles('files/distributors/' . $distributor['name'] . '/documents');
+					foreach($docfiles as $path){
+						$documents['api/' . $path] = ['target' => '_blank'];
 					}
 				}
 				// display form for adding a new user with ini related permissions
@@ -248,6 +257,14 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "file",
+						"description" => LANG::GET('purchase.edit_distributor_documents_update'),
+						'attributes' => [
+							'name' => 'documents[]',
+							'multiple' => true
+						]]
+					],
+					[
+						["type" => "file",
 						"description" => LANG::GET('purchase.edit_distributor_pricelist_update'),
 						'attributes' => [
 							'name' => 'pricelist',
@@ -275,25 +292,29 @@ class PURCHASE extends API {
 					'action' => $distributor['id'] ? 'javascript:api.purchase("put", "distributor", "' . $distributor['id'] . '")' : 'javascript:api.purchase("post", "distributor")'
 				]];
 
-				if ($distributor['pricelist']['validity'])
-					array_splice($form['content'][5], 0, 0,
-				[
-					["type" => "text",
-					"description" => LANG::GET('purchase.edit_distributor_pricelist_validity'),
-					"content" => $distributor['pricelist']['validity']
+				if ($certificates) array_splice($form['content'][4], 1, 0,
+					[
+						['type' => 'links',
+						'description' => LANG::GET('purchase.edit_distributor_certificate_download'),
+						'content' => $certificates
+						]
 					]
-				]
 				);
-
-				if ($certificates)
-					array_splice($form['content'][4], 1, 0,
-				[
-					['type' => 'links',
-					'description' => LANG::GET('purchase.edit_distributor_certificate_download'),
-					'content' => 
-						$certificates
+				if ($documents) array_splice($form['content'][5], 0, 0,
+					[
+						['type' => 'links',
+						'description' => LANG::GET('purchase.edit_distributor_documents_download'),
+						'content' => $documents
+						]
 					]
-				]
+				);
+				if ($distributor['pricelist']['validity']) array_splice($form['content'][6], 0, 0,
+					[
+						["type" => "text",
+						"description" => LANG::GET('purchase.edit_distributor_pricelist_validity'),
+						"content" => $distributor['pricelist']['validity']
+						]
+					]
 				);
 
 				$this->response($form);
