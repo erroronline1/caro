@@ -166,24 +166,12 @@ class USER extends API {
 						'content' => $permissions
 						]
 					],[
-						['type' => 'image',
-						'description' => LANG::GET('user.edit_export_user_image'),
-						'attributes' => [
-							'name' => $user['name'],
-							'url' => $user['image'] ? : '']
-						],
 						['type' => 'photo',
 						'description' => LANG::GET('user.edit_take_photo'),
 						'attributes' => [
 							'name' => 'photo'
 						]],
 					],[
-						['type' => 'image',
-						'description' => LANG::GET('user.edit_export_qr_token'),
-						'attributes' => [
-							'name' => $user['name'],
-							'qrcode' => $user['token']]
-						],
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_token'),
 						'content' => [LANG::GET('user.edit_token_renew') => []]
@@ -199,6 +187,28 @@ class USER extends API {
 						'data-usecase' => 'user',
 						'action' => $user['id'] ? 'javascript:api.user("put", "' . $user['id'] . '")' : 'javascript:api.user("post")'
 					]];
+
+					if ($user['image']) array_splice($form['content'][4], 0, 0,
+					[
+						['type' => 'image',
+						'description' => LANG::GET('user.edit_export_user_image'),
+						'attributes' => [
+							'name' => $user['name'],
+							'url' => $user['image']]
+						]
+					]
+					);
+					if ($user['token']) array_splice($form['content'][5], 0, 0,
+						[
+							['type' => 'image',
+							'description' => LANG::GET('user.edit_export_qr_token'),
+							'attributes' => [
+							'name' => $user['name'],
+							'qrcode' => $user['token']]
+							]
+						]
+					);
+
 				$this->response($form);
 				break;
 
