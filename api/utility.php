@@ -45,7 +45,7 @@ class UTILITY {
 					$parts = array_slice(explode($boundary, $raw_data), 1);
 					$data = array();
 
-					foreach ($parts as $part) {
+					foreach ($parts as $part){
 						// If this is the last part, break
 						if ($part == "--\r\n") break;
 
@@ -56,13 +56,13 @@ class UTILITY {
 						// Parse the headers list
 						$raw_headers = explode("\r\n", $raw_headers);
 						$headers = array();
-						foreach ($raw_headers as $header) {
+						foreach ($raw_headers as $header){
 							list($name, $value) = explode(':', $header);
 							$headers[strtolower($name)] = ltrim($value, ' ');
 						}
 
 						// Parse the Content-Disposition to get the field name, etc.
-						if (isset($headers['content-disposition'])) {
+						if (isset($headers['content-disposition'])){
 							$filename = null;
 							$tmp_name = null;
 							preg_match(
@@ -73,29 +73,44 @@ class UTILITY {
 							list(, $type, $name) = $matches;
 
 							//Parse File
-							if( isset($matches[4]) )
-							{
-								//if labeled the same as previous, skip
-								if( isset( $_FILES[ $matches[ 2 ] ] ) )
-								{
-									continue;
-								}
-
+							if(isset($matches[4])){
 								//get filename
 								$filename = $matches[4];
+								$fieldname = preg_replace('/\[\]/', '', $matches[2]);
 
 								//get tmp name
 								$filename_parts = pathinfo( $filename );
 								$tmp_name = tempnam( ini_get('upload_tmp_dir'), $filename_parts['filename']);
 
 								//populate $_FILES with information, size may be off in multibyte situation
-								$_FILES[ $matches[ 2 ] ] = array(
-									'error'=>0,
-									'name'=>$filename,
-									'tmp_name'=>$tmp_name,
-									'size'=>strlen( $body ),
-									'type'=>$value
-								);
+								$_files = [
+									'error' => 0,
+									'name' => $filename,
+									'tmp_name' => $tmp_name,
+									'size' => strlen( $body ),
+									'type' => $value
+								];
+								
+								if(!isset($_FILES[$fieldname])){
+									$_FILES[$fieldname] = $_files;
+								}
+								elseif(isset($_FILES[$fieldname]) && gettype($_FILES[$fieldname]['name']) !== 'array'){
+									$transform = $_FILES[$fieldname];
+									$_FILES[$fieldname]= [
+										'error' => [$transform['error'], $_files['error']],
+										'name' => [$transform['name'], $_files['name']],
+										'tmp_name' => [$transform['tmp_name'], $_files['tmp_name']],
+										'size' => [$transform['size'], $_files['size']],
+										'type' => [$transform['type'], $_files['type']],
+									];
+								}
+								else {
+										$_FILES[$fieldname]['error'][] = $_files['error'];
+										$_FILES[$fieldname]['name'][] = $_files['name'];
+										$_FILES[$fieldname]['tmp_name'][] = $_files['tmp_name'];
+										$_FILES[$fieldname]['size'][] = $_files['size'];
+										$_FILES[$fieldname]['type'][] = $_files['type'];
+								}
 
 								//place in temporary directory
 								file_put_contents($tmp_name, $body);
@@ -181,25 +196,36 @@ class UTILITY {
 	/**
 	 * moves uploaded files to folder according to input name, adds possible prefix
 	 * 
-	 * @param array $_files mandatory passed $_FILES object
 	 * @param array $name mandatory array of input names
 	 * @param string $folder where to store
 	 * @param array $prefix to add to filename, length according to $files
 	 * 
 	 * @return array paths of stored files
 	 */
-	public static function storeUploadedFiles($_files, $name = [], $folder = '', $prefix = []){
+	public static function storeUploadedFiles($name = [], $folder = '', $prefix = []){
 		/* process $_FILES, store to folder and return an array of destination paths */
 		if (!file_exists($folder)) mkdir($folder, 0777, true);
 		$targets = [];
-		for ($i = 0; $i < count($name); $i++) {
+		function handle ($tmpname, $name, $i, $prefix, $folder){
 			$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
-			$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $_files[$name[$i]]['name'];
+			$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $name;
 			// move_uploaded_file is for post only, else rename for put files
-			if (move_uploaded_file( $_files[$name[$i]]['tmp_name'], $target) ||	rename( $_files[$name[$i]]['tmp_name'], $target))
-				$targets[] = $target;
+			if (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target)){
+				return $target;
+
+			}
 		}
-		return $targets; // including path e.g. to store in database
+
+		for ($i = 0; $i < count($name); $i++) {
+			if (gettype($_FILES[$name[$i]]['name'])!=='array') $targets[] = handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder);
+			else {
+				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
+					$targets[] = handle($_FILES[$name[$i]]['tmp_name'][$j], $_FILES[$name[$i]]['name'][$j], $i, $prefix, $folder);
+				}
+			}
+		}
+
+		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
 
 	/**
