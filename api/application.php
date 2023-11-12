@@ -20,15 +20,15 @@ class APPLICATION extends API {
 
 	public function login(){
 		// select single user based on token
-		if (!boolval($this->_requestedToken) && $_SESSION['user']){
+		if (!boolval($this->_requestedToken) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
 			$this->response($_SESSION['user']);
 		}
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 		$statement->execute([
-			':token' => SQLQUERY::SANITIZE($this->_requestedToken)
+			':token' => $this->_requestedToken
 		]);
-		$result = $statement->fetch(PDO::FETCH_ASSOC);
-		if ($result['token']){
+		
+		if ($result = $statement->fetch(PDO::FETCH_ASSOC) && $result['token']){
 			$_SESSION['user'] = [
 				'name' => $result['name'],
 				'permissions' => explode(',', $result['permissions']),
@@ -41,7 +41,7 @@ class APPLICATION extends API {
 		$this->response(
 			[
 				'form' => [
-					'action' => 'javascript:api.application("get","login")'
+					'action' => "javascript:api.application('get','login')"
 				],
 				'content' => [
 					[[
@@ -60,10 +60,10 @@ class APPLICATION extends API {
 
 	public function menu(){
 		// get permission based menu items
-		if (!$_SESSION['user']) $this->response([LANG::GET('menu.signin_header') => []]);
+		if (!array_key_exists('user', $_SESSION)) $this->response([LANG::GET('menu.signin_header') => []]);
 					
 		$menu=[
-			'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => 'javascript:api.application("get","login", "null")']
+			'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => "javascript:api.application('get','login', 'null')"]
 		];
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.admin_header')] = [
