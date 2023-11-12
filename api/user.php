@@ -37,11 +37,13 @@ class USER extends API {
 				if($this->_payload->renew_on_save){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
-				// convert image
-				if ($_FILES['photo']['tmp_name']) {
-					$user['image'] = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['photo']['tmp_name'], 128));
+				// save and convert image
+				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
+					$user['image'] = UTILITY::storeUploadedFiles(['photo'], 'files/users', [$user['name']])[0];
+					UTILITY::resizeImage($user['image'], 128, UTILITY_IMAGE_REPLACE);
+					$user['image'] = 'api/' . $user['image'];
 				}
-		
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_post'));
 				if ($statement->execute([
 					':name' => $user['name'],
@@ -79,8 +81,11 @@ class USER extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// convert image
-				if ($_FILES['photo']['tmp_name']) {
-					$user['image'] = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['photo']['tmp_name'], 128));
+				// save and convert image
+				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
+					$user['image'] = UTILITY::storeUploadedFiles(['photo'], 'files/users', [$user['name']])[0];
+					UTILITY::resizeImage($user['image'], 128, UTILITY_IMAGE_REPLACE);
+					$user['image'] = 'api/' . $user['image'];
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
@@ -165,7 +170,7 @@ class USER extends API {
 						'description' => LANG::GET('user.edit_export_user_image'),
 						'attributes' => [
 							'name' => $user['name'],
-							'base64img' => $user['image'] ? : '']
+							'url' => $user['image'] ? : '']
 						],
 						['type' => 'photo',
 						'description' => LANG::GET('user.edit_take_photo'),
@@ -204,6 +209,9 @@ class USER extends API {
 					':id' => $this->_requestedUserId
 				]);
 				$user = $statement->fetch(PDO::FETCH_ASSOC);
+
+				unlink(preg_replace('/api\//', '', $user['image']));
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));
 				if ($statement->execute([
 					':id' => $user['id']

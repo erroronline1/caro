@@ -1,4 +1,9 @@
 <?php
+
+define("UTILITY_IMAGE_REPLACE", 0x1);
+define("UTILITY_IMAGE_STREAM", 0x2);
+define("UTILITY_IMAGE_RESSOURCE", 0x4);
+
 class UTILITY {
 
 	/**
@@ -147,15 +152,24 @@ class UTILITY {
 	/**
 	 * @param string $file filename
 	 * @param int $maxSize max pixels on longest side
+	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
 	 * 
-	 * @return object a GdImage ressource
+	 * @return object|null a GdImage ressource or no return
 	 */
-	public static function resizeImage($file, $maxSize = 128){
+	public static function resizeImage($file, $maxSize = 128, $destination = UTILITY_IMAGE_REPLACE){
 		if (is_file($file)){
-			$imgtype=getimagesize($file);
-			if ($imgtype[2] == "1"){ $image = imagecreatefromgif($file); } //gif
-			elseif ($imgtype[2] == "2"){ $image = imagecreatefromjpeg($file); } //jpeg
-			elseif ($imgtype[2] == "3"){ $image = imagecreatefrompng($file); } //png
+			$filetype=getimagesize($file)[2];
+			switch($filetype){
+				case"1": //gif
+					$image = imagecreatefromgif($file);
+					break;
+				case "2": //jpeg
+					$image = imagecreatefromjpeg($file);
+					break;
+				case "3": //png
+					$image = imagecreatefrompng($file);
+					break;
+			}
 		}
 		else $image = imagecreatefromstring($file); // bytestring
 		if ($image) {
@@ -166,17 +180,51 @@ class UTILITY {
 			else $resize = 1;
 			$image2 = imagecreatetruecolor(ceil($owidth * $resize), ceil($oheight * $resize));
 			imagecopyresampled($image2, $image, 0, 0, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $owidth, $oheight);
+			imagedestroy($image);
 
-			ob_start();
-			imagepng($image2, NULL, 0);
+			if ($destination & UTILITY_IMAGE_REPLACE){
+				chmod($file, 0777);
+				switch($filetype){
+					case"1": //gif
+						imagegif($image2, $file);
+						break;
+					case "2": //jpeg
+						imagejpeg($image2, $file, 100);
+						break;
+					case "3": //png
+						imagepng($image2, $file, 0);
+						break;
+				}
+				imagedestroy($image2);
+				return;
+			}
+
+			if ($destination & UTILITY_IMAGE_STREAM) {
+					header("Content-type: application/octet-stream");
+					header("Content-Disposition: attachment; filename=" . pathinfo($file)['basename']);
+			}
+			ob_start();	
+			switch($filetype){
+				case"1": //gif
+					imagegif($image2, null);
+					break;
+				case "2": //jpeg
+					imagejpeg($image2, null, 100);
+					break;
+				case "3": //png
+					imagepng($image2, null, 0);
+					break;
+			}
+			if ($destination & UTILITY_IMAGE_STREAM) {
+				ob_end_flush();
+			}
 			$return = ob_get_clean();
 			ob_end_clean(); 
-			imagedestroy($image);
 			imagedestroy($image2);
-
 			return $return;
 		}
 	}
+
 	/**
 	 * shorthand checking for a set property
 	 * 
@@ -189,6 +237,11 @@ class UTILITY {
 		return (property_exists($object, $property) && boolval($object->{$property})) ? $object->{$property} : false;
 	}
 
+	/**
+	 * @param string $text e.g. from database user input
+	 * 
+	 * @return string to avoid malicious script execution
+	 */
 	public static function scriptFilter($text){
 		return htmlspecialchars(trim($text));
 	}
@@ -212,10 +265,8 @@ class UTILITY {
 			// move_uploaded_file is for post only, else rename for put files
 			if (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target)){
 				return $target;
-
 			}
 		}
-
 		for ($i = 0; $i < count($name); $i++) {
 			if (gettype($_FILES[$name[$i]]['name'])!=='array') $targets[] = handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder);
 			else {
@@ -224,7 +275,6 @@ class UTILITY {
 				}
 			}
 		}
-
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
 

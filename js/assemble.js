@@ -165,10 +165,10 @@ export class Assemble {
 				radius: 1
 			}, document.getElementById(this.imageQrCode.id));
 		}
-		if (this.imageBase64) {
-			const imgcanvas = document.getElementById(this.imageBase64.id),
+		if (this.imageUrl) {
+			const imgcanvas = document.getElementById(this.imageUrl.id),
 				img = new Image();
-			img.src = this.imageBase64.content;
+			img.src = this.imageUrl.content;
 			img.addEventListener('load', function (e) {
 				imgcanvas.getContext('2d').drawImage(this, 0, 0, imgcanvas.width, imgcanvas.height)
 			});
@@ -639,7 +639,7 @@ export class Assemble {
 			attributes:{
 				name: 'exportname', // atypical use of generic attributes on this one
 				qrcode:'e.g. token', // for display of a qrcode with this value
-				base64img: 'base64 encoded string' // for display of an image
+				url: 'base64 encoded string || url' // for display of an image
 			}
 		} */
 		const canvas = document.createElement('canvas');
@@ -650,9 +650,9 @@ export class Assemble {
 			id: canvas.id,
 			content: this.tile.attributes.qrcode
 		}
-		if (this.tile.attributes.base64img) this.imageBase64 = {
+		if (this.tile.attributes.url) this.imageUrl = {
 			id: canvas.id,
-			content: this.tile.attributes.base64img
+			content: this.tile.attributes.url
 		};
 
 		this.elements.add(canvas);
@@ -663,7 +663,7 @@ export class Assemble {
 			'data-type': this.tile.type,
 			'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
 		};
-		if (!(this.imageQrCode || this.imageBase64)) this.tile.attributes.disabled = true;
+		if (!(this.imageQrCode || this.imageUrl)) this.tile.attributes.disabled = true;
 
 		this.button();
 	}

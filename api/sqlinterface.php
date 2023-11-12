@@ -60,7 +60,7 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 		'user_delete-prefetch' => [
-			'mysql' => "SELECT id, name FROM webqs_users WHERE id = :id LIMIT 1",
+			'mysql' => "SELECT id, name, image FROM webqs_users WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'user_delete' => [
