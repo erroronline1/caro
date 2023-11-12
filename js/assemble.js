@@ -484,13 +484,26 @@ export class Assemble {
 			}
 		}*/
 		let select = document.createElement('select');
+		const groups = {};
 		select.name = select.title = this.tile.description;
 		if (this.tile.attributes !== undefined) select = this.apply_attributes(this.tile.attributes, select);
+
 		for (const [key, element] of Object.entries(this.tile.content)) {
-			let option = document.createElement('option');
-			option = this.apply_attributes(element, option);
-			option.appendChild(document.createTextNode(key));
-			select.appendChild(option)
+			if (groups[key[0]] === undefined) groups[key[0]] = [
+				[key, element]
+			];
+			else groups[key[0]].push([key, element]);
+		}
+		for (const [group, elements] of Object.entries(groups)) {
+			let optgroup = document.createElement('optgroup');
+			optgroup.label = group;
+			for (const element of Object.entries(elements)) {
+				let option = document.createElement('option');
+				option = this.apply_attributes(element[1][1], option);
+				option.appendChild(document.createTextNode(element[1][0]));
+				optgroup.appendChild(option);
+			}
+			select.appendChild(optgroup);
 		}
 		this.elements.add(select)
 	}
