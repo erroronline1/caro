@@ -7,10 +7,10 @@ import {
 
 
 export const api = {
-	send: (method, request, successFn, errorFn = null, payload = {}, form_data = false) => {
-		_.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
-			.then(data => {
-				successFn(data);
+	send: async (method, request, successFn, errorFn = null, payload = {}, form_data = false) => {
+		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
+			.then(async data => {
+				await successFn(data);
 			})
 			.catch((error) => {
 				console.trace(error);
@@ -214,7 +214,7 @@ export const api = {
 		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
 		document.getElementById('openmenu').checked = false;
 	},
-	application: (method, ...request) => {
+	application: async (method, ...request) => {
 		/*
 		get application/user
 		get application/menu
@@ -225,7 +225,7 @@ export const api = {
 		let successFn;
 		switch (request[1]) {
 			case 'language':
-				successFn = function (data) {
+				successFn = async function (data) {
 					window.LANGUAGEFILE = data;
 				}
 				break;
@@ -254,7 +254,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn);
+		await api.send(method, request, successFn);
 	},
 
 }
