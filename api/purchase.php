@@ -86,6 +86,11 @@ class PURCHASE extends API {
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
 					UTILITY::storeUploadedFiles(['certificate'], 'files/distributors/' . $distributor['name'] . '/certificates', [$distributor['name'] . '_' . date('Ymd')]);
 				}
+				// save documents
+				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
+					UTILITY::storeUploadedFiles(['documents'], 'files/distributors/' . $distributor['name'] . '/documents', [$distributor['name'] . '_' . date('Ymd')]);
+				}
+				// update pricelist
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
