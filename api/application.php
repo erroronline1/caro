@@ -28,7 +28,7 @@ class APPLICATION extends API {
 			':token' => $this->_requestedToken
 		]);
 		
-		if ($result = $statement->fetch(PDO::FETCH_ASSOC) && $result['token']){
+		if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
 			$_SESSION['user'] = [
 				'name' => $result['name'],
 				'permissions' => explode(',', $result['permissions']),
