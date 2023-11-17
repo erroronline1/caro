@@ -23,8 +23,9 @@ class USER extends API {
 					'image' => ''
 				];
 		
-				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
-				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+				}
 		
 				// chain checked permission levels
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
@@ -66,9 +67,11 @@ class USER extends API {
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
 		
 				$user['name']=$this->_payload->name;
-				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
-				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
-		
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+				}
+				
 				// chain checked permission levels
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
 					if (UTILITY::propertySet($this->_payload, $description)) {
