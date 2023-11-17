@@ -58,7 +58,7 @@ class USER extends API {
 			case 'PUT':
 				$permissions = [];
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-id'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
 					':id' => $this->_requestedUserId
 				]);
@@ -214,7 +214,7 @@ class USER extends API {
 
 			case 'DELETE':
 				// prefetch to return proper name after deletion
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete-prefetch'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
 					':id' => $this->_requestedUserId
 				]);
