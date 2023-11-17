@@ -186,7 +186,7 @@ export class Assemble {
 				originalTileProperties = JSON.parse(JSON.stringify(this.tile)); // deepcopy; this has been a wild hour :/
 				this.description();
 				this[tile[i].type]();
-				if (tile[i].type === 'hiddeninput' && !this.setup.visible || tile[i].type === 'datalist') continue;
+				if (tile[i].type === 'hiddeninput' && !this.setup.visible || tile[i].type === 'datalist' || tile[i].type === 'hr') continue;
 				if (tile.length < 2) {
 					this.assembledTiles.add(this.single(originalTileProperties));
 					continue;
@@ -368,7 +368,7 @@ export class Assemble {
 		input.id = getNextElementID();
 		input.name = this.tile.description;
 		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
-		if ('multiple' in this.tile.attributes) input.onchange = function () {
+		if ('attributes' in this.tile && 'multiple' in this.tile.attributes) input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' ' + LANG.GET('assemble.files_rechoose') : LANG.GET('assemble.files_choose');
 		}
@@ -380,7 +380,7 @@ export class Assemble {
 		label.type = 'button';
 		label.setAttribute('data-type', 'file');
 		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode(('multiple' in this.tile.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
+		label.appendChild(document.createTextNode(('attributes' in this.tile && 'multiple' in this.tile.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
@@ -675,6 +675,11 @@ export class Assemble {
 	trash() {
 		// empty method but necessary to display the delete-area for composer or other future use
 	}
+
+	hr(){
+		this.assembledTiles.add(document.createElement('hr'));
+	}
+
 }
 
 var signaturecanvas = null;
