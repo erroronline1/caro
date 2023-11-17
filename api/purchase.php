@@ -6,6 +6,7 @@ class PURCHASE extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_subMethod = null;
 	private $filtersample = <<<'END'
 	{
 		"filesettings": {
@@ -34,6 +35,7 @@ class PURCHASE extends API {
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
 	private function update_pricelist($file, $filter, $distributorID){
@@ -43,13 +45,13 @@ class PURCHASE extends API {
 		$filter['filesetting']['source'] = $file;
 		$pricelist = new Listprocessor($filter);
 		if (count($pricelist->_list)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-all-unprotected-products'));
 			$statement->execute([
 				':id' => $distributorID
 			]);
 			$insert = '';
 			foreach($pricelist->_list as $i => $row){
-				$insert .= strtr(SQLQUERY::PREPARE('purchase_insert-purchase-items'),
+				$insert .= strtr(SQLQUERY::PREPARE('purchase_post-purchase-product'),
 					[
 						':distributor_id' => $distributorID,
 						':article_no' => "'" . $row['article_no'] . "'",
@@ -79,8 +81,10 @@ class PURCHASE extends API {
 					'certificate' => ['validity' => $this->_payload->certificate_validity],
 					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter]
 				];
-				// checkboxes are not delivered if null, html-value 'on' might have to be converted in given db-structure
-				// e.g. $this->_payload->active = $this->_payload->active ? 1 : 0;
+				
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+				}
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
@@ -109,11 +113,10 @@ class PURCHASE extends API {
 
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$requestedID = $this->_requestedID;
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor-id'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
 				$statement->execute([
-					':id' => $requestedID
+					':id' => $this->_requestedID
 				]);
 				// prepare distributor-array to update, return error if not found
 				if (!($distributor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
@@ -125,6 +128,10 @@ class PURCHASE extends API {
 				$distributor['certificate']['validity'] = $this->_payload->certificate_validity;
 				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
 				$distributor['pricelist']['filter'] = $this->_payload->pricelist_filter;
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+				}
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
@@ -138,9 +145,9 @@ class PURCHASE extends API {
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
 				}
-				// tidy up purchase items database if inactive
+				// tidy up purchase products database if inactive
 				if (!$distributor['active']){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-purchase-items'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-all-unprotected-products'));
 					$statement->execute([
 						':id' => $distributor['id']
 					]);
@@ -161,11 +168,10 @@ class PURCHASE extends API {
 
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$passedID = $this->_requestedID;
 				$datalist=[];
 				$options=['...'=>[]];
 				
-				// prepare existing users lists
+				// prepare existing distributor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor-datalist'));
 				$statement->execute();
 				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -174,10 +180,10 @@ class PURCHASE extends API {
 					$options[$row['name']] = [];
 				}
 		
-				// select single user based on id or name
+				// select single distributor based on id or name
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
 				$statement->execute([
-					':id' => $passedID
+					':id' => $this->_requestedID
 				]);
 				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $distributor = [
 					'id' => null,
@@ -205,7 +211,7 @@ class PURCHASE extends API {
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
-				// display form for adding a new user with ini related permissions
+				// display form for adding a new distributor
 				$form=['content' => [
 					[
 						['type' => 'datalist',
@@ -325,6 +331,299 @@ class PURCHASE extends API {
 				break;
 		}
 	}
+
+	public function product(){
+
+		if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				
+				$product = [
+					'id' => null,
+					'distributor_id' => null,
+					'distributor_name' => $this->_payload->distributor_select !== '...' ? $this->_payload->distributor_select : $this->_payload->distributor_input,
+					'article_no' => $this->_payload->article_no,
+					'article_name' => $this->_payload->article_name,
+					'article_unit' => $this->_payload->article_unit,
+					'active' => UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_product_active')) === LANG::GET('purchase.edit_product_isactive') ? 1 : 0,
+					'protected' => 0
+				];
+
+				// validate distributor
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
+				$statement->execute([
+					':id' => $product['distributor_name']
+				]);
+				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response([], 406);
+				$product['distributor_id'] = $distributor['id'];
+
+				// save documents
+				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
+					$product['protected'] = 1;
+				}
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-product'));
+				if ($statement->execute([
+					':distributor_id' => $product['distributor_id'],
+					':article_no' => $product['article_no'],
+					':article_name' => $product['article_name'],
+					':article_unit' => $product['article_unit'],
+					':active' => $product['active'],
+					':protected' => $product['protected']
+				])){
+					$this->response(['id' => $this->_pdo->lastInsertId(), 'name' => UTILITY::scriptFilter($product['article_name'])]);
+				}
+				break;
+
+			case 'PUT':
+				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				// prepare product-array to update, return error if not found
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
+
+				$product['distributor_name'] = $this->_payload->distributor_select !== '...' ? $this->_payload->distributor_select : $this->_payload->distributor_input;
+				$product['article_no'] = $this->_payload->article_no;
+				$product['article_name'] = $this->_payload->article_name;
+				$product['article_unit'] = $this->_payload->article_unit;
+				$product['active'] = UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_product_active')) === LANG::GET('purchase.edit_product_isactive') ? 1 : 0;
+
+				// validate distributor
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
+				$statement->execute([
+					':id' => $product['distributor_name']
+				]);
+				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response([], 406);
+				$product['distributor_id'] = $distributor['id'];
+				
+				// save documents
+				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
+				}
+				// save documents
+				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
+					$product['protected'] = 1;
+				}
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-product'));
+				if ($statement->execute([
+					':distributor_id' => $product['distributor_id'],
+					':article_no' => $product['article_no'],
+					':article_name' => $product['article_name'],
+					':article_unit' => $product['article_unit'],
+					':active' => $product['active'],
+					':protected' => $product['protected']
+				])){
+					$this->response(['id' => $distributor['id'], 'name' => UTILITY::scriptFilter($this->_payload->name)]);
+				}
+				break;
+
+			case 'GET':
+				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				$datalist=[];
+				$options=['...'=>[]];
+				$datalist_unit=[];
+				
+				// select single product based on id or name
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				if (!$product = $statement->fetch(PDO::FETCH_ASSOC)) $product = [
+					'id' => null,
+					'distributor_id' => '',
+					'distributor_name' => '',
+					'article_no' => '',
+					'article_name' => '',
+					'article_unit' => '',
+					'active' => 1,
+					'protected' => 0
+				];
+
+				$isactive = $product['active'] ? ['checked' => true] : [];
+				$isinactive = !$product['active'] ? ['checked' => true] : [];
+
+				$certificates = [];
+				$documents = [];
+				if ($product['id']) {
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_products', [':name' => $product['distributor_name']]));
+					foreach($docfiles as $path){
+						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
+					}
+				}
+
+				// prepare existing distributor lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor-datalist'));
+				$statement->execute();
+				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($distributor as $key => $row) {
+					$datalist[] = $row['name'];
+					$options[$row['name']] = [];
+					if ($row['name'] === $product['distributor_name']) $options[$row['name']]['selected'] = true;
+				}
+
+				// prepare existing unit lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product-units'));
+				$statement->execute();
+				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($distributor as $key => $row) {
+					$datalist_unit[] = $row['article_unit'];
+				}
+
+
+				// display form for adding or editing a product
+				$form=['content' => [
+					[
+						['type' => 'datalist',
+						'content' => $datalist,
+						'attributes' => [
+							'id' => 'distributors'
+						]],
+						['type' => 'datalist',
+						'content' => $datalist_unit,
+						'attributes' => [
+							'id' => 'units'
+						]]
+					],
+					[
+						['type' => 'searchinput',
+						'description' => LANG::GET('purchase.edit_product_search'),
+						'attributes' => [
+							'placeholder' => LANG::GET('purchase.edit_product_search_label'),
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'product', this.value, 'search'); return false;}"
+						]],
+					],
+					[
+						['type' => 'hr',
+						'separator' => true]
+					],
+					[
+						['type' => 'textinput',
+						'description' => LANG::GET('purchase.edit_product_distributor'),
+						'attributes' => [
+							'name' => 'distributor_input',
+							'list' => 'distributors',
+							'value' => $product['distributor_name']
+						]],
+						['type' => 'select',
+						'description' => LANG::GET('purchase.edit_product_distributor'),
+						'attributes' => [
+							'name' => 'distributor_select'
+						],
+						'content' => $options]
+					],
+					[
+						["type" => "textinput",
+						"description" => LANG::GET('purchase.edit_product_article_no'),
+						'attributes' => [
+							'name' => 'article_no',
+							'required' => true,
+							'value' => $product['article_no']
+						]]
+					],
+					[
+						["type" => "textinput",
+						"description" => LANG::GET('purchase.edit_product_article_name'),
+						'attributes' => [
+							'name' => 'article_name',
+							'required' => true,
+							'value' => $product['article_name']
+						]]
+					],
+					[
+						["type" => "textinput",
+						"description" => LANG::GET('purchase.edit_product_article_unit'),
+						'attributes' => [
+							'name' => 'article_unit',
+							'list' => 'units',
+							'required' => true,
+							'value' => $product['article_unit']
+						]]
+					],
+					[
+						["type" => "file",
+						"description" => LANG::GET('purchase.edit_product_documents_update'),
+						'attributes' => [
+							'name' => 'documents[]',
+							'multiple' => true
+						]]
+					],
+					[
+						["type" => "radio",
+						"description" => LANG::GET('purchase.edit_product_active'),
+						"content" => [
+							LANG::GET('purchase.edit_product_isactive') => $isactive,
+							LANG::GET('purchase.edit_product_isinactive') => $isinactive
+						]]
+					]
+				],
+				'form' => [
+					'data-usecase' => 'purchase',
+					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')"
+				]];
+
+				if ($documents) array_splice($form['content'][6], 0, 0,
+					[
+						['type' => 'links',
+						'description' => LANG::GET('purchase.edit_product_documents_download'),
+						'content' => $documents
+						]
+					]
+				);
+				if ($product['id'] && !$product['protected']) array_push($form['content'],
+					[
+						['type' => 'button',
+						'description' => LANG::GET('purchase.edit_product_delete'),
+						'onpointerdown' => "api('delete', 'product', " . $product['id'] . ")"
+						]
+					]
+				);
+				if ($this->_subMethod === 'search'){
+					$matches = [];
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product-search'));
+					$statement->execute([
+						':search' => $this->_requestedID
+					]);
+					$search = $statement->fetchAll(PDO::FETCH_ASSOC);
+					foreach($search as $key => $row) {
+						$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
+					}
+					array_splice($form['content'], 2, 0,
+						[[
+							['type' => 'links',
+							'description' => LANG::GET('purchase.edit_product_search_matches'),
+							'content' => $matches
+							]
+						]]
+					);
+				}
+				$this->response($form);
+				break;
+		case 'DELETE':
+			if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				// prefetch to return proper name after deletion
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				$product = $statement->fetch(PDO::FETCH_ASSOC);
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-unprotected-product'));
+				if ($statement->execute([
+					':id' => $product['id']
+				])) $this->response(['id' => false, 'name' => UTILITY::scriptFilter($product['article_name'])]);
+				else $this->response(['id' => $product['id'], 'name' => UTILITY::scriptFilter($product['article_name'])]);
+			break;
+		}
+	}
+
 	public function order(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
