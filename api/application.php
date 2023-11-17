@@ -75,6 +75,7 @@ class APPLICATION extends API {
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')] = [
 				LANG::GET('menu.purchase_order') => "javascript:api.purchase('get', 'order')",
+				LANG::GET('menu.purchase_product') => "javascript:api.purchase('get', 'product')",
 				LANG::GET('menu.purchase_distributor') => "javascript:api.purchase('get', 'distributor')"
 			];
 		}

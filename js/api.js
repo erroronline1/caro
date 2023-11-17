@@ -80,28 +80,32 @@ export const api = {
 				switch (request[1]) {
 					case 'component':
 						successFn = function (data) {
-							if (data) api.toast(LANG.GET('assemble.api_component_saved', {':name': data.name}));
+							if (data) api.toast(LANG.GET('assemble.api_component_saved', {
+								':name': data.name
+							}));
 						}
 						if (!(payload = compose_helper.composeNewComponent())) return;
 						break;
 					case 'form':
-							////////////////////////////////////////////
+						////////////////////////////////////////////
 						// TO DO: implement usecases to select from, e.g. in setup.ini? 
 						////////////////////////////////////////////
 						successFn = function (data) {
-							if (data) api.toast(LANG.GET('assemble.api_form_saved', {':name': data.name}));
+							if (data) api.toast(LANG.GET('assemble.api_form_saved', {
+								':name': data.name
+							}));
 						}
 						if (!(payload = compose_helper.composeNewForm())) return;
-						break;				
+						break;
 				}
-			break;
+				break;
 		}
 		api.send(method, request, successFn, null, payload);
 		document.getElementById('openmenu').checked = false;
 	},
 	user: (method, ...request) => {
 		/*
-		get user/{id} // type num
+		get user/{id|name}
 		post user
 		put user/{id}
 		delete user/{id}
@@ -123,7 +127,9 @@ export const api = {
 						api.toast(LANG.GET('user.api_user_not_saved'));
 						return;
 					}
-					api.toast(LANG.GET('user.api_user_saved', {':name': data.name}));
+					api.toast(LANG.GET('user.api_user_saved', {
+						':name': data.name
+					}));
 					api.user('get', data.id);
 				}
 				break;
@@ -134,32 +140,43 @@ export const api = {
 						api.toast(LANG.GET('user.api_user_not_saved'));
 						return;
 					}
-					api.toast(LANG.GET('user.api_user_saved', {':name': data.name}));
+					api.toast(LANG.GET('user.api_user_saved', {
+						':name': data.name
+					}));
 					api.user('get', data.id);
 				}
 				break;
 			case 'delete':
 				successFn = function (data) {
 					if (data.id) {
-						api.toast(LANG.GET('user.api_user_not_deleted', {':name': data.name}));
+						api.toast(LANG.GET('user.api_user_not_deleted', {
+							':name': data.name
+						}));
 						return;
 					}
-					api.toast(LANG.GET('user.api_user_deleted', {':name': data.name}));
+					api.toast(LANG.GET('user.api_user_deleted', {
+						':name': data.name
+					}));
 					api.user('get', data.id);
 				}
 				break;
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, (method === 'post' || method ==='put'));
+		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
 		document.getElementById('openmenu').checked = false;
 	},
 	purchase: (method, ...request) => {
 		/*
-		get purchase/distributor/{id}
+		get purchase/distributor/{id|name}
 		post purchase/distributor
 		put purchase/distributor/{id}
-		delete purchase/distributor/{id}
+
+		get purchase/product/{id}
+		get purchase/product/{id|name}/search
+		post purchase/product
+		put purchase/product/{id}
+		delete purchase/product/{id}
 
 		get purchase/order/{id}
 		post purchase/order
@@ -171,41 +188,92 @@ export const api = {
 		let successFn, payload;
 		switch (method) {
 			case 'get':
-				successFn = function (data) {
-					document.getElementById('main').innerHTML = '';
-					new Assemble(data).initializeSection();
-				};
+				switch (request[1]) {
+					default:
+						successFn = function (data) {
+							document.getElementById('main').innerHTML = '';
+							new Assemble(data).initializeSection();
+						};
+				}
 				break;
 			case 'post':
 				payload = _.getInputs('[data-usecase=purchase]', true);
-				successFn = function (data) {
-					if (!data) {
-						api.toast(LANG.GET('purchase.api_distributor_not_saved', {':name': data.name}));
-						return;
+				switch (request[1]) {
+					case 'distributor':
+						successFn = function (data) {
+							if (!data) {
+								api.toast(LANG.GET('purchase.api_distributor_not_saved', {
+									':name': data.name
+								}));
+								return;
+							}
+							api.toast(LANG.GET('purchase.api_distributor_saved', {
+								':name': data.name
+							}));
+							api.purchase('get', request[1], data.id);
+						}
+						break;
+						case 'product':
+							successFn = function (data) {
+								if (!data) {
+									api.toast(LANG.GET('purchase.api_product_not_saved', {
+										':name': data.name
+									}));
+									return;
+								}
+								api.toast(LANG.GET('purchase.api_product_saved', {
+									':name': data.name
+								}));
+								api.purchase('get', request[1], data.id);
+							}
+							break;
 					}
-					api.toast(LANG.GET('purchase.api_distributor_saved', {':name': data.name}));
-					api.purchase('get', request[1], data.id);
-				}
 				break;
 			case 'put':
-				payload = _.getInputs('[data-usecase=purchase]', true);
-				successFn = function (data) {
-					if (!data) {
-						api.toast(LANG.GET('purchase.api_distributor_not_saved'));
-						return;
+				switch (request[1]) {
+					case 'distributor':
+						payload = _.getInputs('[data-usecase=purchase]', true);
+						successFn = function (data) {
+							if (!data) {
+								api.toast(LANG.GET('purchase.api_distributor_not_saved'));
+								return;
+							}
+							api.toast(LANG.GET('purchase.api_distributor_saved', {
+								':name': data.name
+							}));
+							api.purchase('get', request[1], data.id);
+						}
+						break;
+						case 'product':
+							payload = _.getInputs('[data-usecase=purchase]', true);
+							successFn = function (data) {
+								if (!data) {
+									api.toast(LANG.GET('purchase.api_product_not_saved'));
+									return;
+								}
+								api.toast(LANG.GET('purchase.api_product_saved', {
+									':name': data.name
+								}));
+								api.purchase('get', request[1], data.id);
+							}
+							break;
 					}
-					api.toast(LANG.GET('purchase.api_distributor_saved', {':name': data.name}));
-					api.purchase('get', request[1], data.id);
-				}
 				break;
 			case 'delete':
-				successFn = function (data) {
-					if (data.id) {
-						api.toast(LANG.GET('purchase.api_distributor_not_deleted', {':name': data.name}));
-						return;
-					}
-					api.toast(LANG.GET('purchase.api_distributor_deleted', {':name': data.name}));
-					api.purchase('get', request[1], data.id);
+				switch (request[1]) {
+					case 'product':
+						successFn = function (data) {
+							if (data.id) {
+								api.toast(LANG.GET('purchase.api_product_not_deleted', {
+									':name': data.name
+								}));
+								return;
+							}
+							api.toast(LANG.GET('purchase.api_product_deleted', {
+								':name': data.name
+							}));
+							api.purchase('get', request[1], data.id);
+						}
 				}
 				break;
 			default:
