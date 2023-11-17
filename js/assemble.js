@@ -368,7 +368,11 @@ export class Assemble {
 		input.id = getNextElementID();
 		input.name = this.tile.description;
 		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
-		input.onchange = function () {
+		if ('multiple' in this.tile.attributes) input.onchange = function () {
+			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
+				', ') + ' ' + LANG.GET('assemble.files_rechoose') : LANG.GET('assemble.files_choose');
+		}
+		else input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' ' + LANG.GET('assemble.file_rechoose') : LANG.GET('assemble.file_choose');
 		}
@@ -376,7 +380,7 @@ export class Assemble {
 		label.type = 'button';
 		label.setAttribute('data-type', 'file');
 		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode(LANG.GET('assemble.file_choose')));
+		label.appendChild(document.createTextNode(('multiple' in this.tile.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
