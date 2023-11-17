@@ -197,6 +197,7 @@ export const compose_helper = {
 
 				insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
 				insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+				insertionarea.classList.add('insertionarea');
 				container.insertBefore(insertionarea, container.firstChild);
 				previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
 				draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
@@ -216,6 +217,7 @@ export const compose_helper = {
 		const insertionarea = document.createElement('hr');
 		insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
 		insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+		insertionarea.classList.add('insertionarea');
 		element.insertBefore(insertionarea, element.firstChild);
 	},
 	composer_add_trash: function (section) {

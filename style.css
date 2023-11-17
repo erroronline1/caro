@@ -100,8 +100,8 @@ main>form>article,
 	border-radius: 2em;
 	background-color: var(--protrusion);
 	box-shadow:
-		-2px -2px 6px var(--lightshadow),
-		3px 3px 6px var(--darkshadow);
+		-1px -1px 4px var(--lightshadow),
+		2px 2px 4px var(--darkshadow);
 	transition: ease .2s;
 }
 
@@ -318,6 +318,13 @@ nav>h3:first-child {
 
 hr {
 	margin: 1em auto;
+	height: 1px;
+	width: 100%;
+	border-color: var(--darkshadow);
+}
+
+hr.insertionarea {
+	margin: 1em auto;
 	height: 1em;
 	width: 100%;
 	border-color: var(--foreground);
@@ -393,7 +400,7 @@ button {
 	display: block;
 	border: 1px solid var(--darkshadow);
 	border-radius: 2em;
-	background-color: var(--protrusion);
+	background-color: transparent;
 	transition: ease .15s;
 }
 
