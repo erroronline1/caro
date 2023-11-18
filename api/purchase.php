@@ -39,27 +39,50 @@ class PURCHASE extends API {
 	}
 
 	private function update_pricelist($file, $filter, $distributorID){
-  		$filter='{    "filesetting": {     "headerrowindex": 0,     "dialect": {      "separator": ";",      "enclosure": "\"",      "escape": ""     },     "columns": [      "ArtNr",      "Bezeichnung",      "ME"     ]    },    "modify": {     "rewrite": [{      "article_no": ["ArtNr"],      "article_name": ["Bezeichnung"],      "article_unit": ["ME"]     }]    }   }';
+  		//$filter='{    "filesetting": {     "headerrowindex": 0,     "dialect": {      "separator": ";",      "enclosure": "\"",      "escape": ""     },     "columns": [      "ArtNr",      "Bezeichnung",      "ME"     ]    },    "modify": {     "rewrite": [{      "article_no": ["ArtNr"],      "article_name": ["Bezeichnung"],      "article_unit": ["ME"]     }]    }   }';
 
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
 		$pricelist = new Listprocessor($filter);
 		if (count($pricelist->_list)){
+			// purge all unprotected products for a fresh data set
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-all-unprotected-products'));
 			$statement->execute([
 				':id' => $distributorID
 			]);
-			$insert = '';
+			// retrieve left items
+			$remainder=[];
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product-search'));
+			$statement->execute([
+				':search' => $distributorID
+			]);
+			$remained = $statement->fetchAll(PDO::FETCH_ASSOC);
+			foreach($remained as $key => $row) {
+				$remainder[$row['id']]=$row['article_no'];
+			}
+
+			$query = '';
 			foreach($pricelist->_list as $i => $row){
-				$insert .= strtr(SQLQUERY::PREPARE('purchase_post-purchase-product'),
+				$update = array_search($row['article_no'], $remainder);
+
+				if ($update) $query .= strtr(SQLQUERY::PREPARE('purchase_put-product-protected'),
+				[
+					':id' => $update,
+					':article_name' => "'" . $row['article_name'] . "'",
+					':article_unit' => "'" . $row['article_unit'] . "'",
+				]) . '; ';
+
+				else $query .= strtr(SQLQUERY::PREPARE('purchase_post-product'),
 					[
 						':distributor_id' => $distributorID,
 						':article_no' => "'" . $row['article_no'] . "'",
 						':article_name' => "'" . $row['article_name'] . "'",
-						':article_unit' => "'" . $row['article_unit'] . "'"
+						':article_unit' => "'" . $row['article_unit'] . "'",
+						':active' => 1,
+						':protected' => 0
 					]) . '; ';
 			}
-			$statement = $this->_pdo->prepare($insert);
+			$statement = $this->_pdo->prepare($query);
 			if ($statement->execute()) return date("d.m.Y");
 		}
 		return '';
@@ -74,29 +97,35 @@ class PURCHASE extends API {
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				
+				/**
+				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
+				 * thus directories can not be renamed on name changes of distributors
+				 */
+
 				$distributor = [
 					'name' => $this->_payload->name,
 					'active' => UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_distributor_active')) === LANG::GET('purchase.edit_distributor_isactive') ? 1 : 0,
 					'info' => $this->_payload->info,
 					'certificate' => ['validity' => $this->_payload->certificate_validity],
-					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter]
+					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter],
+					'immutable_fileserver'=> $this->_payload->name . date('Ymd')
 				];
 				
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+					if (preg_match("/" . $pattern . "/m", $distributor['name'], $matches)) $this->response([], 406);
 				}
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
+					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $distributor['pricelist']['filter'], $distributor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-distributor'));
@@ -105,7 +134,8 @@ class PURCHASE extends API {
 					':active' => $distributor['active'],
 					':info' => $distributor['info'],
 					':certificate' => json_encode($distributor['certificate']),
-					':pricelist' => json_encode($distributor['pricelist'])
+					':pricelist' => json_encode($distributor['pricelist']),
+					':immutable_fileserver' => $distributor['immutable_fileserver']
 				])){
 					$this->response(['id' => $this->_pdo->lastInsertId(), 'name' => UTILITY::scriptFilter($this->_payload->name)]);
 				}
@@ -130,20 +160,20 @@ class PURCHASE extends API {
 				$distributor['pricelist']['filter'] = $this->_payload->pricelist_filter;
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+					if (preg_match("/" . $pattern . "/m", $distributor['name'], $matches)) $this->response([], 406);
 				}
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'], $distributor['pricelist_filter'], $distributor['id']);
+					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $distributor['pricelist']['filter'], $distributor['id']);
 				}
 				// tidy up purchase products database if inactive
 				if (!$distributor['active']){
@@ -202,11 +232,11 @@ class PURCHASE extends API {
 				$certificates = [];
 				$documents = [];
 				if ($distributor['id']) {
-					$certfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['name']]));
+					$certfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['immutable_fileserver']]));
 					foreach($certfiles as $path){
 						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]));
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]));
 					foreach($docfiles as $path){
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
@@ -361,7 +391,7 @@ class PURCHASE extends API {
 
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
 					$product['protected'] = 1;
 				}
 
@@ -403,12 +433,8 @@ class PURCHASE extends API {
 				$product['distributor_id'] = $distributor['id'];
 				
 				// save documents
-				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd')]);
-				}
-				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['name']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
 					$product['protected'] = 1;
 				}
 
@@ -453,7 +479,7 @@ class PURCHASE extends API {
 				$certificates = [];
 				$documents = [];
 				if ($product['id']) {
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_products', [':name' => $product['distributor_name']]));
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_products', [':name' => $distributor['immutable_fileserver']]));
 					foreach($docfiles as $path){
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
@@ -501,8 +527,7 @@ class PURCHASE extends API {
 						]],
 					],
 					[
-						['type' => 'hr',
-						'separator' => true]
+						['type' => 'hr']
 					],
 					[
 						['type' => 'textinput',
@@ -598,7 +623,7 @@ class PURCHASE extends API {
 					array_splice($form['content'], 2, 0,
 						[[
 							['type' => 'links',
-							'description' => LANG::GET('purchase.edit_product_search_matches'),
+							'description' => LANG::GET('purchase.edit_product_search_matches', [':number' => count($matches)]),
 							'content' => $matches
 							]
 						]]

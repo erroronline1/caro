@@ -61,7 +61,7 @@ class SQLQUERY {
 		],
 
 		'purchase_post-distributor' => [
-			'mysql' => "INSERT INTO webqs_purchase_distributors (id, active, name, info, certificate, pricelist) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist)",
+			'mysql' => "INSERT INTO webqs_purchase_distributors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
 			'sqlsrv' => ""
 		],
 		'purchase_put-distributor' => [
@@ -82,6 +82,10 @@ class SQLQUERY {
 		],
 		'purchase_put-product' => [
 			'mysql' => "UPDATE webqs_purchase_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = : article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
+			'sqlsrv' => ""
+		],
+		'purchase_put-product-protected' => [
+			'mysql' => "UPDATE webqs_purchase_products SET article_name = :article_name, article_unit = :article_unit WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-product' => [
