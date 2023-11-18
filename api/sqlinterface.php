@@ -81,7 +81,7 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 		'purchase_put-product' => [
-			'mysql' => "UPDATE caro_purchase_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = : article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_purchase_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_put-product-protected' => [
@@ -89,7 +89,7 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 		'purchase_get-product' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_purchase_products AS prod, caro_purchase_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
+			'mysql' => "SELECT prod.*, dist.name as distributor_name, dist.immutable_fileserver as distributor_immutable_fileserver FROM caro_purchase_products AS prod, caro_purchase_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-product-units' => [

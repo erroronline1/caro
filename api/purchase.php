@@ -391,7 +391,7 @@ class PURCHASE extends API {
 
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_products', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -434,12 +434,13 @@ class PURCHASE extends API {
 				
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no'] . '_']);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_products', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-product'));
 				if ($statement->execute([
+					':id' => $this->_requestedID,
 					':distributor_id' => $product['distributor_id'],
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
@@ -447,7 +448,7 @@ class PURCHASE extends API {
 					':active' => $product['active'],
 					':protected' => $product['protected']
 				])){
-					$this->response(['id' => $distributor['id'], 'name' => UTILITY::scriptFilter($this->_payload->name)]);
+					$this->response(['id' => $distributor['id'], 'name' => UTILITY::scriptFilter($this->_payload->article_name)]);
 				}
 				break;
 
@@ -466,6 +467,7 @@ class PURCHASE extends API {
 					'id' => null,
 					'distributor_id' => '',
 					'distributor_name' => '',
+					'distributor_immutable_fileserver' => '',
 					'article_no' => '',
 					'article_name' => '',
 					'article_unit' => '',
@@ -479,9 +481,13 @@ class PURCHASE extends API {
 				$certificates = [];
 				$documents = [];
 				if ($product['id']) {
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_products', [':name' => $distributor['immutable_fileserver']]));
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_products', [':name' => $product['distributor_immutable_fileserver']]));
 					foreach($docfiles as $path){
-						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
+						$file = pathinfo($path);
+						$article_no = explode('_', $file['filename'])[2];
+						similar_text($article_no, $product['article_no'], $percent);
+						if ($percent >= INI['likeliness']['purchase_article_no']) 
+							$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
 
