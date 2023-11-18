@@ -96,26 +96,11 @@ class UTILITY {
 									'type' => $value
 								];
 								
-								if(!isset($_FILES[$fieldname])){
-									$_FILES[$fieldname] = $_files;
-								}
-								elseif(isset($_FILES[$fieldname]) && gettype($_FILES[$fieldname]['name']) !== 'array'){
-									$transform = $_FILES[$fieldname];
-									$_FILES[$fieldname]= [
-										'error' => [$transform['error'], $_files['error']],
-										'name' => [$transform['name'], $_files['name']],
-										'tmp_name' => [$transform['tmp_name'], $_files['tmp_name']],
-										'size' => [$transform['size'], $_files['size']],
-										'type' => [$transform['type'], $_files['type']],
-									];
-								}
-								else {
-										$_FILES[$fieldname]['error'][] = $_files['error'];
-										$_FILES[$fieldname]['name'][] = $_files['name'];
-										$_FILES[$fieldname]['tmp_name'][] = $_files['tmp_name'];
-										$_FILES[$fieldname]['size'][] = $_files['size'];
-										$_FILES[$fieldname]['type'][] = $_files['type'];
-								}
+								$_FILES[$fieldname]['error'][] = $_files['error'];
+								$_FILES[$fieldname]['name'][] = $_files['name'];
+								$_FILES[$fieldname]['tmp_name'][] = $_files['tmp_name'];
+								$_FILES[$fieldname]['size'][] = $_files['size'];
+								$_FILES[$fieldname]['type'][] = $_files['type'];
 
 								//place in temporary directory
 								file_put_contents($tmp_name, $body);
@@ -263,7 +248,7 @@ class UTILITY {
 			$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
 			$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $name;
 			// move_uploaded_file is for post only, else rename for put files
-			if (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target)){
+			if ($tmpname && (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
 				return $target;
 			}
 		}
