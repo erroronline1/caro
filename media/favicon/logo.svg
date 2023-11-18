@@ -7,13 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="75.430954mm"
-   height="75.430954mm"
-   viewBox="0 0 75.430954 75.430954"
+   width="146.72435mm"
+   height="77.022324mm"
+   viewBox="0 0 146.72435 77.022324"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="favicon.svg">
+   sodipodi:docname="logo.svg">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -24,8 +24,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.8313066"
-     inkscape:cx="241.79945"
-     inkscape:cy="83.902909"
+     inkscape:cx="316.38084"
+     inkscape:cy="89.917536"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -51,11 +51,29 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-43.285271,-42.330452)">
+     transform="translate(-23.55228,-40.739082)">
+    <rect
+       style="fill:#e5e9f0;fill-opacity:1;fill-rule:evenodd;stroke-width:7.99999;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1.70078;paint-order:fill markers stroke;stop-color:#000000"
+       id="rect881"
+       width="146.72435"
+       height="77.022324"
+       x="23.55228"
+       y="40.739082" />
     <path
        id="rect837"
        style="fill:#bf616a;fill-opacity:1;fill-rule:evenodd;stroke-width:30.2362;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1.70078;paint-order:fill markers stroke;stop-color:#000000"
        d="m 305.24219,184.68359 -87.12305,119.95703 h 30.78906 l 56.33399,-77.56445 56.33398,77.56445 h 30.78906 z m -69.57227,144.1211 69.57227,95.79297 69.57226,-95.79297 h -30.78906 l -38.7832,53.40039 -38.78321,-53.40039 z"
        transform="scale(0.26458333)" />
+    <text
+       xml:space="preserve"
+       style="font-weight:600;font-size:44.1344px;line-height:1.25;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI Semi-Bold';fill:#4c566a;fill-opacity:1;stroke-width:0.264583"
+       x="27.507654"
+       y="80.450882"
+       id="text879"><tspan
+         sodipodi:role="line"
+         id="tspan877"
+         x="27.507654"
+         y="80.450882"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI Bold';fill:#4c566a;fill-opacity:1;stroke-width:0.264583">C    RO</tspan></text>
   </g>
 </svg>

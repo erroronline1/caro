@@ -73,7 +73,6 @@ video {
 	font-size: 1em;
 }
 
-
 video {
 	height: 0;
 	transition: ease .3s;
@@ -108,6 +107,11 @@ main>form>article,
 article[data-type],
 [data-type=addButton] {
 	padding: 1em 2em 1em 3.5em;
+}
+
+[data-type=links] {
+	max-height: 15em;
+	overflow: auto;
 }
 
 article>header {
@@ -312,6 +316,21 @@ nav>h3:first-child {
 
 /*************************** decorators ******************************/
 
+body::before {
+	background: url('media/favicon/logo.svg'); /*1086x570*/
+	background-size: 100%;
+	background-repeat: no-repeat;
+	transform: rotate(-90deg) translate(-25vh, -21vh);
+	content: "";
+	position: absolute;
+	z-index: -1;
+	height: calc(90vh * 570 / 1086);
+	width:90vh;
+	left: 0;
+	top: 0;
+	opacity: 0.1;
+}
+
 .alert {
 	border: 1px solid var(--red);
 }
@@ -435,7 +454,6 @@ button:active {
 
 [data-type=links]>ul {
 	list-style-type: none;
-	max-height: 15em;
 
 	li {
 		padding: .75em 0;
