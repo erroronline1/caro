@@ -10,28 +10,28 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT TOP 3 WITH TIES * FROM person ORDER BY age ASC"
 		],*/
 		'application_login' => [
-			'mysql' => "SELECT * FROM webqs_user WHERE token = :token LIMIT 1",
+			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
 			'sqlsrv' => ""
 		],
 
 		'form_component-post' => [
-			'mysql' => "INSERT INTO webqs_form_components (id, name, date, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content)",
+			'mysql' => "INSERT INTO caro_form_components (id, name, date, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content)",
 			'sqlsrv' => ""
 		],
 		'form_component-datalist' => [
-			'mysql' => "SELECT name FROM webqs_form_components GROUP BY name ORDER BY name ASC",
+			'mysql' => "SELECT name FROM caro_form_components GROUP BY name ORDER BY name ASC",
 			'sqlsrv' => ""
 		],
 		'form_component-get' => [
-			'mysql' => "SELECT name, content FROM webqs_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'mysql' => "SELECT name, content FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'form_datalist' => [
-			'mysql' => "SELECT name FROM webqs_form_forms GROUP BY name ORDER BY name ASC",
+			'mysql' => "SELECT name FROM caro_form_forms GROUP BY name ORDER BY name ASC",
 			'sqlsrv' => ""
 		],
 		'form_get' => [
-			'mysql' => "SELECT name, content FROM webqs_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'mysql' => "SELECT name, content FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'form_post' => [
@@ -40,72 +40,72 @@ class SQLQUERY {
 		],
 
 		'user_post' => [
-			'mysql' => "INSERT INTO webqs_user (id, name, permissions, token, image) VALUES ( NULL, :name, :permissions, :token, :image)",
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, token, image) VALUES ( NULL, :name, :permissions, :token, :image)",
 			'sqlsrv' => ""
 		],
 		'user_put' => [
-			'mysql' => "UPDATE webqs_user SET name = :name, permissions = :permissions, token = :token, image = :image WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, token = :token, image = :image WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'user_get-datalist' => [
-			'mysql' => "SELECT name FROM webqs_user ORDER BY name ASC",
+			'mysql' => "SELECT name FROM caro_user ORDER BY name ASC",
 			'sqlsrv' => ""
 		],
 		'user_get' => [
-			'mysql' => "SELECT * FROM webqs_user WHERE id = :id OR name = :id LIMIT 1",
+			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'user_delete' => [
-			'mysql' => "DELETE FROM webqs_user WHERE id = :id LIMIT 1",
+			'mysql' => "DELETE FROM caro_user WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 
 		'purchase_post-distributor' => [
-			'mysql' => "INSERT INTO webqs_purchase_distributors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
+			'mysql' => "INSERT INTO caro_purchase_distributors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
 			'sqlsrv' => ""
 		],
 		'purchase_put-distributor' => [
-			'mysql' => "UPDATE webqs_purchase_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_purchase_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-distributor-datalist' => [
-			'mysql' => "SELECT name FROM webqs_purchase_distributors ORDER BY name ASC",
+			'mysql' => "SELECT name FROM caro_purchase_distributors ORDER BY name ASC",
 			'sqlsrv' => ""
 		],
 		'purchase_get-distributor' => [
-			'mysql' => "SELECT * FROM webqs_purchase_distributors WHERE id = :id OR name = :id LIMIT 1",
+			'mysql' => "SELECT * FROM caro_purchase_distributors WHERE id = :id OR name = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_post-product' => [
-			'mysql' => "INSERT INTO webqs_purchase_products (id, distributor_id, article_no, article_name, article_unit, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :active, :protected)",
+			'mysql' => "INSERT INTO caro_purchase_products (id, distributor_id, article_no, article_name, article_unit, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :active, :protected)",
 			'sqlsrv' => ""
 		],
 		'purchase_put-product' => [
-			'mysql' => "UPDATE webqs_purchase_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = : article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_purchase_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = : article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_put-product-protected' => [
-			'mysql' => "UPDATE webqs_purchase_products SET article_name = :article_name, article_unit = :article_unit WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_purchase_products SET article_name = :article_name, article_unit = :article_unit WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-product' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM webqs_purchase_products AS prod, webqs_purchase_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
+			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_purchase_products AS prod, caro_purchase_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'purchase_get-product-units' => [
-			'mysql' => "SELECT article_unit FROM webqs_purchase_products GROUP BY article_unit ORDER BY article_unit ASC",
+			'mysql' => "SELECT article_unit FROM caro_purchase_products GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => ""
 		],
 		'purchase_get-product-search' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM webqs_purchase_products AS prod, webqs_purchase_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
+			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_purchase_products AS prod, caro_purchase_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
 			'sqlsrv' => ""
 		],
 		'purchase_delete-all-unprotected-products' => [
-			'mysql' => "DELETE FROM webqs_purchase_products WHERE distributor_id = :id AND protected = 0",
+			'mysql' => "DELETE FROM caro_purchase_products WHERE distributor_id = :id AND protected = 0",
 			'sqlsrv' => ""
 		],
 		'purchase_delete-unprotected-product' => [
-			'mysql' => "DELETE FROM webqs_purchase_products WHERE id = :id AND protected = 0",
+			'mysql' => "DELETE FROM caro_purchase_products WHERE id = :id AND protected = 0",
 			'sqlsrv' => ""
 		],
 
