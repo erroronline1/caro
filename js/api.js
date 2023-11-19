@@ -26,7 +26,9 @@ export const api = {
 			window.setTimeout(api.toast, 3000);
 		} else toast.close();
 	},
-
+	update_header(string=''){
+		document.querySelector('head>h1').innerHTML = string;
+	},
 	form: (method, ...request) => {
 		/*
 		get form elements from database.
@@ -50,28 +52,40 @@ export const api = {
 				switch (request[1]) {
 					case 'component':
 						successFn = function (data) {
-							data.content.name = data.name;
-							if (data.content) compose_helper.importForm(data.content);
+							if (data.body) {
+								data.body.content.name = data.name;
+								if (data.body.content) compose_helper.importForm(data.body.content);
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
 					case 'component_editor':
 						successFn = function (data) {
-							document.getElementById('main').innerHTML = '';
-							new Compose(data);
-							if (data.component) compose_helper.importComponent(data.component);
+							if (data.body) {
+								document.getElementById('main').innerHTML = '';
+								new Compose(data.body);
+								if (data.body.component) compose_helper.importComponent(data.body.component);
+								}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
 					case 'form':
 						successFn = function (data) {
-							document.getElementById('main').innerHTML = '';
-							new Assemble(data).initializeSection();
+							if (data.body) {
+								document.getElementById('main').innerHTML = '';
+								new Assemble(data.body).initializeSection();
+								}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
 					case 'form_editor':
 						successFn = function (data) {
-							document.getElementById('main').innerHTML = '';
-							new Compose(data);
-							if (data.component) compose_helper.importForm(data.component);
+							if (data.body) {
+								document.getElementById('main').innerHTML = '';
+								new Compose(data.body);
+								if (data.body.component) compose_helper.importForm(data.body.component);
+								}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
 				}
@@ -80,9 +94,8 @@ export const api = {
 				switch (request[1]) {
 					case 'component':
 						successFn = function (data) {
-							if (data) api.toast(LANG.GET('assemble.api_component_saved', {
-								':name': data.name
-							}));
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if ('status' in data && 'name' in data.status && data.status.name) api.form('get','component', data.status.name);
 						}
 						if (!(payload = compose_helper.composeNewComponent())) return;
 						break;
@@ -91,9 +104,7 @@ export const api = {
 						// TO DO: implement usecases to select from, e.g. in setup.ini? 
 						////////////////////////////////////////////
 						successFn = function (data) {
-							if (data) api.toast(LANG.GET('assemble.api_form_saved', {
-								':name': data.name
-							}));
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
@@ -112,53 +123,28 @@ export const api = {
 		*/
 		request = [...request];
 		request.splice(0, 0, 'user');
-		let successFn, payload;
+		let payload,
+			successFn = function (data) {
+						api.toast(data.status.msg);
+						api.user('get', data.status.id);
+					};
 		switch (method) {
 			case 'get':
 				successFn = function (data) {
-					document.getElementById('main').innerHTML = '';
-					new Assemble(data).initializeSection();
+					if (data.body) {
+						document.getElementById('main').innerHTML = '';
+						new Assemble(data.body).initializeSection();
+					}
+					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 				};
 				break;
 			case 'post':
 				payload = _.getInputs('[data-usecase=user]', true);
-				successFn = function (data) {
-					if (!data) {
-						api.toast(LANG.GET('user.api_user_not_saved'));
-						return;
-					}
-					api.toast(LANG.GET('user.api_user_saved', {
-						':name': data.name
-					}));
-					api.user('get', data.id);
-				}
 				break;
 			case 'put':
 				payload = _.getInputs('[data-usecase=user]', true);
-				successFn = function (data) {
-					if (!data) {
-						api.toast(LANG.GET('user.api_user_not_saved'));
-						return;
-					}
-					api.toast(LANG.GET('user.api_user_saved', {
-						':name': data.name
-					}));
-					api.user('get', data.id);
-				}
 				break;
 			case 'delete':
-				successFn = function (data) {
-					if (data.id) {
-						api.toast(LANG.GET('user.api_user_not_deleted', {
-							':name': data.name
-						}));
-						return;
-					}
-					api.toast(LANG.GET('user.api_user_deleted', {
-						':name': data.name
-					}));
-					api.user('get', data.id);
-				}
 				break;
 			default:
 				return;
@@ -185,96 +171,31 @@ export const api = {
 		*/
 		request = [...request];
 		request.splice(0, 0, 'purchase');
-		let successFn, payload;
+		let payload,
+			successFn = function (data) {
+						api.toast(data.status.msg);
+						api.purchase('get', request[1], data.status.id);
+					};
 		switch (method) {
 			case 'get':
 				switch (request[1]) {
 					default:
 						successFn = function (data) {
-							document.getElementById('main').innerHTML = '';
-							new Assemble(data).initializeSection();
+							if (data.body) {
+								document.getElementById('main').innerHTML = '';
+								new Assemble(data.body).initializeSection();
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
 				}
 				break;
 			case 'post':
 				payload = _.getInputs('[data-usecase=purchase]', true);
-				switch (request[1]) {
-					case 'distributor':
-						successFn = function (data) {
-							if (!data) {
-								api.toast(LANG.GET('purchase.api_distributor_not_saved', {
-									':name': data.name
-								}));
-								return;
-							}
-							api.toast(LANG.GET('purchase.api_distributor_saved', {
-								':name': data.name
-							}));
-							api.purchase('get', request[1], data.id);
-						}
-						break;
-						case 'product':
-							successFn = function (data) {
-								if (!data) {
-									api.toast(LANG.GET('purchase.api_product_not_saved', {
-										':name': data.name
-									}));
-									return;
-								}
-								api.toast(LANG.GET('purchase.api_product_saved', {
-									':name': data.name
-								}));
-								api.purchase('get', request[1], data.id);
-							}
-							break;
-					}
 				break;
 			case 'put':
-				switch (request[1]) {
-					case 'distributor':
-						payload = _.getInputs('[data-usecase=purchase]', true);
-						successFn = function (data) {
-							if (!data) {
-								api.toast(LANG.GET('purchase.api_distributor_not_saved'));
-								return;
-							}
-							api.toast(LANG.GET('purchase.api_distributor_saved', {
-								':name': data.name
-							}));
-							api.purchase('get', request[1], data.id);
-						}
-						break;
-						case 'product':
-							payload = _.getInputs('[data-usecase=purchase]', true);
-							successFn = function (data) {
-								if (!data) {
-									api.toast(LANG.GET('purchase.api_product_not_saved'));
-									return;
-								}
-								api.toast(LANG.GET('purchase.api_product_saved', {
-									':name': data.name
-								}));
-								api.purchase('get', request[1], data.id);
-							}
-							break;
-					}
+				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'delete':
-				switch (request[1]) {
-					case 'product':
-						successFn = function (data) {
-							if (data.id) {
-								api.toast(LANG.GET('purchase.api_product_not_deleted', {
-									':name': data.name
-								}));
-								return;
-							}
-							api.toast(LANG.GET('purchase.api_product_deleted', {
-								':name': data.name
-							}));
-							api.purchase('get', request[1], data.id);
-						}
-				}
 				break;
 			default:
 				return;
@@ -294,7 +215,7 @@ export const api = {
 		switch (request[1]) {
 			case 'language':
 				successFn = async function (data) {
-					window.LANGUAGEFILE = data;
+					window.LANGUAGEFILE = data.body;
 				}
 				break;
 			case 'login':
@@ -305,18 +226,18 @@ export const api = {
 				successFn = function (data) {
 					document.getElementById('main').innerHTML = '';
 					api.application('get', 'menu');
-					if (data.form) {
+					if (data.body.form) {
 						document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
-						new Assemble(data).initializeSection();
+						new Assemble(data.body).initializeSection();
 						return;
 					}
-					document.querySelector('body>label').style.backgroundImage = "url('" + data.image + "')";
+					document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
 					document.getElementById('openmenu').checked = false;
 				}
 				break;
 			case 'menu':
 				successFn = function (data) {
-					assemble_helper.userMenu(data);
+					assemble_helper.userMenu(data.body);
 				}
 				break;
 			default:

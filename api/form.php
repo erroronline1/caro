@@ -24,9 +24,16 @@ class FORMS extends API {
 				if ($statement->execute([
 					':name' => $this->_payload->name,
 					':content' => json_encode($content)
-					])){
-						$this->response(['name' => UTILITY::scriptFilter($this->_payload->name)]);
-				}
+					])) $this->response([
+						'status' => [
+							'name' => $this->_payload->name,
+							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $this->_payload->name])
+						]]);
+					else $this->response([
+						'status' => [
+							'name' => false,
+							'name' => LANG::GET('assemble.edit_component_not_saved')
+						]]);
 				break;
 			case 'GET':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
@@ -35,34 +42,34 @@ class FORMS extends API {
 				]);
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
 				$component['content'] = json_decode($component['content']);
-				$this->response($component);
+				$this->response(['body' => $component]);
 				break;
 		}
 	}
 
 	public function component_editor(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-		$requestedComponent = $this->_requestedName;
-		$datalist=[];
-		$options=['...'=>[]];
+		$datalist = [];
+		$options = ['...' => []];
+		$return = [];
 		
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($components as $key => $row) {
-			$datalist[]=$row['name'];
-			$options[$row['name']]=[];
+			$datalist[] = $row['name'];
+			$options[$row['name']] = [];
 		}
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
 		$statement->execute([
-			':name' => $requestedComponent
+			':name' => $this->_requestedName
 		]);
-		if (!$component = $statement->fetch(PDO::FETCH_ASSOC))
-		$component=['name' =>''];
+		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['name' =>''];
+		if($this->_requestedName && $this->_requestedName !== 'false' && !$component['name']) $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedName])];
 
-		$creator = [
+		$return['body'] = [
 			'content' => [
 				[
 					['type' => 'datalist',
@@ -152,44 +159,45 @@ class FORMS extends API {
 				]]
 				]];
 
-		if (array_key_exists('content', $component)) $creator['component'] = json_decode($component['content']);
+		if (array_key_exists('content', $component)) $return['body']['component'] = json_decode($component['content']);
 
-		$this->response($creator);
+		$this->response($return);
 	}
 
 	public function form_editor(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-		$requestedForm = $this->_requestedName;
 		// form to add and edit form components. 
 		$formdatalist = $componentdatalist = [];
-		$formoptions = ['...'=>[]];
-		$componentoptions = ['...'=>[]];
+		$formoptions = ['...' => []];
+		$componentoptions = ['...' => []];
+		$return = [];
 		
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_datalist'));
 		$statement->execute();
 		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($result as $key => $row) {
-			$formdatalist[]=$row['name'];
-			$formoptions[$row['name']]=[];
+			$formdatalist[] = $row['name'];
+			$formoptions[$row['name']] = [];
 		}
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($result as $key => $row) {
-			$componentdatalist[]=$row['name'];
-			$componentoptions[$row['name']]=[];
+			$componentdatalist[] =$row['name'];
+			$componentoptions[$row['name']] = [];
 		}
 			
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 		$statement->execute([
-			':name' => $requestedForm
+			':name' => $this->_requestedName
 		]);
 		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => ''];
+		if($this->_requestedName && $this->_requestedName !== 'false' && !$result['name']) $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedName])];
 
-		$creator = [
+		$return['body'] = [
 			'content' => [
 				[
 					['type' => 'datalist',
@@ -250,8 +258,8 @@ class FORMS extends API {
 					]]
 				]];
 
-		if (array_key_exists('content', $result)) $creator['component'] = json_decode($result['content']);
-		$this->response($creator);
+		if (array_key_exists('content', $result)) $return['body']['component'] = json_decode($result['content']);
+		$this->response($return);
 	}
 	public function form(){
 		switch ($_SERVER['REQUEST_METHOD']){

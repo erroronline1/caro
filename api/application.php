@@ -10,18 +10,10 @@ class APPLICATION extends API {
 		$this->_requestedToken = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
-    public function processApi(){ // endpoint-specific processing of request parameters
-		$func = strtolower($this->_requestedMethod);
-		if(method_exists($this, $func))
-			$this->$func();
-		else
-			$this->response([], 404); // If the method not exist with in this class, response would be "Page not found".
-	}
-
 	public function login(){
 		// select single user based on token
 		if (!boolval($this->_requestedToken) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
-			$this->response($_SESSION['user']);
+			$this->response(['body' => $_SESSION['user']]);
 		}
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 		$statement->execute([
@@ -34,11 +26,11 @@ class APPLICATION extends API {
 				'permissions' => explode(',', $result['permissions']),
 				'image' => $result['image']
 			];
-			$this->response($_SESSION['user']);
+			$this->response(['body' => $_SESSION['user']]);
 		}
 		session_unset();
 		session_destroy();
-		$this->response(
+		$this->response(['body' =>
 			[
 				'form' => [
 					'action' => "javascript:api.application('get','login')"
@@ -55,13 +47,12 @@ class APPLICATION extends API {
 					]]
 				]
 			]
-		);
+		]);
 	}
 
 	public function menu(){
 		// get permission based menu items
-		if (!array_key_exists('user', $_SESSION)) $this->response([LANG::GET('menu.signin_header') => []]);
-					
+		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.signin_header') => []]]);			
 		$menu=[
 			'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => "javascript:api.application('get','login', 'null')"]
 		];
@@ -80,11 +71,11 @@ class APPLICATION extends API {
 			];
 		}
 
-		$this->response($menu);
+		$this->response(['body' => $menu]);
 	}
 
     public function language(){
-		$this->response(LANG::GETALL());
+		$this->response(['body' => LANG::GETALL()]);
 	}
 }
 

@@ -3,11 +3,11 @@
 class USER extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[0]; // method == api request
-	private $_requestedUserId = null;
+	private $_requestedID = null;
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedUserId = array_key_exists(1, REQUEST) ? REQUEST[1] : null;
+		$this->_requestedID = array_key_exists(1, REQUEST) ? REQUEST[1] : null;
 	}
 
 	public function user(){
@@ -24,7 +24,7 @@ class USER extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']])]]);
 				}
 		
 				// chain checked permission levels
@@ -35,7 +35,7 @@ class USER extends API {
 				}
 				$user['permissions'] = implode(',', $permissions);
 				// generate token
-				if($this->_payload->renew_on_save){
+				if(UTILITY::propertySet($this->_payload, LANG::GET('user.edit_token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// save and convert image
@@ -51,9 +51,16 @@ class USER extends API {
 					':permissions' => $user['permissions'],
 					':token' => $user['token'],
 					':image' => $user['image']
-				])){
-					$this->response(['id' => $this->_pdo->lastInsertId(), 'name' => UTILITY::scriptFilter($this->_payload->name)]);
-				}
+				])) $this->response([
+					'status' => [
+						'id' => $this->_pdo->lastInsertId(),
+						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']])
+					]]);
+				else $this->response([
+					'status' => [
+						'id' => false,
+						'name' => LANG::GET('user.edit_user_not_saved')
+					]]);
 				break;
 
 			case 'PUT':
@@ -61,7 +68,7 @@ class USER extends API {
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
-					':id' => $this->_requestedUserId
+					':id' => $this->_requestedID
 				]);
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
@@ -69,7 +76,7 @@ class USER extends API {
 				$user['name']=$this->_payload->name;
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response([], 406);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']])]]);
 				}
 				
 				// chain checked permission levels
@@ -98,14 +105,22 @@ class USER extends API {
 					':permissions' => $user['permissions'],
 					':token' => $user['token'],
 					':image' => $user['image']
-				])){
-					$this->response(['id' => $user['id'], 'name' => UTILITY::scriptFilter($this->_payload->name)]);
-				}
+				])) $this->response([
+					'status' => [
+						'id' => $user['id'],
+						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']])
+					]]);
+				else $this->response([
+					'status' => [
+						'id' => $user['id'],
+						'name' => LANG::GET('user.edit_user_not_saved')
+					]]);
 				break;
 
 			case 'GET':
-				$datalist=[];
-				$options=['...'=>[]];
+				$datalist = [];
+				$options = ['...' => []];
+				$result = [];
 				
 				// prepare existing users lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
@@ -119,7 +134,7 @@ class USER extends API {
 				// select single user based on id or name
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
-					':id' => $this->_requestedUserId
+					':id' => $this->_requestedID
 				]);
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)){$user = [
 					'id' => null,
@@ -128,13 +143,14 @@ class USER extends API {
 					'token' => '',
 					'image' => ''
 				];}
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id']) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID])];
 		
 				// display form for adding a new user with ini related permissions
 				$permissions=[];
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $user['permissions'])) ? ['checked' => true] : [];
 				}
-				$form=['content' => [
+				$result['body']=['content' => [
 					[
 						['type' => 'datalist',
 						'content' => $datalist,
@@ -191,7 +207,7 @@ class USER extends API {
 						'action' => $user['id'] ? 'javascript:api.user("put", "' . $user['id'] . '")' : 'javascript:api.user("post")'
 					]];
 
-					if ($user['image']) array_splice($form['content'][4], 0, 0,
+					if ($user['image']) array_splice($result['body']['content'][4], 0, 0,
 					[
 						['type' => 'image',
 						'description' => LANG::GET('user.edit_export_user_image'),
@@ -201,7 +217,7 @@ class USER extends API {
 						]
 					]
 					);
-					if ($user['token']) array_splice($form['content'][5], 0, 0,
+					if ($user['token']) array_splice($result['body']['content'][5], 0, 0,
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
@@ -212,24 +228,32 @@ class USER extends API {
 						]
 					);
 
-				$this->response($form);
+				$this->response($result);
 				break;
 
 			case 'DELETE':
 				// prefetch to return proper name after deletion
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
-					':id' => $this->_requestedUserId
+					':id' => $this->_requestedID
 				]);
 				$user = $statement->fetch(PDO::FETCH_ASSOC);
 
-				unlink(preg_replace('/api\//', '', $user['image']));
+				if ($user['image']) unlink(preg_replace('/api\//', '', $user['image']));
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));
 				if ($statement->execute([
 					':id' => $user['id']
-				])) $this->response(['id' => false, 'name' => UTILITY::scriptFilter($user['name'])]);
-				else $this->response(['id' => $user['id'], 'name' => UTILITY::scriptFilter($user['name'])]);
+				])) $this->response([
+					'status' => [
+						'msg' => LANG::GET('user.edit_user_deleted', [':name' => $user['name']]),
+						'id' => false
+					]]);
+				else $this->response([
+					'status' => [
+						'msg' => LANG::GET('user.edit_user_not_deleted', [':name' => $user['name']]),
+						'id' => $user['id']
+					]]);
 				break;
 		}
 	}
