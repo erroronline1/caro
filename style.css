@@ -63,7 +63,7 @@ a,
 textarea,
 select,
 canvas,
-video {
+.scanner {
 	text-decoration: none;
 	background-color: transparent;
 	border: none;
@@ -73,13 +73,14 @@ video {
 	font-size: 1em;
 }
 
-video {
+.scanner {
 	height: 0;
 	transition: ease .3s;
+	border:none !important;
 }
 
 canvas,
-video.active {
+.scanner.active {
 	height: 13em;
 }
 

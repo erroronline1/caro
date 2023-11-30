@@ -1,7 +1,6 @@
 /*
 this module helps to assemble forms according to the passed simplified object notation.
 */
-import QrScanner from '../libraries/qr-scanner.min.js';
 import SignaturePad from '../libraries/signature_pad.umd.js';
 import QrCreator from '../libraries/qr-creator.js';
 
@@ -20,21 +19,23 @@ const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdo
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
 	initialize_qrScanner: function (videostream, resultTo) {
-		const stream = document.getElementById(videostream);
-		stream.classList.add('active');
-		const scanner = new QrScanner(
-			stream,
-			result => {
-				document.getElementById(resultTo).value = result.data;
-				scanner.stop();
-				scanner.destroy();
-				stream.classList.remove('active');
-			}, {
-				highlightScanRegion: true
-				/* your options or returnDetailedScanResult: true if you're not specifying any other options */
-			},
-		);
-		scanner.start();
+		const scanner = {
+			canvas: document.getElementById(videostream),
+			output: document.getElementById(resultTo),
+			scanner: new Html5QrcodeScanner(videostream, {
+				fps: 10,
+				qrbox: 350
+			})
+		};
+		scanner.canvas.classList.add('active');
+
+		function scanSuccess(decodedText, decodedResult) {
+			scanner.output.value = decodedText;
+			scanner.canvas.classList.remove('active');
+			scanner.scanner.html5Qrcode.stop();
+			scanner.canvas.innerHTML = '';
+		}
+		scanner.scanner.render(scanSuccess);
 	},
 	exportCanvas: function (id, name) {
 		document.getElementById(id).toBlob(function (blob) {
@@ -623,8 +624,9 @@ export class Assemble {
 			description:'access credentials' (e.g.),
 			attributes:{type:'password'} // to override e.g. for logins 
 		} */
-		const stream = document.createElement('video');
+		const stream = document.createElement('div');
 		stream.id = 'qrscanner';
+		stream.classList.add('scanner');
 
 		this.elements.add(stream);
 
@@ -676,7 +678,7 @@ export class Assemble {
 		// empty method but necessary to display the delete-area for composer or other future use
 	}
 
-	hr(){
+	hr() {
 		this.assembledTiles.add(document.createElement('hr'));
 	}
 
