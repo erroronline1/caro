@@ -166,6 +166,13 @@ export class Assemble {
 				radius: 1
 			}, document.getElementById(this.imageQrCode.id));
 		}
+		if (this.imageBarCode) {
+			JsBarcode('#' + this.imageBarCode.id, this.imageBarCode.content.value, {
+				format: this.imageBarCode.content.format || 'CODE128',
+				background: 'transparent',
+				displayValue: this.imageBarCode.content.displayValue != undefined ? this.imageBarCode.content.displayValue : true,
+			});
+		}
 		if (this.imageUrl) {
 			const imgcanvas = document.getElementById(this.imageUrl.id),
 				img = new Image();
@@ -644,7 +651,8 @@ export class Assemble {
 			description:'export image' (e.g.),
 			attributes:{
 				name: 'exportname', // atypical use of generic attributes on this one
-				qrcode:'e.g. token', // for display of a qrcode with this value
+				qrcode: 'e.g. token', // for display of a qrcode with this value
+				barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
 				url: 'base64 encoded string || url' // for display of an image
 			}
 		} */
@@ -655,6 +663,10 @@ export class Assemble {
 		if (this.tile.attributes.qrcode) this.imageQrCode = {
 			id: canvas.id,
 			content: this.tile.attributes.qrcode
+		}
+		if (this.tile.attributes.barcode) this.imageBarCode = {
+			id: canvas.id,
+			content: this.tile.attributes.barcode
 		}
 		if (this.tile.attributes.url) this.imageUrl = {
 			id: canvas.id,
