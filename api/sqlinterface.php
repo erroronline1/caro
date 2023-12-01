@@ -40,11 +40,11 @@ class SQLQUERY {
 		],
 
 		'user_post' => [
-			'mysql' => "INSERT INTO caro_user (id, name, permissions, token, image) VALUES ( NULL, :name, :permissions, :token, :image)",
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, image) VALUES ( NULL, :name, :permissions, :units, :token, :image)",
 			'sqlsrv' => ""
 		],
 		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, token = :token, image = :image WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, image = :image WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'user_get-datalist' => [

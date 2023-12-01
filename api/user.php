@@ -16,9 +16,11 @@ class USER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$permissions = [];
+				$units = [];
 				$user = [
 					'name' => $this->_payload->name,
 					'permissions' => '',
+					'units' => '',
 					'token' => '',
 					'image' => ''
 				];
@@ -34,10 +36,20 @@ class USER extends API {
 					}
 				}
 				$user['permissions'] = implode(',', $permissions);
+
+				// chain checked organizational units
+				foreach(LANGUAGEFILE['units'] as $unit => $description){
+					if (UTILITY::propertySet($this->_payload, $description)) {
+						$units[] = $unit;
+					}
+				}
+				$user['units'] = implode(',', $units);
+
 				// generate token
 				if(UTILITY::propertySet($this->_payload, LANG::GET('user.edit_token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
+
 				// save and convert image
 				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
 					$user['image'] = UTILITY::storeUploadedFiles(['photo'], "../" . UTILITY::directory('user_photos'), [$user['name']])[0];
@@ -49,6 +61,7 @@ class USER extends API {
 				if ($statement->execute([
 					':name' => $user['name'],
 					':permissions' => $user['permissions'],
+					':units' => $user['units'],
 					':token' => $user['token'],
 					':image' => $user['image']
 				])) $this->response([
@@ -65,6 +78,7 @@ class USER extends API {
 
 			case 'PUT':
 				$permissions = [];
+				$units = [];
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
@@ -86,6 +100,15 @@ class USER extends API {
 					}
 				}
 				$user['permissions'] = implode(',', $permissions);
+
+				// chain checked organizational units
+				foreach(LANGUAGEFILE['units'] as $unit => $description){
+					if (UTILITY::propertySet($this->_payload, $description)) {
+						$units[] = $unit;
+					}
+				}
+				$user['units'] = implode(',', $units);
+
 				// generate token
 				if(UTILITY::propertySet($this->_payload, LANG::GET('user.edit_token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
@@ -103,6 +126,7 @@ class USER extends API {
 					':id' => $user['id'],
 					':name' => $user['name'],
 					':permissions' => $user['permissions'],
+					':units' => $user['units'],
 					':token' => $user['token'],
 					':image' => $user['image']
 				])) $this->response([
@@ -140,6 +164,7 @@ class USER extends API {
 					'id' => null,
 					'name' => '',
 					'permissions' => '',
+					'units' => '',
 					'token' => '',
 					'image' => ''
 				];}
@@ -149,6 +174,10 @@ class USER extends API {
 				$permissions=[];
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $user['permissions'])) ? ['checked' => true] : [];
+				}
+				$units=[];
+				foreach(LANGUAGEFILE['units'] as $unit => $description){
+					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
 				$result['body']=['content' => [
 					[
@@ -185,6 +214,11 @@ class USER extends API {
 						'content' => $permissions
 						]
 					],[
+						['type' => 'checkbox',
+						'description' => LANG::GET('user.edit_units'),
+						'content' => $units
+						]
+					],[
 						['type' => 'photo',
 						'description' => LANG::GET('user.edit_take_photo'),
 						'attributes' => [
@@ -207,7 +241,7 @@ class USER extends API {
 						'action' => $user['id'] ? 'javascript:api.user("put", "' . $user['id'] . '")' : 'javascript:api.user("post")'
 					]];
 
-					if ($user['image']) array_splice($result['body']['content'][4], 0, 0,
+					if ($user['image']) array_splice($result['body']['content'][5], 0, 0,
 					[
 						['type' => 'image',
 						'description' => LANG::GET('user.edit_export_user_image'),
@@ -217,7 +251,7 @@ class USER extends API {
 						]
 					]
 					);
-					if ($user['token']) array_splice($result['body']['content'][5], 0, 0,
+					if ($user['token']) array_splice($result['body']['content'][6], 0, 0,
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
