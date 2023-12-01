@@ -151,8 +151,8 @@ export class Assemble {
 		this.section = null;
 	}
 
-	initializeSection() {
-		if (this.form) {
+	initializeSection(previousSibling = null) {
+		if (this.form && !previousSibling) {
 			this.section = document.createElement('form');
 			this.section.method = 'post';
 			this.section.enctype = 'multipart/form-data';
@@ -173,8 +173,18 @@ export class Assemble {
 		this.assembledTiles = new Set();
 		this.processContent();
 
-		this.section.append(...this.assembledTiles);
-		document.getElementById('main').insertAdjacentElement('beforeend', this.section);
+		if (!previousSibling){
+			this.section.append(...this.assembledTiles);
+			document.getElementById('main').insertAdjacentElement('beforeend', this.section);
+		}
+		else {
+			let prevSib = document.querySelector(previousSibling),
+				tiles =Array.from(this.assembledTiles);
+			for (let i = 0; i<tiles.length; i++){
+				prevSib.parentNode.insertBefore(tiles[i], prevSib.nextSibling);
+				prevSib=tiles[i];
+			}
+		}
 		for (let i = 0; i < this.multiplearticles.length; i++) {
 			document.getElementById(this.multiplearticles[i]).addEventListener('scroll', sectionScroller);
 		}
@@ -301,7 +311,7 @@ export class Assemble {
 		let input = document.createElement('input');
 		let label;
 		input.type = type;
-		input.id = getNextElementID();
+		input.id = this.tile.attributes.id || getNextElementID();
 		input.autocomplete = (this.tile.attributes && this.tile.attributes.type) === 'password' ? 'one-time-code' : 'off';
 		if (this.tile.description) input.name = this.tile.description;
 		input.classList.add('input-field');
@@ -656,7 +666,8 @@ export class Assemble {
 		/*{
 			type: 'scanner',
 			description:'access credentials' (e.g.),
-			attributes:{type:'password'} // to override e.g. for logins 
+			attributes:{type:'password'} // to override e.g. for logins
+			destination: elementId // force output to other input, e.g. search
 		} */
 		const stream = document.createElement('div');
 		stream.id = 'scanner';
@@ -664,7 +675,7 @@ export class Assemble {
 
 		this.elements.add(stream);
 
-		const inputid = this.input('text');
+		const inputid = 'destination' in this.tile ? this.tile.destination : this.input('text');
 		//attributes are processed already, therefore they can be reassigned
 		this.tile.description = LANG.GET('assemble.scan_button');
 		this.tile.attributes = {
