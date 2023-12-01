@@ -8,6 +8,10 @@ import {
 
 export const api = {
 	send: async (method, request, successFn, errorFn = null, payload = {}, form_data = false) => {
+		// default disable camera stream
+		const scanner=document.querySelector('video');
+		if (scanner) scanner.srcObject.getTracks()[0].stop();
+		
 		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
 			.then(async data => {
 				await successFn(data);
