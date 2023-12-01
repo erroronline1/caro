@@ -2,7 +2,7 @@
 // add, edit and delete distributors and orders
 include_once('csvprocessor.php');
 
-class PURCHASE extends API {
+class CONSUMABLES extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
@@ -39,20 +39,18 @@ class PURCHASE extends API {
 	}
 
 	private function update_pricelist($file, $filter, $distributorID){
-  		//$filter='{    "filesetting": {     "headerrowindex": 0,     "dialect": {      "separator": ";",      "enclosure": "\"",      "escape": ""     },     "columns": [      "ArtNr",      "Bezeichnung",      "ME"     ]    },    "modify": {     "rewrite": [{      "article_no": ["ArtNr"],      "article_name": ["Bezeichnung"],      "article_unit": ["ME"]     }]    }   }';
-
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
 		$pricelist = new Listprocessor($filter);
 		if (count($pricelist->_list)){
 			// purge all unprotected products for a fresh data set
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-all-unprotected-products'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
 			$statement->execute([
 				':id' => $distributorID
 			]);
 			// retrieve left items
 			$remainder=[];
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product-search'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-search'));
 			$statement->execute([
 				':search' => $distributorID
 			]);
@@ -65,14 +63,14 @@ class PURCHASE extends API {
 			foreach($pricelist->_list as $i => $row){
 				$update = array_search($row['article_no'], $remainder);
 
-				if ($update) $query .= strtr(SQLQUERY::PREPARE('purchase_put-product-protected'),
+				if ($update) $query .= strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
 					':id' => $update,
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
 				]) . '; ';
 
-				else $query .= strtr(SQLQUERY::PREPARE('purchase_post-product'),
+				else $query .= strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
 						':distributor_id' => $distributorID,
 						':article_no' => "'" . $row['article_no'] . "'",
@@ -90,7 +88,6 @@ class PURCHASE extends API {
 
 	public function distributor(){
 		// Y U NO DELETE? because of audit safety, that's why!
-
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
@@ -102,7 +99,7 @@ class PURCHASE extends API {
 
 				$distributor = [
 					'name' => $this->_payload->name,
-					'active' => UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_distributor_active')) === LANG::GET('purchase.edit_distributor_isactive') ? 1 : 0,
+					'active' => UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_distributor_active')) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0,
 					'info' => $this->_payload->info,
 					'certificate' => ['validity' => $this->_payload->certificate_validity],
 					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter],
@@ -126,7 +123,7 @@ class PURCHASE extends API {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $distributor['pricelist']['filter'], $distributor['id']);
 				}
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-distributor'));
 				if ($statement->execute([
 					':name' => $distributor['name'],
 					':active' => $distributor['active'],
@@ -137,26 +134,26 @@ class PURCHASE extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('purchase.edit_distributor_saved', [':name' => $distributor['name']])
+						'msg' => LANG::GET('consumables.edit_distributor_saved', [':name' => $distributor['name']])
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('purchase.edit_distributor_not_saved')
+						'name' => LANG::GET('consumables.edit_distributor_not_saved')
 					]]);
 				break;
 
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
 				// prepare distributor-array to update, return error if not found
 				if (!($distributor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
 
-				$distributor['active'] = UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_distributor_active')) === LANG::GET('purchase.edit_distributor_isactive') ? 1 : 0;
+				$distributor['active'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_distributor_active')) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0;
 				$distributor['name'] = $this->_payload->name;
 				$distributor['info'] = $this->_payload->info;
 				$distributor['certificate'] = json_decode($distributor['certificate'], true);
@@ -180,15 +177,15 @@ class PURCHASE extends API {
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $distributor['pricelist']['filter'], $distributor['id']);
 				}
-				// tidy up purchase products database if inactive
+				// tidy up consumable products database if inactive
 				if (!$distributor['active']){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-all-unprotected-products'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
 					$statement->execute([
 						':id' => $distributor['id']
 					]);
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-distributor'));
 				if ($statement->execute([
 					':id' => $distributor['id'],
 					':active' => $distributor['active'],
@@ -199,12 +196,12 @@ class PURCHASE extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $distributor['id'],
-						'msg' => LANG::GET('purchase.edit_distributor_saved', [':name' => $distributor['name']])
+						'msg' => LANG::GET('consumables.edit_distributor_saved', [':name' => $distributor['name']])
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => $distributor['id'],
-						'name' => LANG::GET('purchase.edit_distributor_not_saved')
+						'name' => LANG::GET('consumables.edit_distributor_not_saved')
 					]]);
 				break;
 
@@ -215,7 +212,7 @@ class PURCHASE extends API {
 				$result = [];
 				
 				// prepare existing distributor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor-datalist'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor-datalist'));
 				$statement->execute();
 				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($distributor as $key => $row) {
@@ -224,7 +221,7 @@ class PURCHASE extends API {
 				}
 		
 				// select single distributor based on id or name
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
@@ -236,7 +233,7 @@ class PURCHASE extends API {
 					'certificate' => '{"validity":""}',
 					'pricelist' => '{"validity":"", "filter": ""}'
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$distributor['id']) $result['status'] = ['msg' => LANG::GET('purchase.error_distributor_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$distributor['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_distributor_not_found', [':name' => $this->_requestedID])];
 
 				$distributor['certificate'] = json_decode($distributor['certificate'], true);
 				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
@@ -265,14 +262,14 @@ class PURCHASE extends API {
 						]]
 					],[
 						['type' => 'searchinput',
-						'description' => LANG::GET('purchase.edit_existing_distributors'),
+						'description' => LANG::GET('consumables.edit_existing_distributors'),
 						'attributes' => [
-							'placeholder' => LANG::GET('purchase.edit_existing_distributors_label'),
+							'placeholder' => LANG::GET('consumables.edit_existing_distributors_label'),
 							'list' => 'distributors',
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'distributor', this.value); return false;}"
 						]],
 						['type' => 'select',
-						'description' => LANG::GET('purchase.edit_existing_distributors'),
+						'description' => LANG::GET('consumables.edit_existing_distributors'),
 						'attributes' => [
 							'onchange' => "api.purchase('get', 'distributor', this.value)"
 						],
@@ -280,7 +277,7 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "textinput",
-						"description" => LANG::GET('purchase.edit_distributor_name'),
+						"description" => LANG::GET('consumables.edit_distributor_name'),
 						'attributes' => [
 							'name' => 'name',
 							'required' => true,
@@ -289,7 +286,7 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "textarea",
-						"description" => LANG::GET('purchase.edit_distributor_info'),
+						"description" => LANG::GET('consumables.edit_distributor_info'),
 						'attributes' => [
 							'name' => 'info',
 							'value' => $distributor['info'] ? : ''
@@ -297,21 +294,20 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "dateinput",
-						"description" => LANG::GET('purchase.edit_distributor_certificate_validity'),
+						"description" => LANG::GET('consumables.edit_distributor_certificate_validity'),
 						'attributes' => [
 							'name' => 'certificate_validity',
-							'required' => true,
 							'value' => $distributor['certificate']['validity'] ? : ''
 						]],
 						["type" => "file",
-						"description" => LANG::GET('purchase.edit_distributor_certificate_update'),
+						"description" => LANG::GET('consumables.edit_distributor_certificate_update'),
 						'attributes' => [
 							'name' => 'certificate',
 						]]
 					],
 					[
 						["type" => "file",
-						"description" => LANG::GET('purchase.edit_distributor_documents_update'),
+						"description" => LANG::GET('consumables.edit_distributor_documents_update'),
 						'attributes' => [
 							'name' => 'documents[]',
 							'multiple' => true
@@ -319,13 +315,13 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "file",
-						"description" => LANG::GET('purchase.edit_distributor_pricelist_update'),
+						"description" => LANG::GET('consumables.edit_distributor_pricelist_update'),
 						'attributes' => [
 							'name' => 'pricelist',
 							'accept' => '.csv'
 						]],
 						["type" => "textarea",
-						"description" => LANG::GET('purchase.edit_distributor_pricelist_filter'),
+						"description" => LANG::GET('consumables.edit_distributor_pricelist_filter'),
 						'attributes' => [
 							'name' => 'pricelist_filter',
 							'value' => $distributor['pricelist']['filter'] ? : '',
@@ -334,10 +330,10 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "radio",
-						"description" => LANG::GET('purchase.edit_distributor_active'),
+						"description" => LANG::GET('consumables.edit_distributor_active'),
 						"content" => [
-							LANG::GET('purchase.edit_distributor_isactive') => $isactive,
-							LANG::GET('purchase.edit_distributor_isinactive') => $isinactive
+							LANG::GET('consumables.edit_distributor_isactive') => $isactive,
+							LANG::GET('consumables.edit_distributor_isinactive') => $isinactive
 						]]
 					]
 				],
@@ -349,7 +345,7 @@ class PURCHASE extends API {
 				if ($certificates) array_splice($result['body']['content'][4], 1, 0,
 					[
 						['type' => 'links',
-						'description' => LANG::GET('purchase.edit_distributor_certificate_download'),
+						'description' => LANG::GET('consumables.edit_distributor_certificate_download'),
 						'content' => $certificates
 						]
 					]
@@ -357,7 +353,7 @@ class PURCHASE extends API {
 				if ($documents) array_splice($result['body']['content'][5], 0, 0,
 					[
 						['type' => 'links',
-						'description' => LANG::GET('purchase.edit_distributor_documents_download'),
+						'description' => LANG::GET('consumables.edit_distributor_documents_download'),
 						'content' => $documents
 						]
 					]
@@ -365,7 +361,7 @@ class PURCHASE extends API {
 				if ($distributor['pricelist']['validity']) array_splice($result['body']['content'][6], 0, 0,
 					[
 						["type" => "text",
-						"description" => LANG::GET('purchase.edit_distributor_pricelist_validity'),
+						"description" => LANG::GET('consumables.edit_distributor_pricelist_validity'),
 						"content" => $distributor['pricelist']['validity']
 						]
 					]
@@ -377,7 +373,6 @@ class PURCHASE extends API {
 	}
 
 	public function product(){
-
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
@@ -389,16 +384,16 @@ class PURCHASE extends API {
 					'article_no' => $this->_payload->article_no,
 					'article_name' => $this->_payload->article_name,
 					'article_unit' => $this->_payload->article_unit,
-					'active' => UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_product_active')) === LANG::GET('purchase.edit_product_isactive') ? 1 : 0,
+					'active' => UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
 					'protected' => 0
 				];
 
 				// validate distributor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
 				$statement->execute([
 					':id' => $product['distributor_name']
 				]);
-				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('purchase.error_distributor_not_found', [':name' => $product['distributor_name']])]]);
+				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_distributor_not_found', [':name' => $product['distributor_name']])]]);
 				$product['distributor_id'] = $distributor['id'];
 
 				// save documents
@@ -407,7 +402,7 @@ class PURCHASE extends API {
 					$product['protected'] = 1;
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_post-product'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-product'));
 				if ($statement->execute([
 					':distributor_id' => $product['distributor_id'],
 					':article_no' => $product['article_no'],
@@ -418,37 +413,37 @@ class PURCHASE extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('purchase.edit_product_saved', [':name' => $product['article_name']])
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']])
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('purchase.edit_product_not_saved')
+						'name' => LANG::GET('consumables.edit_product_not_saved')
 					]]);
 				break;
 
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
 				// prepare product-array to update, return error if not found
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('purchase.error_product_not_found', [':name' => $this->_requestedID])];
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
 
 				$product['distributor_name'] = $this->_payload->distributor_select !== '...' ? $this->_payload->distributor_select : $this->_payload->distributor_input;
 				$product['article_no'] = $this->_payload->article_no;
 				$product['article_name'] = $this->_payload->article_name;
 				$product['article_unit'] = $this->_payload->article_unit;
-				$product['active'] = UTILITY::propertySet($this->_payload, LANG::GET('purchase.edit_product_active')) === LANG::GET('purchase.edit_product_isactive') ? 1 : 0;
+				$product['active'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 
 				// validate distributor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
 				$statement->execute([
 					':id' => $product['distributor_name']
 				]);
-				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('purchase.error_distributor_not_found', [':name' => $product['distributor_name']])]]);
+				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_distributor_not_found', [':name' => $product['distributor_name']])]]);
 				$product['distributor_id'] = $distributor['id'];
 				
 				// save documents
@@ -457,7 +452,7 @@ class PURCHASE extends API {
 					$product['protected'] = 1;
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_put-product'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-product'));
 				if ($statement->execute([
 					':id' => $this->_requestedID,
 					':distributor_id' => $product['distributor_id'],
@@ -469,12 +464,12 @@ class PURCHASE extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('purchase.edit_product_saved', [':name' => $product['article_name']])
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']])
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'name' => LANG::GET('purchase.edit_product_not_saved')
+						'name' => LANG::GET('consumables.edit_product_not_saved')
 					]]);
 				break;
 
@@ -486,7 +481,7 @@ class PURCHASE extends API {
 				$result = [];
 				
 				// select single product based on id or name
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
@@ -501,7 +496,7 @@ class PURCHASE extends API {
 					'active' => 1,
 					'protected' => 0
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id'] && !$this->_subMethod) $result['status'] = ['msg' => LANG::GET('purchase.error_product_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id'] && !$this->_subMethod) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
 
 				$isactive = $product['active'] ? ['checked' => true] : [];
 				$isinactive = !$product['active'] ? ['checked' => true] : [];
@@ -514,13 +509,13 @@ class PURCHASE extends API {
 						$file = pathinfo($path);
 						$article_no = explode('_', $file['filename'])[2];
 						similar_text($article_no, $product['article_no'], $percent);
-						if ($percent >= INI['likeliness']['purchase_article_no']) 
+						if ($percent >= INI['likeliness']['consumables_article_no']) 
 							$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
 
 				// prepare existing distributor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-distributor-datalist'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor-datalist'));
 				$statement->execute();
 				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($distributor as $key => $row) {
@@ -530,7 +525,7 @@ class PURCHASE extends API {
 				}
 
 				// prepare existing unit lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product-units'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-units'));
 				$statement->execute();
 				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($distributor as $key => $row) {
@@ -554,9 +549,10 @@ class PURCHASE extends API {
 					],
 					[
 						['type' => 'searchinput',
-						'description' => LANG::GET('purchase.edit_product_search'),
+						'description' => LANG::GET('consumables.edit_product_search'),
 						'attributes' => [
-							'placeholder' => LANG::GET('purchase.edit_product_search_label'),
+							'placeholder' => LANG::GET('consumables.edit_product_search_label'),
+							'value' => $this->_requestedID && $this->_subMethod === 'search' ? $this->_requestedID : '',
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'product', this.value, 'search'); return false;}"
 						]],
 					],
@@ -565,14 +561,14 @@ class PURCHASE extends API {
 					],
 					[
 						['type' => 'textinput',
-						'description' => LANG::GET('purchase.edit_product_distributor'),
+						'description' => LANG::GET('consumables.edit_product_distributor'),
 						'attributes' => [
 							'name' => 'distributor_input',
 							'list' => 'distributors',
 							'value' => $product['distributor_name']
 						]],
 						['type' => 'select',
-						'description' => LANG::GET('purchase.edit_product_distributor'),
+						'description' => LANG::GET('consumables.edit_product_distributor'),
 						'attributes' => [
 							'name' => 'distributor_select'
 						],
@@ -580,7 +576,7 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "textinput",
-						"description" => LANG::GET('purchase.edit_product_article_no'),
+						"description" => LANG::GET('consumables.edit_product_article_no'),
 						'attributes' => [
 							'name' => 'article_no',
 							'required' => true,
@@ -589,7 +585,7 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "textinput",
-						"description" => LANG::GET('purchase.edit_product_article_name'),
+						"description" => LANG::GET('consumables.edit_product_article_name'),
 						'attributes' => [
 							'name' => 'article_name',
 							'required' => true,
@@ -598,7 +594,7 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "textinput",
-						"description" => LANG::GET('purchase.edit_product_article_unit'),
+						"description" => LANG::GET('consumables.edit_product_article_unit'),
 						'attributes' => [
 							'name' => 'article_unit',
 							'list' => 'units',
@@ -608,7 +604,7 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "file",
-						"description" => LANG::GET('purchase.edit_product_documents_update'),
+						"description" => LANG::GET('consumables.edit_product_documents_update'),
 						'attributes' => [
 							'name' => 'documents[]',
 							'multiple' => true
@@ -616,10 +612,10 @@ class PURCHASE extends API {
 					],
 					[
 						["type" => "radio",
-						"description" => LANG::GET('purchase.edit_product_active'),
+						"description" => LANG::GET('consumables.edit_product_active'),
 						"content" => [
-							LANG::GET('purchase.edit_product_isactive') => $isactive,
-							LANG::GET('purchase.edit_product_isinactive') => $isinactive
+							LANG::GET('consumables.edit_product_isactive') => $isactive,
+							LANG::GET('consumables.edit_product_isinactive') => $isinactive
 						]]
 					]
 				],
@@ -631,7 +627,7 @@ class PURCHASE extends API {
 				if ($documents) array_splice($result['body']['content'][6], 0, 0,
 					[
 						['type' => 'links',
-						'description' => LANG::GET('purchase.edit_product_documents_download'),
+						'description' => LANG::GET('consumables.edit_product_documents_download'),
 						'content' => $documents
 						]
 					]
@@ -639,16 +635,16 @@ class PURCHASE extends API {
 				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
 					[
 						['type' => 'deletebutton',
-						'description' => LANG::GET('purchase.edit_product_delete'),
+						'description' => LANG::GET('consumables.edit_product_delete'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerdown' => $product['id'] ? "if (confirm('" . LANG::GET('purchase.edit_product_delete_confirm', [':name' => $product['article_name']]) ."')) {api.purchase('delete', 'product', " . $product['id'] . ")}" : ""
+							'onpointerdown' => $product['id'] ? "if (confirm('" . LANG::GET('consumables.edit_product_delete_confirm', [':name' => $product['article_name']]) ."')) {api.purchase('delete', 'product', " . $product['id'] . ")}" : ""
 						]]
 					]
 				);
 				if ($this->_subMethod === 'search'){
 					$matches = [];
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product-search'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-search'));
 					$statement->execute([
 						':search' => $this->_requestedID
 					]);
@@ -659,7 +655,7 @@ class PURCHASE extends API {
 					array_splice($result['body']['content'], 2, 0,
 						[[
 							['type' => 'links',
-							'description' => LANG::GET('purchase.edit_product_search_matches', [':number' => count($matches)]),
+							'description' => LANG::GET('consumables.edit_product_search_matches', [':number' => count($matches)]),
 							'content' => $matches
 							]
 						]]
@@ -670,23 +666,23 @@ class PURCHASE extends API {
 		case 'DELETE':
 			if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				// prefetch to return proper name after deletion
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_get-product'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
 				$product = $statement->fetch(PDO::FETCH_ASSOC);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('purchase_delete-unprotected-product'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-unprotected-product'));
 				if ($statement->execute([
 					':id' => $product['id']
 				])) $this->response([
 					'status' => [
-						'msg' => LANG::GET('purchase.edit_product_deleted', [':name' => $product['article_name']]),
+						'msg' => LANG::GET('consumables.edit_product_deleted', [':name' => $product['article_name']]),
 						'id' => false
 					]]);
 				else $this->response([
 					'status' => [
-						'msg' => LANG::GET('purchase.edit_product_not_deleted', [':name' => $product['article_name']]),
+						'msg' => LANG::GET('consumables.edit_product_not_deleted', [':name' => $product['article_name']]),
 						'id' => $product['id']
 					]]);
 			break;
@@ -711,7 +707,7 @@ class PURCHASE extends API {
 	}
 }
 
-$api = new PURCHASE();
+$api = new CONSUMABLES();
 $api->processApi();
 
 exit;

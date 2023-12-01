@@ -174,7 +174,7 @@ export const api = {
 		delete purchase/order/{id}
 		*/
 		request = [...request];
-		request.splice(0, 0, 'purchase');
+		request.splice(0, 0, 'consumables');
 		let payload,
 			successFn = function (data) {
 						api.toast(data.status.msg);

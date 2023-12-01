@@ -60,52 +60,52 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 
-		'purchase_post-distributor' => [
-			'mysql' => "INSERT INTO caro_purchase_distributors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
+		'consumables_post-distributor' => [
+			'mysql' => "INSERT INTO caro_consumables_distributors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
 			'sqlsrv' => ""
 		],
-		'purchase_put-distributor' => [
-			'mysql' => "UPDATE caro_purchase_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
+		'consumables_put-distributor' => [
+			'mysql' => "UPDATE caro_consumables_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
-		'purchase_get-distributor-datalist' => [
-			'mysql' => "SELECT name FROM caro_purchase_distributors ORDER BY name ASC",
+		'consumables_get-distributor-datalist' => [
+			'mysql' => "SELECT name FROM caro_consumables_distributors ORDER BY name ASC",
 			'sqlsrv' => ""
 		],
-		'purchase_get-distributor' => [
-			'mysql' => "SELECT * FROM caro_purchase_distributors WHERE id = :id OR name = :id LIMIT 1",
+		'consumables_get-distributor' => [
+			'mysql' => "SELECT * FROM caro_consumables_distributors WHERE id = :id OR name = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
-		'purchase_post-product' => [
-			'mysql' => "INSERT INTO caro_purchase_products (id, distributor_id, article_no, article_name, article_unit, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :active, :protected)",
+		'consumables_post-product' => [
+			'mysql' => "INSERT INTO caro_consumables_products (id, distributor_id, article_no, article_name, article_unit, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :active, :protected)",
 			'sqlsrv' => ""
 		],
-		'purchase_put-product' => [
-			'mysql' => "UPDATE caro_purchase_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
+		'consumables_put-product' => [
+			'mysql' => "UPDATE caro_consumables_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
-		'purchase_put-product-protected' => [
-			'mysql' => "UPDATE caro_purchase_products SET article_name = :article_name, article_unit = :article_unit WHERE id = :id LIMIT 1",
+		'consumables_put-product-protected' => [
+			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
-		'purchase_get-product' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name, dist.immutable_fileserver as distributor_immutable_fileserver FROM caro_purchase_products AS prod, caro_purchase_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
+		'consumables_get-product' => [
+			'mysql' => "SELECT prod.*, dist.name as distributor_name, dist.immutable_fileserver as distributor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
 			'sqlsrv' => ""
 		],
-		'purchase_get-product-units' => [
-			'mysql' => "SELECT article_unit FROM caro_purchase_products GROUP BY article_unit ORDER BY article_unit ASC",
+		'consumables_get-product-units' => [
+			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => ""
 		],
-		'purchase_get-product-search' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_purchase_products AS prod, caro_purchase_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
+		'consumables_get-product-search' => [
+			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
 			'sqlsrv' => ""
 		],
-		'purchase_delete-all-unprotected-products' => [
-			'mysql' => "DELETE FROM caro_purchase_products WHERE distributor_id = :id AND protected = 0",
+		'consumables_delete-all-unprotected-products' => [
+			'mysql' => "DELETE FROM caro_consumables_products WHERE distributor_id = :id AND protected = 0",
 			'sqlsrv' => ""
 		],
-		'purchase_delete-unprotected-product' => [
-			'mysql' => "DELETE FROM caro_purchase_products WHERE id = :id AND protected = 0",
+		'consumables_delete-unprotected-product' => [
+			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND protected = 0",
 			'sqlsrv' => ""
 		],
 
