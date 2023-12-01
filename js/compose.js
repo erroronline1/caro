@@ -505,10 +505,10 @@ export class Compose extends Assemble {
 			addblock: 'signature pad'
 		});
 	}
-	compose_qrscanner() {
+	compose_scanner() {
 		this.compose_simpleElement({
-			type: 'qrscanner',
-			description: LANG.GET('assemble.compose_qrscanner'),
+			type: 'scanner',
+			description: LANG.GET('assemble.compose_scanner'),
 			addblock: 'qr-scanner'
 		});
 	}

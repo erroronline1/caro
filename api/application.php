@@ -37,7 +37,7 @@ class APPLICATION extends API {
 				],
 				'content' => [
 					[[
-						'type' => 'qrscanner',
+						'type' => 'scanner',
 						'description' => LANG::GET('user.login_description'),
 						'attributes' => [
                             'data-usecase'=> 'login',

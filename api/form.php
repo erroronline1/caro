@@ -145,8 +145,8 @@ class FORMS extends API {
 					'description' => LANG::GET('assemble.compose_signature')
 				], [
 					'form' => true,
-					'type' => 'compose_qrscanner',
-					'description' => LANG::GET('assemble.compose_qrscanner')
+					'type' => 'compose_scanner',
+					'description' => LANG::GET('assemble.compose_scanner')
 				]],
 				[[
 					'type' => 'compose_component',

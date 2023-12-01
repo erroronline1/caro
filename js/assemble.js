@@ -18,7 +18,34 @@ const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdo
 
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
-	initialize_qrScanner: function (videostream, resultTo) {
+	initialize_scanner: async function (videostream, resultTo) {
+		/*
+		// todo: get pure scanner api working...
+		const scanner = {
+				canvas: document.getElementById(videostream),
+				output: document.getElementById(resultTo),
+				config: {
+					videoConstraints: {
+						height: 250,
+						aspectRatio: 1,
+						frameRate: 10
+					}
+				},
+				scanner: new Html5Qrcode(videostream)
+			},
+			camera = await Html5Qrcode.getCameras();
+		console.log(camera);
+		scanner.canvas.classList.add('active');
+		scanner.canvas.nextElementSibling.nextElementSibling.disabled = 'true';
+
+		function scanSuccess(decodedText, decodedResult) {
+			scanner.output.value = decodedText;
+			scanner.canvas.classList.remove('active');
+			scanner.scanner.stop();
+		}
+		scanner.scanner.start(camera[0].id, scanner.config, scanSuccess);
+		//scanner.scanner.render(scanSuccess);
+		*/
 		const scanner = {
 			canvas: document.getElementById(videostream),
 			output: document.getElementById(resultTo),
@@ -625,14 +652,14 @@ export class Assemble {
 		this.signaturePad = true;
 	}
 
-	qrscanner() {
+	scanner() {
 		/*{
-			type: 'qrscanner',
+			type: 'scanner',
 			description:'access credentials' (e.g.),
 			attributes:{type:'password'} // to override e.g. for logins 
 		} */
 		const stream = document.createElement('div');
-		stream.id = 'qrscanner';
+		stream.id = 'scanner';
 		stream.classList.add('scanner');
 
 		this.elements.add(stream);
@@ -641,7 +668,7 @@ export class Assemble {
 		//attributes are processed already, therefore they can be reassigned
 		this.tile.description = LANG.GET('assemble.scan_button');
 		this.tile.attributes = {
-			'onpointerdown': "assemble_helper.initialize_qrScanner('" + stream.id + "','" + inputid + "')"
+			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.button();
 	}

@@ -76,12 +76,14 @@ canvas,
 .scanner {
 	height: 0;
 	transition: ease .3s;
-	border:none !important;
+	border: none !important;
 }
 
 canvas,
-.scanner.active {
-	height: 13em;
+.scanner.active,
+#scanner>video {
+	height: 15em;
+	margin-bottom:2em;
 }
 
 ul {
@@ -318,7 +320,8 @@ nav>h3:first-child {
 /*************************** decorators ******************************/
 
 body::before {
-	background: url('media/favicon/logo.svg'); /*1086x570*/
+	background: url('media/favicon/logo.svg');
+	/*1086x570*/
 	background-size: 100%;
 	background-repeat: no-repeat;
 	transform: rotate(-90deg) translate(-25vh, -21vh);
@@ -326,7 +329,7 @@ body::before {
 	position: absolute;
 	z-index: -1;
 	height: calc(90vh * 570 / 1086);
-	width:90vh;
+	width: 90vh;
 	left: 0;
 	top: 0;
 	opacity: 0.1;
@@ -536,7 +539,7 @@ button:active {
 	background-image: url("media/signature.svg");
 }
 
-[data-type=qrscanner]::before {
+[data-type=scanner]::before {
 	background-image: url("media/qrcode.svg");
 }
 
