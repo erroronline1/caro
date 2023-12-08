@@ -96,16 +96,16 @@ const sectionScroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
 	setTimeout(() => {
 		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
-		for (let panel = 0; panel < e.target.children.length; panel++) {
+		for (let panel = 0; panel < e.target.children.length+1; panel++) {
 			try {
-				if (panel == Math.floor(e.target.scrollLeft / e.target.clientWidth)) indicator.children[
+				if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth)+1) indicator.children[
 					panel].firstChild.classList.add('articleactive');
 				else indicator.children[panel].firstChild.classList.remove('articleactive');
-			} catch {
-				return;
+			} catch (err){
+				continue;
 			}
 		}
-	}, 500)
+	}, 300)
 };
 
 function prepareForm() {
@@ -151,8 +151,9 @@ export class Assemble {
 		this.section = null;
 	}
 
-	initializeSection(previousSibling = null) {
-		if (this.form && !previousSibling) {
+	initializeSection(nextSibling = null) {
+		nextSibling=document.querySelector(nextSibling);
+		if (this.form && !nextSibling) {
 			this.section = document.createElement('form');
 			this.section.method = 'post';
 			this.section.enctype = 'multipart/form-data';
@@ -173,16 +174,14 @@ export class Assemble {
 		this.assembledTiles = new Set();
 		this.processContent();
 
-		if (!previousSibling){
+		if (!nextSibling){
 			this.section.append(...this.assembledTiles);
 			document.getElementById('main').insertAdjacentElement('beforeend', this.section);
 		}
 		else {
-			let prevSib = document.querySelector(previousSibling),
-				tiles =Array.from(this.assembledTiles);
+			const tiles =Array.from(this.assembledTiles);
 			for (let i = 0; i<tiles.length; i++){
-				prevSib.parentNode.insertBefore(tiles[i], prevSib.nextSibling);
-				prevSib=tiles[i];
+				nextSibling.parentNode.insertBefore(tiles[i], nextSibling);
 			}
 		}
 		for (let i = 0; i < this.multiplearticles.length; i++) {
@@ -250,7 +249,9 @@ export class Assemble {
 	multiple() {
 		const article = document.createElement('article'),
 			section = document.createElement('section'),
-			indicators = document.createElement('div');
+			indicators = document.createElement('div'),
+			toleft = document.createElement('div'),
+			toright = document.createElement('div');
 		this.multiplearticleID = getNextElementID();
 		this.multiplearticles.push(this.multiplearticleID);
 		section.classList = 'inset';
@@ -259,6 +260,12 @@ export class Assemble {
 		article.appendChild(section);
 		indicators.classList = 'sectionindicator';
 		indicators.id = this.multiplearticleID + 'indicator';
+
+		toleft.classList='toleft';
+		toleft.addEventListener('pointerdown', function (e){
+			section.scrollBy(-300,0)
+		});
+		indicators.appendChild(toleft);
 		for (let i = 0; i < this.multipletiles.size; i++) {
 			let indicator = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 				circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -270,6 +277,11 @@ export class Assemble {
 			indicator.appendChild(circle);
 			indicators.appendChild(indicator);
 		}
+		toright.classList='toright';
+		toright.addEventListener('pointerdown', function (e){
+			section.scrollBy(300,0)
+		});		
+		indicators.appendChild(toright);
 		article.appendChild(indicators);
 		return article;
 	}
@@ -670,7 +682,7 @@ export class Assemble {
 			destination: elementId // force output to other input, e.g. search
 		} */
 		const stream = document.createElement('div');
-		stream.id = 'scanner';
+		stream.id = getNextElementID();
 		stream.classList.add('scanner');
 
 		this.elements.add(stream);
