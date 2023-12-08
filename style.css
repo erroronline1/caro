@@ -112,7 +112,8 @@ article[data-type],
 	padding: 1em 2em 1em 3.5em;
 }
 
-[data-type=links] {
+main>[data-type=links],
+section>[data-type=links] { /* otherwise composer displays faulty */
 	max-height: 15em;
 	overflow: auto;
 }
@@ -171,7 +172,26 @@ section {
 .sectionindicator {
 	text-align: center;
 	width: 100%;
-	margin-top: 1em
+	margin-top: 1em;
+	svg {
+		vertical-align: middle;
+	}	
+}
+.toleft, .toright{
+	background-size: cover;
+	width:3em;
+	height:3em;
+	display:inline-block;
+	vertical-align: middle;
+	margin:0 3em;
+	opacity: .5;
+
+}
+.toleft{
+	background-image: url('media/arrow-circle-left.svg');
+}
+.toright{
+	background-image: url('media/arrow-circle-right.svg');
 }
 
 /*************************** general elements ******************************/
@@ -326,7 +346,7 @@ body::before {
 	background-repeat: no-repeat;
 	transform: rotate(-90deg) translate(-25vh, -21vh);
 	content: "";
-	position: absolute;
+	position: fixed;
 	z-index: -1;
 	height: calc(90vh * 570 / 1086);
 	width: 90vh;
