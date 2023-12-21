@@ -2,7 +2,7 @@
 
 define("UTILITY_IMAGE_REPLACE", 0x1);
 define("UTILITY_IMAGE_STREAM", 0x2);
-define("UTILITY_IMAGE_RESSOURCE", 0x4);
+define("UTILITY_IMAGE_RESOURCE", 0x4);
 
 class UTILITY {
 
@@ -138,10 +138,11 @@ class UTILITY {
 	 * @param string $file filename
 	 * @param int $maxSize max pixels on longest side
 	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
+	 * @param string|bool $forceOutputType gif|jpeg|png|jpg
 	 * 
 	 * @return object|null a GdImage ressource or no return
 	 */
-	public static function resizeImage($file, $maxSize = 128, $destination = UTILITY_IMAGE_REPLACE){
+	public static function resizeImage($file, $maxSize = 128, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false){
 		if (is_file($file)){
 			$filetype=getimagesize($file)[2];
 			switch($filetype){
@@ -158,6 +159,7 @@ class UTILITY {
 		}
 		else $image = imagecreatefromstring($file); // bytestring
 		if ($image) {
+			$filename = pathinfo($file)['basename'];
 			$owidth = imagesx($image);
 			$oheight = imagesy($image);		
 			if ($owidth >= $oheight && $owidth > $maxSize) $resize = $maxSize/$owidth;
@@ -170,7 +172,7 @@ class UTILITY {
 			if ($destination & UTILITY_IMAGE_REPLACE){
 				chmod($file, 0777);
 				switch($filetype){
-					case"1": //gif
+					case "1": //gif
 						imagegif($image2, $file);
 						break;
 					case "2": //jpeg
@@ -184,13 +186,22 @@ class UTILITY {
 				return;
 			}
 
+			if ($forceOutputType){
+				$newtype=array_search($forceOutputType, ['gif', 'jpeg', 'png', 'jpg']);
+				if ($newtype !== false){
+					if ($newtype == 3) $newtype = 1;
+					$filetype = $newtype + 1;
+					$filename = pathinfo($file)['filename'] . $forceOutputType;
+				}
+			}
+
 			if ($destination & UTILITY_IMAGE_STREAM) {
 					header("Content-type: application/octet-stream");
-					header("Content-Disposition: attachment; filename=" . pathinfo($file)['basename']);
+					header("Content-Disposition: attachment; filename=" . $filename);
 			}
 			ob_start();	
 			switch($filetype){
-				case"1": //gif
+				case "1": //gif
 					imagegif($image2, null);
 					break;
 				case "2": //jpeg
