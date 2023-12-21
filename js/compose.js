@@ -54,6 +54,9 @@ export const compose_helper = {
 				};
 				if (value) element[property] = value;
 			}
+			if (element['type']==='signature'){
+				element['attributes']={'required':'required'};
+			}
 			sibling = sibling.nextSibling;
 		} while (sibling !== undefined && sibling != null);
 
@@ -248,6 +251,7 @@ export class Compose extends Assemble {
 		article.append(...this.elements);
 		if (this.tile.type === 'trash') compose_helper.composer_add_trash(article);
 		form.append(article);
+		form.setAttribute('data-type', 'composer-form');
 		this.createdArticles.push({
 			id: article.id,
 			content: tileProperties
