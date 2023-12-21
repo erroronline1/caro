@@ -96,12 +96,12 @@ const sectionScroller = (e) => {
 	/* event handler for horizontal scrolling of multiple panels */
 	setTimeout(() => {
 		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
-		for (let panel = 0; panel < e.target.children.length+1; panel++) {
+		for (let panel = 0; panel < e.target.children.length + 1; panel++) {
 			try {
-				if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth)+1) indicator.children[
+				if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth) + 1) indicator.children[
 					panel].firstChild.classList.add('articleactive');
 				else indicator.children[panel].firstChild.classList.remove('articleactive');
-			} catch (err){
+			} catch (err) {
 				continue;
 			}
 		}
@@ -110,11 +110,16 @@ const sectionScroller = (e) => {
 
 function prepareForm() {
 	/* check non typical input fields for presence of required content */
-	const signature = document.getElementById('signaturecanvas');
+	const signature = document.getElementById('signaturecanvas'),
+		required = document.querySelector('[data-required=required]');
 	if (signature) {
 		if (signaturePad.isEmpty()) {
-			signature.classList.add("alert");
-			return false;
+			if (signature == required) {
+				signature.classList.add("alert");
+				return false;
+			}
+			document.getElementById('signature').value = null;
+			return;
 		}
 		let file = new File([dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
 			type: "image/png",
@@ -152,7 +157,7 @@ export class Assemble {
 	}
 
 	initializeSection(nextSibling = null) {
-		nextSibling=document.querySelector(nextSibling);
+		nextSibling = document.querySelector(nextSibling);
 		if (this.form && !nextSibling) {
 			this.section = document.createElement('form');
 			this.section.method = 'post';
@@ -174,13 +179,12 @@ export class Assemble {
 		this.assembledTiles = new Set();
 		this.processContent();
 
-		if (!nextSibling){
+		if (!nextSibling) {
 			this.section.append(...this.assembledTiles);
 			document.getElementById('main').insertAdjacentElement('beforeend', this.section);
-		}
-		else {
-			const tiles =Array.from(this.assembledTiles);
-			for (let i = 0; i<tiles.length; i++){
+		} else {
+			const tiles = Array.from(this.assembledTiles);
+			for (let i = 0; i < tiles.length; i++) {
 				nextSibling.parentNode.insertBefore(tiles[i], nextSibling);
 			}
 		}
@@ -221,21 +225,21 @@ export class Assemble {
 	}
 
 	processContent() {
-		let originalTileProperties; // composer changes these, so originals must be preserved
+		let collapse;
 		this.content.forEach(tile => {
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
-				this.elements = new Set();
 				this.tile = tile[i];
-				originalTileProperties = JSON.parse(JSON.stringify(this.tile)); // deepcopy; this has been a wild hour :/
+				collapse = tile[i].collapse || false;
+				if (!collapse || i === 0) this.elements = new Set();
 				this.description();
 				this[tile[i].type]();
-				if (tile[i].type === 'hiddeninput' && !this.setup.visible || tile[i].type === 'datalist' || tile[i].type === 'hr') continue;
-				if (tile.length < 2) {
-					this.assembledTiles.add(this.single(originalTileProperties));
+				if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
+				if (tile.length < 2 || collapse) {
+					this.assembledTiles.add(this.single(tile[i]));
 					continue;
 				}
-				this.multipletiles.add(this.single(originalTileProperties, true))
+				this.multipletiles.add(this.single(tile[i], true))
 			}
 			if (this.multipletiles.size) this.assembledTiles.add(this.multiple());
 		});
@@ -261,9 +265,9 @@ export class Assemble {
 		indicators.classList = 'sectionindicator';
 		indicators.id = this.multiplearticleID + 'indicator';
 
-		toleft.classList='toleft';
-		toleft.addEventListener('pointerdown', function (e){
-			section.scrollBy(-300,0)
+		toleft.classList = 'toleft';
+		toleft.addEventListener('pointerdown', function (e) {
+			section.scrollBy(-300, 0)
 		});
 		indicators.appendChild(toleft);
 		for (let i = 0; i < this.multipletiles.size; i++) {
@@ -277,10 +281,10 @@ export class Assemble {
 			indicator.appendChild(circle);
 			indicators.appendChild(indicator);
 		}
-		toright.classList='toright';
-		toright.addEventListener('pointerdown', function (e){
-			section.scrollBy(300,0)
-		});		
+		toright.classList = 'toright';
+		toright.addEventListener('pointerdown', function (e) {
+			section.scrollBy(300, 0)
+		});
 		indicators.appendChild(toright);
 		article.appendChild(indicators);
 		return article;
@@ -291,7 +295,7 @@ export class Assemble {
 		const header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.tile.description));
 		this.elements.add(header);
-	};
+	}
 
 	apply_attributes(setup, node) {
 		for (const [key, attribute] of Object.entries(setup)) {
@@ -323,7 +327,7 @@ export class Assemble {
 		let input = document.createElement('input');
 		let label;
 		input.type = type;
-		input.id = this.tile.attributes.id || getNextElementID();
+		input.id = this.tile.attributes && this.tile.attributes.id ? this.tile.attributes.id : getNextElementID();
 		input.autocomplete = (this.tile.attributes && this.tile.attributes.type) === 'password' ? 'one-time-code' : 'off';
 		if (this.tile.description) input.name = this.tile.description;
 		input.classList.add('input-field');
@@ -364,6 +368,10 @@ export class Assemble {
 		let button = document.createElement('button');
 		button.id = getNextElementID();
 		if (this.tile.description) button.appendChild(document.createTextNode(this.tile.description));
+		if (this.tile.attributes && 'value' in this.tile.attributes) {
+			button.appendChild(document.createTextNode(this.tile.attributes.value));
+			delete this.tile.attributes.value;
+		}
 		if (this.tile.attributes !== undefined) button = this.apply_attributes(this.tile.attributes, button);
 		this.elements.add(button);
 		return button.id;
@@ -651,10 +659,12 @@ export class Assemble {
 	signature() {
 		/*{
 			type: 'signature',
-			description:'signature'
+			description:'signature',
+			required: optional boolean
 		} */
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
+		if (this.tile.attributes && this.tile.attributes.required) canvas.setAttribute('data-required', 'required');
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
 		this.tile.description = LANG.GET('assemble.clear_signature');
@@ -744,6 +754,10 @@ export class Assemble {
 		this.assembledTiles.add(document.createElement('hr'));
 	}
 
+	collapsed() {
+		// empty method but neccessary for styling reasons (icon)
+		// multiple input fields within one section
+	}
 }
 
 var signaturecanvas = null;
@@ -777,7 +791,7 @@ function resizeSignatureCanvas() {
 	// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
 	// that the state of this library is consistent with visual state of the canvas, you
 	// have to clear it manually.
-	signaturePad.clear();
+	//signaturePad.clear();
 	// If you want to keep the drawing on resize instead of clearing it you can reset the data.
 	signaturePad.fromData(signaturePad.toData());
 }
