@@ -291,7 +291,7 @@ export class Assemble {
 	}
 
 	description() {
-		if ([undefined, null, false].includes(this.tile.description)) return
+		if ([undefined, null, false].includes(this.tile.description) || this.tile.collapse) return;
 		const header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.tile.description));
 		this.elements.add(header);
@@ -312,8 +312,12 @@ export class Assemble {
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-		const content = document.createTextNode(this.tile.content);
-		this.elements.add(content);
+		
+		const content=this.tile.content.matchAll(/(.*?)(?:\n|\\n|<br \/>)/gm);
+		for (const part of content){
+			this.elements.add(document.createTextNode(part[1]));
+			this.elements.add(document.createElement('br'));
+		}
 	}
 
 	input(type) {
