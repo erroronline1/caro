@@ -9,9 +9,9 @@ import {
 export const api = {
 	send: async (method, request, successFn, errorFn = null, payload = {}, form_data = false) => {
 		// default disable camera stream
-		const scanner=document.querySelector('video');
+		const scanner = document.querySelector('video');
 		if (scanner) scanner.srcObject.getTracks()[0].stop();
-		
+		api.loadindicator(true);
 		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
 			.then(async data => {
 				await successFn(data);
@@ -21,6 +21,21 @@ export const api = {
 				if (errorFn != null) errorFn(error);
 				else api.toast(error);
 			});
+		api.loadindicator(false);
+	},
+	loadindicator: (toggle) => {
+		if (toggle) {
+			document.querySelector('body').style.cursor = 'wait';
+			document.querySelector('.loader').style.display = 'block';
+			document.querySelector('.loader').style.opacity = '1';
+			return;
+		}
+		document.querySelector('body').style.cursor = 'initial';
+		document.querySelector('.loader').style.opacity = '0';
+		setTimeout(() => {
+			document.querySelector('.loader').style.display = 'none'
+		}, 300);
+
 	},
 	toast: function (msg) {
 		const toast = document.querySelector('dialog');
@@ -30,7 +45,7 @@ export const api = {
 			window.setTimeout(api.toast, 3000);
 		} else toast.close();
 	},
-	update_header(string=''){
+	update_header(string = '') {
 		document.querySelector('head>h1').innerHTML = string;
 	},
 	form: (method, ...request) => {
@@ -69,7 +84,7 @@ export const api = {
 								document.getElementById('main').innerHTML = '';
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importComponent(data.body.component);
-								}
+							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
@@ -78,7 +93,7 @@ export const api = {
 							if (data.body) {
 								document.getElementById('main').innerHTML = '';
 								new Assemble(data.body).initializeSection();
-								}
+							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
@@ -88,7 +103,7 @@ export const api = {
 								document.getElementById('main').innerHTML = '';
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importForm(data.body.component);
-								}
+							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						}
 						break;
@@ -99,7 +114,7 @@ export const api = {
 					case 'component':
 						successFn = function (data) {
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
-							if ('status' in data && 'name' in data.status && data.status.name) api.form('get','component', data.status.name);
+							if ('status' in data && 'name' in data.status && data.status.name) api.form('get', 'component', data.status.name);
 						}
 						if (!(payload = compose_helper.composeNewComponent())) return;
 						break;
@@ -129,9 +144,9 @@ export const api = {
 		request.splice(0, 0, 'user');
 		let payload,
 			successFn = function (data) {
-						api.toast(data.status.msg);
-						api.user('get', data.status.id);
-					};
+				api.toast(data.status.msg);
+				api.user('get', data.status.id);
+			};
 		switch (method) {
 			case 'get':
 				successFn = function (data) {
@@ -158,31 +173,47 @@ export const api = {
 	},
 	purchase: (method, ...request) => {
 		/*
-		get purchase/distributor/{id|name}
-		post purchase/distributor
-		put purchase/distributor/{id}
+		get consumables/distributor/{id|name}
+		post consumables/distributor
+		put consumables/distributor/{id}
 
-		get purchase/product/{id}
-		get purchase/product/{id|name}/search
-		post purchase/product
-		put purchase/product/{id}
-		delete purchase/product/{id}
+		get consumables/product/{id}
+		get consumables/product/{id|name}/search
+		post consumables/product
+		put consumables/product/{id}
+		delete consumables/product/{id}
 
-		get purchase/order/{id}
-		post purchase/order
-		put purchase/order/{id}
-		delete purchase/order/{id}
+		get order/intended
+		get order/productsearch/{id|name}
+		get order/order/{id}
+		post order/order
+		put order/order/{id}
+		delete order/order/{id}
 		*/
 		request = [...request];
-		request.splice(0, 0, 'consumables');
+		if (['distributor', 'product'].includes(request[0]))
+			request.splice(0, 0, 'consumables');
+		else
+			request.splice(0, 0, 'order');
+
 		let payload,
 			successFn = function (data) {
-						api.toast(data.status.msg);
-						api.purchase('get', request[1], data.status.id);
-					};
+				api.toast(data.status.msg);
+				api.purchase('get', request[1], data.status.id);
+			};
 		switch (method) {
 			case 'get':
 				switch (request[1]) {
+					case 'productsearch':
+						successFn = function (data) {
+							if (data.body) {
+								let list = document.querySelector('[data-type=links]');
+								if (list) list.remove();
+								new Assemble(data.body).initializeSection('hr');
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+						};
+						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {
