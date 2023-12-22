@@ -1,7 +1,7 @@
 <?php
 class SQLQUERY {
 	public static function PREPARE($context){
-		return self::QUERIES[$context][INI['sql']['driver']];
+		return self::QUERIES[$context][INI['sql'][INI['sql']['use']]['driver']];
 	}
 
 	public const QUERIES = [

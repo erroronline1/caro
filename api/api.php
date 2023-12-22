@@ -22,7 +22,7 @@ class API {
 		//$payload = new PAYLOAD;
 		$this->_payload = UTILITY::parsePayload();//(object) $payload->_payload;
 		
-		$this->_pdo = new PDO( INI['sql']['driver'] . ':' . INI['sql']['host'] . ';' . INI['sql']['database']. ';' . INI['sql']['charset'], INI['sql']['user'], INI['sql']['password']);
+		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password']);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 		$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true); // reuse tokens in prepared statements
