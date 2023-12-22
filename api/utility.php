@@ -108,7 +108,12 @@ class UTILITY {
 							//Parse Field
 							else
 							{
-								$data[$name] = substr($body, 0, strlen($body) - 2);
+								if (substr($name, -2) == '[]') { //is array
+									$name = substr($name, 0, strlen($name)-2);
+									if (array_key_exists($name, $data)) $data[$name][] = substr($body, 0, strlen($body) - 2);
+									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
+								}
+								else $data[$name] = substr($body, 0, strlen($body) - 2);
 							}
 						}
 					}
