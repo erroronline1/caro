@@ -22,8 +22,9 @@ class API {
 		//$payload = new PAYLOAD;
 		$this->_payload = UTILITY::parsePayload();//(object) $payload->_payload;
 		
-		$this->_pdo = new PDO( INI['sql']['driver'] . ':' . INI['sql']['host'] . ';dbname=caro;charset=utf8mb4', INI['sql']['user'], INI['sql']['password']);
-		$this->_pdo->exec("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"); // intuitive group by
+		$this->_pdo = new PDO( INI['sql']['driver'] . ':' . INI['sql']['host'] . ';' . INI['sql']['database']. ';' . INI['sql']['charset'], INI['sql']['user'], INI['sql']['password']);
+		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+		if ($dbsetup) $this->_pdo->exec($dbsetup);
 		$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true); // reuse tokens in prepared statements
 	}
 		

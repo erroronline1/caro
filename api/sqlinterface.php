@@ -9,30 +9,40 @@ class SQLQUERY {
 			'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",
 			'sqlsrv' => "SELECT TOP 3 WITH TIES * FROM person ORDER BY age ASC"
 		],*/
+		'INSTALL' =>[
+			'mysql' => "",
+			'sqlsrv' => ""
+		],
+
+		'DYNAMICDBSETUP' => [
+			'mysql' => "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));",  // intuitive group by
+			'sqlsrv' => ""
+		],
+
 		'application_login' => [
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE CONVERT(VARCHAR, token) = :token"
 		],
 
 		'form_component-post' => [
 			'mysql' => "INSERT INTO caro_form_components (id, name, date, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content)",
-			'sqlsrv' => ""
+			'sqlsrv' => "INSERT INTO caro_form_components (name, date, content) VALUES (:name, CURRENT_TIMESTAMP, :content)"
 		],
 		'form_component-datalist' => [
 			'mysql' => "SELECT name FROM caro_form_components GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) as name FROM caro_form_components GROUP BY CONVERT(VARCHAR, name) ORDER BY CONVERT(VARCHAR, name) ASC"
 		],
 		'form_component-get' => [
 			'mysql' => "SELECT name, content FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT TOP 1 name, content FROM caro_form_components WHERE CONVERT(VARCHAR, name) = :name ORDER BY id DESC"
 		],
 		'form_datalist' => [
 			'mysql' => "SELECT name FROM caro_form_forms GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) as name FROM caro_form_forms GROUP BY CONVERT(VARCHAR, name) ORDER BY CONVERT(VARCHAR, name) ASC"
 		],
 		'form_get' => [
 			'mysql' => "SELECT name, content FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT TOP 1 name, content FROM caro_form_forms WHERE CONVERT(VARCHAR, name) = :name ORDER BY id DESC"
 		],
 		'form_post' => [
 			'mysql' => "",
@@ -41,23 +51,23 @@ class SQLQUERY {
 
 		'user_post' => [
 			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, image) VALUES ( NULL, :name, :permissions, :units, :token, :image)",
-			'sqlsrv' => ""
+			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, image) VALUES ( :name, :permissions, :units, :token, :image)"
 		],
 		'user_put' => [
 			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, image = :image WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, image = :image WHERE id = :id"
 		],
 		'user_get-datalist' => [
 			'mysql' => "SELECT name FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT name FROM caro_user ORDER BY CONVERT(VARCHAR,name) ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR CONVERT(VARCHAR, name) = :id"
 		],
 		'user_delete' => [
 			'mysql' => "DELETE FROM caro_user WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id"
 		],
 
 		'consumables_post-distributor' => [
