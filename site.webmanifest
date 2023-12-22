@@ -1,6 +1,6 @@
 {
-    "name": "webQS",
-    "short_name": "webQS",
+    "name": "CARO",
+    "short_name": "CARO",
     "start_url": "./index.html",
     "scope": ".",
     "theme_color": "#E5E9F0",
