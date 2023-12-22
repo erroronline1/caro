@@ -24,6 +24,7 @@ class APPLICATION extends API {
 			$_SESSION['user'] = [
 				'name' => $result['name'],
 				'permissions' => explode(',', $result['permissions']),
+				'units' => explode(',', $result['units']),
 				'image' => $result['image']
 			];
 			$this->response(['body' => $_SESSION['user']]);
@@ -63,12 +64,13 @@ class APPLICATION extends API {
 				LANG::GET('menu.admin_forms') => "javascript:api.form('get', 'form_editor')"
 			];
 		}
+		$menu[LANG::GET('menu.purchase_header')] = [
+			LANG::GET('menu.purchase_order') => "javascript:api.purchase('get', 'order')",
+			LANG::GET('menu.purchase_intended_orders') => "javascript:api.purchase('get', 'intended')"
+		];
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.purchase_header')] = [
-				LANG::GET('menu.purchase_order') => "javascript:api.purchase('get', 'order')",
-				LANG::GET('menu.purchase_product') => "javascript:api.purchase('get', 'product')",
-				LANG::GET('menu.purchase_distributor') => "javascript:api.purchase('get', 'distributor')"
-			];
+			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = "javascript:api.purchase('get', 'product')";
+			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_distributor')] = "javascript:api.purchase('get', 'distributor')";
 		}
 
 		$this->response(['body' => $menu]);

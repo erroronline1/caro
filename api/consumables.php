@@ -1,5 +1,5 @@
 <?php
-// add, edit and delete distributors and orders
+// add, edit and delete distributors and products
 include_once('csvprocessor.php');
 
 class CONSUMABLES extends API {
@@ -687,23 +687,6 @@ class CONSUMABLES extends API {
 					]]);
 			break;
 		}
-	}
-
-	public function order(){
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			case 'GET':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			case 'DELETE':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			}
 	}
 }
 

@@ -119,7 +119,49 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 
-	];
+		'order_get-product-search' => [
+			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id AND prod.active = 1",
+			'sqlsrv' => ""
+		],
+		'order_post-intended-order' => [
+			'mysql' => "INSERT INTO caro_consumables_intended_orders (id, order_data) VALUES (NULL, :order_data)",
+			'sqlsrv' => ""
+		],
+		'order_put-intended-order' => [
+			'mysql' => "UPDATE caro_consumables_intended_orders SET order_data = :order_data WHERE id = :id",
+			'sqlsrv' => ""
+		],
+		'order_get-intended-order' => [
+			'mysql' => "SELECT * FROM caro_consumables_intended_orders WHERE id = :id LIMIT 1",
+			'sqlsrv' => ""
+		],
+		'order_delete-intended-order' => [
+			'mysql' => "DELETE FROM caro_consumables_intended_orders WHERE id = :id LIMIT 1",
+			'sqlsrv' => ""
+		],
 
+		'order_get-intended-orders' => [
+			'mysql' => "SELECT * FROM caro_consumables_intended_orders",
+			'sqlsrv' => ""
+		],
+
+		'order_post-order' => [
+			'mysql' => "INSERT INTO caro_consumables_orders (id, order_data, approval, approved, ordered, received) VALUES (NULL, :order_data, :approval, CURRENT_TIMESTAMP, NULL, NULL)",
+			'sqlsrv' => ""
+		],
+		'order_put-order' => [
+			'mysql' => "UPDATE caro_consumables_orders SET order_data = :order_data WHERE id = :id",
+			'sqlsrv' => ""
+		],
+		'order_get-order' => [
+			'mysql' => "SELECT * FROM caro_consumables_orders WHERE id = :id LIMIT 1",
+			'sqlsrv' => ""
+		],
+		'order_delete-order' => [
+			'mysql' => "DELETE FROM caro_consumables_orders WHERE id = :id LIMIT 1",
+			'sqlsrv' => ""
+		],
+
+	];
 }
 ?>

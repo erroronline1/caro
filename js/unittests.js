@@ -1,23 +1,10 @@
 //test assembling
-import {
-    assemble_helper
-} from '../js/assemble.js';
-window.assemble_helper = assemble_helper;
-import {
-    api
-} from '../scripts.js';
-api.getForms('qr', 'template', 'qr');
+//api.getForms('qr', 'template', 'qr');
+
+//test api
+//api.user('user_new');
 
 //test composing
-/*import {
-    Compose,
-    MetaCompose,
-    compose_helper
-} from '../js/compose.js';
-window.MetaCompose = MetaCompose;
-window.compose_helper = compose_helper;
-
-window.Compose = Compose;
 /*const createForm = {
     "content": [
         [{
@@ -79,8 +66,9 @@ window.Compose = Compose;
         }],
         [{
             "type": "button",
+            "description":"generate/update form object",
             "attributes": {
-                "value": "♺ generate/update form object",
+                "data-type": "generateupdate",
                 "onclick": "console.log(compose_helper.composeNewForm())"
             }
         }],
@@ -91,7 +79,7 @@ window.Compose = Compose;
     ]
 };
 new Compose(createForm);
-
+/*
 const oldform = {
     "name":"oldform",
     "content": [

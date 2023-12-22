@@ -1,29 +1,34 @@
 //import relevant functions and set global scope
 
 import {
-    Assemble,
-    assemble_helper
+	Assemble,
+	assemble_helper
 } from '../js/assemble.js';
 window.Assemble = Assemble;
 window.assemble_helper = assemble_helper;
 
 import {
-    api
+	api
 } from '../js/api.js';
 window.api = api;
 
 import {
-    Compose,
-    MetaCompose,
-    compose_helper
+	Compose,
+	MetaCompose,
+	compose_helper
 } from '../js/compose.js';
 window.Compose = Compose;
 window.MetaCompose = MetaCompose;
 window.compose_helper = compose_helper;
 
 import {
-    LANG
+	LANG
 } from '../js/language.js';
 window.LANG = LANG;
+
+import {
+	orderClient
+} from '../js/order.js';
+window.orderClient = orderClient;
 
 api.application('get', 'login');
