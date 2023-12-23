@@ -145,20 +145,24 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 
-		'order_post-order' => [
-			'mysql' => "INSERT INTO caro_consumables_orders (id, order_data, approval, approved, ordered, received) VALUES (NULL, :order_data, :approval, CURRENT_TIMESTAMP, NULL, NULL)",
+		'order_post-approved-order' => [
+			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL)",
 			'sqlsrv' => ""
 		],
-		'order_put-order' => [
-			'mysql' => "UPDATE caro_consumables_orders SET order_data = :order_data WHERE id = :id",
+		'order_put-approved-order-ordered' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => ""
 		],
-		'order_get-order' => [
-			'mysql' => "SELECT * FROM caro_consumables_orders WHERE id = :id LIMIT 1",
+		'order_put-approved-order-received' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET received = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => ""
 		],
-		'order_delete-order' => [
-			'mysql' => "DELETE FROM caro_consumables_orders WHERE id = :id LIMIT 1",
+		'order_get-approved-order' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit)",
+			'sqlsrv' => ""
+		],
+		'order_delete-approved-order' => [
+			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 

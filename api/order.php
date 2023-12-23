@@ -62,16 +62,19 @@ class ORDER extends API {
 							$text .= $this->fields[$key] . ': ' . $value . '\n';
 						}
 					}
-					array_push($result['body']['content'], 
-						[['type' => 'text',
+					array_push($result['body']['content'], [
+						['type' => 'text',
 						'content' => $text,
+						'collapse' => true
+						],
+						['type' => 'button',
 						'collapse' => true,
-				],
-				['type' => 'button',
-				'collapse' => true,
-				'description' => LANG::GET('order.edit_intended_order'),
-				'attributes' =>['type' => 'button',
-				'onpointerdown' => "api.purchase('get', 'order', " . $order['id']. ")"]]
+						'description' => LANG::GET('order.edit_intended_order'),
+						'attributes' =>['type' => 'button',
+						'onpointerdown' => "api.purchase('get', 'order', " . $order['id']. ")"]],
+						['type' => 'cart',
+						'collapse' => true
+						]
 					]);
 				}
 			break;
@@ -114,7 +117,7 @@ class ORDER extends API {
 				if ($this->_payload->approval_token){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 					$statement->execute([
-						':token' => $this->_requestedToken
+						':token' => $this->_payload->approval_token
 					]);
 					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
 						$approval = $result['name'] . LANG::GET('order.token_verified');
@@ -157,11 +160,12 @@ class ORDER extends API {
 				for ($i = 0; $i<count($order_data['items']);$i++){
 					$order_data2 = $order_data['items'][$i];
 					foreach ($keys as $key){
-						if ($key != ['items']) $order_data2[$key] = $order_data[$key];
+						if (!in_array($key, ['items','organizational_unit'])) $order_data2[$key] = $order_data[$key];
 					}
-					$query .= strtr(SQLQUERY::PREPARE('order_post-order'),
+					$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 					[
 						':order_data' => "'" . json_encode($order_data2) . "'",
+						':organizational_unit' => "'" . $order_data['organizational_unit'] . "'",
 						':approval' => "'" . $approval . "'",
 					]) . '; ';
 				}
@@ -178,13 +182,13 @@ class ORDER extends API {
 					]];
 				break;
 			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				unset ($this->_payload->Search_product);
 				$approval = false;
 				if ($this->_payload->approval_token){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 					$statement->execute([
-						':token' => $this->_requestedToken
+						':token' => $this->_payload->approval_token
 					]);
 					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
 						$approval = $result['name'] . LANG::GET('order.token_verified');
@@ -228,11 +232,12 @@ class ORDER extends API {
 				for ($i = 0; $i<count($order_data['items']);$i++){
 					$order_data2 = $order_data['items'][$i];
 					foreach ($keys as $key){
-						if ($key != ['items']) $order_data2[$key] = $order_data[$key];
+						if (!in_array($key, ['items','organizational_unit'])) $order_data2[$key] = $order_data[$key];
 					}
-					$query .= strtr(SQLQUERY::PREPARE('order_post-order'),
+					$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 					[
 						':order_data' => "'" . json_encode($order_data2) . "'",
+						':organizational_unit' => "'" . $order_data['organizational_unit'] . "'",
 						':approval' => "'" . $approval . "'",
 					]) . '; ';
 				}
@@ -391,6 +396,7 @@ class ORDER extends API {
 						'description' => LANG::GET('order.commission'),
 						'attributes' => [
 							'name' => 'commission',
+							'required' => true,
 							'placeholder' => LANG::GET('order.add_commission_placeholder'),
 							'value' => array_key_exists('commission', $order) ? $order['commission'] : ''
 						]]
@@ -488,8 +494,7 @@ class ORDER extends API {
 
 				break;
 			case 'DELETE':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-intended-order'));
 				if ($statement->execute([
 					':id' => $this->_requestedID
@@ -505,14 +510,126 @@ class ORDER extends API {
 						'id' => $this->_requestedID,
 						'msg' => LANG::GET('order.failed_delete')
 					]];
-
-
-
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-intended-order'));
+				break;
+			}
+		$this->response($result);
+	}
+	public function approved(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'PUT':
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if ($this->_subMethod == 'ordered') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
+				if ($this->_subMethod == 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
 				$statement->execute([
 					':id' => $this->_requestedID
+					]);
+				$result=[
+					'status' => [
+						'msg' => LANG::GET('order.' . $this->_subMethod)
+					]];
+				break;
+			case 'GET':
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				$result=['body'=>['content'=>[]]];
+				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = LANGUAGEFILE['units']; // see all orders
+				else { // see only orders for own units
+					$units = [];
+					foreach($_SESSION['user']['units'] as $unit){
+						$units[] = LANG::GET('units.' . $unit);
+					}
+				}
+				// in clause doesnt work without manually preparing
+				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order'),
+				[
+					':organizational_unit' => "'".implode("','", $units)."'"
 				]);
-			break;
+				$statement = $this->_pdo->prepare($query);
+				$statement->execute();
+				$order = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($order as $row) {
+					$content = [];
+					$text = '\n';
+					foreach (json_decode($row['order_data']) as $key => $value){ // data
+						$content[]=[
+							'type' => 'textinput',
+							'collapse' => true,
+							'attributes' => [
+								'value' => $value,
+								'placeholder' => $this->fields[$key],
+								'readonly' => true,
+								'onpointerdown' => 'orderClient.toClipboard(this)'
+							]
+						];
+					}
+					$text .= $this->fields['organizational_unit'] . ': ' . $row['organizational_unit'] . '\n';
+					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
+					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
+					if ($row['ordered']) $text .= LANG::GET('order.ordered') . ': ' . $row['ordered'] . '\n';
+					if ($row['received']) $text .= LANG::GET('order.received') . ': ' . $row['received'] . '\n';
+
+					$status=[];
+					if (boolval($row['ordered']))
+						$status[LANG::GET('order.ordered')] = ['disabled' => true, 'checked' => true];
+					else
+						$status[LANG::GET('order.ordered')] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'ordered'); this.disabled=true"];
+					if (boolval($row['received']))
+						$status[LANG::GET('order.received')] = ['disabled' => true, 'checked' => true];
+					else
+						$status[LANG::GET('order.received')] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'received'); this.disabled=true"];
+					$content[]=[
+						'type' => 'text',
+						'content' => $text,
+						'collapse' => true,
+					];
+					$content[]=[
+						'type' => 'checkbox',
+						'collapse' => true,
+						'content' => $status
+					];
+					if (str_contains($row['approval'], 'data:image/png')){
+						$content[]=[
+							'type' => 'image',
+							'collapse' => true,
+							'description' => LANG::GET('order.approval_image'),
+							'attributes' => [
+								'name' => LANG::GET('order.approval_image'),
+								'url' => $row['approval']]
+						];
+					}
+					$content[]=[
+						'type' => 'deletebutton',
+						'collapse' => true,
+						'description' => LANG::GET('order.delete_intended_order'),
+						'attributes' => [
+							'type' => 'button',
+							'onpointerdown' => "if (confirm(LANG.GET('order.delete_intended_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
+						]
+					];
+					$content[]=[
+						'type' => 'cart',
+						'collapse' => true
+					];
+					array_push($result['body']['content'], $content);
+				}
+				break;
+			case 'DELETE':
+				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
+				if ($statement->execute([
+					':id' => $this->_requestedID
+					])) {
+					$result=[
+					'status' => [
+						'id' => false,
+						'msg' => LANG::GET('order.deleted')
+					]];
+				}
+				else $result=[
+					'status' => [
+						'id' => $this->_requestedID,
+						'msg' => LANG::GET('order.failed_delete')
+					]];
+				break;
 			}
 		$this->response($result);
 	}

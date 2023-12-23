@@ -189,6 +189,10 @@ export const api = {
 		post order/order
 		put order/order/{id}
 		delete order/order/{id}
+
+		get order/approved/
+		put order/approved/{id}/{ordered|received}
+		delete order/approved/{id}
 		*/
 		request = [...request];
 		if (['distributor', 'product'].includes(request[0]))
@@ -228,6 +232,12 @@ export const api = {
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'put':
+				if (['ordered', 'received'].includes(request[3])) {
+					successFn = function (data) {
+						api.toast(data.status.msg);
+					};
+					break;
+				}	
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'delete':
