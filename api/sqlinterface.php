@@ -123,25 +123,25 @@ class SQLQUERY {
 			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id AND prod.active = 1",
 			'sqlsrv' => ""
 		],
-		'order_post-intended-order' => [
-			'mysql' => "INSERT INTO caro_consumables_intended_orders (id, order_data) VALUES (NULL, :order_data)",
+		'order_post-prepared-order' => [
+			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",
 			'sqlsrv' => ""
 		],
-		'order_put-intended-order' => [
-			'mysql' => "UPDATE caro_consumables_intended_orders SET order_data = :order_data WHERE id = :id",
+		'order_put-prepared-order' => [
+			'mysql' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id",
 			'sqlsrv' => ""
 		],
-		'order_get-intended-order' => [
-			'mysql' => "SELECT * FROM caro_consumables_intended_orders WHERE id = :id LIMIT 1",
+		'order_get-prepared-order' => [
+			'mysql' => "SELECT * FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
-		'order_delete-intended-order' => [
-			'mysql' => "DELETE FROM caro_consumables_intended_orders WHERE id = :id LIMIT 1",
+		'order_delete-prepared-order' => [
+			'mysql' => "DELETE FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 
-		'order_get-intended-orders' => [
-			'mysql' => "SELECT * FROM caro_consumables_intended_orders",
+		'order_get-prepared-orders' => [
+			'mysql' => "SELECT * FROM caro_consumables_prepared_orders",
 			'sqlsrv' => ""
 		],
 
