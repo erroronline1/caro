@@ -55,6 +55,7 @@
             "match":
                 "all": dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
                 "any": dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
+        "transfer": add a new column with comparison value
 
         "apply": "filter_by_monthinterval",
         "comment": description, will be displayed
@@ -74,6 +75,8 @@
 
     "modify": modifies the result
         "add": adds a column with the set value. if the name is already in use this will be replaced!
+               if property is an array with number values and arithmetic operators it will try to calculate
+               comma will be replaced with a decimal point in the latter case. hope for a proper number format.
         "replace": replaces regex matches with the given value either at a specified field or in all
                    according to index 0 being a column name or none/null
         "remove": remove columns from result, may have been used solely for filtering
@@ -168,6 +171,16 @@ class Listprocessor {
 		$day = $offset_date->format('j');
 		$offset_date->modify('first day of +1 month')->modify('+' . (min($day, $offset_date->format('t')) - 1) . ' days');
 		return explode('-', $offset_date->format($dateformat));
+	}
+
+	public function calculate($expression = []){
+		/* tries to calculate an expression, returns rounded number, otherwise string */
+		$expression = str_replace(',', '.', implode('', $expression));
+		if (preg_match('/^[0-9\+\-\*\/\(\)\.]+$/', $expression)) {
+			return round(eval('return ' . $expression . ';'));
+		} else {
+			return $expression;
+		}
 	}
 
 	public function importFile(){
@@ -488,6 +501,9 @@ class Listprocessor {
 				"any":{
 					"ORIGININDEX": "COMPAREFILEINDEX"
 				}
+			},
+			"transfer": {
+				"NEWPARENTCOLUMN": "COMPARECOLUMN"
 			}
 		},
 		*/
@@ -496,6 +512,7 @@ class Listprocessor {
 		$this->_log[] = '[*] comparing with '. $rule['filesetting']['source'];
 		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_.argument['processedYear']], True);
 		$equals = new \DS\Set();
+		$transfercolumns = array_key_exists('transfer', $rule) ? $rule['transfer']: null;
 
 		foreach ($rule['match'] as $any_or_all){
 			$compare_columns = rule['match'][$any_or_all];
@@ -515,7 +532,16 @@ class Listprocessor {
 						$correspond[$corresponded++] = $self_row[$column] === $cmp_row[$compare_columns[$column]];
 						if ($any_or_all === 'any') break;
 					}
-					if ($any_or_all === 'any' && in_array(true, $correspond) || ($any_or_all === 'all' && !in_array(false, $correspond))) $equals->add($i);
+					if ($any_or_all === 'any' && in_array(true, $correspond) || ($any_or_all === 'all' && !in_array(false, $correspond))) {
+						$equals->add($i);
+						if ($transfercolumns){
+							foreach ($transfercolumns as $transfer){
+								if (!array_key_exists($transfer, $this->setting['filesetting']['columns']))
+									$this->setting['filesetting']['columns'][] = $transfer;
+								$this->_list[$i][$transfer] = $cmp_row[$transfercolumns[$transfer]];
+							}
+						}
+					}
 				}
 			}
 		}
@@ -624,7 +650,7 @@ class Listprocessor {
 		{
 			"add":{
 				"NEWCOLUMNNAME": "string",
-				"ANOTHERCOLUMNNAME" : "string"
+				"ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
 			},
 			"replace":[
 				["NAME", "regex", "replacement"],
@@ -646,7 +672,15 @@ class Listprocessor {
 						if (!in_array($rule, $this->_setting['filesetting']['columns']))
 								$this->_setting['filesetting']['columns'][] = $key;
 						foreach ($this->_list as $i => $row){
-							$this->_list[$i][$key] = $rule;
+							if (is_array($modifications[$modify][$key])){
+								$expression = [];
+								foreach ($modifications[$modify][$key] as $possible_col){
+									$expression[] =  array_key_exists($possible_col, $this->_list[$i]) ? $this->_list[$i][$possible_col] : $possible_col;
+								}
+							}
+							else
+								$expression = [$modifications[$modify][$key]];
+							$this->_list[$i][$key] = $this->calculate($expression);
 						}
 						break;
 					case 'replace':
