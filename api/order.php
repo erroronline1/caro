@@ -94,6 +94,9 @@ class ORDER extends API {
 				]);
 				$search = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($search as $key => $row) {
+					foreach($row as $key => $value){
+						$row[$key]=str_replace("\n", ' ', $row[$key]);
+					}
 					$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['distributor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "'); return false;"];
 				}
 				$result['body']['content']=
@@ -172,7 +175,7 @@ class ORDER extends API {
 				$statement = $this->_pdo->prepare($query);
 				if ($statement->execute()) $result=[
 					'status' => [
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => false,
 						'msg' => LANG::GET('order.saved')
 					]];
 				else $result=[
@@ -245,7 +248,7 @@ class ORDER extends API {
 				if ($statement->execute()) {
 					$result=[
 					'status' => [
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => false,
 						'msg' => LANG::GET('order.saved')
 					]];
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-intended-order'));
