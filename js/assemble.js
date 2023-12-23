@@ -154,6 +154,9 @@ export class Assemble {
 		this.multiplearticles = [];
 		this.multiplearticleID = null;
 		this.section = null;
+		this.imageQrCode = [];
+		this.imageBarCode = [];
+		this.imageUrl = [];
 	}
 
 	initializeSection(nextSibling = null) {
@@ -195,32 +198,52 @@ export class Assemble {
 		if (this.signaturePad) {
 			initialize_SignaturePad();
 		}
-		if (this.imageQrCode) {
+		if (this.imageQrCode.length) {
 			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
-			QrCreator.render({
-				text: this.imageQrCode.content,
-				size: 1024,
-				ecLevel: 'H',
-				background: null,
-				fill: '#000000',
-				radius: 1
-			}, document.getElementById(this.imageQrCode.id));
+			for (const image of this.imageQrCode) {
+				QrCreator.render({
+					text: image.content,
+					size: 1024,
+					ecLevel: 'H',
+					background: null,
+					fill: '#000000',
+					radius: 1
+				}, document.getElementById(image.id));
+			}
 		}
-		if (this.imageBarCode) {
-			JsBarcode('#' + this.imageBarCode.id, this.imageBarCode.content.value, {
-				format: this.imageBarCode.content.format || 'CODE128',
-				background: 'transparent',
-				displayValue: this.imageBarCode.content.displayValue != undefined ? this.imageBarCode.content.displayValue : true,
-			});
+		if (this.imageBarCode.length) {
+			for (const image of this.imageBarCode) {
+				JsBarcode('#' + image.id, image.content.value, {
+					format: image.content.format || 'CODE128',
+					background: 'transparent',
+					displayValue: image.content.displayValue != undefined ? image.content.displayValue : true,
+				});
+			}
 		}
-		if (this.imageUrl) {
-			const imgcanvas = document.getElementById(this.imageUrl.id),
-				img = new Image();
-			img.src = this.imageUrl.content;
-			img.addEventListener('load', function (e) {
-				imgcanvas.getContext('2d').drawImage(this, 0, 0, imgcanvas.width, imgcanvas.height)
-			});
-			img.dispatchEvent(new Event('load'));
+		if (this.imageUrl.length) {
+			for (const image of this.imageUrl) {
+				let imgcanvas = document.getElementById(image.id),
+					img = new Image();
+				img.src = image.content;
+				img.addEventListener('load', function (e) {
+					let x, y,
+						w = this.width,
+						h = this.height,
+						xoffset = 0,
+						yoffset = 0;
+					if (w >= h) {
+						x = imgcanvas.width;
+						y = imgcanvas.height * h / w;
+						yoffset = (x - y) / 2;
+					} else {
+						x = imgcanvas.width * w / h;
+						y = imgcanvas.height;
+						xoffset = (y - x) / 2;
+					}
+					imgcanvas.getContext('2d').drawImage(this, xoffset, yoffset, x, y)
+				});
+				img.dispatchEvent(new Event('load'));
+			}
 		}
 	}
 
@@ -312,9 +335,9 @@ export class Assemble {
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-		
-		const content=this.tile.content.matchAll(/(.*?)(?:\n|\\n|<br \/>|$)/gm);
-		for (const part of content){
+
+		const content = this.tile.content.matchAll(/(.*?)(?:\n|\\n|<br \/>|$)/gm);
+		for (const part of content) {
 			this.elements.add(document.createTextNode(part[1]));
 			this.elements.add(document.createElement('br'));
 		}
@@ -721,21 +744,31 @@ export class Assemble {
 			}
 		} */
 		const canvas = document.createElement('canvas');
+		let disabled = true;
 		canvas.id = getNextElementID();
 		canvas.classList.add('imagecanvas');
 		canvas.width = canvas.height = 1024;
-		if (this.tile.attributes.qrcode) this.imageQrCode = {
-			id: canvas.id,
-			content: this.tile.attributes.qrcode
+		if (this.tile.attributes.qrcode) {
+			this.imageQrCode.push({
+				id: canvas.id,
+				content: this.tile.attributes.qrcode
+			});
+			disabled = false;
 		}
-		if (this.tile.attributes.barcode) this.imageBarCode = {
-			id: canvas.id,
-			content: this.tile.attributes.barcode
+		if (this.tile.attributes.barcode) {
+			this.imageBarCode.push({
+				id: canvas.id,
+				content: this.tile.attributes.barcode
+			});
+			disabled = false;
 		}
-		if (this.tile.attributes.url) this.imageUrl = {
-			id: canvas.id,
-			content: this.tile.attributes.url
-		};
+		if (this.tile.attributes.url) {
+			this.imageUrl.push({
+				id: canvas.id,
+				content: this.tile.attributes.url
+			});
+			disabled = false;
+		}
 
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
@@ -745,7 +778,7 @@ export class Assemble {
 			'data-type': this.tile.type,
 			'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
 		};
-		if (!(this.imageQrCode || this.imageUrl)) this.tile.attributes.disabled = true;
+		if (disabled) this.tile.attributes.disabled = true;
 
 		this.button();
 	}
