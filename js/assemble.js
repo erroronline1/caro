@@ -776,6 +776,7 @@ function initialize_SignaturePad() {
 		// It's Necessary to use an opaque color when saving image as JPEG;
 		// this option can be omitted if only saving as PNG or SVG
 		//backgroundColor: 'rgb(255, 255, 255)'
+		penColor: "rgb(46, 52, 64)"
 	});
 	// On mobile devices it might make more sense to listen to orientation change,
 	// rather than window resize events.
