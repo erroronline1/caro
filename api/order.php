@@ -94,7 +94,7 @@ class ORDER extends API {
 				]);
 				$search = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($search as $key => $row) {
-					$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = ['href' => "javascript:orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['distributor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "')"];
+					$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['distributor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "'); return false;"];
 				}
 				$result['body']['content']=
 					[[
@@ -124,7 +124,7 @@ class ORDER extends API {
 					}
 				}
 				if ($_FILES['signature']['tmp_name']){
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['signature']['tmp_name'], 128, UTILITY_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['signature']['tmp_name'], 256, UTILITY_IMAGE_RESOURCE, 'png'));
 				}
 				unset ($this->_payload->approval_token);
 				$order_data=['items'=>[]];
@@ -195,7 +195,7 @@ class ORDER extends API {
 					}
 				}
 				if (array_key_exists('signature', $_FILES) &&  $_FILES['signature']['tmp_name']){
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['signature']['tmp_name'][0], 128, UTILITY_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['signature']['tmp_name'][0], 256, UTILITY_IMAGE_RESOURCE, 'png'));
 				}
 				unset ($this->_payload->approval_token);
 				$order_data=['items'=>[]];
