@@ -677,3 +677,7 @@ button:active {
 	/* multiple input fields within one section */
 	background-image: url("media/list-ul.svg");
 }
+
+[data-type=cart]::before {
+	background-image: url("media/shopping-cart.svg");
+}

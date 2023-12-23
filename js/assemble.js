@@ -762,6 +762,10 @@ export class Assemble {
 		// empty method but neccessary for styling reasons (icon)
 		// multiple input fields within one section
 	}
+
+	cart() {
+		// empty method but neccessary for styling reasons (icon)
+	}
 }
 
 var signaturecanvas = null;
