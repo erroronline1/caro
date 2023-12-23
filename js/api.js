@@ -183,7 +183,7 @@ export const api = {
 		put consumables/product/{id}
 		delete consumables/product/{id}
 
-		get order/intended
+		get order/prepared
 		get order/productsearch/{id|name}
 		get order/order/{id}
 		post order/order

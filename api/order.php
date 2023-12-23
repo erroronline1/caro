@@ -27,11 +27,11 @@ class ORDER extends API {
 		];
 	}
 
-	public function intended(){
+	public function prepared(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-intended-orders'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-orders'));
 				$statement->execute();
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
 				// display all orders assigned to organizational unit
@@ -69,7 +69,7 @@ class ORDER extends API {
 						],
 						['type' => 'button',
 						'collapse' => true,
-						'description' => LANG::GET('order.edit_intended_order'),
+						'description' => LANG::GET('order.edit_prepared_order'),
 						'attributes' =>['type' => 'button',
 						'onpointerdown' => "api.purchase('get', 'order', " . $order['id']. ")"]],
 						['type' => 'cart',
@@ -145,14 +145,14 @@ class ORDER extends API {
 				if(!count($order_data['items'])) $this->response([], 406);
 
 				if (!$approval){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-intended-order'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
 					$statement->execute([
 						':order_data' => json_encode($order_data)
 					]);
 					$result=[
 						'status' => [
 							'id' => $this->_pdo->lastInsertId(),
-							'msg' => LANG::GET('order.saved_to_intended')
+							'msg' => LANG::GET('order.saved_to_prepared')
 						]];
 					break;
 				}
@@ -216,7 +216,7 @@ class ORDER extends API {
 				if(!count($order_data['items'])) $this->response([], 406);
 
 				if (!$approval){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-intended-order'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-prepared-order'));
 					$statement->execute([
 						':order_data' => json_encode($order_data),
 						':id' => $this->_requestedID
@@ -224,7 +224,7 @@ class ORDER extends API {
 					$result=[
 						'status' => [
 							'id' => $this->_requestedID,
-							'msg' => LANG::GET('order.saved_to_intended')
+							'msg' => LANG::GET('order.saved_to_prepared')
 						]];
 					break;
 				}
@@ -251,7 +251,7 @@ class ORDER extends API {
 						'id' => false,
 						'msg' => LANG::GET('order.saved')
 					]];
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-intended-order'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-prepared-order'));
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
@@ -281,7 +281,7 @@ class ORDER extends API {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-intended-order'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-order'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
@@ -488,17 +488,17 @@ class ORDER extends API {
 				}
 				if ($this->_requestedID) array_push($result['body']['content'], [
 					['type' => 'deletebutton',
-						'description' => LANG::GET('order.delete_intended_order'),
+						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerdown' => 'if (confirm("'. LANG::GET('order.delete_intended_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
+							'onpointerdown' => 'if (confirm("'. LANG::GET('order.delete_prepared_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
 						]]
 				]);
 
 				break;
 			case 'DELETE':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-intended-order'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-prepared-order'));
 				if ($statement->execute([
 					':id' => $this->_requestedID
 					])) {
@@ -602,10 +602,10 @@ class ORDER extends API {
 					$content[]=[
 						'type' => 'deletebutton',
 						'collapse' => true,
-						'description' => LANG::GET('order.delete_intended_order'),
+						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',
-							'onpointerdown' => "if (confirm(LANG.GET('order.delete_intended_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
+							'onpointerdown' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
 						]
 					];
 					$content[]=[
