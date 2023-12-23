@@ -148,7 +148,7 @@ class UTILITY {
 	 * 
 	 * @return object|null a GdImage ressource or no return
 	 */
-	public static function resizeImage($file, $maxSize = 128, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false){
+	public static function resizeImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false){
 		if (is_file($file)){
 			$filetype=getimagesize($file)[2];
 			switch($filetype){
@@ -172,6 +172,7 @@ class UTILITY {
 			elseif ($owidth < $oheight && $oheight > $maxSize) $resize = $maxSize/$oheight;
 			else $resize = 1;
 			$image2 = imagecreatetruecolor(ceil($owidth * $resize), ceil($oheight * $resize));
+			imagecolortransparent($image2, imagecolorallocate($image2, 0, 0, 0));
 			imagecopyresampled($image2, $image, 0, 0, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $owidth, $oheight);
 			imagedestroy($image);
 
@@ -193,7 +194,7 @@ class UTILITY {
 			}
 
 			if ($forceOutputType){
-				$newtype=array_search($forceOutputType, ['gif', 'jpeg', 'png', 'jpg']);
+				$newtype = array_search($forceOutputType, ['gif', 'jpeg', 'png', 'jpg']);
 				if ($newtype !== false){
 					if ($newtype == 3) $newtype = 1;
 					$filetype = $newtype + 1;
@@ -214,15 +215,15 @@ class UTILITY {
 					imagejpeg($image2, null, 100);
 					break;
 				case "3": //png
-					imagepng($image2, null, 0);
+					imagepng($image2, null, 6);
 					break;
 			}
-			if ($destination & UTILITY_IMAGE_STREAM) {
-				ob_end_flush();
-			}
-			$return = ob_get_clean();
-			ob_end_clean(); 
 			imagedestroy($image2);
+			if ($destination & UTILITY_IMAGE_STREAM) {
+				ob_flush();
+			}
+			$return = ob_get_contents();
+			ob_end_clean(); 
 			return $return;
 		}
 	}
