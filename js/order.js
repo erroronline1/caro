@@ -1,6 +1,6 @@
 export const orderClient = {
 	addProduct: (...data) => {
-		// order to be taken into account in order.php as well!
+		// order to be taken into account in order.php "productsearch" method as well!
 		const nodes = document.querySelectorAll('[data-type=collapsed]'),
 			newNode = nodes[nodes.length - 1].cloneNode(true),
 			transfer = ['', ...data]; // first item is supposed to be quantity
@@ -49,5 +49,11 @@ export const orderClient = {
 			if (hasValue) node.children[i].setAttribute('required', '');
 			else node.children[i].removeAttribute('required');
 		}
+	},
+	toClipboard: (node) =>{
+		node.select();
+		node.setSelectionRange(0, 99999); // For mobile devices
+		navigator.clipboard.writeText(node.value);
+		api.toast(LANG.GET('general.copied_to_clipboard'));
 	}
 };
