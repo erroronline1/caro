@@ -799,6 +799,10 @@ export class Assemble {
 	cart() {
 		// empty method but neccessary for styling reasons (icon)
 	}
+
+	message() {
+		// empty method but neccessary for styling reasons (icon)
+	}
 }
 
 var signaturecanvas = null;

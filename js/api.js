@@ -48,6 +48,48 @@ export const api = {
 	update_header(string = '') {
 		document.querySelector('head>h1').innerHTML = string;
 	},
+	application: async (method, ...request) => {
+		/*
+		get application/user
+		get application/menu
+		get application/language
+		*/
+		request = [...request];
+		request.splice(0, 0, 'application');
+		let successFn;
+		switch (request[1]) {
+			case 'language':
+				successFn = async function (data) {
+					window.LANGUAGEFILE = data.body;
+				}
+				break;
+			case 'login':
+				const logintoken = document.querySelector('[data-usecase=login]');
+				if (logintoken) {
+					request.push((logintoken.value ? logintoken.value : null));
+				}
+				successFn = function (data) {
+					document.getElementById('main').innerHTML = '';
+					api.application('get', 'menu');
+					if (data.body.form) {
+						document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
+						new Assemble(data.body).initializeSection();
+						return;
+					}
+					document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
+					document.getElementById('openmenu').checked = false;
+				}
+				break;
+			case 'menu':
+				successFn = function (data) {
+					assemble_helper.userMenu(data.body);
+				}
+				break;
+			default:
+				return;
+		}
+		await api.send(method, request, successFn);
+	},
 	form: (method, ...request) => {
 		/*
 		get form elements from database.
@@ -133,19 +175,21 @@ export const api = {
 		api.send(method, request, successFn, null, payload);
 		document.getElementById('openmenu').checked = false;
 	},
-	user: (method, ...request) => {
+	message: (method, ...request) => {
 		/*
-		get user/{id|name}
-		post user
-		put user/{id}
-		delete user/{id}
+		get inbox
+		get sent
+		get message/{id}
+		post message
+		delete message/{id}/{redirect}
 		*/
 		request = [...request];
-		request.splice(0, 0, 'user');
+		request.splice(0, 0, 'message');
 		let payload,
 			successFn = function (data) {
 				api.toast(data.status.msg);
-				api.user('get', data.status.id);
+				if ('redirect' in data.status && data.status.redirect)
+					api.message('get', data.status.redirect);
 			};
 		switch (method) {
 			case 'get':
@@ -158,17 +202,14 @@ export const api = {
 				};
 				break;
 			case 'post':
-				payload = _.getInputs('[data-usecase=user]', true);
-				break;
-			case 'put':
-				payload = _.getInputs('[data-usecase=user]', true);
+				payload = _.getInputs('[data-usecase=message]', true);
 				break;
 			case 'delete':
 				break;
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
+		api.send(method, request, successFn, null, payload, method === 'post');
 		document.getElementById('openmenu').checked = false;
 	},
 	purchase: (method, ...request) => {
@@ -248,47 +289,42 @@ export const api = {
 		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
 		document.getElementById('openmenu').checked = false;
 	},
-	application: async (method, ...request) => {
+	user: (method, ...request) => {
 		/*
-		get application/user
-		get application/menu
-		get application/language
+		get user/{id|name}
+		post user
+		put user/{id}
+		delete user/{id}
 		*/
 		request = [...request];
-		request.splice(0, 0, 'application');
-		let successFn;
-		switch (request[1]) {
-			case 'language':
-				successFn = async function (data) {
-					window.LANGUAGEFILE = data.body;
-				}
-				break;
-			case 'login':
-				const logintoken = document.querySelector('[data-usecase=login]');
-				if (logintoken) {
-					request.push((logintoken.value ? logintoken.value : null));
-				}
+		request.splice(0, 0, 'user');
+		let payload,
+			successFn = function (data) {
+				api.toast(data.status.msg);
+				api.user('get', data.status.id);
+			};
+		switch (method) {
+			case 'get':
 				successFn = function (data) {
-					document.getElementById('main').innerHTML = '';
-					api.application('get', 'menu');
-					if (data.body.form) {
-						document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
+					if (data.body) {
+						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
-						return;
 					}
-					document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
-					document.getElementById('openmenu').checked = false;
-				}
+					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+				};
 				break;
-			case 'menu':
-				successFn = function (data) {
-					assemble_helper.userMenu(data.body);
-				}
+			case 'post':
+				payload = _.getInputs('[data-usecase=user]', true);
+				break;
+			case 'put':
+				payload = _.getInputs('[data-usecase=user]', true);
+				break;
+			case 'delete':
 				break;
 			default:
 				return;
 		}
-		await api.send(method, request, successFn);
+		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
+		document.getElementById('openmenu').checked = false;
 	},
-
 }

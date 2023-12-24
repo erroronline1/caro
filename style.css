@@ -681,3 +681,7 @@ button:active {
 [data-type=cart]::before {
 	background-image: url("media/shopping-cart.svg");
 }
+
+[data-type=message]::before {
+	background-image: url("media/envelope.svg");
+}

@@ -166,6 +166,26 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 
+		'message_get_message' => [
+			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",
+			'sqlsrv' => ""
+		],
+		'message_post_message' => [
+			'mysql' => "INSERT INTO caro_messages (id, from_user, to_user, message, timestamp, alert) VALUES (NULL, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)",
+			'sqlsrv' => ""
+		],
+		'message_delete_message' => [
+			'mysql' => "DELETE FROM caro_messages WHERE id = :id LIMIT 1",
+			'sqlsrv' => ""
+		],
+		'message_get_inbox' => [
+			'mysql' => "SELECT t1.*, t2.name as from_user FROM caro_messages as t1, caro_user as t2 WHERE t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC",
+			'sqlsrv' => ""
+		],
+		'message_get_sent' => [
+			'mysql' => "SELECT t1.*, t2.name as to_user FROM caro_messages as t1, caro_user as t2 WHERE t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
+			'sqlsrv' => ""
+		],
 	];
 }
 ?>

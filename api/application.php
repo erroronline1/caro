@@ -25,7 +25,8 @@ class APPLICATION extends API {
 				'name' => $result['name'],
 				'permissions' => explode(',', $result['permissions']),
 				'units' => explode(',', $result['units']),
-				'image' => $result['image']
+				'image' => $result['image'],
+				'id' => $result['id']
 			];
 			$this->response(['body' => $_SESSION['user']]);
 		}
@@ -55,23 +56,28 @@ class APPLICATION extends API {
 		// get permission based menu items
 		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.signin_header') => []]]);			
 		$menu=[
-			'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => "javascript:api.application('get','login', 'null')"]
+			'logout' => [LANG::GET('menu.signout_user', [':name' => $_SESSION['user']['name']]) => "javascript:api.application('get','login', 'null')"],
+			LANG::GET('menu.message_header') => [
+				LANG::GET('menu.message_inbox') => "javascript:api.message('get', 'inbox')",
+				LANG::GET('menu.message_new') => "javascript:api.message('get', 'message')",
+				LANG::GET('menu.message_sent') => "javascript:api.message('get', 'sent')"
+			]
 		];
-		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.admin_header')] = [
-				LANG::GET('menu.admin_users') => "javascript:api.user('get')",
-				LANG::GET('menu.admin_form_components') => "javascript:api.form('get', 'component_editor')",
-				LANG::GET('menu.admin_forms') => "javascript:api.form('get', 'form_editor')"
-			];
-		}
 		$menu[LANG::GET('menu.purchase_header')] = [
 			LANG::GET('menu.purchase_order') => "javascript:api.purchase('get', 'order')",
 			LANG::GET('menu.purchase_prepared_orders') => "javascript:api.purchase('get', 'prepared')",
 			LANG::GET('menu.purchase_approved_orders') => "javascript:api.purchase('get', 'approved')"
 		];
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = "javascript:api.purchase('get', 'product')";
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_distributor')] = "javascript:api.purchase('get', 'distributor')";
+			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = "javascript:api.purchase('get', 'product')";
+		}
+		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.admin_header')] = [
+				LANG::GET('menu.admin_users') => "javascript:api.user('get')",
+				LANG::GET('menu.admin_form_components') => "javascript:api.form('get', 'component_editor')",
+				LANG::GET('menu.admin_forms') => "javascript:api.form('get', 'form_editor')"
+			];
 		}
 
 		$this->response(['body' => $menu]);
