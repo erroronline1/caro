@@ -72,19 +72,19 @@ class SQLQUERY {
 
 		'consumables_post-distributor' => [
 			'mysql' => "INSERT INTO caro_consumables_distributors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
-			'sqlsrv' => ""
+			'sqlsrv' => "INSERT INTO caro_consumables_distributors (active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)"
 		],
 		'consumables_put-distributor' => [
 			'mysql' => "UPDATE caro_consumables_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_consumables_distributors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id"
 		],
 		'consumables_get-distributor-datalist' => [
 			'mysql' => "SELECT name FROM caro_consumables_distributors ORDER BY name ASC",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) FROM caro_consumables_distributors ORDER BY CONVERT(VARCHAR, name) ASC"
 		],
 		'consumables_get-distributor' => [
 			'mysql' => "SELECT * FROM caro_consumables_distributors WHERE id = :id OR name = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT * FROM caro_consumables_distributors WHERE CONVERT(VARCHAR, id) = :id OR CONVERT(VARCHAR, name) = :id"
 		],
 		'consumables_post-product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, distributor_id, article_no, article_name, article_unit, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :active, :protected)",

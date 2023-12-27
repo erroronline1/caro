@@ -50,7 +50,7 @@ CREATE TABLE caro_form_components (
 
 
 
-CREATE TABLE  IF NOT EXISTS `caro_consumables_distributors` (
+CREATE TABLE IF NOT EXISTS `caro_consumables_distributors` (
   `id` int NOT NULL AUTO_INCREMENT,
   `active` tinyint(1) NOT NULL,
   `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -60,6 +60,17 @@ CREATE TABLE  IF NOT EXISTS `caro_consumables_distributors` (
   `immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+IF OBJECT_ID(N'caro_consumables_distributors', N'U') IS NULL
+CREATE TABLE caro_consumables_distributors (
+  id int NOT NULL IDENTITY(1,1),
+  active tinyint NOT NULL,
+  name text NOT NULL,
+  info text  NOT NULL,
+  certificate text NOT NULL,
+  pricelist text NOT NULL,
+  immutable_fileserver text NOT NULL,
+);
 */
 
 ?>
