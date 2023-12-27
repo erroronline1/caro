@@ -464,10 +464,12 @@ let catchemall = [ // more or less static
 	"./js/compose.js",
 	"./js/import.js",
 	"./js/language.js",
+	"./js/utilities.js",
 	"./libraries/erroronline1.js",
+	"./libraries/html5-qrcode.min.js",
+	"./libraries/JsBarcode.all.min.js",
+	"./libraries/qr-creator.js",
 	"./libraries/signature_pad.umd.js",
-	"./libraries/qr-scanner.min.js",
-	"./libraries/qr-scanner-worker.min.js"
 ];
 
 icons.forEach(set => {
@@ -501,21 +503,24 @@ self.addEventListener("activate", event => {
 	);
 });
 
-// Offline-first, cache-first strategy
-// Kick off two asynchronous requests, one to the cache and one to the network
-// If there's a cached version available, use it, but fetch an update for next time.
-// Gets data on screen as quickly as possible, then updates once the network has returned the latest data. 
+// Network-first, cache-after strategy
 self.addEventListener("fetch", event => {
 	event.respondWith(
-		caches.open(cacheName).then(cache => {
-			return cache.match(event.request).then(response => {
-				return response || fetch(event.request).then(networkResponse => {
-					if (networkResponse) {
-						cache.put(event.request, networkResponse.clone());
-						return networkResponse;
-					}
-				});
-			})
+		fetch(event.request).then(function (response) {
+	
+		  // Create a copy of the response and save it to the cache
+		  let copy = response.clone();
+		  event.waitUntil(caches.open('app').then(function (cache) {
+			return cache.put(event.request, copy);
+		  }));
+	
+		  // Return the response
+		  return response;
+	
+	  }).catch(function (error) {
+		  return caches.match(event.request).then(function (response) {
+			return response;
+		  });
 		})
-	);
+	  );
 });

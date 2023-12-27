@@ -2,6 +2,7 @@
     "name": "CARO",
     "short_name": "CARO",
     "start_url": "./index.html",
+    "id": "/caro/index.html",
     "scope": ".",
     "theme_color": "#E5E9F0",
     "background_color": "#E5E9F0",
