@@ -179,9 +179,9 @@ export const api = {
 		/*
 		get inbox
 		get sent
-		get message/{id}
+		get message/{id}/(reply|forward)
 		post message
-		delete message/{id}/{redirect}
+		delete message/{id}/(inbox|sent)
 		*/
 		request = [...request];
 		request.splice(0, 0, 'message');

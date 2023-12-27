@@ -44,6 +44,7 @@ class MESSAGE extends API {
 			case 'GET':
 				$datalist = [];
 				$result = [];
+				$prefill = ['message'=>'', 'to'=>''];
 				
 				// prepare existing users lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
@@ -56,17 +57,29 @@ class MESSAGE extends API {
 				// select message
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_message'));
 				$statement->execute([
-					':id' => $this->_requestedID
+					':id' => $this->_requestedID,
+					':user' => $_SESSION['user']['id']
 				]);
 				if (!$message = $statement->fetch(PDO::FETCH_ASSOC)){$message = [
 					'id' => null,
+					'user' => $_SESSION['user']['id'],
 					'from_user' => '',
 					'to_user' => '',
 					'message' => '',
 					'timestamp' => ''
 				];}
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$message['id']) $result['status'] = ['msg' => LANG::GET('message.error_not_found')];
-		
+				
+				if (in_array($this->_redirect, ['reply', 'forward']) && $message['message'])
+					$prefill['message'] = 
+						str_repeat("\n",4) . str_repeat('-', 17) . "\n" .
+						LANG::GET('message.from') . ': ' . $message['from_user'] . "\n" .
+						LANG::GET('message.to') . ': ' . $message['to_user'] . "\n" .
+						LANG::GET('message.time') . ': ' . $message['timestamp'] . "\n" .
+						LANG::GET('message.message') . ":\n" . $message['message'];
+				if (in_array($this->_redirect, ['reply']) && $message['message'])
+					$prefill['to'] = $message['from_user'];
+
 				// display form for writing or reading a message
 				$result['body']=['content' => [
 					[
@@ -83,7 +96,7 @@ class MESSAGE extends API {
 							'required' => true,
 							'placeholder' => LANG::GET('message.to'),
 							'list' => 'users',
-							'value' => $message['from_user'] ? : ''
+							'value' => $prefill['to'] ? : ''
 						]],
 						['type' => 'textarea',
 						'collapse' => true,
@@ -91,7 +104,7 @@ class MESSAGE extends API {
 							'name' => 'message',
 							'required' => true,
 							'placeholder' => LANG::GET('message.message'),
-							'value' => $message['message'] ? : '',
+							'value' => $prefill['message'] ? : '',
 							'rows' => 10
 						]],
 						['type' => 'message',
@@ -101,35 +114,15 @@ class MESSAGE extends API {
 					],
 					'form' => [
 						'data-usecase' => 'message',
-						'action' => $message['id'] ? 'javascript:void(0)' : 'javascript:api.message("post", "message")'
+						'action' => 'javascript:api.message("post", "message")'
 					]];
 
 				break;
 			case 'DELETE':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_message'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
-				$message = $statement->fetch(PDO::FETCH_ASSOC);
-
-				
-				/*
-				tired now...
-				todo:
-				* duplicate emails: owner sender or recipient
-				* check ownership on deletion
-				* reply
-				* forward
-				* search
-				* mobile problems within inbox and sent?!
-
-
-				*/
-
-
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_delete_message'));
 				if ($statement->execute([
-					':id' => $this->_requestedID
+					':id' => $this->_requestedID,
+					':user' => $_SESSION['user']['id']
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.delete_success'),
@@ -180,6 +173,16 @@ class MESSAGE extends API {
 				['type' => 'text',
 				'collapse' => true,
 				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
+				],
+				['type' => 'button',
+				'collapse'=> true,
+				'description' => LANG::GET('message.reply'),
+				'attributes' => [
+					'type' => 'button',
+					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
+					]],
+				['type' => 'message',
+				'collapse' => true
 				],
 				['type' => 'deletebutton',
 				'collapse'=> true,
@@ -232,6 +235,16 @@ class MESSAGE extends API {
 				['type' => 'text',
 				'collapse' => true,
 				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
+				],
+				['type' => 'button',
+				'collapse'=> true,
+				'description' => LANG::GET('message.forward'),
+				'attributes' => [
+					'type' => 'button',
+					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'forward')" 
+					]],
+				['type' => 'message',
+				'collapse' => true
 				],
 				['type' => 'deletebutton',
 				'collapse'=> true,
