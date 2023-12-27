@@ -1,11 +1,13 @@
 const _serviceWorker = {
 	swRegistration : null,
+	permission: null,
 	register: async function () {
 		if ('serviceWorker' in navigator) {
 			this.swRegistration = await navigator.serviceWorker.register('./service-worker.js');
-			return this.swRegistration;
+			this.permission = await window.Notification.requestPermission();
 		}
-		throw new Error('No Service Worker support!');
+		else
+			throw new Error('No Service Worker support!');
 	},
 	requestNotificationPermission: async function () {
 		const permission = await window.Notification.requestPermission();
@@ -17,19 +19,12 @@ const _serviceWorker = {
 			throw new Error('Permission not granted for Notification');
 		}
 	},
-
-	showLocalNotification: function (title, body, swRegistration) {
+	showLocalNotification: function (title, body) {
 		const options = {
 			'body': body,
 			// here you can add more properties like icon, image, vibrate, etc.
 		};
-		if (swRegistration.active) swRegistration.showNotification(title, options);
-	},
-	init: async function () {
-		{
-			const swRegistration = await this.register();
-			const permission = await this.requestNotificationPermission();
-		}
+		if (this.swRegistration.active) this.swRegistration.showNotification(title, options);
 	}
 }
 
