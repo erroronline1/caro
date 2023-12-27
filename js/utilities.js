@@ -1,13 +1,13 @@
-export const serviceWorker = {
+const _serviceWorker = {
 	swRegistration : null,
-	register: async () => {
+	register: async function () {
 		if ('serviceWorker' in navigator) {
-			serviceWorker.swRegistration = await navigator.serviceWorker.register('./service-worker.js');
-			return serviceWorker.swRegistration;
+			this.swRegistration = await navigator.serviceWorker.register('./service-worker.js');
+			return this.swRegistration;
 		}
 		throw new Error('No Service Worker support!');
 	},
-	requestNotificationPermission: async () => {
+	requestNotificationPermission: async function () {
 		const permission = await window.Notification.requestPermission();
 		// value of permission can be 'granted', 'default', 'denied'
 		// granted: user has accepted the request
@@ -18,22 +18,22 @@ export const serviceWorker = {
 		}
 	},
 
-	showLocalNotification: (title, body, swRegistration) => {
+	showLocalNotification: function (title, body, swRegistration) {
 		const options = {
 			'body': body,
 			// here you can add more properties like icon, image, vibrate, etc.
 		};
 		if (swRegistration.active) swRegistration.showNotification(title, options);
 	},
-	init: async () => {
+	init: async function () {
 		{
-			const swRegistration = await serviceWorker.register();
-			const permission = await serviceWorker.requestNotificationPermission();
+			const swRegistration = await this.register();
+			const permission = await this.requestNotificationPermission();
 		}
 	}
 }
 
-export const orderClient = {
+const orderClient = {
 	addProduct: (...data) => {
 		// order to be taken into account in order.php "productsearch" method as well!
 		const nodes = document.querySelectorAll('[data-type=collapsed]'),

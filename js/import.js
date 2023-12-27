@@ -26,11 +26,4 @@ import {
 } from '../js/language.js';
 window.LANG = LANG;
 
-import {
-	serviceWorker,
-	orderClient
-} from '../js/order.js';
-window.orderClient = orderClient;
-window.serviceWorker = serviceWorker;
-
 api.application('get', 'login');
