@@ -565,8 +565,17 @@ class ORDER extends API {
 				foreach($order as $row) {
 					$content = [];
 					$text = '\n';
-					foreach (json_decode($row['order_data']) as $key => $value){ // data
-						$content[]=[
+					$decoded_order_data = json_decode($row['order_data'], true);
+					if (array_key_exists('barcode', $decoded_order_data) && strlen($decoded_order_data['barcode'])) $content[]=[
+						'type' => 'image',
+						'collapse' => true,
+						'attributes' => [
+							'barcode' => ['value' => $decoded_order_data['barcode']],
+							'imageonly' => true
+						]
+					];
+					foreach ($decoded_order_data as $key => $value){ // data
+						if ($key != 'barcode') $content[]=[
 							'type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
@@ -577,6 +586,7 @@ class ORDER extends API {
 							]
 						];
 					}
+
 					$text .= $this->fields['organizational_unit'] . ': ' . $row['organizational_unit'] . '\n';
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
@@ -606,10 +616,11 @@ class ORDER extends API {
 						$content[]=[
 							'type' => 'image',
 							'collapse' => true,
-							'description' => LANG::GET('order.approval_image'),
+							//'description' => LANG::GET('order.approval_image'),
 							'attributes' => [
+								'imageonly' => true,
 								'name' => LANG::GET('order.approval_image'),
-								'url' => $row['approval']]
+								'url' => $row['approval']],
 						];
 					}
 					$content[]=[
