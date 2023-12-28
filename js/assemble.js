@@ -741,6 +741,7 @@ export class Assemble {
 				qrcode: 'e.g. token', // for display of a qrcode with this value
 				barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
 				url: 'base64 encoded string || url' // for display of an image
+				imageonly: true || undefined // flag to display without download button
 			}
 		} */
 		const canvas = document.createElement('canvas');
@@ -771,16 +772,18 @@ export class Assemble {
 		}
 
 		this.elements.add(canvas);
-		//this tile does not process attributes, therefore they can be reassigned
-		this.tile.attributes = {
-			'type': 'button',
-			'class': 'inlinebutton',
-			'data-type': this.tile.type,
-			'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
-		};
-		if (disabled) this.tile.attributes.disabled = true;
-
-		this.button();
+		
+		if (!this.tile.attributes.imageonly){
+			//this tile does not process attributes, therefore they can be reassigned
+			this.tile.attributes = {
+				'type': 'button',
+				'class': 'inlinebutton',
+				'data-type': this.tile.type,
+				'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
+			};
+			if (disabled) this.tile.attributes.disabled = true;
+			this.button();
+		}
 	}
 
 	trash() {
