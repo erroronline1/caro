@@ -31,7 +31,7 @@ class USER extends API {
 		
 				// chain checked permission levels
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, $description)) {
+					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
 						$permissions[] = $level;
 					}
 				}
@@ -39,7 +39,7 @@ class USER extends API {
 
 				// chain checked organizational units
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, $description)) {
+					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
 						$units[] = $unit;
 					}
 				}
@@ -95,7 +95,7 @@ class USER extends API {
 				
 				// chain checked permission levels
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, $description)) {
+					if (UTILITY::propertySet($this->_payload,  str_replace(' ', '_', $description))) {
 						$permissions[] = $level;
 					}
 				}
@@ -103,7 +103,7 @@ class USER extends API {
 
 				// chain checked organizational units
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, $description)) {
+					if (UTILITY::propertySet($this->_payload,  str_replace(' ', '_', $description))) {
 						$units[] = $unit;
 					}
 				}

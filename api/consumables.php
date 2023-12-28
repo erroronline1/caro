@@ -388,7 +388,8 @@ class CONSUMABLES extends API {
 					'article_no' => $this->_payload->article_no,
 					'article_name' => $this->_payload->article_name,
 					'article_unit' => $this->_payload->article_unit,
-					'active' => UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
+					'article_ean' => $this->_payload->article_ean,
+					'active' => UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_product_active'))) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
 					'protected' => 0
 				];
 
@@ -442,7 +443,7 @@ class CONSUMABLES extends API {
 				$product['article_name'] = $this->_payload->article_name;
 				$product['article_unit'] = $this->_payload->article_unit;
 				$product['article_ean'] = $this->_payload->article_ean;
-				$product['active'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
+				$product['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_product_active'))) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 
 				// validate distributor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
