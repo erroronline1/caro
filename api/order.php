@@ -37,7 +37,7 @@ class ORDER extends API {
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
 				// display all orders assigned to organizational unit
 				$userunits=[];
-				foreach($_SESSION['user']['units'] as $i => $unit){
+				foreach($_SESSION['user']['units'] as $unit){
 					array_push($userunits, LANG::GET('units.'. $unit));
 				}
 				$organizational_orders=[];
