@@ -80,7 +80,7 @@ class SQLQUERY {
 		],
 		'consumables_get-distributor-datalist' => [
 			'mysql' => "SELECT name FROM caro_consumables_distributors ORDER BY name ASC",
-			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) FROM caro_consumables_distributors ORDER BY CONVERT(VARCHAR, name) ASC"
+			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) as name FROM caro_consumables_distributors ORDER BY CONVERT(VARCHAR, name) ASC"
 		],
 		'consumables_get-distributor' => [
 			'mysql' => "SELECT * FROM caro_consumables_distributors WHERE id = :id OR name = :id LIMIT 1",
@@ -88,103 +88,107 @@ class SQLQUERY {
 		],
 		'consumables_post-product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, distributor_id, article_no, article_name, article_unit, article_ean, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :article_ean, :active, :protected)",
-			'sqlsrv' => ""
+			'sqlsrv' => "INSERT INTO caro_consumables_products (distributor_id, article_no, article_name, article_unit, article_ean, active, protected) VALUES (:distributor_id, :article_no, :article_name, :article_unit, :article_ean, :active, :protected)"
 		],
 		'consumables_put-product' => [
 			'mysql' => "UPDATE caro_consumables_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_consumables_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected WHERE id = :id"
 		],
 		'consumables_put-product-protected' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean WHERE id = :id"
 		],
 		'consumables_get-product' => [
 			'mysql' => "SELECT prod.*, dist.name as distributor_name, dist.immutable_fileserver as distributor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE prod.id = :id AND prod.distributor_id = dist.id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT prod.*, dist.name as distributor_name, dist.immutable_fileserver as distributor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE CONVERT(VARCHAR, prod.id) = :id AND prod.distributor_id = dist.id"
 		],
 		'consumables_get-product-units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT CONVERT(VARCHAR, article_unit) as article_unit FROM caro_consumables_products GROUP BY CONVERT(VARCHAR, article_unit) ORDER BY CONVERT(VARCHAR, article_unit) ASC"
 		],
 		'consumables_get-product-search' => [
 			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (CONVERT(VARCHAR, prod.id) = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id"
 		],
 		'consumables_delete-all-unprotected-products' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE distributor_id = :id AND protected = 0",
-			'sqlsrv' => ""
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE distributor_id = :id AND protected = 0"
 		],
 		'consumables_delete-unprotected-product' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND protected = 0",
-			'sqlsrv' => ""
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND protected = 0"
 		],
 
 		'order_get-product-search' => [
 			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id AND prod.active = 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (CONVERT(VARCHAR, prod.id) = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id AND prod.active = 1"
 		],
 		'order_post-prepared-order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",
-			'sqlsrv' => ""
+			'sqlsrv' => "INSERT INTO caro_consumables_prepared_orders (order_data) VALUES (:order_data)"
 		],
 		'order_put-prepared-order' => [
 			'mysql' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id"
 		],
 		'order_get-prepared-order' => [
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_consumables_prepared_orders WHERE CONVERT(VARCHAR, id) = :id"
 		],
 		'order_delete-prepared-order' => [
 			'mysql' => "DELETE FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "DELETE FROM caro_consumables_prepared_orders WHERE id = :id"
 		],
 
 		'order_get-prepared-orders' => [
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT * FROM caro_consumables_prepared_orders"
 		],
 
 		'order_post-approved-order' => [
 			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL)",
-			'sqlsrv' => ""
+			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL)"
 		],
 		'order_put-approved-order-ordered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET ordered = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'order_put-approved-order-received' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET received = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => ""
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET received = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'order_get-approved-order' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit)",
-			'sqlsrv' => ""
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE CONVERT(VARCHAR, organizational_unit) IN (:organizational_unit)"
 		],
 		'order_delete-approved-order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
-			'sqlsrv' => ""
+			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
 
 		'message_get_message' => [
-			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user = :user AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",
-			'sqlsrv' => ""
+			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",
+			'sqlsrv' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id"
 		],
 		'message_post_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user, from_user, to_user, message, timestamp, alert) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1); INSERT INTO caro_messages (id, user, from_user, to_user, message, timestamp, alert) VALUES (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)",
-			'sqlsrv' => ""
+			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, alert) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1), (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, alert) VALUES (:from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1), (:to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)"
+		],
+		'message_post_system_message' => [
+			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, alert) VALUES (NULL, :to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, alert) VALUES (:to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0)"
 		],
 		'message_delete_message' => [
-			'mysql' => "DELETE FROM caro_messages WHERE id = :id and user = :user LIMIT 1",
-			'sqlsrv' => ""
+			'mysql' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user LIMIT 1",
+			'sqlsrv' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user"
 		],
 		'message_get_inbox' => [
-			'mysql' => "SELECT t1.*, t2.name as from_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC",
-			'sqlsrv' => ""
+			'mysql' => "SELECT t1.*, t2.name as from_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC",
+			'sqlsrv' => "SELECT t1.*, t2.name as from_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC"
 		],
 		'message_get_sent' => [
-			'mysql' => "SELECT t1.*, t2.name as to_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
-			'sqlsrv' => ""
+			'mysql' => "SELECT t1.*, t2.name as to_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
+			'sqlsrv' => "SELECT t1.*, t2.name as to_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC"
 		],
 	];
 }
