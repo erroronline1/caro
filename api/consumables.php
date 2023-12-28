@@ -19,14 +19,16 @@ class CONSUMABLES extends API {
 			"columns": [
 				"ArticleNo",
 				"Name",
-				"Unit"
+				"Unit",
+				"EAN"
 			]
 		},
 		"modify": {
 			"rewrite": {
 				"article_no": ["ArticleNo"],
 				"article_name": ["Name"],
-				"article_unit": ["Unit"]
+				"article_unit": ["Unit"],
+				"article_ean": ["EAN"]
 			}
 		}
 	}
@@ -68,6 +70,7 @@ class CONSUMABLES extends API {
 					':id' => $update,
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
+					':article_ean' => "'" . $row['article_ean'] . "'",
 				]) . '; ';
 
 				else $query .= strtr(SQLQUERY::PREPARE('consumables_post-product'),
@@ -76,6 +79,7 @@ class CONSUMABLES extends API {
 						':article_no' => "'" . $row['article_no'] . "'",
 						':article_name' => "'" . $row['article_name'] . "'",
 						':article_unit' => "'" . $row['article_unit'] . "'",
+						':article_ean' => "'" . $row['article_ean'] . "'",
 						':active' => 1,
 						':protected' => 0
 					]) . '; ';
@@ -99,7 +103,7 @@ class CONSUMABLES extends API {
 
 				$distributor = [
 					'name' => $this->_payload->name,
-					'active' => UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_distributor_active')) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0,
+					'active' => UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_distributor_active'))) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0,
 					'info' => $this->_payload->info,
 					'certificate' => ['validity' => $this->_payload->certificate_validity],
 					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter],
@@ -153,7 +157,7 @@ class CONSUMABLES extends API {
 				// prepare distributor-array to update, return error if not found
 				if (!($distributor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
 
-				$distributor['active'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_distributor_active')) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0;
+				$distributor['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_distributor_active'))) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0;
 				$distributor['name'] = $this->_payload->name;
 				$distributor['info'] = $this->_payload->info;
 				$distributor['certificate'] = json_decode($distributor['certificate'], true);
@@ -408,6 +412,7 @@ class CONSUMABLES extends API {
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
 					':article_unit' => $product['article_unit'],
+					':article_ean' => $product['article_ean'],
 					':active' => $product['active'],
 					':protected' => $product['protected']
 				])) $this->response([
@@ -436,6 +441,7 @@ class CONSUMABLES extends API {
 				$product['article_no'] = $this->_payload->article_no;
 				$product['article_name'] = $this->_payload->article_name;
 				$product['article_unit'] = $this->_payload->article_unit;
+				$product['article_ean'] = $this->_payload->article_ean;
 				$product['active'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 
 				// validate distributor
@@ -459,6 +465,7 @@ class CONSUMABLES extends API {
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
 					':article_unit' => $product['article_unit'],
+					':article_ean' => $product['article_ean'],
 					':active' => $product['active'],
 					':protected' => $product['protected']
 				])) $this->response([
@@ -493,6 +500,7 @@ class CONSUMABLES extends API {
 					'article_no' => '',
 					'article_name' => '',
 					'article_unit' => '',
+					'article_ean' => '',
 					'active' => 1,
 					'protected' => 0
 				];
@@ -600,6 +608,16 @@ class CONSUMABLES extends API {
 							'list' => 'units',
 							'required' => true,
 							'value' => $product['article_unit']
+						]]
+					],
+					[
+						["type" => "textinput",
+						"description" => LANG::GET('consumables.edit_product_article_ean'),
+						'attributes' => [
+							'name' => 'article_ean',
+							'list' => 'units',
+							'required' => true,
+							'value' => $product['article_ean']
 						]]
 					],
 					[

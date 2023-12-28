@@ -87,15 +87,15 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_consumables_distributors WHERE CONVERT(VARCHAR, id) = :id OR CONVERT(VARCHAR, name) = :id"
 		],
 		'consumables_post-product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, distributor_id, article_no, article_name, article_unit, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :active, :protected)",
+			'mysql' => "INSERT INTO caro_consumables_products (id, distributor_id, article_no, article_name, article_unit, article_ean, active, protected) VALUES (NULL, :distributor_id, :article_no, :article_name, :article_unit, :article_ean, :active, :protected)",
 			'sqlsrv' => ""
 		],
 		'consumables_put-product' => [
-			'mysql' => "UPDATE caro_consumables_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, active = :active, protected = :protected WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_consumables_products SET distributor_id = :distributor_id, article_no = :article_no, article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'consumables_put-product-protected' => [
-			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean WHERE id = :id LIMIT 1",
 			'sqlsrv' => ""
 		],
 		'consumables_get-product' => [
@@ -107,7 +107,7 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 		'consumables_get-product-search' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
+			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id",
 			'sqlsrv' => ""
 		],
 		'consumables_delete-all-unprotected-products' => [
@@ -120,7 +120,7 @@ class SQLQUERY {
 		],
 
 		'order_get-product-search' => [
-			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id AND prod.active = 1",
+			'mysql' => "SELECT prod.*, dist.name as distributor_name FROM caro_consumables_products AS prod, caro_consumables_distributors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%')) AND prod.distributor_id = dist.id AND prod.active = 1",
 			'sqlsrv' => ""
 		],
 		'order_post-prepared-order' => [

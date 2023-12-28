@@ -24,6 +24,7 @@ class ORDER extends API {
 			'commission' => LANG::GET('order.commission'),
 			'deliverydate' => LANG::GET('order.delivery_date'),
 			'info' => LANG::GET('order.additional_info'),
+			'barcode' => LANG::GET('order.barcode'),
 		];
 	}
 
@@ -97,7 +98,7 @@ class ORDER extends API {
 					foreach($row as $key => $value){
 						$row[$key]=str_replace("\n", ' ', $row[$key]);
 					}
-					$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['distributor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "'); return false;"];
+					$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['distributor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
 				}
 				$result['body']['content']=
 					[[
@@ -373,6 +374,12 @@ class ORDER extends API {
 							'placeholder' => LANG::GET('order.productname_label'),
 							'onblur' => 'orderClient.required(this.parentNode)'
 						]],
+						['type' => 'hiddeninput',
+						'collapse' => true,
+						'attributes' => [
+							'name' => 'barcode[]',
+							'value' => '' // otherwise undefined messes up
+						]],
 						['type' => 'button',
 						'collapse' => true,
 						'attributes' => [
@@ -473,7 +480,13 @@ class ORDER extends API {
 								'onblur' => 'orderClient.required(this.parentNode)',
 								'value' => $order['items'][$i]['name']
 							]],
-							['type' => 'button',
+							['type' => 'hiddeninput',
+							'collapse' => true,
+							'attributes' => [
+								'name' => 'barcode[]',
+								'value' => $order['items'][$i]['barcode']
+							]],
+								['type' => 'button',
 							'collapse' => true,
 							'attributes' => [
 								'value' => LANG::GET('order.add_delete'),

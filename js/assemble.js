@@ -423,7 +423,7 @@ export class Assemble {
 		input.id = getNextElementID();
 		input.value = this.tile.value;
 		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
-		if (!this.setup.visible) this.assembledTiles.add(input);
+		if (!this.setup.visible) this.elements.add(input);
 		else {
 			const value = document.createTextNode(input.value);
 			this.elements.add(value);
