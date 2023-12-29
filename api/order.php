@@ -36,14 +36,17 @@ class ORDER extends API {
 				$statement->execute();
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
 				// display all orders assigned to organizational unit
-				$userunits=[];
-				foreach($_SESSION['user']['units'] as $unit){
-					array_push($userunits, LANG::GET('units.'. $unit));
+				if (array_intersect(['admin'], $_SESSION['user']['permissions'])) $units = LANGUAGEFILE['units']; // see all orders
+				else { // see only orders for own units
+					$units = [];
+					foreach($_SESSION['user']['units'] as $unit){
+						$units[] = LANG::GET('units.' . $unit);
+					}
 				}
 				$organizational_orders=[];
 				foreach($orders as $key => $row) {
 					$order_data=json_decode($row['order_data'], true);
-					if (array_intersect([$order_data['organizational_unit']], $userunits)) {
+					if (array_intersect([$order_data['organizational_unit']], $units)) {
 						array_push($organizational_orders, $row);
 					}
 				}
@@ -484,7 +487,7 @@ class ORDER extends API {
 							'collapse' => true,
 							'attributes' => [
 								'name' => 'barcode[]',
-								'value' => $order['items'][$i]['barcode']
+								'value' => array_key_exists ('barcode', $order['items'][$i]) ? $order['items'][$i]['barcode'] : ''
 							]],
 								['type' => 'button',
 							'collapse' => true,
@@ -571,8 +574,8 @@ class ORDER extends API {
 						'collapse' => true,
 						'attributes' => [
 							'barcode' => ['value' => $decoded_order_data['barcode']],
-							'imageonly' => true
-						]
+							'imageonly' => ['width' => '10em', 'height' => '3em']
+							]
 					];
 					foreach ($decoded_order_data as $key => $value){ // data
 						if ($key != 'barcode') $content[]=[
@@ -584,6 +587,18 @@ class ORDER extends API {
 								'readonly' => true,
 								'onpointerdown' => 'orderClient.toClipboard(this)'
 							]
+						];
+					}
+
+					if (str_contains($row['approval'], 'data:image/png')){
+						$content[]=[
+							'type' => 'image',
+							'collapse' => true,
+							//'description' => LANG::GET('order.approval_image'),
+							'attributes' => [
+								'imageonly' => ['width' => '10em', 'marginTop' => '1em'],
+								'name' => LANG::GET('order.approval_image'),
+								'url' => $row['approval']],
 						];
 					}
 
@@ -612,17 +627,6 @@ class ORDER extends API {
 						'collapse' => true,
 						'content' => $status
 					];
-					if (str_contains($row['approval'], 'data:image/png')){
-						$content[]=[
-							'type' => 'image',
-							'collapse' => true,
-							//'description' => LANG::GET('order.approval_image'),
-							'attributes' => [
-								'imageonly' => true,
-								'name' => LANG::GET('order.approval_image'),
-								'url' => $row['approval']],
-						];
-					}
 					$content[]=[
 						'type' => 'deletebutton',
 						'collapse' => true,
