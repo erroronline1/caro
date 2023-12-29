@@ -214,9 +214,9 @@ export const api = {
 	},
 	purchase: (method, ...request) => {
 		/*
-		get consumables/distributor/{id|name}
-		post consumables/distributor
-		put consumables/distributor/{id}
+		get consumables/vendor/{id|name}
+		post consumables/vendor
+		put consumables/vendor/{id}
 
 		get consumables/product/{id}
 		get consumables/product/{id|name}/search
@@ -236,7 +236,7 @@ export const api = {
 		delete order/approved/{id}
 		*/
 		request = [...request];
-		if (['distributor', 'product'].includes(request[0]))
+		if (['vendor', 'product'].includes(request[0]))
 			request.splice(0, 0, 'consumables');
 		else
 			request.splice(0, 0, 'order');

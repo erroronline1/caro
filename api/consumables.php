@@ -1,5 +1,5 @@
 <?php
-// add, edit and delete distributors and products
+// add, edit and delete vendors and products
 include_once('csvprocessor.php');
 
 class CONSUMABLES extends API {
@@ -40,7 +40,7 @@ class CONSUMABLES extends API {
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
-	private function update_pricelist($file, $filter, $distributorID){
+	private function update_pricelist($file, $filter, $vendorID){
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
 		$pricelist = new Listprocessor($filter);
@@ -48,13 +48,13 @@ class CONSUMABLES extends API {
 			// purge all unprotected products for a fresh data set
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
 			$statement->execute([
-				':id' => $distributorID
+				':id' => $vendorID
 			]);
 			// retrieve left items
 			$remainder=[];
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-search'));
 			$statement->execute([
-				':search' => $distributorID
+				':search' => $vendorID
 			]);
 			$remained = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($remained as $key => $row) {
@@ -75,7 +75,7 @@ class CONSUMABLES extends API {
 
 				else $query .= strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
-						':distributor_id' => $distributorID,
+						':vendor_id' => $vendorID,
 						':article_no' => "'" . $row['article_no'] . "'",
 						':article_name' => "'" . $row['article_name'] . "'",
 						':article_unit' => "'" . $row['article_unit'] . "'",
@@ -90,7 +90,7 @@ class CONSUMABLES extends API {
 		return '';
 	}
 
-	public function distributor(){
+	public function vendor(){
 		// Y U NO DELETE? because of audit safety, that's why!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -98,12 +98,12 @@ class CONSUMABLES extends API {
 				
 				/**
 				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
-				 * thus directories can not be renamed on name changes of distributors
+				 * thus directories can not be renamed on name changes of vendors
 				 */
 
-				$distributor = [
+				$vendor = [
 					'name' => $this->_payload->name,
-					'active' => UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_distributor_active'))) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0,
+					'active' => UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_vendor_active'))) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
 					'info' => $this->_payload->info,
 					'certificate' => ['validity' => $this->_payload->certificate_validity],
 					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter],
@@ -111,101 +111,101 @@ class CONSUMABLES extends API {
 				];
 				
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $distributor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('distributor.error_distributor_forbidden_name', [':name' => $distributor['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
 				}
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $distributor['pricelist']['filter'], $distributor['id']);
+					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 				}
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-vendor'));
 				if ($statement->execute([
-					':name' => $distributor['name'],
-					':active' => $distributor['active'],
-					':info' => $distributor['info'],
-					':certificate' => json_encode($distributor['certificate']),
-					':pricelist' => json_encode($distributor['pricelist']),
-					':immutable_fileserver' => $distributor['immutable_fileserver']
+					':name' => $vendor['name'],
+					':active' => $vendor['active'],
+					':info' => $vendor['info'],
+					':certificate' => json_encode($vendor['certificate']),
+					':pricelist' => json_encode($vendor['pricelist']),
+					':immutable_fileserver' => $vendor['immutable_fileserver']
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('consumables.edit_distributor_saved', [':name' => $distributor['name']])
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']])
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('consumables.edit_distributor_not_saved')
+						'name' => LANG::GET('consumables.edit_vendor_not_saved')
 					]]);
 				break;
 
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				// prepare distributor-array to update, return error if not found
-				if (!($distributor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
+				// prepare vendor-array to update, return error if not found
+				if (!($vendor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
 
-				$distributor['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_distributor_active'))) === LANG::GET('consumables.edit_distributor_isactive') ? 1 : 0;
-				$distributor['name'] = $this->_payload->name;
-				$distributor['info'] = $this->_payload->info;
-				$distributor['certificate'] = json_decode($distributor['certificate'], true);
-				$distributor['certificate']['validity'] = $this->_payload->certificate_validity;
-				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
-				$distributor['pricelist']['filter'] = $this->_payload->pricelist_filter;
+				$vendor['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_vendor_active'))) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
+				$vendor['name'] = $this->_payload->name;
+				$vendor['info'] = $this->_payload->info;
+				$vendor['certificate'] = json_decode($vendor['certificate'], true);
+				$vendor['certificate']['validity'] = $this->_payload->certificate_validity;
+				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+				$vendor['pricelist']['filter'] = $this->_payload->pricelist_filter;
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $distributor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('distributor.error_distributor_forbidden_name', [':name' => $distributor['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
 				}
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
-					$distributor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $distributor['pricelist']['filter'], $distributor['id']);
+					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 				}
 				// tidy up consumable products database if inactive
-				if (!$distributor['active']){
+				if (!$vendor['active']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
 					$statement->execute([
-						':id' => $distributor['id']
+						':id' => $vendor['id']
 					]);
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-distributor'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-vendor'));
 				if ($statement->execute([
-					':id' => $distributor['id'],
-					':active' => $distributor['active'],
-					':name' => $distributor['name'],
-					':info' => $distributor['info'],
-					':certificate' => json_encode($distributor['certificate']),
-					':pricelist' => json_encode($distributor['pricelist'])
+					':id' => $vendor['id'],
+					':active' => $vendor['active'],
+					':name' => $vendor['name'],
+					':info' => $vendor['info'],
+					':certificate' => json_encode($vendor['certificate']),
+					':pricelist' => json_encode($vendor['pricelist'])
 				])) $this->response([
 					'status' => [
-						'id' => $distributor['id'],
-						'msg' => LANG::GET('consumables.edit_distributor_saved', [':name' => $distributor['name']])
+						'id' => $vendor['id'],
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']])
 					]]);
 				else $this->response([
 					'status' => [
-						'id' => $distributor['id'],
-						'name' => LANG::GET('consumables.edit_distributor_not_saved')
+						'id' => $vendor['id'],
+						'name' => LANG::GET('consumables.edit_vendor_not_saved')
 					]]);
 				break;
 
@@ -215,21 +215,21 @@ class CONSUMABLES extends API {
 				$options = ['...' => []];
 				$result = [];
 				
-				// prepare existing distributor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor-datalist'));
+				// prepare existing vendor lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
 				$statement->execute();
-				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($distributor as $key => $row) {
+				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = [];
 				}
 		
-				// select single distributor based on id or name
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
+				// select single vendor based on id or name
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $distributor = [
+				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $vendor = [
 					'id' => null,
 					'name' => '',
 					'active' => 0,
@@ -237,81 +237,81 @@ class CONSUMABLES extends API {
 					'certificate' => '{"validity":""}',
 					'pricelist' => '{"validity":"", "filter": ""}'
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$distributor['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_distributor_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$vendor['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID])];
 
-				$distributor['certificate'] = json_decode($distributor['certificate'], true);
-				$distributor['pricelist'] = json_decode($distributor['pricelist'], true);
-				$isactive = $distributor['active'] ? ['checked' => true] : [];
-				$isinactive = !$distributor['active'] ? ['checked' => true] : [];
+				$vendor['certificate'] = json_decode($vendor['certificate'], true);
+				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+				$isactive = $vendor['active'] ? ['checked' => true] : [];
+				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
 
 				$certificates = [];
 				$documents = [];
-				if ($distributor['id']) {
-					$certfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_certificates', [':name' => $distributor['immutable_fileserver']]));
+				if ($vendor['id']) {
+					$certfiles = UTILITY::listFiles("../" . UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
 					foreach($certfiles as $path){
 						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_documents', [':name' => $distributor['immutable_fileserver']]));
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
 					foreach($docfiles as $path){
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
-				// display form for adding a new distributor
+				// display form for adding a new vendor
 				$result['body']=['content' => [
 					[
 						['type' => 'datalist',
 						'content' => $datalist,
 						'attributes' => [
-							'id' => 'distributors'
+							'id' => 'vendors'
 						]]
 					],[
 						['type' => 'searchinput',
-						'description' => LANG::GET('consumables.edit_existing_distributors'),
+						'description' => LANG::GET('consumables.edit_existing_vendors'),
 						'attributes' => [
-							'placeholder' => LANG::GET('consumables.edit_existing_distributors_label'),
-							'list' => 'distributors',
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'distributor', this.value); return false;}"
+							'placeholder' => LANG::GET('consumables.edit_existing_vendors_label'),
+							'list' => 'vendors',
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
 						]],
 						['type' => 'select',
-						'description' => LANG::GET('consumables.edit_existing_distributors'),
+						'description' => LANG::GET('consumables.edit_existing_vendors'),
 						'attributes' => [
-							'onchange' => "api.purchase('get', 'distributor', this.value)"
+							'onchange' => "api.purchase('get', 'vendor', this.value)"
 						],
 						'content' => $options]
 					],
 					[
 						["type" => "textinput",
-						"description" => LANG::GET('consumables.edit_distributor_name'),
+						"description" => LANG::GET('consumables.edit_vendor_name'),
 						'attributes' => [
 							'name' => 'name',
 							'required' => true,
-							'value' => $distributor['name'] ? : ''
+							'value' => $vendor['name'] ? : ''
 						]]
 					],
 					[
 						["type" => "textarea",
-						"description" => LANG::GET('consumables.edit_distributor_info'),
+						"description" => LANG::GET('consumables.edit_vendor_info'),
 						'attributes' => [
 							'name' => 'info',
-							'value' => $distributor['info'] ? : ''
+							'value' => $vendor['info'] ? : ''
 						]]
 					],
 					[
 						["type" => "dateinput",
-						"description" => LANG::GET('consumables.edit_distributor_certificate_validity'),
+						"description" => LANG::GET('consumables.edit_vendor_certificate_validity'),
 						'attributes' => [
 							'name' => 'certificate_validity',
-							'value' => $distributor['certificate']['validity'] ? : ''
+							'value' => $vendor['certificate']['validity'] ? : ''
 						]],
 						["type" => "file",
-						"description" => LANG::GET('consumables.edit_distributor_certificate_update'),
+						"description" => LANG::GET('consumables.edit_vendor_certificate_update'),
 						'attributes' => [
 							'name' => 'certificate',
 						]]
 					],
 					[
 						["type" => "file",
-						"description" => LANG::GET('consumables.edit_distributor_documents_update'),
+						"description" => LANG::GET('consumables.edit_vendor_documents_update'),
 						'attributes' => [
 							'name' => 'documents[]',
 							'multiple' => true
@@ -319,37 +319,37 @@ class CONSUMABLES extends API {
 					],
 					[
 						["type" => "file",
-						"description" => LANG::GET('consumables.edit_distributor_pricelist_update'),
+						"description" => LANG::GET('consumables.edit_vendor_pricelist_update'),
 						'attributes' => [
 							'name' => 'pricelist',
 							'accept' => '.csv'
 						]],
 						["type" => "textarea",
-						"description" => LANG::GET('consumables.edit_distributor_pricelist_filter'),
+						"description" => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 						'attributes' => [
 							'name' => 'pricelist_filter',
-							'value' => $distributor['pricelist']['filter'] ? : '',
+							'value' => $vendor['pricelist']['filter'] ? : '',
 							'placeholder' => json_encode(json_decode($this->filtersample, true))
 						]]
 					],
 					[
 						["type" => "radio",
-						"description" => LANG::GET('consumables.edit_distributor_active'),
+						"description" => LANG::GET('consumables.edit_vendor_active'),
 						"content" => [
-							LANG::GET('consumables.edit_distributor_isactive') => $isactive,
-							LANG::GET('consumables.edit_distributor_isinactive') => $isinactive
+							LANG::GET('consumables.edit_vendor_isactive') => $isactive,
+							LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
 						]]
 					]
 				],
 				'form' => [
 					'data-usecase' => 'purchase',
-					'action' => $distributor['id'] ? 'javascript:api.purchase("put", "distributor", "' . $distributor['id'] . '")' : 'javascript:api.purchase("post", "distributor")'
+					'action' => $vendor['id'] ? 'javascript:api.purchase("put", "vendor", "' . $vendor['id'] . '")' : 'javascript:api.purchase("post", "vendor")'
 				]];
 
 				if ($certificates) array_splice($result['body']['content'][4], 1, 0,
 					[
 						['type' => 'links',
-						'description' => LANG::GET('consumables.edit_distributor_certificate_download'),
+						'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
 						'content' => $certificates
 						]
 					]
@@ -357,16 +357,16 @@ class CONSUMABLES extends API {
 				if ($documents) array_splice($result['body']['content'][5], 0, 0,
 					[
 						['type' => 'links',
-						'description' => LANG::GET('consumables.edit_distributor_documents_download'),
+						'description' => LANG::GET('consumables.edit_vendor_documents_download'),
 						'content' => $documents
 						]
 					]
 				);
-				if ($distributor['pricelist']['validity']) array_splice($result['body']['content'][6], 0, 0,
+				if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][6], 0, 0,
 					[
 						["type" => "text",
-						"description" => LANG::GET('consumables.edit_distributor_pricelist_validity'),
-						"content" => $distributor['pricelist']['validity']
+						"description" => LANG::GET('consumables.edit_vendor_pricelist_validity'),
+						"content" => $vendor['pricelist']['validity']
 						]
 					]
 				);
@@ -383,8 +383,8 @@ class CONSUMABLES extends API {
 				
 				$product = [
 					'id' => null,
-					'distributor_id' => null,
-					'distributor_name' => $this->_payload->distributor_select !== '...' ? $this->_payload->distributor_select : $this->_payload->distributor_input,
+					'vendor_id' => null,
+					'vendor_name' => $this->_payload->vendor_select !== '...' ? $this->_payload->vendor_select : $this->_payload->vendor_input,
 					'article_no' => $this->_payload->article_no,
 					'article_name' => $this->_payload->article_name,
 					'article_unit' => $this->_payload->article_unit,
@@ -393,23 +393,23 @@ class CONSUMABLES extends API {
 					'protected' => 0
 				];
 
-				// validate distributor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
+				// validate vendor
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
-					':id' => $product['distributor_name']
+					':id' => $product['vendor_name']
 				]);
-				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_distributor_not_found', [':name' => $product['distributor_name']])]]);
-				$product['distributor_id'] = $distributor['id'];
+				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']])]]);
+				$product['vendor_id'] = $vendor['id'];
 
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_products', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-product'));
 				if ($statement->execute([
-					':distributor_id' => $product['distributor_id'],
+					':vendor_id' => $product['vendor_id'],
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
 					':article_unit' => $product['article_unit'],
@@ -438,31 +438,31 @@ class CONSUMABLES extends API {
 				// prepare product-array to update, return error if not found
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
 
-				$product['distributor_name'] = $this->_payload->distributor_select !== '...' ? $this->_payload->distributor_select : $this->_payload->distributor_input;
+				$product['vendor_name'] = $this->_payload->vendor_select !== '...' ? $this->_payload->vendor_select : $this->_payload->vendor_input;
 				$product['article_no'] = $this->_payload->article_no;
 				$product['article_name'] = $this->_payload->article_name;
 				$product['article_unit'] = $this->_payload->article_unit;
 				$product['article_ean'] = $this->_payload->article_ean;
 				$product['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_product_active'))) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 
-				// validate distributor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor'));
+				// validate vendor
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
-					':id' => $product['distributor_name']
+					':id' => $product['vendor_name']
 				]);
-				if (!$distributor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_distributor_not_found', [':name' => $product['distributor_name']])]]);
-				$product['distributor_id'] = $distributor['id'];
+				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']])]]);
+				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('distributor_products', [':name' => $distributor['immutable_fileserver']]), [$distributor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-product'));
 				if ($statement->execute([
 					':id' => $this->_requestedID,
-					':distributor_id' => $product['distributor_id'],
+					':vendor_id' => $product['vendor_id'],
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
 					':article_unit' => $product['article_unit'],
@@ -495,9 +495,9 @@ class CONSUMABLES extends API {
 				]);
 				if (!$product = $statement->fetch(PDO::FETCH_ASSOC)) $product = [
 					'id' => null,
-					'distributor_id' => '',
-					'distributor_name' => '',
-					'distributor_immutable_fileserver' => '',
+					'vendor_id' => '',
+					'vendor_name' => '',
+					'vendor_immutable_fileserver' => '',
 					'article_no' => '',
 					'article_name' => '',
 					'article_unit' => '',
@@ -513,7 +513,7 @@ class CONSUMABLES extends API {
 				$certificates = [];
 				$documents = [];
 				if ($product['id']) {
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('distributor_products', [':name' => $product['distributor_immutable_fileserver']]));
+					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
 					foreach($docfiles as $path){
 						$file = pathinfo($path);
 						$article_no = explode('_', $file['filename'])[2];
@@ -523,21 +523,21 @@ class CONSUMABLES extends API {
 					}
 				}
 
-				// prepare existing distributor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor-datalist'));
+				// prepare existing vendor lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
 				$statement->execute();
-				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($distributor as $key => $row) {
+				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = [];
-					if ($row['name'] === $product['distributor_name']) $options[$row['name']]['selected'] = true;
+					if ($row['name'] === $product['vendor_name']) $options[$row['name']]['selected'] = true;
 				}
 
 				// prepare existing unit lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-units'));
 				$statement->execute();
-				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($distributor as $key => $row) {
+				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($vendor as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
@@ -548,7 +548,7 @@ class CONSUMABLES extends API {
 						['type' => 'datalist',
 						'content' => $datalist,
 						'attributes' => [
-							'id' => 'distributors'
+							'id' => 'vendors'
 						]],
 						['type' => 'datalist',
 						'content' => $datalist_unit,
@@ -570,16 +570,16 @@ class CONSUMABLES extends API {
 					],
 					[
 						['type' => 'textinput',
-						'description' => LANG::GET('consumables.edit_product_distributor'),
+						'description' => LANG::GET('consumables.edit_product_vendor'),
 						'attributes' => [
-							'name' => 'distributor_input',
-							'list' => 'distributors',
-							'value' => $product['distributor_name']
+							'name' => 'vendor_input',
+							'list' => 'vendors',
+							'value' => $product['vendor_name']
 						]],
 						['type' => 'select',
-						'description' => LANG::GET('consumables.edit_product_distributor'),
+						'description' => LANG::GET('consumables.edit_product_vendor'),
 						'attributes' => [
-							'name' => 'distributor_select'
+							'name' => 'vendor_select'
 						],
 						'content' => $options]
 					],
@@ -669,7 +669,7 @@ class CONSUMABLES extends API {
 					]);
 					$search = $statement->fetchAll(PDO::FETCH_ASSOC);
 					foreach($search as $key => $row) {
-						$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
+						$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
 					}
 					array_splice($result['body']['content'], 2, 0,
 						[[

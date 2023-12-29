@@ -18,7 +18,7 @@ class ORDER extends API {
 			'unit' => LANG::GET('order.unit_label'),
 			'number' => LANG::GET('order.ordernumber_label'),
 			'quantity' => LANG::GET('order.quantity_label'),
-			'distributor' => LANG::GET('order.distributor_label'),
+			'vendor' => LANG::GET('order.vendor_label'),
 			'orderer' => LANG::GET('order.orderer'),
 			'organizational_unit' => LANG::GET('order.unit'),
 			'commission' => LANG::GET('order.commission'),
@@ -101,7 +101,7 @@ class ORDER extends API {
 					foreach($row as $key => $value){
 						$row[$key]=str_replace("\n", ' ', $row[$key]);
 					}
-					$matches[$row['distributor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['distributor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
+					$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
 				}
 				$result['body']['content']=
 					[[
@@ -270,18 +270,18 @@ class ORDER extends API {
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
 
-				// prepare existing distributor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-distributor-datalist'));
+				// prepare existing vendor lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
 				$statement->execute();
-				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($distributor as $key => $row) {
+				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
 				}
 				// prepare existing unit lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-units'));
 				$statement->execute();
-				$distributor = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($distributor as $key => $row) {
+				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($vendor as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
@@ -330,7 +330,7 @@ class ORDER extends API {
 						['type' => 'datalist',
 						'content' => $datalist,
 						'attributes' => [
-							'id' => 'distributors'
+							'id' => 'vendors'
 						]],
 						['type' => 'datalist',
 						'content' => $datalist_unit,
@@ -358,9 +358,9 @@ class ORDER extends API {
 						['type' => 'textinput',
 						'collapse' => true,
 						'attributes' => [
-							'name' => 'distributor[]',
-							'list' => 'distributors',
-							'placeholder' => LANG::GET('order.distributor_label'),
+							'name' => 'vendor[]',
+							'list' => 'vendors',
+							'placeholder' => LANG::GET('order.vendor_label'),
 							'onblur' => 'orderClient.required(this.parentNode)'
 						]],
 						['type' => 'textinput',
@@ -461,11 +461,11 @@ class ORDER extends API {
 							['type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
-								'name' => 'distributor[]',
-								'list' => 'distributors',
-								'placeholder' => LANG::GET('order.distributor_label'),
+								'name' => 'vendor[]',
+								'list' => 'vendors',
+								'placeholder' => LANG::GET('order.vendor_label'),
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['distributor']
+								'value' => $order['items'][$i]['vendor']
 							]],
 							['type' => 'textinput',
 							'collapse' => true,

@@ -69,7 +69,7 @@ class APPLICATION extends API {
 			LANG::GET('menu.purchase_approved_orders') => "javascript:api.purchase('get', 'approved')"
 		];
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_distributor')] = "javascript:api.purchase('get', 'distributor')";
+			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = "javascript:api.purchase('get', 'vendor')";
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = "javascript:api.purchase('get', 'product')";
 		}
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
