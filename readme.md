@@ -38,3 +38,22 @@ tested devices:
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
 * [put request with multipart form data](https://stackoverflow.com/a/18678678)
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
+
+
+# open tasks
+* checkbox/radio char failure on iis
+* orders: initiate message on approvement and from approved orders (inquiry)
+* forms and contexts
+* vendor list
+* user qualifications, certificates
+* monitoring measuring equipment, rental parts, machinery, crutches
+* sample check MDR §14
+* caro audit
+* manuals
+* pdf export
+* stl viewer
+* pdf directory (internal and external documents)
+* purchase: batch identifier (product and delivery note number) for...
+* ...material tracing within documentation
+* text recommendations
+
