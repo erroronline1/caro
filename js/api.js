@@ -264,6 +264,7 @@ export const api = {
 							if (data.body) {
 								document.getElementById('main').innerHTML = '';
 								new Assemble(data.body).initializeSection();
+								if (request[1] === 'approved') orderClient.filter();
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
@@ -273,7 +274,7 @@ export const api = {
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'put':
-				if (['ordered', 'received'].includes(request[3])) {
+				if (['ordered', 'received', 'archived'].includes(request[3])) {
 					successFn = function (data) {
 						api.toast(data.status.msg);
 					};
