@@ -145,8 +145,10 @@ export class Assemble {
 	]
 
 	elements are assembled by default but input elements can be assigned common html attributes
-	names are set according to description. 
-		*/
+	names are set according to description.
+
+	if any element has an article-attribute consisting of attribute-value pairs the article will have set the attributes
+	*/
 	constructor(setup) {
 		this.setup = setup;
 		this.content = setup.content;
@@ -157,6 +159,7 @@ export class Assemble {
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
+		this.articleAttributes = [];
 	}
 
 	initializeSection(nextSibling = null) {
@@ -250,6 +253,7 @@ export class Assemble {
 	processContent() {
 		let collapse;
 		this.content.forEach(tile => {
+			this.articleAttributes=[];
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
 				this.tile = tile[i];
@@ -257,6 +261,7 @@ export class Assemble {
 				if (!collapse || i === 0) this.elements = new Set();
 				this.description();
 				this[tile[i].type]();
+				if ('article' in tile[i]) this.articleAttributes = tile[i].article;
 				if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
 				if (tile.length < 2 || collapse) {
 					this.assembledTiles.add(this.single(tile[i]));
@@ -270,6 +275,9 @@ export class Assemble {
 	single(tileProperties, oneOfFew = false) { // parameters are required by composer method
 		const article = document.createElement('article');
 		article.setAttribute('data-type', tileProperties.type);
+		for (const [attribute, value] of Object.entries(this.articleAttributes)){
+			article.setAttribute(attribute, value);
+		}
 		article.append(...this.elements);
 		return article;
 	}
@@ -310,6 +318,9 @@ export class Assemble {
 		});
 		indicators.appendChild(toright);
 		article.appendChild(indicators);
+		for (const [attribute, value] of Object.entries(this.articleAttributes)){
+			article.setAttribute(attribute, value);
+		}
 		return article;
 	}
 
@@ -809,6 +820,9 @@ export class Assemble {
 	}
 
 	message() {
+		// empty method but neccessary for styling reasons (icon)
+	}
+	filter() {
 		// empty method but neccessary for styling reasons (icon)
 	}
 }
