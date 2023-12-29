@@ -242,11 +242,12 @@ class FORMS extends API {
 						'onchange' => "api.form('get', 'component', this.value)"
 					],
 					'content' => $componentoptions],
-					[
+					/*[
 						'form' => true,
 						'type' => 'compose_hiddeninput',
 						'description' => LANG::GET('assemble.compose_hiddeninput'),
-					]],
+					]*/
+					],
 					[[
 						'type' => 'compose_form',
 						'description' => LANG::GET('assemble.compose_form'),
