@@ -685,3 +685,7 @@ button:active {
 [data-type=message]::before {
 	background-image: url("media/envelope.svg");
 }
+
+[data-type=filter]::before {
+	background-image: url("media/filter.svg");
+}
