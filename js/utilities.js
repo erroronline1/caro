@@ -1,12 +1,11 @@
 const _serviceWorker = {
-	swRegistration : null,
+	swRegistration: null,
 	permission: null,
 	register: async function () {
 		if ('serviceWorker' in navigator) {
 			this.swRegistration = await navigator.serviceWorker.register('./service-worker.js');
 			this.permission = await window.Notification.requestPermission();
-		}
-		else
+		} else
 			throw new Error('No Service Worker support!');
 	},
 	requestNotificationPermission: async function () {
@@ -80,10 +79,27 @@ const orderClient = {
 			else node.children[i].removeAttribute('required');
 		}
 	},
-	toClipboard: (node) =>{
+	toClipboard: (node) => {
 		node.select();
 		node.setSelectionRange(0, 99999); // For mobile devices
 		navigator.clipboard.writeText(node.value);
 		api.toast(LANG.GET('general.copied_to_clipboard'));
+	},
+	filter: (type = undefined) => {
+		let display, hide;
+		if (type) {
+			display = document.querySelectorAll(`article[data-type=cart][data-${type}]`);
+			hide = document.querySelectorAll(`article[data-type=cart]:not([data-${type}])`);
+		} else {
+			hide = document.querySelectorAll(`article[data-type=cart]`);
+			display = document.querySelectorAll('article[data-type=cart]:not([data-ordered]):not([data-received]):not([data-archived])');
+		}
+
+		hide.forEach(article => {
+			article.style.display = 'none';
+		});
+		display.forEach(article => {
+			article.style.display = 'block';
+		});
 	}
 };
