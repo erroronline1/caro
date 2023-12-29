@@ -539,6 +539,7 @@ class ORDER extends API {
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				if ($this->_subMethod == 'ordered') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
 				if ($this->_subMethod == 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
+				if ($this->_subMethod == 'archived') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
 				$statement->execute([
 					':id' => $this->_requestedID
 					]);
@@ -549,7 +550,21 @@ class ORDER extends API {
 				break;
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$result=['body'=>['content'=>[]]];
+				$result=['body'=>['content'=>[
+					[
+						['type' => 'radio',
+						'collapse' => true,
+						'content' => [
+							LANG::GET('order.untreated')=>['checked' => true, 'onfocus' => 'orderClient.filter()'],
+							LANG::GET('order.ordered')=>['onfocus' => 'orderClient.filter("ordered")'],
+							LANG::GET('order.received')=>['onfocus' => 'orderClient.filter("received")'],
+							LANG::GET('order.archived')=>['onfocus' => 'orderClient.filter("archived")'],
+						]
+						],
+						['type' => 'filter',
+						'collapse' => true]
+					]
+				]]];
 				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = LANGUAGEFILE['units']; // see all orders
 				else { // see only orders for own units
 					$units = [];
@@ -605,18 +620,18 @@ class ORDER extends API {
 					$text .= $this->fields['organizational_unit'] . ': ' . $row['organizational_unit'] . '\n';
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
-					if ($row['ordered']) $text .= LANG::GET('order.ordered') . ': ' . $row['ordered'] . '\n';
-					if ($row['received']) $text .= LANG::GET('order.received') . ': ' . $row['received'] . '\n';
 
 					$status=[];
-					if (boolval($row['ordered']))
-						$status[LANG::GET('order.ordered')] = ['disabled' => true, 'checked' => true];
-					else
-						$status[LANG::GET('order.ordered')] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'ordered'); this.disabled=true"];
-					if (boolval($row['received']))
-						$status[LANG::GET('order.received')] = ['disabled' => true, 'checked' => true];
-					else
-						$status[LANG::GET('order.received')] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'received'); this.disabled=true"];
+					$statusfilter=[];
+					foreach(['ordered','received','archived'] as $s){
+						if (boolval($row[$s])) {
+							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true];
+							$text .= LANG::GET('order.' . $s) . ': ' . $row[$s] . '\n';
+							$statusfilter['data-' . $s]='';
+						}
+						else
+							$status[LANG::GET('order.' . $s)] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"];
+					}
 					$content[]=[
 						'type' => 'text',
 						'content' => $text,
@@ -627,9 +642,11 @@ class ORDER extends API {
 						'collapse' => true,
 						'content' => $status
 					];
+
 					$content[]=[
 						'type' => 'deletebutton',
 						'collapse' => true,
+						'article' => $statusfilter,
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',

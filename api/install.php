@@ -84,6 +84,7 @@ $queries = [
 			"	`approved` timestamp NOT NULL," .
 			"	`ordered` timestamp NULL DEFAULT NULL," .
 			"	`received` timestamp NULL DEFAULT NULL" .
+			"	`archived` timestamp NULL DEFAULT NULL" .
 			"	PRIMARY KEY (`id`)" .
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 		,
@@ -159,6 +160,7 @@ $queries = [
 			"	approved smalldatetime NOT NULL," .
 			"	ordered smalldatetime NULL DEFAULT NULL," .
 			"	received smalldatetime NULL DEFAULT NULL" .
+			"	archived smalldatetime NULL DEFAULT NULL" .
 			");"
 								
 		]
