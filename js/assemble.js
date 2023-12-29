@@ -741,13 +741,18 @@ export class Assemble {
 				qrcode: 'e.g. token', // for display of a qrcode with this value
 				barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
 				url: 'base64 encoded string || url' // for display of an image
-				imageonly: true || undefined // flag to display without download button
+				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
 			}
 		} */
 		const canvas = document.createElement('canvas');
 		let disabled = true;
 		canvas.id = getNextElementID();
 		canvas.classList.add('imagecanvas');
+		if (typeof this.tile.attributes.imageonly === 'object') {
+			for (const [key, value] of Object.entries(this.tile.attributes.imageonly)){
+				canvas.style[key] = value;
+			}
+		}
 		canvas.width = canvas.height = 1024;
 		if (this.tile.attributes.qrcode) {
 			this.imageQrCode.push({
