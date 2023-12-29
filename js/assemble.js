@@ -77,15 +77,17 @@ export const assemble_helper = {
 		if (!content) return;
 		const elements = [];
 		for (const [group, items] of Object.entries(content)) {
+			const wrapper =document.createElement('div');
 			const header = document.createElement('h3');
 			header.appendChild(document.createTextNode(group));
-			elements.push(header);
+			wrapper.appendChild(header);
 			for (const [description, href] of Object.entries(items)) {
 				const link = document.createElement('a');
 				link.href = href;
 				link.appendChild(document.createTextNode(description));
-				elements.push(link);
+				wrapper.appendChild(link);
 			};
+			elements.push(wrapper);
 		};
 		document.querySelector('nav').innerHTML = '';
 		document.querySelector('nav').append(...elements);

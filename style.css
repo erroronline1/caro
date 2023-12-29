@@ -367,6 +367,11 @@ nav {
 	width: 3em;
 	padding: 1em;
 	transition: all ease .3s;
+	column-width: 10em;
+}
+
+nav>div {
+	break-inside: avoid
 }
 
 body>input {
@@ -401,14 +406,14 @@ input:checked~nav {
 	height: calc(100vh - 4em);
 }
 
-nav>a,
-nav>h3 {
+nav>div>a,
+nav>div>h3 {
 	display: block;
 	line-height: 2em;
 	white-space: nowrap;
 }
 
-nav>h3:first-child {
+nav>div:first-child {
 	margin-top: 3em;
 }
 
