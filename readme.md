@@ -1,29 +1,40 @@
-CARO
-Cloud Assisted Record and Operation
+![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
+# CARO - Cloud Assisted Record and Operation
 
-
-prerequisites:
-* php > 8
+## prerequisites
+* php >= 8
 * mysql or sql server (or some other database, but queries may have to be adjusted. as i chose pdo as database connectivity i hope this is possible)
 * ssl (camera access for qr-scanner and serviceworkers don't work otherwise)
+* vendor pricelists as csv-files - one per vendor
+
+tested server environments:
+* apache [uniform server zero XV](https://uniformserver.com) with php 8.2, mysql 8.0.31
+* microsoft iis with sql express (sql server 22)
+
+tested devices:
+* desktop pc win10 edge-browser
+* notebook win11 firefox-browser
+* smartphone android12 firefox-browser
+
+## installation
 * php.ini memory_limit ~1024MB for processing of large csv-files, disable open_basedir at least for local iis for file handlers
 * my.ini (MySQL) max_allowed_packet = 100M
 * manually set mime type for site-webmanifest as application/manifest+json for iis servers
-* vendor pricelists as csv-files
+* set up api/setup.ini, especially the used sql subset and its credentials
+* run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
 
-information:
-* dragging doesn't work on handhelds for touch-events do not include this function. constructing form will need devices with mice or a supported pointer to avoid bloating scripts.
+## limitations
+* dragging doesn't work on handhelds for touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts.
 
 
-
-
-external libraries:
+## ressources
+### external libraries
 * https://github.com/mebjas/html5-qrcode
 * https://github.com/szimek/signature_pad
 * https://github.com/nimiq/qr-creator
 * https://github.com/lindell/JsBarcode/
 
-partially heavily inspired by:
-* https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html
-* https://stackoverflow.com/a/18678678
-* https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site
+### additional help for
+* [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
+* [put request with multipart form data](https://stackoverflow.com/a/18678678)
+* [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
