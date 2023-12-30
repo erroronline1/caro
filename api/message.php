@@ -22,6 +22,7 @@ class MESSAGE extends API {
 					':id' => $this->_payload->to
 				]);
 				if (!$recipient = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_payload->to])]], 400);
+				if ($recipient['id'] < 2) $this->response(['status' => ['msg' => LANG::GET('message.forbidden')]], 403);
 				
 				$message = [
 					'from_user' => $_SESSION['user']['id'],
@@ -51,7 +52,7 @@ class MESSAGE extends API {
 				$statement->execute();
 				$user = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($user as $key => $row) {
-					$datalist[] = $row['name'];
+					if ($row['id'] > 1)	$datalist[] = $row['name'];
 				}
 		
 				// select message
@@ -126,7 +127,7 @@ class MESSAGE extends API {
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.delete_success'),
-						'redirect' => 'sent'
+						'redirect' => $this->_redirect ? : 'inbox'
 					]]);
 				else $this->response([
 					'status' => [
@@ -174,13 +175,6 @@ class MESSAGE extends API {
 				'collapse' => true,
 				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
 				],
-				['type' => 'button',
-				'collapse'=> true,
-				'description' => LANG::GET('message.reply'),
-				'attributes' => [
-					'type' => 'button',
-					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
-					]],
 				['type' => 'message',
 				'collapse' => true
 				],
@@ -196,6 +190,16 @@ class MESSAGE extends API {
 				]
 			];
 		}
+		if ($message['from_user']!=1) array_splice($content, 3,0, [
+			['type' => 'button',
+				'collapse'=> true,
+				'description' => LANG::GET('message.reply'),
+				'attributes' => [
+					'type' => 'button',
+					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
+					]]
+				]);
+
 		$result['body']['content'] = $content;
 		$this->response($result);
 	}
