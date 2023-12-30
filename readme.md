@@ -23,9 +23,9 @@ tested devices:
 * set up api/setup.ini, especially the used sql subset and its credentials
 * run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
 
-## limitations
+## limitations and intended usecases
 * dragging doesn't work on handhelds for touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts.
-
+* orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose.
 
 ## ressources
 ### external libraries
@@ -39,10 +39,10 @@ tested devices:
 * [put request with multipart form data](https://stackoverflow.com/a/18678678)
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
 
-
 # open tasks
+* orders: initiate message from approved orders (inquiry)
 * checkbox/radio char failure on iis
-* orders: initiate message on approvement and from approved orders (inquiry)
+* qr-code reader raw implementation
 * forms and contexts
 * vendor list
 * user qualifications, certificates
