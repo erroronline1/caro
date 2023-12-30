@@ -23,6 +23,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE CONVERT(VARCHAR, token) = :token"
 		],
+		'application_get_permission_group' => [
+			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')",
+			'sqlsrv' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')"
+		],
 
 		'form_component-post' => [
 			'mysql' => "INSERT INTO caro_form_components (id, name, date, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content)",
@@ -58,8 +62,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, image = :image WHERE id = :id"
 		],
 		'user_get-datalist' => [
-			'mysql' => "SELECT name FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT name FROM caro_user ORDER BY CONVERT(VARCHAR,name) ASC"
+			'mysql' => "SELECT id, name FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name FROM caro_user ORDER BY CONVERT(VARCHAR, name) ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
