@@ -115,43 +115,100 @@ class ORDER extends API {
 		$this->response($result);
 	}
 
+	private function alertPurchase(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
+		$statement->execute([
+			':group' => 'purchase'
+		]);
+		$purchase = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($purchase as $row) {
+			$message = [
+				'from_user' => 1,
+				'to_user' => $row['id'],
+				'message' => LANG::GET('order.alert_purchase')
+			];
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));
+			$statement->execute($message);
+		}
+	}
+
+	private function processOrderForm(){
+		unset ($this->_payload->Search_product);
+		$approval = false;
+		if ($this->_payload->approval_token){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
+			$statement->execute([
+				':token' => $this->_payload->approval_token
+			]);
+			if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
+				$approval = $result['name'] . LANG::GET('order.token_verified');
+			}
+		}
+		if ($_FILES['signature']['tmp_name']){
+			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
+			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
+		}
+		unset ($this->_payload->approval_token);
+		$order_data=['items'=>[]];
+		foreach ($this->_payload as $key => $value){
+			if (is_array($value)){
+				foreach($value as $index => $subvalue){
+					if ($subvalue != null) $order_data['items'][$index][$key] = $subvalue;
+				}
+			} else {
+				if ($value != null) $order_data[$key] = $value;
+			}
+		}
+		$order_data['orderer']=$_SESSION['user']['name'];
+
+		if(!count($order_data['items'])) $this->response([], 406);
+		return ['approval' => $approval, 'order_data' => $order_data];
+	}
+
+	private function postApprovedOrder($processedOrderData){
+		$keys = array_keys($processedOrderData['order_data']);
+		$order_data2 = [];
+		$query = '';
+		for ($i = 0; $i<count($processedOrderData['order_data']['items']);$i++){
+			$order_data2 = $processedOrderData['order_data']['items'][$i];
+			foreach ($keys as $key){
+				if (!in_array($key, ['items','organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
+			}
+			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
+			[
+				':order_data' => "'" . json_encode($order_data2) . "'",
+				':organizational_unit' => "'" . $processedOrderData['order_data']['organizational_unit'] . "'",
+				':approval' => "'" . $processedOrderData['approval'] . "'",
+			]) . '; ';
+		}
+		$statement = $this->_pdo->prepare($query);
+		if ($statement->execute()) {
+			$result=[
+			'status' => [
+				'id' => false,
+				'msg' => LANG::GET('order.saved')
+			]];
+			$this->alertPurchase();
+		}
+		else $result=[
+			'status' => [
+				'id' => false,
+				'msg' => LANG::GET('order.failed_save')
+			]];
+		return $result;
+	}
+
 	public function order(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				unset ($this->_payload->Search_product);
-				$approval = false;
-				if ($this->_payload->approval_token){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
-					$statement->execute([
-						':token' => $this->_payload->approval_token
-					]);
-					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
-						$approval = $result['name'] . LANG::GET('order.token_verified');
-					}
-				}
-				if ($_FILES['signature']['tmp_name']){
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['signature']['tmp_name'], 256, UTILITY_IMAGE_RESOURCE, 'png'));
-				}
-				unset ($this->_payload->approval_token);
-				$order_data=['items'=>[]];
-				foreach ($this->_payload as $key => $value){
-					if (is_array($value)){
-						foreach($value as $index => $subvalue){
-							if ($subvalue != null) $order_data['items'][$index][$key] = $subvalue;
-						}
-					} else {
-						if ($value != null) $order_data[$key] = $value;
-					}
-				}
-				$order_data['orderer']=$_SESSION['user']['name'];
 
-				if(!count($order_data['items'])) $this->response([], 406);
+				$processedOrderData =$this->processOrderForm();
 
-				if (!$approval){
+				if (!$processedOrderData['approval']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
 					$statement->execute([
-						':order_data' => json_encode($order_data)
+						':order_data' => json_encode($processedOrderData['order_data'])
 					]);
 					$result=[
 						'status' => [
@@ -161,68 +218,16 @@ class ORDER extends API {
 					break;
 				}
 				
-				$keys = array_keys($order_data);
-				$order_data2 = [];
-				$query = '';
-				for ($i = 0; $i<count($order_data['items']);$i++){
-					$order_data2 = $order_data['items'][$i];
-					foreach ($keys as $key){
-						if (!in_array($key, ['items','organizational_unit'])) $order_data2[$key] = $order_data[$key];
-					}
-					$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
-					[
-						':order_data' => "'" . json_encode($order_data2) . "'",
-						':organizational_unit' => "'" . $order_data['organizational_unit'] . "'",
-						':approval' => "'" . $approval . "'",
-					]) . '; ';
-				}
-				$statement = $this->_pdo->prepare($query);
-				if ($statement->execute()) $result=[
-					'status' => [
-						'id' => false,
-						'msg' => LANG::GET('order.saved')
-					]];
-				else $result=[
-					'status' => [
-						'id' => false,
-						'msg' => LANG::GET('order.failed_save')
-					]];
+				$result = $this->postApprovedOrder($processedOrderData);
 				break;
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				unset ($this->_payload->Search_product);
-				$approval = false;
-				if ($this->_payload->approval_token){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
-					$statement->execute([
-						':token' => $this->_payload->approval_token
-					]);
-					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
-						$approval = $result['name'] . LANG::GET('order.token_verified');
-					}
-				}
-				if (array_key_exists('signature', $_FILES) &&  $_FILES['signature']['tmp_name']){
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($_FILES['signature']['tmp_name'][0], 256, UTILITY_IMAGE_RESOURCE, 'png'));
-				}
-				unset ($this->_payload->approval_token);
-				$order_data=['items'=>[]];
-				foreach ($this->_payload as $key => $value){
-					if (is_array($value)){
-						foreach($value as $index => $subvalue){
-							if ($subvalue != null) $order_data['items'][$index][$key] = $subvalue;
-						}
-					} else {
-						if ($value != null) $order_data[$key] = $value;
-					}
-				}
-				$order_data['orderer']=$_SESSION['user']['name'];
+				$processedOrderData =$this->processOrderForm();
 
-				if(!count($order_data['items'])) $this->response([], 406);
-
-				if (!$approval){
+				if (!$processedOrderData['approval']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-prepared-order'));
 					$statement->execute([
-						':order_data' => json_encode($order_data),
+						':order_data' => json_encode($processedOrderData['order_data']),
 						':id' => $this->_requestedID
 					]);
 					$result=[
@@ -233,38 +238,14 @@ class ORDER extends API {
 					break;
 				}
 				
-				$keys = array_keys($order_data);
-				$order_data2 = [];
-				$query = '';
-				for ($i = 0; $i<count($order_data['items']);$i++){
-					$order_data2 = $order_data['items'][$i];
-					foreach ($keys as $key){
-						if (!in_array($key, ['items','organizational_unit'])) $order_data2[$key] = $order_data[$key];
-					}
-					$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
-					[
-						':order_data' => "'" . json_encode($order_data2) . "'",
-						':organizational_unit' => "'" . $order_data['organizational_unit'] . "'",
-						':approval' => "'" . $approval . "'",
-					]) . '; ';
-				}
-				$statement = $this->_pdo->prepare($query);
-				if ($statement->execute()) {
-					$result=[
-					'status' => [
-						'id' => false,
-						'msg' => LANG::GET('order.saved')
-					]];
+				$result = $this->postApprovedOrder($processedOrderData);
+
+				if ($result['status']['msg']==LANG::GET('order.saved')){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-prepared-order'));
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
 				}
-				else $result=[
-					'status' => [
-						'id' => false,
-						'msg' => LANG::GET('order.failed_save')
-					]];
 				break;
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
