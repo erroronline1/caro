@@ -41,16 +41,17 @@ tested devices:
 * [webworker caching](https://developer.chrome.com/docs/workbox/caching-strategies-overview)
 
 # open tasks
+* unread messages indicator and notification
+* stl viewer
 * qr-code reader raw implementation
 * forms and contexts
+* pdf export
 * vendor list
 * user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
 * caro audit
 * manuals
-* pdf export
-* stl viewer
 * pdf directory (internal and external documents)
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
