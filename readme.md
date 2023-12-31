@@ -41,7 +41,6 @@ tested devices:
 * [webworker caching](https://developer.chrome.com/docs/workbox/caching-strategies-overview)
 
 # open tasks
-* orders: initiate message from approved orders (inquiry)
 * checkbox/radio char failure on iis
 * qr-code reader raw implementation
 * forms and contexts

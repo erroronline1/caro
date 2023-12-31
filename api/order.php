@@ -574,7 +574,7 @@ class ORDER extends API {
 							]
 					];
 					foreach ($decoded_order_data as $key => $value){ // data
-						if ($key != 'barcode') $content[]=[
+						if (!in_array($key,['barcode', 'orderer'])) $content[]=[
 							'type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
@@ -584,6 +584,21 @@ class ORDER extends API {
 								'onpointerdown' => 'orderClient.toClipboard(this)'
 							]
 						];
+						if ($key == 'orderer') {
+							$messagepayload=[];
+							foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
+								$messagepayload[':' . $key] = $decoded_order_data[$key];
+							}
+							$content[]=[
+							'type' => 'textinput',
+							'collapse' => true,
+							'attributes' => [
+								'value' => $value,
+								'placeholder' => LANG::GET('order.message_orderer'),
+								'readonly' => true,
+								'onpointerdown' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
+							]
+						];}
 					}
 
 					if (str_contains($row['approval'], 'data:image/png')){

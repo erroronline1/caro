@@ -14,7 +14,7 @@ export const api = {
 		api.loadindicator(true);
 		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
 			.then(async data => {
-				if (data.status===203) api.toast(LANG.GET('general.service_worker_cache_fallback'));
+				if (data.status === 203) api.toast(LANG.GET('general.service_worker_cache_fallback'));
 				await successFn(data.body);
 			})
 			.catch((error) => {
@@ -181,6 +181,7 @@ export const api = {
 		get inbox
 		get sent
 		get message/{id}/(reply|forward)
+		get message/0/0/{name}/{message} // to initiate a new message with given recipient and prepared message
 		post message
 		delete message/{id}/(inbox|sent)
 		*/
@@ -280,7 +281,7 @@ export const api = {
 						api.toast(data.status.msg);
 					};
 					break;
-				}	
+				}
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'delete':
