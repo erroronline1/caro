@@ -500,7 +500,7 @@ textarea {
 
 .check input:checked::before {
 	background-color: var(--green);
-	content: '✔';
+	content: '\2714';
 	box-shadow: 0 0 5px 1px var(--green);
 }
 
