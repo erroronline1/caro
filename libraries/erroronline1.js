@@ -75,8 +75,8 @@ export const _ = {
 			method: method, // *GET, POST, PUT, DELETE, etc.
 			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
 			body: (method == 'GET' ? null : (form_data ? payload : JSON.stringify(payload))) // body data type must match "Content-Type" header
-		}).then(response => {
-			if (response.ok) return response.json();
+		}).then(async response => {
+			if (response.statusText==='OK') return {'status':response.status, 'body':await response.json()};
 			else throw new Error('server responded ' + response.status + ': ' + httpResponse[response.status]);
 		});
 		return response;

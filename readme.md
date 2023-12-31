@@ -38,6 +38,7 @@ tested devices:
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
 * [put request with multipart form data](https://stackoverflow.com/a/18678678)
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
+* [webworker caching](https://developer.chrome.com/docs/workbox/caching-strategies-overview)
 
 # open tasks
 * orders: initiate message from approved orders (inquiry)
