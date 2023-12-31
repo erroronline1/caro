@@ -28,7 +28,6 @@ self.addEventListener("fetch", event => {
 	event.respondWith(caches.open(cacheName).then((cache) => {
 		// Go to the network first
 		return fetch(event.request).then((fetchedResponse) => {
-			console.log('hello');
 			cache.put(event.request, fetchedResponse.clone());
 			return fetchedResponse;
 		}).catch(() => {
@@ -38,7 +37,7 @@ self.addEventListener("fetch", event => {
 					status: 203,
 					statusText: "OK",
 					headers: response.headers,
-				  });
+				});
 				return cacheResponse;
 			});
 		});
