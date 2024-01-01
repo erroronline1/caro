@@ -39,6 +39,9 @@ tested devices:
 * [put request with multipart form data](https://stackoverflow.com/a/18678678)
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
 * [webworker caching](https://developer.chrome.com/docs/workbox/caching-strategies-overview)
+* [indexedDB](https://github.com/jakearchibald/idb)
+* [indexedDB with promises](https://github.com/jakearchibald/idb-keyval)
+* [background sync for post and push](https://www.twilio.com/blog/send-messages-when-youre-back-online-with-service-workers-and-background-sync-html)
 
 # open tasks
 * unread messages indicator and notification

@@ -76,7 +76,10 @@ export const _ = {
 			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
 			body: (method == 'GET' ? null : (form_data ? payload : JSON.stringify(payload))) // body data type must match "Content-Type" header
 		}).then(async response => {
-			if (response.statusText==='OK') return {'status':response.status, 'body':await response.json()};
+			if (response.statusText === 'OK') return {
+				'status': response.status,
+				'body': await response.json()
+			};
 			else throw new Error('server responded ' + response.status + ': ' + httpResponse[response.status]);
 		});
 		return response;
@@ -155,5 +158,117 @@ export const _ = {
 	sleep: function (delay) {
 		// use from async function with await _.sleep(ms)
 		return new Promise(resolve => setTimeout(resolve, delay));
+	},
+	indexedDB: {
+		/*
+		.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.add('entries', {'123':'456'})}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
+
+		_.indexedDB.add('entries', {'123':'789'}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
+
+		await _.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.get('entries')}).then((res)=>{console.log(res);}, (err)=>{console.log(err);})
+		*/
+		db: null,
+		name: null,
+		version: 1,
+		promisify: function(request){
+			return new Promise ((resolve, reject) => {
+				request.oncomplete=request.onsuccess= () =>resolve(request.result);
+				request.onabort=request.onerror= () =>reject(request.error);
+			});
+		},
+		setup: function (name, table, indices) {
+			return new Promise((resolve, reject) => {
+				if (_.indexedDB.db) {
+					resolve();
+					return;
+				}
+				_.indexedDB.name = name;
+				let dbReq = window.indexedDB.open(name, _.indexedDB.version);
+				// Fires when the version of the database goes up, or the database is created
+				// for the first time
+				dbReq.onupgradeneeded = function (event) {
+					let db = event.target.result;
+					// Create an object store named ${store}, or retrieve it if it already exists.
+					// Object stores in databases are where data are stored.
+					let entry;
+					if (!db.objectStoreNames.contains(table)) {
+						entry = db.createObjectStore(table, {
+							autoIncrement: true
+						});
+						if (indices != undefined)
+							for (index of indices) {
+								entry.createIndex(index, index, {
+									unique: false
+								});
+							}
+					} else {
+						entry = dbReq.transaction.objectStore(table);
+					}
+					_.indexedDB.db = db;
+				}
+				// Fires once the database is opened (and onupgradeneeded completes, if
+				// onupgradeneeded was called)
+				dbReq.onsuccess = function (event) {
+					// Set the db variable to our database so we can use it!
+					_.indexedDB.db = event.target.result;
+					resolve();
+				}
+				// Fires when we can't open the database
+				dbReq.onerror = function (event) {
+					reject(`error opening database ${event.target.errorCode}`);
+				}
+			});
+		},
+		add: function (table = '', contents = {}) { // contents to be an object with key:value pairs 
+			return new Promise((resolve, reject) => {
+				let request = _.indexedDB.db.transaction([table], 'readwrite').objectStore(table);
+				let entry = {
+					timestamp: Date.now()
+				};
+				for (const [key, value] of Object.entries(contents)) {
+					entry[key] = value;
+				}
+				request.add(entry);
+				request.oncomplete = () => {
+					resolve();
+				};
+				request.onerror = () => {
+					reject();
+				};
+			});
+		},
+		get: async function (table = '') {
+			return new Promise((resolve, reject) => {
+				let request = _.indexedDB.db.transaction([table], 'readonly').objectStore(table).openCursor();
+				let results = [];
+				request.onsuccess = async function (event) {
+					let cursor = event.target.result;
+					if (cursor != null) {
+						console.log(cursor.value);
+						results.push(cursor.value);
+						_.indexedDB.promisify(cursor.continue());
+					} else resolve(results);
+				}
+				// If we get an error, like that the note wasn't in the object
+				// store, we handle the error in the onerror handler
+				request.onerror = function (event) {
+					reject(`error getting entries: ${event.target.errorCode}`);
+				}
+			});
+		},
+		delete: async function(table='', index) {
+			return new Promise((resolve, reject) => {
+				let request = _.indexedDB.db.transaction([table], 'readonly').objectStore(table).delete(index);
+				request.onsuccess = async function (event) {
+					resolve();
+				}
+				// If we get an error, like that the note wasn't in the object
+				// store, we handle the error in the onerror handler
+				request.onerror = function (event) {
+					reject(`error getting entries: ${event.target.errorCode}`);
+				}
+			});
+
+		}
 	}
 }
