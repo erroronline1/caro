@@ -1,4 +1,5 @@
-const cacheName = "20231231_0057"; // Change value to force update
+const cacheName = "2020240101_1638"; // Change value to force update
+
 
 self.addEventListener("install", event => {
 	// Kick out the old service worker
@@ -21,6 +22,10 @@ self.addEventListener("activate", event => {
 			)
 		})
 	);
+});
+
+self.addEventListener("message", (event) => {
+	console.log(`Message received: ${event.data}`);
 });
 
 // Network-first strategy

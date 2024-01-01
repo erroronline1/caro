@@ -21,9 +21,13 @@ const _serviceWorker = {
 	showLocalNotification: function (title, body) {
 		const options = {
 			'body': body,
+			'icon': './media/favicon/android/android-launchericon-192-192.png',
 			// here you can add more properties like icon, image, vibrate, etc.
 		};
 		if (this.swRegistration.active) this.swRegistration.showNotification(title, options);
+	},
+	postMessage: function (message) {
+		this.swRegistration.active.postMessage(message);
 	}
 }
 
