@@ -23,7 +23,7 @@ $queries = [
 			"	PRIMARY KEY (`id`)" .
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" .
 			" " .
-			"INSERT INTO caro_user (id, name, permissions, units, token, image), (NULL, 'Caro App', 'admin', '', '1234', 'media/favicon/logo.png');" .
+			"INSERT INTO caro_user (id, name, permissions, units, token, image), (NULL, '" . INI['caroapp'] . "', 'admin', '', '1234', 'media/favicon/logo.png');" .
 			" " .
 			"CREATE TABLE IF NOT EXISTS `caro_form_components` (" .
 			"	`id` int NOT NULL AUTO_INCREMENT," .
@@ -99,7 +99,7 @@ $queries = [
 			"	image text  NOT NULL" .
 			");" .
 			" " .
-			"INSERT INTO caro_user (name, permissions, units, token, image), ('Caro App', 'admin', '', '1234', 'media/favicon/logo.png');" .
+			"INSERT INTO caro_user (name, permissions, units, token, image), ('" . INI['caroapp'] . "', 'admin', '', '1234', 'media/favicon/logo.png');" .
 			" " .
 			'IF OBJECT_ID(N"caro_form_components", N"U") IS NULL ' .
 			"CREATE TABLE caro_form_components (" .
