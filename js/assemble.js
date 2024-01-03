@@ -4,10 +4,6 @@ this module helps to assemble forms according to the passed simplified object no
 import SignaturePad from '../libraries/signature_pad.umd.js';
 import QrCreator from '../libraries/qr-creator.js';
 
-import {
-	_
-} from '../libraries/erroronline1.js';
-
 var ElementID = 0;
 
 export function getNextElementID() {

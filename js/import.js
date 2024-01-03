@@ -26,9 +26,4 @@ import {
 } from '../js/language.js';
 window.LANG = LANG;
 
-import {
-	_
-} from '../libraries/erroronline1.js';
-window._ = _;
-
 api.application('get', 'login');

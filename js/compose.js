@@ -5,9 +5,6 @@ import {
 	getNextElementID,
 	Assemble
 } from './assemble.js';
-import {
-	_
-} from '../libraries/erroronline1.js';
 
 //chain as much previousElementSibling as iterations. every odd will be deep copied including nodes (aka labels)
 const cloneItems = "for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value = ''; clone.id = compose_helper.getNextElementID(); this.parentNode.insertBefore(clone, this);}";

@@ -1,9 +1,6 @@
 import {
     api
 } from '../js/api.js';
-import {
-    _
-} from '../libraries/erroronline1.js';
 
 await api.application('get', 'language');
 // assignment of variable needs suprisingly long and i have not been able to manage this reliable with await
