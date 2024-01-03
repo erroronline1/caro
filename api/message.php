@@ -194,16 +194,24 @@ class MESSAGE extends API {
 				]
 			];
 		}
-		if ($message['from_user']!=1) array_splice($content, 3,0, [
+		if ($message['from_user'] != INI['caroapp']) array_splice($content[0], 4, 0, [
 			['type' => 'button',
-				'collapse'=> true,
-				'description' => LANG::GET('message.reply'),
-				'attributes' => [
-					'type' => 'button',
-					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
-					]]
-				]);
-
+			'collapse'=> true,
+			'description' => LANG::GET('message.reply'),
+			'attributes' => [
+				'type' => 'button',
+				'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
+				]]
+			]);
+		if ($message['image']) array_splice($content[0], 0, 0, [
+			['type' => 'image',
+			'collapse'=> true,
+			'attributes' => [
+				'url' => $message['image'],
+				'imageonly' => ['width' => '3em', 'height' => '3em'] 
+				]]
+			]);
+		
 		$result['body']['content'] = $content;
 		$this->response($result);
 	}
@@ -265,6 +273,15 @@ class MESSAGE extends API {
 				'collapse' => true
 				]
 			];
+			if ($message['image']) array_splice($content[0], 0, 0, [
+				['type' => 'image',
+				'collapse'=> true,
+				'attributes' => [
+					'url' => $message['image'],
+					'imageonly' => ['width' => '3em', 'height' => '3em'] 
+					]]
+				]);
+	
 		}
 		$result['body']['content'] = $content;
 		$this->response($result);

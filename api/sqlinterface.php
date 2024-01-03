@@ -191,12 +191,12 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user"
 		],
 		'message_get_inbox' => [
-			'mysql' => "SELECT t1.*, t2.name as from_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC",
-			'sqlsrv' => "SELECT t1.*, t2.name as from_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC"
+			'mysql' => "SELECT t1.*, t2.name as from_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC",
+			'sqlsrv' => "SELECT t1.*, t2.name as from_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC"
 		],
 		'message_get_sent' => [
-			'mysql' => "SELECT t1.*, t2.name as to_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
-			'sqlsrv' => "SELECT t1.*, t2.name as to_user FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC"
+			'mysql' => "SELECT t1.*, t2.name as to_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
+			'sqlsrv' => "SELECT t1.*, t2.name as to_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC"
 		],
 	];
 }
