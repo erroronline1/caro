@@ -21,7 +21,7 @@ class SQLQUERY {
 
 		'application_login' => [
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE CONVERT(VARCHAR, token) = :token"
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token LIKE :token"
 		],
 		'application_get_permission_group' => [
 			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')",
