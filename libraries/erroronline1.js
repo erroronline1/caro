@@ -53,7 +53,7 @@ var httpResponse = {
 	507: 'Insufficient Storage'
 };
 
-export const _ = {
+const _ = {
 	el: function (x) { // shortcut for readabilities sake: _.el('element')
 		return document.getElementById(x);
 	},
@@ -161,31 +161,27 @@ export const _ = {
 	},
 	indexedDB: {
 		/*
-		.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.add('entries', {'123':'456'})}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
-
+		_.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.add('entries', {'123':'456'})}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
 		_.indexedDB.add('entries', {'123':'789'}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
-
 		await _.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.get('entries')}).then((res)=>{console.log(res);}, (err)=>{console.log(err);})
 		*/
 		db: null,
 		name: null,
 		version: 1,
-		promisify: function(request){
-			return new Promise ((resolve, reject) => {
-				request.oncomplete=request.onsuccess= () =>resolve(request.result);
-				request.onabort=request.onerror= () =>reject(request.error);
+		promisify: function (request) {
+			return new Promise((resolve, reject) => {
+				request.oncomplete = request.onsuccess = () => resolve(request.result);
+				request.onabort = request.onerror = () => reject(request.error);
 			});
 		},
 		setup: function (name, table, indices) {
 			return new Promise((resolve, reject) => {
 				if (_.indexedDB.db) {
-					resolve();
+					resolve(_.indexedDB.db);
 					return;
 				}
 				_.indexedDB.name = name;
-				let dbReq = window.indexedDB.open(name, _.indexedDB.version);
-				// Fires when the version of the database goes up, or the database is created
-				// for the first time
+				let dbReq = indexedDB.open(name, _.indexedDB.version);
 				dbReq.onupgradeneeded = function (event) {
 					let db = event.target.result;
 					// Create an object store named ${store}, or retrieve it if it already exists.
@@ -206,14 +202,10 @@ export const _ = {
 					}
 					_.indexedDB.db = db;
 				}
-				// Fires once the database is opened (and onupgradeneeded completes, if
-				// onupgradeneeded was called)
 				dbReq.onsuccess = function (event) {
-					// Set the db variable to our database so we can use it!
 					_.indexedDB.db = event.target.result;
-					resolve();
+					resolve(_.indexedDB.db);
 				}
-				// Fires when we can't open the database
 				dbReq.onerror = function (event) {
 					reject(`error opening database ${event.target.errorCode}`);
 				}
@@ -221,54 +213,52 @@ export const _ = {
 		},
 		add: function (table = '', contents = {}) { // contents to be an object with key:value pairs 
 			return new Promise((resolve, reject) => {
-				let request = _.indexedDB.db.transaction([table], 'readwrite').objectStore(table);
+				let request = _.indexedDB.db.transaction([table], 'readwrite'),
+					objectStore = request.objectStore(table),
+					objectStoreRequest;
 				let entry = {
 					timestamp: Date.now()
 				};
 				for (const [key, value] of Object.entries(contents)) {
 					entry[key] = value;
 				}
-				request.add(entry);
-				request.oncomplete = () => {
-					resolve();
+				objectStoreRequest = objectStore.add(entry);
+				request.onerror = (event) => {
+					reject(event.target.errorCode);
 				};
-				request.onerror = () => {
-					reject();
+				objectStoreRequest.onsuccess = (event) => {
+					resolve(event.target.result); // key
 				};
 			});
 		},
-		get: async function (table = '') {
+		get: async function (table = '') { //returns all entries in given table with keys
 			return new Promise((resolve, reject) => {
-				let request = _.indexedDB.db.transaction([table], 'readonly').objectStore(table).openCursor();
-				let results = [];
-				request.onsuccess = async function (event) {
-					let cursor = event.target.result;
-					if (cursor != null) {
-						console.log(cursor.value);
-						results.push(cursor.value);
-						_.indexedDB.promisify(cursor.continue());
-					} else resolve(results);
+				let request = _.indexedDB.db.transaction([table], 'readonly'),
+					objectStore = request.objectStore(table),
+					keys = objectStore.getAllKeys(),
+					results = {};
+				keys.onsuccess = async function (event) {
+					for (const k of event.target.result) {
+						let entry = await _.indexedDB.promisify(objectStore.get(k));
+						results[k] = entry;
+					}
+					resolve(results);
 				}
-				// If we get an error, like that the note wasn't in the object
-				// store, we handle the error in the onerror handler
 				request.onerror = function (event) {
 					reject(`error getting entries: ${event.target.errorCode}`);
 				}
 			});
 		},
-		delete: async function(table='', index) {
+		delete: async function (table = '', key) {
 			return new Promise((resolve, reject) => {
-				let request = _.indexedDB.db.transaction([table], 'readonly').objectStore(table).delete(index);
+				let request = _.indexedDB.db.transaction([table], 'readwrite').objectStore(table).delete(key);
 				request.onsuccess = async function (event) {
 					resolve();
 				}
-				// If we get an error, like that the note wasn't in the object
-				// store, we handle the error in the onerror handler
 				request.onerror = function (event) {
 					reject(`error getting entries: ${event.target.errorCode}`);
 				}
 			});
-
 		}
 	}
 }
