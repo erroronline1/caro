@@ -47,6 +47,7 @@ self.addEventListener("fetch", event => {
 	});
 	event.respondWith(caches.open(cacheName).then(async (cache) => {
 		// Go to the network first
+		const clonedRequest = await event.request.clone();
 		return fetch(event.request).then((fetchedResponse) => {
 			if (event.request.method === 'GET') cache.put(event.request, fetchedResponse.clone());
 			return fetchedResponse;
@@ -62,9 +63,10 @@ self.addEventListener("fetch", event => {
 			}, (error) => {
 				return cacheResponse
 			});
-			console.log('request: ', event.request);
 			//return;
-			_.indexedDB.add('cached_post_put_delete', event.request).then(
+			await _.indexedDB.add('cached_post_put_delete', {
+				'request': await clonedRequest.blob()
+			}).then(
 				() => {
 					cacheResponse = new Response(JSON.stringify({
 						status: {
@@ -78,7 +80,9 @@ self.addEventListener("fetch", event => {
 						}
 					});
 					return cacheResponse;
-				});
+				}).catch((error) => {
+				return cacheResponse;
+			});
 			return cacheResponse;
 		});
 	}));
