@@ -1,5 +1,5 @@
 const cacheName = "2020240101_1638"; // Change value to force update
-
+let syncLock = false;
 importScripts('./libraries/erroronline1.js');
 
 self.addEventListener("install", event => {
@@ -51,29 +51,27 @@ self.addEventListener("fetch", event => {
 		return fetch(event.request).then(async (fetchedResponse) => {
 			if (event.request.method === 'GET') cache.put(event.request, fetchedResponse.clone());
 			//sync-event still marked as experimental as of 01/2024 so sync has to be performed on successful fetch request
-			/*
-			await _.indexedDB.get('cached_post_put_delete').then(async (cachedRequests) => {
-				for await (const [key, entry] of Object.entries(cachedRequests)) {
-					fetch(entry.url, {
+			if (!syncLock) {
+				syncLock = true;
+				const cachedRequests = await _.indexedDB.keys('cached_post_put_delete');
+				let successfullyRequested = [];
+				for (const [key, entry] of Object.entries(cachedRequests)) {
+					await fetch(entry.url, {
 							method: entry.method,
 							headers: {
 								'Content-Type': entry.type
 							},
 							body: entry.request
-						})
-						.then(async () => {
-							_.indexedDB.setup('caro', 'cached_post_put_delete').then(() => {
-								// ffs! yuno delete?
-								_.indexedDB.delete('cached_post_put_delete', key)
-							});
+						}).then(() => {
+							successfullyRequested.push(key)
 						})
 						.catch(error => {
 							console.log(error)
 						});
 				}
-			});
-			*/
-
+				console.log(await _.indexedDB.delete('cached_post_put_delete', successfullyRequested));
+				syncLock = false;
+			}
 			return fetchedResponse;
 		}).catch(async () => {
 			// If the network is unavailable, get cached get requests or store post, put, delete

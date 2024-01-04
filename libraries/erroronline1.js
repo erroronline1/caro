@@ -231,7 +231,7 @@ const _ = {
 				};
 			});
 		},
-		get: async function (table = '') { //returns all entries in given table with keys
+		keys: async function (table = '') { //returns all entries in given table with keys
 			return new Promise((resolve, reject) => {
 				let request = _.indexedDB.db.transaction([table], 'readonly'),
 					objectStore = request.objectStore(table),
@@ -249,15 +249,18 @@ const _ = {
 				}
 			});
 		},
-		delete: async function (table = '', key) {
+		delete: async function (table = '', keys=[]) {
 			return new Promise(async (resolve, reject) => {
 				let transaction = await _.indexedDB.db.transaction([table], 'readwrite');
-				let request = await transaction.objectStore(table).delete(key);
-				request.onsuccess = function (event) {
-					resolve(key);
+				let store = await transaction.objectStore(table);
+				for await (const key of keys){
+					store.delete(key);
 				}
-				request.onerror = function (event) {
-					reject(`error getting entries: ${event.target.errorCode}`);
+				transaction.oncomplete = function (event) {
+					resolve(keys);
+				}
+				transaction.onerror = function (event) {
+					reject(`error deleting entries: ${event.target.errorCode}`);
 				}
 			});
 		}
