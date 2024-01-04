@@ -34,8 +34,18 @@ self.addEventListener("message", (event) => {
 
 // Network-first strategy
 self.addEventListener("fetch", event => {
-	let cacheResponse;
-	event.respondWith(caches.open(cacheName).then((cache) => {
+	let cacheResponse = new Response(JSON.stringify({
+		status: {
+			msg: 'data unavailable due to unconnected network'
+		}
+	}, null, 2), {
+		status: 503,
+		statusText: "OK",
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+	event.respondWith(caches.open(cacheName).then(async (cache) => {
 		// Go to the network first
 		return fetch(event.request).then((fetchedResponse) => {
 			if (event.request.method === 'GET') cache.put(event.request, fetchedResponse.clone());
@@ -49,16 +59,18 @@ self.addEventListener("fetch", event => {
 					headers: response.headers
 				});
 				return cacheResponse;
+			}, (error) => {
+				return cacheResponse
 			});
-			console.log(new Response(event.request).json);
-			return;
+			console.log('request: ', event.request);
+			//return;
 			_.indexedDB.add('cached_post_put_delete', event.request).then(
 				() => {
-					cacheResponse = Response.json({
+					cacheResponse = new Response(JSON.stringify({
 						status: {
 							msg: 'request will be synced on next network access'
 						}
-					}, {
+					}, null, 2), {
 						status: 203,
 						statusText: "OK",
 						headers: {
@@ -66,22 +78,8 @@ self.addEventListener("fetch", event => {
 						}
 					});
 					return cacheResponse;
-				},
-				() => {
-					cacheResponse = Response.json({
-						status: {
-							msg: 'request could not be stored for syncing'
-						}
-					}, {
-						status: 503,
-						statusText: "OK",
-						headers: {
-							'Content-Type': 'application/json'
-						}
-					});
-					return cacheResponse;
 				});
-
+			return cacheResponse;
 		});
 	}));
 });
