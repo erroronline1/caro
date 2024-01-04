@@ -22,7 +22,7 @@ self.addEventListener("activate", event => {
 				})
 			)
 		}).then(() => {
-			_.indexedDB.setup('caro', 'cached_post_put_delete')
+			_.indexedDB.setup('caro', 'cached_post_put_delete');
 			clients.claim();
 		})
 	);
@@ -48,8 +48,32 @@ self.addEventListener("fetch", event => {
 	event.respondWith(caches.open(cacheName).then(async (cache) => {
 		// Go to the network first
 		const clonedRequest = await event.request.clone();
-		return fetch(event.request).then((fetchedResponse) => {
+		return fetch(event.request).then(async (fetchedResponse) => {
 			if (event.request.method === 'GET') cache.put(event.request, fetchedResponse.clone());
+			//sync-event still marked as experimental as of 01/2024 so sync has to be performed on successful fetch request
+			/*
+			await _.indexedDB.get('cached_post_put_delete').then(async (cachedRequests) => {
+				for await (const [key, entry] of Object.entries(cachedRequests)) {
+					fetch(entry.url, {
+							method: entry.method,
+							headers: {
+								'Content-Type': entry.type
+							},
+							body: entry.request
+						})
+						.then(async () => {
+							_.indexedDB.setup('caro', 'cached_post_put_delete').then(() => {
+								// ffs! yuno delete?
+								_.indexedDB.delete('cached_post_put_delete', key)
+							});
+						})
+						.catch(error => {
+							console.log(error)
+						});
+				}
+			});
+			*/
+
 			return fetchedResponse;
 		}).catch(async () => {
 			// If the network is unavailable, get cached get requests or store post, put, delete
@@ -63,8 +87,11 @@ self.addEventListener("fetch", event => {
 			}, (error) => {
 				return cacheResponse
 			});
-			//return;
+			// since get-requests should have been handled until here, do something with the others
 			await _.indexedDB.add('cached_post_put_delete', {
+				'method': clonedRequest.method,
+				'url': clonedRequest.url,
+				'type': clonedRequest.headers.get('content-type'),
 				'request': await clonedRequest.blob()
 			}).then(
 				() => {
