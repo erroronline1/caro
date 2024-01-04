@@ -250,10 +250,11 @@ const _ = {
 			});
 		},
 		delete: async function (table = '', key) {
-			return new Promise((resolve, reject) => {
-				let request = _.indexedDB.db.transaction([table], 'readwrite').objectStore(table).delete(key);
-				request.onsuccess = async function (event) {
-					resolve();
+			return new Promise(async (resolve, reject) => {
+				let transaction = await _.indexedDB.db.transaction([table], 'readwrite');
+				let request = await transaction.objectStore(table).delete(key);
+				request.onsuccess = function (event) {
+					resolve(key);
 				}
 				request.onerror = function (event) {
 					reject(`error getting entries: ${event.target.errorCode}`);
