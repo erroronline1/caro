@@ -85,6 +85,7 @@ export const api = {
 				break;
 			case 'menu':
 				successFn = function (data) {
+					document.querySelector('header>h1').innerHTML = LANG.GET('general.welcome_header');
 					assemble_helper.userMenu(data.body);
 				}
 				break;
@@ -109,7 +110,11 @@ export const api = {
 		*/
 		request = [...request];
 		request.splice(0, 0, 'form');
-		let successFn, payload;
+		let successFn, payload,
+			title = {
+				'component_editor': LANG.GET('menu.admin_form_components'),
+				'form_editor': LANG.GET('menu.admin_forms')
+			};
 
 		switch (method) {
 			case 'get':
@@ -126,6 +131,7 @@ export const api = {
 					case 'component_editor':
 						successFn = function (data) {
 							if (data.body) {
+								document.querySelector('header>h1').innerHTML = title[request[1]];
 								document.getElementById('main').innerHTML = '';
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importComponent(data.body.component);
@@ -145,6 +151,7 @@ export const api = {
 					case 'form_editor':
 						successFn = function (data) {
 							if (data.body) {
+								document.querySelector('header>h1').innerHTML = title[request[1]];
 								document.getElementById('main').innerHTML = '';
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importForm(data.body.component);
@@ -194,11 +201,18 @@ export const api = {
 				api.toast(data.status.msg);
 				if ('redirect' in data.status && data.status.redirect)
 					api.message('get', data.status.redirect);
+			},
+			title = {
+				'inbox': LANG.GET('menu.message_inbox'),
+				'sent': LANG.GET('menu.message_sent'),
+				'message': LANG.GET('menu.message_new')
 			};
+
 		switch (method) {
 			case 'get':
 				successFn = function (data) {
 					if (data.body) {
+						document.querySelector('header>h1').innerHTML = title[request[1]];
 						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
 					}
@@ -249,6 +263,13 @@ export const api = {
 			successFn = function (data) {
 				api.toast(data.status.msg);
 				api.purchase('get', request[1], data.status.id);
+			},
+			title = {
+				'vendor': LANG.GET('menu.purchase_vendor'),
+				'product': LANG.GET('menu.purchase_product'),
+				'order': LANG.GET('menu.purchase_order'),
+				'prepared': LANG.GET('menu.purchase_prepared_orders'),
+				'approved': LANG.GET('menu.purchase_approved_orders')
 			};
 		switch (method) {
 			case 'get':
@@ -266,6 +287,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.body) {
+								document.querySelector('header>h1').innerHTML = title[request[1]];
 								document.getElementById('main').innerHTML = '';
 								new Assemble(data.body).initializeSection();
 								if (request[1] === 'approved') orderClient.filter();
@@ -312,6 +334,7 @@ export const api = {
 			case 'get':
 				successFn = function (data) {
 					if (data.body) {
+						document.querySelector('header>h1').innerHTML = LANG.GET('menu.admin_users');
 						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
 					}
