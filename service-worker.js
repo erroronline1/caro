@@ -98,7 +98,7 @@ self.addEventListener("fetch", event => {
 							msg: 'request will be synced on next network access'
 						}
 					}, null, 2), {
-						status: 203,
+						status: 207,
 						statusText: "OK",
 						headers: {
 							'Content-Type': 'application/json'

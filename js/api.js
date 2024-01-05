@@ -11,7 +11,12 @@ export const api = {
 		api.loadindicator(true);
 		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
 			.then(async data => {
-				if (data.status === 203) api.toast(LANG.GET('general.service_worker_cache_fallback'));
+				if (data.status === 203) api.toast(LANG.GET('general.service_worker_get_cache_fallback'));
+				if (data.status === 207) {
+					api.toast(LANG.GET('general.service_worker_post_cache_fallback'));
+					_serviceWorker.doOnPostCache();
+					return;
+				}
 				await successFn(data.body);
 			})
 			.catch((error) => {

@@ -28,6 +28,12 @@ const _serviceWorker = {
 	},
 	postMessage: function (message) {
 		this.swRegistration.active.postMessage(message);
+	},
+	doOnPostCache: function(){
+		const buttons=document.querySelectorAll('[type=submit]');
+		for (const element of buttons){
+			element.disabled=true;
+		};
 	}
 }
 
