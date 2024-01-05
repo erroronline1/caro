@@ -42,7 +42,6 @@ tested devices:
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* syncing post, put and delete
 * syncing every possible get to chache?
 * unread messages indicator and notification
 * stl viewer
