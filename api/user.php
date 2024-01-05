@@ -46,7 +46,7 @@ class USER extends API {
 				$user['units'] = implode(',', $units);
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, LANG::GET('user.edit_token_renew'))){
+				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
@@ -110,7 +110,7 @@ class USER extends API {
 				$user['units'] = implode(',', $units);
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, LANG::GET('user.edit_token_renew'))){
+				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// convert image
