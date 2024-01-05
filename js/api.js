@@ -48,8 +48,9 @@ export const api = {
 			window.setTimeout(api.toast, 3000);
 		} else toast.close();
 	},
-	update_header(string = '') {
-		document.querySelector('head>h1').innerHTML = string;
+	update_header: function (string = '') {
+		document.querySelector('header>h1').innerHTML = string;
+		window.scrollTo({top: 0, behavior: 'smooth'});
 	},
 	application: async (method, ...request) => {
 		/*
@@ -85,7 +86,7 @@ export const api = {
 				break;
 			case 'menu':
 				successFn = function (data) {
-					document.querySelector('header>h1').innerHTML = LANG.GET('general.welcome_header');
+					api.update_header(LANG.GET('general.welcome_header'));
 					assemble_helper.userMenu(data.body);
 				}
 				break;
@@ -131,7 +132,7 @@ export const api = {
 					case 'component_editor':
 						successFn = function (data) {
 							if (data.body) {
-								document.querySelector('header>h1').innerHTML = title[request[1]];
+								api.update_header(title[request[1]]);
 								document.getElementById('main').innerHTML = '';
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importComponent(data.body.component);
@@ -151,7 +152,7 @@ export const api = {
 					case 'form_editor':
 						successFn = function (data) {
 							if (data.body) {
-								document.querySelector('header>h1').innerHTML = title[request[1]];
+								api.update_header(title[request[1]]);
 								document.getElementById('main').innerHTML = '';
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importForm(data.body.component);
@@ -212,7 +213,7 @@ export const api = {
 			case 'get':
 				successFn = function (data) {
 					if (data.body) {
-						document.querySelector('header>h1').innerHTML = title[request[1]];
+						api.update_header(title[request[1]]);
 						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
 					}
@@ -287,7 +288,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.body) {
-								document.querySelector('header>h1').innerHTML = title[request[1]];
+								api.update_header(title[request[1]]);
 								document.getElementById('main').innerHTML = '';
 								new Assemble(data.body).initializeSection();
 								if (request[1] === 'approved') orderClient.filter();
@@ -334,7 +335,7 @@ export const api = {
 			case 'get':
 				successFn = function (data) {
 					if (data.body) {
-						document.querySelector('header>h1').innerHTML = LANG.GET('menu.admin_users');
+						api.update_header(LANG.GET('menu.admin_users'));
 						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
 					}
