@@ -73,7 +73,7 @@ export const assemble_helper = {
 		if (!content) return;
 		const elements = [];
 		for (const [group, items] of Object.entries(content)) {
-			const wrapper =document.createElement('div');
+			const wrapper = document.createElement('div');
 			const header = document.createElement('h3');
 			header.appendChild(document.createTextNode(group));
 			wrapper.appendChild(header);
@@ -85,8 +85,8 @@ export const assemble_helper = {
 			};
 			elements.push(wrapper);
 		};
-		document.querySelector('nav').innerHTML = '';
-		document.querySelector('nav').append(...elements);
+		document.querySelector('#menu').innerHTML = '';
+		document.querySelector('#menu').append(...elements);
 	}
 }
 
@@ -251,7 +251,7 @@ export class Assemble {
 	processContent() {
 		let collapse;
 		this.content.forEach(tile => {
-			this.articleAttributes=[];
+			this.articleAttributes = [];
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
 				this.tile = tile[i];
@@ -273,7 +273,7 @@ export class Assemble {
 	single(tileProperties, oneOfFew = false) { // parameters are required by composer method
 		const article = document.createElement('article');
 		article.setAttribute('data-type', tileProperties.type);
-		for (const [attribute, value] of Object.entries(this.articleAttributes)){
+		for (const [attribute, value] of Object.entries(this.articleAttributes)) {
 			article.setAttribute(attribute, value);
 		}
 		article.append(...this.elements);
@@ -316,7 +316,7 @@ export class Assemble {
 		});
 		indicators.appendChild(toright);
 		article.appendChild(indicators);
-		for (const [attribute, value] of Object.entries(this.articleAttributes)){
+		for (const [attribute, value] of Object.entries(this.articleAttributes)) {
 			article.setAttribute(attribute, value);
 		}
 		return article;
@@ -758,7 +758,7 @@ export class Assemble {
 		canvas.id = getNextElementID();
 		canvas.classList.add('imagecanvas');
 		if (typeof this.tile.attributes.imageonly === 'object') {
-			for (const [key, value] of Object.entries(this.tile.attributes.imageonly)){
+			for (const [key, value] of Object.entries(this.tile.attributes.imageonly)) {
 				canvas.style[key] = value;
 			}
 		}
@@ -786,8 +786,8 @@ export class Assemble {
 		}
 
 		this.elements.add(canvas);
-		
-		if (!this.tile.attributes.imageonly){
+
+		if (!this.tile.attributes.imageonly) {
 			//this tile does not process attributes, therefore they can be reassigned
 			this.tile.attributes = {
 				'type': 'button',
