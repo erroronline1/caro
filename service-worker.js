@@ -1,7 +1,6 @@
 const cacheName = "2020240101_1638"; // Change value to force update
 importScripts('./libraries/erroronline1.js');
-var syncLock = false,
-	database = _.idb;
+var database = _.idb;
 database.database = {
 	name: 'caro',
 	table: 'cached_post_put_delete'
@@ -55,27 +54,23 @@ self.addEventListener("fetch", event => {
 		return fetch(event.request).then(async (fetchedResponse) => {
 			if (event.request.method === 'GET') cache.put(event.request, fetchedResponse.clone());
 			//sync-event still marked as experimental as of 01/2024 so sync has to be performed on successful fetch request
-			if (!syncLock) {
-				syncLock = true;
-				const cachedRequests = await database.all();
-				let successfullyRequested = [];
-				for (const [key, entry] of Object.entries(cachedRequests)) {
-					await fetch(entry.url, {
-							method: entry.method,
-							headers: {
-								'Content-Type': entry.type
-							},
-							body: entry.request
-						}).then(() => {
-							successfullyRequested.push(key)
-						})
-						.catch(error => {
-							console.log(error)
-						});
-				}
-				await database.delete(successfullyRequested);
-				syncLock = false;
+			const cachedRequests = await database.all();
+			let successfullyRequested = [];
+			for (const [key, entry] of Object.entries(cachedRequests)) {
+				await fetch(entry.url, {
+						method: entry.method,
+						headers: {
+							'Content-Type': entry.type
+						},
+						body: entry.request
+					}).then(() => {
+						successfullyRequested.push(parseInt(key, 10));
+					})
+					.catch(error => {
+						console.log(error)
+					});
 			}
+			if (successfullyRequested.length) await database.delete(successfullyRequested);
 			return fetchedResponse;
 		}).catch(async () => {
 			// If the network is unavailable, get cached get requests or store post, put, delete
