@@ -159,36 +159,35 @@ const _ = {
 		// use from async function with await _.sleep(ms)
 		return new Promise(resolve => setTimeout(resolve, delay));
 	},
-	indexedDB: {
+	idb: {
 		/*
-		_.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.add('entries', {'123':'456'})}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
-		_.indexedDB.add('entries', {'123':'789'}).then(()=>{console.log('yes');}, (err)=>{console.log(err);})
-		await _.indexedDB.setup('test', 'entries').then(()=>{_.indexedDB.get('entries')}).then((res)=>{console.log(res);}, (err)=>{console.log(err);})
+		_.idb.database = {...}
+		_.idb.add({'123':'456'})
+		_.idb.all()
+
+		you could as well assign the idb-property to a new variable to have a brand new database handler
 		*/
-		db: null,
-		name: null,
 		version: 1,
-		promisify: function (request) {
+		database: { // modify this once after import
+			name: 'database',
+			table: 'table'
+		},
+		promise: function (request) {
 			return new Promise((resolve, reject) => {
 				request.oncomplete = request.onsuccess = () => resolve(request.result);
 				request.onabort = request.onerror = () => reject(request.error);
 			});
 		},
-		setup: function (name, table, indices) {
+		open: function (indices) {
 			return new Promise((resolve, reject) => {
-				if (_.indexedDB.db) {
-					resolve(_.indexedDB.db);
-					return;
-				}
-				_.indexedDB.name = name;
-				let dbReq = indexedDB.open(name, _.indexedDB.version);
-				dbReq.onupgradeneeded = function (event) {
-					let db = event.target.result;
+				let initialize = indexedDB.open(_.idb.database.name, _.idb.version);
+				initialize.onupgradeneeded = () => {
+					const db = initialize.result;
 					// Create an object store named ${store}, or retrieve it if it already exists.
 					// Object stores in databases are where data are stored.
 					let entry;
-					if (!db.objectStoreNames.contains(table)) {
-						entry = db.createObjectStore(table, {
+					if (!db.objectStoreNames.contains(_.idb.database.table)) {
+						entry = db.createObjectStore(_.idb.database.table, {
 							autoIncrement: true
 						});
 						if (indices != undefined)
@@ -198,62 +197,66 @@ const _ = {
 								});
 							}
 					} else {
-						entry = dbReq.transaction.objectStore(table);
+						entry = initialize.transaction.objectStore(_.idb.database.table);
 					}
-					_.indexedDB.db = db;
 				}
-				dbReq.onsuccess = function (event) {
-					_.indexedDB.db = event.target.result;
-					resolve(_.indexedDB.db);
+				initialize.onsuccess = () => {
+					resolve({
+						db: initialize.result,
+						table: _.idb.database.table
+					});
 				}
-				dbReq.onerror = function (event) {
-					reject(`error opening database ${event.target.errorCode}`);
+				initialize.onerror = () => {
+					reject(`error opening database ${initialize.errorCode}`);
 				}
 			});
 		},
-		add: function (table = '', contents = {}) { // contents to be an object with key:value pairs 
-			return new Promise((resolve, reject) => {
-				let request = _.indexedDB.db.transaction([table], 'readwrite'),
-					objectStore = request.objectStore(table),
-					objectStoreRequest;
-				let entry = {
-					timestamp: Date.now()
-				};
+		add: function (contents = {}) { // contents to be an object with key:value pairs 
+			return new Promise(async (resolve, reject) => {
+				const db = await _.idb.open();
+				const transaction = db.db.transaction(db.table, 'readwrite'),
+					objectStore = transaction.objectStore(db.table),
+					entry = {
+						timestamp: Date.now()
+					};
 				for (const [key, value] of Object.entries(contents)) {
 					entry[key] = value;
 				}
-				objectStoreRequest = objectStore.add(entry);
-				request.onerror = (event) => {
-					reject(event.target.errorCode);
+				const objectStoreRequest = objectStore.add(entry);
+				objectStoreRequest.onerror = (event) => {
+					console.log('error storing ', contents, event);
+					reject(event.target);
 				};
 				objectStoreRequest.onsuccess = (event) => {
 					resolve(event.target.result); // key
 				};
 			});
 		},
-		keys: async function (table = '') { //returns all entries in given table with keys
-			return new Promise((resolve, reject) => {
-				let request = _.indexedDB.db.transaction([table], 'readonly'),
-					objectStore = request.objectStore(table),
+		all: async function () { //returns all entries in given table with keys
+			return new Promise(async (resolve, reject) => {
+				const db = await _.idb.open();
+				const transaction = db.db.transaction(db.table, 'readonly'),
+					objectStore = transaction.objectStore(db.table),
 					keys = objectStore.getAllKeys(),
 					results = {};
 				keys.onsuccess = async function (event) {
 					for (const k of event.target.result) {
-						let entry = await _.indexedDB.promisify(objectStore.get(k));
+						let entry = await _.idb.promise(objectStore.get(k));
 						results[k] = entry;
 					}
 					resolve(results);
 				}
-				request.onerror = function (event) {
+				keys.onerror = function (event) {
 					reject(`error getting entries: ${event.target.errorCode}`);
 				}
 			});
 		},
-		delete: async function (table = '', keys=[]) {
+		delete: async function (keys = []) {
 			return new Promise(async (resolve, reject) => {
-				let transaction = await _.indexedDB.db.transaction([table], 'readwrite');
-				let store = await transaction.objectStore(table);
-				for await (const key of keys){
+				const db = await _.idb.open();
+				const transaction = await db.db.transaction(db.table, 'readwrite'),
+					store = await transaction.objectStore(db.table);
+				for await (const key of keys) {
 					store.delete(key);
 				}
 				transaction.oncomplete = function (event) {

@@ -1,6 +1,11 @@
 const cacheName = "2020240101_1638"; // Change value to force update
-let syncLock = false;
 importScripts('./libraries/erroronline1.js');
+var syncLock = false,
+	database = _.idb;
+database.database = {
+	name: 'caro',
+	table: 'cached_post_put_delete'
+}
 
 self.addEventListener("install", event => {
 	// Kick out the old service worker
@@ -22,7 +27,6 @@ self.addEventListener("activate", event => {
 				})
 			)
 		}).then(() => {
-			_.indexedDB.setup('caro', 'cached_post_put_delete');
 			clients.claim();
 		})
 	);
@@ -53,7 +57,7 @@ self.addEventListener("fetch", event => {
 			//sync-event still marked as experimental as of 01/2024 so sync has to be performed on successful fetch request
 			if (!syncLock) {
 				syncLock = true;
-				const cachedRequests = await _.indexedDB.keys('cached_post_put_delete');
+				const cachedRequests = await database.all();
 				let successfullyRequested = [];
 				for (const [key, entry] of Object.entries(cachedRequests)) {
 					await fetch(entry.url, {
@@ -69,7 +73,7 @@ self.addEventListener("fetch", event => {
 							console.log(error)
 						});
 				}
-				console.log(await _.indexedDB.delete('cached_post_put_delete', successfullyRequested));
+				await database.delete(successfullyRequested);
 				syncLock = false;
 			}
 			return fetchedResponse;
@@ -86,13 +90,14 @@ self.addEventListener("fetch", event => {
 				return cacheResponse
 			});
 			// since get-requests should have been handled until here, do something with the others
-			await _.indexedDB.add('cached_post_put_delete', {
+			let data = {
 				'method': clonedRequest.method,
 				'url': clonedRequest.url,
 				'type': clonedRequest.headers.get('content-type'),
 				'request': await clonedRequest.blob()
-			}).then(
-				() => {
+			};
+			await database.add(data)
+				.then(() => {
 					cacheResponse = new Response(JSON.stringify({
 						status: {
 							msg: 'request will be synced on next network access'
@@ -105,9 +110,10 @@ self.addEventListener("fetch", event => {
 						}
 					});
 					return cacheResponse;
-				}).catch((error) => {
-				return cacheResponse;
-			});
+				}, (error) => {
+					console.log(error);
+					return cacheResponse;
+				});
 			return cacheResponse;
 		});
 	}));
