@@ -21,7 +21,7 @@ class SQLQUERY {
 
 		'application_login' => [
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token LIKE :token"
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token"
 		],
 		'application_get_permission_group' => [
 			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')",
@@ -34,19 +34,19 @@ class SQLQUERY {
 		],
 		'form_component-datalist' => [
 			'mysql' => "SELECT name FROM caro_form_components GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) as name FROM caro_form_components GROUP BY CONVERT(VARCHAR, name) ORDER BY CONVERT(VARCHAR, name) ASC"
+			'sqlsrv' => "SELECT name FROM caro_form_components GROUP BY name ORDER BY name ASC"
 		],
 		'form_component-get' => [
 			'mysql' => "SELECT name, content FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 name, content FROM caro_form_components WHERE CONVERT(VARCHAR, name) = :name ORDER BY id DESC"
+			'sqlsrv' => "SELECT TOP 1 name, content FROM caro_form_components WHERE name = :name ORDER BY id DESC"
 		],
 		'form_datalist' => [
 			'mysql' => "SELECT name FROM caro_form_forms GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) as name FROM caro_form_forms GROUP BY CONVERT(VARCHAR, name) ORDER BY CONVERT(VARCHAR, name) ASC"
+			'sqlsrv' => "SELECT name FROM caro_form_forms GROUP BY name ORDER BY name ASC"
 		],
 		'form_get' => [
 			'mysql' => "SELECT name, content FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 name, content FROM caro_form_forms WHERE CONVERT(VARCHAR, name) = :name ORDER BY id DESC"
+			'sqlsrv' => "SELECT TOP 1 name, content FROM caro_form_forms WHERE name = :name ORDER BY id DESC"
 		],
 		'form_post' => [
 			'mysql' => "",
@@ -63,11 +63,11 @@ class SQLQUERY {
 		],
 		'user_get-datalist' => [
 			'mysql' => "SELECT id, name FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name FROM caro_user ORDER BY CONVERT(VARCHAR, name) ASC"
+			'sqlsrv' => "SELECT id, name FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR CONVERT(VARCHAR, name) = :id"
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 		'user_delete' => [
 			'mysql' => "DELETE FROM caro_user WHERE id = :id LIMIT 1",
@@ -84,11 +84,11 @@ class SQLQUERY {
 		],
 		'consumables_get-vendor-datalist' => [
 			'mysql' => "SELECT name FROM caro_consumables_vendors ORDER BY name ASC",
-			'sqlsrv' => "SELECT CONVERT(VARCHAR, name) as name FROM caro_consumables_vendors ORDER BY CONVERT(VARCHAR, name) ASC"
+			'sqlsrv' => "SELECT name as name FROM caro_consumables_vendors ORDER BY name ASC"
 		],
 		'consumables_get-vendor' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id LIMIT 1",
-			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR CONVERT(VARCHAR, name) = :id"
+			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 		'consumables_post-product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_unit, article_ean, active, protected) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_unit, :article_ean, :active, :protected)",
@@ -108,7 +108,7 @@ class SQLQUERY {
 		],
 		'consumables_get-product-units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
-			'sqlsrv' => "SELECT CONVERT(VARCHAR, article_unit) as article_unit FROM caro_consumables_products GROUP BY CONVERT(VARCHAR, article_unit) ORDER BY CONVERT(VARCHAR, article_unit) ASC"
+			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC"
 		],
 		'consumables_get-product-search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (prod.id = :search OR prod.article_no LIKE CONCAT('%', :search, '%') OR prod.article_ean LIKE CONCAT('%', :search, '%') OR prod.article_name LIKE CONCAT('%', :search, '%')) AND prod.vendor_id = dist.id",
@@ -167,7 +167,7 @@ class SQLQUERY {
 		],
 		'order_get-approved-order' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE CONVERT(VARCHAR, organizational_unit) IN (:organizational_unit) ORDER BY id DESC"
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC"
 		],
 		'order_delete-approved-order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
