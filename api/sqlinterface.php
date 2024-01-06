@@ -178,13 +178,17 @@ class SQLQUERY {
 			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",
 			'sqlsrv' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id"
 		],
+		'message_get_unseen' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
+		],
 		'message_post_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, alert) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1), (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)",
-			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, alert) VALUES (:from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1), (:to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)"
+			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, seen) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1), (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, seen) VALUES (:from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1), (:to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0)"
 		],
 		'message_post_system_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, alert) VALUES (NULL, :to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0)",
-			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, alert) VALUES (:to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0)"
+			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, seen) VALUES (NULL, :to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, seen) VALUES (:to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0)"
 		],
 		'message_delete_message' => [
 			'mysql' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user LIMIT 1",
@@ -194,6 +198,10 @@ class SQLQUERY {
 			'mysql' => "SELECT t1.*, t2.name as from_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC",
 			'sqlsrv' => "SELECT t1.*, t2.name as from_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.to_user = :user AND t1.from_user = t2.id ORDER BY t1.timestamp DESC"
 		],
+		'message_put_seen' => [
+			'mysql' => "UPDATE caro_messages SET seen = 1 WHERE user_id = :user",
+			'sqlsrv' => "UPDATE caro_messages SET seen = 1 WHERE user_id = :user"
+		],		
 		'message_get_sent' => [
 			'mysql' => "SELECT t1.*, t2.name as to_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
 			'sqlsrv' => "SELECT t1.*, t2.name as to_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC"

@@ -143,10 +143,29 @@ class MESSAGE extends API {
 		$this->response($result);
 	}
 	
+	public function unread(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
+		$statement->execute([
+			':user' => $_SESSION['user']['id']
+		]);
+		$num = $statement->fetch(PDO::FETCH_ASSOC);
+		$this->response([
+			'amount' => $num['number']
+		]);
+	}
+
 	public function inbox(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result = ['body'=>[]];
 		
+		// set messages to seen on entering inbox
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_put_seen'));
+		$statement->execute([
+			':user' => $_SESSION['user']['id']
+		]);
+
 		// select messages
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_inbox'));
 		$statement->execute([
