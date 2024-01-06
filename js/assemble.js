@@ -77,9 +77,11 @@ export const assemble_helper = {
 			const header = document.createElement('h3');
 			header.appendChild(document.createTextNode(group));
 			wrapper.appendChild(header);
-			for (const [description, href] of Object.entries(items)) {
+			for (const [description, attributes] of Object.entries(items)) {
 				const link = document.createElement('a');
-				link.href = href;
+				for (const [attribute, value] of Object.entries(attributes)) {
+					link.setAttribute(attribute, value);
+				}
 				link.appendChild(document.createTextNode(description));
 				wrapper.appendChild(link);
 			};
@@ -87,6 +89,13 @@ export const assemble_helper = {
 		};
 		document.querySelector('#menu').innerHTML = '';
 		document.querySelector('#menu').append(...elements);
+
+		const container = document.createElement('span'),
+			message = document.createElement('img');
+		message.src = './media/envelope.svg';
+		container.setAttribute('data-unreadmessages', '0');
+		container.append(message);
+		document.querySelector('nav div').append(container);
 	}
 }
 
