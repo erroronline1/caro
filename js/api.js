@@ -50,7 +50,10 @@ export const api = {
 	},
 	update_header: function (string = '') {
 		document.querySelector('header>h1').innerHTML = string;
-		window.scrollTo({top: 0, behavior: 'smooth'});
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth'
+		});
 	},
 	application: async (method, ...request) => {
 		/*
@@ -195,7 +198,7 @@ export const api = {
 		post message
 		delete message/{id}/(inbox|sent)
 
-		get unread (returns number of unread messages, only used within service-worker)
+		get notification // (returns number of unnotified/unread messages, only used within service-worker)
 
 		*/
 		request = [...request];

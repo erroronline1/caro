@@ -143,16 +143,24 @@ class MESSAGE extends API {
 		$this->response($result);
 	}
 	
-	public function unread(){
+	public function notification(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
+		$statement->execute([
+			':user' => $_SESSION['user']['id']
+		]);
+		$unnotified = $statement->fetch(PDO::FETCH_ASSOC);
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_put_notified'));
+		$statement->execute([
+			':user' => $_SESSION['user']['id']
+		]);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id']
 		]);
-		$num = $statement->fetch(PDO::FETCH_ASSOC);
+		$unseen = $statement->fetch(PDO::FETCH_ASSOC);
 		$this->response([
-			'amount' => $num['number']
+			'unnotified' => $unnotified['number'], 'unseen' => $unseen['number']
 		]);
 	}
 

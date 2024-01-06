@@ -55,6 +55,7 @@ $queries = [
 			"	`to_user` int NOT NULL," .
 			"	`message` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 			"	`timestamp` timestamp NOT NULL," .
+			"	`notified` tinyint DEFAULT NULL," .
 			"	`seen` tinyint DEFAULT NULL," .
 			"	PRIMARY KEY (`id`)" .
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -133,6 +134,7 @@ $queries = [
 			"	to_user int NOT NULL," .
 			"	message varchar(MAX) NOT NULL," .
 			"	timestamp smalldatetime NOT NULL," .
+			"	notified tinyint DEFAULT NULL," .
 			"	seen tinyint DEFAULT NULL," .
 			");"
 			,

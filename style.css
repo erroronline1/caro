@@ -54,7 +54,7 @@ main {
 	margin: 0 auto;
 	width: 100%;
 	max-width: 50em;
-	margin-bottom: 5em;
+	margin-bottom: 6em;
 }
 
 /*************************** article elements******************************/
@@ -374,7 +374,7 @@ body>label {
 	background-size: cover;
 	background-image: url("media/bars.svg");
 	cursor: pointer;
-	height:4em;
+	height: 4em;
 	width: 4em;
 	bottom: 1em;
 	left: 50%;
@@ -422,6 +422,23 @@ nav {
 
 input:checked~nav {
 	height: calc(100vh - 2em);
+}
+
+[data-unreadmessages]>img{
+	width:1.5em;
+	height:1.5em;
+}
+[data-unreadmessages]::after {
+	content: attr(data-unreadmessages);
+	color: var(--red);
+	position: absolute;
+	margin-top: -.5em;
+	margin-left: .25em;
+	font-size: .75em;
+}
+
+[data-unreadmessages='0']::after {
+	display: none;
 }
 
 

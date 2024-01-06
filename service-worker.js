@@ -1,10 +1,33 @@
-const cacheName = "2020240101_1638"; // Change value to force update
+const cacheName = "2020240107_0050"; // Change value to force update
 importScripts('./libraries/erroronline1.js');
 var database = _.idb;
 database.database = {
 	name: 'caro',
 	table: 'cached_post_put_delete'
 }
+
+const _serviceWorker = {
+	client: null,
+	showLocalNotification: function (title, body) {
+		// well, this is available in theory but unused due to unavailable language class
+		// better cast to client to have things handled over there
+		const options = {
+			'body': body,
+			'icon': './media/favicon/android/android-launchericon-192-192.png',
+			// here you can add more properties like icon, image, vibrate, etc.
+		};
+		self.registration.showNotification(title, options);
+	},
+	postMessage: function (message) {
+		this.client.postMessage(message);
+	},
+
+};
+addEventListener('message', (message) => {
+	_serviceWorker.client = message.source;
+	//do something with message.data
+
+});
 
 self.addEventListener("install", event => {
 	// Kick out the old service worker
@@ -29,10 +52,6 @@ self.addEventListener("activate", event => {
 			clients.claim();
 		})
 	);
-});
-
-self.addEventListener("message", (event) => {
-	console.log(`Message received: ${event.data}`);
 });
 
 // Network-first strategy
@@ -113,3 +132,23 @@ self.addEventListener("fetch", event => {
 		});
 	}));
 });
+
+setInterval(async () => {
+	//_serviceWorker.postMessage({test:'value'});
+	let count = await fetch('api/api.php/message/notification/', {
+		method: 'GET',
+		cache: 'no-cache',
+		body: null
+	}).then(async response => {
+		if (response.statusText === 'OK') return {
+			'status': response.status,
+			'body': await response.json()
+		};
+		else return 'server responded ' + response.status + ': ' + httpResponse[response.status];
+	});
+	console.log(count);
+	_serviceWorker.postMessage({
+		unnotified: count.body.unnotified,
+		unseen: count.body.unseen
+	});
+}, 30000);

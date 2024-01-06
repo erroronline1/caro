@@ -5,6 +5,12 @@ const _serviceWorker = {
 		if ('serviceWorker' in navigator) {
 			this.swRegistration = await navigator.serviceWorker.register('./service-worker.js');
 			this.permission = await window.Notification.requestPermission();
+			navigator.serviceWorker.ready.then(registration => {
+				registration.active.postMessage("Hi service worker");
+				navigator.serviceWorker.addEventListener('message', (message) => {
+					this.onMessage(message.data);
+				});
+			});
 		} else
 			throw new Error('No Service Worker support!');
 	},
@@ -29,11 +35,25 @@ const _serviceWorker = {
 	postMessage: function (message) {
 		this.swRegistration.active.postMessage(message);
 	},
-	doOnPostCache: function(){
-		const buttons=document.querySelectorAll('[type=submit]');
-		for (const element of buttons){
-			element.disabled=true;
+	doOnPostCache: function () {
+		const buttons = document.querySelectorAll('[type=submit]');
+		for (const element of buttons) {
+			element.disabled = true;
 		};
+	},
+	onMessage: function (data) {
+		console.log(data);
+		if ('unnotified' in data) {
+			if (data.unnotified) {
+				let body = data.unnotified > 1 ? LANG.GET('message.new_messages', {
+					':amount': data.unnotified
+				}) : LANG.GET('message.new_message');
+				this.showLocalNotification(LANG.GET('menu.message_header'), body);
+			}
+		}
+		if ('unseen' in data) {
+			for (const mail of document.querySelectorAll('[data-unreadmessages]')) mail.setAttribute('data-unreadmessages', data.unseen);
+		}
 	}
 }
 
