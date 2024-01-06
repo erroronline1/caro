@@ -194,6 +194,9 @@ export const api = {
 		get message/0/0/{name}/{message} // to initiate a new message with given recipient and prepared message
 		post message
 		delete message/{id}/(inbox|sent)
+
+		get unread (returns number of unread messages, only used within service-worker)
+
 		*/
 		request = [...request];
 		request.splice(0, 0, 'message');
