@@ -51,6 +51,15 @@ const _serviceWorker = {
 			}
 		}
 		if ('unseen' in data) {
+			document.querySelector('nav div').innerHTML = '';
+			if (data.unseen) {
+				const container = document.createElement('span'),
+					message = document.createElement('img');
+				message.src = './media/envelope.svg';
+				container.setAttribute('data-unreadmessages', data.unseen);
+				container.append(message);
+				document.querySelector('nav div').append(container);
+			}
 			for (const mail of document.querySelectorAll('[data-unreadmessages]')) mail.setAttribute('data-unreadmessages', data.unseen);
 		}
 	}

@@ -87,15 +87,8 @@ export const assemble_helper = {
 			};
 			elements.push(wrapper);
 		};
-		document.querySelector('#menu').innerHTML = document.querySelector('nav div').innerHTML = '';
+		document.querySelector('#menu').innerHTML = '';
 		document.querySelector('#menu').append(...elements);
-
-		const container = document.createElement('span'),
-			message = document.createElement('img');
-		message.src = './media/envelope.svg';
-		container.setAttribute('data-unreadmessages', '0');
-		container.append(message);
-		document.querySelector('nav div').append(container);
 	}
 }
 
