@@ -35,14 +35,13 @@ const _serviceWorker = {
 	postMessage: function (message) {
 		this.swRegistration.active.postMessage(message);
 	},
-	doOnPostCache: function () {
+	onPostCache: function () {
 		const buttons = document.querySelectorAll('[type=submit]');
 		for (const element of buttons) {
 			element.disabled = true;
 		};
 	},
 	onMessage: function (data) {
-		console.log(data);
 		if ('unnotified' in data) {
 			if (data.unnotified) {
 				let body = data.unnotified > 1 ? LANG.GET('message.new_messages', {

@@ -87,7 +87,7 @@ export const assemble_helper = {
 			};
 			elements.push(wrapper);
 		};
-		document.querySelector('#menu').innerHTML = '';
+		document.querySelector('#menu').innerHTML = document.querySelector('nav div').innerHTML = '';
 		document.querySelector('#menu').append(...elements);
 
 		const container = document.createElement('span'),
