@@ -27,3 +27,6 @@ import {
 window.LANG = LANG;
 
 api.application('get', 'login');
+setInterval(() => {
+	if (_serviceWorker.swRegistration) api.application('get', 'wakeworker');
+}, 300000);

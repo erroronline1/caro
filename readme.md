@@ -26,6 +26,7 @@ tested devices:
 ## limitations and intended usecases
 * dragging doesn't work on handhelds for touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts.
 * orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose.
+* notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support.
 
 ## ressources
 ### external libraries
@@ -43,7 +44,6 @@ tested devices:
 
 # open tasks
 * syncing every possible get to chache?
-* unread messages indicator and notification
 * stl viewer
 * qr-code reader raw implementation
 * forms and contexts

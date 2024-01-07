@@ -86,6 +86,10 @@ class APPLICATION extends API {
     public function language(){
 		$this->response(['body' => LANG::GETALL()]);
 	}
+
+	public function wakeworker(){
+		$this->response(['live' => 'wake up and let the cloak of life cling to your bones']);
+	}
 }
 
 $api = new APPLICATION();

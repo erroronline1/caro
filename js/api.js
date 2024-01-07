@@ -2,9 +2,8 @@ import {
 	assemble_helper
 } from './assemble.js';
 
-
 export const api = {
-	send: async (method, request, successFn, errorFn = null, payload = {}, form_data = false) => {
+	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
 		// default disable camera stream
 		const scanner = document.querySelector('video');
 		if (scanner) scanner.srcObject.getTracks()[0].stop();
@@ -14,10 +13,10 @@ export const api = {
 				if (data.status === 203) api.toast(LANG.GET('general.service_worker_get_cache_fallback'));
 				if (data.status === 207) {
 					api.toast(LANG.GET('general.service_worker_post_cache_fallback'));
-					_serviceWorker.doOnPostCache();
+					_serviceWorker.onPostCache();
 					return;
 				}
-				await successFn(data.body);
+				if (successFn) await successFn(data.body);
 			})
 			.catch((error) => {
 				console.trace(error);
@@ -92,6 +91,8 @@ export const api = {
 					api.update_header(LANG.GET('general.welcome_header'));
 					assemble_helper.userMenu(data.body);
 				}
+				break;
+			case 'wakeworker':
 				break;
 			default:
 				return;

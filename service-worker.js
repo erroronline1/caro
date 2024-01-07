@@ -1,6 +1,7 @@
-const cacheName = "2020240107_0050"; // Change value to force update
+const cacheName = "2020240107_0101"; // Change value to force update
 importScripts('./libraries/erroronline1.js');
-var database = _.idb;
+var database = _.idb,
+	notificationInterval;
 database.database = {
 	name: 'caro',
 	table: 'cached_post_put_delete'
@@ -90,6 +91,26 @@ self.addEventListener("fetch", event => {
 					});
 			}
 			if (successfullyRequested.length) await database.delete(successfullyRequested);
+			clearInterval(notificationInterval);
+			notificationInterval = setInterval(async () => {
+				let count = await fetch('api/api.php/message/notification/', {
+					method: 'GET',
+					cache: 'no-cache',
+					body: null
+				}).then(async response => {
+					if (response.statusText === 'OK') return {
+						'status': response.status,
+						'body': await response.json()
+					};
+					else return undefined;
+				}, () => {
+					return undefined;
+				});
+				if (count) _serviceWorker.postMessage({
+					unnotified: count.body.unnotified,
+					unseen: count.body.unseen
+				});
+			}, 10000);
 			return fetchedResponse;
 		}).catch(async () => {
 			// If the network is unavailable, get cached get requests or store post, put, delete
@@ -132,23 +153,3 @@ self.addEventListener("fetch", event => {
 		});
 	}));
 });
-
-setInterval(async () => {
-	//_serviceWorker.postMessage({test:'value'});
-	let count = await fetch('api/api.php/message/notification/', {
-		method: 'GET',
-		cache: 'no-cache',
-		body: null
-	}).then(async response => {
-		if (response.statusText === 'OK') return {
-			'status': response.status,
-			'body': await response.json()
-		};
-		else return 'server responded ' + response.status + ': ' + httpResponse[response.status];
-	});
-	console.log(count);
-	_serviceWorker.postMessage({
-		unnotified: count.body.unnotified,
-		unseen: count.body.unseen
-	});
-}, 30000);
