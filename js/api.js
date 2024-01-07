@@ -92,8 +92,6 @@ export const api = {
 					assemble_helper.userMenu(data.body);
 				}
 				break;
-			case 'wakeworker':
-				break;
 			default:
 				return;
 		}

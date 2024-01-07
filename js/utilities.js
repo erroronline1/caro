@@ -1,12 +1,15 @@
 const _serviceWorker = {
-	swRegistration: null,
+	worker: null,
 	permission: null,
 	register: async function () {
 		if ('serviceWorker' in navigator) {
-			this.swRegistration = await navigator.serviceWorker.register('./service-worker.js');
+			this.worker = await navigator.serviceWorker.register('./service-worker.js');
 			this.permission = await window.Notification.requestPermission();
 			navigator.serviceWorker.ready.then(registration => {
-				registration.active.postMessage("Hi service worker");
+				setInterval(() => {
+					console.log('posting worker');
+					if (registration) _serviceWorker.postMessage('getnotifications');
+				}, 300000);
 				navigator.serviceWorker.addEventListener('message', (message) => {
 					this.onMessage(message.data);
 				});
@@ -30,10 +33,10 @@ const _serviceWorker = {
 			'icon': './media/favicon/android/android-launchericon-192-192.png',
 			// here you can add more properties like icon, image, vibrate, etc.
 		};
-		if (this.swRegistration.active) this.swRegistration.showNotification(title, options);
+		if (this.worker.active) this.worker.showNotification(title, options);
 	},
 	postMessage: function (message) {
-		this.swRegistration.active.postMessage(message);
+		this.worker.active.postMessage(message);
 	},
 	onPostCache: function () {
 		const buttons = document.querySelectorAll('[type=submit]');

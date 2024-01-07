@@ -1,33 +1,35 @@
 const cacheName = "2020240107_0101"; // Change value to force update
 importScripts('./libraries/erroronline1.js');
-var database = _.idb,
-	notificationInterval;
+var database = _.idb;
 database.database = {
 	name: 'caro',
 	table: 'cached_post_put_delete'
 }
 
-const _serviceWorker = {
-	client: null,
-	showLocalNotification: function (title, body) {
-		// well, this is available in theory but unused due to unavailable language class
-		// better cast to client to have things handled over there
-		const options = {
-			'body': body,
-			'icon': './media/favicon/android/android-launchericon-192-192.png',
-			// here you can add more properties like icon, image, vibrate, etc.
-		};
-		self.registration.showNotification(title, options);
-	},
-	postMessage: function (message) {
-		this.client.postMessage(message);
-	},
-
-};
-addEventListener('message', (message) => {
-	_serviceWorker.client = message.source;
+addEventListener('message', async (message) => {
+	client = message.source;
 	//do something with message.data
-
+	switch (message.data) {
+		case 'getnotifications':
+			let count = await fetch('api/api.php/message/notification/', {
+				method: 'GET',
+				cache: 'no-cache',
+				body: null
+			}).then(async response => {
+				if (response.statusText === 'OK') return {
+					'status': response.status,
+					'body': await response.json()
+				};
+				else return undefined;
+			}, () => {
+				return undefined;
+			});
+			if (count) client.postMessage({
+				unnotified: count.body.unnotified,
+				unseen: count.body.unseen
+			});
+			break;
+	}
 });
 
 self.addEventListener("install", event => {
@@ -91,26 +93,6 @@ self.addEventListener("fetch", event => {
 					});
 			}
 			if (successfullyRequested.length) await database.delete(successfullyRequested);
-			clearInterval(notificationInterval);
-			notificationInterval = setInterval(async () => {
-				let count = await fetch('api/api.php/message/notification/', {
-					method: 'GET',
-					cache: 'no-cache',
-					body: null
-				}).then(async response => {
-					if (response.statusText === 'OK') return {
-						'status': response.status,
-						'body': await response.json()
-					};
-					else return undefined;
-				}, () => {
-					return undefined;
-				});
-				if (count) _serviceWorker.postMessage({
-					unnotified: count.body.unnotified,
-					unseen: count.body.unseen
-				});
-			}, 10000);
 			return fetchedResponse;
 		}).catch(async () => {
 			// If the network is unavailable, get cached get requests or store post, put, delete
