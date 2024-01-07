@@ -51,7 +51,7 @@ const _serviceWorker = {
 			}
 		}
 		if ('unseen' in data) {
-			document.querySelector('nav div').innerHTML = '';
+			document.querySelector('nav div').innerHTML = '&nbsp;';
 			if (data.unseen) {
 				const container = document.createElement('span'),
 					message = document.createElement('img');

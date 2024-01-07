@@ -266,7 +266,7 @@ input[type=number] {
 dialog {
 	position: fixed;
 	display: block;
-	bottom: 4em;
+	bottom: 6em;
 	height: fit-content;
 	width: 30em;
 	border-radius: 1em;
