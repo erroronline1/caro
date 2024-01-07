@@ -7,7 +7,6 @@ const _serviceWorker = {
 			this.permission = await window.Notification.requestPermission();
 			navigator.serviceWorker.ready.then(registration => {
 				setInterval(() => {
-					console.log('posting worker');
 					if (registration) _serviceWorker.postMessage('getnotifications');
 				}, 300000);
 				navigator.serviceWorker.addEventListener('message', (message) => {
