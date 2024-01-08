@@ -45,7 +45,7 @@ const _serviceWorker = {
 	},
 	onMessage: function (data) {
 		if ('unnotified' in data) {
-			if (data.unnotified) {
+			if (parseInt(data.unnotified, 10)) {
 				let body = data.unnotified > 1 ? LANG.GET('message.new_messages', {
 					':amount': data.unnotified
 				}) : LANG.GET('message.new_message');
@@ -54,7 +54,7 @@ const _serviceWorker = {
 		}
 		if ('unseen' in data) {
 			document.querySelector('nav div').innerHTML = '&nbsp;';
-			if (data.unseen) {
+			if (parseInt(data.unseen,10)) {
 				const container = document.createElement('span'),
 					message = document.createElement('img');
 				message.src = './media/envelope.svg';
