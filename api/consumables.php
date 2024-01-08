@@ -212,18 +212,9 @@ class CONSUMABLES extends API {
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
-				$options = ['...' => []];
+				$options = [LANG::GET('consumables.edit_existing_vendors_new') => []];
 				$result = [];
 				
-				// prepare existing vendor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
-				$statement->execute();
-				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($vendor as $key => $row) {
-					$datalist[] = $row['name'];
-					$options[$row['name']] = [];
-				}
-		
 				// select single vendor based on id or name
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
@@ -237,13 +228,26 @@ class CONSUMABLES extends API {
 					'certificate' => '{"validity":""}',
 					'pricelist' => '{"validity":"", "filter": ""}'
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$vendor['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
+					$result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID])];
 
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
 				$isactive = $vendor['active'] ? ['checked' => true] : [];
 				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
 
+				// prepare existing vendor lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
+				$statement->execute();
+				$vendorlist = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($vendorlist as $key => $row) {
+					$datalist[] = $row['name'];
+					$options[$row['name']] = [];
+					if ($row['name'] == 
+					$vendor['name']) 
+					$options[$row['name']]['selected'] = true;
+				}
+				
 				$certificates = [];
 				$documents = [];
 				if ($vendor['id']) {

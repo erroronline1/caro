@@ -278,6 +278,7 @@ export const api = {
 				'prepared': LANG.GET('menu.purchase_prepared_orders'),
 				'approved': LANG.GET('menu.purchase_approved_orders')
 			};
+		if (request[2]=== LANG.GET('consumables.edit_existing_vendors_new')) request.splice(2,1);
 		switch (method) {
 			case 'get':
 				switch (request[1]) {
