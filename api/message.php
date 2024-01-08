@@ -144,7 +144,7 @@ class MESSAGE extends API {
 	}
 	
 	public function notification(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header')]], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id']
