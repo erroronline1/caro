@@ -304,7 +304,7 @@ class ORDER extends API {
 							'value' => $this->_requestedID && $this->_subMethod === 'search' ? $this->_requestedID : '',
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', this.value); return false;}",
 							'onblur' => "if (this.value) {api.purchase('get', 'productsearch', this.value); return false;}",
-							'id' => 'productsearch' 
+							'id' => 'productsearch'
 						]]
 					],[
 						['type' => 'hr']
@@ -327,7 +327,8 @@ class ORDER extends API {
 							'min' => '1',
 							'max' => '99999',
 							'placeholder' => LANG::GET('order.quantity_label'),
-							'onblur' => 'orderClient.required(this.parentNode)'
+							'onblur' => 'orderClient.required(this.parentNode)',
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'collapse' => true,
@@ -335,7 +336,8 @@ class ORDER extends API {
 							'name' => 'unit[]',
 							'list' => 'units',
 							'placeholder' => LANG::GET('order.unit_label'),
-							'onblur' => 'orderClient.required(this.parentNode)'
+							'onblur' => 'orderClient.required(this.parentNode)',
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'collapse' => true,
@@ -343,21 +345,24 @@ class ORDER extends API {
 							'name' => 'vendor[]',
 							'list' => 'vendors',
 							'placeholder' => LANG::GET('order.vendor_label'),
-							'onblur' => 'orderClient.required(this.parentNode)'
+							'onblur' => 'orderClient.required(this.parentNode)',
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'collapse' => true,
 						'attributes' => [
 							'name' => 'number[]',
 							'placeholder' => LANG::GET('order.ordernumber_label'),
-							'onblur' => 'orderClient.required(this.parentNode)'
+							'onblur' => 'orderClient.required(this.parentNode)',
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'collapse' => true,
 						'attributes' => [
 							'name' => 'name[]',
 							'placeholder' => LANG::GET('order.productname_label'),
-							'onblur' => 'orderClient.required(this.parentNode)'
+							'onblur' => 'orderClient.required(this.parentNode)',
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'hiddeninput',
 						'collapse' => true,
@@ -379,7 +384,8 @@ class ORDER extends API {
 						'description' => LANG::GET('order.additional_info'),
 						'attributes' => [
 							'name' => 'info',
-							'value' => array_key_exists('info', $order) ? $order['info'] : ''
+							'value' => array_key_exists('info', $order) ? $order['info'] : '',
+							'data-loss' => 'prevent'
 						]]
 					],[
 						['type' => 'radio',
@@ -393,7 +399,8 @@ class ORDER extends API {
 							'name' => 'commission',
 							'required' => true,
 							'placeholder' => LANG::GET('order.add_commission_placeholder'),
-							'value' => array_key_exists('commission', $order) ? $order['commission'] : ''
+							'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
+							'data-loss' => 'prevent'
 						]]
 					],[
 						['type' => 'dateinput',
@@ -429,8 +436,9 @@ class ORDER extends API {
 								'max' => '99999',
 								'placeholder' => LANG::GET('order.quantity_label'),
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['quantity']
-							]],
+								'value' => $order['items'][$i]['quantity'],
+								'data-loss' => 'prevent'
+								]],
 							['type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
@@ -438,8 +446,9 @@ class ORDER extends API {
 								'list' => 'units',
 								'placeholder' => LANG::GET('order.unit_label'),
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['unit']
-							]],
+								'value' => $order['items'][$i]['unit'],
+								'data-loss' => 'prevent'
+								]],
 							['type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
@@ -447,24 +456,27 @@ class ORDER extends API {
 								'list' => 'vendors',
 								'placeholder' => LANG::GET('order.vendor_label'),
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['vendor']
-							]],
+								'value' => $order['items'][$i]['vendor'],
+								'data-loss' => 'prevent'
+								]],
 							['type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
 								'name' => 'number[]',
 								'placeholder' => LANG::GET('order.ordernumber_label'),
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['number']
-							]],
+								'value' => $order['items'][$i]['number'],
+								'data-loss' => 'prevent'
+								]],
 							['type' => 'textinput',
 							'collapse' => true,
 							'attributes' => [
 								'name' => 'name[]',
 								'placeholder' => LANG::GET('order.productname_label'),
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['name']
-							]],
+								'value' => $order['items'][$i]['name'],
+								'data-loss' => 'prevent'
+								]],
 							['type' => 'hiddeninput',
 							'collapse' => true,
 							'attributes' => [

@@ -101,7 +101,8 @@ class MESSAGE extends API {
 							'required' => true,
 							'placeholder' => LANG::GET('message.to'),
 							'list' => 'users',
-							'value' => $prefill['to'] ? : ''
+							'value' => $prefill['to'] ? : '',
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'textarea',
 						'collapse' => true,
@@ -110,7 +111,8 @@ class MESSAGE extends API {
 							'required' => true,
 							'placeholder' => LANG::GET('message.message'),
 							'value' => $prefill['message'] ? : '',
-							'rows' => 10
+							'rows' => 10,
+							'data-loss' => 'prevent'
 						]],
 						['type' => 'message',
 						'collapse' => true

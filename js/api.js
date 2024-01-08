@@ -3,10 +3,38 @@ import {
 } from './assemble.js';
 
 export const api = {
+	preventDataloss: {
+		// explicitly start this on any eligible successFn
+		// on appending queries (e.g. searches) set api.preventDataloss.monitor = false within query routing
+		monitor: false,
+		event: function (event) {
+			// api must define data-loss=prevent for formfields that should be tracked
+			if (event.target.dataset.loss !== 'prevent') return;
+			api.preventDataloss.monitor = true;
+			console.log(event.target);
+		},
+		start: function () {
+			console.log('pd started');
+			document.addEventListener('input', api.preventDataloss.event);
+		},
+		stop: function () {
+			console.log('pd stopped');
+			document.removeEventListener('input', api.preventDataloss.event);
+			api.preventDataloss.monitor = false;
+		},
+		proceedAnyway: function (method) {
+			console.log(api.preventDataloss.monitor, method.toUpperCase());
+			if (api.preventDataloss.monitor && method.toUpperCase() === 'GET')
+				return confirm(LANG.GET('general.prevent_dataloss'))
+			return true;
+		}
+	},
 	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
 		// default disable camera stream
 		const scanner = document.querySelector('video');
 		if (scanner) scanner.srcObject.getTracks()[0].stop();
+		if (!api.preventDataloss.proceedAnyway(method)) return false;
+		api.preventDataloss.stop()
 		api.loadindicator(true);
 		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
 			.then(async data => {
@@ -221,9 +249,12 @@ export const api = {
 						api.update_header(title[request[1]]);
 						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
+						api.preventDataloss.start();
 					}
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
-					if (request[1]==='inbox' && _serviceWorker.worker) _serviceWorker.onMessage({unseen:0});
+					if (request[1] === 'inbox' && _serviceWorker.worker) _serviceWorker.onMessage({
+						unseen: 0
+					});
 				};
 				break;
 			case 'post':
@@ -278,11 +309,12 @@ export const api = {
 				'prepared': LANG.GET('menu.purchase_prepared_orders'),
 				'approved': LANG.GET('menu.purchase_approved_orders')
 			};
-		if (request[2]=== LANG.GET('consumables.edit_existing_vendors_new')) request.splice(2,1);
+		if (request[2] === LANG.GET('consumables.edit_existing_vendors_new')) request.splice(2, 1);
 		switch (method) {
 			case 'get':
 				switch (request[1]) {
 					case 'productsearch':
+						api.preventDataloss.monitor = false;
 						successFn = function (data) {
 							if (data.body) {
 								let list = document.querySelector('[data-type=links]');
@@ -299,6 +331,7 @@ export const api = {
 								document.getElementById('main').innerHTML = '';
 								new Assemble(data.body).initializeSection();
 								if (request[1] === 'approved') orderClient.filter();
+								api.preventDataloss.start();
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
