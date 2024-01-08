@@ -223,6 +223,7 @@ export const api = {
 						new Assemble(data.body).initializeSection();
 					}
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+					if (request[1]==='inbox' && _serviceWorker.worker) _serviceWorker.onMessage({unseen:0});
 				};
 				break;
 			case 'post':
