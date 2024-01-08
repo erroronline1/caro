@@ -250,6 +250,7 @@ class ORDER extends API {
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
+				$datalist_unit = [];
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
