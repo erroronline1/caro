@@ -1,11 +1,10 @@
 <?php
 /*
-   filters and returns a csv case list according to setup.
+filters and returns a named array according to setup.
     if a filterset uses date thresholds or date intervals and month or year are not manually set,
     the current date is processed.
 
-    setup can either be specified in filter.json can be extended for other lists and filters and the specific
-    filter-set set as default or passed as argument, or passed as dict if used as a module.
+    setup is passed as names array.
     filters and modifications are processed in order of appearance.
     modifications take place with the filtered list only for performance reasons.
     compare lists can be filtered and manipulated likewise. due to recursive implementation the origin list
@@ -13,7 +12,7 @@
 
 	"postProcessing": optional string as hint what to do with the result file
     "filesetting":
-		"source": file to process
+		"source": file to process or a named array (the other filesettings don't matter then)
 	    "headerrowindex": offset for title row
 	    "dialect": settings according to php fgetcsv
 	    "columns": list/array of column names to process and export to destination
@@ -149,8 +148,9 @@ class Listprocessor {
 		if (!array_key_exists('processedMonth', $this->_argument)) $this->_argument['processedMonth'] = date('m');
 		if (!array_key_exists('processedYear', $this->_argument)) $this->_argument['processedMonth'] = date('Y');
 
-		if ($this->importFile())
-			$this->filter();
+		if (is_file($this->_setting['filesetting']['source'])) $this->importFile();
+		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = $this->_setting['filesetting']['source'];
+		if ($this->_list) $this->filter();
 	}
 
 	public function monthdiff($first = [], $last = [], $dateformat = []){
@@ -721,9 +721,5 @@ class Listprocessor {
 		}
 	}
 }
-
-//$t=new Listprocessor($setup, ['track'=>['REFERENZ'=>['27']]]);
-//echo implode('<br>', $t->_log);
-//var_dump($t->_list[array_rand($t->_list, 1)]);
 ?>
 
