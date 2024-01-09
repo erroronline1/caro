@@ -20,13 +20,20 @@ tested devices:
 * php.ini memory_limit ~1024MB for processing of large csv-files, disable open_basedir at least for local iis for file handlers
 * my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manually set mime type for site-webmanifest as application/manifest+json for iis servers
-* set up api/setup.ini, especially the used sql subset and its credentials
+* set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
 * run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
 
 ## limitations and intended usecases
-* dragging doesn't work on handhelds for touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts.
-* orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose.
-* notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support.
+
+### setup
+* setting the package size for the sql environment to a higher value than default is useful beside the packagesize within setup.ini. batch-queries ar supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit
+
+### system limitations
+* notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support
+
+### useage notes and caveats
+* dragging doesn't work on handhelds for touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts
+* orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
 
 ## ressources
 ### external libraries
