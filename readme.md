@@ -18,7 +18,7 @@ tested devices:
 
 ## installation
 * php.ini memory_limit ~1024MB for processing of large csv-files, disable open_basedir at least for local iis for file handlers
-* my.ini (MySQL) max_allowed_packet = 100M
+* my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manually set mime type for site-webmanifest as application/manifest+json for iis servers
 * set up api/setup.ini, especially the used sql subset and its credentials
 * run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
