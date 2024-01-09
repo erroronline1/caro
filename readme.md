@@ -26,7 +26,7 @@ tested devices:
 ## limitations and intended usecases
 
 ### setup
-* setting the package size for the sql environment to a higher value than default is useful beside the packagesize within setup.ini. batch-queries ar supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit
+* setting the package size for the sql environment to a higher value than default is useful beside the packagesize within setup.ini. batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit
 
 ### system limitations
 * notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support
@@ -36,7 +36,7 @@ tested devices:
 * orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
 
 ### importing vendor pricelists
-vendor pricelists must have an easy structure to be importable like
+vendor pricelists must have an easy structure to be importable. it may need additional off-app customizing available data to have input files like:
 
 | Article Number | Article Name | EAN         | Sales Unit |
 | :------------- | :----------- | :---------- | :--------- |
@@ -44,7 +44,7 @@ vendor pricelists must have an easy structure to be importable like
 | 2345           | Trousers     | 23459907    | Package    |
 | 3456           | Socks        | 90897345    | Pair       |
 
-while setting up a vendor an import rule must be defined like
+while setting up a vendor an import rule must be defined like:
 ```js
 {
     "filesettings": {
@@ -71,6 +71,8 @@ while setting up a vendor an import rule must be defined like
     }
 }
 ```
+
+if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewrite rules depend on the database columns for the caro_consumables_products database-table.
 
 ## ressources
 ### external libraries
