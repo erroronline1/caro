@@ -5,7 +5,7 @@
 * php >= 8
 * mysql or sql server (or some other database, but queries may have to be adjusted. as i chose pdo as database connectivity i hope this is possible)
 * ssl (camera access for qr-scanner and serviceworkers don't work otherwise)
-* vendor pricelists as csv-files - one per vendor
+* vendor pricelists as csv-files [see details](#importing-vendor-pricelists)
 
 tested server environments:
 * apache [uniform server zero XV](https://uniformserver.com) with php 8.2, mysql 8.0.31
@@ -32,8 +32,45 @@ tested devices:
 * notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support
 
 ### useage notes and caveats
-* dragging doesn't work on handhelds for touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts
+* dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts
 * orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
+
+### importing vendor pricelists
+vendor pricelists must have an easy structure to be importable like
+
+| Article Number | Article Name | EAN         | Sales Unit |
+| :------------- | :----------- | :---------- | :--------- |
+| 1234           | Shirt        | 90879087    | Piece      |
+| 2345           | Trousers     | 23459907    | Package    |
+| 3456           | Socks        | 90897345    | Pair       |
+
+while setting up a vendor an import rule must be defined like
+```js
+{
+    "filesettings": {
+        "headerrowindex": 0,
+        "dialect": {
+            "separator": ";",
+            "enclosure": "\"",
+            "escape": ""
+        },
+        "columns": [
+            "Article Number",
+            "Article Name",
+            "EAN",
+            "Sales Unit"
+        ]
+    },
+    "modify": {
+        "rewrite": {
+            "article_no": ["Article Number"],
+            "article_name": ["Article Name"],
+            "article_ean": ["EAN"],
+            "article_unit": ["Sales Unit"]
+        }
+    }
+}
+```
 
 ## ressources
 ### external libraries
@@ -50,18 +87,18 @@ tested devices:
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* syncing every possible get to chache?
 * stl viewer
-* qr-code reader raw implementation
-* forms and contexts
+* pdf directory (internal and external documents)
+* qr- and bar-code generator
 * pdf export
+* forms and contexts
 * vendor list
 * user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
+* qr-code reader raw implementation
 * sample check MDR §14
 * caro audit
 * manuals
-* pdf directory (internal and external documents)
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * text recommendations
