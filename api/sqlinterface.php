@@ -4,6 +4,18 @@ class SQLQUERY {
 		return self::QUERIES[$context][INI['sql'][INI['sql']['use']]['driver']];
 	}
 
+	public static function CHUNKIFY($chunks, $query = null){
+		if ($query){
+			$chunkIndex=count($chunks)-1;
+			if (array_key_exists($chunkIndex, $chunks)){
+				if (strlen($chunks[$chunkIndex] . $query) < INI['sql'][INI['sql']['use']]['packagesize']) $chunks[$chunkIndex] .= $query;
+				else $chunks[] = $query;
+			}
+			else $chunks[] = $query;
+		}
+		return $chunks;
+	}
+
 	public const QUERIES = [
 		/*'context' => [
 			'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",

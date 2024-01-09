@@ -44,6 +44,8 @@ class CONSUMABLES extends API {
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
 		$pricelist = new Listprocessor($filter);
+		$sqlchunks = [];
+		$date = '';
 		if (count($pricelist->_list)){
 			// purge all unprotected products for a fresh data set
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
@@ -61,19 +63,16 @@ class CONSUMABLES extends API {
 				$remainder[$row['id']]=$row['article_no'];
 			}
 
-			$query = '';
-			foreach($pricelist->_list as $i => $row){
+			foreach ($pricelist->_list as $i => $row){
 				$update = array_search($row['article_no'], $remainder);
-
-				if ($update) $query .= strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
+				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
 					':id' => $update,
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
 				]) . '; ';
-
-				else $query .= strtr(SQLQUERY::PREPARE('consumables_post-product'),
+				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
 						':vendor_id' => $vendorID,
 						':article_no' => "'" . $row['article_no'] . "'",
@@ -83,9 +82,14 @@ class CONSUMABLES extends API {
 						':active' => 1,
 						':protected' => 0
 					]) . '; ';
+
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
 			}
-			$statement = $this->_pdo->prepare($query);
-			if ($statement->execute()) return date("d.m.Y");
+			foreach ($sqlchunks as $chunk){
+				$statement = $this->_pdo->prepare($chunk);
+				if ($statement->execute()) $date = date("d.m.Y");
+			}
+			return $date;
 		}
 		return '';
 	}
