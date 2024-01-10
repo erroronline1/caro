@@ -673,11 +673,16 @@ class ORDER extends API {
 							$text .= LANG::GET('order.' . $s) . ': ' . $row[$s] . '\n';
 							$statusfilter['data-' . $s]='';
 						}
-						else
-							$status[LANG::GET('order.' . $s)] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"];
+						else {
+							if (
+								(in_array($s, ['received', 'archived']) && (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)))
+								|| (in_array($s, ['ordered']) && (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])))
+							) $status[LANG::GET('order.' . $s)] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"];
+							else $status[LANG::GET('order.' . $s)] = ['disabled' => true];
+						}
 					}
 					if (!($row['ordered'] || $row['received'] || $row['archived']))	$status[LANG::GET('order.disapprove')]=[
-						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"
+						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-disapproved', '');"
 					];
 
 					$content[]=[
