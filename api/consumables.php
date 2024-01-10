@@ -127,8 +127,10 @@ class CONSUMABLES extends API {
 					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
+				$pricelistImportError = '';
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
+					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-vendor'));
@@ -142,7 +144,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']])
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError
 					]]);
 				else $this->response([
 					'status' => [
@@ -182,8 +184,10 @@ class CONSUMABLES extends API {
 					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
+				$pricelistImportError = '';
 				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
+					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
 				}
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
@@ -204,7 +208,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $vendor['id'],
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']])
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError
 					]]);
 				else $this->response([
 					'status' => [
@@ -337,7 +341,8 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'name' => 'pricelist_filter',
 							'value' => $vendor['pricelist']['filter'] ? : '',
-							'placeholder' => json_encode(json_decode($this->filtersample, true))
+							'placeholder' => json_encode(json_decode($this->filtersample, true)),
+							'rows' => 8
 						]]
 					],
 					[
