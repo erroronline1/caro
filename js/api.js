@@ -127,6 +127,49 @@ export const api = {
 		}
 		await api.send(method, request, successFn);
 	},
+	files: async (method, ...request) => {
+		/*
+		post files/files
+		get files/files
+		get files/files/{directory}
+		delete files/files/{directory}/{file}
+
+		get files/manager
+
+		post files/directory
+		delete files/directory/{directory}
+		*/
+		request = [...request];
+		request.splice(0, 0, 'files');
+		let successFn = function (data) {
+				if (data.body) {
+					api.update_header(title[request[1]]);
+					document.getElementById('main').innerHTML = '';
+					new Assemble(data.body).initializeSection();
+				}
+				if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+			},
+			payload,
+			title = {
+				'files': LANG.GET('menu.files_files'),
+				'manager': LANG.GET('menu.files_manager')
+			};
+
+		switch (method) {
+			case 'get':
+			default:
+
+				break;
+			case 'post':
+				successFn = function (data) {
+					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+				};
+				payload = _.getInputs('[data-usecase=files]', true);
+				break;
+		}
+		api.send(method, request, successFn, null, payload);
+		document.getElementById('openmenu').checked = false;
+	},
 	form: (method, ...request) => {
 		/*
 		get form elements from database.

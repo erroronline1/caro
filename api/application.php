@@ -61,8 +61,14 @@ class APPLICATION extends API {
 				LANG::GET('menu.message_inbox') => ['href' => "javascript:api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
 				LANG::GET('menu.message_new') => ['href' => "javascript:api.message('get', 'message')"],
 				LANG::GET('menu.message_sent') => ['href' => "javascript:api.message('get', 'sent')"]
+			],
+			LANG::GET('menu.files_header') => [
+				LANG::GET('menu.files_files') => ['href' => "javascript:api.files('get', 'files')"]
 			]
 		];
+		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_manager')] = ['href' => "javascript:api.files('get', 'manager')"];
+		}
 		$menu[LANG::GET('menu.purchase_header')] = [
 			LANG::GET('menu.purchase_order') => ['href' => "javascript:api.purchase('get', 'order')"],
 			LANG::GET('menu.purchase_prepared_orders') => ['href' => "javascript:api.purchase('get', 'prepared')"],
