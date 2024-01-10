@@ -227,7 +227,7 @@ class Listprocessor {
 
 		foreach ($this->_list as $row => &$values){
 			foreach($values as $column => &$columnvalue){
-				$this->_list[$row][$column]=mb_convert_encoding($columnvalue, 'UTF-8', mb_detect_encoding($columnvalue, "UTF-8, ISO-8859-1, ISO-8859-15", true));
+				$this->_list[$row][$column]=mb_convert_encoding($columnvalue, 'UTF-8', ['ISO-8859-1', 'ISO-8859-3', 'ISO-8859-15', 'UTF-8']);
 			}
 		}
 		return true;
