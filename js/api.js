@@ -288,7 +288,7 @@ export const api = {
 		delete order/order/{id}
 
 		get order/approved/
-		put order/approved/{id}/{ordered|received}
+		put order/approved/{id}/{ordered|received|archived|disapproved}
 		delete order/approved/{id}
 		*/
 		request = [...request];
@@ -341,7 +341,7 @@ export const api = {
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'put':
-				if (['ordered', 'received', 'archived'].includes(request[3])) {
+				if (['ordered', 'received', 'archived', 'disapproved'].includes(request[3])) {
 					successFn = function (data) {
 						api.toast(data.status.msg);
 					};

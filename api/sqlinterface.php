@@ -39,6 +39,10 @@ class SQLQUERY {
 			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')",
 			'sqlsrv' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')"
 		],
+		'application_get_unit_group' => [
+			'mysql' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%', :group, '%')",
+			'sqlsrv' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%', :group, '%')"
+		],
 
 		'form_component-post' => [
 			'mysql' => "INSERT INTO caro_form_components (id, name, date, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content)",
@@ -177,9 +181,13 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_approved_orders SET archived = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET archived = CURRENT_TIMESTAMP WHERE id = :id"
 		],
-		'order_get-approved-order' => [
+		'order_get-approved-order-by-unit' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC"
+		],
+		'order_get-approved-order-by-id' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id"
 		],
 		'order_delete-approved-order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
