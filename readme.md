@@ -33,7 +33,7 @@ tested devices:
 
 ### useage notes and caveats
 * dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts
-* orders can be deleted at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
+* orders can be deleted by administrative users and requesting unit members at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
 
 ### importing vendor pricelists
 vendor pricelists must have an easy structure to be importable. it may need additional off-app customizing available data to have input files like:
