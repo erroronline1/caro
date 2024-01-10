@@ -115,23 +115,6 @@ class ORDER extends API {
 		$this->response($result);
 	}
 
-	private function alertPurchase(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
-		$statement->execute([
-			':group' => 'purchase'
-		]);
-		$purchase = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($purchase as $row) {
-			$message = [
-				'from_user' => 1,
-				'to_user' => $row['id'],
-				'message' => LANG::GET('order.alert_purchase')
-			];
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));
-			$statement->execute($message);
-		}
-	}
-
 	private function processOrderForm(){
 		unset ($this->_payload->Search_product);
 		$approval = false;
@@ -188,7 +171,7 @@ class ORDER extends API {
 				'id' => false,
 				'msg' => LANG::GET('order.saved')
 			]];
-			$this->alertPurchase();
+			$this->alertUserGroup('purchase', LANG::GET('order.alert_purchase'), 'permission');		
 		}
 		else $result=[
 			'status' => [
@@ -534,9 +517,55 @@ class ORDER extends API {
 				if ($this->_subMethod == 'ordered') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
 				if ($this->_subMethod == 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
 				if ($this->_subMethod == 'archived') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
+				if ($this->_subMethod == 'disapproved') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
 				$statement->execute([
 					':id' => $this->_requestedID
 					]);
+				if ($this->_subMethod == 'disapproved'){
+					$order = $statement->fetch(PDO::FETCH_ASSOC);
+					$decoded_order_data = json_decode($order['order_data'], true);
+
+					// prepare possible keys
+					$prepared = [
+						'items' => [[]],
+						'info' => null,
+						'organizational_unit' => $order['organizational_unit'],
+						'commission' => null,
+						'orderer' => null,
+						'deliverydate' => null
+					];
+					// fill possible keys
+					foreach ($decoded_order_data as $key => $value){
+						if (array_key_exists($key, $prepared)) $prepared[$key] = $value;
+						else $prepared['items'][0][$key] = $value;
+					}
+					// add initially approval date
+					$prepared['info'] .= ($prepared['info'] ? "\n": '') . LANG::GET('order.initially_approved') . ': ' . $order['approved'];
+					// clear unused keys
+					foreach ($prepared as $key => $value) {
+						if (!$value) unset($prepared[$key]);
+					}
+					// add to prepared orders
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
+					$statement->execute([
+						':order_data' => json_encode($prepared)
+					]);
+					// delete approved order
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
+					$statement->execute([
+						':id' => $this->_requestedID
+					]);
+					// inform user group
+					$messagepayload=[];
+					foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
+						$messagepayload[':' . $key] = $decoded_order_data[$key];
+					}
+					$this->alertUserGroup(array_search($order['organizational_unit'], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
+						':order' => LANG::GET('order.message', $messagepayload),
+						':unit' => $order['organizational_unit'],
+						':user' => $_SESSION['user']['name']
+					]), 'unit');
+				}
 				$result=[
 					'status' => [
 						'msg' => LANG::GET('order.' . $this->_subMethod)
@@ -559,17 +588,23 @@ class ORDER extends API {
 						'collapse' => true]
 					]
 				]]];
-				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = LANGUAGEFILE['units']; // see all orders
-				else { // see only orders for own units
-					$units = [];
+				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $displayunits = LANGUAGEFILE['units']; // see all orders
+				else { // display only orders for own units
+					$displayunits = [];
 					foreach($_SESSION['user']['units'] as $unit){
-						$units[] = LANG::GET('units.' . $unit);
+						$displayunits[] = LANG::GET('units.' . $unit);
 					}
 				}
+				// translate user-units for permission to delete
+				$userunits = [];
+				foreach($_SESSION['user']['units'] as $unit){
+					$userunits[] = LANG::GET('units.' . $unit);
+				}
+
 				// in clause doesnt work without manually preparing
-				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order'),
+				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order-by-unit'),
 				[
-					':organizational_unit' => "'".implode("','", $units)."'"
+					':organizational_unit' => "'".implode("','", $displayunits)."'"
 				]);
 				$statement = $this->_pdo->prepare($query);
 				$statement->execute();
@@ -641,6 +676,10 @@ class ORDER extends API {
 						else
 							$status[LANG::GET('order.' . $s)] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"];
 					}
+					if (!($row['ordered'] || $row['received'] || $row['archived']))	$status[LANG::GET('order.disapprove')]=[
+						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"
+					];
+
 					$content[]=[
 						'type' => 'text',
 						'content' => $text,
@@ -652,7 +691,7 @@ class ORDER extends API {
 						'content' => $status
 					];
 
-					$content[]=[
+					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'deletebutton',
 						'collapse' => true,
 						'article' => $statusfilter,
