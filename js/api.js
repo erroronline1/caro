@@ -11,19 +11,15 @@ export const api = {
 			// api must define data-loss=prevent for formfields that should be tracked
 			if (event.target.dataset.loss !== 'prevent') return;
 			api.preventDataloss.monitor = true;
-			console.log(event.target);
 		},
 		start: function () {
-			console.log('pd started');
 			document.addEventListener('input', api.preventDataloss.event);
 		},
 		stop: function () {
-			console.log('pd stopped');
 			document.removeEventListener('input', api.preventDataloss.event);
 			api.preventDataloss.monitor = false;
 		},
 		proceedAnyway: function (method) {
-			console.log(api.preventDataloss.monitor, method.toUpperCase());
 			if (api.preventDataloss.monitor && method.toUpperCase() === 'GET')
 				return confirm(LANG.GET('general.prevent_dataloss'))
 			return true;
