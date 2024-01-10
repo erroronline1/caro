@@ -100,6 +100,25 @@ class API {
 		else
 			$this->response([], 404); // If the method not exist with in this class, response would be "Page not found".
 	}
+
+	public function alertUserGroup($group, $message, $permission_or_unit){
+		if ($permission_or_unit == 'permission') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
+		if ($permission_or_unit == 'unit') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
+		$statement->execute([
+			':group' => $group
+		]);
+		$purchase = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($purchase as $row) {
+			$postmessage = [
+				'from_user' => 1,
+				'to_user' => $row['id'],
+				'message' => $message
+			];
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));
+			$statement->execute($postmessage);
+		}
+	}
+
 }
 
 if (in_array(REQUEST[0], ['application', 'form', 'user', 'consumables', 'order', 'message'])) require_once(REQUEST[0] . '.php');
