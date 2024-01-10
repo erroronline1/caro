@@ -80,7 +80,7 @@ class APPLICATION extends API {
 			];
 		}
 
-		$this->response(['body' => $menu]);
+		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
 	}
 
     public function language(){

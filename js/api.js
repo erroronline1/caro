@@ -116,7 +116,13 @@ export const api = {
 				break;
 			case 'menu':
 				successFn = function (data) {
-					api.update_header(LANG.GET('general.welcome_header'));
+					let signin = LANG.GET('menu.signin_header'),
+						greeting = ', ' + signin.charAt(0).toLowerCase() + signin.slice(1);
+					if (data.user) greeting = ' ' + data.user;
+
+					api.update_header(LANG.GET('general.welcome_header', {
+						':user': greeting
+					}));
 					assemble_helper.userMenu(data.body);
 				}
 				break;
