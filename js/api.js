@@ -110,7 +110,7 @@ export const api = {
 						new Assemble(data.body).initializeSection();
 						return;
 					}
-					document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
+					if (data.body.image) document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
 					document.getElementById('openmenu').checked = false;
 				}
 				break;
