@@ -340,13 +340,17 @@ export class Assemble {
 		return node;
 	}
 
+	has_content(tile){
+		return ('content' in tile || 'attributes' in tile || 'description' in tile);
+	}
+
 	text() {
 		/* {
 			type: 'text',
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-
+		if (!this.has_content(this.tile)) return;
 		const content = this.tile.content.matchAll(/(.*?)(?:\n|\\n|<br \/>|$)/gm);
 		for (const part of content) {
 			this.elements.add(document.createTextNode(part[1]));
@@ -362,6 +366,7 @@ export class Assemble {
 				placeholder: 'text input'
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let input = document.createElement('input');
 		let label;
 		input.type = type;
@@ -403,6 +408,7 @@ export class Assemble {
 				onpointerdown: 'alert("hello")'
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let button = document.createElement('button');
 		button.id = getNextElementID();
 		if (this.tile.description) button.appendChild(document.createTextNode(this.tile.description));
@@ -428,6 +434,7 @@ export class Assemble {
 			attributes: {value: '3.14'}
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let input = document.createElement('input');
 		input.type = 'hidden';
 		input.name = this.tile.description;
@@ -464,6 +471,7 @@ export class Assemble {
 				multiple: true
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			button = document.createElement('button');
@@ -503,6 +511,7 @@ export class Assemble {
 				name: 'photo'
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			img = document.createElement('img'),
@@ -590,6 +599,7 @@ export class Assemble {
 				}
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let select = document.createElement('select');
 		const groups = {};
 		select.name = select.title = this.tile.description;
@@ -624,6 +634,7 @@ export class Assemble {
 				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		let textarea = document.createElement('textarea');
 		textarea.name = this.tile.description;
 		textarea.autocomplete = 'off';
@@ -645,6 +656,7 @@ export class Assemble {
 				}
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		for (const [checkbox, attributes] of Object.entries(this.tile.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
@@ -681,6 +693,7 @@ export class Assemble {
 				}
 			}
 		}*/
+		if (!this.has_content(this.tile)) return;
 		const ul = document.createElement('ul');
 		for (const [link, attributes] of Object.entries(this.tile.content)) {
 			let li = document.createElement('li'),
@@ -700,6 +713,7 @@ export class Assemble {
 			description:'signature',
 			required: optional boolean
 		} */
+		if (!this.has_content(this.tile)) return;
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
 		if (this.tile.attributes && this.tile.attributes.required) canvas.setAttribute('data-required', 'required');
@@ -729,6 +743,7 @@ export class Assemble {
 			attributes:{type:'password'} // to override e.g. for logins
 			destination: elementId // force output to other input, e.g. search
 		} */
+		if (!this.has_content(this.tile)) return;
 		const stream = document.createElement('div');
 		stream.id = getNextElementID();
 		stream.classList.add('scanner');
@@ -755,6 +770,7 @@ export class Assemble {
 				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
 			}
 		} */
+		if (!this.has_content(this.tile)) return;
 		const canvas = document.createElement('canvas');
 		let disabled = true;
 		canvas.id = getNextElementID();
