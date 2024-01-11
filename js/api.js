@@ -127,20 +127,20 @@ export const api = {
 		}
 		await api.send(method, request, successFn);
 	},
-	files: async (method, ...request) => {
+	file: async (method, ...request) => {
 		/*
-		post files/files
-		get files/files
-		get files/files/{directory}
-		delete files/files/{directory}/{file}
+		post file/files
+		get file/files
+		get file/files/{directory}
+		delete file/files/{directory}/{file}
 
-		get files/manager
+		get file/manager
 
-		post files/directory
-		delete files/directory/{directory}
+		post file/directory
+		delete file/directory/{directory}
 		*/
 		request = [...request];
-		request.splice(0, 0, 'files');
+		request.splice(0, 0, 'file');
 		let successFn = function (data) {
 				if (data.body) {
 					api.update_header(title[request[1]]);
@@ -164,10 +164,10 @@ export const api = {
 				successFn = function (data) {
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 				};
-				payload = _.getInputs('[data-usecase=files]', true);
+				payload = _.getInputs('[data-usecase=file]', true);
 				break;
 		}
-		api.send(method, request, successFn, null, payload);
+		api.send(method, request, successFn, null, payload, method === 'post');
 		document.getElementById('openmenu').checked = false;
 	},
 	form: (method, ...request) => {
