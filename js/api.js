@@ -148,6 +148,7 @@ export const api = {
 					new Assemble(data.body).initializeSection();
 				}
 				if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+				if ('status' in data && 'redirect' in data.status) api.file('get', ...data.status.redirect);
 			},
 			payload,
 			title = {
@@ -163,6 +164,7 @@ export const api = {
 			case 'post':
 				successFn = function (data) {
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+					if ('status' in data && 'redirect' in data.status) api.file('get', ...data.status.redirect);
 				};
 				payload = _.getInputs('[data-usecase=file]', true);
 				break;
