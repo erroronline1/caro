@@ -42,6 +42,12 @@ body {
 	-webkit-user-select: none;
 	user-select: none;
 }
+/* Large devices such as laptops (1024px and up) */
+@media only screen and (min-width: 64em) {
+	body{
+		font-size: 13px;
+	}
+}
 
 header {
 	margin: .75em auto;
@@ -397,6 +403,12 @@ nav {
 	div {
 		display: block;
 		margin-bottom: 1em;
+	}
+}
+/* Large devices such as laptops (1024px and up) */
+@media only screen and (min-width: 64em) {
+	nav{
+		font-size: 1.125em;
 	}
 }
 
