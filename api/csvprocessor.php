@@ -16,6 +16,7 @@ filters and returns a named array according to setup.
 	    "headerrowindex": offset for title row
 	    "dialect": settings according to php fgetcsv
 	    "columns": list/array of column names to process and export to destination
+        "encoding": comma separated string of possible character encoding of sourcefile
 
     "filter": list/array of objects/dicts
         "apply": "filter_by_expression"
@@ -227,7 +228,7 @@ class Listprocessor {
 
 		foreach ($this->_list as $row => &$values){
 			foreach($values as $column => &$columnvalue){
-				$this->_list[$row][$column]=mb_convert_encoding($columnvalue, 'UTF-8', ['ISO-8859-1', 'ISO-8859-3', 'ISO-8859-15', 'UTF-8']);
+				$this->_list[$row][$column]=mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
 			}
 		}
 		return true;

@@ -43,6 +43,7 @@ class CONSUMABLES extends API {
 	private function update_pricelist($file, $filter, $vendorID){
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
+		$filter['filesetting']['encoding'] = INI['likeliness']['csvprocessor_source_encoding'];
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
@@ -531,7 +532,7 @@ class CONSUMABLES extends API {
 						$file = pathinfo($path);
 						$article_no = explode('_', $file['filename'])[2];
 						similar_text($article_no, $product['article_no'], $percent);
-						if ($percent >= INI['likeliness']['consumables_article_no']) 
+						if ($percent >= INI['likeliness']['consumables_article_no_similarity']) 
 							$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
