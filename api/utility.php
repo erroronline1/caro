@@ -282,6 +282,31 @@ class UTILITY {
 	}
 
 	/**
+	 * deletes files and folders recursively unregarding of content!
+	 * 
+	 * @param string|array $paths 
+	 * 
+	 * @return bool about success
+	 */
+	public static function delete($paths = []){
+		$result = false;
+		if (gettype($paths)==='string') $paths=[$paths];
+		foreach ($paths as $path) {
+			if (is_file($path)){
+				$result = unlink($path);
+			}
+			elseif (is_dir($path)){
+				foreach(scandir($path) as $subdir){
+					if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
+					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
+				}
+				$result = rmdir($path);
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * scans a directory and returns contained files
 	 * 
 	 * @param string $folder folder to scan

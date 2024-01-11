@@ -116,7 +116,7 @@ class USER extends API {
 				// convert image
 				// save and convert image
 				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
-					if ($user['image']) unlink(preg_replace('/api\//', '', $user['image']));
+					if ($user['image'] && $user['id'] > 1) UTILITY::delete($user['image']);
 
 					$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
@@ -275,7 +275,7 @@ class USER extends API {
 				]);
 				$user = $statement->fetch(PDO::FETCH_ASSOC);
 
-				if ($user['image']) unlink(preg_replace('/api\//', '', $user['image']));
+				if ($user['image'] && $user['id'] > 1) UTILITY::delete($user['image']);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));
 				if ($statement->execute([
