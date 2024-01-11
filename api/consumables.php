@@ -121,11 +121,11 @@ class CONSUMABLES extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				$pricelistImportError = '';
@@ -178,11 +178,11 @@ class CONSUMABLES extends API {
 
 				// save certificate
 				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], "../" . UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['certificate'], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+					UTILITY::storeUploadedFiles(['documents'], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				$pricelistImportError = '';
@@ -260,11 +260,11 @@ class CONSUMABLES extends API {
 				$certificates = [];
 				$documents = [];
 				if ($vendor['id']) {
-					$certfiles = UTILITY::listFiles("../" . UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
+					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
 					foreach($certfiles as $path){
 						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
+					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
 					foreach($docfiles as $path){
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
 					}
@@ -417,7 +417,7 @@ class CONSUMABLES extends API {
 
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles(['documents'], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -469,7 +469,7 @@ class CONSUMABLES extends API {
 				
 				// save documents
 				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], "../" . UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles(['documents'], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -527,7 +527,7 @@ class CONSUMABLES extends API {
 				$certificates = [];
 				$documents = [];
 				if ($product['id']) {
-					$docfiles = UTILITY::listFiles("../" . UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
+					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
 					foreach($docfiles as $path){
 						$file = pathinfo($path);
 						$article_no = explode('_', $file['filename'])[2];

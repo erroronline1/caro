@@ -282,18 +282,51 @@ class UTILITY {
 	}
 
 	/**
-	 * scans a directory and returns files in reversed order
+	 * scans a directory and returns contained files
 	 * 
 	 * @param string $folder folder to scan
+	 * @param string $order asc|desc by default
 	 * 
 	 * @return array file list 
 	 */
-	public static function listFiles($folder){
+	public static function listFiles($folder, $order='desc'){
 		$result=[];
 		if (!file_exists($folder)) return $result;
-		$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+		switch ($order){
+			case 'desc':
+				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+				break;
+			case 'asc':
+				$dir = scandir($folder);
+				break;
+		}
 		foreach($dir as $i => $file){
 			if (is_file($folder . '/' . $file)) $result[] = $folder . '/' . $file;
+		}
+		return $result;
+	}
+
+	/**
+	 * scans a directory and returns contained subdirectories
+	 * 
+	 * @param string $folder folder to scan
+	 * @param string $order asc|desc by default
+	 * 
+	 * @return array file list 
+	 */
+	public static function listDirectories($folder, $order='desc'){
+		$result=[];
+		if (!file_exists($folder)) return $result;
+		switch ($order){
+			case 'desc':
+				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+				break;
+			case 'asc':
+				$dir = scandir($folder);
+				break;
+		}
+		foreach($dir as $i => $file){
+			if (is_dir($folder . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $folder . '/' . $file;
 		}
 		return $result;
 	}
@@ -302,21 +335,27 @@ class UTILITY {
 	 * returns folders defined in setup.ini
 	 * 
 	 * @param string $request key
-	 * @param array $replace named array with replacements
+	 * @param array $replace optional named array with replacements
 	 * 
 	 * @return string directory
 	 */
 	public static function directory($request, $replace=[]){
 		if (!array_key_exists($request, INI['fileserver'])){
-			return '../files';
+			return '../fileserver';
 		}
 		$patterns = [];
 		$replacements = [];
-		foreach($replace as $pattern => $replacement){
-			$patterns[] = '/' . $pattern . '/';
-			$replacements[] = $replacement;
+		if ($replace){
+			foreach($replace as $pattern => $replacement){
+				$patterns[] = '/' . $pattern . '/';
+				$replacements[] = $replacement;
+			}
 		}
-		return preg_replace($patterns, $replacements, INI['fileserver'][$request]);
+		else {
+			$patterns[] = '/\/:\w{1,}/';
+			$replacements[] = '';
+		}
+		return '../' . preg_replace($patterns, $replacements, INI['fileserver'][$request]);
 	}
 }
 ?>
