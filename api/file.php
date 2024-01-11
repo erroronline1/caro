@@ -56,15 +56,29 @@ class FILE extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.new_folder'))));
-				if ($new_folder){
-					$new_folder = '../' . UTILITY::directory('files_documents', [':category' => $new_folder]);
-					UTILITY::storeUploadedFiles([], $new_folder);
+				if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.new_folder')))){
+					$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.new_folder'))));
+					if ($new_folder){
+						$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
+						UTILITY::storeUploadedFiles([], $new_folder);
+						$this->response(['status' => [
+							'msg' => LANG::GET('file.new_folder_created', [':name' => $new_folder]),
+							'redirect' => ['manager']
+							]]);
+					}
+				}
+				$destination = UTILITY::propertySet($this->_payload, 'destination');
+				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name'] && $destination) {
+					UTILITY::storeUploadedFiles(['files'], UTILITY::directory('files_documents', [':category' => $destination]));
 					$this->response(['status' => [
-						'msg' => LANG::GET('file.new_folder_created', [':name' => $new_folder])
+						'msg' => LANG::GET('file.new_file_created'),
+						'redirect' => ['manager', $destination]
 					]]);
 				}
-				break;
+				$this->response(['status' => [
+					'msg' => LANG::GET('file.creation_error')
+				]]);
+		break;
 			case 'GET':
 				$result=['body'=>
 				['form' => [
@@ -77,14 +91,22 @@ class FILE extends API {
 					if ($folders){
 						$content=[];
 						foreach ($folders as $folder){
-							$display = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
-							$content[$display] = ['href'=>"javascript:api.file('get', 'manager', '" . $display . "')"];
+							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
+							$result['body']['content'][]=[
+								['type' => 'links',
+								'collapse' => true,
+								'content' => [$foldername => ['href' => "javascript:api.file('get', 'manager', '" . $foldername . "')"]]],
+								['type' => 'button',
+								'collapse' => true,
+								'description' => LANG::GET('file.delete_folder'),
+								'attributes' => [
+									'type' => 'button',
+									'onpointerdown' => "if (confirm('" . LANG::GET('file.delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'manager', '" . $foldername . "')"
+								]],
+								['type' => 'links',
+								'collapse' => true],
+								];
 						}
-						$result['body']['content'][]=[
-							['type' => 'links',
-							'description' => LANG::GET('file.created_folders'),
-							'content' => $content]
-						];
 					}
 					$result['body']['content'][]=[
 						['type' => 'textinput',
@@ -94,12 +116,51 @@ class FILE extends API {
 					];
 				}
 				else {
-
+					$files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+					if ($files){
+						$content=[];
+						foreach ($files as $file){
+							$file=['path' => substr($file,1), 'name' => pathinfo($file)['basename']];
+							$result['body']['content'][]=[
+								['type' => 'links',
+								'collapse' => true,
+								'content' => [$file['path'] => ['href' => $file['path']]]],
+								['type' => 'button',
+								'collapse' => true,
+								'description' => LANG::GET('file.delete_file'),
+								'attributes' => [
+									'type' => 'button',
+									'onpointerdown' => "if (confirm('" . LANG::GET('file.delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'manager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
+								]],
+								['type' => 'links',
+								'collapse' => true],
+							];
+						}
+					}
+					$result['body']['content'][]=[
+						['type' => 'hiddeninput',
+						'collapse' => true,
+						'attributes' => [
+							'name' => 'destination',
+							'value' => $this->_requestedFolder]],
+						['type' => 'file',
+						'collapse' => true,
+						'attributes' => [
+							'name' => 'files[]',
+							'multiple' => true,
+							'required' => true]]
+					];
 				}
 				$this->response($result);
-
 				break;
 			case 'DELETE':
+				if (UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''))) $this->response(['status' => [
+					'msg' => LANG::GET('file.deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
+					'redirect' => ['manager',  $this->_requestedFile ? $this->_requestedFolder : null]
+				]]);
+				else $this->response(['status' => [
+					'msg' => LANG::GET('file.creation_error')
+				]]);
 				break;
 		}
 	}
