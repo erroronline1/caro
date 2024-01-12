@@ -290,8 +290,13 @@ class UTILITY {
 	 */
 	public static function delete($paths = []){
 		$result = false;
+		$allowed = false;
 		if (gettype($paths)==='string') $paths=[$paths];
 		foreach ($paths as $path) {
+			foreach (array_keys(INI['fileserver']) as $fileserver){
+				if (stristr($path, self::directory($fileserver))) $allowed = true;
+			}
+			if (!$allowed) return false;
 			if (is_file($path)){
 				$result = unlink($path);
 			}
