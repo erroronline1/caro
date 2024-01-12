@@ -90,7 +90,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 # open tasks
 * stl viewer
-* pdf directory (internal and external documents)
 * qr- and bar-code generator
 * pdf export
 * forms and contexts
