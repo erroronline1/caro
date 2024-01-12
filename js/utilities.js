@@ -126,12 +126,14 @@ const orderClient = {
 		api.toast(LANG.GET('general.copied_to_clipboard'));
 	},
 	filter: (type = undefined) => {
-		let display, hide;
+		let display, hide, not='';
+		hide = document.querySelectorAll('article[data-type=cart]');
 		if (type) {
-			display = document.querySelectorAll(`article[data-type=cart][data-${type}]`);
-			hide = document.querySelectorAll(`article[data-type=cart]:not([data-${type}])`);
+			if (type==='ordered') not = ':not([data-received]):not([data-archived])';
+			if (type==='received') not = ':not([data-archived])';
+			display = document.querySelectorAll(`article[data-type=cart][data-${type}]${not}`);
+			console.log(`article[data-type=cart][data-${type}]${not}`);
 		} else {
-			hide = document.querySelectorAll(`article[data-type=cart]`);
 			display = document.querySelectorAll('article[data-type=cart]:not([data-ordered]):not([data-received]):not([data-archived])');
 		}
 
