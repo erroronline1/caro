@@ -129,15 +129,13 @@ export const api = {
 	},
 	file: async (method, ...request) => {
 		/*
-		post file/files
-		get file/files
+		get file/filter/{directory}
+
 		get file/files/{directory}
-		delete file/files/{directory}/{file}
 
-		get file/manager
-
-		post file/directory
-		delete file/directory/{directory}
+		post file/manager
+		get file/manager/{directory}
+		delete file/manager/{directory}/{file}
 		*/
 		request = [...request];
 		request.splice(0, 0, 'file');
@@ -158,8 +156,19 @@ export const api = {
 
 		switch (method) {
 			case 'get':
-			default:
-
+				switch (request[1]) {
+					case 'filter':
+						successFn = function (data) {
+							if (data.status) {
+								const all = document.querySelectorAll('[data-filtered]');
+								for (const file of all){
+									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block': 'none';
+								}
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+						};
+						break;
+					}
 				break;
 			case 'post':
 				successFn = function (data) {

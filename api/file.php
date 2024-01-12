@@ -12,39 +12,64 @@ class FILE extends API {
 		$this->_requestedFile = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
-	public function files(){
-		/**
-		 * no put method for windows server permissions are a pita
-		 * thus directories can not be renamed
-		 */
-
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			case 'GET':
-				break;
-			case 'DELETE':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
+	public function filter(){
+		if ($this->_requestedFolder && $this->_requestedFolder != 'null') $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+		else {
+			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+			$files = [];
+			foreach ($folders as $folder) {
+				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+			}
 		}
-		$this->response($result);
+		$matches = [];
+		foreach ($files as $file){
+			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
+			if ($percent >= INI['likeliness']['file_search_similarity']) $matches[] = substr($file,1);
+		}
+		$this->response(['status' => [
+			'data' => $matches
+		]]);
 	}
 
-	public function directory(){
-		/**
-		 * no put method for windows server permissions are a pita
-		 * thus directories can not be renamed
-		 */
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				break;
-			case 'GET':
-				break;
-			case 'DELETE':
-				break;
+	public function files(){
+		if (!(array_intersect(['admin', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$result['body'] = [
+		'content' => [
+				[
+					['type' => 'searchinput',
+					'collapse' => true,
+					'attributes' => [
+						'placeholder' => LANG::GET('file.file_filter_label'),
+						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+						'onblur' => "if (this.value) {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+						'id' => 'productsearch'
+					]],[
+						'type' => 'filter',
+						'collapse' => true
+					]
+				]
+			]
+		];
+		if ($this->_requestedFolder && $this->_requestedFolder != 'null') $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+		else {
+			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+			$files = [];
+			foreach ($folders as $folder) {
+				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+			}
 		}
+		$matches = [];
+		foreach ($files as $file){
+			$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
+			$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path']];
+		}
+		$result['body']['content'][]=
+		[
+			['type' => 'links',
+			'description' => LANG::GET('file.file_filtered'),
+			'content' => $matches
+			]
+		];
 		$this->response($result);
 	}
 
@@ -56,27 +81,28 @@ class FILE extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.new_folder')))){
-					$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.new_folder'))));
-					if ($new_folder){
-						$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
-						UTILITY::storeUploadedFiles([], $new_folder);
-						$this->response(['status' => [
-							'msg' => LANG::GET('file.new_folder_created', [':name' => $new_folder]),
-							'redirect' => ['manager']
-							]]);
+				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.manager_new_folder'))));
+				if ($new_folder){
+					foreach(INI['forbidden']['names'] as $pattern){
+						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['status' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder])]]);
 					}
+					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
+					UTILITY::storeUploadedFiles([], $new_folder);
+					$this->response(['status' => [
+						'msg' => LANG::GET('file.manager_new_folder_created', [':name' => $new_folder]),
+						'redirect' => ['manager']
+						]]);
 				}
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
 				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name'] && $destination) {
 					UTILITY::storeUploadedFiles(['files'], UTILITY::directory('files_documents', [':category' => $destination]));
 					$this->response(['status' => [
-						'msg' => LANG::GET('file.new_file_created'),
+						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['manager', $destination]
 					]]);
 				}
 				$this->response(['status' => [
-					'msg' => LANG::GET('file.creation_error')
+					'msg' => LANG::GET('file.manager_error')
 				]]);
 		break;
 			case 'GET':
@@ -98,10 +124,10 @@ class FILE extends API {
 								'content' => [$foldername => ['href' => "javascript:api.file('get', 'manager', '" . $foldername . "')"]]],
 								['type' => 'button',
 								'collapse' => true,
-								'description' => LANG::GET('file.delete_folder'),
+								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerdown' => "if (confirm('" . LANG::GET('file.delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'manager', '" . $foldername . "')"
+									'onpointerdown' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'manager', '" . $foldername . "')"
 								]],
 								['type' => 'links',
 								'collapse' => true],
@@ -110,7 +136,7 @@ class FILE extends API {
 					}
 					$result['body']['content'][]=[
 						['type' => 'textinput',
-						'description' => LANG::GET('file.new_folder'),
+						'description' => LANG::GET('file.manager_new_folder'),
 						'attributes' => [
 							'required' => true]]
 					];
@@ -122,15 +148,33 @@ class FILE extends API {
 						foreach ($files as $file){
 							$file=['path' => substr($file,1), 'name' => pathinfo($file)['basename']];
 							$result['body']['content'][]=[
+								['type' => 'searchinput',
+								'collapse' => true,
+								'attributes' => [
+									'placeholder' => LANG::GET('file.file_filter_label'),
+									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+									'onblur' => "if (this.value) {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+									'id' => 'productsearch'
+								]],[
+									'type' => 'filter',
+									'collapse' => true
+								]
+							];
+		
+							$result['body']['content'][]=[
+								['type' => 'hiddeninput',
+								'collapse' => true,
+								'description' => 'filter',
+								'attributes'=>['data-filtered' => $file['path']]],
 								['type' => 'links',
 								'collapse' => true,
 								'content' => [$file['path'] => ['href' => $file['path']]]],
 								['type' => 'button',
 								'collapse' => true,
-								'description' => LANG::GET('file.delete_file'),
+								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerdown' => "if (confirm('" . LANG::GET('file.delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'manager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
+									'onpointerdown' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'manager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
 								]],
 								['type' => 'links',
 								'collapse' => true],
@@ -155,11 +199,11 @@ class FILE extends API {
 				break;
 			case 'DELETE':
 				if (UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''))) $this->response(['status' => [
-					'msg' => LANG::GET('file.deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
+					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
 					'redirect' => ['manager',  $this->_requestedFile ? $this->_requestedFolder : null]
 				]]);
 				else $this->response(['status' => [
-					'msg' => LANG::GET('file.creation_error')
+					'msg' => LANG::GET('file.manager_error')
 				]]);
 				break;
 		}
