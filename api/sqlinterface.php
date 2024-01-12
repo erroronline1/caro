@@ -206,6 +206,10 @@ class SQLQUERY {
 			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
 			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
 		],
+		'message_get_filter' => [
+			'mysql' => "SELECT id FROM caro_messages WHERE user_id = :user AND message LIKE CONCAT('%', :msgfilter, '%')",
+			'sqlsrv' => "SELECT id FROM caro_messages WHERE user_id = :user AND message LIKE CONCAT('%', :msgfilter, '%')"
+		],
 		'message_post_message' => [
 			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)",
 			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (:from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1, 1), (:to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)"

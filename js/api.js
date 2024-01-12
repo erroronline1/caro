@@ -276,6 +276,8 @@ export const api = {
 		/*
 		get inbox
 		get sent
+		get filter/{filter}
+
 		get message/{id}/(reply|forward)
 		get message/0/0/{name}/{message} // to initiate a new message with given recipient and prepared message
 		post message
@@ -300,18 +302,33 @@ export const api = {
 
 		switch (method) {
 			case 'get':
-				successFn = function (data) {
-					if (data.body) {
-						api.update_header(title[request[1]]);
-						document.getElementById('main').innerHTML = '';
-						new Assemble(data.body).initializeSection();
-						api.preventDataloss.start();
+				switch (request[1]) {
+					case 'filter':
+						successFn = function (data) {
+							if (data.status) {
+								const all = document.querySelectorAll('[data-filtered]');
+								for (const file of all){
+									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block': 'none';
+								}
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+						};
+						break;
+					default:
+						successFn = function (data) {
+							if (data.body) {
+								api.update_header(title[request[1]]);
+								document.getElementById('main').innerHTML = '';
+								new Assemble(data.body).initializeSection();
+								api.preventDataloss.start();
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (request[1] === 'inbox' && _serviceWorker.worker) _serviceWorker.onMessage({
+								unseen: 0
+							});
+						};
+						break;
 					}
-					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
-					if (request[1] === 'inbox' && _serviceWorker.worker) _serviceWorker.onMessage({
-						unseen: 0
-					});
-				};
 				break;
 			case 'post':
 				payload = _.getInputs('[data-usecase=message]', true);

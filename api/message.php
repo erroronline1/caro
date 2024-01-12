@@ -166,6 +166,22 @@ class MESSAGE extends API {
 		]);
 	}
 
+	public function filter(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_filter'));
+		$statement->execute([
+			':user' => $_SESSION['user']['id'],
+			':msgfilter' => $this->_requestedID
+		]);
+		$unseen = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$matches = [];
+		foreach ($unseen as $row){
+			$matches[] = $row['id'];
+		}
+		$this->response(['status' => [
+			'data' => $matches
+		]]);
+	}
+
 	public function inbox(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result = ['body'=>[]];
@@ -183,11 +199,25 @@ class MESSAGE extends API {
 		]);
 		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		// display form for writing or reading a message
-		$content=[];
-		foreach($messages as $key => $message) {
-
+		$content=[[
+				['type' => 'searchinput',
+				'collapse' => true,
+				'attributes' => [
+					'placeholder' => LANG::GET('message.message_filter_label'),
+					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
+					'onblur' => "api.message('get', 'filter', this.value); return false;",
+					'id' => 'productsearch'
+				]],[
+					'type' => 'filter',
+					'collapse' => true
+				]
+		]];
+		foreach($messages as $message) {
 			$content[]= [
+				['type' => 'hiddeninput',
+				'collapse' => true,
+				'description' => 'filter',
+				'attributes'=>['data-filtered' => $message['id']]],
 				['type' => 'textinput',
 				'collapse' => true,
 				'description' => LANG::GET('message.from'),
@@ -256,11 +286,26 @@ class MESSAGE extends API {
 		]);
 		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		// display form for writing or reading a message
-		$content=[];
+		$content=[[
+			['type' => 'searchinput',
+			'collapse' => true,
+			'attributes' => [
+				'placeholder' => LANG::GET('message.message_filter_label'),
+				'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
+				'onblur' => "api.message('get', 'filter', this.value); return false;",
+				'id' => 'productsearch'
+			]],[
+				'type' => 'filter',
+				'collapse' => true
+			]
+		]];
 		foreach($messages as $key => $message) {
 
 			$content[]= [
+				['type' => 'hiddeninput',
+				'collapse' => true,
+				'description' => 'filter',
+				'attributes'=>['data-filtered' => $message['id']]],
 				['type' => 'textinput',
 				'collapse' => true,
 				'description' => LANG::GET('message.to'),
