@@ -172,9 +172,9 @@ class MESSAGE extends API {
 			':user' => $_SESSION['user']['id'],
 			':msgfilter' => $this->_requestedID
 		]);
-		$unseen = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$filtered = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$matches = [];
-		foreach ($unseen as $row){
+		foreach ($filtered as $row){
 			$matches[] = $row['id'];
 		}
 		$this->response(['status' => [
