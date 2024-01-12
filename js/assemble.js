@@ -694,7 +694,7 @@ export class Assemble {
 			}
 		}*/
 		if (!this.has_content(this.tile)) return;
-		const ul = document.createElement('ul');
+		let ul = document.createElement('ul');
 		for (const [link, attributes] of Object.entries(this.tile.content)) {
 			let li = document.createElement('li'),
 				a = document.createElement('a');
@@ -704,6 +704,7 @@ export class Assemble {
 			li.appendChild(a);
 			ul.appendChild(li);
 		}
+		ul = this.apply_attributes(this.tile.attributes, ul);
 		this.elements.add(ul);
 	}
 
