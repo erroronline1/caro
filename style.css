@@ -42,9 +42,10 @@ body {
 	-webkit-user-select: none;
 	user-select: none;
 }
+
 /* Large devices such as laptops (1024px and up) */
 @media only screen and (min-width: 64em) {
-	body{
+	body {
 		font-size: 13px;
 	}
 }
@@ -244,10 +245,10 @@ input[type=number] {
 .input-label {
 	position: relative;
 	outline: none;
-	top: -1.45rem;
+	top: -1.45em;
 	pointer-events: none;
 	transition: .3s;
-	font-size: medium;
+	font-size: inherit;
 	opacity: .5;
 	margin: 0;
 	padding: 0;
@@ -255,9 +256,19 @@ input[type=number] {
 
 .input-field:not(:placeholder-shown)+.input-label,
 .input-field:focus+.input-label {
-	top: -2.75rem;
+	top: -4em;
 	font-size: x-small;
 }
+
+/* Large devices such as laptops (1024px and up) */
+@media only screen and (min-width: 64em) {
+
+	.input-field:not(:placeholder-shown)+.input-label,
+	.input-field:focus+.input-label {
+		top: -3.5em;
+	}
+}
+
 
 .imagecanvas,
 .photoupload {
@@ -405,9 +416,10 @@ nav {
 		margin-bottom: 1em;
 	}
 }
+
 /* Large devices such as laptops (1024px and up) */
 @media only screen and (min-width: 64em) {
-	nav{
+	nav {
 		font-size: 1.125em;
 	}
 }
@@ -436,10 +448,11 @@ input:checked~nav {
 	height: calc(100vh - 2em);
 }
 
-[data-unreadmessages]>img{
-	width:1.5em;
-	height:1.5em;
+[data-unreadmessages]>img {
+	width: 1.5em;
+	height: 1.5em;
 }
+
 [data-unreadmessages]::after {
 	content: attr(data-unreadmessages);
 	color: var(--red);
