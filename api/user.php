@@ -2,12 +2,105 @@
 // add, edit and delete users
 class USER extends API {
     // processed parameters for readability
-    public $_requestedMethod = REQUEST[0]; // method == api request
+    public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedID = array_key_exists(1, REQUEST) ? REQUEST[1] : null;
+		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+	}
+
+	public function profile(){
+		if (!$_SESSION['user']['id']) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'PUT':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
+				$statement->execute([
+					':id' => $_SESSION['user']['id']
+				]);
+				// prepare user-array to update, return error if not found
+				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+
+				// convert image
+				// save and convert image
+				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
+					if ($user['image'] && $user['id'] > 1) UTILITY::delete($user['image']);
+
+					$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
+					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
+					$user['image'] = substr($user['image'], 3);
+				}
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
+				if ($statement->execute([
+					':id' => $user['id'],
+					':name' => $user['name'],
+					':permissions' => $user['permissions'],
+					':units' => $user['units'],
+					':token' => $user['token'],
+					':image' => $user['image']
+				])) $this->response([
+					'status' => [
+						'id' => $user['id'],
+						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']])
+					]]);
+				else $this->response([
+					'status' => [
+						'id' => $user['id'],
+						'name' => LANG::GET('user.edit_user_not_saved')
+					]]);
+
+				break;
+			case 'GET':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
+				$statement->execute([
+					':id' => $_SESSION['user']['id']
+				]);
+				// prepare user-array to update, return error if not found
+				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+				$permissions = '';
+				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+					$permissions .= in_array($level, explode(',', $user['permissions'])) ? ', ' . $description : '';
+				}
+				$units = '';
+				foreach(LANGUAGEFILE['units'] as $unit => $description){
+					$units .= in_array($unit, explode(',', $user['units'])) ? ', ' . $description : '';
+				}
+				$result['body']=['content' => [
+					[
+						['type' => 'text',
+						'description' => LANG::GET('user.display_user'),
+						'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
+							LANG::GET('user.display_permissions') . ': ' . substr($permissions, 2) . "\n" .
+							LANG::GET('user.edit_units') . ': ' . substr($units, 2) . "\n"]
+					],[
+						['type' => 'photo',
+						'description' => LANG::GET('user.edit_take_photo'),
+						'attributes' => [
+							'name' => 'photo'
+						]],
+					]
+					],
+					'form' => [
+						'data-usecase' => 'user',
+						'action' => "javascript:api.user('put', 'profile')"
+					]];
+
+					if ($user['image']) array_splice($result['body']['content'][1], 0, 0,
+					[
+						['type' => 'image',
+						'description' => LANG::GET('user.edit_export_user_image'),
+						'attributes' => [
+							'name' => $user['name'] . '_pic',
+							'url' => $user['image']]
+						]
+					]
+					);
+
+				$this->response($result);
+
+				break;
+		}
+	
 	}
 
 	public function user(){
@@ -173,11 +266,11 @@ class USER extends API {
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id']) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID])];
 		
 				// display form for adding a new user with ini related permissions
-				$permissions=[];
+				$permissions = [];
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $user['permissions'])) ? ['checked' => true] : [];
 				}
-				$units=[];
+				$units = [];
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
@@ -194,12 +287,12 @@ class USER extends API {
 						'attributes' => [
 							'placeholder' => LANG::GET('user.edit_existing_users_label'),
 							'list' => 'users',
-							'onkeypress' => "if (event.key === 'Enter') {api.user('get', this.value); return false;}"
+							'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
 						]],
 						['type' => 'select',
 						'description' => LANG::GET('user.edit_existing_users'),
 						'attributes' => [
-							'onchange' => "api.user('get', this.value)"
+							'onchange' => "api.user('get', 'user', this.value)"
 						],
 						'content' => $options]
 					],[
@@ -235,12 +328,12 @@ class USER extends API {
 						'description' => LANG::GET('user.edit_delete_button'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerdown' => $user['id'] ? 'if (confirm("'. LANG::GET('user.edit_delete_confirm', [':name' => $user['name']]) .'")) {api.user("delete", ' . $user['id'] . ')}' : ''
+							'onpointerdown' => $user['id'] ? "if (confirm('". LANG::GET('user.edit_delete_confirm', [':name' => $user['name']]) ."')) {api.user('delete', 'user', ". $user['id'] . ")}" : ''
 						]]
 					]],
 					'form' => [
 						'data-usecase' => 'user',
-						'action' => $user['id'] ? 'javascript:api.user("put", "' . $user['id'] . '")' : 'javascript:api.user("post")'
+						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
 					if ($user['image']) array_splice($result['body']['content'][5], 0, 0,
@@ -248,7 +341,7 @@ class USER extends API {
 						['type' => 'image',
 						'description' => LANG::GET('user.edit_export_user_image'),
 						'attributes' => [
-							'name' => $user['name'],
+							'name' => $user['name'] . '_pic',
 							'url' => $user['image']]
 						]
 					]
@@ -258,7 +351,7 @@ class USER extends API {
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
 							'attributes' => [
-							'name' => $user['name'],
+							'name' => $user['name'] . '_token',
 							'qrcode' => $user['token']]
 							]
 						]

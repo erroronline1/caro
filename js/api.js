@@ -161,14 +161,14 @@ export const api = {
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
-								for (const file of all){
-									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block': 'none';
+								for (const file of all) {
+									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
 						break;
-					}
+				}
 				break;
 			case 'post':
 				successFn = function (data) {
@@ -307,8 +307,8 @@ export const api = {
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
-								for (const file of all){
-									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block': 'none';
+								for (const file of all) {
+									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
@@ -328,7 +328,7 @@ export const api = {
 							});
 						};
 						break;
-					}
+				}
 				break;
 			case 'post':
 				payload = _.getInputs('[data-usecase=message]', true);
@@ -403,8 +403,8 @@ export const api = {
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
-								for (const file of all){
-									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block': 'none';
+								for (const file of all) {
+									file.parentNode.style.display = data.status.data.includes(parseInt(file.dataset.filtered, 10)) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
@@ -445,23 +445,28 @@ export const api = {
 	},
 	user: (method, ...request) => {
 		/*
-		get user/{id|name}
-		post user
-		put user/{id}
-		delete user/{id}
+		get user/profile
+		get user/user/{id|name}
+		post user/user
+		put user/user/{id}
+		delete user/user/{id}
 		*/
 		request = [...request];
 		request.splice(0, 0, 'user');
 		let payload,
 			successFn = function (data) {
 				api.toast(data.status.msg);
-				api.user('get', data.status.id);
-			};
+				api.user('get', request[1], data.status.id);
+			},
+			title = {
+				'profile': LANG.GET('menu.user_profile'),
+				'user': LANG.GET('menu.user_manager')
+			};;
 		switch (method) {
 			case 'get':
 				successFn = function (data) {
 					if (data.body) {
-						api.update_header(LANG.GET('menu.admin_users'));
+						api.update_header(title[request[1]]);
 						document.getElementById('main').innerHTML = '';
 						new Assemble(data.body).initializeSection();
 					}

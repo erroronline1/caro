@@ -69,6 +69,9 @@ class APPLICATION extends API {
 				LANG::GET('menu.purchase_order') => ['href' => "javascript:api.purchase('get', 'order')"],
 				LANG::GET('menu.purchase_prepared_orders') => ['href' => "javascript:api.purchase('get', 'prepared')"],
 				LANG::GET('menu.purchase_approved_orders') => ['href' => "javascript:api.purchase('get', 'approved')"]
+			],
+			LANG::GET('menu.user_header') => [
+				LANG::GET('menu.user_profile') => ['href' => "javascript:api.user('get', 'profile')"],
 			]
 		];
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
@@ -79,8 +82,8 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['href' => "javascript:api.purchase('get', 'product')"];
 		}
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.user_header')][LANG::GET('menu.user_manager')] =['href' => "javascript:api.user('get', 'user')"];
 			$menu[LANG::GET('menu.admin_header')] = [
-				LANG::GET('menu.admin_users') => ['href' => "javascript:api.user('get')"],
 				LANG::GET('menu.admin_form_components') => ['href' => "javascript:api.form('get', 'component_editor')"],
 				LANG::GET('menu.admin_forms') => ['href' => "javascript:api.form('get', 'form_editor')"]
 			];
