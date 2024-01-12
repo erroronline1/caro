@@ -246,7 +246,7 @@ class MESSAGE extends API {
 				'description' => LANG::GET('message.delete'),
 				'attributes' => [
 					'type' => 'button',
-					'onpointerdown' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
+					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
 					]],
 				['type' => 'message',
 				'collapse' => true
@@ -258,7 +258,7 @@ class MESSAGE extends API {
 				'description' => LANG::GET('message.reply'),
 				'attributes' => [
 					'type' => 'button',
-					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
+					'onpointerup' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
 					]]
 				]);
 			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
@@ -331,7 +331,7 @@ class MESSAGE extends API {
 				'description' => LANG::GET('message.forward'),
 				'attributes' => [
 					'type' => 'button',
-					'onpointerdown' => "api.message('get', 'message', " . $message['id'] . ", 'forward')" 
+					'onpointerup' => "api.message('get', 'message', " . $message['id'] . ", 'forward')" 
 					]],
 				['type' => 'message',
 				'collapse' => true
@@ -341,7 +341,7 @@ class MESSAGE extends API {
 				'description' => LANG::GET('message.delete'),
 				'attributes' => [
 					'type' => 'button',
-					'onpointerdown' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
+					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
 				]],
 				['type' => 'message',
 				'collapse' => true

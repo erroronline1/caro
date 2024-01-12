@@ -671,7 +671,7 @@ class CONSUMABLES extends API {
 						'description' => LANG::GET('consumables.edit_product_delete'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerdown' => $product['id'] ? "if (confirm('" . LANG::GET('consumables.edit_product_delete_confirm', [':name' => $product['article_name']]) ."')) {api.purchase('delete', 'product', " . $product['id'] . ")}" : ""
+							'onpointerup' => $product['id'] ? "if (confirm('" . LANG::GET('consumables.edit_product_delete_confirm', [':name' => $product['article_name']]) ."')) {api.purchase('delete', 'product', " . $product['id'] . ")}" : ""
 						]]
 					]
 				);

@@ -132,7 +132,7 @@ class FILE extends API {
 								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerdown' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'manager', '" . $foldername . "')"
+									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'manager', '" . $foldername . "')"
 								]],
 								['type' => 'links',
 								'collapse' => true],
@@ -177,7 +177,7 @@ class FILE extends API {
 								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerdown' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'manager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
+									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'manager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
 								]],
 								['type' => 'links',
 								'collapse' => true],

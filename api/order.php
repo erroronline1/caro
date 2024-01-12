@@ -75,7 +75,7 @@ class ORDER extends API {
 						'collapse' => true,
 						'description' => LANG::GET('order.edit_prepared_order'),
 						'attributes' =>['type' => 'button',
-						'onpointerdown' => "api.purchase('get', 'order', " . $order['id']. ")"]],
+						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]],
 						['type' => 'cart',
 						'collapse' => true
 						]
@@ -101,7 +101,7 @@ class ORDER extends API {
 					foreach($row as $key => $value){
 						$row[$key]=str_replace("\n", ' ', $row[$key]);
 					}
-					$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'onpointerdown' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
+					$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
 				}
 				$result['body']['content']=
 					[[
@@ -384,7 +384,7 @@ class ORDER extends API {
 						'attributes' => [
 							'value' => LANG::GET('order.add_button'),
 							'type' => 'button',
-							'onpointerdown' => 'orderClient.cloneNew(this.parentNode)'
+							'onpointerup' => 'orderClient.cloneNew(this.parentNode)'
 						]],
 						['type' => 'collapsed',
 						'collapse' => true],
@@ -497,7 +497,7 @@ class ORDER extends API {
 							'attributes' => [
 								'value' => LANG::GET('order.add_delete'),
 								'type' => 'button',
-								'onpointerdown' => 'this.parentNode.remove()'
+								'onpointerup' => 'this.parentNode.remove()'
 							]],
 							['type' => 'collapsed',
 							'collapse' => true],
@@ -510,7 +510,7 @@ class ORDER extends API {
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerdown' => 'if (confirm("'. LANG::GET('order.delete_prepared_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
+							'onpointerup' => 'if (confirm("'. LANG::GET('order.delete_prepared_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
 						]]
 				]);
 
@@ -667,7 +667,7 @@ class ORDER extends API {
 								'value' => $value,
 								'placeholder' => $this->fields[$key],
 								'readonly' => true,
-								'onpointerdown' => 'orderClient.toClipboard(this)'
+								'onpointerup' => 'orderClient.toClipboard(this)'
 							]
 						];
 						if ($key == 'orderer') {
@@ -682,7 +682,7 @@ class ORDER extends API {
 								'value' => $value,
 								'placeholder' => LANG::GET('order.message_orderer'),
 								'readonly' => true,
-								'onpointerdown' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
+								'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
 							]
 						];}
 					}
@@ -741,7 +741,7 @@ class ORDER extends API {
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',
-							'onpointerdown' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
+							'onpointerup' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
 						]
 					];
 					$content[]=[
