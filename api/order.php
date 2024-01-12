@@ -142,7 +142,9 @@ class ORDER extends API {
 	}
 
 	private function processOrderForm(){
-		unset ($this->_payload->Search_product);
+		$unset=str_replace(' ', '_', LANG::GET('consumables.edit_product_search'));
+		unset ($this->_payload->$unset);
+
 		$approval = false;
 		if ($this->_payload->approval_token){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
