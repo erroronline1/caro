@@ -31,6 +31,20 @@ class FILE extends API {
 		]]);
 	}
 
+	public function bundlefilter(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
+		$statement->execute();
+		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$matches = [];
+		foreach($bundles as $row) {
+			similar_text($this->_requestedFolder, $row['name'], $percent);
+			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = $row['id'];
+		}
+		$this->response(['status' => [
+			'data' => $matches
+		]]);
+	}
+
 	public function files(){
 		if (!(array_intersect(['admin', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result['body'] = [
@@ -78,7 +92,7 @@ class FILE extends API {
 		$this->response($result);
 	}
 
-	public function manager(){
+	public function filemanager(){
 		/**
 		 * no put method for windows server permissions are a pita
 		 * thus directories can not be renamed
@@ -95,7 +109,7 @@ class FILE extends API {
 					UTILITY::storeUploadedFiles([], $new_folder);
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_folder_created', [':name' => $new_folder]),
-						'redirect' => ['manager']
+						'redirect' => ['filemanager']
 						]]);
 				}
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
@@ -103,7 +117,7 @@ class FILE extends API {
 					UTILITY::storeUploadedFiles(['files'], UTILITY::directory('files_documents', [':category' => $destination]));
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
-						'redirect' => ['manager', $destination]
+						'redirect' => ['filemanager', $destination]
 					]]);
 				}
 				$this->response(['status' => [
@@ -114,7 +128,7 @@ class FILE extends API {
 				$result=['body'=>
 				['form' => [
 					'data-usecase' => 'file',
-					'action' => "javascript:api.file('post', 'manager')"],
+					'action' => "javascript:api.file('post', 'filemanager')"],
 				'content'=>[]]];
 
 				if (!$this->_requestedFolder){
@@ -126,13 +140,13 @@ class FILE extends API {
 							$result['body']['content'][]=[
 								['type' => 'links',
 								'collapse' => true,
-								'content' => [$foldername => ['href' => "javascript:api.file('get', 'manager', '" . $foldername . "')"]]],
+								'content' => [$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]]],
 								['type' => 'button',
 								'collapse' => true,
 								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'manager', '" . $foldername . "')"
+									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'filemanager', '" . $foldername . "')"
 								]],
 								['type' => 'links',
 								'collapse' => true],
@@ -177,7 +191,7 @@ class FILE extends API {
 								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'manager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
+									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
 								]],
 								['type' => 'links',
 								'collapse' => true],
@@ -203,7 +217,7 @@ class FILE extends API {
 			case 'DELETE':
 				if (UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''))) $this->response(['status' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
-					'redirect' => ['manager',  $this->_requestedFile ? $this->_requestedFolder : null]
+					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null]
 				]]);
 				else $this->response(['status' => [
 					'msg' => LANG::GET('file.manager_error')
@@ -211,7 +225,170 @@ class FILE extends API {
 				break;
 		}
 	}
+
+	public function bundle(){
+		if (!(array_intersect(['admin', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$result['body'] = [
+		'content' => [
+				[
+					['type' => 'searchinput',
+					'collapse' => true,
+					'attributes' => [
+						'placeholder' => LANG::GET('file.file_filter_label'),
+						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
+						'onblur' => "api.file('get', 'bundlefilter', this.value); return false;",
+						'id' => 'filesearch'
+					]],[
+						'type' => 'filter',
+						'collapse' => true
+					]
+				]
+			]
+		];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
+		$statement->execute();
+		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($bundles as $row) {
+			$list=[];
+			foreach (json_decode($row['content'], true) as $name => $path){
+				$list[$name]= ['href' => $path];
+			}
+			$result['body']['content'][]=
+			[
+				['type' => 'links',
+				'description' => $row['name'],
+				'content' => $list,
+				'attributes' => ['data-filtered' => $row['id']]
+				]
+			];
+		}
+		$this->response($result);
+	}
+
+	public function bundlemanager(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$unset = str_replace(' ', '_', LANG::GET('file.edit_existing_bundle'));
+				unset ($this->_payload->$unset);
+				$save_name = str_replace(' ', '_', LANG::GET('file.edit_save_bundle'));
+				$name=$this->_payload->$save_name;
+				unset ($this->_payload->$save_name);
+				$active=str_replace(' ', '_', LANG::GET('file.edit_bundle_active'));
+				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
+				unset ($this->_payload->$active);
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-post'));
+				if ($statement->execute([
+					':name' => $name,
+					':content' => json_encode($this->_payload),
+					':active' => $isactive
+					])) $this->response([
+						'status' => [
+							'name' => $name,
+							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name])
+						]]);
+					else $this->response([
+						'status' => [
+							'name' => false,
+							'name' => LANG::GET('file.edit_bundle_not_saved')
+						]]);
+				
+				var_dump($this->_payload);
+				die();
+				break;
+			case 'GET':
+				$datalist = [];
+				$options = ['...' => []];
+				$return = [];
+				
+				// prepare existing bundle lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-datalist'));
+				$statement->execute();
+				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($bundles as $row) {
+					$datalist[] = $row['name'];
+					$options[$row['name']] = [];
+				}
+		
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get'));
+				$statement->execute([
+					':name' => $this->_requestedFolder
+				]);
+				if (!$bundle = $statement->fetch(PDO::FETCH_ASSOC)) $bundle = ['name' => '', 'content' => '', 'active' => null];
+				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['status'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder])];
+		
+				$return['body'] = [
+					'form' => [
+						'data-usecase' => 'file',
+						'action' => "javascript:api.file('post', 'bundlemanager')"
+					],
+					'content' => [
+						[
+							['type' => 'datalist',
+							'content' => $datalist,
+							'attributes' => [
+								'id' => 'bundles'
+							]]
+						],[
+							['type' => 'searchinput',
+							'description' => LANG::GET('file.edit_existing_bundle'),
+							'attributes' => [
+								'placeholder' => LANG::GET('file.edit_existing_bundle_label'),
+								'list' => 'bundles',
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
+							]],
+							['type' => 'select',
+							'description' => LANG::GET('file.edit_existing_bundle'),
+							'attributes' => [
+								'onchange' => "api.file('get', 'bundlemanager', this.value)"
+							],
+							'content' => $options]
+						]]];
+
+				$files = [];
+				$bundle['content']= json_decode($bundle['content'], true);
+				$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+				foreach ($folders as $folder) {
+					$files[$folder] = UTILITY::listFiles($folder ,'asc');
+				}
+				foreach ($files as $folder => $content){
+					$matches = [];
+					foreach ($content as $file){
+						$file=['path' => substr($file, 1), 'file' => pathinfo($file)['filename']];
+						$matches[$file['file']] = ['value' => $file['path']];
+						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$file['file']]['checked'] = true;
+					}
+					$return['body']['content'][] =
+					[
+						['type' => 'checkbox',
+						'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+						'content' => $matches
+						]
+					];
+				}
+				$return['body']['content'][] = [
+					['type' => 'textinput',
+					'description' => LANG::GET('file.edit_save_bundle'),
+					'attributes'=>['value' => $bundle['name']]]
+				];
+
+				$isactive = $bundle['active'] ? ['checked' => true] : [];
+				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
+				$return['body']['content'][] = [
+					['type' => 'radio',
+					'description' => LANG::GET('file.edit_bundle_active'),
+					'content'=>[
+						LANG::GET('file.edit_active_bundle')=>$isactive,
+						LANG::GET('file.edit_inactive_bundle')=>$isinactive,
+					]]
+				];
+				$this->response($return);
+				break;
+		}
+	}
 }
+
 
 $api = new FILE();
 $api->processApi();

@@ -133,9 +133,14 @@ export const api = {
 
 		get file/files/{directory}
 
-		post file/manager
-		get file/manager/{directory}
-		delete file/manager/{directory}/{file}
+		post file/filemanager
+		get file/filemanager/{directory}
+		delete file/filemanager/{directory}/{file}
+
+		get file/bundle/{bundle}
+
+		post file/bundlemanager
+		get file/bundlemanager/{bundle}
 		*/
 		request = [...request];
 		request.splice(0, 0, 'file');
@@ -151,7 +156,9 @@ export const api = {
 			payload,
 			title = {
 				'files': LANG.GET('menu.files_files'),
-				'manager': LANG.GET('menu.files_manager')
+				'bundle': LANG.GET('menu.files_bundles'),
+				'filemanager': LANG.GET('menu.files_file_manager'),
+				'bundlemanager': LANG.GET('menu.files_bundle_manager')
 			};
 
 		switch (method) {
@@ -168,7 +175,18 @@ export const api = {
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
 						break;
-				}
+					case 'bundlefilter':
+						successFn = function (data) {
+							if (data.status) {
+								const all = document.querySelectorAll('[data-filtered]');
+								for (const list of all) {
+									list.parentNode.style.display = data.status.data.includes(parseInt(list.dataset.filtered, 10)) ? 'block' : 'none';
+								}
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+						};
+						break;
+					}
 				break;
 			case 'post':
 				successFn = function (data) {

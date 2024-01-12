@@ -63,7 +63,8 @@ class APPLICATION extends API {
 				LANG::GET('menu.message_sent') => ['href' => "javascript:api.message('get', 'sent')"]
 			],
 			LANG::GET('menu.files_header') => [
-				LANG::GET('menu.files_files') => ['href' => "javascript:api.file('get', 'files')"]
+				LANG::GET('menu.files_files') => ['href' => "javascript:api.file('get', 'files')"],
+				LANG::GET('menu.files_bundles') => ['href' => "javascript:api.file('get', 'bundle')"],
 			],
 			LANG::GET('menu.purchase_header') => [
 				LANG::GET('menu.purchase_order') => ['href' => "javascript:api.purchase('get', 'order')"],
@@ -75,7 +76,8 @@ class APPLICATION extends API {
 			]
 		];
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_manager')] = ['href' => "javascript:api.file('get', 'manager')"];
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['href' => "javascript:api.file('get', 'filemanager')"];
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['href' => "javascript:api.file('get', 'bundlemanager')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['href' => "javascript:api.purchase('get', 'vendor')"];

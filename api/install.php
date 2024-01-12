@@ -89,6 +89,15 @@ $queries = [
 			"	`archived` timestamp NULL DEFAULT NULL" .
 			"	PRIMARY KEY (`id`)" .
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+			,
+			"CREATE TABLE IF NOT EXISTS `caro_form_components` (" .
+			"	`id` int NOT NULL AUTO_INCREMENT," .
+			"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+			"	`date` timestamp NOT NULL," .
+			"	`content` json NOT NULL," .
+			"	`active` tinyint NOT NULL" .
+			"	PRIMARY KEY (`id`)" .
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 			]
 		,
 		'sqlsrv' => [
@@ -166,6 +175,15 @@ $queries = [
 			"	ordered smalldatetime NULL DEFAULT NULL," .
 			"	received smalldatetime NULL DEFAULT NULL," .
 			"	archived smalldatetime NULL DEFAULT NULL" .
+			");"
+			,
+			"IF OBJECT_ID(N'caro_file_bundles', N'U') IS NULL " .
+			"CREATE TABLE caro_file_bundles (" .
+			"	id int NOT NULL IDENTITY(1,1)," .
+			"	name varchar(MAX) NOT NULL," .
+			"	date smalldatetime NOT NULL," .
+			"	content varchar(MAX) NOT NULL" .
+			"	active tinyint NOT NULL" .
 			");"
 			]				
 		]

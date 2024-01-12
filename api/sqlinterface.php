@@ -242,6 +242,24 @@ class SQLQUERY {
 			'mysql' => "SELECT t1.*, t2.name as to_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC",
 			'sqlsrv' => "SELECT t1.*, t2.name as to_user, t2.image FROM caro_messages as t1, caro_user as t2 WHERE t1.user_id = :user AND t1.from_user = :user AND t1.to_user = t2.id ORDER BY t1.timestamp DESC"
 		],
+
+		'file_bundles-post' => [
+			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
+			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
+		],
+		'file_bundles-datalist' => [
+			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
+			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
+		],
+		'file_bundles-get' => [
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
+		],
+		'file_bundles-get-active' => [
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
+			'sqlsrv' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name"
+		],
+
 	];
 }
 ?>
