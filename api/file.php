@@ -42,7 +42,7 @@ class FILE extends API {
 						'placeholder' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
 						'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
-						'id' => 'productsearch'
+						'id' => 'filesearch'
 					]],[
 						'type' => 'filter',
 						'collapse' => true
@@ -50,26 +50,31 @@ class FILE extends API {
 				]
 			]
 		];
-		if ($this->_requestedFolder && $this->_requestedFolder != 'null') $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+		$files = [];
+		if ($this->_requestedFolder && $this->_requestedFolder != 'null') {
+			$folder = UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]);
+			$files[$folder] = UTILITY::listFiles($folder ,'asc');
+		}
 		else {
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-			$files = [];
 			foreach ($folders as $folder) {
-				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+				$files[$folder] = UTILITY::listFiles($folder ,'asc');
 			}
 		}
-		$matches = [];
-		foreach ($files as $file){
-			$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
-			$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path']];
+		foreach ($files as $folder => $content){
+			$matches = [];
+			foreach ($content as $file){
+				$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
+				$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path']];
+			}
+			$result['body']['content'][]=
+			[
+				['type' => 'links',
+				'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+				'content' => $matches
+				]
+			];
 		}
-		$result['body']['content'][]=
-		[
-			['type' => 'links',
-			'description' => LANG::GET('file.file_filtered'),
-			'content' => $matches
-			]
-		];
 		$this->response($result);
 	}
 
