@@ -193,6 +193,10 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
+		'order_get_filter' => [
+			'mysql' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND order_data LIKE CONCAT('%', :orderfilter, '%')",
+			'sqlsrv' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND order_data LIKE CONCAT('%', :orderfilter, '%')"
+		],
 
 		'message_get_message' => [
 			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",

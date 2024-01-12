@@ -115,6 +115,32 @@ class ORDER extends API {
 		$this->response($result);
 	}
 
+	public function filter(){
+		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $displayunits = LANGUAGEFILE['units']; // see all orders
+		else { // display only orders for own units
+			$displayunits = [];
+			foreach($_SESSION['user']['units'] as $unit){
+				$displayunits[] = LANG::GET('units.' . $unit);
+			}
+		}
+		// in clause doesnt work without manually preparing
+		$query = strtr(SQLQUERY::PREPARE('order_get_filter'),
+		[
+			':organizational_unit' => "'".implode("','", $displayunits)."'",
+			':orderfilter' => "'" . $this->_requestedID . "'"
+		]);
+		$statement = $this->_pdo->prepare($query);
+		$statement->execute();
+		$filtered = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$matches = [];
+		foreach ($filtered as $row){
+			$matches[] = $row['id'];
+		}
+		$this->response(['status' => [
+			'data' => $matches
+		]]);
+	}
+
 	private function processOrderForm(){
 		unset ($this->_payload->Search_product);
 		$approval = false;
@@ -582,8 +608,15 @@ class ORDER extends API {
 							LANG::GET('order.ordered')=>['onfocus' => 'orderClient.filter("ordered")'],
 							LANG::GET('order.received')=>['onfocus' => 'orderClient.filter("received")'],
 							LANG::GET('order.archived')=>['onfocus' => 'orderClient.filter("archived")'],
-						]
-						],
+						]],
+						['type' => 'searchinput',
+						'collapse' => true,
+						'attributes' => [
+							'placeholder' => LANG::GET('order.order_filter_label'),
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
+							'onblur' => "api.purchase('get', 'filter', this.value); return false;",
+							'id' => 'productsearch'
+						]],
 						['type' => 'filter',
 						'collapse' => true]
 					]
@@ -621,6 +654,11 @@ class ORDER extends API {
 							'imageonly' => ['width' => '10em', 'height' => '3em']
 							]
 					];
+					$content[]=
+						['type' => 'hiddeninput',
+						'collapse' => true,
+						'description' => 'filter',
+						'attributes'=>['data-filtered' => $row['id']]];
 					foreach ($decoded_order_data as $key => $value){ // data
 						if (!in_array($key,['barcode', 'orderer'])) $content[]=[
 							'type' => 'textinput',

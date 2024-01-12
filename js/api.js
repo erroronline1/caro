@@ -363,6 +363,8 @@ export const api = {
 		get order/approved/
 		put order/approved/{id}/{ordered|received|archived|disapproved}
 		delete order/approved/{id}
+
+		get order/filtered/{filter}
 		*/
 		request = [...request];
 		if (['vendor', 'product'].includes(request[0]))
@@ -393,6 +395,17 @@ export const api = {
 								let list = document.querySelector('[data-type=links]');
 								if (list) list.remove();
 								new Assemble(data.body).initializeSection('hr');
+							}
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+						};
+						break;
+					case 'filter':
+						successFn = function (data) {
+							if (data.status) {
+								const all = document.querySelectorAll('[data-filtered]');
+								for (const file of all){
+									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block': 'none';
+								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
