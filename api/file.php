@@ -24,7 +24,7 @@ class FILE extends API {
 		$matches = [];
 		foreach ($files as $file){
 			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
-			if ($percent >= INI['likeliness']['file_search_similarity']) $matches[] = substr($file,1);
+			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file,1);
 		}
 		$this->response(['status' => [
 			'data' => $matches
@@ -41,7 +41,7 @@ class FILE extends API {
 					'attributes' => [
 						'placeholder' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
-						'onblur' => "if (this.value) {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+						'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
 						'id' => 'productsearch'
 					]],[
 						'type' => 'filter',
@@ -144,23 +144,21 @@ class FILE extends API {
 				else {
 					$files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
-						$content=[];
+						$result['body']['content'][]=[
+							['type' => 'searchinput',
+							'collapse' => true,
+							'attributes' => [
+								'placeholder' => LANG::GET('file.file_filter_label'),
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+								'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
+								'id' => 'productsearch'
+							]],[
+								'type' => 'filter',
+								'collapse' => true
+							]
+						];
 						foreach ($files as $file){
 							$file=['path' => substr($file,1), 'name' => pathinfo($file)['basename']];
-							$result['body']['content'][]=[
-								['type' => 'searchinput',
-								'collapse' => true,
-								'attributes' => [
-									'placeholder' => LANG::GET('file.file_filter_label'),
-									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
-									'onblur' => "if (this.value) {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
-									'id' => 'productsearch'
-								]],[
-									'type' => 'filter',
-									'collapse' => true
-								]
-							];
-		
 							$result['body']['content'][]=[
 								['type' => 'hiddeninput',
 								'collapse' => true,
