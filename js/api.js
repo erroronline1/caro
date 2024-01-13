@@ -468,6 +468,7 @@ export const api = {
 	tool: (method, ...request) => {
 		/*
 		get tool/code
+		get tool/code/display?key=value
 		*/
 		request = [...request];
 		request.splice(0, 0, 'tool');
@@ -490,9 +491,13 @@ export const api = {
 					}
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 				};
+				if (request[3] === 'display') {
+					payload = _.getInputs('[data-usecase=tool_create_code]');
+				console.log(payload);
+				}
 				break;
 			case 'post':
-				payload = _.getInputs('[data-usecase=user]', true);
+				//payload = _.getInputs('[data-usecase=user]', true);
 				break;
 			default:
 				return;

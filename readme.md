@@ -90,7 +90,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 # open tasks
 * stl viewer (https://github.com/omrips/viewstl most promising)
-* qr- and bar-code generator
 * tips and help on landing page
 * forms and contexts
 * pdf export
