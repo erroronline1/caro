@@ -175,6 +175,28 @@ class TOOL extends API {
 		}
 		$this->response($result);
 	}
+	public function scanner(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		$result['body']=['content' => [
+			[
+				['type' => 'scanner',
+				'description' => LANG::GET('menu.tools_scanner'),
+				'collapse' => true,
+				'destination' => 'tool_scanner'
+				],
+				['type' => 'textarea',
+				'collapse' => true,
+				'attributes' =>[
+					'rows' => 8,
+					'id' => 'tool_scanner'
+				]],
+				['type' => 'scanner',
+				'collapse' => true
+				]
+			]
+		]];
+		$this->response($result);
+	}
 	
 }
 
