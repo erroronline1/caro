@@ -175,6 +175,7 @@ class TOOL extends API {
 		}
 		$this->response($result);
 	}
+
 	public function scanner(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body']=['content' => [
@@ -193,6 +194,37 @@ class TOOL extends API {
 				]],
 				['type' => 'scanner',
 				'collapse' => true
+				]
+			]
+		]];
+		$this->response($result);
+	}
+	
+	public function stlviewer(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
+		$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+		$files = [];
+		foreach ($folders as $folder) {
+			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+		}
+		$options = ['...'=>[]];
+		foreach ($files as $path){
+			if (pathinfo($path)['extension'] === 'stl') $options[$path] = [];
+		}
+
+		$result['body']=['content' => [
+			[
+				['type' => 'select',
+				'description' => LANG::GET('tool.stl_viewer_select'),
+				'attributes' => [
+					'onchange' => "toolModule.stlviewer = new StlViewer(document.getElementById('stlviewer_canvas'), { models: [ {id:0, filename:'../' + this.value} ] });"
+				],
+				'content' => $options]
+			],[
+				['type' => 'stlviewer',
+				'description' => LANG::GET('menu.tool_stl_viewer')
 				]
 			]
 		]];

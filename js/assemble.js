@@ -340,7 +340,7 @@ export class Assemble {
 		return node;
 	}
 
-	has_content(tile){
+	has_content(tile) {
 		return ('content' in tile || 'attributes' in tile || 'description' in tile);
 	}
 
@@ -822,6 +822,17 @@ export class Assemble {
 		}
 	}
 
+	stlviewer() {
+		/*{
+			type: 'stlviewer',
+			description:'viewstl' (e.g.),
+		} */
+		const div = document.createElement('div');
+		div.id = 'stlviewer_canvas';
+		div.classList = 'stlviewer';
+		this.elements.add(div);
+	}
+
 	trash() {
 		// empty method but necessary to display the delete-area for composer or other future use
 	}
@@ -842,6 +853,7 @@ export class Assemble {
 	message() {
 		// empty method but neccessary for styling reasons (icon)
 	}
+
 	filter() {
 		// empty method but neccessary for styling reasons (icon)
 	}

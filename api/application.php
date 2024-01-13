@@ -78,6 +78,7 @@ class APPLICATION extends API {
 			LANG::GET('menu.tools_header') => [
 				LANG::GET('menu.tools_digital_codes') => ['href' => "javascript:api.tool('get', 'code')"],
 				LANG::GET('menu.tools_scanner') => ['href' => "javascript:api.tool('get', 'scanner')"],
+				LANG::GET('menu.tool_stl_viewer') => ['href' => "javascript:api.tool('get', 'stlviewer')"],
 			],
 			LANG::GET('menu.user_header') => [
 				LANG::GET('menu.user_profile') => ['href' => "javascript:api.user('get', 'profile')"],

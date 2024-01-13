@@ -145,3 +145,7 @@ const orderClient = {
 		});
 	}
 };
+
+const toolModule={
+	stlviewer:null
+};

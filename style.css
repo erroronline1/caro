@@ -93,6 +93,11 @@ canvas,
 	margin-bottom: 2em;
 }
 
+.stlviewer {
+	height: 25em;
+	margin-bottom: 2em;
+}
+
 ul {
 	margin: 0;
 	padding-left: 1em
@@ -747,4 +752,8 @@ button:active {
 
 [data-type=filter]::before {
 	background-image: url("media/filter.svg");
+}
+
+[data-type=stlviewer]::before {
+	background-image: url("media/cube.svg");
 }

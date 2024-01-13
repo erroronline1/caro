@@ -479,7 +479,8 @@ export const api = {
 			},
 			title = {
 				'code': LANG.GET('menu.tools_digital_codes'),
-				'scanner': LANG.GET('menu.tools_scanner')
+				'scanner': LANG.GET('menu.tools_scanner'),
+				'stlviewer': LANG.GET('menu.tool_stl_viewer')
 			};;
 		switch (method) {
 			case 'get':
