@@ -54,7 +54,7 @@ const _serviceWorker = {
 		}
 		if ('unseen' in data) {
 			document.querySelector('nav div').innerHTML = '&nbsp;';
-			if (parseInt(data.unseen,10)) {
+			if (parseInt(data.unseen, 10)) {
 				const container = document.createElement('span'),
 					message = document.createElement('img');
 				message.src = './media/envelope.svg';
@@ -126,11 +126,11 @@ const orderClient = {
 		api.toast(LANG.GET('general.copied_to_clipboard'));
 	},
 	filter: (type = undefined) => {
-		let display, hide, not='';
+		let display, hide, not = '';
 		hide = document.querySelectorAll('article[data-type=cart]');
 		if (type) {
-			if (type==='ordered') not = ':not([data-received]):not([data-archived])';
-			if (type==='received') not = ':not([data-archived])';
+			if (type === 'ordered') not = ':not([data-received]):not([data-archived])';
+			if (type === 'received') not = ':not([data-archived])';
 			display = document.querySelectorAll(`article[data-type=cart][data-${type}]${not}`);
 			console.log(`article[data-type=cart][data-${type}]${not}`);
 		} else {
@@ -146,6 +146,16 @@ const orderClient = {
 	}
 };
 
-const toolModule={
-	stlviewer:null
+const toolModule = {
+	stlviewer: null,
+	initStlViewer: function (file) {
+		const canvas = document.getElementById('stlviewer_canvas');
+		canvas.replaceChildren();
+		this.stlviewer = new StlViewer(canvas, {
+			models: [{
+				id: 0,
+				filename: file
+			}]
+		});
+	}
 };

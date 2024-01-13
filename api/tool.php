@@ -205,7 +205,6 @@ class TOOL extends API {
 
 		$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
 		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-		$files = [];
 		foreach ($folders as $folder) {
 			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 		}
@@ -219,7 +218,7 @@ class TOOL extends API {
 				['type' => 'select',
 				'description' => LANG::GET('tool.stl_viewer_select'),
 				'attributes' => [
-					'onchange' => "toolModule.stlviewer = new StlViewer(document.getElementById('stlviewer_canvas'), { models: [ {id:0, filename:'../' + this.value} ] });"
+					'onchange' => "toolModule.initStlViewer('../' + this.value)"
 				],
 				'content' => $options]
 			],[
