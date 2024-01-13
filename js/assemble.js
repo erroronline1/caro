@@ -259,7 +259,7 @@ export class Assemble {
 				this.tile = tile[i];
 				collapse = tile[i].collapse || false;
 				if (!collapse || i === 0) this.elements = new Set();
-				this.description();
+				this.description(i);
 				this[tile[i].type]();
 				if ('article' in tile[i]) this.articleAttributes = tile[i].article;
 				if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
@@ -324,8 +324,8 @@ export class Assemble {
 		return article;
 	}
 
-	description() {
-		if ([undefined, null, false].includes(this.tile.description) || this.tile.collapse) return;
+	description(i) {
+		if ([undefined, null, false].includes(this.tile.description) || (this.tile.collapse && i > 0)) return;
 		const header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.tile.description));
 		this.elements.add(header);
