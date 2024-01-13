@@ -273,11 +273,11 @@ input[type=number] {
 .imagecanvas,
 .photoupload {
 	display: block;
-	/*margin-top: -2em;*/
+	margin-bottom: 0;
 	float: right;
 	height: 4em;
 	width: 4em;
-	object-fit: cover;
+	object-fit: contain;
 }
 
 dialog {

@@ -188,6 +188,7 @@ class TOOL extends API {
 				'collapse' => true,
 				'attributes' =>[
 					'rows' => 8,
+					'readonly' => true,
 					'id' => 'tool_scanner'
 				]],
 				['type' => 'scanner',

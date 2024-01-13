@@ -653,7 +653,7 @@ class ORDER extends API {
 						'collapse' => true,
 						'attributes' => [
 							'barcode' => ['value' => $decoded_order_data['barcode']],
-							'imageonly' => ['width' => '10em', 'height' => '3em']
+							'imageonly' => ['width' => '10em', 'height' => '4em']
 							]
 					];
 					$content[]=
@@ -693,7 +693,6 @@ class ORDER extends API {
 						$content[]=[
 							'type' => 'image',
 							'collapse' => true,
-							//'description' => LANG::GET('order.approval_image'),
 							'attributes' => [
 								'imageonly' => ['width' => '10em', 'marginTop' => '1em'],
 								'name' => LANG::GET('order.approval_image'),
