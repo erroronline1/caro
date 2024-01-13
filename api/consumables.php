@@ -196,6 +196,7 @@ class CONSUMABLES extends API {
 					$statement->execute([
 						':id' => $vendor['id']
 					]);
+					$vendor['pricelist']['validity'] = '';
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-vendor'));
