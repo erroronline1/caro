@@ -112,7 +112,7 @@ export const api = {
 				break;
 			case 'menu':
 				successFn = function (data) {
-					let signin = LANG.GET('menu.signin_header'),
+					let signin = LANG.GET('menu.application_signin'),
 						greeting = ', ' + signin.charAt(0).toLowerCase() + signin.slice(1);
 					if (data.user) greeting = ' ' + data.user;
 
