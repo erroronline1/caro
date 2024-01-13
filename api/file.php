@@ -396,7 +396,7 @@ class FILE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['files'], '../' . INI['sharepoint']['folder']);
+					UTILITY::storeUploadedFiles(['files'], '../' . INI['sharepoint']['folder'], [$_SESSION['user']['name']]);
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['sharepoint']
