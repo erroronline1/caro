@@ -89,10 +89,11 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* stl viewer
+* stl viewer (https://github.com/omrips/viewstl most promising)
 * qr- and bar-code generator
-* pdf export
+* tips and help on landing page
 * forms and contexts
+* pdf export
 * vendor list
 * user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
