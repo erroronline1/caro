@@ -134,24 +134,26 @@ const _ = {
 			fields = new FormData(document.querySelector(querySelector));
 		} else {
 			fields = {};
-			let inputs = document.querySelector(querySelector);
-			Object.keys(inputs).forEach(input => {
-				if (inputs[input].type == 'radio' && inputs[input].checked)
-					fields[inputs[input].name] = inputs[input].value;
-				else if (inputs[input].type == 'checkbox') {
-					if (inputs[input].name.contains('[]')) {
-						inputs[input].name = inputs[input].name.replace('[]', '');
-						if (typeof fields[inputs[input].name] === 'object' && inputs[input].value) fields[inputs[input].name].push(inputs[input].checked ? inputs[input].value : 0)
-						else if (inputs[input].value) fields[inputs[input].name] = [inputs[input].checked ? inputs[input].value : 0];
-					} else fields[inputs[input].name] = inputs[input].checked ? inputs[input].value : 0;
-				} else if (['text', 'tel', 'date', 'number', 'hidden', 'email'].contains(inputs[input].type)) {
-					if (inputs[input].name.contains('[]')) {
-						inputs[input].name = inputs[input].name.replace('[]', '');
-						if (typeof fields[inputs[input].name] === 'object' && inputs[input].value) fields[inputs[input].name].push(inputs[input].value)
-						else if (inputs[input].value) fields[inputs[input].name] = [inputs[input].value];
-					} else fields[inputs[input].name] = inputs[input].value;
-				}
-			});
+			let inputs = document.querySelectorAll(querySelector),
+			sanitizedname;
+			for (const input of inputs){
+				sanitizedname = input.name.replaceAll(/\W/g, '_');
+				if (input.type == 'radio' && input.checked)
+					fields[sanitizedname] = input.value;
+				else if (input.type == 'checkbox') {
+					if (input.name.contains('[]')) {
+						input.name = input.name.replace('[]', '');
+						if (typeof fields[sanitizedname] === 'object' && input.value) fields[sanitizedname].push(input.checked ? input.value : 0)
+						else if (input.value) fields[sanitizedname] = [input.checked ? input.value : 0];
+					} else fields[sanitizedname] = input.checked ? input.value : 0;
+				} else if (['text', 'tel', 'time', 'date', 'number', 'hidden', 'email'].contains(input.type)) {
+					if (input.name.contains('[]')) {
+						input.name = input.name.replace('[]', '');
+						if (typeof fields[sanitizedname] === 'object' && input.value) fields[sanitizedname].push(input.value)
+						else if (input.value) fields[sanitizedname] = [input.value];
+					} else fields[sanitizedname] = input.value;
+				} else fields[sanitizedname] = input.value;
+			}
 		}
 		return fields;
 	},
