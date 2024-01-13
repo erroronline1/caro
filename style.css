@@ -657,6 +657,10 @@ button:active {
 	background-image: url("media/calendar-alt.svg");
 }
 
+[data-type=timeinput]::before {
+	background-image: url("media/clock.svg");
+}
+
 [data-type=file]::before {
 	background-image: url("media/upload.svg");
 }

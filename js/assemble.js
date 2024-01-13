@@ -397,6 +397,9 @@ export class Assemble {
 	dateinput() {
 		this.input('date');
 	}
+	timeinput() {
+		this.input('time');
+	}
 	searchinput() {
 		this.input('search');
 	}
