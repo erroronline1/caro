@@ -65,6 +65,7 @@ class APPLICATION extends API {
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['href' => "javascript:api.file('get', 'files')"],
 				LANG::GET('menu.files_bundles') => ['href' => "javascript:api.file('get', 'bundle')"],
+				LANG::GET('menu.files_sharepoint') => ['href' => "javascript:api.file('get', 'sharepoint')"],
 			],
 			LANG::GET('menu.purchase_header') => [
 				LANG::GET('menu.purchase_order') => ['href' => "javascript:api.purchase('get', 'order')"],

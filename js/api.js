@@ -141,6 +141,9 @@ export const api = {
 
 		post file/bundlemanager
 		get file/bundlemanager/{bundle}
+
+		post file/sharepoint
+		get file/sharepoint
 		*/
 		request = [...request];
 		request.splice(0, 0, 'file');
@@ -157,6 +160,7 @@ export const api = {
 			title = {
 				'files': LANG.GET('menu.files_files'),
 				'bundle': LANG.GET('menu.files_bundles'),
+				'sharepoint': LANG.GET('menu.files_sharepoint'),
 				'filemanager': LANG.GET('menu.files_file_manager'),
 				'bundlemanager': LANG.GET('menu.files_bundle_manager')
 			};

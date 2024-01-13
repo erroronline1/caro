@@ -13,7 +13,7 @@ class FILE extends API {
 	}
 
 	public function filter(){
-		if ($this->_requestedFolder && $this->_requestedFolder != 'null') $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+		if ($this->_requestedFolder && $this->_requestedFolder != 'null') $files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
 		else {
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			$files = [];
@@ -79,7 +79,7 @@ class FILE extends API {
 			$matches = [];
 			foreach ($content as $file){
 				$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
-				$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path']];
+				$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 			}
 			$result['body']['content'][]=
 			[
@@ -139,6 +139,7 @@ class FILE extends API {
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
 							$result['body']['content'][]=[
 								['type' => 'links',
+								'description' => LANG::GET('file.manager_folder_header', [':date' => date('Y-m-d H:i', filemtime($folder))]),
 								'collapse' => true,
 								'content' => [$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]]],
 								['type' => 'button',
@@ -170,7 +171,7 @@ class FILE extends API {
 								'placeholder' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
 								'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
-								'id' => 'productsearch'
+								'id' => 'filefilter'
 							]],[
 								'type' => 'filter',
 								'collapse' => true
@@ -179,13 +180,14 @@ class FILE extends API {
 						foreach ($files as $file){
 							$file=['path' => substr($file,1), 'name' => pathinfo($file)['basename']];
 							$result['body']['content'][]=[
+								['type' => 'links',
+								'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
+								'collapse' => true,
+								'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank']]],
 								['type' => 'hiddeninput',
 								'collapse' => true,
 								'description' => 'filter',
 								'attributes'=>['data-filtered' => $file['path']]],
-								['type' => 'links',
-								'collapse' => true,
-								'content' => [$file['path'] => ['href' => $file['path']]]],
 								['type' => 'button',
 								'collapse' => true,
 								'description' => LANG::GET('file.manager_delete_file'),
@@ -200,6 +202,7 @@ class FILE extends API {
 					}
 					$result['body']['content'][]=[
 						['type' => 'hiddeninput',
+						'description' => LANG::GET('file.manager_new_file'),
 						'collapse' => true,
 						'attributes' => [
 							'name' => 'destination',
@@ -251,7 +254,7 @@ class FILE extends API {
 		foreach($bundles as $row) {
 			$list=[];
 			foreach (json_decode($row['content'], true) as $name => $path){
-				$list[$name]= ['href' => $path];
+				$list[$name]= ['href' => $path, 'target' => '_blank'];
 			}
 			$result['body']['content'][]=
 			[
@@ -387,6 +390,85 @@ class FILE extends API {
 				break;
 		}
 	}
+
+	public function sharepoint(){
+		if (!$_SESSION['user']) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name']) {
+					UTILITY::storeUploadedFiles(['files'], '../' . INI['sharepoint']['folder']);
+					$this->response(['status' => [
+						'msg' => LANG::GET('file.manager_new_file_created'),
+						'redirect' => ['sharepoint']
+					]]);
+				}
+				$this->response(['status' => [
+					'msg' => LANG::GET('file.manager_error')
+				]]);
+		break;
+			case 'GET':
+				$result=['body'=>
+				['form' => [
+					'data-usecase' => 'file',
+					'action' => "javascript:api.file('post', 'sharepoint')"],
+				'content'=>[]]];
+
+				$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+				if ($files){
+					$result['body']['content'][]=[
+						['type' => 'searchinput',
+						'collapse' => true,
+						'attributes' => [
+							'placeholder' => LANG::GET('file.file_filter_label'),
+							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",
+							'onblur' => "api.file('get', 'filter', 'sharepoint', this.value); return false;",
+							'id' => 'filefilter'
+						]],[
+							'type' => 'filter',
+							'collapse' => true
+						]
+					];
+					foreach ($files as $file){
+						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
+						$filetime=filemtime($file['path']);
+						if (time() > $filetime + INI['sharepoint']['lifespan']*3600) {
+							UTILITY::delete($file['path']);
+						}
+						else {
+							$result['body']['content'][]=[
+								['type' => 'links',
+								'collapse' => true,
+								'description' => LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]),
+								'content' => [$file['name'] => ['href' => substr($file['path'], 1), 'target' => '_blank']]],
+								['type' => 'hiddeninput',
+								'collapse' => true,
+								'description' => 'filter',
+								'attributes'=>['data-filtered' => substr($file['path'], 1)]],
+								['type' => 'links',
+								'collapse' => true]
+							];
+						}
+					}
+				}
+				$result['body']['content'][]=[
+					['type' => 'hiddeninput',
+					'description' => LANG::GET('file.sharepoint_upload_header'),
+					'collapse' => true,
+					'attributes' => [
+						'name' => 'destination',
+						'value' => $this->_requestedFolder]],
+					['type' => 'file',
+					'collapse' => true,
+					'attributes' => [
+						'name' => 'files[]',
+						'multiple' => true,
+						'required' => true]]
+				];
+				$this->response($result);
+				break;
+		}
+	}
+
 }
 
 
