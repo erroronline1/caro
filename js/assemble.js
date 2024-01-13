@@ -704,7 +704,7 @@ export class Assemble {
 			li.appendChild(a);
 			ul.appendChild(li);
 		}
-		ul = this.apply_attributes(this.tile.attributes, ul);
+		if ('attributes' in this.tile) ul = this.apply_attributes(this.tile.attributes, ul);
 		this.elements.add(ul);
 	}
 
