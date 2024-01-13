@@ -190,7 +190,7 @@ export const api = {
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 						};
 						break;
-					}
+				}
 				break;
 			case 'post':
 				successFn = function (data) {
@@ -463,6 +463,41 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
+		document.getElementById('openmenu').checked = false;
+	},
+	tool: (method, ...request) => {
+		/*
+		get tool/code
+		*/
+		request = [...request];
+		request.splice(0, 0, 'tool');
+		let payload,
+			successFn = function (data) {
+				api.toast(data.status.msg);
+				api.user('get', request[1], data.status.id);
+			},
+			title = {
+				'code': LANG.GET('menu.tools_digital_codes'),
+				'user': LANG.GET('menu.user_manager')
+			};;
+		switch (method) {
+			case 'get':
+				successFn = function (data) {
+					if (data.body) {
+						api.update_header(title[request[1]]);
+						document.getElementById('main').innerHTML = '';
+						new Assemble(data.body).initializeSection();
+					}
+					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+				};
+				break;
+			case 'post':
+				payload = _.getInputs('[data-usecase=user]', true);
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === 'post');
 		document.getElementById('openmenu').checked = false;
 	},
 	user: (method, ...request) => {
