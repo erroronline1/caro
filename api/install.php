@@ -98,6 +98,14 @@ $queries = [
 			"	`active` tinyint NOT NULL" .
 			"	PRIMARY KEY (`id`)" .
 			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+			,
+			"CREATE TABLE IF NOT EXISTS `caro_manual` (" .
+			"	`id` int NOT NULL AUTO_INCREMENT," .
+			"	`title` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+			"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+			"	`permissions` text COLLATE utf8mb4_unicode_ci NOT NULL" .
+			"	PRIMARY KEY (`id`)" .
+			") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 			]
 		,
 		'sqlsrv' => [
@@ -184,6 +192,14 @@ $queries = [
 			"	date smalldatetime NOT NULL," .
 			"	content varchar(MAX) NOT NULL" .
 			"	active tinyint NOT NULL" .
+			");"
+			,
+			"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
+			"CREATE TABLE caro_manual (" .
+			"	id int NOT NULL IDENTITY(1,1)," .
+			"	title varchar(MAX) NOT NULL," .
+			"	content varchar(MAX) NOT NULL," .
+			"	permissions varchar(MAX) NOT NULL" .
 			");"
 			]				
 		]

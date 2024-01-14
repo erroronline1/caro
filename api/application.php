@@ -4,10 +4,11 @@ class APPLICATION extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
     private $_requestedToken = null;
+    private $_requestedManual = null;
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedToken = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedToken = $this->_requestedManual = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	public function login(){
@@ -58,6 +59,7 @@ class APPLICATION extends API {
 		$menu=[
 			LANG::GET('menu.application_header') => [
 				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['href' => "javascript:api.application('get','login', 'null')"],
+				LANG::GET('menu.application_start') => ['href' => "javascript:api.application('get', 'start')"],			
 				LANG::GET('menu.application_user_profile') => ['href' => "javascript:api.user('get', 'profile')"],			
 			],
 			LANG::GET('menu.message_header') => [
@@ -90,6 +92,7 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['href' => "javascript:api.file('get', 'filemanager')"];
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['href' => "javascript:api.file('get', 'bundlemanager')"];
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['href' => "javascript:api.user('get', 'user')"];
+			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['href' => "javascript:api.application('get', 'manual')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['href' => "javascript:api.purchase('get', 'vendor')"];
@@ -101,6 +104,195 @@ class APPLICATION extends API {
 
     public function language(){
 		$this->response(['body' => LANG::GETALL()]);
+	}
+
+	public function start(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		$result = ['user' => $_SESSION['user']['name'], 'body' => ['content' => []]];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
+		$statement->execute();
+		$manual = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$topics = [];
+		foreach ($manual as $row){
+			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
+				[
+					'type' => 'text',
+					'description' => $row['title'],
+					'content' => $row['content']
+				];
+		}
+		$result['body']['content'][] = $topics;
+		$this->response($result);
+	}
+
+	public function manual(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$result = [
+			'user' => $_SESSION['user']['name'],
+			'body' => ['content' => []]
+		];
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$permissions = [];
+				$entry = [
+					'title' => $this->_payload->title,
+					'content' => $this->_payload->content,
+					'permissions' => '',
+				];
+		
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['name']])]]);
+				}
+		
+				// chain checked permission levels
+				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
+						$permissions[] = $level;
+					}
+				}
+				$entry['permissions'] = implode(',', $permissions);
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_post_manual'));
+				if ($statement->execute([
+					':title' => $entry['title'],
+					':content' => $entry['content'],
+					':permissions' => $entry['permissions']
+				])) $this->response([
+					'status' => [
+						'id' => $this->_pdo->lastInsertId(),
+						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']])
+					]]);
+				else $this->response([
+					'status' => [
+						'id' => false,
+						'name' => LANG::GET('application.edit_manual_not_saved')
+					]]);
+				break;
+			case 'PUT':
+				$permissions = [];
+				$entry = [
+					'title' => $this->_payload->title,
+					'content' => $this->_payload->content,
+					'permissions' => '',
+				];
+		
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['name']])]]);
+				}
+		
+				// chain checked permission levels
+				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
+						$permissions[] = $level;
+					}
+				}
+				$entry['permissions'] = implode(',', $permissions);
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_put_manual'));
+				if ($statement->execute([
+					':title' => $entry['title'],
+					':content' => $entry['content'],
+					':permissions' => $entry['permissions'],
+					':id' => $this->_requestedManual
+				])) $this->response([
+					'status' => [
+						'id' => $this->_requestedManual,
+						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']])
+					]]);
+				else $this->response([
+					'status' => [
+						'id' => false,
+						'name' => LANG::GET('application.edit_manual_not_saved')
+					]]);
+
+				break;
+			case 'GET':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual-by-id'));
+				$statement->execute([':id' => $this->_requestedManual]);
+				if (!$entry = $statement->fetch(PDO::FETCH_ASSOC)) $entry=[
+					'id' => null,
+					'title' => '',
+					'content' => '',
+					'permissions' => ''
+				];
+				$result['body']['form'] = [
+					'data-usecase' => 'manual',
+					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
+				$statement->execute();
+				$manual = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$options = ['...' . LANG::GET('application.edit_new_manual_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . LANG::GET('application.edit_new_manual_topic')) ? ['selected' => true] : []];
+				foreach ($manual as $row){
+					$options[$row['title']] = ['value' => $row['id']];
+					if ($entry['id'] === $row['id']) $options[$row['title']]['selected'] = true; 
+				}
+
+				$permissions = [];
+				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+					$permissions[$description] = in_array($level, explode(',', $entry['permissions'])) ? ['checked' => true] : [];
+				}
+
+				$result['body']['content'] = [
+					[
+						['type' => 'select',
+						'description' => LANG::GET('application.edit_select_manual_topic'),
+						'attributes' => [
+							'onchange' => "api.application('get', 'manual', this.value)"
+						],
+						'content' => $options]
+					],[
+						['type' => 'textinput',
+						'description' => LANG::GET('application.edit_manual_title'),
+						'attributes' => [
+							'name' => 'title',
+							'value' => $entry['title']
+						]
+						]
+					],[
+						['type' => 'textarea',
+						'description' => LANG::GET('application.edit_manual_content'),
+						'attributes' => [
+							'rows' => 8,
+							'name' => 'content',
+							'value' => $entry['content']
+						]
+						]
+					],[
+						['type' => 'checkbox',
+						'description' => LANG::GET('application.edit_manual_permissions'),
+						'content' => $permissions
+						]
+					]
+				];
+				if ($entry['id']) $result['body']['content'][] = [
+						['type' => 'deletebutton',
+						'description' => LANG::GET('application.edit_manual_delete'),
+						'attributes' => [
+							'type' => 'button',
+							'onpointerup' => "if (confirm('" . LANG::GET('application.edit_manual_delete_confirm') . "')) api.application('delete', 'manual', " . $entry['id'] . ")"
+						]
+						]
+				];
+	
+				break;
+			case 'DELETE':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_delete_manual'));
+				if ($statement->execute([
+					':id' => $this->_requestedManual
+				])) $this->response([
+					'status' => [
+						'msg' => LANG::GET('application.edit_manual_deleted'),
+						'id' => false
+					]]);
+				else $this->response([
+					'status' => [
+						'msg' => LANG::GET('application.edit_manual_error'),
+						'id' => $this->_requestedManual
+					]]);
+				break;
+		}
+		$this->response($result);
 	}
 }
 

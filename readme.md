@@ -34,6 +34,7 @@ tested devices:
 ### useage notes and caveats
 * dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts
 * orders can be deleted by administrative users and requesting unit members at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
+* the manual is intentionally editable to accomodate it to users comprehension.
 
 ### importing vendor pricelists
 vendor pricelists must have an easy structure to be importable. it may need additional off-app customizing available data to have input files like:
@@ -90,7 +91,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* tips and help on landing page
 * forms and contexts
 * pdf export
 * vendor list
@@ -103,4 +103,5 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * text recommendations
+* calendar and alerts
 

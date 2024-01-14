@@ -80,13 +80,14 @@ export const api = {
 	},
 	application: async (method, ...request) => {
 		/*
-		get application/user
-		get application/menu
 		get application/language
+		get application/login
+		get application/menu
+		get application/start
 		*/
 		request = [...request];
 		request.splice(0, 0, 'application');
-		let successFn;
+		let successFn, payload;
 		switch (request[1]) {
 			case 'language':
 				successFn = async function (data) {
@@ -99,7 +100,7 @@ export const api = {
 					request.push((logintoken.value ? logintoken.value : null));
 				}
 				successFn = function (data) {
-					document.getElementById('main').innerHTML = '';
+					document.getElementById('main').replaceChildren();
 					api.application('get', 'menu');
 					if (data.body.form) {
 						document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
@@ -107,25 +108,57 @@ export const api = {
 						return;
 					}
 					if (data.body.image) document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
+					api.application('get', 'start');
 					document.getElementById('openmenu').checked = false;
 				}
 				break;
 			case 'menu':
 				successFn = function (data) {
+					assemble_helper.userMenu(data.body);
+				}
+				break;
+			case 'start':
+				successFn = function (data) {
 					let signin = LANG.GET('menu.application_signin'),
 						greeting = ', ' + signin.charAt(0).toLowerCase() + signin.slice(1);
 					if (data.user) greeting = ' ' + data.user;
-
 					api.update_header(LANG.GET('general.welcome_header', {
 						':user': greeting
 					}));
-					assemble_helper.userMenu(data.body);
+					document.getElementById('main').replaceChildren();
+					new Assemble(data.body).initializeSection();
+					document.getElementById('openmenu').checked = false;
 				}
+				break;
+			case 'manual':
+				switch (method) {
+					case 'get':
+						successFn = function (data) {
+							api.update_header(LANG.GET('menu.application_manual_manager'));
+							document.getElementById('main').replaceChildren();
+							new Assemble(data.body).initializeSection();
+							document.getElementById('openmenu').checked = false;
+						}
+						break;
+					case 'delete':
+						successFn = function (data) {
+							api.toast(data.status.msg);
+							api.application('get', request[1], data.status.id);
+						}
+						break;
+					default:
+						successFn = function (data) {
+							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							api.application('get', request[1], data.status.id);
+						};
+						payload = _.getInputs('[data-usecase=manual]', true);
+						break;
+					}
 				break;
 			default:
 				return;
 		}
-		await api.send(method, request, successFn);
+		await api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
 	},
 	file: async (method, ...request) => {
 		/*
@@ -150,7 +183,7 @@ export const api = {
 		let successFn = function (data) {
 				if (data.body) {
 					api.update_header(title[request[1]]);
-					document.getElementById('main').innerHTML = '';
+					document.getElementById('main').replaceChildren();
 					new Assemble(data.body).initializeSection();
 				}
 				if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
@@ -241,7 +274,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById('main').innerHTML = '';
+								document.getElementById('main').replaceChildren();
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importComponent(data.body.component);
 							}
@@ -251,7 +284,7 @@ export const api = {
 					case 'form':
 						successFn = function (data) {
 							if (data.body) {
-								document.getElementById('main').innerHTML = '';
+								document.getElementById('main').replaceChildren();
 								new Assemble(data.body).initializeSection();
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
@@ -261,7 +294,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById('main').innerHTML = '';
+								document.getElementById('main').replaceChildren();
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importForm(data.body.component);
 							}
@@ -340,7 +373,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById('main').innerHTML = '';
+								document.getElementById('main').replaceChildren();
 								new Assemble(data.body).initializeSection();
 								api.preventDataloss.start();
 							}
@@ -436,7 +469,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById('main').innerHTML = '';
+								document.getElementById('main').replaceChildren();
 								new Assemble(data.body).initializeSection();
 								if (request[1] === 'approved') orderClient.filter();
 								api.preventDataloss.start();
@@ -487,14 +520,14 @@ export const api = {
 				successFn = function (data) {
 					if (data.body) {
 						api.update_header(title[request[1]]);
-						document.getElementById('main').innerHTML = '';
+						document.getElementById('main').replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
 				};
 				if (request[3] === 'display') {
 					payload = _.getInputs('[data-usecase=tool_create_code]');
-				console.log(payload);
+					console.log(payload);
 				}
 				break;
 			case 'post':
@@ -530,7 +563,7 @@ export const api = {
 				successFn = function (data) {
 					if (data.body) {
 						api.update_header(title[request[1]]);
-						document.getElementById('main').innerHTML = '';
+						document.getElementById('main').replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
 					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);

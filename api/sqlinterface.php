@@ -43,6 +43,26 @@ class SQLQUERY {
 			'mysql' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%', :group, '%')",
 			'sqlsrv' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%', :group, '%')"
 		],
+		'application_post_manual' => [
+			'mysql' => "INSERT INTO caro_manual (id, title, content, permissions) VALUES (NULL, :title, :content, :permissions)",
+			'sqlsrv' => "INSERT INTO caro_manual (title, content, permissions) VALUES (:title, :content, :permissions)"
+		],
+		'application_put_manual' => [
+			'mysql' => "UPDATE caro_manual SET title = :title, content = :content, permissions = :permissions WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_manual SET title = :title, content = :content, permissions = :permissions WHERE id = :id"
+		],
+		'application_get_manual' => [
+			'mysql' => "SELECT * FROM caro_manual ORDER BY title",
+			'sqlsrv' => "SELECT * FROM caro_manual ORDER BY title"
+		],
+		'application_get_manual-by-id' => [
+			'mysql' => "SELECT * FROM caro_manual WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_manual WHERE id = :id"
+		],
+		'application_delete_manual' => [
+			'mysql' => "DELETE FROM caro_manual WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
+		],
 
 		'form_component-post' => [
 			'mysql' => "INSERT INTO caro_form_components (id, name, date, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content)",
