@@ -72,7 +72,8 @@ while setting up a vendor an import rule must be defined like:
     }
 }
 ```
-
+*headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+ 
 if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewrite rules depend on the database columns for the caro_consumables_products database-table.
 
 ## ressources

@@ -9,13 +9,8 @@ class CONSUMABLES extends API {
 	private $_subMethod = null;
 	private $filtersample = <<<'END'
 	{
+		"info": "more rules may apply, see documentation if neccessary",
 		"filesettings": {
-			"headerrowindex": 0,
-			"dialect": {
-				"separator": ";",
-				"enclosure": "\"",
-				"escape": ""
-			},
 			"columns": [
 				"ArticleNo",
 				"Name",
@@ -44,6 +39,8 @@ class CONSUMABLES extends API {
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
 		$filter['filesetting']['encoding'] = INI['likeliness']['csvprocessor_source_encoding'];
+		if (!array_key_exists('headerrowindex', $filter['filesetting'])) $filter['filesetting']['headerrowindex'] = INI['csv']['headerrowindex'];
+		if (!array_key_exists('dialect', $filter['filesetting'])) $filter['filesetting']['dialect'] = INI['csv']['dialect'];
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
