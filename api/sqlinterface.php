@@ -106,8 +106,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 		'user_delete' => [
-			'mysql' => "DELETE FROM caro_user WHERE id = :id LIMIT 1",
-			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id"
+			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id",
+			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id"
 		],
 
 		'consumables_post-vendor' => [
