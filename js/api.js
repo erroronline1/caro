@@ -254,8 +254,8 @@ export const api = {
 		request.splice(0, 0, 'form');
 		let successFn, payload,
 			title = {
-				'component_editor': LANG.GET('menu.admin_form_components'),
-				'form_editor': LANG.GET('menu.admin_forms')
+				'component_editor': LANG.GET('menu.forms_manage_components'),
+				'form_editor': LANG.GET('menu.forms_manage_forms')
 			};
 
 		switch (method) {
@@ -555,8 +555,8 @@ export const api = {
 				api.user('get', request[1], data.status.id);
 			},
 			title = {
-				'profile': LANG.GET('menu.user_profile'),
-				'user': LANG.GET('menu.user_manager')
+				'profile': LANG.GET('menu.application_user_profile'),
+				'user': LANG.GET('menu.application_user_manager')
 			};;
 		switch (method) {
 			case 'get':
