@@ -206,7 +206,7 @@ $queries = [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, image) VALUES ('" . INI['caroapp'] . "', 'admin', '', '1234', 'media/favicon/logo.png');",
 				'component' => "INSERT INTO caro_form_components (name, date, content) VALUES " .
 					"('template', CURRENT_TIMESTAMP, '{\"form\": {}, \"content\": [[{\"type\": \"textinput\", \"attributes\": {\"placeholder\": \"text input\"}, \"description\": \"text field\"}, {\"type\": \"numberinput\", \"attributes\": {\"placeholder\": \"nummer\"}, \"description\": \"number field\"}, {\"type\": \"textarea\", \"attributes\": {\"rows\": 4, \"value\": \"values are passed as a value pseudoattribute\"}, \"description\": \"textarea (multiline)\"}, {\"type\": \"dateinput\", \"attributes\": {\"placeholder\": \"datum\"}, \"description\": \"date field\"}], [{\"type\": \"file\", \"description\": \"file upload\"}], [{\"type\": \"photo\", \"description\": \"photo upload\"}], [{\"type\": \"text\", \"content\": \"it is very informative\", \"description\": \"this is just a text\"}, {\"type\": \"links\", \"content\": {\"Link 1\": {\"href\": \"http://erroronline.one\"}, \"Link 2\": {\"href\": \"#\"}}, \"description\": \"links\"}], [{\"type\": \"checkbox\", \"content\": {\"Checkbox 3\": {}, \"checkbox 2\": {}, \"checkbox 4\": {}, \"Checkbox 1ä $\": {}}, \"description\": \"checkboxes\"}, {\"type\": \"radio\", \"content\": {\"Radio 1\": {}, \"Radio 2\": {}}, \"description\": \"radiobuttons\"}, {\"type\": \"select\", \"content\": {\"Entry 1\": {\"value\": \"eins\"}, \"Entry 2\": {\"value\": \"zwei\", \"selected\": true}}, \"attributes\": {\"size\": 2}, \"description\": \"select list\"}], [{\"type\": \"signature\", \"description\": \"signature\"}], [{\"type\": \"scanner\", \"description\": \"the text-input will be populated by the result of the scanner\"}]]}');",
-				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (NULL, ':title', ':content', ':permissions');",
+				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
 			]
 		]
 	]
@@ -215,6 +215,7 @@ $queries = [
 $driver = INI['sql'][INI['sql']['use']]['driver'];
 
 try {
+//	throw new ErrorException('force update');
 	$statement = $pdo->query($queries['precheck'][$driver]);
 	echo "databases already installed.";
 }
