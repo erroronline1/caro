@@ -277,7 +277,7 @@ class SQLQUERY {
 		],
 		'file_bundles-get-active' => [
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
-			'sqlsrv' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name"
+			'sqlsrv' => "SELECT DISTINCT name, * FROM caro_file_bundles WHERE active = 1"
 		],
 
 	];
