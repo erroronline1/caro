@@ -105,6 +105,12 @@ export const api = {
 					if (data.body.form) {
 						document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
 						new Assemble(data.body).initializeSection();
+						let signin = LANG.GET('menu.application_signin'),
+							greeting = ', ' + signin.charAt(0).toLowerCase() + signin.slice(1);
+						if (data.user) greeting = ' ' + data.user;
+						api.update_header(LANG.GET('general.welcome_header', {
+							':user': greeting
+						}));
 						return;
 					}
 					if (data.body.image) document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
@@ -153,7 +159,7 @@ export const api = {
 						};
 						payload = _.getInputs('[data-usecase=manual]', true);
 						break;
-					}
+				}
 				break;
 			default:
 				return;
