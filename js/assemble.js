@@ -298,7 +298,11 @@ export class Assemble {
 
 		toleft.classList = 'toleft';
 		toleft.addEventListener('pointerdown', function (e) {
-			section.scrollBy(-300, 0)
+			section.scrollBy({
+				top: 0,
+				left: -400,
+				behaviour: 'smooth'
+			});
 		});
 		indicators.appendChild(toleft);
 		for (let i = 0; i < this.multipletiles.size; i++) {
@@ -314,7 +318,11 @@ export class Assemble {
 		}
 		toright.classList = 'toright';
 		toright.addEventListener('pointerdown', function (e) {
-			section.scrollBy(300, 0)
+			section.scrollBy({
+				top: 0,
+				left: 400,
+				behaviour: 'smooth'
+			});
 		});
 		indicators.appendChild(toright);
 		article.appendChild(indicators);

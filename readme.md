@@ -93,7 +93,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 # open tasks
 * display inbox messages from deleted users
-* scrolling buttons in edge / smooth scrolling
 * forms and contexts
 * pdf export
 * vendor list
