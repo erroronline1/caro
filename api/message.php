@@ -252,7 +252,7 @@ class MESSAGE extends API {
 				'collapse' => true
 				]
 			];
-			if ($message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
+			if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
 				['type' => 'button',
 				'collapse'=> true,
 				'description' => LANG::GET('message.reply'),

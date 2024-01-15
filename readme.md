@@ -92,7 +92,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* display inbox messages from deleted users
 * forms and contexts
 * pdf export
 * vendor list
