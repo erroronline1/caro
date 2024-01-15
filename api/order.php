@@ -10,7 +10,7 @@ class ORDER extends API {
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 
 		$this->fields=[
@@ -155,7 +155,7 @@ class ORDER extends API {
 				$approval = $result['name'] . LANG::GET('order.token_verified');
 			}
 		}
-		if ($_FILES['signature']['tmp_name']){
+		if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
 		}
