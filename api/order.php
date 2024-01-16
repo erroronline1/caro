@@ -686,8 +686,13 @@ class ORDER extends API {
 									'readonly' => true,
 									'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
 								]
+/*								'type' => 'links',
+								'collapse' => true,
+								'content' => [
+									LANG::GET('order.message_orderer') . ' ' . $this->fields['orderer'] . ' ' . $value => ['href' => '#', 'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"]
+								]*/
+
 							];
-							$text .= $this->fields['orderer'] . ': ' . $value . '\n';
 						}
 					}
 
