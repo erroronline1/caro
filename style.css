@@ -615,14 +615,6 @@ button:active {
 
 /*************************** decorators ******************************/
 
-[data-type=links]>ul {
-	list-style-type: none;
-
-	li {
-		padding: .75em 0;
-	}
-}
-
 .reset::before,
 .add::before,
 .delete::before,
@@ -642,8 +634,17 @@ button:active {
 	cursor: move;
 }
 
-[data-type=links]>ul>li::before {
-	background-image: url('media/external-link-alt.svg');
+[data-type=links]>ul,
+ul {
+	list-style-type: none;
+
+	li {
+		padding: .75em 0;
+	}
+
+	li::before {
+		background-image: url('media/external-link-alt.svg');
+	}
 }
 
 [data-type=text]::before {
