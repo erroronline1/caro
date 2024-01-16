@@ -96,13 +96,12 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * alias option for products
 * added products only text?
 * case number as order verification
-* orderer within approved orders
+* orderer within approved orders (more visible, not input field) -> api call partially broken
 * comments on order disapproval
 * filter length string orders
 * filter by fields? dropdown?
 * partial delivery (6 of 10 delivered?) "received"
 * unarchived but received delete after x days
-* filter on ordering buggy!?
 * bulk approval? (new order alert only one time) checkbox on prepared order block
 * media attachments
 
