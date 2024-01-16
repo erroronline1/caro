@@ -656,6 +656,7 @@ class ORDER extends API {
 							'imageonly' => ['width' => '10em', 'height' => '4em']
 							]
 					];
+					
 					$content[]=
 						['type' => 'hiddeninput',
 						'collapse' => true,
@@ -676,7 +677,27 @@ class ORDER extends API {
 							$messagepayload=[];
 							foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
 								$messagepayload[':' . $key] = $decoded_order_data[$key];
+//								$messagepayload[':' . $key] = mb_convert_encoding($decoded_order_data[$key], "UTF-8", mb_detect_encoding($decoded_order_data[$key]));
 							}
+							$content[]=[
+								'type' => 'hiddeninput',
+								'collapse' => true,
+								'attributes' => [
+									'name' => 'to',
+									'value' => $value,
+									'data-message' => $row['id']
+								]
+							];
+							$content[]=[
+								'type' => 'hiddeninput',
+								'collapse' => true,
+								'attributes' => [
+									'name' => 'message',
+									'value' => LANG::GET('order.message', $messagepayload),
+									'data-message' => $row['id']
+								]
+							];
+	
 							$content[]=[
 								'type' => 'textinput',
 								'collapse' => true,
@@ -684,7 +705,7 @@ class ORDER extends API {
 									'value' => $value,
 									'placeholder' => LANG::GET('order.message_orderer'),
 									'readonly' => true,
-									'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
+									'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"
 								]
 /*								'type' => 'links',
 								'collapse' => true,

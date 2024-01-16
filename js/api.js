@@ -339,8 +339,8 @@ export const api = {
 		get sent
 		get filter/{filter}
 
-		get message/{id}/(reply|forward)
-		get message/0/0/{name}/{message} // to initiate a new message with given recipient and prepared message
+		get message/ // empty form
+		get message/{queryselector} // to initiate a new message with (hidden or visible) recipient and prepared message _.getinputs(queryselector)
 		post message
 		delete message/{id}/(inbox|sent)
 
@@ -388,6 +388,7 @@ export const api = {
 								unseen: 0
 							});
 						};
+						if (request[2]) payload = _.getInputs(request[2])
 						break;
 				}
 				break;

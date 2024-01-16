@@ -49,7 +49,9 @@ class MESSAGE extends API {
 			case 'GET':
 				$datalist = [];
 				$result = [];
-				$prefill = ['message'=>$this->_message ? : '', 'to'=>$this->_recipient ? : ''];
+				$prefill = [
+					'message'=>UTILITY::propertySet($this->_payload, 'message') ? : '',
+					'to'=>UTILITY::propertySet($this->_payload, 'to') ? : ''];
 				
 				// prepare existing users lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
@@ -58,33 +60,7 @@ class MESSAGE extends API {
 				foreach($user as $key => $row) {
 					if ($row['id'] > 1)	$datalist[] = $row['name'];
 				}
-		
-				// select message
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_message'));
-				$statement->execute([
-					':id' => $this->_requestedID,
-					':user' => $_SESSION['user']['id']
-				]);
-				if (!$message = $statement->fetch(PDO::FETCH_ASSOC)){$message = [
-					'id' => null,
-					'user' => $_SESSION['user']['id'],
-					'from_user' => '',
-					'to_user' => '',
-					'message' => '',
-					'timestamp' => ''
-				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$message['id']) $result['status'] = ['msg' => LANG::GET('message.error_not_found')];
-				
-				if (in_array($this->_redirect, ['reply', 'forward']) && $message['message'])
-					$prefill['message'] = 
-						str_repeat("\n",4) . str_repeat('-', 17) . "\n" .
-						LANG::GET('message.from') . ': ' . $message['from_user'] . "\n" .
-						LANG::GET('message.to') . ': ' . $message['to_user'] . "\n" .
-						LANG::GET('message.time') . ': ' . $message['timestamp'] . "\n" .
-						LANG::GET('message.message') . ":\n" . $message['message'];
-				if (in_array($this->_redirect, ['reply']) && $message['message'])
-					$prefill['to'] = $message['from_user'];
-
+						
 				// display form for writing or reading a message
 				$result['body']=['content' => [
 					[
@@ -121,7 +97,7 @@ class MESSAGE extends API {
 					],
 					'form' => [
 						'data-usecase' => 'message',
-						'action' => 'javascript:api.message("post", "message")'
+						'action' => "javascript:api.message('post', 'message')"
 					]];
 
 				break;
@@ -222,7 +198,9 @@ class MESSAGE extends API {
 				'collapse' => true,
 				'description' => LANG::GET('message.from'),
 				'attributes' => [
+					'name' => 'to',
 					'readonly' => true,
+					'data-message' => $message['id'],
 					'placeholder' => LANG::GET('message.from'),
 					'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
 				]],
@@ -230,6 +208,7 @@ class MESSAGE extends API {
 				'collapse' => true,
 				'attributes' => [
 					'name' => 'message',
+					'data-message' => $message['id'],
 					'readonly' => true,
 					'value' => $message['message'],
 					'rows' => 7
@@ -258,7 +237,7 @@ class MESSAGE extends API {
 				'description' => LANG::GET('message.reply'),
 				'attributes' => [
 					'type' => 'button',
-					'onpointerup' => "api.message('get', 'message', " . $message['id'] . ", 'reply')" 
+					'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'reply')" 
 					]]
 				]);
 			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
@@ -310,7 +289,9 @@ class MESSAGE extends API {
 				'collapse' => true,
 				'description' => LANG::GET('message.to'),
 				'attributes' => [
+					'name' => 'to',
 					'readonly' => true,
+					'data-message' => $message['id'],
 					'placeholder' => LANG::GET('message.to'),
 					'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
 				]],
@@ -318,6 +299,7 @@ class MESSAGE extends API {
 				'collapse' => true,
 				'attributes' => [
 					'name' => 'message',
+					'data-message' => $message['id'],
 					'readonly' => true,
 					'value' => $message['message'],
 					'rows' => 7
@@ -331,7 +313,7 @@ class MESSAGE extends API {
 				'description' => LANG::GET('message.forward'),
 				'attributes' => [
 					'type' => 'button',
-					'onpointerup' => "api.message('get', 'message', " . $message['id'] . ", 'forward')" 
+					'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'sent')" 
 					]],
 				['type' => 'message',
 				'collapse' => true
