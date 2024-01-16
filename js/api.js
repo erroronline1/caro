@@ -464,8 +464,8 @@ export const api = {
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
-								for (const file of all) {
-									file.parentNode.style.display = data.status.data.includes(parseInt(file.dataset.filtered, 10)) ? 'block' : 'none';
+								for (const order of all) {
+									order.parentNode.style.display = data.status.data.includes(order.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
