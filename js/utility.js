@@ -132,7 +132,6 @@ const orderClient = {
 			if (type === 'ordered') not = ':not([data-received]):not([data-archived])';
 			if (type === 'received') not = ':not([data-archived])';
 			display = document.querySelectorAll(`article[data-type=cart][data-${type}]${not}`);
-			console.log(`article[data-type=cart][data-${type}]${not}`);
 		} else {
 			display = document.querySelectorAll('article[data-type=cart]:not([data-ordered]):not([data-received]):not([data-archived])');
 		}
