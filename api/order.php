@@ -678,15 +678,17 @@ class ORDER extends API {
 								$messagepayload[':' . $key] = $decoded_order_data[$key];
 							}
 							$content[]=[
-							'type' => 'textinput',
-							'collapse' => true,
-							'attributes' => [
-								'value' => $value,
-								'placeholder' => LANG::GET('order.message_orderer'),
-								'readonly' => true,
-								'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
-							]
-						];}
+								'type' => 'textinput',
+								'collapse' => true,
+								'attributes' => [
+									'value' => $value,
+									'placeholder' => LANG::GET('order.message_orderer'),
+									'readonly' => true,
+									'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"
+								]
+							];
+							$text .= $this->fields['orderer'] . ': ' . $value . '\n';
+						}
 					}
 
 					if (str_contains($row['approval'], 'data:image/png')){
