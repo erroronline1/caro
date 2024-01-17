@@ -22,8 +22,8 @@ html {
 }
 
 ::-webkit-scrollbar {
-	width: 3px;
-	height: 3px
+	width: .3em;
+	height: .3em
 }
 
 ::-webkit-scrollbar-track,
@@ -34,6 +34,9 @@ html {
 ::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb:hover {
 	background: var(--foreground);
+	border-radius: .125em;
+	width: .15em;
+	height: .15em
 }
 
 /*************************** layout ******************************/
