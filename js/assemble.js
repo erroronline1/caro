@@ -182,14 +182,13 @@ export class Assemble {
 			}]);
 		} else this.section = document.createElement('div');
 
-		this.assembledTiles = new Set();
-		this.processContent();
-
+		this.assembledPanels = this.processContent();
+		
 		if (!nextSibling) {
-			this.section.append(...this.assembledTiles);
+			this.section.append(...this.assembledPanels);
 			document.getElementById('main').insertAdjacentElement('beforeend', this.section);
 		} else {
-			const tiles = Array.from(this.assembledTiles);
+			const tiles = Array.from(this.assembledPanels);
 			for (let i = 0; i < tiles.length; i++) {
 				nextSibling.parentNode.insertBefore(tiles[i], nextSibling);
 			}
@@ -251,12 +250,60 @@ export class Assemble {
 	}
 
 	processContent() {
-		let collapse;
-		this.content.forEach(tile => {
+		/**
+		 * content to exist of three nestings
+		 * [ panel
+		 * 		[ slide
+		 * 			{ element },
+		 * 			{ element }
+		 * 		],
+		 * 		[ slide ...],
+		 * ],
+		 * [ panel ...]
+		 * 
+		 * or two nestings
+		 * [ panel
+		 * 		{ element },
+		 * 		{ element }
+		 * ]
+		 */
+		let assembledPanels = new Set();
+		this.content.forEach(panel => {
+			const article = document.createElement('article');
+
+			function processPanel(elements){
+				let content=new Set();
+				if (elements.constructor.name === 'Array') {
+					const section =document.createElement('section');
+					elements.forEach(element => {
+						if (elements[0].constructor.name === 'Array') section.append(...processPanel.call(this, element));
+						else content.add(...processPanel.call(this, element));
+					});
+					if (elements[0].constructor.name === 'Array') content.add(section);
+				}
+				else  {
+					this.currentElement = elements;
+					try {
+						content.add(...this[elements.type]());
+					}
+					catch {
+						content.add(this[elements.type]());
+					}
+				}
+				return content;
+			}
+			article.append(...processPanel.call(this, panel))
+			assembledPanels.add(article);
+
+	})
+	console.log(assembledPanels);
+		return assembledPanels;
+	return;
+	/*	this.content.forEach(tile => {
 			this.articleAttributes = [];
 			this.multipletiles = new Set();
 			for (let i = 0; i < tile.length; i++) {
-				this.tile = tile[i];
+				this.currentElement = tile[i];
 				collapse = tile[i].collapse || false;
 				if (!collapse || i === 0) this.elements = new Set();
 				this.description(i);
@@ -264,13 +311,15 @@ export class Assemble {
 				if ('article' in tile[i]) this.articleAttributes = tile[i].article;
 				if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
 				if (tile.length < 2 || collapse) {
-					this.assembledTiles.add(this.single(tile[i]));
+					this.assembledPanels.add(this.single(tile[i]));
 					continue;
 				}
 				this.multipletiles.add(this.single(tile[i], true))
 			}
-			if (this.multipletiles.size) this.assembledTiles.add(this.multiple());
-		});
+			if (this.multipletiles.size) this.assembledPanels.add(this.multiple());
+		});*/
+		
+
 	}
 	single(tileProperties, oneOfFew = false) { // parameters are required by composer method
 		const article = document.createElement('article');
@@ -333,9 +382,9 @@ export class Assemble {
 	}
 
 	description(i) {
-		if ([undefined, null, false].includes(this.tile.description) || (this.tile.collapse && i > 0)) return;
+		if ([undefined, null, false].includes(this.currentElement.description) || (this.currentElement.collapse && i > 0)) return;
 		const header = document.createElement('header');
-		header.appendChild(document.createTextNode(this.tile.description));
+		header.appendChild(document.createTextNode(this.currentElement.description));
 		this.elements.add(header);
 	}
 
@@ -358,12 +407,16 @@ export class Assemble {
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-		if (!this.has_content(this.tile)) return;
-		const content = this.tile.content.matchAll(/(.*?)(?:\n|\\n|<br \/>|$)/gm);
+		if (!this.has_content(this.currentElement)) return;
+		const content = this.currentElement.content.matchAll(/(.*?)(?:\n\r|\n|<br.\/>|<br>|$)/gm),
+		span=document.createElement('span');
 		for (const part of content) {
-			this.elements.add(document.createTextNode(part[1]));
-			this.elements.add(document.createElement('br'));
+			if (!part[1].length) continue;
+			span.append(document.createTextNode(part[1]));
+			span.append(document.createElement('br'));
 		}
+		span.append(document.createElement('br'));
+		return span;
 	}
 
 	input(type) {
@@ -374,23 +427,23 @@ export class Assemble {
 				placeholder: 'text input'
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input');
 		let label;
 		input.type = type;
-		input.id = this.tile.attributes && this.tile.attributes.id ? this.tile.attributes.id : getNextElementID();
-		input.autocomplete = (this.tile.attributes && this.tile.attributes.type) === 'password' ? 'one-time-code' : 'off';
-		if (this.tile.description) input.name = this.tile.description;
+		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
+		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === 'password' ? 'one-time-code' : 'off';
+		if (this.currentElement.description) input.name = this.currentElement.description;
 		input.classList.add('input-field');
-		if (this.tile.attributes !== undefined) {
-			if (this.tile.attributes.placeholder) {
+		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.attributes.placeholder) {
 				label = document.createElement('label');
 				label.htmlFor = input.id;
-				label.appendChild(document.createTextNode(this.tile.attributes.placeholder));
-				this.tile.attributes.placeholder = ' ';
+				label.appendChild(document.createTextNode(this.currentElement.attributes.placeholder));
+				this.currentElement.attributes.placeholder = ' ';
 				label.classList.add('input-label');
 			}
-			input = this.apply_attributes(this.tile.attributes, input);
+			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
 		this.elements.add(input);
 		if (label) this.elements.add(label);
@@ -419,15 +472,15 @@ export class Assemble {
 				onpointerdown: 'alert("hello")'
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let button = document.createElement('button');
 		button.id = getNextElementID();
-		if (this.tile.description) button.appendChild(document.createTextNode(this.tile.description));
-		if (this.tile.attributes && 'value' in this.tile.attributes) {
-			button.appendChild(document.createTextNode(this.tile.attributes.value));
-			delete this.tile.attributes.value;
+		if (this.currentElement.description) button.appendChild(document.createTextNode(this.currentElement.description));
+		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) {
+			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
+			delete this.currentElement.attributes.value;
 		}
-		if (this.tile.attributes !== undefined) button = this.apply_attributes(this.tile.attributes, button);
+		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
 		this.elements.add(button);
 		return button.id;
 	}
@@ -445,13 +498,13 @@ export class Assemble {
 			attributes: {value: '3.14'}
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input');
 		input.type = 'hidden';
-		input.name = this.tile.description;
+		input.name = this.currentElement.description;
 		input.id = getNextElementID();
-		input.value = this.tile.value;
-		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
+		input.value = this.currentElement.value;
+		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
 		if (!this.setup.visible) this.elements.add(input);
 		else {
 			const value = document.createTextNode(input.value);
@@ -464,13 +517,13 @@ export class Assemble {
 		let datalist = document.createElement('datalist');
 		let option;
 		datalist.id = getNextElementID();
-		if (this.tile.attributes !== undefined) datalist = this.apply_attributes(this.tile.attributes, datalist);
-		this.tile.content.forEach(key => {
+		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
+		this.currentElement.content.forEach(key => {
 			option = document.createElement('option');
 			option.value = key;
 			datalist.appendChild(option);
 		});
-		this.assembledTiles.add(datalist);
+		this.assembledPanels.add(datalist);
 		return datalist.id;
 	}
 
@@ -482,15 +535,15 @@ export class Assemble {
 				multiple: true
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			button = document.createElement('button');
 		input.type = 'file';
 		input.id = getNextElementID();
-		input.name = this.tile.description;
-		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
-		if ('attributes' in this.tile && 'multiple' in this.tile.attributes) input.onchange = function () {
+		input.name = this.currentElement.description;
+		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
+		if ('attributes' in this.currentElement && 'multiple' in this.currentElement.attributes) input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' ' + LANG.GET('assemble.files_rechoose') : LANG.GET('assemble.files_choose');
 		}
@@ -502,7 +555,7 @@ export class Assemble {
 		label.type = 'button';
 		label.setAttribute('data-type', 'file');
 		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode(('attributes' in this.tile && 'multiple' in this.tile.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
+		label.appendChild(document.createTextNode(('attributes' in this.currentElement && 'multiple' in this.currentElement.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
 
 		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
@@ -522,7 +575,7 @@ export class Assemble {
 				name: 'photo'
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			img = document.createElement('img'),
@@ -565,11 +618,11 @@ export class Assemble {
 
 		input.type = 'file';
 		input.id = getNextElementID();
-		input.name = this.tile.description + '[]';
+		input.name = this.currentElement.description + '[]';
 		input.accept = 'image/*';
 		input.capture = true;
 		input.onchange = changeEvent;
-		if (this.tile.attributes !== undefined) input = this.apply_attributes(this.tile.attributes, input);
+		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
 		label.onclick = new Function("document.getElementById('" + input.id + "').click();");
 		label.type = 'button';
 		label.setAttribute('data-type', 'photo');
@@ -610,13 +663,13 @@ export class Assemble {
 				}
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let select = document.createElement('select');
 		const groups = {};
-		select.name = select.title = this.tile.description;
-		if (this.tile.attributes !== undefined) select = this.apply_attributes(this.tile.attributes, select);
+		select.name = select.title = this.currentElement.description;
+		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
-		for (const [key, element] of Object.entries(this.tile.content)) {
+		for (const [key, element] of Object.entries(this.currentElement.content)) {
 			if (groups[key[0]] === undefined) groups[key[0]] = [
 				[key, element]
 			];
@@ -645,12 +698,12 @@ export class Assemble {
 				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let textarea = document.createElement('textarea');
-		textarea.name = this.tile.description;
+		textarea.name = this.currentElement.description;
 		textarea.autocomplete = 'off';
-		if (this.tile.attributes !== undefined) textarea = this.apply_attributes(this.tile.attributes, textarea);
-		if (this.tile.attributes && 'value' in this.tile.attributes) textarea.appendChild(document.createTextNode(this.tile.attributes.value));
+		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 		this.elements.add(textarea);
 	}
 
@@ -667,13 +720,13 @@ export class Assemble {
 				}
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
-		for (const [checkbox, attributes] of Object.entries(this.tile.content)) {
+		if (!this.has_content(this.currentElement)) return;
+		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
 			if (radio) {
 				input.type = 'radio';
-				input.name = this.tile.description;
+				input.name = this.currentElement.description;
 				input.value = checkbox;
 			} else {
 				input.type = 'checkbox';
@@ -704,9 +757,9 @@ export class Assemble {
 				}
 			}
 		}*/
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		let ul = document.createElement('ul');
-		for (const [link, attributes] of Object.entries(this.tile.content)) {
+		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let li = document.createElement('li'),
 				a = document.createElement('a');
 			a = this.apply_attributes(attributes, a);
@@ -715,7 +768,7 @@ export class Assemble {
 			li.appendChild(a);
 			ul.appendChild(li);
 		}
-		if ('attributes' in this.tile) ul = this.apply_attributes(this.tile.attributes, ul);
+		if ('attributes' in this.currentElement) ul = this.apply_attributes(this.currentElement.attributes, ul);
 		this.elements.add(ul);
 	}
 
@@ -725,20 +778,20 @@ export class Assemble {
 			description:'signature',
 			required: optional boolean
 		} */
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
-		if (this.tile.attributes && this.tile.attributes.required) canvas.setAttribute('data-required', 'required');
+		if (this.currentElement.attributes && this.currentElement.attributes.required) canvas.setAttribute('data-required', 'required');
 		this.elements.add(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
-		this.tile.description = LANG.GET('assemble.clear_signature');
-		this.tile.attributes = {
+		this.currentElement.description = LANG.GET('assemble.clear_signature');
+		this.currentElement.attributes = {
 			'type': 'button',
 			'name': '',
 			'onpointerdown': 'signaturePad.clear()'
 		};
 		this.button();
-		this.tile.attributes = {
+		this.currentElement.attributes = {
 			'type': 'file',
 			'id': 'signature',
 			'name': 'signature',
@@ -755,17 +808,17 @@ export class Assemble {
 			attributes:{type:'password'} // to override e.g. for logins
 			destination: elementId // force output to other input, e.g. search
 		} */
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		const stream = document.createElement('div');
 		stream.id = getNextElementID();
 		stream.classList.add('scanner');
 
 		this.elements.add(stream);
 
-		const inputid = 'destination' in this.tile ? this.tile.destination : this.input('text');
+		const inputid = 'destination' in this.currentElement ? this.currentElement.destination : this.input('text');
 		//attributes are processed already, therefore they can be reassigned
-		this.tile.description = LANG.GET('assemble.scan_button');
-		this.tile.attributes = {
+		this.currentElement.description = LANG.GET('assemble.scan_button');
+		this.currentElement.attributes = {
 			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')"
 		};
 		this.button();
@@ -782,50 +835,50 @@ export class Assemble {
 				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
 			}
 		} */
-		if (!this.has_content(this.tile)) return;
+		if (!this.has_content(this.currentElement)) return;
 		const canvas = document.createElement('canvas');
 		let disabled = true;
 		canvas.id = getNextElementID();
 		canvas.classList.add('imagecanvas');
-		if (typeof this.tile.attributes.imageonly === 'object') {
-			for (const [key, value] of Object.entries(this.tile.attributes.imageonly)) {
+		if (typeof this.currentElement.attributes.imageonly === 'object') {
+			for (const [key, value] of Object.entries(this.currentElement.attributes.imageonly)) {
 				canvas.style[key] = value;
 			}
 		}
 		canvas.width = canvas.height = 1024;
-		if (this.tile.attributes.qrcode) {
+		if (this.currentElement.attributes.qrcode) {
 			this.imageQrCode.push({
 				id: canvas.id,
-				content: this.tile.attributes.qrcode
+				content: this.currentElement.attributes.qrcode
 			});
 			disabled = false;
 		}
-		if (this.tile.attributes.barcode) {
+		if (this.currentElement.attributes.barcode) {
 			this.imageBarCode.push({
 				id: canvas.id,
-				content: this.tile.attributes.barcode
+				content: this.currentElement.attributes.barcode
 			});
 			disabled = false;
 		}
-		if (this.tile.attributes.url) {
+		if (this.currentElement.attributes.url) {
 			this.imageUrl.push({
 				id: canvas.id,
-				content: this.tile.attributes.url
+				content: this.currentElement.attributes.url
 			});
 			disabled = false;
 		}
 
 		this.elements.add(canvas);
 
-		if (!this.tile.attributes.imageonly) {
+		if (!this.currentElement.attributes.imageonly) {
 			//this tile does not process attributes, therefore they can be reassigned
-			this.tile.attributes = {
+			this.currentElement.attributes = {
 				'type': 'button',
 				'class': 'inlinebutton',
-				'data-type': this.tile.type,
-				'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.tile.attributes.name + '")'
+				'data-type': this.currentElement.type,
+				'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")'
 			};
-			if (disabled) this.tile.attributes.disabled = true;
+			if (disabled) this.currentElement.attributes.disabled = true;
 			this.button();
 		}
 	}
@@ -846,7 +899,7 @@ export class Assemble {
 	}
 
 	hr() {
-		this.assembledTiles.add(document.createElement('hr'));
+		this.assembledPanels.add(document.createElement('hr'));
 	}
 
 	collapsed() {

@@ -115,11 +115,11 @@ class APPLICATION extends API {
 		$topics = [];
 		foreach ($manual as $row){
 			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
-				[
+				[[
 					'type' => 'text',
 					'description' => $row['title'],
 					'content' => $row['content']
-				];
+				]];
 		}
 		$result['body']['content'][] = $topics;
 		$this->response($result);
