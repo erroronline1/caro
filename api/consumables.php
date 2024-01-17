@@ -628,8 +628,6 @@ class CONSUMABLES extends API {
 						"description" => LANG::GET('consumables.edit_product_article_ean'),
 						'attributes' => [
 							'name' => 'article_ean',
-							'list' => 'units',
-							'required' => true,
 							'value' => $product['article_ean']
 						]]
 					],
