@@ -335,14 +335,17 @@ export const api = {
 	},
 	message: (method, ...request) => {
 		/*
-		get inbox
-		get sent
-		get filter/{filter}
+		get message/inbox
+		get message/sent
+		get message/filter/{filter}
 
-		get message/ // empty form
-		get message/{queryselector} // to initiate a new message with (hidden or visible) recipient and prepared message _.getinputs(queryselector)
-		post message
-		delete message/{id}/(inbox|sent)
+		get message/message/ // empty form
+		post message/message
+		delete message/message/{id}/(inbox|sent)
+
+		// to initiate a new message with (hidden or visible inputs having both the same unique queryselector) prepared recipient and message using _.getinputs(queryselector)
+		call by api.message('get', 'message', '{queryselector}') 
+		results in get message/message?to=recipient&message=messagetext
 
 		get notification // (returns number of unnotified/unread messages, only used within service-worker)
 

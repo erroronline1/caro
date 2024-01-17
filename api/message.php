@@ -5,15 +5,11 @@ class MESSAGE extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_redirect = null;
-	private $_recipient = null;
-	private $_message = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 0 ? REQUEST[2] : null) : null;
 		$this->_redirect = array_key_exists(3, REQUEST) ? (REQUEST[3] != 0 ? REQUEST[3] : null) : null;
-		$this->_recipient = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
-		$this->_message = array_key_exists(5, REQUEST) ? REQUEST[5] : null;
 	}
 
 	public function message(){
@@ -279,7 +275,6 @@ class MESSAGE extends API {
 			]
 		]];
 		foreach($messages as $key => $message) {
-
 			$content[]= [
 				['type' => 'hiddeninput',
 				'collapse' => true,
@@ -337,7 +332,6 @@ class MESSAGE extends API {
 					'imageonly' => ['width' => '3em', 'height' => '3em'] 
 					]]
 				]);
-	
 		}
 		$result['body']['content'] = $content;
 		$this->response($result);
