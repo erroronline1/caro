@@ -8,8 +8,8 @@ class MESSAGE extends API {
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 0 ? REQUEST[2] : null) : null;
-		$this->_redirect = array_key_exists(3, REQUEST) ? (REQUEST[3] != 0 ? REQUEST[3] : null) : null;
+		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_redirect = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
 	public function message(){
