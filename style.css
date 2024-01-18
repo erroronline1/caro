@@ -81,7 +81,8 @@ canvas,
 	text-decoration: none;
 	background-color: transparent;
 	border: none;
-	width: 100%;
+	width: calc(100% - 2em);
+	margin-left:2em;
 	outline: none;
 	display: inline-block;
 	font-size: 1em;
@@ -449,6 +450,8 @@ nav {
 		display: block;
 		line-height: 2em;
 		white-space: nowrap;
+		width: 100%;
+		margin-left:initial;	
 	}
 
 	:first-child {
@@ -618,36 +621,28 @@ button:active {
 
 /*************************** decorators ******************************/
 
+[draggable=true]:active {
+	cursor: move;
+}
+
 .reset::before,
 .add::before,
 .delete::before,
 [data-type]::before,
 [data-menu]~label::before,
-[data-type=links]>ul>li::before {
+[data-type=links]::before,
+main a::before {
 	content: "";
 	display: inline-block;
 	height: 1em;
 	width: 1em;
 	vertical-align: top;
 	background-size: cover;
-	margin: .25em 1em 0 -2em;
+	margin: .25em .75em 0 -1.75em;
 }
 
-[draggable=true]:active {
-	cursor: move;
-}
-
-[data-type=links]>ul,
-ul {
-	list-style-type: none;
-
-	li {
-		padding: .75em 0;
-	}
-
-	li::before {
-		background-image: url('media/external-link-alt.svg');
-	}
+main a::before {
+	background-image: url('media/external-link-alt.svg');
 }
 
 [data-type=text]::before {
