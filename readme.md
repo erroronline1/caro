@@ -92,6 +92,9 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* order filter (approved)
+
+
 * preselect vendor ? add order by (+)-sign?
 * alias option for products
 * added products only text?
