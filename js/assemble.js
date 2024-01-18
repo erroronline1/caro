@@ -183,7 +183,7 @@ export class Assemble {
 		} else this.section = document.createElement('div');
 
 		this.assembledPanels = this.processContent();
-		
+
 		if (!nextSibling) {
 			this.section.append(...this.assembledPanels);
 			document.getElementById('main').insertAdjacentElement('beforeend', this.section);
@@ -269,56 +269,53 @@ export class Assemble {
 		 */
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
-			const article = document.createElement('article');
-
-			function processPanel(elements){
-				let content=new Set();
+			function processPanel(elements) {
+				let content = [];
 				if (elements.constructor.name === 'Array') {
-					const section =document.createElement('section');
+					const section = document.createElement('section');
+					section.id = getNextElementID();
 					elements.forEach(element => {
 						if (elements[0].constructor.name === 'Array') section.append(...processPanel.call(this, element));
-						else content.add(...processPanel.call(this, element));
+						else content = content.concat(processPanel.call(this, element));
 					});
-					if (elements[0].constructor.name === 'Array') content.add(section);
-				}
-				else  {
+					if (elements[0].constructor.name === 'Array') content = content.concat(section);
+				} else {
 					this.currentElement = elements;
-					try {
-						content.add(...this[elements.type]());
-					}
-					catch {
-						content.add(this[elements.type]());
-					}
+					content = content.concat(this[elements.type]());
 				}
 				return content;
 			}
-			article.append(...processPanel.call(this, panel))
-			assembledPanels.add(article);
-
-	})
-	console.log(assembledPanels);
-		return assembledPanels;
-	return;
-	/*	this.content.forEach(tile => {
-			this.articleAttributes = [];
-			this.multipletiles = new Set();
-			for (let i = 0; i < tile.length; i++) {
-				this.currentElement = tile[i];
-				collapse = tile[i].collapse || false;
-				if (!collapse || i === 0) this.elements = new Set();
-				this.description(i);
-				this[tile[i].type]();
-				if ('article' in tile[i]) this.articleAttributes = tile[i].article;
-				if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
-				if (tile.length < 2 || collapse) {
-					this.assembledPanels.add(this.single(tile[i]));
-					continue;
-				}
-				this.multipletiles.add(this.single(tile[i], true))
+			const nodes = processPanel.call(this, panel);
+			if (nodes.length < 2 && ['DATALIST', 'HR'].includes(nodes[0].nodeName)) {
+				assembledPanels.add(...nodes);
+			} else {
+				const article = document.createElement('article');
+				article.append(...nodes);
+				assembledPanels.add(article);
 			}
-			if (this.multipletiles.size) this.assembledPanels.add(this.multiple());
-		});*/
-		
+		})
+		return assembledPanels;
+		return;
+		/*	this.content.forEach(tile => {
+				this.articleAttributes = [];
+				this.multipletiles = new Set();
+				for (let i = 0; i < tile.length; i++) {
+					this.currentElement = tile[i];
+					collapse = tile[i].collapse || false;
+					if (!collapse || i === 0) this.elements = new Set();
+					this.description(i);
+					this[tile[i].type]();
+					if ('article' in tile[i]) this.articleAttributes = tile[i].article;
+					if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
+					if (tile.length < 2 || collapse) {
+						this.assembledPanels.add(this.single(tile[i]));
+						continue;
+					}
+					this.multipletiles.add(this.single(tile[i], true))
+				}
+				if (this.multipletiles.size) this.assembledPanels.add(this.multiple());
+			});*/
+
 
 	}
 	single(tileProperties, oneOfFew = false) { // parameters are required by composer method
@@ -408,15 +405,15 @@ export class Assemble {
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
 		if (!this.has_content(this.currentElement)) return;
-		const content = this.currentElement.content.matchAll(/(.*?)(?:\n\r|\n|<br.\/>|<br>|$)/gm),
-		span=document.createElement('span');
+		const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
+			result = [];
 		for (const part of content) {
 			if (!part[1].length) continue;
-			span.append(document.createTextNode(part[1]));
-			span.append(document.createElement('br'));
+			result.push(document.createTextNode(part[1]));
+			result.push(document.createElement('br'));
 		}
-		span.append(document.createElement('br'));
-		return span;
+		result.push(document.createElement('br'));
+		return result;
 	}
 
 	input(type) {
@@ -445,24 +442,23 @@ export class Assemble {
 			}
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
-		this.elements.add(input);
-		if (label) this.elements.add(label);
-		return input.id;
+		if (label) return [input, label];
+		return input; //input.id;
 	}
 	textinput() {
-		this.input('text');
+		return this.input('text');
 	}
 	numberinput() {
-		this.input('number');
+		return this.input('number');
 	}
 	dateinput() {
-		this.input('date');
+		return this.input('date');
 	}
 	timeinput() {
-		this.input('time');
+		return this.input('time');
 	}
 	searchinput() {
-		this.input('search');
+		return this.input('search');
 	}
 	button() {
 		/*{
@@ -481,14 +477,13 @@ export class Assemble {
 			delete this.currentElement.attributes.value;
 		}
 		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
-		this.elements.add(button);
-		return button.id;
+		return button; //button.id;
 	}
 	deletebutton() { // to style it properly by adding data-type to article container
-		this.button();
+		return this.button();
 	}
 	submitbutton() {
-		this.button();
+		return this.button();
 	}
 
 	hiddeninput() {
@@ -523,8 +518,9 @@ export class Assemble {
 			option.value = key;
 			datalist.appendChild(option);
 		});
-		this.assembledPanels.add(datalist);
-		return datalist.id;
+		return datalist;
+		//this.assembledPanels.add(datalist);
+		//return datalist.id;
 	}
 
 	file() {
@@ -562,9 +558,7 @@ export class Assemble {
 		button.setAttribute('data-type', 'reset');
 		button.classList.add('inlinebutton');
 
-		this.elements.add(input)
-		this.elements.add(label);
-		this.elements.add(button);
+		return [input, label, button];
 	}
 
 	photo() {
@@ -642,11 +636,7 @@ export class Assemble {
 		addbutton.classList.add('inlinebutton');
 		addbutton.type = 'button';
 
-		this.elements.add(input);
-		this.elements.add(img);
-		this.elements.add(label);
-		this.elements.add(addbutton);
-		this.elements.add(resetbutton);
+		return [input, img, label, addbutton, resetbutton];
 	}
 
 	select() {
@@ -664,8 +654,9 @@ export class Assemble {
 			}
 		}*/
 		if (!this.has_content(this.currentElement)) return;
-		let select = document.createElement('select');
 		const groups = {};
+		let select = document.createElement('select');
+
 		select.name = select.title = this.currentElement.description;
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
@@ -686,7 +677,7 @@ export class Assemble {
 			}
 			select.appendChild(optgroup);
 		}
-		this.elements.add(select)
+		return select; //this.elements.add(select)
 	}
 
 	textarea() {
@@ -704,7 +695,7 @@ export class Assemble {
 		textarea.autocomplete = 'off';
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
-		this.elements.add(textarea);
+		return textarea; //this.elements.add(textarea);
 	}
 
 	checkbox(radio = null) {
@@ -721,6 +712,7 @@ export class Assemble {
 			}
 		}*/
 		if (!this.has_content(this.currentElement)) return;
+		const result = [];
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
@@ -735,13 +727,13 @@ export class Assemble {
 
 			label.classList.add('check');
 			input = this.apply_attributes(attributes, input);
-			label.appendChild(input);
-			label.appendChild(document.createTextNode(checkbox));
-			this.elements.add(label);
+			label.append(input, document.createTextNode(checkbox));
+			result.push(label); //this.elements.add(label);
 		}
+		return result;
 	}
 	radio() {
-		this.checkbox('radioinstead');
+		return this.checkbox('radioinstead');
 	}
 	links() {
 		/*{
@@ -769,7 +761,7 @@ export class Assemble {
 			ul.appendChild(li);
 		}
 		if ('attributes' in this.currentElement) ul = this.apply_attributes(this.currentElement.attributes, ul);
-		this.elements.add(ul);
+		return ul;
 	}
 
 	signature() {
@@ -779,10 +771,11 @@ export class Assemble {
 			required: optional boolean
 		} */
 		if (!this.has_content(this.currentElement)) return;
+		let result = [];
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
 		if (this.currentElement.attributes && this.currentElement.attributes.required) canvas.setAttribute('data-required', 'required');
-		this.elements.add(canvas);
+		result.push(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
 		this.currentElement.description = LANG.GET('assemble.clear_signature');
 		this.currentElement.attributes = {
@@ -790,15 +783,16 @@ export class Assemble {
 			'name': '',
 			'onpointerdown': 'signaturePad.clear()'
 		};
-		this.button();
+		result = result.concat(this.button());
 		this.currentElement.attributes = {
 			'type': 'file',
 			'id': 'signature',
 			'name': 'signature',
 			'hidden': true
 		};
-		this.input('file');
+		result = result.concat(this.input('file'));
 		this.signaturePad = true;
+		return result;
 	}
 
 	scanner() {
@@ -809,11 +803,12 @@ export class Assemble {
 			destination: elementId // force output to other input, e.g. search
 		} */
 		if (!this.has_content(this.currentElement)) return;
+		const result = [];
 		const stream = document.createElement('div');
 		stream.id = getNextElementID();
 		stream.classList.add('scanner');
 
-		this.elements.add(stream);
+		result.push(stream);
 
 		const inputid = 'destination' in this.currentElement ? this.currentElement.destination : this.input('text');
 		//attributes are processed already, therefore they can be reassigned
@@ -821,7 +816,7 @@ export class Assemble {
 		this.currentElement.attributes = {
 			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')"
 		};
-		this.button();
+		return result.concat(this.button());
 	}
 	image() {
 		/*{
@@ -836,6 +831,7 @@ export class Assemble {
 			}
 		} */
 		if (!this.has_content(this.currentElement)) return;
+		let result = [];
 		const canvas = document.createElement('canvas');
 		let disabled = true;
 		canvas.id = getNextElementID();
@@ -868,7 +864,7 @@ export class Assemble {
 			disabled = false;
 		}
 
-		this.elements.add(canvas);
+		result.push(canvas);
 
 		if (!this.currentElement.attributes.imageonly) {
 			//this tile does not process attributes, therefore they can be reassigned
@@ -879,8 +875,9 @@ export class Assemble {
 				'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")'
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
-			this.button();
+			result = result.concat(this.button());
 		}
+		return result;
 	}
 
 	stlviewer() {
@@ -888,10 +885,10 @@ export class Assemble {
 			type: 'stlviewer',
 			description:'viewstl' (e.g.),
 		} */
-		const div = document.createElement('div');
-		div.id = 'stlviewer_canvas';
-		div.classList = 'stlviewer';
-		this.elements.add(div);
+		const article = document.createElement('article');
+		article.id = 'stlviewer_canvas';
+		article.classList = 'stlviewer';
+		return article;
 	}
 
 	trash() {
@@ -899,7 +896,7 @@ export class Assemble {
 	}
 
 	hr() {
-		this.assembledPanels.add(document.createElement('hr'));
+		return (document.createElement('hr'));
 	}
 
 	collapsed() {

@@ -240,16 +240,14 @@ class APPLICATION extends API {
 						'attributes' => [
 							'onchange' => "api.application('get', 'manual', this.value)"
 						],
-						'content' => $options]
-					],[
+						'content' => $options],
 						['type' => 'textinput',
 						'description' => LANG::GET('application.edit_manual_title'),
 						'attributes' => [
 							'name' => 'title',
 							'value' => $entry['title']
 						]
-						]
-					],[
+						],
 						['type' => 'textarea',
 						'description' => LANG::GET('application.edit_manual_content'),
 						'attributes' => [
@@ -257,8 +255,7 @@ class APPLICATION extends API {
 							'name' => 'content',
 							'value' => $entry['content']
 						]
-						]
-					],[
+						],
 						['type' => 'checkbox',
 						'description' => LANG::GET('application.edit_manual_permissions'),
 						'content' => $permissions
