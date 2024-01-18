@@ -274,21 +274,20 @@ class CONSUMABLES extends API {
 						'content' => $datalist,
 						'attributes' => [
 							'id' => 'vendors'
-						]]
-					],[
-						['type' => 'searchinput',
-						'description' => LANG::GET('consumables.edit_existing_vendors'),
-						'attributes' => [
-							'placeholder' => LANG::GET('consumables.edit_existing_vendors_label'),
-							'list' => 'vendors',
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
 						]],
 						['type' => 'select',
 						'description' => LANG::GET('consumables.edit_existing_vendors'),
 						'attributes' => [
 							'onchange' => "api.purchase('get', 'vendor', this.value)"
 						],
-						'content' => $options]
+						'content' => $options],
+						['type' => 'searchinput',
+						'description' => LANG::GET('consumables.edit_existing_vendors'),
+						'attributes' => [
+							'placeholder' => LANG::GET('consumables.edit_existing_vendors_label'),
+							'list' => 'vendors',
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+						]]
 					],
 					[
 						["type" => "textinput",
@@ -297,28 +296,35 @@ class CONSUMABLES extends API {
 							'name' => 'name',
 							'required' => true,
 							'value' => $vendor['name'] ? : ''
-						]]
-					],
-					[
+						]],
 						["type" => "textarea",
 						"description" => LANG::GET('consumables.edit_vendor_info'),
 						'attributes' => [
 							'name' => 'info',
-							'value' => $vendor['info'] ? : ''
+							'value' => $vendor['info'] ? : '',
+							'rows' => 8
+						]],
+						["type" => "radio",
+						"description" => LANG::GET('consumables.edit_vendor_active'),
+						"content" => [
+							LANG::GET('consumables.edit_vendor_isactive') => $isactive,
+							LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
 						]]
 					],
 					[
-						["type" => "dateinput",
-						"description" => LANG::GET('consumables.edit_vendor_certificate_validity'),
-						'attributes' => [
-							'name' => 'certificate_validity',
-							'value' => $vendor['certificate']['validity'] ? : ''
-						]],
-						["type" => "file",
-						"description" => LANG::GET('consumables.edit_vendor_certificate_update'),
-						'attributes' => [
-							'name' => 'certificate',
-						]]
+						[
+							["type" => "dateinput",
+							"description" => LANG::GET('consumables.edit_vendor_certificate_validity'),
+							'attributes' => [
+								'name' => 'certificate_validity',
+								'value' => $vendor['certificate']['validity'] ? : ''
+							]],
+							["type" => "file",
+							"description" => LANG::GET('consumables.edit_vendor_certificate_update'),
+							'attributes' => [
+								'name' => 'certificate',
+							]]
+						]
 					],
 					[
 						["type" => "file",
@@ -329,28 +335,22 @@ class CONSUMABLES extends API {
 						]]
 					],
 					[
-						["type" => "file",
-						"description" => LANG::GET('consumables.edit_vendor_pricelist_update'),
-						'attributes' => [
-							'name' => 'pricelist',
-							'accept' => '.csv'
-						]],
-						["type" => "textarea",
-						"description" => LANG::GET('consumables.edit_vendor_pricelist_filter'),
-						'attributes' => [
-							'name' => 'pricelist_filter',
-							'value' => $vendor['pricelist']['filter'] ? : '',
-							'placeholder' => json_encode(json_decode($this->filtersample, true)),
-							'rows' => 8
-						]]
-					],
-					[
-						["type" => "radio",
-						"description" => LANG::GET('consumables.edit_vendor_active'),
-						"content" => [
-							LANG::GET('consumables.edit_vendor_isactive') => $isactive,
-							LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
-						]]
+						[
+							["type" => "file",
+							"description" => LANG::GET('consumables.edit_vendor_pricelist_update'),
+							'attributes' => [
+								'name' => 'pricelist',
+								'accept' => '.csv'
+							]],
+							["type" => "textarea",
+							"description" => LANG::GET('consumables.edit_vendor_pricelist_filter'),
+							'attributes' => [
+								'name' => 'pricelist_filter',
+								'value' => $vendor['pricelist']['filter'] ? : '',
+								'placeholder' => json_encode(json_decode($this->filtersample, true)),
+								'rows' => 8
+							]]
+						]
 					]
 				],
 				'form' => [
@@ -358,7 +358,7 @@ class CONSUMABLES extends API {
 					'action' => $vendor['id'] ? 'javascript:api.purchase("put", "vendor", "' . $vendor['id'] . '")' : 'javascript:api.purchase("post", "vendor")'
 				]];
 
-				if ($certificates) array_splice($result['body']['content'][4], 1, 0,
+				if ($certificates) array_splice($result['body']['content'][2][0], 0, 0,
 					[
 						['type' => 'links',
 						'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
@@ -366,15 +366,13 @@ class CONSUMABLES extends API {
 						]
 					]
 				);
-				if ($documents) array_splice($result['body']['content'][5], 0, 0,
-					[
-						['type' => 'links',
-						'description' => LANG::GET('consumables.edit_vendor_documents_download'),
-						'content' => $documents
-						]
+				if ($documents) array_unshift($result['body']['content'][3],
+					['type' => 'links',
+					'description' => LANG::GET('consumables.edit_vendor_documents_download'),
+					'content' => $documents
 					]
 				);
-				if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][6], 0, 0,
+				if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][4][0], 0, 0,
 					[
 						["type" => "text",
 						"description" => LANG::GET('consumables.edit_vendor_pricelist_validity'),
@@ -566,9 +564,7 @@ class CONSUMABLES extends API {
 						'content' => $datalist_unit,
 						'attributes' => [
 							'id' => 'units'
-						]]
-					],
-					[
+						]],
 						['type' => 'searchinput',
 						'description' => LANG::GET('consumables.edit_product_search'),
 						'attributes' => [
@@ -593,27 +589,21 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'name' => 'vendor_select'
 						],
-						'content' => $options]
-					],
-					[
+						'content' => $options],
 						["type" => "textinput",
 						"description" => LANG::GET('consumables.edit_product_article_no'),
 						'attributes' => [
 							'name' => 'article_no',
 							'required' => true,
 							'value' => $product['article_no']
-						]]
-					],
-					[
+						]],
 						["type" => "textinput",
 						"description" => LANG::GET('consumables.edit_product_article_name'),
 						'attributes' => [
 							'name' => 'article_name',
 							'required' => true,
 							'value' => $product['article_name']
-						]]
-					],
-					[
+						]],
 						["type" => "textinput",
 						"description" => LANG::GET('consumables.edit_product_article_unit'),
 						'attributes' => [
@@ -621,9 +611,7 @@ class CONSUMABLES extends API {
 							'list' => 'units',
 							'required' => true,
 							'value' => $product['article_unit']
-						]]
-					],
-					[
+						]],
 						["type" => "textinput",
 						"description" => LANG::GET('consumables.edit_product_article_ean'),
 						'attributes' => [
@@ -653,12 +641,10 @@ class CONSUMABLES extends API {
 					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')"
 				]];
 
-				if ($documents) array_splice($result['body']['content'][6], 0, 0,
-					[
-						['type' => 'links',
-						'description' => LANG::GET('consumables.edit_product_documents_download'),
-						'content' => $documents
-						]
+				if ($documents) array_unshift($result['body']['content'][3],
+					['type' => 'links',
+					'description' => LANG::GET('consumables.edit_product_documents_download'),
+					'content' => $documents
 					]
 				);
 				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
@@ -681,7 +667,7 @@ class CONSUMABLES extends API {
 					foreach($search as $key => $row) {
 						$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
 					}
-					array_splice($result['body']['content'], 2, 0,
+					array_splice($result['body']['content'], 1, 0,
 						[[
 							['type' => 'links',
 							'description' => LANG::GET('consumables.edit_product_search_matches', [':number' => count($matches)]),

@@ -69,16 +69,12 @@ class ORDER extends API {
 					array_push($result['body']['content'], [
 						['type' => 'text',
 						'content' => $text,
-						'collapse' => true
 						],
 						['type' => 'button',
-						'collapse' => true,
 						'description' => LANG::GET('order.edit_prepared_order'),
 						'attributes' =>['type' => 'button',
 						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]],
-						['type' => 'cart',
-						'collapse' => true
-						]
+						['type' => 'cart']
 					]);
 				}
 			break;
@@ -332,7 +328,6 @@ class ORDER extends API {
 						]]
 					],[
 						['type' => 'numberinput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'quantity[]',
 							'min' => '1',
@@ -342,7 +337,6 @@ class ORDER extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'unit[]',
 							'list' => 'units',
@@ -351,7 +345,6 @@ class ORDER extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'vendor[]',
 							'list' => 'vendors',
@@ -360,7 +353,6 @@ class ORDER extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'number[]',
 							'placeholder' => LANG::GET('order.ordernumber_label'),
@@ -368,7 +360,6 @@ class ORDER extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'name[]',
 							'placeholder' => LANG::GET('order.productname_label'),
@@ -376,20 +367,16 @@ class ORDER extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'hiddeninput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'barcode[]',
 							'value' => '' // otherwise undefined messes up
 						]],
 						['type' => 'button',
-						'collapse' => true,
 						'attributes' => [
 							'value' => LANG::GET('order.add_button'),
 							'type' => 'button',
 							'onpointerup' => 'orderClient.cloneNew(this.parentNode)'
-						]],
-						['type' => 'collapsed',
-						'collapse' => true],
+						]]
 					],[
 						['type' => 'textarea',
 						'description' => LANG::GET('order.additional_info'),
@@ -440,7 +427,6 @@ class ORDER extends API {
 						array_push($items,
 						[
 							['type' => 'numberinput',
-							'collapse' => true,
 							'attributes' => [
 								'name' => 'quantity[]',
 								'min' => '1',
@@ -451,7 +437,6 @@ class ORDER extends API {
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
-							'collapse' => true,
 							'attributes' => [
 								'name' => 'unit[]',
 								'list' => 'units',
@@ -461,7 +446,6 @@ class ORDER extends API {
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
-							'collapse' => true,
 							'attributes' => [
 								'name' => 'vendor[]',
 								'list' => 'vendors',
@@ -471,7 +455,6 @@ class ORDER extends API {
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
-							'collapse' => true,
 							'attributes' => [
 								'name' => 'number[]',
 								'placeholder' => LANG::GET('order.ordernumber_label'),
@@ -480,7 +463,6 @@ class ORDER extends API {
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
-							'collapse' => true,
 							'attributes' => [
 								'name' => 'name[]',
 								'placeholder' => LANG::GET('order.productname_label'),
@@ -489,20 +471,16 @@ class ORDER extends API {
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'hiddeninput',
-							'collapse' => true,
 							'attributes' => [
 								'name' => 'barcode[]',
 								'value' => array_key_exists ('barcode', $order['items'][$i]) ? $order['items'][$i]['barcode'] : ''
 							]],
 								['type' => 'button',
-							'collapse' => true,
 							'attributes' => [
 								'value' => LANG::GET('order.add_delete'),
 								'type' => 'button',
 								'onpointerup' => 'this.parentNode.remove()'
-							]],
-							['type' => 'collapsed',
-							'collapse' => true],
+							]]
 						]);
 					}
 					array_splice($result['body']['content'], 4, 0, $items);
@@ -604,7 +582,6 @@ class ORDER extends API {
 				$result=['body'=>['content'=>[
 					[
 						['type' => 'radio',
-						'collapse' => true,
 						'content' => [
 							LANG::GET('order.untreated')=>['checked' => true, 'onfocus' => 'orderClient.filter()'],
 							LANG::GET('order.ordered')=>['onfocus' => 'orderClient.filter("ordered")'],
@@ -612,15 +589,13 @@ class ORDER extends API {
 							LANG::GET('order.archived')=>['onfocus' => 'orderClient.filter("archived")'],
 						]],
 						['type' => 'searchinput',
-						'collapse' => true,
 						'attributes' => [
 							'placeholder' => LANG::GET('order.order_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
 							'onblur' => "api.purchase('get', 'filter', this.value); return false;",
 							'id' => 'productsearch'
 						]],
-						['type' => 'filter',
-						'collapse' => true]
+						['type' => 'filter']
 					]
 				]]];
 				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $displayunits = LANGUAGEFILE['units']; // see all orders
@@ -650,7 +625,6 @@ class ORDER extends API {
 					$decoded_order_data = json_decode($row['order_data'], true);
 					if (array_key_exists('barcode', $decoded_order_data) && strlen($decoded_order_data['barcode'])) $content[]=[
 						'type' => 'image',
-						'collapse' => true,
 						'attributes' => [
 							'barcode' => ['value' => $decoded_order_data['barcode']],
 							'imageonly' => ['width' => '10em', 'height' => '4em']
@@ -659,13 +633,11 @@ class ORDER extends API {
 					
 					$content[]=
 						['type' => 'hiddeninput',
-						'collapse' => true,
 						'description' => 'filter',
 						'attributes'=>['data-filtered' => $row['id']]];
 					foreach ($decoded_order_data as $key => $value){ // data
 						if (!in_array($key,['barcode', 'orderer'])) $content[]=[
 							'type' => 'textinput',
-							'collapse' => true,
 							'attributes' => [
 								'value' => $value,
 								'placeholder' => $this->fields[$key],
@@ -681,7 +653,6 @@ class ORDER extends API {
 							}
 							$content[]=[
 								'type' => 'hiddeninput',
-								'collapse' => true,
 								'attributes' => [
 									'name' => 'to',
 									'value' => $value,
@@ -690,7 +661,6 @@ class ORDER extends API {
 							];
 							$content[]=[
 								'type' => 'hiddeninput',
-								'collapse' => true,
 								'attributes' => [
 									'name' => 'message',
 									'value' => LANG::GET('order.message', $messagepayload),
@@ -700,7 +670,6 @@ class ORDER extends API {
 	
 							$content[]=[
 								'type' => 'textinput',
-								'collapse' => true,
 								'attributes' => [
 									'value' => $value,
 									'placeholder' => LANG::GET('order.message_orderer'),
@@ -708,7 +677,6 @@ class ORDER extends API {
 									'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"
 								]
 /*								'type' => 'links',
-								'collapse' => true,
 								'content' => [
 									LANG::GET('order.message_orderer') . ' ' . $this->fields['orderer'] . ' ' . $value => ['href' => '#', 'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"]
 								]*/
@@ -720,7 +688,6 @@ class ORDER extends API {
 					if (str_contains($row['approval'], 'data:image/png')){
 						$content[]=[
 							'type' => 'image',
-							'collapse' => true,
 							'attributes' => [
 								'imageonly' => ['width' => '10em', 'marginTop' => '1em'],
 								'name' => LANG::GET('order.approval_image'),
@@ -755,17 +722,14 @@ class ORDER extends API {
 					$content[]=[
 						'type' => 'text',
 						'content' => $text,
-						'collapse' => true,
 					];
 					$content[]=[
 						'type' => 'checkbox',
-						'collapse' => true,
 						'content' => $status
 					];
 
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'deletebutton',
-						'collapse' => true,
 						'article' => $statusfilter,
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
@@ -775,7 +739,6 @@ class ORDER extends API {
 					];
 					$content[]=[
 						'type' => 'cart',
-						'collapse' => true
 					];
 					array_push($result['body']['content'], $content);
 				}

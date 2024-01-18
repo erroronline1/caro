@@ -36,7 +36,6 @@ class TOOL extends API {
 					[
 						['type' => 'dateinput',
 						'description' => LANG::GET('tool.qrcode_appointment_date'),
-						'collapse' => true,
 						'attributes' => [
 							'data-usecase' => 'tool_create_code',
 							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_date'))) ? : ''
@@ -44,14 +43,12 @@ class TOOL extends API {
 						],
 						['type' => 'timeinput',
 						'description' => LANG::GET('tool.qrcode_appointment_time'),
-						'collapse' => true,
 						'attributes' => [
 							'data-usecase' => 'tool_create_code',
 							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_time'))) ? : ''
 							]
 						],
-						['type' => 'dateinput',
-						'collapse' => true],
+						['type' => 'dateinput'],
 					],
 					[
 						['type' => 'textinput',
@@ -182,19 +179,15 @@ class TOOL extends API {
 			[
 				['type' => 'scanner',
 				'description' => LANG::GET('menu.tools_scanner'),
-				'collapse' => true,
 				'destination' => 'tool_scanner'
 				],
 				['type' => 'textarea',
-				'collapse' => true,
 				'attributes' =>[
 					'rows' => 8,
 					'readonly' => true,
 					'id' => 'tool_scanner'
 				]],
-				['type' => 'scanner',
-				'collapse' => true
-				]
+				['type' => 'scanner']
 			]
 		]];
 		$this->response($result);

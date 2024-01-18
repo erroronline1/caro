@@ -280,8 +280,7 @@ class USER extends API {
 						'content' => $datalist,
 						'attributes' => [
 							'id' => 'users'
-						]]
-					],[
+						]],
 						['type' => 'searchinput',
 						'description' => LANG::GET('user.edit_existing_users'),
 						'attributes' => [
@@ -302,13 +301,11 @@ class USER extends API {
 							'name' => 'name',
 							'required' => true,
 							'value' => $user['name'] ? : ''
-						]]
-					],[
+						]],
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_permissions'),
 						'content' => $permissions
-						]
-					],[
+						],
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_units'),
 						'content' => $units
@@ -336,24 +333,20 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) array_splice($result['body']['content'][5], 0, 0,
-					[
+					if ($user['image']) array_unshift($result['body']['content'][2],
 						['type' => 'image',
 						'description' => LANG::GET('user.edit_export_user_image'),
 						'attributes' => [
 							'name' => $user['name'] . '_pic',
 							'url' => $user['image']]
 						]
-					]
 					);
-					if ($user['token']) array_splice($result['body']['content'][6], 0, 0,
-						[
-							['type' => 'image',
-							'description' => LANG::GET('user.edit_export_qr_token'),
-							'attributes' => [
-							'name' => $user['name'] . '_token',
-							'qrcode' => $user['token']]
-							]
+					if ($user['token']) array_unshift($result['body']['content'][3],
+						['type' => 'image',
+						'description' => LANG::GET('user.edit_export_qr_token'),
+						'attributes' => [
+						'name' => $user['name'] . '_token',
+						'qrcode' => $user['token']]
 						]
 					);
 

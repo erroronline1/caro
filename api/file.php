@@ -51,7 +51,6 @@ class FILE extends API {
 		'content' => [
 				[
 					['type' => 'searchinput',
-					'collapse' => true,
 					'attributes' => [
 						'placeholder' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
@@ -59,7 +58,6 @@ class FILE extends API {
 						'id' => 'filesearch'
 					]],[
 						'type' => 'filter',
-						'collapse' => true
 					]
 				]
 			]
@@ -129,29 +127,27 @@ class FILE extends API {
 				['form' => [
 					'data-usecase' => 'file',
 					'action' => "javascript:api.file('post', 'filemanager')"],
-				'content'=>[]]];
+				'content'=>[]
+				]];
 
 				if (!$this->_requestedFolder){
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
 						$content=[];
+						$result['body']['content'][] = [];
 						foreach ($folders as $folder){
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
-							$result['body']['content'][]=[
+							array_push($result['body']['content'][0],
 								['type' => 'links',
 								'description' => LANG::GET('file.manager_folder_header', [':date' => date('Y-m-d H:i', filemtime($folder))]),
-								'collapse' => true,
 								'content' => [$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]]],
 								['type' => 'button',
-								'collapse' => true,
 								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
 									'type' => 'button',
 									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'filemanager', '" . $foldername . "')"
-								]],
-								['type' => 'links',
-								'collapse' => true],
-								];
+								]]
+							);
 						}
 					}
 					$result['body']['content'][]=[
@@ -166,7 +162,6 @@ class FILE extends API {
 					if ($files){
 						$result['body']['content'][]=[
 							['type' => 'searchinput',
-							'collapse' => true,
 							'attributes' => [
 								'placeholder' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
@@ -174,41 +169,34 @@ class FILE extends API {
 								'id' => 'filefilter'
 							]],[
 								'type' => 'filter',
-								'collapse' => true
 							]
 						];
+						$result['body']['content'][] = [];
 						foreach ($files as $file){
 							$file=['path' => substr($file,1), 'name' => pathinfo($file)['basename']];
-							$result['body']['content'][]=[
+							array_push($result['body']['content'][1],
 								['type' => 'links',
 								'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
-								'collapse' => true,
 								'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank']]],
 								['type' => 'hiddeninput',
-								'collapse' => true,
 								'description' => 'filter',
 								'attributes'=>['data-filtered' => $file['path']]],
 								['type' => 'button',
-								'collapse' => true,
 								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
 									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
-								]],
-								['type' => 'links',
-								'collapse' => true],
-							];
+								]]
+							);
 						}
 					}
 					$result['body']['content'][]=[
 						['type' => 'hiddeninput',
 						'description' => LANG::GET('file.manager_new_file'),
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'destination',
 							'value' => $this->_requestedFolder]],
 						['type' => 'file',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'files[]',
 							'multiple' => true,
@@ -235,7 +223,6 @@ class FILE extends API {
 		'content' => [
 				[
 					['type' => 'searchinput',
-					'collapse' => true,
 					'attributes' => [
 						'placeholder' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
@@ -243,7 +230,6 @@ class FILE extends API {
 						'id' => 'filesearch'
 					]],[
 						'type' => 'filter',
-						'collapse' => true
 					]
 				]
 			]
@@ -332,8 +318,7 @@ class FILE extends API {
 							'content' => $datalist,
 							'attributes' => [
 								'id' => 'bundles'
-							]]
-						],[
+							]],
 							['type' => 'searchinput',
 							'description' => LANG::GET('file.edit_existing_bundle'),
 							'attributes' => [
@@ -362,7 +347,7 @@ class FILE extends API {
 						$matches[$file['file']] = ['value' => $file['path']];
 						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$file['file']]['checked'] = true;
 					}
-					$return['body']['content'][] =
+					if ($matches) $return['body']['content'][] =
 					[
 						['type' => 'checkbox',
 						'description' => LANG::GET('file.file_list', [':folder' => $folder]),
@@ -370,15 +355,12 @@ class FILE extends API {
 						]
 					];
 				}
-				$return['body']['content'][] = [
-					['type' => 'textinput',
-					'description' => LANG::GET('file.edit_save_bundle'),
-					'attributes'=>['value' => $bundle['name']]]
-				];
-
 				$isactive = $bundle['active'] ? ['checked' => true] : [];
 				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
 				$return['body']['content'][] = [
+					['type' => 'textinput',
+					'description' => LANG::GET('file.edit_save_bundle'),
+					'attributes'=>['value' => $bundle['name']]],
 					['type' => 'radio',
 					'description' => LANG::GET('file.edit_bundle_active'),
 					'content'=>[
@@ -423,42 +405,35 @@ class FILE extends API {
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",
 							'onblur' => "api.file('get', 'filter', 'sharepoint', this.value); return false;",
 							'id' => 'filefilter'
-						]],[
-							'type' => 'filter',
-							'collapse' => true
-						]
+						]],
+						['type' => 'filter']
 					];
-					foreach ($files as $file){
+					$result['body']['content'][] = [];
+						foreach ($files as $file){
 						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
 						$filetime=filemtime($file['path']);
 						if (time() > $filetime + INI['sharepoint']['lifespan']*3600) {
 							UTILITY::delete($file['path']);
 						}
 						else {
-							$result['body']['content'][]=[
+							array_push($result['body']['content'][1],
 								['type' => 'links',
-								'collapse' => true,
 								'description' => LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]),
 								'content' => [$file['name'] => ['href' => substr($file['path'], 1), 'target' => '_blank']]],
 								['type' => 'hiddeninput',
-								'collapse' => true,
 								'description' => 'filter',
-								'attributes'=>['data-filtered' => substr($file['path'], 1)]],
-								['type' => 'links',
-								'collapse' => true]
-							];
+								'attributes'=>['data-filtered' => substr($file['path'], 1)]]
+							);
 						}
 					}
 				}
 				$result['body']['content'][]=[
 					['type' => 'hiddeninput',
 					'description' => LANG::GET('file.sharepoint_upload_header'),
-					'collapse' => true,
 					'attributes' => [
 						'name' => 'destination',
 						'value' => $this->_requestedFolder]],
 					['type' => 'file',
-					'collapse' => true,
 					'attributes' => [
 						'name' => 'files[]',
 						'multiple' => true,

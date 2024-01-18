@@ -67,7 +67,6 @@ class MESSAGE extends API {
 						]],
 					],[
 						['type' => 'textinput',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'to',
 							'required' => true,
@@ -77,7 +76,6 @@ class MESSAGE extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textarea',
-						'collapse' => true,
 						'attributes' => [
 							'name' => 'message',
 							'required' => true,
@@ -86,9 +84,7 @@ class MESSAGE extends API {
 							'rows' => 10,
 							'data-loss' => 'prevent'
 						]],
-						['type' => 'message',
-						'collapse' => true
-						]
+						['type' => 'message']
 					]
 					],
 					'form' => [
@@ -173,25 +169,20 @@ class MESSAGE extends API {
 
 		$content=[[
 				['type' => 'searchinput',
-				'collapse' => true,
 				'attributes' => [
 					'placeholder' => LANG::GET('message.message_filter_label'),
 					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
 					'onblur' => "api.message('get', 'filter', this.value); return false;",
 					'id' => 'productsearch'
-				]],[
-					'type' => 'filter',
-					'collapse' => true
-				]
+				]],
+				['type' => 'filter']
 		]];
 		foreach($messages as $message) {
 			$content[]= [
 				['type' => 'hiddeninput',
-				'collapse' => true,
 				'description' => 'filter',
 				'attributes'=>['data-filtered' => $message['id']]],
 				['type' => 'textinput',
-				'collapse' => true,
 				'description' => LANG::GET('message.from'),
 				'attributes' => [
 					'name' => 'to',
@@ -201,7 +192,6 @@ class MESSAGE extends API {
 					'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
-				'collapse' => true,
 				'attributes' => [
 					'name' => 'message',
 					'data-message' => $message['id'],
@@ -210,26 +200,18 @@ class MESSAGE extends API {
 					'rows' => 7
 				]],
 				['type' => 'text',
-				'collapse' => true,
 				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
 				],
-				['type' => 'message',
-				'collapse' => true
-				],
 				['type' => 'deletebutton',
-				'collapse'=> true,
 				'description' => LANG::GET('message.delete'),
 				'attributes' => [
 					'type' => 'button',
 					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
 					]],
-				['type' => 'message',
-				'collapse' => true
-				]
+				['type' => 'message']
 			];
 			if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
 				['type' => 'button',
-				'collapse'=> true,
 				'description' => LANG::GET('message.reply'),
 				'attributes' => [
 					'type' => 'button',
@@ -238,7 +220,6 @@ class MESSAGE extends API {
 				]);
 			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
 				['type' => 'image',
-				'collapse'=> true,
 				'attributes' => [
 					'url' => $message['image'],
 					'imageonly' => ['width' => '3em', 'height' => '3em'] 
@@ -263,25 +244,20 @@ class MESSAGE extends API {
 
 		$content=[[
 			['type' => 'searchinput',
-			'collapse' => true,
 			'attributes' => [
 				'placeholder' => LANG::GET('message.message_filter_label'),
 				'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
 				'onblur' => "api.message('get', 'filter', this.value); return false;",
 				'id' => 'productsearch'
-			]],[
-				'type' => 'filter',
-				'collapse' => true
-			]
+			]],
+			['type' => 'filter']
 		]];
 		foreach($messages as $key => $message) {
 			$content[]= [
 				['type' => 'hiddeninput',
-				'collapse' => true,
 				'description' => 'filter',
 				'attributes'=>['data-filtered' => $message['id']]],
 				['type' => 'textinput',
-				'collapse' => true,
 				'description' => LANG::GET('message.to'),
 				'attributes' => [
 					'name' => 'to',
@@ -291,7 +267,6 @@ class MESSAGE extends API {
 					'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
-				'collapse' => true,
 				'attributes' => [
 					'name' => 'message',
 					'data-message' => $message['id'],
@@ -300,33 +275,24 @@ class MESSAGE extends API {
 					'rows' => 7
 				]],
 				['type' => 'text',
-				'collapse' => true,
 				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
 				],
 				['type' => 'button',
-				'collapse'=> true,
 				'description' => LANG::GET('message.forward'),
 				'attributes' => [
 					'type' => 'button',
 					'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'sent')" 
-					]],
-				['type' => 'message',
-				'collapse' => true
-				],
+				]],
 				['type' => 'deletebutton',
-				'collapse'=> true,
 				'description' => LANG::GET('message.delete'),
 				'attributes' => [
 					'type' => 'button',
 					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
 				]],
-				['type' => 'message',
-				'collapse' => true
-				]
+				['type' => 'message']
 			];
 			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
 				['type' => 'image',
-				'collapse'=> true,
 				'attributes' => [
 					'url' => $message['image'],
 					'imageonly' => ['width' => '3em', 'height' => '3em'] 

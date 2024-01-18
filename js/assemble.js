@@ -874,10 +874,10 @@ export class Assemble {
 			type: 'stlviewer',
 			description:'viewstl' (e.g.),
 		} */
-		const article = document.createElement('article');
-		article.id = 'stlviewer_canvas';
-		article.classList = 'stlviewer';
-		return article;
+		const div = document.createElement('div');
+		div.id = 'stlviewer_canvas';
+		div.classList = 'stlviewer';
+		return div;
 	}
 
 	trash() {
