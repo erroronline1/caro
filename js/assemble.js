@@ -262,7 +262,8 @@ export class Assemble {
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
 			function processPanel(elements) {
-				let content = [];
+				let content = [],
+				description;
 				if (elements.constructor.name === 'Array') {
 					const section = document.createElement('section');
 					section.id = getNextElementID();
@@ -273,6 +274,8 @@ export class Assemble {
 					if (elements[0].constructor.name === 'Array') content = content.concat(section);
 				} else {
 					this.currentElement = elements;
+					description = this.description()
+					if (description) content.push(this.description());
 					content = content.concat(this[elements.type]());
 				}
 				return content;
@@ -375,11 +378,11 @@ export class Assemble {
 		return article;
 	}
 
-	description(i) {
-		if ([undefined, null, false].includes(this.currentElement.description) || (this.currentElement.collapse && i > 0)) return;
+	description() {
+		if ([undefined, null, false].includes(this.currentElement.description)) return;
 		const header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.currentElement.description));
-		this.elements.add(header);
+		return header;
 	}
 
 	apply_attributes(setup, node) {
