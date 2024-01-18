@@ -212,7 +212,8 @@ export const api = {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
 								for (const file of all) {
-									file.previousElementSibling.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
+									if (request[1] === 'bundle'){file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';}
+									else file.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);

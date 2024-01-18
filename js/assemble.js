@@ -739,18 +739,15 @@ export class Assemble {
 			}
 		}*/
 		if (!this.has_content(this.currentElement)) return;
-		let ul = document.createElement('ul');
+		let result = [];
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
-			let li = document.createElement('li'),
-				a = document.createElement('a');
+			let a = document.createElement('a');
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
 			a.appendChild(document.createTextNode(link));
-			li.appendChild(a);
-			ul.appendChild(li);
+			result.push(a);
 		}
-		if ('attributes' in this.currentElement) ul = this.apply_attributes(this.currentElement.attributes, ul);
-		return ul;
+		return result;
 	}
 
 	signature() {

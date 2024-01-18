@@ -415,13 +415,10 @@ class FILE extends API {
 							UTILITY::delete($file['path']);
 						}
 						else {
+							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]);
 							array_push($result['body']['content'][1],
 								['type' => 'links',
-								'description' => LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]),
-								'content' => [$file['name'] => ['href' => substr($file['path'], 1), 'target' => '_blank']]],
-								['type' => 'hiddeninput',
-								'description' => 'filter',
-								'attributes'=>['data-filtered' => substr($file['path'], 1)]]
+								'content' => [$name => ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank']]]
 							);
 						}
 					}
