@@ -212,7 +212,7 @@ export const api = {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
 								for (const file of all) {
-									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
+									file.previousElementSibling.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);

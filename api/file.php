@@ -399,7 +399,6 @@ class FILE extends API {
 				if ($files){
 					$result['body']['content'][]=[
 						['type' => 'searchinput',
-						'collapse' => true,
 						'attributes' => [
 							'placeholder' => LANG::GET('file.file_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",
