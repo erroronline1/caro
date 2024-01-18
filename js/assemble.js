@@ -137,20 +137,12 @@ export class Assemble {
 	assembles forms and screen elements.
 	deepest nesting of input object is three levels
 	form:null or {attributes} / nothing creates just a div e.g. just for text and links
-	content:[
-		[card
-			{element0},
-			{element1}
-		],
-	]
+	content:[	see this.processContent() ]
 
-	elements are assembled by default but input elements can be assigned common html attributes
-	names are set according to description.
-
-	if any element has an article-attribute consisting of attribute-value pairs the article will have set the attributes
+	elements are assembled by default but can be assigned common html attributes
+	names are set according to description if not overridden by explicit attribute
 	*/
 	constructor(setup) {
-		this.setup = setup;
 		this.content = setup.content;
 		this.form = setup.form;
 		this.multiplearticles = [];
@@ -159,7 +151,7 @@ export class Assemble {
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
-		this.articleAttributes = [];
+		this.articleAttributes = []; // to be overhauled
 	}
 
 	initializeSection(nextSibling = null) {
@@ -286,16 +278,21 @@ export class Assemble {
 				return content;
 			}
 			const nodes = processPanel.call(this, panel);
-			if (nodes.length < 2 && ['DATALIST', 'HR'].includes(nodes[0].nodeName)) {
-				assembledPanels.add(...nodes);
-			} else {
+			let frame = false;
+			for (let n = 0; n < nodes.length; n++) {
+				if (!(['DATALIST', 'HR'].includes(nodes[n].nodeName) || nodes[n].hidden)) {
+					frame = true;
+					break;
+				}
+			}
+			if (frame) {
+				console.log(nodes[0].hidden);
 				const article = document.createElement('article');
 				article.append(...nodes);
 				assembledPanels.add(article);
-			}
+			} else assembledPanels.add(...nodes);
 		})
 		return assembledPanels;
-		return;
 		/*	this.content.forEach(tile => {
 				this.articleAttributes = [];
 				this.multipletiles = new Set();
@@ -443,7 +440,7 @@ export class Assemble {
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
 		if (label) return [input, label];
-		return input; //input.id;
+		return input;
 	}
 	textinput() {
 		return this.input('text');
@@ -477,7 +474,7 @@ export class Assemble {
 			delete this.currentElement.attributes.value;
 		}
 		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
-		return button; //button.id;
+		return button;
 	}
 	deletebutton() { // to style it properly by adding data-type to article container
 		return this.button();
@@ -500,13 +497,7 @@ export class Assemble {
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
 		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
-		if (!this.setup.visible) this.elements.add(input);
-		else {
-			const value = document.createTextNode(input.value);
-			this.elements.add(value);
-			this.elements.add(input);
-		}
-		return input.id;
+		return input;
 	}
 	datalist() {
 		let datalist = document.createElement('datalist');
@@ -519,8 +510,6 @@ export class Assemble {
 			datalist.appendChild(option);
 		});
 		return datalist;
-		//this.assembledPanels.add(datalist);
-		//return datalist.id;
 	}
 
 	file() {
@@ -677,7 +666,7 @@ export class Assemble {
 			}
 			select.appendChild(optgroup);
 		}
-		return select; //this.elements.add(select)
+		return select;
 	}
 
 	textarea() {
@@ -695,7 +684,7 @@ export class Assemble {
 		textarea.autocomplete = 'off';
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
-		return textarea; //this.elements.add(textarea);
+		return textarea;
 	}
 
 	checkbox(radio = null) {
@@ -728,7 +717,7 @@ export class Assemble {
 			label.classList.add('check');
 			input = this.apply_attributes(attributes, input);
 			label.append(input, document.createTextNode(checkbox));
-			result.push(label); //this.elements.add(label);
+			result.push(label);
 		}
 		return result;
 	}
