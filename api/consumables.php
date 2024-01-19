@@ -377,9 +377,7 @@ class CONSUMABLES extends API {
 						'content' => $documents
 						]
 					],
-					[
-						$result['body']['content'][3]
-					]
+					$result['body']['content'][3]
 				];
 				if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][4], 0, 0,
 					[[
@@ -657,9 +655,7 @@ class CONSUMABLES extends API {
 						'content' => $documents
 						]
 					],
-					[
-						$result['body']['content'][3]
-					]
+					$result['body']['content'][3]
 				];
 				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
 					[

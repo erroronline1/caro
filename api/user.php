@@ -94,16 +94,13 @@ class USER extends API {
 								'url' => $user['image']]
 							]
 						],
-						[
-							$result['body']['content'][1]
-						]
+						$result['body']['content'][1]
 					];
 
 				$this->response($result);
-
 				break;
 		}
-	
+
 	}
 
 	public function user(){
@@ -345,9 +342,7 @@ class USER extends API {
 								'url' => $user['image']]
 							]
 						],
-						[
-							$result['body']['content'][2]
-						]
+						$result['body']['content'][2]
 					];
 					if ($user['token']) $result['body']['content'][3]=[
 						[
@@ -358,9 +353,7 @@ class USER extends API {
 							'qrcode' => $user['token']]
 							]
 						],
-						[
-							$result['body']['content'][3]
-						]
+						$result['body']['content'][3]
 					];
 
 				$this->response($result);
