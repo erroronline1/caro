@@ -397,6 +397,23 @@ class FILE extends API {
 
 				$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
 				if ($files){
+					$display=[];
+					foreach ($files as $file){
+						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
+						$filetime=filemtime($file['path']);
+						if ((time()-$filetime)/3600 > INI['sharepoint']['lifespan']) {
+							UTILITY::delete($file['path']);
+						}
+						else {
+							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]);
+							array_push($display,
+								['type' => 'links',
+								'content' => [$name => ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank']]]
+							);
+						}
+					}
+				}
+				if ($display){
 					$result['body']['content'][]=[
 						['type' => 'searchinput',
 						'attributes' => [
@@ -407,21 +424,7 @@ class FILE extends API {
 						]],
 						['type' => 'filter']
 					];
-					$result['body']['content'][] = [];
-						foreach ($files as $file){
-						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
-						$filetime=filemtime($file['path']);
-						if (time() > $filetime + INI['sharepoint']['lifespan']*3600) {
-							UTILITY::delete($file['path']);
-						}
-						else {
-							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]);
-							array_push($result['body']['content'][1],
-								['type' => 'links',
-								'content' => [$name => ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank']]]
-							);
-						}
-					}
+					$result['body']['content'][] = $display;
 				}
 				$result['body']['content'][]=[
 					['type' => 'hiddeninput',
