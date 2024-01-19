@@ -137,6 +137,7 @@ const _ = {
 			let inputs = document.querySelectorAll(querySelector),
 			sanitizedname;
 			for (const input of inputs){
+				input.value= encodeURIComponent(input.value);
 				sanitizedname = input.name.replaceAll(/\W/g, '_');
 				if (input.type == 'radio' && input.checked)
 					fields[sanitizedname] = input.value;
