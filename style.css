@@ -88,6 +88,21 @@ canvas,
 	font-size: 1em;
 }
 
+article>header {
+	width:2em;
+	padding: 0;
+	display: inline-block;
+	margin: 0 0 1em 0;
+}
+
+article>span[data-type]{
+	width:2em;
+	padding: 0;
+	display: inline-block;
+	margin: 0 0 1em 0;
+
+}
+
 .scanner {
 	height: 0;
 	transition: ease .3s;
@@ -139,16 +154,6 @@ article[data-type],
 	/* otherwise composer displays faulty */
 	max-height: none;
 	overflow: auto;
-}
-
-
-article>header {
-	width: 100%;
-	padding: 0;
-	text-align: left;
-	display: inline-block;
-	margin: 0;
-	margin-bottom: 1em
 }
 
 section>form,
@@ -639,6 +644,10 @@ main a::before {
 	vertical-align: top;
 	background-size: cover;
 	margin: .25em .75em 0 -1.75em;
+}
+
+[data-type]::before{
+	margin: .25em 0 0 0;
 }
 
 main a::before {
