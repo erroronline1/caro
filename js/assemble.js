@@ -137,7 +137,7 @@ export class Assemble {
 	assembles forms and screen elements.
 	deepest nesting of input object is three levels
 	form:null or {attributes} / nothing creates just a div e.g. just for text and links
-	content:[	see this.processContent() ]
+	content:[ see this.processContent() ]
 
 	elements are assembled by default but can be assigned common html attributes
 	names are set according to description if not overridden by explicit attribute
@@ -145,13 +145,10 @@ export class Assemble {
 	constructor(setup) {
 		this.content = setup.content;
 		this.form = setup.form;
-		this.multiplearticles = [];
-		this.multiplearticleID = null;
 		this.section = null;
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
-		this.articleAttributes = []; // to be overhauled
 	}
 
 	initializeSection(nextSibling = null) {
@@ -185,8 +182,10 @@ export class Assemble {
 				nextSibling.parentNode.insertBefore(tiles[i], nextSibling);
 			}
 		}
-		for (let i = 0; i < this.multiplearticles.length; i++) {
-			document.getElementById(this.multiplearticles[i]).addEventListener('scroll', sectionScroller);
+
+		let scrollables = document.querySelectorAll('section');
+		for (const section of scrollables) {
+			if (section.childNodes.length > 1) section.addEventListener('scroll', sectionScroller);;
 		}
 
 		if (this.signaturePad) {
@@ -271,10 +270,9 @@ export class Assemble {
 							const article = document.createElement('article');
 							article.append(...processPanel.call(this, element));
 							section.append(article);
-						}
-						else content = content.concat(processPanel.call(this, element));
+						} else content = content.concat(processPanel.call(this, element));
 					});
-					if (elements[0].constructor.name === 'Array') content = content.concat(section);
+					if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
 				} else {
 					this.currentElement = elements;
 					if (!this.currentElement.type.match(/datalist|button|hidden/gi)) content.push(this.icon());
@@ -291,7 +289,6 @@ export class Assemble {
 				}
 			}
 			if (frame) {
-				console.log(nodes[0].hidden);
 				const article = document.createElement('article');
 				article.append(...nodes);
 				assembledPanels.add(article);
@@ -320,40 +317,24 @@ export class Assemble {
 
 
 	}
-	single(tileProperties, oneOfFew = false) { // parameters are required by composer method
-		const article = document.createElement('article');
-		article.setAttribute('data-type', tileProperties.type);
-		for (const [attribute, value] of Object.entries(this.articleAttributes)) {
-			article.setAttribute(attribute, value);
-		}
-		article.append(...this.elements);
-		return article;
-	}
-	multiple() {
-		const article = document.createElement('article'),
-			section = document.createElement('section'),
-			indicators = document.createElement('div'),
+
+	slider(sectionID, length) {
+		const indicators = document.createElement('div'),
 			toleft = document.createElement('div'),
 			toright = document.createElement('div');
-		this.multiplearticleID = getNextElementID();
-		this.multiplearticles.push(this.multiplearticleID);
-		section.classList = 'inset';
-		section.id = this.multiplearticleID;
-		section.append(...this.multipletiles);
-		article.appendChild(section);
 		indicators.classList = 'sectionindicator';
-		indicators.id = this.multiplearticleID + 'indicator';
+		indicators.id = sectionID + 'indicator';
 
 		toleft.classList = 'toleft';
 		toleft.addEventListener('pointerdown', function (e) {
-			section.scrollBy({
+			document.getElementById(sectionID).scrollBy({
 				top: 0,
 				left: -400,
 				behaviour: 'smooth'
 			});
 		});
 		indicators.appendChild(toleft);
-		for (let i = 0; i < this.multipletiles.size; i++) {
+		for (let i = 0; i < length; i++) {
 			let indicator = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 				circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 			indicator.classList = 'articleindicator';
@@ -366,18 +347,14 @@ export class Assemble {
 		}
 		toright.classList = 'toright';
 		toright.addEventListener('pointerdown', function (e) {
-			section.scrollBy({
+			document.getElementById(sectionID).scrollBy({
 				top: 0,
 				left: 400,
 				behaviour: 'smooth'
 			});
 		});
 		indicators.appendChild(toright);
-		article.appendChild(indicators);
-		for (const [attribute, value] of Object.entries(this.articleAttributes)) {
-			article.setAttribute(attribute, value);
-		}
-		return article;
+		return indicators;
 	}
 
 	icon() {
