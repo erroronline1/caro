@@ -130,7 +130,7 @@ class ORDER extends API {
 		$filtered = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$matches = [];
 		foreach ($filtered as $row){
-			$matches[] = $row['id'];
+			$matches[] = strval($row['id']);
 		}
 		$this->response(['status' => [
 			'data' => $matches
@@ -142,7 +142,7 @@ class ORDER extends API {
 		unset ($this->_payload->$unset);
 
 		$approval = false;
-		if ($this->_payload->approval_token){
+		if (UTILITY::propertySet(_payload, 'approval_token')){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 			$statement->execute([
 				':token' => $this->_payload->approval_token
@@ -479,7 +479,7 @@ class ORDER extends API {
 								'name' => 'barcode[]',
 								'value' => array_key_exists ('barcode', $order['items'][$i]) ? $order['items'][$i]['barcode'] : ''
 							]],
-								['type' => 'button',
+							['type' => 'button',
 							'attributes' => [
 								'value' => LANG::GET('order.add_delete'),
 								'type' => 'button',
@@ -491,11 +491,11 @@ class ORDER extends API {
 				}
 				if ($this->_requestedID) array_push($result['body']['content'], [
 					['type' => 'deletebutton',
-						'description' => LANG::GET('order.delete_prepared_order'),
-						'attributes' => [
-							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerup' => 'if (confirm("'. LANG::GET('order.delete_prepared_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
-						]]
+					'description' => LANG::GET('order.delete_prepared_order'),
+					'attributes' => [
+						'type' => 'button', // apparently defaults to submit otherwise
+						'onpointerup' => 'if (confirm("'. LANG::GET('order.delete_prepared_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
+					]]
 				]);
 
 				break;
@@ -652,8 +652,7 @@ class ORDER extends API {
 						if ($key == 'orderer') {
 							$messagepayload=[];
 							foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
-								$messagepayload[':' . $key] = $decoded_order_data[$key];
-//								$messagepayload[':' . $key] = mb_convert_encoding($decoded_order_data[$key], "UTF-8", mb_detect_encoding($decoded_order_data[$key]));
+								if (array_key_exists($key, $decoded_order_data)) $messagepayload[':' . $key] = $decoded_order_data[$key];
 							}
 							$content[]=[
 								'type' => 'hiddeninput',
@@ -704,23 +703,28 @@ class ORDER extends API {
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
 
 					$status=[];
-					$statusfilter=[];
 					foreach(['ordered','received','archived'] as $s){
 						if (boolval($row[$s])) {
-							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true];
+							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true, 'data-' . $s => true];
 							$text .= LANG::GET('order.' . $s) . ': ' . $row[$s] . '\n';
-							$statusfilter['data-' . $s]='';
 						}
 						else {
 							if (
 								(in_array($s, ['received', 'archived']) && (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)))
 								|| (in_array($s, ['ordered']) && (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])))
-							) $status[LANG::GET('order.' . $s)] = ['onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-".$s."', '');"];
-							else $status[LANG::GET('order.' . $s)] = ['disabled' => true];
+							) $status[LANG::GET('order.' . $s)] = [
+								'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.setAttribute('data-".$s."', 'true');",
+								'data-'.$s => false
+							];
+							else $status[LANG::GET('order.' . $s)] = [
+								'disabled' => true,
+								'data-'.$s => false
+							];
 						}
 					}
 					if (!($row['ordered'] || $row['received'] || $row['archived']))	$status[LANG::GET('order.disapprove')]=[
-						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.parentNode.parentNode.setAttribute('data-disapproved', '');"
+						'data_disapproved' => 'false',
+						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.setAttribute('data-disapproved', 'true');"
 					];
 
 					$content[]=[
@@ -734,7 +738,6 @@ class ORDER extends API {
 
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'deletebutton',
-						'article' => $statusfilter,
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',

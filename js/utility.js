@@ -126,21 +126,11 @@ const orderClient = {
 		api.toast(LANG.GET('general.copied_to_clipboard'));
 	},
 	filter: (type = undefined) => {
-		let display, hide, not = '';
-		hide = document.querySelectorAll('article[data-type=cart]');
-		if (type) {
-			if (type === 'ordered') not = ':not([data-received]):not([data-archived])';
-			if (type === 'received') not = ':not([data-archived])';
-			display = document.querySelectorAll(`article[data-type=cart][data-${type}]${not}`);
-		} else {
-			display = document.querySelectorAll('article[data-type=cart]:not([data-ordered]):not([data-received]):not([data-archived])');
-		}
-
-		hide.forEach(article => {
-			article.style.display = 'none';
+		document.querySelectorAll('[data-ordered]').forEach(article => {
+			article.parentNode.parentNode.style.display = 'none';
 		});
-		display.forEach(article => {
-			article.style.display = 'block';
+		(type ? display = document.querySelectorAll(`[data-${type}=true]`) : document.querySelectorAll('[data-ordered=false]')).forEach(article => {
+			article.parentNode.parentNode.style.display = 'block';
 		});
 	}
 };
