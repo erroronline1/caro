@@ -85,16 +85,19 @@ class USER extends API {
 						'action' => "javascript:api.user('put', 'profile')"
 					]];
 
-					if ($user['image']) array_splice($result['body']['content'][1], 0, 0,
-					[
-						['type' => 'image',
-						'description' => LANG::GET('user.edit_export_user_image'),
-						'attributes' => [
-							'name' => $user['name'] . '_pic',
-							'url' => $user['image']]
+					if ($user['image']) $result['body']['content'][1]=[
+						[
+							['type' => 'image',
+							'description' => LANG::GET('user.edit_export_user_image'),
+							'attributes' => [
+								'name' => $user['name'] . '_pic',
+								'url' => $user['image']]
+							]
+						],
+						[
+							$result['body']['content'][1]
 						]
-					]
-					);
+					];
 
 				$this->response($result);
 
@@ -333,22 +336,32 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) array_unshift($result['body']['content'][2],
-						['type' => 'image',
-						'description' => LANG::GET('user.edit_export_user_image'),
-						'attributes' => [
-							'name' => $user['name'] . '_pic',
-							'url' => $user['image']]
+					if ($user['image']) $result['body']['content'][2]=[
+						[
+							['type' => 'image',
+							'description' => LANG::GET('user.edit_export_user_image'),
+							'attributes' => [
+								'name' => $user['name'] . '_pic',
+								'url' => $user['image']]
+							]
+						],
+						[
+							$result['body']['content'][2]
 						]
-					);
-					if ($user['token']) array_unshift($result['body']['content'][3],
-						['type' => 'image',
-						'description' => LANG::GET('user.edit_export_qr_token'),
-						'attributes' => [
-						'name' => $user['name'] . '_token',
-						'qrcode' => $user['token']]
+					];
+					if ($user['token']) $result['body']['content'][3]=[
+						[
+							['type' => 'image',
+							'description' => LANG::GET('user.edit_export_qr_token'),
+							'attributes' => [
+							'name' => $user['name'] . '_token',
+							'qrcode' => $user['token']]
+							]
+						],
+						[
+							$result['body']['content'][3]
 						]
-					);
+					];
 
 				$this->response($result);
 				break;

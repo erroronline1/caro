@@ -121,7 +121,7 @@ class APPLICATION extends API {
 					'content' => $row['content']
 				]];
 		}
-		$result['body']['content'][] = $topics;
+		$result['body']['content'] = [$topics];
 		$this->response($result);
 	}
 

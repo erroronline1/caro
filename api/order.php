@@ -408,17 +408,21 @@ class ORDER extends API {
 							'value' => array_key_exists('deliverydate', $order) ? $order['deliverydate'] : ''
 						]]
 					],[
-						['type' => 'signature',
-						'description' => LANG::GET('order.add_approval_signature'),
-						'attributes' => [
-							'name' => 'approval_signature'
-						]],
-						['type' => 'scanner',
-						"description" => LANG::GET('order.add_approval_token'),
-						'attributes' => [
-							'name' => 'approval_token',
-							'type' => 'password'
-						]]
+						[
+							['type' => 'signature',
+							'description' => LANG::GET('order.add_approval_signature'),
+							'attributes' => [
+								'name' => 'approval_signature'
+							]]
+						],
+						[
+							['type' => 'scanner',
+							"description" => LANG::GET('order.add_approval_token'),
+							'attributes' => [
+								'name' => 'approval_token',
+								'type' => 'password'
+							]]
+						]
 					],
 				]];
 				if ($order['items']){

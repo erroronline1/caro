@@ -318,7 +318,9 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'name' => 'certificate_validity',
 								'value' => $vendor['certificate']['validity'] ? : ''
-							]],
+							]]
+						],
+						[
 							["type" => "file",
 							"description" => LANG::GET('consumables.edit_vendor_certificate_update'),
 							'attributes' => [
@@ -341,7 +343,9 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'name' => 'pricelist',
 								'accept' => '.csv'
-							]],
+							]]
+						],
+						[
 							["type" => "textarea",
 							"description" => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 							'attributes' => [
@@ -358,7 +362,7 @@ class CONSUMABLES extends API {
 					'action' => $vendor['id'] ? 'javascript:api.purchase("put", "vendor", "' . $vendor['id'] . '")' : 'javascript:api.purchase("post", "vendor")'
 				]];
 
-				if ($certificates) array_splice($result['body']['content'][2][0], 0, 0,
+				if ($certificates) array_splice($result['body']['content'][2], 0, 0,
 					[
 						['type' => 'links',
 						'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
@@ -366,19 +370,24 @@ class CONSUMABLES extends API {
 						]
 					]
 				);
-				if ($documents) array_unshift($result['body']['content'][3],
-					['type' => 'links',
-					'description' => LANG::GET('consumables.edit_vendor_documents_download'),
-					'content' => $documents
-					]
-				);
-				if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][4][0], 0, 0,
+				if ($documents) $result['body']['content'][3]=[
 					[
+						['type' => 'links',
+						'description' => LANG::GET('consumables.edit_vendor_documents_download'),
+						'content' => $documents
+						]
+					],
+					[
+						$result['body']['content'][3]
+					]
+				];
+				if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][4], 0, 0,
+					[[
 						["type" => "text",
 						"description" => LANG::GET('consumables.edit_vendor_pricelist_validity'),
 						"content" => $vendor['pricelist']['validity']
 						]
-					]
+					]]
 				);
 
 				$this->response($result);
@@ -641,12 +650,17 @@ class CONSUMABLES extends API {
 					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')"
 				]];
 
-				if ($documents) array_unshift($result['body']['content'][3],
-					['type' => 'links',
-					'description' => LANG::GET('consumables.edit_product_documents_download'),
-					'content' => $documents
+				if ($documents) $result['body']['content'][3]=[
+					[
+						['type' => 'links',
+						'description' => LANG::GET('consumables.edit_product_documents_download'),
+						'content' => $documents
+						]
+					],
+					[
+						$result['body']['content'][3]
 					]
-				);
+				];
 				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
 					[
 						['type' => 'deletebutton',
