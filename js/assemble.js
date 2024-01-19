@@ -262,20 +262,22 @@ export class Assemble {
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
 			function processPanel(elements) {
-				let content = [],
-				description;
+				let content = [];
 				if (elements.constructor.name === 'Array') {
 					const section = document.createElement('section');
 					section.id = getNextElementID();
 					elements.forEach(element => {
-						if (elements[0].constructor.name === 'Array') section.append(...processPanel.call(this, element));
+						if (elements[0].constructor.name === 'Array') {
+							const article = document.createElement('article');
+							article.append(...processPanel.call(this, element));
+							section.append(article);
+						}
 						else content = content.concat(processPanel.call(this, element));
 					});
 					if (elements[0].constructor.name === 'Array') content = content.concat(section);
 				} else {
 					this.currentElement = elements;
-					description = this.description()
-					if (description) content.push(this.description());
+					if (!this.currentElement.type.match(/datalist|button|hidden/gi)) content.push(this.icon());
 					content = content.concat(this[elements.type]());
 				}
 				return content;
@@ -376,6 +378,12 @@ export class Assemble {
 			article.setAttribute(attribute, value);
 		}
 		return article;
+	}
+
+	icon() {
+		const span = document.createElement('span');
+		span.setAttribute('data-type', this.currentElement.type);
+		return span;
 	}
 
 	description() {
@@ -480,9 +488,11 @@ export class Assemble {
 		return button;
 	}
 	deletebutton() { // to style it properly by adding data-type to article container
+		this.currentElement.attributes['data-type'] = 'deletebutton';
 		return this.button();
 	}
 	submitbutton() {
+		this.currentElement.attributes['data-type'] = 'submitbutton';
 		return this.button();
 	}
 
@@ -803,7 +813,8 @@ export class Assemble {
 		//attributes are processed already, therefore they can be reassigned
 		this.currentElement.description = LANG.GET('assemble.scan_button');
 		this.currentElement.attributes = {
-			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')"
+			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
+			'data-type': 'scanner'
 		};
 		return result.concat(this.button());
 	}
