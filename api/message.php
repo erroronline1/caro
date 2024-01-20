@@ -57,7 +57,7 @@ class MESSAGE extends API {
 					if ($row['id'] > 1)	$datalist[] = $row['name'];
 				}
 						
-				// display form for writing or reading a message
+				// display form for writing
 				$result['body']=['content' => [
 					[
 						['type' => 'datalist',
@@ -76,15 +76,14 @@ class MESSAGE extends API {
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textarea',
+						'description' => LANG::GET('message.message'),
 						'attributes' => [
 							'name' => 'message',
 							'required' => true,
-							'placeholder' => LANG::GET('message.message'),
 							'value' => $prefill['message'] ? : '',
 							'rows' => 10,
 							'data-loss' => 'prevent'
-						]],
-						['type' => 'message']
+						]]
 					]
 					],
 					'form' => [
@@ -168,20 +167,20 @@ class MESSAGE extends API {
 		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 		$content=[[
-				['type' => 'searchinput',
+				['type' => 'filterinput',
 				'attributes' => [
 					'placeholder' => LANG::GET('message.message_filter_label'),
 					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
 					'onblur' => "api.message('get', 'filter', this.value); return false;",
 					'id' => 'productsearch'
-				]],
-				['type' => 'filter']
+				]]
 		]];
 		foreach($messages as $message) {
 			$content[]= [
 				['type' => 'hiddeninput',
 				'description' => 'filter',
-				'attributes'=>['data-filtered' => $message['id']]],
+				'attributes'=>['data-filtered' => $message['id']]
+			],
 				['type' => 'textinput',
 				'description' => LANG::GET('message.from'),
 				'attributes' => [
@@ -192,6 +191,7 @@ class MESSAGE extends API {
 					'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
+				'description' => LANG::GET('message.message'),
 				'attributes' => [
 					'name' => 'message',
 					'data-message' => $message['id'],
@@ -207,8 +207,7 @@ class MESSAGE extends API {
 				'attributes' => [
 					'type' => 'button',
 					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
-					]],
-				['type' => 'message']
+				]]
 			];
 			if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
 				['type' => 'button',
@@ -223,7 +222,9 @@ class MESSAGE extends API {
 				'attributes' => [
 					'url' => $message['image'],
 					'imageonly' => ['width' => '3em', 'height' => '3em'] 
-					]]
+					]],
+					['type' => 'br'],
+					['type' => 'br'],
 				]);
 		}
 		
@@ -243,14 +244,13 @@ class MESSAGE extends API {
 		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 		$content=[[
-			['type' => 'searchinput',
+			['type' => 'filterinput',
 			'attributes' => [
 				'placeholder' => LANG::GET('message.message_filter_label'),
 				'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
 				'onblur' => "api.message('get', 'filter', this.value); return false;",
 				'id' => 'productsearch'
-			]],
-			['type' => 'filter']
+			]]
 		]];
 		foreach($messages as $key => $message) {
 			$content[]= [
@@ -267,6 +267,7 @@ class MESSAGE extends API {
 					'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
+				'description' => LANG::GET('message.message'),
 				'attributes' => [
 					'name' => 'message',
 					'data-message' => $message['id'],
@@ -288,15 +289,16 @@ class MESSAGE extends API {
 				'attributes' => [
 					'type' => 'button',
 					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
-				]],
-				['type' => 'message']
+				]]
 			];
 			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
 				['type' => 'image',
 				'attributes' => [
 					'url' => $message['image'],
 					'imageonly' => ['width' => '3em', 'height' => '3em'] 
-					]]
+					]],
+					['type' => 'br'],
+					['type' => 'br'],
 				]);
 		}
 		$result['body']['content'] = $content;

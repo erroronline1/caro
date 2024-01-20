@@ -38,7 +38,7 @@ class FILE extends API {
 		$matches = [];
 		foreach($bundles as $row) {
 			similar_text($this->_requestedFolder, $row['name'], $percent);
-			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = $row['id'];
+			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = strval($row['id']);
 		}
 		$this->response(['status' => [
 			'data' => $matches
@@ -50,15 +50,13 @@ class FILE extends API {
 		$result['body'] = [
 		'content' => [
 				[
-					['type' => 'searchinput',
+					['type' => 'filterinput',
 					'attributes' => [
 						'placeholder' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
 						'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
 						'id' => 'filesearch'
-					]],[
-						'type' => 'filter',
-					]
+					]]
 				]
 			]
 		];
@@ -161,15 +159,13 @@ class FILE extends API {
 					$files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						$result['body']['content'][]=[
-							['type' => 'searchinput',
+							['type' => 'filterinput',
 							'attributes' => [
 								'placeholder' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
 								'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
 								'id' => 'filefilter'
-							]],[
-								'type' => 'filter',
-							]
+							]]
 						];
 						$result['body']['content'][] = [];
 						foreach ($files as $file){
@@ -192,11 +188,11 @@ class FILE extends API {
 					}
 					$result['body']['content'][]=[
 						['type' => 'hiddeninput',
-						'description' => LANG::GET('file.manager_new_file'),
 						'attributes' => [
 							'name' => 'destination',
 							'value' => $this->_requestedFolder]],
 						['type' => 'file',
+						'description' => LANG::GET('file.manager_new_file'),
 						'attributes' => [
 							'name' => 'files[]',
 							'multiple' => true,
@@ -220,17 +216,15 @@ class FILE extends API {
 	public function bundle(){
 		if (!(array_intersect(['admin', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result['body'] = [
-		'content' => [
+			'content' => [
 				[
-					['type' => 'searchinput',
+					['type' => 'filterinput',
 					'attributes' => [
 						'placeholder' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
 						'onblur' => "api.file('get', 'bundlefilter', this.value); return false;",
 						'id' => 'filesearch'
-					]],[
-						'type' => 'filter',
-					]
+					]]
 				]
 			]
 		];
@@ -239,8 +233,8 @@ class FILE extends API {
 		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($bundles as $row) {
 			$list=[];
-			foreach (json_decode($row['content'], true) as $name => $path){
-				$list[$name]= ['href' => $path, 'target' => '_blank'];
+			foreach (json_decode($row['content'], true) as $path){
+				$list[pathinfo($path)['basename']]= ['href' => $path, 'target' => '_blank'];
 			}
 			$result['body']['content'][]=
 			[
@@ -396,8 +390,8 @@ class FILE extends API {
 				'content'=>[]]];
 
 				$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+				$display=[];
 				if ($files){
-					$display=[];
 					foreach ($files as $file){
 						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
 						$filetime=filemtime($file['path']);
@@ -406,33 +400,33 @@ class FILE extends API {
 						}
 						else {
 							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]);
-							array_push($display,
-								['type' => 'links',
-								'content' => [$name => ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank']]]
-							);
+							$display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
 						}
 					}
 				}
 				if ($display){
 					$result['body']['content'][]=[
-						['type' => 'searchinput',
+						['type' => 'filterinput',
 						'attributes' => [
 							'placeholder' => LANG::GET('file.file_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",
 							'onblur' => "api.file('get', 'filter', 'sharepoint', this.value); return false;",
 							'id' => 'filefilter'
-						]],
-						['type' => 'filter']
+						]]
 					];
-					$result['body']['content'][] = $display;
+					$result['body']['content'][] = [
+						['type' => 'links',
+						'description' => LANG::GET('file.sharepoint_upload_headersdfgsdf'),
+						'content' => $display]
+					];
 				}
 				$result['body']['content'][]=[
 					['type' => 'hiddeninput',
-					'description' => LANG::GET('file.sharepoint_upload_header'),
 					'attributes' => [
 						'name' => 'destination',
 						'value' => $this->_requestedFolder]],
 					['type' => 'file',
+					'description' => LANG::GET('file.sharepoint_upload_header'),
 					'attributes' => [
 						'name' => 'files[]',
 						'multiple' => true,
