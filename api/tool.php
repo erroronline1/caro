@@ -21,68 +21,57 @@ class TOOL extends API {
 		$types=[
 			'qrcode_text' => ['name' => LANG::GET('tool.qrcode_text'),
 				'content'=> [
-					[
-						['type' => 'textarea',
-						'description' => LANG::GET('tool.qrcode_text'),
-						'attributes' => [
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_text'))) ? : ''
-						]]
-					]
+					['type' => 'textarea',
+					'description' => LANG::GET('tool.qrcode_text'),
+					'attributes' => [
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_text'))) ? : ''
+					]]
 				],
 				'code' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_text'))) ? : ''],
 			'qrcode_appointment' => ['name' => LANG::GET('tool.qrcode_appointment'),
 				'content'=>[
-					[
-						['type' => 'dateinput',
-						'description' => LANG::GET('tool.qrcode_appointment_date'),
-						'attributes' => [
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_date'))) ? : ''
-							]
-						],
-						['type' => 'timeinput',
-						'description' => LANG::GET('tool.qrcode_appointment_time'),
-						'attributes' => [
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_time'))) ? : ''
-							]
-						],
-						['type' => 'dateinput'],
+					['type' => 'dateinput',
+					'description' => LANG::GET('tool.qrcode_appointment_date'),
+					'attributes' => [
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_date'))) ? : ''
+						]
 					],
-					[
-						['type' => 'textinput',
-						'description' => LANG::GET('tool.qrcode_appointment_occasion'),
-						'attributes' => [
-							'placeholder' => LANG::GET('tool.qrcode_appointment_occasion_placeholder'),
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_occasion'))) ? : ''
-							]
-						],
+					['type' => 'timeinput',
+					'description' => LANG::GET('tool.qrcode_appointment_time'),
+					'attributes' => [
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_time'))) ? : ''
+						]
 					],
-					[
-						['type' => 'textinput',
-						'description' => LANG::GET('tool.qrcode_appointment_reminder'),
-						'attributes' => [
-							'placeholder' => LANG::GET('tool.qrcode_appointment_reminder_placeholder'),
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_reminder'))) ? : ''
-							]
-						],
+					['type' => 'textinput',
+					'description' => LANG::GET('tool.qrcode_appointment_occasion'),
+					'attributes' => [
+						'placeholder' => LANG::GET('tool.qrcode_appointment_occasion_placeholder'),
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_occasion'))) ? : ''
+						]
 					],
-					[
-						['type' => 'numberinput',
-						'description' => LANG::GET('tool.qrcode_appointment_duration'),
-						'attributes' => [
-							'min' => 1,
-							'max' => 200,
-							'step' => 1,
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_duration'))) ? : 1
-							]
-						],
-					]
+					['type' => 'textinput',
+					'description' => LANG::GET('tool.qrcode_appointment_reminder'),
+					'attributes' => [
+						'placeholder' => LANG::GET('tool.qrcode_appointment_reminder_placeholder'),
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_reminder'))) ? : ''
+						]
 					],
+					['type' => 'numberinput',
+					'description' => LANG::GET('tool.qrcode_appointment_duration'),
+					'attributes' => [
+						'min' => 1,
+						'max' => 200,
+						'step' => 1,
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_duration'))) ? : 1
+						]
+					],
+				],
 				'code' =>
 					"BEGIN:VEVENT\n" .
 					"SUMMARY:" . UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_occasion'))) . "\n" .
@@ -94,34 +83,29 @@ class TOOL extends API {
 			],
 			'barcode_code128' => ['name' => LANG::GET('tool.barcode_code128'),
 				'content'=>[
-					[
-						['type' => 'textinput',
-						'description' => LANG::GET('tool.barcode_description'),
-						'attributes' => [
-							'placeholder' => LANG::GET('tool.barcode_code128_placeholder'),
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''
-							]
-						],
+					['type' => 'textinput',
+					'description' => LANG::GET('tool.barcode_description'),
+					'attributes' => [
+						'placeholder' => LANG::GET('tool.barcode_code128_placeholder'),
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''
+						]
 					],
 				],
 				'code' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''],
 			'barcode_ean13' => ['name' => LANG::GET('tool.barcode_ean13'),
 				'content'=>[
-					[
-						['type' => 'numberinput',
-						'description' => LANG::GET('tool.barcode_description'),
-						'attributes' => [
-							'placeholder' => LANG::GET('tool.barcode_ean13_placeholder'),
-							'data-usecase' => 'tool_create_code',
-							'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''
-							]
-						],
+					['type' => 'numberinput',
+					'description' => LANG::GET('tool.barcode_description'),
+					'attributes' => [
+						'placeholder' => LANG::GET('tool.barcode_ean13_placeholder'),
+						'data-usecase' => 'tool_create_code',
+						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''
+						]
 					],
 				],
 				'code' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''],
 		];
-		$result['body']=['content' => $types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content']];
 
 		$options=[];
 		foreach($types as $type => $properties){
@@ -129,22 +113,24 @@ class TOOL extends API {
 			if ($this->_requestedType === $type) $options[$properties['name']]['selected'] = true;
 		}
 
-		array_unshift($result['body']['content'], [
-			['type' => 'select',
-			'description' => LANG::GET('tool.code_select_type'),
-			'attributes' => [
-				'onchange' => "api.tool('get', 'code', this.value)"
-			],
-			'content' => $options]
-		]);
-		$result['body']['content'][] = [
-			['type' => 'submitbutton',
-			'description' => LANG::GET('tool.code_create_button'),
-			'attributes' =>[
-				'type' => 'button',
-				'onpointerup' =>  "api.tool('get', 'code', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "', 'display')"
-			]]
-		];
+
+		$result['body']=['content' => [
+			[
+				['type' => 'select',
+				'description' => LANG::GET('tool.code_select_type'),
+				'attributes' => [
+					'onchange' => "api.tool('get', 'code', this.value)"
+				],
+				'content' => $options],
+				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content'],
+				['type' => 'submitbutton',
+				'description' => LANG::GET('tool.code_create_button'),
+				'attributes' =>[
+					'type' => 'button',
+					'onpointerup' =>  "api.tool('get', 'code', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "', 'display')"
+				]]
+			]
+		]];
 
 		if ($this->_requestedType){
 			if ($types[$this->_requestedType]['code']){
@@ -182,12 +168,12 @@ class TOOL extends API {
 				'destination' => 'tool_scanner'
 				],
 				['type' => 'textarea',
+				'description' => 'result',
 				'attributes' =>[
 					'rows' => 8,
 					'readonly' => true,
 					'id' => 'tool_scanner'
-				]],
-				['type' => 'scanner']
+				]]
 			]
 		]];
 		$this->response($result);
@@ -213,8 +199,7 @@ class TOOL extends API {
 				'attributes' => [
 					'onchange' => "toolModule.initStlViewer('../' + this.value)"
 				],
-				'content' => $options]
-			],[
+				'content' => $options],
 				['type' => 'stlviewer',
 				'description' => LANG::GET('menu.tool_stl_viewer')
 				]
