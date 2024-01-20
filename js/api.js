@@ -224,7 +224,7 @@ export const api = {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
 								for (const list of all) {
-									list.parentNode.style.display = data.status.data.includes(parseInt(list.dataset.filtered, 10)) ? 'block' : 'none';
+									list.parentNode.style.display = data.status.data.includes(list.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
