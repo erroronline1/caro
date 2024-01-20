@@ -50,6 +50,22 @@ body {
 	user-select: none;
 }
 
+body::before {
+	background: url('media/favicon/logo.svg');
+	/*1086x570*/
+	background-size: 100%;
+	background-repeat: no-repeat;
+	transform: rotate(-90deg) translate(-25vh, -21vh);
+	content: "";
+	position: fixed;
+	z-index: -1;
+	height: calc(90vh * 570 / 1086);
+	width: 90vh;
+	left: 0;
+	top: 0;
+	opacity: 0.1;
+}
+
 /* Large devices such as laptops (1024px and up) */
 @media only screen and (min-width: 64em) {
 	body {
@@ -69,233 +85,6 @@ main {
 	width: 100%;
 	max-width: 50em;
 	margin-bottom: 6em;
-}
-
-/*************************** article elements******************************/
-input,
-a,
-textarea,
-select,
-canvas,
-.scanner {
-	text-decoration: none;
-	background-color: transparent;
-	border: none;
-	width: calc(100% - 2em);
-	margin-left:2em;
-	outline: none;
-	display: inline-block;
-	font-size: 1em;
-}
-
-article>header {
-	width:2em;
-	padding: 0;
-	display: inline-block;
-	margin: 0 0 1em 0;
-}
-
-article>span[data-type]{
-	width:2em;
-	padding: 0;
-	display: inline-block;
-	margin: 0 0 1em 0;
-
-}
-
-.scanner {
-	height: 0;
-	transition: ease .3s;
-	border: none !important;
-}
-
-canvas,
-.scanner.active,
-#scanner>video {
-	height: 15em;
-	margin-bottom: 2em;
-}
-
-.stlviewer {
-	height: 25em;
-	margin-bottom: 2em;
-}
-
-ul {
-	margin: 0;
-	padding-left: 1em
-}
-
-article,
-main>form>article,
-[data-type=addButton] {
-	margin: 1em 0;
-	padding: 1em;
-	width: 100%;
-	display: inline-block;
-	border: 1px solid var(--3d-border);
-	border-radius: 1em;
-	background-color: var(--protrusion);
-	box-shadow: 3px 3px 6px var(--darkshadow);
-	transition: ease .2s;
-}
-
-article[data-type],
-[data-type=addButton] {
-	padding: 1em 2em 1em 3.5em;
-}
-
-[data-type=links] {
-	max-height: 15em;
-	overflow: auto;
-}
-
-[data-type=composer-form]>[data-type=links] {
-	/* otherwise composer displays faulty */
-	max-height: none;
-	overflow: auto;
-}
-
-section>form,
-section>article,
-section>div[draggable] {
-	width: 100%;
-	padding-top: 1em;
-	padding-bottom: 1em;
-	scroll-snap-align: center;
-	flex: none;
-	overflow: auto;
-	box-shadow: none;
-	border: none;
-	background: none;
-}
-
-form>article,
-section>div>article {
-	box-shadow: none;
-	border: none;
-	background: none;
-}
-
-.expanded {
-	white-space: unset;
-	overflow: auto;
-}
-
-.inset,
-[data-type=trash] {
-	box-shadow: inset 3px 3px 5px var(--darkshadow);
-}
-
-section {
-	border: 1px solid var(--3d-border);
-	border-radius: .75em;
-	display: flex;
-	flex-direction: row;
-	scroll-snap-type: x mandatory;
-	scroll-behavior: smooth;
-	overflow: scroll;
-	margin: -.5em;
-}
-
-.sectionindicator {
-	text-align: center;
-	width: 100%;
-	margin-top: 1em;
-
-	svg {
-		vertical-align: middle;
-	}
-}
-
-.toleft,
-.toright {
-	background-size: cover;
-	width: 3em;
-	height: 3em;
-	display: inline-block;
-	vertical-align: middle;
-	margin: 0 3em;
-	opacity: .5;
-
-}
-
-.toleft {
-	background-image: url('media/arrow-circle-left.svg');
-}
-
-.toright {
-	background-image: url('media/arrow-circle-right.svg');
-}
-
-/*************************** general elements ******************************/
-svg {
-	fill: var(--foreground);
-}
-
-h1 {
-	color: var(--foreground);
-}
-
-input[type=file] {
-	display: none;
-}
-
-a,
-a:active,
-a:visited {
-	color: inherit
-}
-
-textarea {
-	text-align: left;
-}
-
-input[type=number] {
-	appearance: textfield
-}
-
-.input-field {
-	background: transparent;
-	z-index: 1;
-}
-
-.input-label {
-	position: relative;
-	outline: none;
-	top: -1.45em;
-	pointer-events: none;
-	transition: .3s;
-	font-size: inherit;
-	opacity: .5;
-	margin: 0;
-	padding: 0;
-}
-
-.input-field:not(:placeholder-shown)+.input-label,
-.input-field:focus+.input-label {
-	top: -4em;
-	font-size: x-small;
-}
-
-/* Large devices such as laptops (1024px and up) */
-@media only screen and (min-width: 64em) {
-
-	.input-field:not(:placeholder-shown)+.input-label,
-	.input-field:focus+.input-label {
-		top: -3.5em;
-	}
-}
-
-
-.imagecanvas,
-.photoupload {
-	display: block;
-	margin-bottom: 0;
-	float: right;
-	height: 4em;
-	width: 4em;
-	object-fit: contain;
 }
 
 dialog {
@@ -456,7 +245,7 @@ nav {
 		line-height: 2em;
 		white-space: nowrap;
 		width: 100%;
-		margin-left:initial;	
+		margin-left: initial;
 	}
 
 	:first-child {
@@ -486,104 +275,169 @@ input:checked~nav {
 	display: none;
 }
 
-
-/*************************** decorators ******************************/
-
-body::before {
-	background: url('media/favicon/logo.svg');
-	/*1086x570*/
-	background-size: 100%;
-	background-repeat: no-repeat;
-	transform: rotate(-90deg) translate(-25vh, -21vh);
-	content: "";
-	position: fixed;
-	z-index: -1;
-	height: calc(90vh * 570 / 1086);
-	width: 90vh;
-	left: 0;
-	top: 0;
-	opacity: 0.1;
+/*************************** input elements and call to action *******************************/
+input,
+textarea,
+select,
+canvas,
+.scanner {
+	text-decoration: none;
+	border: none;
+	width: calc(100% - 2em);
+	outline: none;
+	display: inline-block;
+	font-size: 1em;
+	text-align: left;
+	background: transparent;
+	z-index: 1;
 }
 
-.alert {
-	border: 1px solid var(--red);
+input[type=file] {
+	display: none;
 }
 
-hr {
-	margin: 1em auto;
-	height: 1px;
-	width: 100%;
-	border-color: var(--darkshadow);
+a,
+a:active,
+a:visited {
+	color: inherit;
+	text-decoration: none;
+	outline: none;
 }
 
-hr.insertionarea {
-	margin: 1em auto;
-	height: 1em;
-	width: 100%;
-	border-color: var(--foreground);
-	border-radius: .5em;
-}
-
-section>div>hr {
-	width: 95%
-}
-
-.hrhover {
-	background-color: var(--green);
+a[data-filtered] {
+	display: block;
+	line-height: 3em;
 }
 
 input[type=text],
 input[type=number],
 input[type=search],
 input[type=password],
-textarea {
-	border-bottom: 1px solid var(--foreground);
+input[type=date],
+input[type=time],
+textarea,
+select {
+	border: 1px solid var(--foreground);
+	border-radius: .2em;
+	padding: .75em
 }
 
-.check {
+input[type=number] {
+	appearance: textfield
+}
+
+.radio,
+.checkbox {
 	display: inline-block;
 	position: relative;
-	min-width: 10em;
-	padding-left: 1em;
-	margin: 0 1em 1em 0;
+	min-width: 12em;
+	margin: 1em 1em 1em 2em;
 }
 
-.check input {
+.radio {
+	padding-left: 2em;
+}
+
+.radio input,
+.checkbox input {
 	appearance: none;
 	width: auto;
 }
 
-.check input::before {
+.radio input[type=radio]::before {
 	position: absolute;
 	content: '';
 	top: -12.5%;
-	left: -5%;
+	left: 0;
 	display: block;
 	width: 1.5em;
 	height: 1.5em;
-	color: var(--background);
+	color: var(--green);
+	background: var(--background);
 	border: 1px solid var(--foreground);
 	border-radius: 50%;
 	transition: ease .2s;
 	text-align: center;
 }
 
-.check input:checked::before {
+.radio input[type=radio]:checked::before {
+	content: '\23FA';
+}
+
+.checkbox input[type=checkbox]::after {
+	position: absolute;
+	content: '';
+	top: -12.5%;
+	right: 0;
+	display: block;
+	width: 1.5em;
+	height: 1.5em;
+	color: var(--background);
+	border: 1px solid var(--foreground);
+	border-radius: .2em;
+	transition: ease .2s;
+	text-align: center;
+}
+
+.checkbox input[type=checkbox]:checked::after {
 	background-color: var(--green);
 	content: '\2714';
-	box-shadow: 0 0 5px 1px var(--green);
 }
 
-.articleindicator {
-	stroke: var(--foreground);
-	stroke-width: 1px;
-	fill: none;
-	width: 10px;
-	height: 10px;
+.input-label {
+	position: relative;
+	top: -2.15em;
+	pointer-events: none;
+	transition: .3s;
+	opacity: .5;
+	margin: 0 0 0 2.8em;
 }
 
-.articleactive {
-	fill: var(--foreground);
+input:not(:placeholder-shown)+.input-label,
+input:focus+.input-label,
+select+label.input-label {
+	position: relative;
+	pointer-events: none;
+	font-size: .75em;
+	top: -5em;
+	margin: 0 0 0 3.7em;
+	padding: 0 .25em;
+	opacity: 1;
+	background-color: var(--background);
+}
+
+.textarea-label {
+	position: relative;
+	pointer-events: none;
+	font-size: .75em;
+	top: .75em;
+	margin: 0 0 0 1.7em;
+	padding: 0 .25em;
+	opacity: 1;
+	background-color: var(--background);
+
+	&+textarea {
+		margin-left: 2em;
+	}
+}
+
+.toleft,
+.toright {
+	background-size: cover;
+	width: 3em;
+	height: 3em;
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 3em;
+	opacity: .5;
+}
+
+.toleft {
+	background-image: url('media/arrow-circle-left.svg');
+}
+
+.toright {
+	background-image: url('media/arrow-circle-right.svg');
 }
 
 button {
@@ -614,6 +468,10 @@ button:active {
 		inset -2px -2px 3px var(--lightshadow);
 }
 
+.signature_required_alert {
+	border: 1px solid var(--red);
+}
+
 [data-type=addButton] {
 	margin: 1em 0 0 0;
 }
@@ -624,30 +482,187 @@ button:active {
 		0px 0px 2px var(--darkshadow);
 }
 
+/*************************** article elements and boxes ******************************/
+
+article>header {
+	margin: .75em auto;
+	width: auto;
+	text-align: left;
+	display: block;
+}
+
+article>span[data-type] {
+	padding: 0;
+	width: 0;
+}
+
+.scanner {
+	height: 0;
+	transition: ease .3s;
+	border: none !important;
+}
+
+canvas,
+.scanner.active,
+#scanner>video {
+	height: 15em;
+	margin-bottom: 2em;
+}
+
+.stlviewer {
+	height: 25em;
+	margin-bottom: 2em;
+}
+
+article,
+main>form>article,
+[data-type=addButton] {
+	margin: 1em 0;
+	padding: 1em;
+	width: 100%;
+	display: inline-block;
+	border: 1px solid var(--3d-border);
+	border-radius: 1em;
+	background-color: var(--protrusion);
+	box-shadow: 3px 3px 6px var(--darkshadow);
+	transition: ease .2s;
+}
+
+section {
+	border: 1px solid var(--3d-border);
+	border-radius: .75em;
+	display: flex;
+	flex-direction: row;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	overflow: scroll;
+	margin: -.5em;
+}
+
+article[data-type],
+[data-type=addButton] {
+	padding: 1em 2em 1em 3.5em;
+}
+
+[data-type=links] {
+	max-height: 15em;
+	overflow: auto;
+}
+
+[data-type=composer-form]>[data-type=links] {
+	/* otherwise composer displays faulty */
+	max-height: none;
+	overflow: auto;
+}
+
+section>form,
+section>article,
+section>div[draggable] {
+	width: 100%;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	scroll-snap-align: center;
+	flex: none;
+	overflow: auto;
+	box-shadow: none;
+	border: none;
+	background: none;
+}
+
+form>article,
+section>div>article {
+	box-shadow: none;
+	border: none;
+	background: none;
+}
+
+.inset,
+[data-type=trash] {
+	box-shadow: inset 3px 3px 5px var(--darkshadow);
+}
+
+.sectionindicator {
+	text-align: center;
+	width: 100%;
+	margin-top: 1em;
+
+	svg {
+		vertical-align: middle;
+	}
+}
+
+.imagecanvas,
+.photoupload {
+	display: block;
+	margin-bottom: 0;
+	float: right;
+	height: 4em;
+	width: 4em;
+	object-fit: contain;
+}
+
+/*************************** general elements ******************************/
+svg {
+	fill: var(--foreground);
+}
+
+h1 {
+	color: var(--foreground);
+}
+
 /*************************** decorators ******************************/
+
+hr {
+	margin: 1em auto;
+	height: 1px;
+	width: 100%;
+	border-color: var(--darkshadow);
+}
+
+hr.insertionarea {
+	margin: 1em auto;
+	height: 1em;
+	width: 100%;
+	border-color: var(--foreground);
+	border-radius: .5em;
+}
+
+section>div>hr {
+	width: 95%
+}
+
+.hrhover {
+	background-color: var(--green);
+}
+
+.articleindicator {
+	stroke: var(--foreground);
+	stroke-width: 1px;
+	fill: none;
+	width: 10px;
+	height: 10px;
+}
+
+.articleactive {
+	fill: var(--foreground);
+}
+
+/*************************** icons and cursors ******************************/
 
 [draggable=true]:active {
 	cursor: move;
 }
 
-.reset::before,
-.add::before,
-.delete::before,
 [data-type]::before,
 [data-menu]~label::before,
-[data-type=links]::before,
 main a::before {
 	content: "";
 	display: inline-block;
 	height: 1em;
 	width: 1em;
-	vertical-align: top;
+	vertical-align: middle;
 	background-size: cover;
-	margin: .25em .75em 0 -1.75em;
-}
-
-[data-type]::before{
-	margin: .25em 0 0 0;
+	margin: 0 .75em 0 0;
 }
 
 main a::before {
@@ -719,7 +734,8 @@ main a::before {
 	background-image: url("media/trash-alt.svg");
 }
 
-[data-type=hiddeninput]::before {
+[data-type=hiddeninput]::before,
+[data-type=password]::before {
 	background-image: url("media/user-secret.svg");
 }
 
@@ -749,11 +765,6 @@ main a::before {
 	background-image: url("media/paper-plane.svg");
 }
 
-[data-type=collapsed]::before {
-	/* multiple input fields within one section */
-	background-image: url("media/list-ul.svg");
-}
-
 [data-type=cart]::before {
 	background-image: url("media/shopping-cart.svg");
 }
@@ -762,7 +773,7 @@ main a::before {
 	background-image: url("media/envelope.svg");
 }
 
-[data-type=filter]::before {
+[data-type=filterinput]::before {
 	background-image: url("media/filter.svg");
 }
 

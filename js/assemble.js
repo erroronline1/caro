@@ -115,7 +115,7 @@ function prepareForm() {
 	if (signature) {
 		if (signaturePad.isEmpty()) {
 			if (signature == required) {
-				signature.classList.add("alert");
+				signature.classList.add("signature_required_alert");
 				return false;
 			}
 			document.getElementById('signature').value = null;
@@ -275,7 +275,6 @@ export class Assemble {
 					if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
 				} else {
 					this.currentElement = elements;
-					if (!this.currentElement.type.match(/datalist|button|hidden/gi)) content.push(this.icon());
 					content = content.concat(this[elements.type]());
 				}
 				return content;
@@ -295,27 +294,6 @@ export class Assemble {
 			} else assembledPanels.add(...nodes);
 		})
 		return assembledPanels;
-		/*	this.content.forEach(tile => {
-				this.articleAttributes = [];
-				this.multipletiles = new Set();
-				for (let i = 0; i < tile.length; i++) {
-					this.currentElement = tile[i];
-					collapse = tile[i].collapse || false;
-					if (!collapse || i === 0) this.elements = new Set();
-					this.description(i);
-					this[tile[i].type]();
-					if ('article' in tile[i]) this.articleAttributes = tile[i].article;
-					if ((tile[i].type === 'hiddeninput' && !this.setup.visible) || tile[i].type === 'datalist' || tile[i].type === 'hr' || (collapse && i < tile.length - 1)) continue;
-					if (tile.length < 2 || collapse) {
-						this.assembledPanels.add(this.single(tile[i]));
-						continue;
-					}
-					this.multipletiles.add(this.single(tile[i], true))
-				}
-				if (this.multipletiles.size) this.assembledPanels.add(this.multiple());
-			});*/
-
-
 	}
 
 	slider(sectionID, length) {
@@ -358,16 +336,17 @@ export class Assemble {
 	}
 
 	icon() {
-		const span = document.createElement('span');
+		const br = document.createElement('br'),
+			span = document.createElement('span');
 		span.setAttribute('data-type', this.currentElement.type);
-		return span;
+		return [br, span];
 	}
 
-	description() {
-		if ([undefined, null, false].includes(this.currentElement.description)) return;
+	header() {
 		const header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.currentElement.description));
-		return header;
+		header.setAttribute('data-type', this.currentElement.type);
+		return [header];
 	}
 
 	apply_attributes(setup, node) {
@@ -379,19 +358,18 @@ export class Assemble {
 		return node;
 	}
 
-	has_content(tile) {
-		return ('content' in tile || 'attributes' in tile || 'description' in tile);
-	}
-
 	text() {
 		/* {
 			type: 'text',
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-		if (!this.has_content(this.currentElement)) return;
-		const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
-			result = [];
+		const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+		let result = [];
+		if (this.currentElement.description) {
+			result = result.concat(this.header());
+		}
+
 		for (const part of content) {
 			if (!part[1].length) continue;
 			result.push(document.createTextNode(part[1]));
@@ -409,15 +387,15 @@ export class Assemble {
 				placeholder: 'text input'
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input');
 		let label;
 		input.type = type;
+		if (type === 'password') this.currentElement.type = 'password';
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === 'password' ? 'one-time-code' : 'off';
 		if (this.currentElement.description) input.name = this.currentElement.description;
-		input.classList.add('input-field');
 		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.description) this.currentElement.attributes['placeholder'] = this.currentElement.description;
 			if (this.currentElement.attributes.placeholder) {
 				label = document.createElement('label');
 				label.htmlFor = input.id;
@@ -427,8 +405,8 @@ export class Assemble {
 			}
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
-		if (label) return [input, label];
-		return input;
+		if (label) return [...this.icon(), input, label];
+		return [...this.icon(), input];
 	}
 	textinput() {
 		return this.input('text');
@@ -445,6 +423,9 @@ export class Assemble {
 	searchinput() {
 		return this.input('search');
 	}
+	filterinput() {
+		return this.input('search');
+	}
 	button() {
 		/*{
 			type: 'button',
@@ -453,7 +434,6 @@ export class Assemble {
 				onpointerdown: 'alert("hello")'
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		let button = document.createElement('button');
 		button.id = getNextElementID();
 		if (this.currentElement.description) button.appendChild(document.createTextNode(this.currentElement.description));
@@ -480,7 +460,6 @@ export class Assemble {
 			attributes: {value: '3.14'}
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input');
 		input.type = 'hidden';
 		input.name = this.currentElement.description;
@@ -510,7 +489,6 @@ export class Assemble {
 				multiple: true
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			button = document.createElement('button');
@@ -537,7 +515,7 @@ export class Assemble {
 		button.setAttribute('data-type', 'reset');
 		button.classList.add('inlinebutton');
 
-		return [input, label, button];
+		return [...this.header(), input, label, button];
 	}
 
 	photo() {
@@ -548,7 +526,6 @@ export class Assemble {
 				name: 'photo'
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
 			img = document.createElement('img'),
@@ -615,7 +592,7 @@ export class Assemble {
 		addbutton.classList.add('inlinebutton');
 		addbutton.type = 'button';
 
-		return [input, img, label, addbutton, resetbutton];
+		return [...this.header(), input, img, label, addbutton, resetbutton];
 	}
 
 	select() {
@@ -632,10 +609,8 @@ export class Assemble {
 				}
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		const groups = {};
 		let select = document.createElement('select');
-
 		select.name = select.title = this.currentElement.description;
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
@@ -656,7 +631,13 @@ export class Assemble {
 			}
 			select.appendChild(optgroup);
 		}
-		return select;
+		if (this.currentElement.description) {
+			const label = document.createElement('label');
+			label.appendChild(document.createTextNode(this.currentElement.description));
+			label.classList.add('input-label');
+			return [...this.icon(), select, label];
+		}
+		return [...this.icon(), select];
 	}
 
 	textarea() {
@@ -668,13 +649,21 @@ export class Assemble {
 				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
 		let textarea = document.createElement('textarea');
 		textarea.name = this.currentElement.description;
+		textarea.id = getNextElementID;
 		textarea.autocomplete = 'off';
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
-		return textarea;
+
+		if (this.currentElement.description) {
+			const label = document.createElement('label');
+			label.htmlFor = textarea.id;
+			label.appendChild(document.createTextNode(this.currentElement.description));
+			label.classList.add('textarea-label');
+			return [...this.icon(), label, textarea];
+		}
+		return [...this.icon(), textarea];
 	}
 
 	checkbox(radio = null) {
@@ -690,23 +679,26 @@ export class Assemble {
 				}
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
-		const result = [];
+		const result = [...this.header()];
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
 			if (radio) {
+				label.classList.add('radio');
 				input.type = 'radio';
 				input.name = this.currentElement.description;
 				input.value = checkbox;
 			} else {
+				label.classList.add('checkbox');
 				input.type = 'checkbox';
 				input.name = checkbox;
 			}
-
-			label.classList.add('check');
 			input = this.apply_attributes(attributes, input);
-			label.append(input, document.createTextNode(checkbox));
+			if (radio) {
+				label.append(input, document.createTextNode(checkbox));
+			} else {
+				label.append(document.createTextNode(checkbox), input);
+			}
 			result.push(label);
 		}
 		return result;
@@ -728,10 +720,11 @@ export class Assemble {
 				}
 			}
 		}*/
-		if (!this.has_content(this.currentElement)) return;
-		let result = [];
+		let result = [...this.header()];
+		result.push(this.hiddeninput());
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement('a');
+			console.log(link, attributes);
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
 			a.appendChild(document.createTextNode(link));
@@ -746,8 +739,7 @@ export class Assemble {
 			description:'signature',
 			required: optional boolean
 		} */
-		if (!this.has_content(this.currentElement)) return;
-		let result = [];
+		let result = [...this.header()];
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
 		if (this.currentElement.attributes && this.currentElement.attributes.required) canvas.setAttribute('data-required', 'required');
@@ -778,22 +770,28 @@ export class Assemble {
 			attributes:{type:'password'} // to override e.g. for logins
 			destination: elementId // force output to other input, e.g. search
 		} */
-		if (!this.has_content(this.currentElement)) return;
-		const result = [];
 		const stream = document.createElement('div');
+		let result = [],
+			input, inputid;
 		stream.id = getNextElementID();
 		stream.classList.add('scanner');
-
 		result.push(stream);
-
-		const inputid = 'destination' in this.currentElement ? this.currentElement.destination : this.input('text');
+		if ('destination' in this.currentElement) {
+			inputid = this.currentElement.destination;
+		} else {
+			if ('attributes' in this.currentElement && 'type' in this.currentElement.attributes) input = [...this.input(this.currentElement.attributes.type)];
+			else input = [...this.input('text')];
+			inputid = input[1].id;
+			result = result.concat(input);
+		}
 		//attributes are processed already, therefore they can be reassigned
-		this.currentElement.description = LANG.GET('assemble.scan_button');
+		this.currentElement.description = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
 		this.currentElement.attributes = {
 			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
 			'data-type': 'scanner'
 		};
-		return result.concat(this.button());
+		result.push(this.button())
+		return result;
 	}
 	image() {
 		/*{
@@ -807,7 +805,6 @@ export class Assemble {
 				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
 			}
 		} */
-		if (!this.has_content(this.currentElement)) return;
 		let result = [];
 		const canvas = document.createElement('canvas');
 		let disabled = true;
@@ -817,7 +814,8 @@ export class Assemble {
 			for (const [key, value] of Object.entries(this.currentElement.attributes.imageonly)) {
 				canvas.style[key] = value;
 			}
-		}
+		} else result = result.concat(this.header());
+
 		canvas.width = canvas.height = 1024;
 		if (this.currentElement.attributes.qrcode) {
 			this.imageQrCode.push({
@@ -876,9 +874,8 @@ export class Assemble {
 		return (document.createElement('hr'));
 	}
 
-	collapsed() {
-		// empty method but neccessary for styling reasons (icon)
-		// multiple input fields within one section
+	br() {
+		return (document.createElement('br'));
 	}
 
 	cart() {
