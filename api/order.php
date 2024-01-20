@@ -53,7 +53,7 @@ class ORDER extends API {
 				$result=['body' => ['content' => []]];
 				foreach($organizational_orders as $order){ // order
 					$text = '';
-					foreach (json_decode($order['order_data']) as $key => $value){ // data
+					foreach (json_decode($order['order_data'], true) as $key => $value){ // data
 						if (is_array($value)){
 							foreach($value as $index => $item){ // items
 								foreach ($item as $itemkey => $itemvalue){
@@ -98,13 +98,14 @@ class ORDER extends API {
 					}
 					$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
 				}
-				$result['body']['content']=
-					[[
+				$result['body']['content'] = [
+					[
 						['type' => 'links',
 						'description' => LANG::GET('order.add_product_search_matches', [':number' => count($matches)]),
 						'content' => $matches
 						]
-					]];
+					]
+				];
 				break;
 			}
 		$this->response($result);
@@ -150,6 +151,7 @@ class ORDER extends API {
 				$approval = $result['name'] . LANG::GET('order.token_verified');
 			}
 		}
+
 		if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
@@ -159,10 +161,10 @@ class ORDER extends API {
 		foreach ($this->_payload as $key => $value){
 			if (is_array($value)){
 				foreach($value as $index => $subvalue){
-					if ($subvalue != null) $order_data['items'][$index][$key] = $subvalue;
+					if (boolval($subvalue)) $order_data['items'][intval($index)][$key] = $subvalue;
 				}
 			} else {
-				if ($value != null) $order_data[$key] = $value;
+				if (boolval($value)) $order_data[$key] = $value;
 			}
 		}
 		$order_data['orderer']=$_SESSION['user']['name'];
@@ -228,7 +230,7 @@ class ORDER extends API {
 				break;
 			case 'PUT':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$processedOrderData =$this->processOrderForm();
+				$processedOrderData = $this->processOrderForm();
 
 				if (!$processedOrderData['approval']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-prepared-order'));
@@ -482,7 +484,7 @@ class ORDER extends API {
 							]]
 						]);
 					}
-					array_splice($result['body']['content'], 4, 0, $items);
+					array_splice($result['body']['content'], 3, 0, $items);
 				}
 				if ($this->_requestedID) array_push($result['body']['content'], [
 					['type' => 'deletebutton',
