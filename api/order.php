@@ -73,8 +73,7 @@ class ORDER extends API {
 						['type' => 'button',
 						'description' => LANG::GET('order.edit_prepared_order'),
 						'attributes' =>['type' => 'button',
-						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]],
-						['type' => 'cart']
+						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
 					]);
 				}
 			break;
@@ -142,7 +141,7 @@ class ORDER extends API {
 		unset ($this->_payload->$unset);
 
 		$approval = false;
-		if (UTILITY::propertySet(_payload, 'approval_token')){
+		if (UTILITY::propertySet($this->_payload, 'approval_token')){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 			$statement->execute([
 				':token' => $this->_payload->approval_token
@@ -302,8 +301,7 @@ class ORDER extends API {
 						['type' => 'scanner',
 						'description' => LANG::GET('consumables.edit_product_search'),
 						'destination' => 'productsearch'
-						]
-					],[
+						],
 						['type' => 'searchinput',
 						'description' => LANG::GET('consumables.edit_product_search'),
 						'attributes' => [
@@ -384,13 +382,11 @@ class ORDER extends API {
 							'name' => 'info',
 							'value' => array_key_exists('info', $order) ? $order['info'] : '',
 							'data-loss' => 'prevent'
-						]]
-					],[
+						]],
 						['type' => 'radio',
 						'description' => LANG::GET('order.unit'),
 						'content' => $organizational_units
-						]
-					],[
+						],
 						['type' => 'scanner',
 						'description' => LANG::GET('order.commission'),
 						'attributes' => [
@@ -399,8 +395,7 @@ class ORDER extends API {
 							'placeholder' => LANG::GET('order.add_commission_placeholder'),
 							'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
 							'data-loss' => 'prevent'
-						]]
-					],[
+						]],
 						['type' => 'dateinput',
 						'description' => LANG::GET('order.delivery_date'),
 						'attributes' => [
