@@ -394,7 +394,7 @@ export class Assemble {
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === 'password' ? 'one-time-code' : 'off';
 		if (this.currentElement.description) input.name = this.currentElement.description;
-		if (this.currentElement.attributes !== undefined) {
+		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.hidden === undefined) {
 			if (this.currentElement.description) this.currentElement.attributes['placeholder'] = this.currentElement.description;
 			if (this.currentElement.attributes.placeholder) {
 				label = document.createElement('label');
@@ -405,6 +405,7 @@ export class Assemble {
 			}
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
+		if (this.currentElement.attributes.hidden !== undefined) return input;
 		if (label) return [...this.icon(), input, label];
 		return [...this.icon(), input];
 	}
@@ -514,7 +515,6 @@ export class Assemble {
 		button.appendChild(document.createTextNode('Reset'));
 		button.setAttribute('data-type', 'reset');
 		button.classList.add('inlinebutton');
-
 		return [...this.header(), input, label, button];
 	}
 
@@ -752,13 +752,11 @@ export class Assemble {
 			'onpointerdown': 'signaturePad.clear()'
 		};
 		result = result.concat(this.button());
-		this.currentElement.attributes = {
-			'type': 'file',
-			'id': 'signature',
-			'name': 'signature',
-			'hidden': true
-		};
-		result = result.concat(this.input('file'));
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.id = 'signature';
+		input.hidden = true;
+		result.push(input);
 		this.signaturePad = true;
 		return result;
 	}
