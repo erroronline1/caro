@@ -337,6 +337,9 @@ input[type=number] {
 .radio {
 	padding-left: 2em;
 }
+.checkbox {
+	padding-right: 2em;
+}
 
 .radio input,
 .checkbox input {
