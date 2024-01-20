@@ -51,18 +51,22 @@ export const api = {
 	},
 	loadindicator: (toggle) => {
 		if (toggle) {
-			document.querySelector('body').style.cursor = 'wait';
-			document.querySelector('.loader').style.display = 'block';
-			document.querySelector('.loader').style.opacity = '1';
+			api.loadindicatorTimeout.push(setTimeout(() => {
+				document.querySelector('body').style.cursor = 'wait';
+				document.querySelector('.loader').style.display = 'block';
+				document.querySelector('.loader').style.opacity = '1';
+			}, 500)); // wait a bit to avoid flash on every request
 			return;
 		}
+		api.loadindicatorTimeout.map((id) => clearTimeout(id));
+		api.loadindicatorTimeout = [];
 		document.querySelector('body').style.cursor = 'initial';
 		document.querySelector('.loader').style.opacity = '0';
 		setTimeout(() => {
 			document.querySelector('.loader').style.display = 'none'
 		}, 300);
-
 	},
+	loadindicatorTimeout: [],
 	toast: function (msg) {
 		const toast = document.querySelector('dialog');
 		if (typeof msg !== 'undefined') {
@@ -212,8 +216,9 @@ export const api = {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
 								for (const file of all) {
-									if (request[1] === 'bundle'){file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';}
-									else file.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
+									if (request[1] === 'bundle') {
+										file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
+									} else file.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
@@ -459,7 +464,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								let list = document.querySelector('[data-type=links]');
-								if (list) list.remove();
+								if (list) list.parentNode.remove();
 								new Assemble(data.body).initializeSection('hr');
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
@@ -497,7 +502,6 @@ export const api = {
 					successFn = function (data) {
 						api.toast(data.status.msg);
 					};
-					break;
 				}
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
