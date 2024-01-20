@@ -568,7 +568,7 @@ class ORDER extends API {
 					// inform user group
 					$messagepayload=[];
 					foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
-						$messagepayload[':' . $key] = $decoded_order_data[$key];
+						if (array_key_exists($key, $decoded_order_data)) $messagepayload[':' . $key] = $decoded_order_data[$key];
 					}
 					$this->alertUserGroup(array_search($order['organizational_unit'], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
 						':order' => LANG::GET('order.message', $messagepayload),
