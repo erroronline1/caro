@@ -754,7 +754,7 @@ export class Assemble {
 		result = result.concat(this.button());
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.id = 'signature';
+		input.id = input.name ='signature';
 		input.hidden = true;
 		result.push(input);
 		this.signaturePad = true;
