@@ -185,7 +185,8 @@ export class Assemble {
 
 		let scrollables = document.querySelectorAll('section');
 		for (const section of scrollables) {
-			if (section.childNodes.length > 1) section.addEventListener('scroll', sectionScroller);;
+			if (section.childNodes.length > 1) section.addEventListener('scroll', sectionScroller);
+			section.dispatchEvent(new Event('scroll'));
 		}
 
 		if (this.signaturePad) {
