@@ -13,7 +13,7 @@ class FILE extends API {
 	}
 
 	public function filter(){
-		if ($this->_requestedFolder && $this->_requestedFolder != 'null') $files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
 		else {
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			$files = [];
@@ -173,15 +173,13 @@ class FILE extends API {
 							array_push($result['body']['content'][1],
 								['type' => 'links',
 								'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
-								'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank']]],
-								['type' => 'hiddeninput',
-								'description' => 'filter',
-								'attributes'=>['data-filtered' => $file['path']]],
+								'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]]],
 								['type' => 'deletebutton',
 								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')"
+									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')",
+									'data-filtered' => $file['path']
 								]]
 							);
 						}
