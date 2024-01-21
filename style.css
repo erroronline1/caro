@@ -456,6 +456,12 @@ button:disabled {
 	padding-left: 2em
 }
 
+[data-type=deletebutton] {
+	color:var(--foreground);
+	background-color: var(--background);
+	border: 1px solid var(--cta);
+}
+
 button:active {
 	background-color: var(--cta_active);
 }
@@ -515,7 +521,8 @@ main>form>article,
 	display: inline-block;
 	border: 1px solid var(--3d-border);
 	border-radius: 1em;
-	background-color: var(--protrusion);
+	backdrop-filter: blur(10px);
+	/*background-color: var(--protrusion);*/
 	box-shadow: 3px 3px 6px var(--darkshadow);
 	transition: ease .2s;
 }
@@ -551,7 +558,8 @@ section>form,
 section>article,
 section>div[draggable] {
 	width: 100%;
-	padding-top: 1em;
+	padding-top: 0;
+	margin-top:0;
 	padding-bottom: 1em;
 	scroll-snap-align: center;
 	flex: none;
