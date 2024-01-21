@@ -282,7 +282,7 @@ export class Assemble {
 			const nodes = processPanel.call(this, panel);
 			let frame = false;
 			for (let n = 0; n < nodes.length; n++) {
-				if (!(['DATALIST', 'HR'].includes(nodes[n].nodeName) || nodes[n].hidden)) {
+				if (!(['DATALIST', 'HR', 'BUTTON'].includes(nodes[n].nodeName) || nodes[n].hidden)) {
 					frame = true;
 					break;
 				}
@@ -298,19 +298,21 @@ export class Assemble {
 
 	slider(sectionID, length) {
 		const indicators = document.createElement('div'),
-			toleft = document.createElement('div'),
-			toright = document.createElement('div');
+			toleft = document.createElement('button'),
+			toright = document.createElement('button');
 		indicators.classList = 'sectionindicator';
 		indicators.id = sectionID + 'indicator';
 
-		toleft.classList = 'toleft';
-		toleft.addEventListener('pointerdown', function (e) {
+		toleft.addEventListener('pointerup', function (e) {
 			document.getElementById(sectionID).scrollBy({
 				top: 0,
 				left: -400,
 				behaviour: 'smooth'
 			});
 		});
+		toleft.setAttribute('data-type', 'toleft');
+		toleft.classList.add('inlinebutton');
+		toleft.type = 'button';
 		indicators.appendChild(toleft);
 		for (let i = 0; i < length; i++) {
 			let indicator = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
@@ -323,14 +325,16 @@ export class Assemble {
 			indicator.appendChild(circle);
 			indicators.appendChild(indicator);
 		}
-		toright.classList = 'toright';
-		toright.addEventListener('pointerdown', function (e) {
+		toright.addEventListener('pointerup', function (e) {
 			document.getElementById(sectionID).scrollBy({
 				top: 0,
 				left: 400,
 				behaviour: 'smooth'
 			});
 		});
+		toright.setAttribute('data-type', 'toright');
+		toright.classList.add('inlinebutton');
+		toright.type = 'button';
 		indicators.appendChild(toright);
 		return indicators;
 	}
@@ -751,7 +755,7 @@ export class Assemble {
 			'name': '',
 			'onpointerdown': 'signaturePad.clear()'
 		};
-		result = result.concat(this.button());
+		result = result.concat(this.deletebutton());
 		const input = document.createElement('input');
 		input.type = 'file';
 		input.id = input.name ='signature';
