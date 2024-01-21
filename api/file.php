@@ -139,7 +139,7 @@ class FILE extends API {
 								['type' => 'links',
 								'description' => LANG::GET('file.manager_folder_header', [':date' => date('Y-m-d H:i', filemtime($folder))]),
 								'content' => [$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]]],
-								['type' => 'button',
+								['type' => 'deletebutton',
 								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
 									'type' => 'button',
@@ -177,7 +177,7 @@ class FILE extends API {
 								['type' => 'hiddeninput',
 								'description' => 'filter',
 								'attributes'=>['data-filtered' => $file['path']]],
-								['type' => 'button',
+								['type' => 'deletebutton',
 								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
@@ -234,7 +234,8 @@ class FILE extends API {
 		foreach($bundles as $row) {
 			$list=[];
 			foreach (json_decode($row['content'], true) as $path){
-				$list[pathinfo($path)['basename']]= ['href' => $path, 'target' => '_blank'];
+				$list[pathinfo($path)['basename']]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
+			];
 			}
 			$result['body']['content'][]=
 			[
@@ -334,20 +335,32 @@ class FILE extends API {
 				foreach ($folders as $folder) {
 					$files[$folder] = UTILITY::listFiles($folder ,'asc');
 				}
+				$filePerSlide = 0;
+				$matches = [];
+				$currentfolder = '';
 				foreach ($files as $folder => $content){
-					$matches = [];
 					foreach ($content as $file){
-						$file=['path' => substr($file, 1), 'file' => pathinfo($file)['filename']];
-						$matches[$file['file']] = ['value' => $file['path']];
-						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$file['file']]['checked'] = true;
+						$pathinfo = pathinfo($file);
+						$file = ['path' => substr($file, 1), 'file' => $pathinfo['basename'], 'folder' => $pathinfo['dirname']];
+						if ($currentfolder != $file['folder']) {
+							$matches[] = [];
+							$currentfolder = $file['folder'];
+							$filePerSlide = 0;
+						}
+						$article = intval(count($matches) - 1);
+						if (empty($filePerSlide++ % INI['file']['bundle_files_per_slide'])){
+							$matches[$article][] = [['type' => 'checkbox',
+								'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+								'content' => []
+								]];
+						}
+						$slide = intval(count($matches[$article]) - 1);
+						$matches[$article][$slide][0]['content'][$file['file']] = ['value' => $file['path']];
+						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$article][$slide][0]['content'][$file['file']]['checked'] = true;
 					}
-					if ($matches) $return['body']['content'][] =
-					[
-						['type' => 'checkbox',
-						'description' => LANG::GET('file.file_list', [':folder' => $folder]),
-						'content' => $matches
-						]
-					];
+				}
+				foreach ($matches as $folder) {
+					$return['body']['content'][] = $folder;
 				}
 				$isactive = $bundle['active'] ? ['checked' => true] : [];
 				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
