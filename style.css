@@ -1,7 +1,7 @@
 :root {
 	--background: rgb(229, 233, 240);
 	--foreground: rgb(46, 52, 64);
-	--protrusion: rgb(229, 233, 240);
+	--article: rgb(236, 239, 244);
 	--menu: rgb(216, 222, 233);
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
@@ -13,6 +13,7 @@
 	--green: rgb(153, 179, 132);
 	--purple: rgb(180, 142, 173);
 	--cta:rgb(136, 192, 208);
+	--cta_darker: rgb(80,155,176);
 	--cta_active: rgb(161, 227, 246);
 }
 
@@ -305,7 +306,7 @@ input[type=file] {
 a,
 a:active,
 a:visited {
-	color: var(--cta);
+	color: var(--cta_darker);
 	text-decoration: none;
 	outline: none;
 }
@@ -363,7 +364,7 @@ input[type=number] {
 	width: 1.5em;
 	height: 1.5em;
 	color: var(--green);
-	background: var(--background);
+	background: var(--article);
 	border: 1px solid var(--foreground);
 	border-radius: 50%;
 	transition: ease .2s;
@@ -382,7 +383,7 @@ input[type=number] {
 	display: block;
 	width: 1.5em;
 	height: 1.5em;
-	color: var(--background);
+	color: var(--article);
 	border: 1px solid var(--foreground);
 	border-radius: .2em;
 	transition: ease .2s;
@@ -413,7 +414,7 @@ select+label.input-label {
 	margin: 0 0 0 3.7em;
 	padding: 0 .25em;
 	opacity: 1;
-	background-color: var(--background);
+	background-color: var(--article);
 }
 
 .textarea-label {
@@ -424,7 +425,7 @@ select+label.input-label {
 	margin: 0 0 0 1.7em;
 	padding: 0 .25em;
 	opacity: 1;
-	background-color: var(--background);
+	background-color: var(--article);
 
 	&+textarea {
 		margin-left: 2em;
@@ -440,7 +441,7 @@ button {
 	border-radius: 2em 2em 2em 2em;
 	background-color: var(--cta);
 	transition: ease .15s;
-	color: var(--background);
+	color: var(--article);
 	font-weight: bold;
 }
 
@@ -458,7 +459,7 @@ button:disabled {
 
 [data-type=deletebutton] {
 	color:var(--foreground);
-	background-color: var(--background);
+	background-color: var(--article);
 	border: 1px solid var(--cta);
 }
 
@@ -521,8 +522,7 @@ main>form>article,
 	display: inline-block;
 	border: 1px solid var(--3d-border);
 	border-radius: 1em;
-	backdrop-filter: blur(10px);
-	/*background-color: var(--protrusion);*/
+	background-color: var(--article);
 	box-shadow: 3px 3px 6px var(--darkshadow);
 	transition: ease .2s;
 }
@@ -666,19 +666,19 @@ main a::before {
 }
 
 main a::before {
-	background-color: var(--cta);
+	background-color: var(--cta_darker);
 	-webkit-mask-image: url('media/external-link-alt.svg');
 	mask-image: url('media/external-link-alt.svg');
 }
 
 [data-type=toleft]::before {
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/arrow-left.svg');
 	mask-image: url('media/arrow-left.svg');
 }
 
 [data-type=toright]::before {
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/arrow-right.svg');
 	mask-image: url('media/arrow-right.svg');
 }
@@ -712,7 +712,7 @@ main a::before {
 }
 button[data-type=file]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/upload.svg');
 	mask-image: url('media/upload.svg');
 }
@@ -722,7 +722,7 @@ button[data-type=file]::before {
 }
 button[data-type=photo]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/camera.svg');
 	mask-image: url('media/camera.svg');
 }
@@ -756,7 +756,7 @@ button[data-type=photo]::before {
 }
 button[data-type=scanner]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/qrcode.svg');
 	mask-image: url('media/qrcode.svg');
 }
@@ -784,7 +784,7 @@ button[data-type=trash]::before {
 }
 button[data-type=additem]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/plus.svg');
 	mask-image: url('media/plus.svg');
 }
@@ -801,7 +801,7 @@ button[data-type=additem]::before {
 button[data-type=reset]::before,
 button[data-type=generateupdate]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/repeat-alt.svg');
 	mask-image: url('media/repeat-alt.svg');
 }
@@ -814,7 +814,7 @@ button[data-type=generateupdate]::before {
 button[data-type=savebutton]::before,
 button[data-type=save]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/save.svg');
 	mask-image: url('media/save.svg');
 }
@@ -824,7 +824,7 @@ button[data-type=save]::before {
 }
 button[data-type=image]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/image.svg');
 	mask-image: url('media/image.svg');
 }
@@ -834,7 +834,7 @@ button[data-type=image]::before {
 }
 button[data-type=submitbutton]::before {
 	background-image:none;
-	background-color: var(--background);
+	background-color: var(--article);
 	-webkit-mask-image: url('media/paper-plane.svg');
 	mask-image: url('media/paper-plane.svg');
 }
