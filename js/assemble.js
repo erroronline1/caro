@@ -729,7 +729,6 @@ export class Assemble {
 		result.push(this.hiddeninput());
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement('a');
-			console.log(link, attributes);
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
 			a.appendChild(document.createTextNode(link));
@@ -759,7 +758,7 @@ export class Assemble {
 		result = result.concat(this.deletebutton());
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.id = input.name ='signature';
+		input.id = input.name = 'signature';
 		input.hidden = true;
 		result.push(input);
 		this.signaturePad = true;
