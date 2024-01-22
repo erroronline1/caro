@@ -12,8 +12,8 @@
 	--yellow: rgb(235, 203, 139);
 	--green: rgb(153, 179, 132);
 	--purple: rgb(180, 142, 173);
-	--cta:rgb(136, 192, 208);
-	--cta_darker: rgb(80,155,176);
+	--cta: rgb(136, 192, 208);
+	--cta_darker: rgb(80, 155, 176);
 	--cta_active: rgb(161, 227, 246);
 }
 
@@ -247,7 +247,7 @@ nav {
 
 	a,
 	h3 {
-		color:inherit;
+		color: inherit;
 		display: block;
 		line-height: 2em;
 		white-space: nowrap;
@@ -344,6 +344,7 @@ input[type=number] {
 .radio {
 	padding-left: 2em;
 }
+
 .checkbox {
 	padding-right: 2em;
 	text-align: right;
@@ -458,7 +459,7 @@ button:disabled {
 }
 
 [data-type=deletebutton] {
-	color:var(--foreground);
+	color: var(--foreground);
 	background-color: var(--article);
 	border: 1px solid var(--cta);
 }
@@ -479,6 +480,20 @@ button:active {
 	box-shadow:
 		-1px -1px 2px var(--lightshadow),
 		0px 0px 2px var(--darkshadow);
+}
+
+[data-type=toleft],
+[data-type=toright] {
+	display: none
+}
+
+/* Large devices such as laptops (1024px and up) */
+@media only screen and (min-width: 64em) {
+
+	[data-type=toleft],
+	[data-type=toright] {
+		display: inline-block
+	}
 }
 
 /*************************** article elements and boxes ******************************/
@@ -559,7 +574,7 @@ section>article,
 section>div[draggable] {
 	width: 100%;
 	padding-top: 0;
-	margin-top:0;
+	margin-top: 0;
 	padding-bottom: 1em;
 	scroll-snap-align: center;
 	flex: none;
@@ -610,6 +625,7 @@ h1 {
 br {
 	clear: both;
 }
+
 /*************************** decorators ******************************/
 
 hr {
@@ -710,8 +726,9 @@ main a::before {
 [data-type=file]::before {
 	background-image: url("media/upload.svg");
 }
+
 button[data-type=file]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/upload.svg');
 	mask-image: url('media/upload.svg');
@@ -720,8 +737,9 @@ button[data-type=file]::before {
 [data-type=photo]::before {
 	background-image: url("media/camera.svg");
 }
+
 button[data-type=photo]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/camera.svg');
 	mask-image: url('media/camera.svg');
@@ -754,8 +772,9 @@ button[data-type=photo]::before {
 [data-type=scanner]::before {
 	background-image: url("media/qrcode.svg");
 }
+
 button[data-type=scanner]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/qrcode.svg');
 	mask-image: url('media/qrcode.svg');
@@ -768,7 +787,7 @@ button[data-type=scanner]::before {
 
 button[data-type=deletebutton]::before,
 button[data-type=trash]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--red);
 	-webkit-mask-image: url('media/trash-alt.svg');
 	mask-image: url('media/trash-alt.svg');
@@ -782,8 +801,9 @@ button[data-type=trash]::before {
 [data-type=additem]::before {
 	background-image: url("media/plus.svg");
 }
+
 button[data-type=additem]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/plus.svg');
 	mask-image: url('media/plus.svg');
@@ -798,9 +818,10 @@ button[data-type=additem]::before {
 [data-type=generateupdate]::before {
 	background-image: url("media/repeat-alt.svg");
 }
+
 button[data-type=reset]::before,
 button[data-type=generateupdate]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/repeat-alt.svg');
 	mask-image: url('media/repeat-alt.svg');
@@ -811,9 +832,10 @@ button[data-type=generateupdate]::before {
 [data-type=save]::before {
 	background-image: url("media/save.svg");
 }
+
 button[data-type=savebutton]::before,
 button[data-type=save]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/save.svg');
 	mask-image: url('media/save.svg');
@@ -822,8 +844,9 @@ button[data-type=save]::before {
 [data-type=image]::before {
 	background-image: url("media/image.svg");
 }
+
 button[data-type=image]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/image.svg');
 	mask-image: url('media/image.svg');
@@ -832,8 +855,9 @@ button[data-type=image]::before {
 [data-type=submitbutton]::before {
 	background-image: url("media/paper-plane.svg");
 }
+
 button[data-type=submitbutton]::before {
-	background-image:none;
+	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('media/paper-plane.svg');
 	mask-image: url('media/paper-plane.svg');
