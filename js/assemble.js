@@ -784,7 +784,7 @@ export class Assemble {
 		} else {
 			if ('attributes' in this.currentElement && 'type' in this.currentElement.attributes) input = [...this.input(this.currentElement.attributes.type)];
 			else input = [...this.input('text')];
-			inputid = input[1].id;
+			inputid = input[1].id ? input[1].id : input[2].id;
 			result = result.concat(input);
 		}
 		//attributes are processed already, therefore they can be reassigned
