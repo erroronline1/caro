@@ -146,31 +146,5 @@ const toolModule = {
 				filename: file
 			}]
 		});
-	},
-	defaultAvatar: function (name) {
-		const names = name.split(' '),
-			height = 128,
-			width = 128,
-			font = Math.min(height / 1.5, width / 1.5);
-		initials = name[0][0].toUpperCase();
-		if (names.length > 1) {
-			for (let n = names.length - 1; n > -1; n--) {
-				if (isNaN(names[n])) {
-					initials += names[n][0].toUpperCase();
-					break;
-				}
-			}
-		}
-		let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-			text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-		svg.setAttributeNS(null, 'viewbox', '0 0 128 128');
-		svg.setAttribute('width', width);
-		svg.setAttribute('height', height);
-		text.setAttributeNS(null, 'x', width / 2 - font * .3 * initials.length + font * .05 * (initials.length - 1));
-		text.setAttributeNS(null, 'y', height / 2 + font / 3);
-		text.setAttribute('style', 'font-family: monospace; font-size:' + font);
-		text.appendChild(document.createTextNode(initials));
-		svg.appendChild(text);
-		return 'data:image/svg+xml;utf8,' + new XMLSerializer().serializeToString(svg);
 	}
 };

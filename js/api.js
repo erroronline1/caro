@@ -118,7 +118,6 @@ export const api = {
 						return;
 					}
 					if (data.body.image) document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
-					else if (data.body.name) document.querySelector('body>label').style.backgroundImage = "url('" + toolModule.defaultAvatar(data.body.name) + "')";
 					api.application('get', 'start');
 				}
 				break;

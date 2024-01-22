@@ -143,12 +143,19 @@ class USER extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
-				// save and convert image
-				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
-					$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
-					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
-					$user['image'] = substr($user['image'], 3);
+				// save and convert image or create default
+				if (!(array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name'])) {
+					$tempPhoto = tmpfile();
+					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
+					$_FILES['photo'] = [
+						'name' => 'defaultpic.png',
+						'type' => 'imgae/png',
+						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
+					];
 				}
+				$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
+				UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
+				$user['image'] = substr($user['image'], 3);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_post'));
 				if ($statement->execute([
@@ -179,7 +186,8 @@ class USER extends API {
 				]);
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
-		
+				
+				$updateName = !($user['name']==$this->_payload->name);
 				$user['name']=$this->_payload->name;
 
 				foreach(INI['forbidden']['names'] as $pattern){
@@ -206,11 +214,19 @@ class USER extends API {
 				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
-				// convert image
 				// save and convert image
+				// save and convert image or create default
+				if (!(array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) && $updateName) {
+					$tempPhoto = tmpfile();
+					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
+					$_FILES['photo'] = [
+						'name' => 'defaultpic.png',
+						'type' => 'imgae/png',
+						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
+					];
+				}
 				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete($user['image']);
-
 					$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
@@ -384,6 +400,26 @@ class USER extends API {
 					]]);
 				break;
 		}
+	}
+
+	private function defaultPic($name){
+		$names = explode(' ', $name);
+		$initials = strtoupper(substr($names[0], 0, 1));
+		if (count($names) >1) $initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
+
+		$image = imagecreatetruecolor(256, 256);
+		$font_size = round(256 / 2);
+		$y = round(256 / 2 + $font_size / 2.4);
+		$x= round(256 / 2 - $font_size *.33 * strlen($initials));
+		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
+		imagefill($image, 0, 0, $background_color);
+		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
+		imagefttext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
+		ob_start();
+		imagepng($image);
+		$image = ob_get_contents();
+		ob_end_clean();
+		return $image;
 	}
 }
 
