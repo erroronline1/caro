@@ -339,7 +339,7 @@ input[type=number] {
 }
 
 .radio {
-	padding-left: 2em;
+	padding-left: 2.5em;
 }
 
 .checkbox {
@@ -349,48 +349,33 @@ input[type=number] {
 
 .radio input,
 .checkbox input {
-	appearance: none;
-	width: auto;
-}
-
-.radio input[type=radio]::before {
-	position: absolute;
-	content: '';
-	top: -12.5%;
-	left: 0;
-	display: block;
-	width: 1.5em;
-	height: 1.5em;
-	color: var(--green);
 	background: var(--article);
-	border: 1px solid var(--foreground);
-	border-radius: 50%;
-	transition: ease .2s;
-	text-align: center;
-}
-
-.radio input[type=radio]:checked::before {
-	content: '\23FA';
-}
-
-.checkbox input[type=checkbox]::after {
-	position: absolute;
-	content: '';
-	top: -12.5%;
-	right: 0;
-	display: block;
+	accent-color: var(--green);
 	width: 1.5em;
 	height: 1.5em;
-	color: var(--article);
-	border: 1px solid var(--foreground);
-	border-radius: .2em;
-	transition: ease .2s;
-	text-align: center;
+	margin: 0 1em;
+	position: absolute;
 }
 
-.checkbox input[type=checkbox]:checked::after {
-	background-color: var(--green);
-	content: '\2714';
+.radio input {
+	margin: 0 -2.5em
+}
+
+.radio input:not(:checked)::before,
+.checkbox input:not(:checked)::before {
+	content: "";
+	position: absolute;
+	width: 1.5em;
+	height: 1.5em;
+	top: 0;
+	left: 0;
+	border: 1px solid var(--foreground);
+	border-radius: 2px;
+	background-color: var(--article);
+}
+
+.radio input:not(:checked)::before {
+	border-radius: 50%;
 }
 
 .input-label {
