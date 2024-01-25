@@ -22,6 +22,10 @@ class LANG {
 		return preg_replace($patterns, $replacements, LANGUAGEFILE[$request[0]][$request[1]]);
 	}
 
+	public static function PROPERTY($request, $replace=[]){
+		return str_replace(' ', '_', self::GET($request, $replace));
+	}
+
 	public static function GETALL(){
 		return LANGUAGEFILE;
 	}
