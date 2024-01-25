@@ -41,10 +41,9 @@ class APPLICATION extends API {
 				'content' => [
 					[[
 						'type' => 'scanner',
-						'description' => LANG::GET('user.login_description'),
 						'attributes' => [
                             'data-usecase'=> 'login',
-							'name' => 'login',
+							'name' => LANG::GET('user.login_description'),
 							'type' => 'password'
 						]
 					]]
@@ -135,13 +134,13 @@ class APPLICATION extends API {
 			case 'POST':
 				$permissions = [];
 				$entry = [
-					'title' => $this->_payload->title,
-					'content' => $this->_payload->content,
+					'title' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_title')),
+					'content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_content')),
 					'permissions' => '',
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']])]]);
 				}
 		
 				// chain checked permission levels
@@ -171,13 +170,13 @@ class APPLICATION extends API {
 			case 'PUT':
 				$permissions = [];
 				$entry = [
-					'title' => $this->_payload->title,
-					'content' => $this->_payload->content,
+					'title' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_title')),
+					'content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_content')),
 					'permissions' => '',
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']])]]);
 				}
 		
 				// chain checked permission levels
@@ -236,23 +235,22 @@ class APPLICATION extends API {
 				$result['body']['content'] = [
 					[
 						['type' => 'select',
-						'description' => LANG::GET('application.edit_select_manual_topic'),
 						'attributes' => [
+							'name' => LANG::GET('application.edit_select_manual_topic'),
 							'onchange' => "api.application('get', 'manual', this.value)"
 						],
 						'content' => $options],
 						['type' => 'textinput',
-						'description' => LANG::GET('application.edit_manual_title'),
 						'attributes' => [
-							'name' => 'title',
-							'value' => $entry['title']
+							'name' => LANG::GET('application.edit_manual_title'),
+							'value' => $entry['title'],
+
 						]
 						],
 						['type' => 'textarea',
-						'description' => LANG::GET('application.edit_manual_content'),
 						'attributes' => [
 							'rows' => 8,
-							'name' => 'content',
+							'name' => LANG::GET('application.edit_manual_content'),
 							'value' => $entry['content']
 						]
 						],

@@ -52,7 +52,7 @@ class FILE extends API {
 				[
 					['type' => 'filterinput',
 					'attributes' => [
-						'placeholder' => LANG::GET('file.file_filter_label'),
+						'name' => LANG::GET('file.file_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
 						'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
 						'id' => 'filesearch'
@@ -96,7 +96,7 @@ class FILE extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('file.manager_new_folder'))));
+				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, LANG::PROPERTY('file.manager_new_folder')));
 				if ($new_folder){
 					foreach(INI['forbidden']['names'] as $pattern){
 						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['status' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder])]]);
@@ -125,7 +125,7 @@ class FILE extends API {
 				['form' => [
 					'data-usecase' => 'file',
 					'action' => "javascript:api.file('post', 'filemanager')"],
-				'content'=>[]
+					'content'=>[]
 				]];
 
 				if (!$this->_requestedFolder){
@@ -150,8 +150,8 @@ class FILE extends API {
 					}
 					$result['body']['content'][]=[
 						['type' => 'textinput',
-						'description' => LANG::GET('file.manager_new_folder'),
 						'attributes' => [
+							'name' => LANG::GET('file.manager_new_folder'),
 							'required' => true]]
 					];
 				}
@@ -161,7 +161,7 @@ class FILE extends API {
 						$result['body']['content'][]=[
 							['type' => 'filterinput',
 							'attributes' => [
-								'placeholder' => LANG::GET('file.file_filter_label'),
+								'name' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
 								'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
 								'id' => 'filefilter'
@@ -218,7 +218,7 @@ class FILE extends API {
 				[
 					['type' => 'filterinput',
 					'attributes' => [
-						'placeholder' => LANG::GET('file.file_filter_label'),
+						'name' => LANG::GET('file.bundle_filter_label'),
 						'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
 						'onblur' => "api.file('get', 'bundlefilter', this.value); return false;",
 						'id' => 'filesearch'
@@ -253,10 +253,12 @@ class FILE extends API {
 			case 'POST':
 				$unset = str_replace(' ', '_', LANG::GET('file.edit_existing_bundle'));
 				unset ($this->_payload->$unset);
+				$unset = str_replace(' ', '_', LANG::GET('file.edit_existing_bundle_select'));
+				unset ($this->_payload->$unset);
 				$save_name = str_replace(' ', '_', LANG::GET('file.edit_save_bundle'));
-				$name=$this->_payload->$save_name;
+				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
-				$active=str_replace(' ', '_', LANG::GET('file.edit_bundle_active'));
+				$active = str_replace(' ', '_', LANG::GET('file.edit_bundle_active'));
 				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
 				unset ($this->_payload->$active);
 
@@ -312,19 +314,18 @@ class FILE extends API {
 							'attributes' => [
 								'id' => 'bundles'
 							]],
-							['type' => 'searchinput',
-							'description' => LANG::GET('file.edit_existing_bundle'),
-							'attributes' => [
-								'placeholder' => LANG::GET('file.edit_existing_bundle_label'),
-								'list' => 'bundles',
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
-							]],
 							['type' => 'select',
-							'description' => LANG::GET('file.edit_existing_bundle'),
 							'attributes' => [
+								'name' => LANG::GET('file.edit_existing_bundle_select'),
 								'onchange' => "api.file('get', 'bundlemanager', this.value)"
 							],
-							'content' => $options]
+							'content' => $options],
+							['type' => 'searchinput',
+							'attributes' => [
+								'name' => LANG::GET('file.edit_existing_bundle'),
+								'list' => 'bundles',
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
+							]]
 						]]];
 
 				$files = [];
@@ -364,8 +365,10 @@ class FILE extends API {
 				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
 				$return['body']['content'][] = [
 					['type' => 'textinput',
-					'description' => LANG::GET('file.edit_save_bundle'),
-					'attributes'=>['value' => $bundle['name']]],
+					'attributes'=>[
+						'name'=> LANG::GET('file.edit_save_bundle'),
+						'value' => $bundle['name']]
+					],
 					['type' => 'radio',
 					'description' => LANG::GET('file.edit_bundle_active'),
 					'content'=>[
@@ -398,7 +401,8 @@ class FILE extends API {
 				['form' => [
 					'data-usecase' => 'file',
 					'action' => "javascript:api.file('post', 'sharepoint')"],
-				'content'=>[]]];
+					'content'=>[]]
+				];
 
 				$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
 				$display=[];
@@ -419,7 +423,7 @@ class FILE extends API {
 					$result['body']['content'][]=[
 						['type' => 'filterinput',
 						'attributes' => [
-							'placeholder' => LANG::GET('file.file_filter_label'),
+							'name' => LANG::GET('file.file_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",
 							'onblur' => "api.file('get', 'filter', 'sharepoint', this.value); return false;",
 							'id' => 'filefilter'
@@ -427,15 +431,10 @@ class FILE extends API {
 					];
 					$result['body']['content'][] = [
 						['type' => 'links',
-						'description' => LANG::GET('file.sharepoint_upload_headersdfgsdf'),
 						'content' => $display]
 					];
 				}
 				$result['body']['content'][]=[
-					['type' => 'hiddeninput',
-					'attributes' => [
-						'name' => 'destination',
-						'value' => $this->_requestedFolder]],
 					['type' => 'file',
 					'description' => LANG::GET('file.sharepoint_upload_header'),
 					'attributes' => [

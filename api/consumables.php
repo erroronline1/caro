@@ -102,18 +102,17 @@ class CONSUMABLES extends API {
 				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
 				 * thus directories can not be renamed on name changes of vendors
 				 */
-
 				$vendor = [
-					'name' => $this->_payload->name,
-					'active' => UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_vendor_active'))) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
-					'info' => $this->_payload->info,
-					'certificate' => ['validity' => $this->_payload->certificate_validity],
-					'pricelist' => ['validity' => '', 'filter' => $this->_payload->pricelist_filter],
-					'immutable_fileserver'=> $this->_payload->name . date('Ymd')
+					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')),
+					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
+					'info' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info')),
+					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
+					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
+					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . date('Ymd')
 				];
 				
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
 				}
 
 				// save certificate
@@ -161,13 +160,13 @@ class CONSUMABLES extends API {
 				// prepare vendor-array to update, return error if not found
 				if (!($vendor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
 
-				$vendor['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_vendor_active'))) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
-				$vendor['name'] = $this->_payload->name;
-				$vendor['info'] = $this->_payload->info;
+				$vendor['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
+				$vendor['name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name'));
+				$vendor['info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info'));
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
-				$vendor['certificate']['validity'] = $this->_payload->certificate_validity;
+				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
-				$vendor['pricelist']['filter'] = $this->_payload->pricelist_filter;
+				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
@@ -276,31 +275,28 @@ class CONSUMABLES extends API {
 							'id' => 'vendors'
 						]],
 						['type' => 'select',
-						'description' => LANG::GET('consumables.edit_existing_vendors'),
 						'attributes' => [
+							'name' => LANG::GET('consumables.edit_existing_vendors'),
 							'onchange' => "api.purchase('get', 'vendor', this.value)"
 						],
 						'content' => $options],
 						['type' => 'searchinput',
-						'description' => LANG::GET('consumables.edit_existing_vendors'),
 						'attributes' => [
-							'placeholder' => LANG::GET('consumables.edit_existing_vendors_label'),
+							'name' => LANG::GET('consumables.edit_existing_vendors_search'),
 							'list' => 'vendors',
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
 						]]
 					],
 					[
 						["type" => "textinput",
-						"description" => LANG::GET('consumables.edit_vendor_name'),
 						'attributes' => [
-							'name' => 'name',
+							"name" => LANG::GET('consumables.edit_vendor_name'),
 							'required' => true,
 							'value' => $vendor['name'] ? : ''
 						]],
 						["type" => "textarea",
-						"description" => LANG::GET('consumables.edit_vendor_info'),
 						'attributes' => [
-							'name' => 'info',
+							'name' => LANG::GET('consumables.edit_vendor_info'),
 							'value' => $vendor['info'] ? : '',
 							'rows' => 8
 						]],
@@ -314,9 +310,8 @@ class CONSUMABLES extends API {
 					[
 						[
 							["type" => "dateinput",
-							"description" => LANG::GET('consumables.edit_vendor_certificate_validity'),
 							'attributes' => [
-								'name' => 'certificate_validity',
+								'name' => LANG::GET('consumables.edit_vendor_certificate_validity'),
 								'value' => $vendor['certificate']['validity'] ? : ''
 							]]
 						],
@@ -347,9 +342,8 @@ class CONSUMABLES extends API {
 						],
 						[
 							["type" => "textarea",
-							"description" => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 							'attributes' => [
-								'name' => 'pricelist_filter',
+								'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 								'value' => $vendor['pricelist']['filter'] ? : '',
 								'placeholder' => json_encode(json_decode($this->filtersample, true)),
 								'rows' => 8
@@ -359,7 +353,7 @@ class CONSUMABLES extends API {
 				],
 				'form' => [
 					'data-usecase' => 'purchase',
-					'action' => $vendor['id'] ? 'javascript:api.purchase("put", "vendor", "' . $vendor['id'] . '")' : 'javascript:api.purchase("post", "vendor")'
+					'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')"
 				]];
 
 				if ($certificates) array_splice($result['body']['content'][2], 0, 0,
@@ -387,7 +381,6 @@ class CONSUMABLES extends API {
 						]
 					]]
 				);
-
 				$this->response($result);
 				break;
 		}
@@ -401,12 +394,13 @@ class CONSUMABLES extends API {
 				$product = [
 					'id' => null,
 					'vendor_id' => null,
-					'vendor_name' => $this->_payload->vendor_select !== '...' ? $this->_payload->vendor_select : $this->_payload->vendor_input,
-					'article_no' => $this->_payload->article_no,
-					'article_name' => $this->_payload->article_name,
-					'article_unit' => $this->_payload->article_unit,
-					'article_ean' => $this->_payload->article_ean,
-					'active' => UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_product_active'))) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
+					'vendor_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor')),
+					'vendor_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor')),
+					'article_no' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no')),
+					'article_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name')),
+					'article_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')),
+					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')),
+					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
 					'protected' => 0
 				];
 
@@ -455,12 +449,12 @@ class CONSUMABLES extends API {
 				// prepare product-array to update, return error if not found
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
 
-				$product['vendor_name'] = $this->_payload->vendor_select !== '...' ? $this->_payload->vendor_select : $this->_payload->vendor_input;
-				$product['article_no'] = $this->_payload->article_no;
-				$product['article_name'] = $this->_payload->article_name;
-				$product['article_unit'] = $this->_payload->article_unit;
-				$product['article_ean'] = $this->_payload->article_ean;
-				$product['active'] = UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('consumables.edit_product_active'))) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
+				$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
+				$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
+				$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
+				$product['article_unit'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit'));
+				$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
+				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
@@ -501,7 +495,7 @@ class CONSUMABLES extends API {
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
-				$options = ['...' => []];
+				$options = [LANG::GET('consumables.edit_product_vendor_select_default') => []];
 				$datalist_unit = [];
 				$result = [];
 				
@@ -572,10 +566,13 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'id' => 'units'
 						]],
+						['type' => 'scanner',
+						'description' => LANG::GET('consumables.edit_product_search_scan'),
+						'destination' => LANG::GET('consumables.edit_product_search')
+						],
 						['type' => 'searchinput',
-						'description' => LANG::GET('consumables.edit_product_search'),
 						'attributes' => [
-							'placeholder' => LANG::GET('consumables.edit_product_search_label'),
+							'name' => LANG::GET('consumables.edit_product_search'),
 							'value' => $this->_requestedID && $this->_subMethod === 'search' ? $this->_requestedID : '',
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'product', this.value, 'search'); return false;}"
 						]],
@@ -584,45 +581,39 @@ class CONSUMABLES extends API {
 						['type' => 'hr']
 					],
 					[
-						['type' => 'textinput',
-						'description' => LANG::GET('consumables.edit_product_vendor'),
+						['type' => 'select',
 						'attributes' => [
-							'name' => 'vendor_input',
+							'name' => LANG::GET('consumables.edit_product_vendor_select'),
+						],
+						'content' => $options],
+						['type' => 'textinput',
+						'attributes' => [
+							'name' => LANG::GET('consumables.edit_product_vendor'),
 							'list' => 'vendors',
 							'value' => $product['vendor_name']
 						]],
-						['type' => 'select',
-						'description' => LANG::GET('consumables.edit_product_vendor'),
-						'attributes' => [
-							'name' => 'vendor_select'
-						],
-						'content' => $options],
 						["type" => "textinput",
-						"description" => LANG::GET('consumables.edit_product_article_no'),
 						'attributes' => [
-							'name' => 'article_no',
+							'name' => LANG::GET('consumables.edit_product_article_no'),
 							'required' => true,
 							'value' => $product['article_no']
 						]],
 						["type" => "textinput",
-						"description" => LANG::GET('consumables.edit_product_article_name'),
 						'attributes' => [
-							'name' => 'article_name',
+							'name' => LANG::GET('consumables.edit_product_article_name'),
 							'required' => true,
 							'value' => $product['article_name']
 						]],
 						["type" => "textinput",
-						"description" => LANG::GET('consumables.edit_product_article_unit'),
 						'attributes' => [
-							'name' => 'article_unit',
+							'name' => LANG::GET('consumables.edit_product_article_unit'),
 							'list' => 'units',
 							'required' => true,
 							'value' => $product['article_unit']
 						]],
 						["type" => "textinput",
-						"description" => LANG::GET('consumables.edit_product_article_ean'),
 						'attributes' => [
-							'name' => 'article_ean',
+							'name' => LANG::GET('consumables.edit_product_article_ean'),
 							'value' => $product['article_ean']
 						]]
 					],

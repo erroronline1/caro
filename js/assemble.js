@@ -262,16 +262,25 @@ export class Assemble {
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
 			function processPanel(elements) {
-				let content = [];
+				let content = [],
+					widget;
 				if (elements.constructor.name === 'Array') {
 					const section = document.createElement('section');
 					section.id = getNextElementID();
 					elements.forEach(element => {
+						widget = processPanel.call(this, element);
+						if (!typeof widget === 'array') widget = [widget];
 						if (elements[0].constructor.name === 'Array') {
 							const article = document.createElement('article');
-							article.append(...processPanel.call(this, element));
+							for (const e of widget) {
+								if (e) article.append(e);
+							}
 							section.append(article);
-						} else content = content.concat(processPanel.call(this, element));
+						} else {
+							for (const e of widget) {
+								if (e) content.push(e);
+							}
+						}
 					});
 					if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
 				} else {
@@ -348,7 +357,8 @@ export class Assemble {
 	}
 
 	header() {
-		const header = document.createElement('header');
+		if (this.currentElement.description == undefined) return [];
+		let header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.currentElement.description));
 		header.setAttribute('data-type', this.currentElement.type);
 		return [header];
@@ -387,32 +397,29 @@ export class Assemble {
 	input(type) {
 		/*{
 			type: 'textinput',
-			description: 'text input',
+			description: 'please provide information about...',
 			attributes: {
-				placeholder: 'text input'
+				name: 'variable name' // will be used as an accessible placeholder
 			}
 		}*/
-		let input = document.createElement('input');
-		let label;
+		let input = document.createElement('input'),
+			label, div;
 		input.type = type;
 		if (type === 'password') this.currentElement.type = 'password';
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === 'password' ? 'one-time-code' : 'off';
-		if (this.currentElement.description) input.name = this.currentElement.description;
-		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.hidden === undefined) {
-			if (this.currentElement.description) this.currentElement.attributes['placeholder'] = this.currentElement.description;
-			if (this.currentElement.attributes.placeholder) {
-				label = document.createElement('label');
-				label.htmlFor = input.id;
-				label.appendChild(document.createTextNode(this.currentElement.attributes.placeholder));
-				this.currentElement.attributes.placeholder = ' ';
-				label.classList.add('input-label');
-			}
-			input = this.apply_attributes(this.currentElement.attributes, input);
+		label = document.createElement('label');
+		label.htmlFor = input.id;
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
+		this.currentElement.attributes.placeholder = ' '; // to access input:not(:placeholder-shown) query selector 
+		label.classList.add('input-label');
+		input = this.apply_attributes(this.currentElement.attributes, input);
+		if (this.currentElement.description) {
+			div = document.createElement('div');
+			div.appendChild(document.createTextNode(this.currentElement.description));
 		}
 		if (this.currentElement.attributes.hidden !== undefined) return input;
-		if (label) return [...this.icon(), input, label];
-		return [...this.icon(), input];
+		return [...this.icon(), input, label, div];
 	}
 	textinput() {
 		return this.input('text');
@@ -462,16 +469,16 @@ export class Assemble {
 	hiddeninput() {
 		/*{
 			type: 'hiddeninput',
-			description: 'value of pi',
-			attributes: {value: '3.14'}
+			attributes: {
+				name: 'name',
+				value: '3.14'}
 			}
 		}*/
 		let input = document.createElement('input');
 		input.type = 'hidden';
-		input.name = this.currentElement.description;
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
-		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
+		if ('attributes' in this.currentElement) input = this.apply_attributes(this.currentElement.attributes, input);
 		return input;
 	}
 	datalist() {
@@ -492,6 +499,7 @@ export class Assemble {
 			type: 'file',
 			description: 'file upload',
 			attributes: {
+				name: 'variable name',
 				multiple: true
 			}
 		}*/
@@ -604,6 +612,9 @@ export class Assemble {
 		/*{
 			type: 'select',
 			description: 'list',
+			attributes: {
+				name: 'variable name'
+			},
 			content: {
 				'entry one': {
 					value: '1'
@@ -615,8 +626,9 @@ export class Assemble {
 			}
 		}*/
 		const groups = {};
-		let select = document.createElement('select');
-		select.name = select.title = this.currentElement.description;
+		let select = document.createElement('select'),
+			label, div;
+		select.title = this.currentElement.attributes.name.replace(/\[\]/g, '');
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
 		for (const [key, element] of Object.entries(this.currentElement.content)) {
@@ -636,13 +648,14 @@ export class Assemble {
 			}
 			select.appendChild(optgroup);
 		}
+		label = document.createElement('label');
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
+		label.classList.add('input-label');
 		if (this.currentElement.description) {
-			const label = document.createElement('label');
-			label.appendChild(document.createTextNode(this.currentElement.description));
-			label.classList.add('input-label');
-			return [...this.icon(), select, label];
+			div = document.createElement('div');
+			div.appendChild(document.createTextNode(this.currentElement.description));
 		}
-		return [...this.icon(), select];
+		return [...this.icon(), select, label, div];
 	}
 
 	textarea() {
@@ -654,21 +667,24 @@ export class Assemble {
 				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
-		let textarea = document.createElement('textarea');
-		textarea.name = this.currentElement.description;
-		textarea.id = getNextElementID;
+		let textarea = document.createElement('textarea'),
+			label, div;
+		textarea.id = getNextElementID();
 		textarea.autocomplete = 'off';
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 
-		if (this.currentElement.description) {
-			const label = document.createElement('label');
+		if (this.currentElement.attributes.name != undefined) {
+			label = document.createElement('label');
 			label.htmlFor = textarea.id;
-			label.appendChild(document.createTextNode(this.currentElement.description));
+			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
 			label.classList.add('textarea-label');
-			return [...this.icon(), label, textarea];
 		}
-		return [...this.icon(), textarea];
+		if (this.currentElement.description) {
+			div = document.createElement('div');
+			div.appendChild(document.createTextNode(this.currentElement.description));
+		}
+		return [...this.icon(), label, textarea, div];
 	}
 
 	checkbox(radio = null) {
@@ -726,7 +742,7 @@ export class Assemble {
 			}
 		}*/
 		let result = [...this.header()];
-		result.push(this.hiddeninput());
+		if ('attributes' in this.currentElement) result.push(this.hiddeninput());
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement('a');
 			a = this.apply_attributes(attributes, a);

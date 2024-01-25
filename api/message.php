@@ -19,15 +19,15 @@ class MESSAGE extends API {
 				// get recipient id
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
-					':id' => $this->_payload->to
+					':id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))
 				]);
-				if (!$recipient = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_payload->to])]], 400);
+				if (!$recipient = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))])]], 400);
 				if ($recipient['id'] < 2) $this->response(['status' => ['msg' => LANG::GET('message.forbidden')]], 403);
 				
 				$message = [
 					'from_user' => $_SESSION['user']['id'],
 					'to_user' => $recipient['id'],
-					'message' => $this->_payload->message
+					'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))
 				];
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_message'));
@@ -46,9 +46,9 @@ class MESSAGE extends API {
 				$datalist = [];
 				$result = [];
 				$prefill = [
-					'message'=>UTILITY::propertySet($this->_payload, 'message') ? : '',
-					'to'=>UTILITY::propertySet($this->_payload, 'to') ? : ''];
-				
+					'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : '',
+					'to' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.from')) ? : (UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : '')
+				];				
 				// prepare existing users lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 				$statement->execute();
@@ -68,17 +68,15 @@ class MESSAGE extends API {
 					],[
 						['type' => 'textinput',
 						'attributes' => [
-							'name' => 'to',
+							'name' => LANG::GET('message.to'),
 							'required' => true,
-							'placeholder' => LANG::GET('message.to'),
 							'list' => 'users',
 							'value' => $prefill['to'] ? : '',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textarea',
-						'description' => LANG::GET('message.message'),
 						'attributes' => [
-							'name' => 'message',
+							'name' => LANG::GET('message.message'),
 							'required' => true,
 							'value' => $prefill['message'] ? : '',
 							'rows' => 10,
@@ -169,7 +167,7 @@ class MESSAGE extends API {
 		$content=[[
 				['type' => 'filterinput',
 				'attributes' => [
-					'placeholder' => LANG::GET('message.message_filter_label'),
+					'name' => LANG::GET('message.message_filter_label'),
 					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
 					'onblur' => "api.message('get', 'filter', this.value); return false;",
 					'id' => 'productsearch'
@@ -182,18 +180,15 @@ class MESSAGE extends API {
 				'attributes'=>['data-filtered' => $message['id']]
 			],
 				['type' => 'textinput',
-				'description' => LANG::GET('message.from'),
 				'attributes' => [
-					'name' => 'to',
 					'readonly' => true,
 					'data-message' => $message['id'],
-					'placeholder' => LANG::GET('message.from'),
+					'name' => LANG::GET('message.from'),
 					'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
-				'description' => LANG::GET('message.message'),
 				'attributes' => [
-					'name' => 'message',
+					'name' => LANG::GET('message.message'),
 					'data-message' => $message['id'],
 					'readonly' => true,
 					'value' => $message['message'],
@@ -246,7 +241,7 @@ class MESSAGE extends API {
 		$content=[[
 			['type' => 'filterinput',
 			'attributes' => [
-				'placeholder' => LANG::GET('message.message_filter_label'),
+				'name' => LANG::GET('message.message_filter_label'),
 				'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
 				'onblur' => "api.message('get', 'filter', this.value); return false;",
 				'id' => 'productsearch'
@@ -258,18 +253,15 @@ class MESSAGE extends API {
 				'description' => 'filter',
 				'attributes'=>['data-filtered' => $message['id']]],
 				['type' => 'textinput',
-				'description' => LANG::GET('message.to'),
 				'attributes' => [
-					'name' => 'to',
+					'name' => LANG::GET('message.to'),
 					'readonly' => true,
 					'data-message' => $message['id'],
-					'placeholder' => LANG::GET('message.to'),
 					'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
-				'description' => LANG::GET('message.message'),
 				'attributes' => [
-					'name' => 'message',
+					'name' => LANG::GET('message.message'),
 					'data-message' => $message['id'],
 					'readonly' => true,
 					'value' => $message['message'],

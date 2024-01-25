@@ -111,7 +111,7 @@ class USER extends API {
 				$permissions = [];
 				$units = [];
 				$user = [
-					'name' => $this->_payload->name,
+					'name' => UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name')),
 					'permissions' => '',
 					'units' => '',
 					'token' => '',
@@ -187,8 +187,8 @@ class USER extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
 				
-				$updateName = !($user['name']==$this->_payload->name);
-				$user['name']=$this->_payload->name;
+				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name')));
+				$user['name'] = UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']])]]);
@@ -297,24 +297,22 @@ class USER extends API {
 						'attributes' => [
 							'id' => 'users'
 						]],
-						['type' => 'searchinput',
-						'description' => LANG::GET('user.edit_existing_users'),
-						'attributes' => [
-							'placeholder' => LANG::GET('user.edit_existing_users_label'),
-							'list' => 'users',
-							'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
-						]],
 						['type' => 'select',
-						'description' => LANG::GET('user.edit_existing_users'),
 						'attributes' => [
+							'name' => LANG::GET('user.edit_existing_user_select'),
 							'onchange' => "api.user('get', 'user', this.value)"
 						],
-						'content' => $options]
+						'content' => $options],
+						['type' => 'searchinput',
+						'attributes' => [
+							'name' => LANG::GET('user.edit_existing_user'),
+							'list' => 'users',
+							'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
+						]]
 					],[
 						['type' => 'textinput',
-						'description' => LANG::GET('user.edit_name'),
 						'attributes' => [
-							'name' => 'name',
+							'name' => LANG::GET('user.edit_name'),
 							'required' => true,
 							'value' => $user['name'] ? : ''
 						]],

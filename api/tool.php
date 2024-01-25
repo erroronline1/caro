@@ -22,8 +22,8 @@ class TOOL extends API {
 			'qrcode_text' => ['name' => LANG::GET('tool.qrcode_text'),
 				'content'=> [
 					['type' => 'textarea',
-					'description' => LANG::GET('tool.qrcode_text'),
 					'attributes' => [
+						'name' => LANG::GET('tool.qrcode_text'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_text'))) ? : ''
 					]]
@@ -32,38 +32,38 @@ class TOOL extends API {
 			'qrcode_appointment' => ['name' => LANG::GET('tool.qrcode_appointment'),
 				'content'=>[
 					['type' => 'dateinput',
-					'description' => LANG::GET('tool.qrcode_appointment_date'),
 					'attributes' => [
+						'name' => LANG::GET('tool.qrcode_appointment_date'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_date'))) ? : ''
 						]
 					],
 					['type' => 'timeinput',
-					'description' => LANG::GET('tool.qrcode_appointment_time'),
 					'attributes' => [
+						'name' => LANG::GET('tool.qrcode_appointment_time'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_time'))) ? : ''
 						]
 					],
 					['type' => 'textinput',
-					'description' => LANG::GET('tool.qrcode_appointment_occasion'),
+					'description' => LANG::GET('tool.qrcode_appointment_occasion_description'),
 					'attributes' => [
-						'placeholder' => LANG::GET('tool.qrcode_appointment_occasion_placeholder'),
+						'name' => LANG::GET('tool.qrcode_appointment_occasion'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_occasion'))) ? : ''
 						]
 					],
 					['type' => 'textinput',
-					'description' => LANG::GET('tool.qrcode_appointment_reminder'),
+					'description' => LANG::GET('tool.qrcode_appointment_reminder_description'),
 					'attributes' => [
-						'placeholder' => LANG::GET('tool.qrcode_appointment_reminder_placeholder'),
+						'name' => LANG::GET('tool.qrcode_appointment_reminder'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_reminder'))) ? : ''
 						]
 					],
 					['type' => 'numberinput',
-					'description' => LANG::GET('tool.qrcode_appointment_duration'),
 					'attributes' => [
+						'name' => LANG::GET('tool.qrcode_appointment_duration'),
 						'min' => 1,
 						'max' => 200,
 						'step' => 1,
@@ -84,9 +84,9 @@ class TOOL extends API {
 			'barcode_code128' => ['name' => LANG::GET('tool.barcode_code128'),
 				'content'=>[
 					['type' => 'textinput',
-					'description' => LANG::GET('tool.barcode_description'),
+					'description' => LANG::GET('tool.barcode_code128_placeholder'),
 					'attributes' => [
-						'placeholder' => LANG::GET('tool.barcode_code128_placeholder'),
+						'name' => LANG::GET('tool.barcode_description'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''
 						]
@@ -96,9 +96,9 @@ class TOOL extends API {
 			'barcode_ean13' => ['name' => LANG::GET('tool.barcode_ean13'),
 				'content'=>[
 					['type' => 'numberinput',
-					'description' => LANG::GET('tool.barcode_description'),
+					'description' => LANG::GET('tool.barcode_ean13_placeholder'),
 					'attributes' => [
-						'placeholder' => LANG::GET('tool.barcode_ean13_placeholder'),
+						'name' => LANG::GET('tool.barcode_description'),
 						'data-usecase' => 'tool_create_code',
 						'value' => UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.barcode_description'))) ? : ''
 						]
@@ -117,8 +117,8 @@ class TOOL extends API {
 		$result['body']=['content' => [
 			[
 				['type' => 'select',
-				'description' => LANG::GET('tool.code_select_type'),
 				'attributes' => [
+					'name' => LANG::GET('tool.code_select_type'),
 					'onchange' => "api.tool('get', 'code', this.value)"
 				],
 				'content' => $options],
@@ -168,8 +168,8 @@ class TOOL extends API {
 				'destination' => 'tool_scanner'
 				],
 				['type' => 'textarea',
-				'description' => 'result',
 				'attributes' =>[
+					'name' => LANG::GET('tool.scanner_result'),
 					'rows' => 8,
 					'readonly' => true,
 					'id' => 'tool_scanner'
@@ -195,13 +195,12 @@ class TOOL extends API {
 		$result['body']=['content' => [
 			[
 				['type' => 'select',
-				'description' => LANG::GET('tool.stl_viewer_select'),
 				'attributes' => [
+					'name' => LANG::GET('tool.stl_viewer_select'),
 					'onchange' => "toolModule.initStlViewer('../' + this.value)"
 				],
 				'content' => $options],
 				['type' => 'stlviewer',
-				'description' => LANG::GET('menu.tool_stl_viewer')
 				]
 			]
 		]];

@@ -57,13 +57,13 @@ class ORDER extends API {
 						if (is_array($value)){
 							foreach($value as $index => $item){ // items
 								foreach ($item as $itemkey => $itemvalue){
-									$text .= $this->fields[$itemkey] . ': ' . $itemvalue . '\n';
+									$text .= $itemkey . ': ' . $itemvalue . '\n';
 								}
 								$text .= '\n';
 							}
 
 						} else {
-							$text .= $this->fields[$key] . ': ' . $value . '\n';
+							$text .= $key . ': ' . $value . '\n';
 						}
 					}
 					array_push($result['body']['content'], [
@@ -138,7 +138,7 @@ class ORDER extends API {
 	}
 
 	private function processOrderForm(){
-		$unset=str_replace(' ', '_', LANG::GET('consumables.edit_product_search'));
+		$unset=LANG::PROPERTY('consumables.edit_product_search');
 		unset ($this->_payload->$unset);
 
 		$approval = false;
@@ -156,7 +156,8 @@ class ORDER extends API {
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
 		}
-		unset ($this->_payload->approval_token);
+		$unset=LANG::PROPERTY('consumables.add_approval_token');
+		unset ($this->_payload->$unset);
 		$order_data=['items'=>[]];
 		foreach ($this->_payload as $key => $value){
 			if (is_array($value)){
@@ -301,13 +302,12 @@ class ORDER extends API {
 				'content' => [
 					[
 						['type' => 'scanner',
-						'description' => LANG::GET('consumables.edit_product_search'),
-						'destination' => 'productsearch'
+						'description' => LANG::GET('consumables.edit_product_search_scan'),
+						'destination' => LANG::GET('consumables.edit_product_search')
 						],
 						['type' => 'searchinput',
-						'description' => LANG::GET('consumables.edit_product_search'),
 						'attributes' => [
-							'placeholder' => LANG::GET('consumables.edit_product_search_label'),
+							'name' => LANG::GET('consumables.edit_product_search'),
 							'value' => $this->_requestedID && $this->_subMethod === 'search' ? $this->_requestedID : '',
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', this.value); return false;}",
 							'onblur' => "if (this.value) {api.purchase('get', 'productsearch', this.value); return false;}",
@@ -329,46 +329,41 @@ class ORDER extends API {
 					],[
 						['type' => 'numberinput',
 						'attributes' => [
-							'name' => 'quantity[]',
+							'name' => LANG::GET('order.quantity_label') . '[]',
 							'min' => '1',
 							'max' => '99999',
-							'placeholder' => LANG::GET('order.quantity_label'),
 							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'attributes' => [
-							'name' => 'unit[]',
+							'name' => LANG::GET('order.unit_label') . '[]',
 							'list' => 'units',
-							'placeholder' => LANG::GET('order.unit_label'),
 							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'attributes' => [
-							'name' => 'vendor[]',
+							'name' => LANG::GET('order.vendor_label') . '[]',
 							'list' => 'vendors',
-							'placeholder' => LANG::GET('order.vendor_label'),
 							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'attributes' => [
-							'name' => 'number[]',
-							'placeholder' => LANG::GET('order.ordernumber_label'),
+							'name' => LANG::GET('order.ordernumber_label') . '[]',
 							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'attributes' => [
-							'name' => 'name[]',
-							'placeholder' => LANG::GET('order.productname_label'),
+							'name' => LANG::GET('order.productname_label') . '[]',
 							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'hiddeninput',
 						'attributes' => [
-							'name' => 'barcode[]',
+							'name' => LANG::GET('order.barcode') . '[]',
 							'value' => '' // otherwise undefined messes up
 						]],
 						['type' => 'button',
@@ -379,9 +374,8 @@ class ORDER extends API {
 						]]
 					],[
 						['type' => 'textarea',
-						'description' => LANG::GET('order.additional_info'),
 						'attributes' => [
-							'name' => 'info',
+							'name' => LANG::GET('order.additional_info'),
 							'value' => array_key_exists('info', $order) ? $order['info'] : '',
 							'data-loss' => 'prevent'
 						]],
@@ -390,18 +384,15 @@ class ORDER extends API {
 						'content' => $organizational_units
 						],
 						['type' => 'scanner',
-						'description' => LANG::GET('order.commission'),
 						'attributes' => [
-							'name' => 'commission',
 							'required' => true,
-							'placeholder' => LANG::GET('order.add_commission_placeholder'),
+							'name' => LANG::GET('order.add_commission_label'),
 							'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'dateinput',
-						'description' => LANG::GET('order.delivery_date'),
 						'attributes' => [
-							'name' => 'deliverydate',
+							'name' => LANG::GET('order.delivery_date'),
 							'value' => array_key_exists('deliverydate', $order) ? $order['deliverydate'] : ''
 						]]
 					],[
@@ -414,9 +405,8 @@ class ORDER extends API {
 						],
 						[
 							['type' => 'scanner',
-							"description" => LANG::GET('order.add_approval_token'),
 							'attributes' => [
-								'name' => 'approval_token',
+								'name' => LANG::GET('order.add_approval_token'),
 								'type' => 'password'
 							]]
 						]
@@ -429,51 +419,46 @@ class ORDER extends API {
 						[
 							['type' => 'numberinput',
 							'attributes' => [
-								'name' => 'quantity[]',
 								'min' => '1',
 								'max' => '99999',
-								'placeholder' => LANG::GET('order.quantity_label'),
+								'name' => LANG::GET('order.quantity_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
 								'value' => $order['items'][$i]['quantity'],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
 							'attributes' => [
-								'name' => 'unit[]',
 								'list' => 'units',
-								'placeholder' => LANG::GET('order.unit_label'),
+								'name' => LANG::GET('order.unit_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
 								'value' => $order['items'][$i]['unit'],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
 							'attributes' => [
-								'name' => 'vendor[]',
 								'list' => 'vendors',
-								'placeholder' => LANG::GET('order.vendor_label'),
+								'name' => LANG::GET('order.vendor_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
 								'value' => $order['items'][$i]['vendor'],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
 							'attributes' => [
-								'name' => 'number[]',
-								'placeholder' => LANG::GET('order.ordernumber_label'),
+								'name' => LANG::GET('order.ordernumber_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
 								'value' => $order['items'][$i]['number'],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
 							'attributes' => [
-								'name' => 'name[]',
-								'placeholder' => LANG::GET('order.productname_label'),
+								'name' => LANG::GET('order.productname_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
 								'value' => $order['items'][$i]['name'],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'hiddeninput',
 							'attributes' => [
-								'name' => 'barcode[]',
+								'name' => LANG::GET('order.barcode') . '[]',
 								'value' => array_key_exists ('barcode', $order['items'][$i]) ? $order['items'][$i]['barcode'] : ''
 							]],
 							['type' => 'button',
@@ -591,7 +576,7 @@ class ORDER extends API {
 						]],
 						['type' => 'searchinput',
 						'attributes' => [
-							'placeholder' => LANG::GET('order.order_filter_label'),
+							'name' => LANG::GET('order.order_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
 							'onblur' => "api.purchase('get', 'filter', this.value); return false;",
 							'id' => 'productsearch'
@@ -641,7 +626,7 @@ class ORDER extends API {
 							'type' => 'textinput',
 							'attributes' => [
 								'value' => $value,
-								'placeholder' => $this->fields[$key],
+								'name' => $key,
 								'readonly' => true,
 								'onpointerup' => 'orderClient.toClipboard(this)'
 							]
@@ -654,7 +639,7 @@ class ORDER extends API {
 							$content[]=[
 								'type' => 'hiddeninput',
 								'attributes' => [
-									'name' => 'to',
+									'name' => LANG::PROPERTY('message.to'),
 									'value' => $value,
 									'data-message' => $row['id']
 								]
@@ -662,7 +647,7 @@ class ORDER extends API {
 							$content[]=[
 								'type' => 'hiddeninput',
 								'attributes' => [
-									'name' => 'message',
+									'name' => LANG::PROPERTY('message.message'),
 									'value' => LANG::GET('order.message', $messagepayload),
 									'data-message' => $row['id']
 								]
@@ -672,7 +657,7 @@ class ORDER extends API {
 								'type' => 'textinput',
 								'attributes' => [
 									'value' => $value,
-									'placeholder' => LANG::GET('order.message_orderer'),
+									'name' => LANG::GET('order.message_orderer'),
 									'readonly' => true,
 									'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"
 								]
@@ -695,7 +680,7 @@ class ORDER extends API {
 						];
 					}
 
-					$text .= $this->fields['organizational_unit'] . ': ' . $row['organizational_unit'] . '\n';
+					$text .= LANG::GET('order.unit') . ': ' . $row['organizational_unit'] . '\n';
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
 
@@ -740,9 +725,6 @@ class ORDER extends API {
 							'type' => 'button',
 							'onpointerup' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
 						]
-					];
-					$content[]=[
-						'type' => 'cart',
 					];
 					array_push($result['body']['content'], $content);
 				}
