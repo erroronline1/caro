@@ -148,6 +148,11 @@ class FILE extends API {
 							);
 						}
 					}
+					array_push($result['body']['content'][0],
+						['type' => 'links',
+						'description' => LANG::GET('menu.files_sharepoint'),
+						'content' => [LANG::GET('menu.files_sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]]]
+					);
 					$result['body']['content'][]=[
 						['type' => 'textinput',
 						'attributes' => [
@@ -156,7 +161,8 @@ class FILE extends API {
 					];
 				}
 				else {
-					$files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
+					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						$result['body']['content'][]=[
 							['type' => 'filterinput',
@@ -184,7 +190,8 @@ class FILE extends API {
 							);
 						}
 					}
-					$result['body']['content'][]=[
+					if ($this->_requestedFolder === 'sharepoint') unset ($result['body']['form']);
+					else $result['body']['content'][]=[
 						['type' => 'hiddeninput',
 						'attributes' => [
 							'name' => 'destination',
@@ -200,7 +207,9 @@ class FILE extends API {
 				$this->response($result);
 				break;
 			case 'DELETE':
-				if (UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''))) $this->response(['status' => [
+				if ($this->_requestedFolder === 'sharepoint') $success = UTILITY::delete('../' . INI['sharepoint']['folder'] . '/' . $this->_requestedFile);
+				else $success = UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
+				if ($success) $this->response(['status' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
 					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null]
 				]]);
@@ -251,14 +260,14 @@ class FILE extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$unset = str_replace(' ', '_', LANG::GET('file.edit_existing_bundle'));
+				$unset = LANG::PROPERTY('file.edit_existing_bundle_select');
 				unset ($this->_payload->$unset);
-				$unset = str_replace(' ', '_', LANG::GET('file.edit_existing_bundle_select'));
+				$unset = LANG::PROPERTY('file.edit_existing_bundle');
 				unset ($this->_payload->$unset);
-				$save_name = str_replace(' ', '_', LANG::GET('file.edit_save_bundle'));
+				$save_name = LANG::PROPERTY('file.edit_save_bundle');
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
-				$active = str_replace(' ', '_', LANG::GET('file.edit_bundle_active'));
+				$active = LANG::PROPERTY('file.edit_bundle_active');
 				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
 				unset ($this->_payload->$active);
 
@@ -277,9 +286,6 @@ class FILE extends API {
 							'name' => false,
 							'name' => LANG::GET('file.edit_bundle_not_saved')
 						]]);
-				
-				var_dump($this->_payload);
-				die();
 				break;
 			case 'GET':
 				$datalist = [];
