@@ -487,6 +487,12 @@ article>span[data-type] {
 	width: 0;
 }
 
+label+div,
+textarea+div {
+	margin:-1em 0  0 2.3em;
+	font-size: .75em;
+}
+
 .scanner {
 	height: 0;
 	transition: ease .3s;
