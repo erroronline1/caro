@@ -70,13 +70,13 @@ const _serviceWorker = {
 const orderClient = {
 	addProduct: (...data) => {
 		// order to be taken into account in order.php "productsearch" method as well!
-		const nodes = document.querySelectorAll('[data-type=collapsed]'),
-			newNode = nodes[nodes.length - 1].cloneNode(true),
+		const nodes = document.querySelectorAll('main>form>article'),
+			newNode = nodes[nodes.length - 3].cloneNode(true),
 			transfer = ['', ...data]; // first item is supposed to be quantity
 
 		newNode.children[newNode.children.length - 1].remove();
-		for (let i = 0; i < newNode.children.length; i += 2) {
-			if ('value' in newNode.children[i]) newNode.children[i].value = transfer[i / 2];
+		for (let i = 2; i < newNode.children.length; i += 4) {
+			if ('value' in newNode.children[i]) newNode.children[i].value = transfer[(i-2)/4];
 			newNode.children[i].required = 'required';
 		}
 		const deleteButton = document.createElement('button');
@@ -86,7 +86,7 @@ const orderClient = {
 		});
 		newNode.append(deleteButton);
 
-		nodes[nodes.length - 1].parentNode.insertBefore(newNode, nodes[nodes.length - 1]);
+		nodes[nodes.length - 3].parentNode.insertBefore(newNode, nodes[nodes.length - 3]);
 	},
 	cloneNew: (node) => {
 		const newNode = node.cloneNode(true),
