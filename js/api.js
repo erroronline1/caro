@@ -228,6 +228,7 @@ export const api = {
 							if (data.status) {
 								const all = document.querySelectorAll('[data-filtered]');
 								for (const list of all) {
+									if (isNaN(list.dataset.filtered)) continue;
 									list.parentNode.style.display = data.status.data.includes(list.dataset.filtered) ? 'block' : 'none';
 								}
 							}
