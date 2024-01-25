@@ -140,7 +140,7 @@ export class Assemble {
 	content:[ see this.processContent() ]
 
 	elements are assembled by default but can be assigned common html attributes
-	names are set according to description if not overridden by explicit attribute
+	names are mandatory for input elements
 	*/
 	constructor(setup) {
 		this.content = setup.content;
@@ -149,6 +149,7 @@ export class Assemble {
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
+		this.names = {};
 	}
 
 	initializeSection(nextSibling = null) {
@@ -259,36 +260,37 @@ export class Assemble {
 		 * 		{ element }
 		 * ]
 		 */
+		function processPanel(elements) {
+			let content = [],
+				widget;
+			if (elements.constructor.name === 'Array') {
+				const section = document.createElement('section');
+				section.id = getNextElementID();
+				elements.forEach(element => {
+					widget = processPanel.call(this, element);
+					if (!typeof widget === 'array') widget = [widget];
+					if (elements[0].constructor.name === 'Array') {
+						const article = document.createElement('article');
+						for (const e of widget) {
+							if (e) article.append(e);
+						}
+						section.append(article);
+					} else {
+						for (const e of widget) {
+							if (e) content.push(e);
+						}
+					}
+				});
+				if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
+			} else {
+				this.currentElement = elements;
+				content = content.concat(this[elements.type]());
+			}
+			return content;
+		}
+
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
-			function processPanel(elements) {
-				let content = [],
-					widget;
-				if (elements.constructor.name === 'Array') {
-					const section = document.createElement('section');
-					section.id = getNextElementID();
-					elements.forEach(element => {
-						widget = processPanel.call(this, element);
-						if (!typeof widget === 'array') widget = [widget];
-						if (elements[0].constructor.name === 'Array') {
-							const article = document.createElement('article');
-							for (const e of widget) {
-								if (e) article.append(e);
-							}
-							section.append(article);
-						} else {
-							for (const e of widget) {
-								if (e) content.push(e);
-							}
-						}
-					});
-					if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
-				} else {
-					this.currentElement = elements;
-					content = content.concat(this[elements.type]());
-				}
-				return content;
-			}
 			const nodes = processPanel.call(this, panel);
 			let frame = false;
 			for (let n = 0; n < nodes.length; n++) {
@@ -373,6 +375,16 @@ export class Assemble {
 		return node;
 	}
 
+	names_numerator(name) {
+		if ([...name.matchAll(/\[\]/g)].length) return name;
+		if (name in this.names) {
+			this.names[name] += 1;
+			return name + '(' + this.names[name] + ')';
+		}
+		this.names[name] = 1;
+		return name;
+	}
+
 	text() {
 		/* {
 			type: 'text',
@@ -413,6 +425,8 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
 		this.currentElement.attributes.placeholder = ' '; // to access input:not(:placeholder-shown) query selector 
 		label.classList.add('input-label');
+
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (this.currentElement.description) {
 			div = document.createElement('div');
@@ -478,6 +492,7 @@ export class Assemble {
 		input.type = 'hidden';
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
 		if ('attributes' in this.currentElement) input = this.apply_attributes(this.currentElement.attributes, input);
 		return input;
 	}
@@ -628,8 +643,9 @@ export class Assemble {
 		const groups = {};
 		let select = document.createElement('select'),
 			label, div;
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, '');
-		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
+		if ('attributes' in this.currentElement) select = this.apply_attributes(this.currentElement.attributes, select);
 
 		for (const [key, element] of Object.entries(this.currentElement.content)) {
 			if (groups[key[0]] === undefined) groups[key[0]] = [
@@ -671,15 +687,16 @@ export class Assemble {
 			label, div;
 		textarea.id = getNextElementID();
 		textarea.autocomplete = 'off';
-		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
-		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
-
-		if (this.currentElement.attributes.name != undefined) {
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) {
+			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
 			label = document.createElement('label');
 			label.htmlFor = textarea.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
 			label.classList.add('textarea-label');
 		}
+		if ('attributes' in this.currentElement.attributes) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		if ('attributes' in this.currentElement && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
+
 		if (this.currentElement.description) {
 			div = document.createElement('div');
 			div.appendChild(document.createTextNode(this.currentElement.description));
@@ -707,12 +724,12 @@ export class Assemble {
 			if (radio) {
 				label.classList.add('radio');
 				input.type = 'radio';
-				input.name = this.currentElement.description;
+				input.name = this.names_numerator(this.currentElement.description);
 				input.value = checkbox;
 			} else {
 				label.classList.add('checkbox');
 				input.type = 'checkbox';
-				input.name = checkbox;
+				input.name = this.names_numerator(checkbox);
 			}
 			input = this.apply_attributes(attributes, input);
 			if (radio) {
