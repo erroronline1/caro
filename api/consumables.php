@@ -75,6 +75,7 @@ class CONSUMABLES extends API {
 						':vendor_id' => $vendorID,
 						':article_no' => "'" . $row['article_no'] . "'",
 						':article_name' => "'" . $row['article_name'] . "'",
+						':article_alias' => "''",
 						':article_unit' => "'" . $row['article_unit'] . "'",
 						':article_ean' => "'" . $row['article_ean'] . "'",
 						':active' => 1,
@@ -398,6 +399,7 @@ class CONSUMABLES extends API {
 					'vendor_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor')),
 					'article_no' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no')),
 					'article_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name')),
+					'article_alias' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')),
 					'article_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')),
 					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')),
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
@@ -423,6 +425,7 @@ class CONSUMABLES extends API {
 					':vendor_id' => $product['vendor_id'],
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
+					':article_alias' => $product['article_alias'],
 					':article_unit' => $product['article_unit'],
 					':article_ean' => $product['article_ean'],
 					':active' => $product['active'],
@@ -452,6 +455,7 @@ class CONSUMABLES extends API {
 				$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
 				$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
 				$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
+				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
 				$product['article_unit'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit'));
 				$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
 				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
@@ -476,6 +480,7 @@ class CONSUMABLES extends API {
 					':vendor_id' => $product['vendor_id'],
 					':article_no' => $product['article_no'],
 					':article_name' => $product['article_name'],
+					':article_alias' => $product['article_alias'],
 					':article_unit' => $product['article_unit'],
 					':article_ean' => $product['article_ean'],
 					':active' => $product['active'],
@@ -511,6 +516,7 @@ class CONSUMABLES extends API {
 					'vendor_immutable_fileserver' => '',
 					'article_no' => '',
 					'article_name' => '',
+					'article_alias' => '',
 					'article_unit' => '',
 					'article_ean' => '',
 					'active' => 1,
@@ -606,6 +612,12 @@ class CONSUMABLES extends API {
 						]],
 						["type" => "textinput",
 						'attributes' => [
+							'name' => LANG::GET('consumables.edit_product_article_alias'),
+							'required' => true,
+							'value' => $product['article_alias']
+						]],
+						["type" => "textinput",
+						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_article_unit'),
 							'list' => 'units',
 							'required' => true,
@@ -666,7 +678,7 @@ class CONSUMABLES extends API {
 					]);
 					$search = $statement->fetchAll(PDO::FETCH_ASSOC);
 					foreach($search as $key => $row) {
-						$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
+						$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")", 'data-filtered' => 'breakline'];
 					}
 					array_splice($result['body']['content'], 1, 0,
 						[[

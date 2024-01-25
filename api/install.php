@@ -62,6 +62,7 @@ $queries = [
 				"	`vendor_id` int NOT NULL," .
 				"	`article_no` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`article_name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`active` tinyint NOT NULL," .
@@ -161,6 +162,7 @@ $queries = [
 				"	vendor_id int NOT NULL," .
 				"	article_no varchar(MAX) NOT NULL," .
 				"	article_name varchar(MAX) NOT NULL," .
+				"	article_alias varchar(MAX) NOT NULL," .
 				"	article_unit varchar(MAX) NOT NULL," .
 				"	article_ean varchar(MAX) NOT NULL," .
 				"	active tinyint NOT NULL," .
@@ -214,28 +216,32 @@ $queries = [
 
 $driver = INI['sql'][INI['sql']['use']]['driver'];
 
+$devupdate = false;
 try {
-//	throw new ErrorException('force update');
+	if ($devupdate) throw new ErrorException('force update');
 	$statement = $pdo->query($queries['precheck'][$driver]);
 	echo "databases already installed.";
 }
 catch (Exception $e){
 	$processing = $queries['install'][$driver]['tables'];
-	// add default user
-	$processing[] = $queries['install'][$driver]['insertions']['user'];
-	// add component template
-	$processing[] = $queries['install'][$driver]['insertions']['component'];
-	// add default manual entries according to set up language
-	foreach(LANGUAGEFILE['defaultmanual'] as $entry){
-		$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
-			':title' => $entry['title'],
-			':content' => $entry['content'],
-			':permissions' => $entry['permissions']
-		]);
-	}
-	foreach ($processing as $command){
-		echo $command . "\n";
-		$statement = $pdo->query($command);
+
+	if (!$devupdate) {
+		// add default user
+		$processing[] = $queries['install'][$driver]['insertions']['user'];
+		// add component template
+		$processing[] = $queries['install'][$driver]['insertions']['component'];
+		// add default manual entries according to set up language
+		foreach(LANGUAGEFILE['defaultmanual'] as $entry){
+			$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
+				':title' => $entry['title'],
+				':content' => $entry['content'],
+				':permissions' => $entry['permissions']
+			]);
+		}
+		foreach ($processing as $command){
+			echo $command . "\n";
+			$statement = $pdo->query($command);
+		}
 	}
 } 
 
