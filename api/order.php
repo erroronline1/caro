@@ -12,20 +12,6 @@ class ORDER extends API {
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-
-		$this->fields=[
-			'name' => LANG::GET('order.productname_label'),
-			'unit' => LANG::GET('order.unit_label'),
-			'number' => LANG::GET('order.ordernumber_label'),
-			'quantity' => LANG::GET('order.quantity_label'),
-			'vendor' => LANG::GET('order.vendor_label'),
-			'orderer' => LANG::GET('order.orderer'),
-			'organizational_unit' => LANG::GET('order.unit'),
-			'commission' => LANG::GET('order.commission'),
-			'deliverydate' => LANG::GET('order.delivery_date'),
-			'info' => LANG::GET('order.additional_info'),
-			'barcode' => LANG::GET('order.barcode'),
-		];
 	}
 
 	public function prepared(){
@@ -46,7 +32,7 @@ class ORDER extends API {
 				$organizational_orders=[];
 				foreach($orders as $key => $row) {
 					$order_data=json_decode($row['order_data'], true);
-					if (array_intersect([$order_data['organizational_unit']], $units)) {
+					if (array_intersect([$order_data[LANG::PROPERTY('order.unit')]], $units)) {
 						array_push($organizational_orders, $row);
 					}
 				}
@@ -168,7 +154,7 @@ class ORDER extends API {
 				if (boolval($value)) $order_data[$key] = $value;
 			}
 		}
-		$order_data['orderer']=$_SESSION['user']['name'];
+		$order_data[LANG::GET('order.orderer')]=$_SESSION['user']['name'];
 
 		if(!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
@@ -181,12 +167,12 @@ class ORDER extends API {
 		for ($i = 0; $i<count($processedOrderData['order_data']['items']);$i++){
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
-				if (!in_array($key, ['items','organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
+				if (!in_array($key, ['items',LANG::PROPERTY('order.unit')])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
 			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 			[
 				':order_data' => "'" . json_encode($order_data2) . "'",
-				':organizational_unit' => "'" . $processedOrderData['order_data']['organizational_unit'] . "'",
+				':organizational_unit' => "'" . $processedOrderData['order_data'][LANG::PROPERTY('order.unit')] . "'",
 				':approval' => "'" . $processedOrderData['approval'] . "'",
 			]) . '; ';
 		}
@@ -281,18 +267,18 @@ class ORDER extends API {
 					':id' => $this->_requestedID
 				]);
 				if (!$order = $statement->fetch(PDO::FETCH_ASSOC)){$order = [
-					'info' => '',
-					'organizational_unit' => '',
-					'commission' => '',
-					'deliverydate' => '',
+					LANG::PROPERTY('order.additional_info') => '',
+					LANG::PROPERTY('order.unit') => '',
+					LANG::PROPERTY('order.commission') => '',
+					LANG::PROPERTY('order.delivery_date') => '',
 					'items' => false
 				];} else {
 					$order = json_decode($order['order_data'], true);
 				}
 				$organizational_units=[];
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					$organizational_units[$description] = ['name' => 'organizational_unit', 'required' => true];
-					if (array_key_exists('organizational_unit', $order) && in_array($description, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
+					$organizational_units[$description] = ['name' => LANG::PROPERTY('order.unit'), 'required' => true];
+					if (array_key_exists(LANG::PROPERTY('order.unit'), $order) && in_array($description, explode(',', $order[LANG::PROPERTY('order.unit')]))) $organizational_units[$description]['checked'] = true;
 				}
 
 				$result['body'] = ['form'=>[
@@ -376,24 +362,29 @@ class ORDER extends API {
 						['type' => 'textarea',
 						'attributes' => [
 							'name' => LANG::GET('order.additional_info'),
-							'value' => array_key_exists('info', $order) ? $order['info'] : '',
+							'value' => array_key_exists(LANG::PROPERTY('order.additional_info'), $order) ? $order[LANG::PROPERTY('order.additional_info')] : '',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'radio',
 						'description' => LANG::GET('order.unit'),
 						'content' => $organizational_units
 						],
-						['type' => 'scanner',
+						['type' => 'textinput',
+						'description' => LANG::GET('order.add_commission_label'),
 						'attributes' => [
 							'required' => true,
-							'name' => LANG::GET('order.add_commission_label'),
-							'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
-							'data-loss' => 'prevent'
+							'name' => LANG::GET('order.commission'),
+							'value' => array_key_exists(LANG::PROPERTY('order.commission'), $order) ? $order[LANG::PROPERTY('order.commission')] : '',
+							'data-loss' => 'prevent',
+							'id' => 'commission'
 						]],
+						['type' => 'scanner',
+						'destination' => 'commission'
+						],
 						['type' => 'dateinput',
 						'attributes' => [
 							'name' => LANG::GET('order.delivery_date'),
-							'value' => array_key_exists('deliverydate', $order) ? $order['deliverydate'] : ''
+							'value' => array_key_exists(LANG::PROPERTY('order.delivery_date'), $order) ? $order[LANG::PROPERTY('order.delivery_date')] : ''
 						]]
 					],[
 						[
@@ -423,7 +414,7 @@ class ORDER extends API {
 								'max' => '99999',
 								'name' => LANG::GET('order.quantity_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['quantity'],
+								'value' => $order['items'][$i][LANG::PROPERTY('order.quantity_label')],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
@@ -431,7 +422,7 @@ class ORDER extends API {
 								'list' => 'units',
 								'name' => LANG::GET('order.unit_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['unit'],
+								'value' => $order['items'][$i][LANG::PROPERTY('order.unit_label')],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
@@ -439,27 +430,27 @@ class ORDER extends API {
 								'list' => 'vendors',
 								'name' => LANG::GET('order.vendor_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['vendor'],
+								'value' => $order['items'][$i][LANG::PROPERTY('order.vendor_label')],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('order.ordernumber_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['number'],
+								'value' => $order['items'][$i][LANG::PROPERTY('order.ordernumber_label')],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('order.productname_label') . '[]',
 								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i]['name'],
+								'value' => $order['items'][$i][LANG::PROPERTY('order.productname_label')],
 								'data-loss' => 'prevent'
 								]],
 							['type' => 'hiddeninput',
 							'attributes' => [
 								'name' => LANG::GET('order.barcode') . '[]',
-								'value' => array_key_exists ('barcode', $order['items'][$i]) ? $order['items'][$i]['barcode'] : ''
+								'value' => array_key_exists (LANG::PROPERTY('order.barcode'), $order['items'][$i]) ? $order['items'][$i][LANG::PROPERTY('order.barcode')] : ''
 							]],
 							['type' => 'button',
 							'attributes' => [
@@ -521,7 +512,7 @@ class ORDER extends API {
 					$prepared = [
 						'items' => [[]],
 						'info' => null,
-						'organizational_unit' => $order['organizational_unit'],
+						'organizational_unit' => $order[LANG::PROPERTY('order.unit')],
 						'commission' => null,
 						'orderer' => null,
 						'deliverydate' => null
@@ -532,7 +523,7 @@ class ORDER extends API {
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
-					$prepared['info'] .= ($prepared['info'] ? "\n": '') . LANG::GET('order.initially_approved') . ': ' . $order['approved'];
+					$prepared[LANG::PROPERTY('order.additional_info')] .= ($prepared[LANG::PROPERTY('order.additional_info')] ? "\n": '') . LANG::GET('order.initially_approved') . ': ' . $order['approved'];
 					// clear unused keys
 					foreach ($prepared as $key => $value) {
 						if (!$value) unset($prepared[$key]);
@@ -552,9 +543,9 @@ class ORDER extends API {
 					foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
 						if (array_key_exists($key, $decoded_order_data)) $messagepayload[':' . $key] = $decoded_order_data[$key];
 					}
-					$this->alertUserGroup(array_search($order['organizational_unit'], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
+					$this->alertUserGroup(array_search($order[LANG::PROPERTY('order.unit')], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
 						':order' => LANG::GET('order.message', $messagepayload),
-						':unit' => $order['organizational_unit'],
+						':unit' => $order[LANG::PROPERTY('order.unit')],
 						':user' => $_SESSION['user']['name']
 					]), 'unit');
 				}
@@ -568,6 +559,7 @@ class ORDER extends API {
 				$result=['body'=>['content'=>[
 					[
 						['type' => 'radio',
+						'description' => LANG::GET('order.order_filter'),
 						'content' => [
 							LANG::GET('order.untreated')=>['checked' => true, 'onfocus' => 'orderClient.filter()'],
 							LANG::GET('order.ordered')=>['onfocus' => 'orderClient.filter("ordered")'],
@@ -609,10 +601,10 @@ class ORDER extends API {
 					$content = [];
 					$text = '\n';
 					$decoded_order_data = json_decode($row['order_data'], true);
-					if (array_key_exists('barcode', $decoded_order_data) && strlen($decoded_order_data['barcode'])) $content[]=[
+					if (array_key_exists(LANG::PROPERTY('order.barcode'), $decoded_order_data) && strlen($decoded_order_data[LANG::PROPERTY('order.barcode')])) $content[]=[
 						'type' => 'image',
 						'attributes' => [
-							'barcode' => ['value' => $decoded_order_data['barcode']],
+							'barcode' => ['value' => $decoded_order_data[LANG::PROPERTY('order.barcode')]],
 							'imageonly' => ['width' => '10em', 'height' => '4em']
 							]
 					];
@@ -620,9 +612,9 @@ class ORDER extends API {
 					$content[]=
 						['type' => 'hiddeninput',
 						'description' => 'filter',
-						'attributes'=>['data-filtered' => $row['id']]];
+						'attributes' => ['data-filtered' => $row['id']]];
 					foreach ($decoded_order_data as $key => $value){ // data
-						if (!in_array($key,['barcode', 'orderer'])) $content[]=[
+						if (!in_array($key,[LANG::PROPERTY('order.barcode'), LANG::PROPERTY('order.orderer')])) $content[]=[
 							'type' => 'textinput',
 							'attributes' => [
 								'value' => $value,
@@ -631,10 +623,18 @@ class ORDER extends API {
 								'onpointerup' => 'orderClient.toClipboard(this)'
 							]
 						];
-						if ($key == 'orderer') {
+						if ($key == LANG::PROPERTY('order.orderer')) {
+							$fields=[
+								'name' => LANG::PROPERTY('order.productname_label'),
+								'unit' => LANG::PROPERTY('order.unit_label'),
+								'number' => LANG::PROPERTY('order.ordernumber_label'),
+								'quantity' => LANG::PROPERTY('order.quantity_label'),
+								'vendor' => LANG::PROPERTY('order.vendor_label'),
+								'commission' => LANG::PROPERTY('order.commission'),
+							];
 							$messagepayload=[];
-							foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
-								if (array_key_exists($key, $decoded_order_data)) $messagepayload[':' . $key] = $decoded_order_data[$key];
+							foreach ($fields as $replace => $with){
+								if (array_key_exists($with, $decoded_order_data)) $messagepayload[':' . $replace] = $decoded_order_data[$with];
 							}
 							$content[]=[
 								'type' => 'hiddeninput',
