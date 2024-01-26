@@ -240,8 +240,8 @@ class FILE extends API {
 		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($bundles as $row) {
 			$list=[];
-			foreach (json_decode($row['content'], true) as $path){
-				$list[pathinfo($path)['basename']]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
+			foreach (json_decode($row['content'], true) as $file => $path){
+				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
 			];
 			}
 			$result['body']['content'][]=
