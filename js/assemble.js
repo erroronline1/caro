@@ -694,7 +694,7 @@ export class Assemble {
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
 			label.classList.add('textarea-label');
 		}
-		if ('attributes' in this.currentElement.attributes) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		if ('attributes' in this.currentElement) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if ('attributes' in this.currentElement && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 
 		if (this.currentElement.description) {
@@ -717,18 +717,20 @@ export class Assemble {
 				}
 			}
 		}*/
-		const result = [...this.header()];
+		const result = [...this.header()],
+			radioname = this.currentElement.description ? this.names_numerator(this.currentElement.description) : null; // keep same name for current article
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
 			if (radio) {
 				label.classList.add('radio');
 				input.type = 'radio';
-				input.name = this.names_numerator(this.currentElement.description);
+				input.name = radioname;
 				input.value = checkbox;
 			} else {
 				label.classList.add('checkbox');
 				input.type = 'checkbox';
+				console.log(checkbox);
 				input.name = this.names_numerator(checkbox);
 			}
 			input = this.apply_attributes(attributes, input);
