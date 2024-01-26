@@ -10,7 +10,7 @@ export function getNextElementID() {
 	return 'elementID' + ++ElementID;
 }
 
-const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown'];
+const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdown', 'onpointerup'];
 
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
@@ -539,7 +539,7 @@ export class Assemble {
 		label.classList.add('inlinebutton');
 		label.appendChild(document.createTextNode(('attributes' in this.currentElement && 'multiple' in this.currentElement.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
 
-		button.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
 		button.setAttribute('data-type', 'reset');
 		button.classList.add('inlinebutton');
@@ -585,11 +585,11 @@ export class Assemble {
 				deletebutton.type = 'button';
 				nextPhoto.insertBefore(deletebutton, nextPhoto.childNodes[4]);
 			}
-			nextPhoto.childNodes[4].onpointerdown = new Function('this.parentNode.remove();');
+			nextPhoto.childNodes[4].onpointerup = new Function('this.parentNode.remove();');
 			// add button
-			nextPhoto.childNodes[5].onpointerdown = cloneNode;
+			nextPhoto.childNodes[5].onpointerup = cloneNode;
 			// reset button
-			nextPhoto.childNodes[6].onpointerdown = new Function("let e=document.getElementById('" + nextPhoto.childNodes[1].id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+			nextPhoto.childNodes[6].onpointerup = new Function("let e=document.getElementById('" + nextPhoto.childNodes[1].id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 
 			this.parentNode.after(nextPhoto);
 		}
@@ -609,13 +609,13 @@ export class Assemble {
 
 		img.classList.add('photoupload');
 
-		resetbutton.onpointerdown = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		resetbutton.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		resetbutton.appendChild(document.createTextNode(LANG.GET('assemble.reset')));
 		resetbutton.setAttribute('data-type', 'reset');
 		resetbutton.classList.add('inlinebutton');
 		resetbutton.type = 'button';
 
-		addbutton.onpointerdown = cloneNode;
+		addbutton.onpointerup = cloneNode;
 		addbutton.setAttribute('data-type', 'additem');
 		addbutton.classList.add('inlinebutton');
 		addbutton.type = 'button';
@@ -788,7 +788,7 @@ export class Assemble {
 		this.currentElement.attributes = {
 			'type': 'button',
 			'name': '',
-			'onpointerdown': 'signaturePad.clear()'
+			'onpointerup': 'signaturePad.clear()'
 		};
 		result = result.concat(this.deletebutton());
 		const input = document.createElement('input');
@@ -824,7 +824,7 @@ export class Assemble {
 		//attributes are processed already, therefore they can be reassigned
 		this.currentElement.description = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
 		this.currentElement.attributes = {
-			'onpointerdown': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
+			'onpointerup': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
 			'data-type': 'scanner'
 		};
 		result.push(this.button())
@@ -884,7 +884,7 @@ export class Assemble {
 				'type': 'button',
 				'class': 'inlinebutton',
 				'data-type': this.currentElement.type,
-				'onpointerdown': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")'
+				'onpointerup': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")'
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
 			result = result.concat(this.button());
