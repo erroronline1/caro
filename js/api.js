@@ -103,12 +103,10 @@ export const api = {
 				if (logintoken) {
 					request.push((logintoken.value ? logintoken.value : null));
 				}
-				successFn = function (data) {
+				successFn = async function (data) {
 					document.getElementById('main').replaceChildren();
-					api.application('get', 'menu');
-					document.getElementById('openmenu').checked = false;
+					await api.application('get', 'menu');
 					if (data.body.form) {
-						document.querySelector('body>label').style.backgroundImage = "url(./media/bars.svg)";
 						new Assemble(data.body).initializeSection();
 						let signin = LANG.GET('menu.application_signin'),
 							greeting = ', ' + signin.charAt(0).toLowerCase() + signin.slice(1);
@@ -117,7 +115,7 @@ export const api = {
 						}));
 						return;
 					}
-					if (data.body.image) document.querySelector('body>label').style.backgroundImage = "url('" + data.body.image + "')";
+					if (data.body.image) document.querySelector('nav>label:first-child').style.backgroundImage = "url('" + data.body.image + "')";
 					api.application('get', 'start');
 				}
 				break;
@@ -136,7 +134,6 @@ export const api = {
 					}));
 					document.getElementById('main').replaceChildren();
 					new Assemble(data.body).initializeSection();
-					document.getElementById('openmenu').checked = false;
 				}
 				break;
 			case 'manual':
@@ -146,7 +143,6 @@ export const api = {
 							api.update_header(LANG.GET('menu.application_manual_manager'));
 							document.getElementById('main').replaceChildren();
 							new Assemble(data.body).initializeSection();
-							document.getElementById('openmenu').checked = false;
 						}
 						break;
 					case 'delete':
@@ -246,7 +242,6 @@ export const api = {
 				break;
 		}
 		api.send(method, request, successFn, null, payload, method === 'post');
-		document.getElementById('openmenu').checked = false;
 	},
 	form: (method, ...request) => {
 		/*
@@ -337,7 +332,6 @@ export const api = {
 				break;
 		}
 		api.send(method, request, successFn, null, payload);
-		document.getElementById('openmenu').checked = false;
 	},
 	message: (method, ...request) => {
 		/*
@@ -410,7 +404,6 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, method === 'post');
-		document.getElementById('openmenu').checked = false;
 	},
 	purchase: (method, ...request) => {
 		/*
@@ -511,7 +504,6 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
-		document.getElementById('openmenu').checked = false;
 	},
 	tool: (method, ...request) => {
 		/*
@@ -552,7 +544,6 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, method === 'post');
-		document.getElementById('openmenu').checked = false;
 	},
 	user: (method, ...request) => {
 		/*
@@ -596,6 +587,5 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
-		document.getElementById('openmenu').checked = false;
 	},
 }

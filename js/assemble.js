@@ -71,24 +71,45 @@ export const assemble_helper = {
 	},
 	userMenu: function (content) {
 		if (!content) return;
-		const elements = [];
+		const menu = document.querySelector('nav'),
+			elements = [],
+		icons = {'default' : "url('media/bars.svg')"};
+		icons[LANG.GET('menu.application_header')] = "url('media/bars.svg')";
+		icons[LANG.GET('menu.message_header')] = "url('media/envelope.svg')";
+		icons[LANG.GET('menu.forms_header')] = "url('media/pencil.svg')";
+		icons[LANG.GET('menu.purchase_header')] = "url('media/shopping-cart.svg')";
+		icons[LANG.GET('menu.files_header')] = "url('media/cloud-download.svg')";
+		icons[LANG.GET('menu.tools_header')] = "url('media/tools.svg')";
+
+		let label, input,ul,li,link;
 		for (const [group, items] of Object.entries(content)) {
-			const wrapper = document.createElement('div');
-			const header = document.createElement('h3');
-			header.appendChild(document.createTextNode(group));
-			wrapper.appendChild(header);
+			label = document.createElement('label');
+			label.style.backgroundImage = icons[group];
+			label.htmlFor=group;
+			input=document.createElement('input');
+			input.type='checkbox';
+			input.id=group;
+			label.append(input);
+			ul=document.createElement('ul');
+			ul.style.bottom=Object.entries(items).length*2+2+'em';
+			ul.style.minHeight=Object.entries(items).length*2+'em';
 			for (const [description, attributes] of Object.entries(items)) {
-				const link = document.createElement('a');
-				for (const [attribute, value] of Object.entries(attributes)) {
-					link.setAttribute(attribute, value);
+				li=document.createElement('li');
+				if ('href' in attributes){
+					link = document.createElement('a');
+					for (const [attribute, value] of Object.entries(attributes)) {
+						link.setAttribute(attribute, value);
+					}
+					link.appendChild(document.createTextNode(description));
+					li.append(link);				
 				}
-				link.appendChild(document.createTextNode(description));
-				wrapper.appendChild(link);
-			};
-			elements.push(wrapper);
-		};
-		document.querySelector('#menu').innerHTML = '';
-		document.querySelector('#menu').append(...elements);
+				else li.append(document.createTextNode(description))
+				ul.append(li);
+			}
+			label.append(ul);
+			elements.push(label);
+		}
+		menu.replaceChildren(...elements);
 	}
 }
 
@@ -825,7 +846,8 @@ export class Assemble {
 		this.currentElement.description = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
 		this.currentElement.attributes = {
 			'onpointerup': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
-			'data-type': 'scanner'
+			'data-type': 'scanner',
+			'type':'button'
 		};
 		result.push(this.button())
 		return result;

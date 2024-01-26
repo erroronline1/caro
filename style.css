@@ -206,46 +206,57 @@ dialog[open] {
 
 /*************************** menu ******************************/
 
-body>input {
-	display: none;
-}
-
-body>label,
 nav {
 	position: fixed;
-	backdrop-filter: blur(10px);
-	display: block;
-	padding: 1em;
-	transition: all ease .3s;
-}
-
-body>label {
-	z-index: 99;
-	box-shadow: var(--shadow);
-	background-size: cover;
-	background-image: url("media/bars.svg");
-	cursor: pointer;
-	height: 4em;
-	width: 4em;
-	bottom: 1em;
-	left: 50%;
-	transform: translateX(-25%);
-	border: 1px solid var(--lightershadow);
-	border-radius: 50%;
-}
-
-nav {
 	z-index: 98;
-	overflow: hidden;
 	box-shadow: var(--shadow);
+	backdrop-filter: blur(10px);
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	height: 3em;
+	height: 4em;
+	padding: .75em;
+	vertical-align: top;
 
-	div {
-		display: block;
-		margin-bottom: 1em;
+	label {
+		float: left;
+		background-size: contain;
+		background-repeat: no-repeat;
+		cursor: pointer;
+		margin: 0 1em;
+		width: 3em;
+		height: 2.5em;
+		padding: .2em;
+	}
+
+	label:first-of-type {
+		border-radius: 50%;
+		height: 3.1em;
+	}
+
+	input {
+		display: none
+	}
+
+	ul {
+		backdrop-filter: blur(10px);
+		z-index: 100;
+		position: relative;
+		left: -3em;
+		/* bottom: 12em;
+		min-height:1em;
+		dynamically set on constructor according to items*/
+		width: 15em;
+		list-style-type: none;
+		display: none;
+
+		li {
+			line-height: 2em;
+		}
+	}
+
+	input:checked~ul {
+		display: block
 	}
 }
 
@@ -451,6 +462,11 @@ button {
 	font-weight: bold;
 }
 
+article>button {
+	margin-left: 1.75em;
+	width: calc(100% - 2em);
+}
+
 main>form>button {
 	box-shadow: var(--shadow);
 }
@@ -516,14 +532,14 @@ textarea+div {
 }
 
 .scanner {
-	height: 0;
-	transition: ease .3s;
+	display: none;
 	border: none !important;
 }
 
 canvas,
 .scanner.active,
 #scanner>video {
+	display: block;
 	height: 15em;
 	margin-bottom: 2em;
 }
@@ -707,7 +723,7 @@ main a::before {
 }
 
 [data-type=text]::before {
-	background-image: url("media/book-reader.svg");
+	background-image: url("media/info-circle.svg");
 }
 
 [data-type=textinput]::before {
@@ -880,8 +896,4 @@ button[data-type=submitbutton]::before {
 
 [data-type=filterinput]::before {
 	background-image: url("media/filter.svg");
-}
-
-[data-type=stlviewer]::before {
-	background-image: url("media/cube.svg");
 }
