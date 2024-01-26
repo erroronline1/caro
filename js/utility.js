@@ -76,7 +76,7 @@ const orderClient = {
 
 		newNode.children[newNode.children.length - 1].remove();
 		for (let i = 2; i < newNode.children.length; i += 4) {
-			if ('value' in newNode.children[i]) newNode.children[i].value = transfer[(i-2)/4];
+			if ('value' in newNode.children[i]) newNode.children[i].value = transfer[(i - 2) / 4];
 			newNode.children[i].required = 'required';
 		}
 		const deleteButton = document.createElement('button');
@@ -148,3 +148,8 @@ const toolModule = {
 		});
 	}
 };
+
+window.addEventListener('scroll', function () {
+	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight+100)) * 100;
+	document.querySelector('header>div').style.width = percentScrolled + '%';
+});
