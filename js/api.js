@@ -457,7 +457,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								let list = document.querySelector('[data-type=links]');
-								if (list) list.parentNode.remove();
+								if (list) list.parentNode.parentNode.parentNode.remove();
 								new Assemble(data.body).initializeSection('hr');
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);

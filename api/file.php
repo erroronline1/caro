@@ -353,7 +353,7 @@ class FILE extends API {
 							$filePerSlide = 0;
 						}
 						$article = intval(count($matches) - 1);
-						if (empty($filePerSlide++ % INI['file']['bundle_files_per_slide'])){
+						if (empty($filePerSlide++ % INI['splitresults']['bundle_files_per_slide'])){
 							$matches[$article][] = [['type' => 'checkbox',
 								'description' => LANG::GET('file.file_list', [':folder' => $folder]),
 								'content' => []

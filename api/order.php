@@ -72,26 +72,39 @@ class ORDER extends API {
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$result = ['body'=>[]];
 
-				$matches = [];
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-product-search'));
 				$statement->execute([
 					':search' => $this->_requestedID
 				]);
 				$search = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+				$productsPerSlide = 0;
+				$matches = [[]];
+
 				foreach($search as $key => $row) {
 					foreach($row as $key => $value){
-						$row[$key]=str_replace("\n", ' ', $row[$key]);
+						$row[$key] = str_replace("\n", ' ', $row[$key]);
 					}
-					$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'data-filtered' => 'breakline', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
+					$article = intval(count($matches) - 1);
+					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
+						$matches[$article][] = [
+							['type' => 'links',
+							'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
+							'content' => []
+							]
+						];
+					}
+					$slide = intval(count($matches[$article]) - 1);
+					$matches[$article][$slide][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'data-filtered' => 'breakline', 'data-type' => 'cart', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
 				}
-				$result['body']['content'] = [
-					[
-						['type' => 'links',
-						'description' => LANG::GET('order.add_product_search_matches', [':number' => count($matches)]),
-						'content' => $matches
-						]
+				if (!$matches[0]) $matches[0][] = [
+					['type' => 'links',
+					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
+					'content' => []
 					]
 				];
+
+				$result['body']['content'] = $matches;
 				break;
 			}
 		$this->response($result);
@@ -369,6 +382,9 @@ class ORDER extends API {
 						'description' => LANG::GET('order.unit'),
 						'content' => $organizational_units
 						],
+						['type' => 'scanner',
+						'destination' => 'commission'
+						],
 						['type' => 'textinput',
 						'description' => LANG::GET('order.add_commission_label'),
 						'attributes' => [
@@ -378,9 +394,6 @@ class ORDER extends API {
 							'data-loss' => 'prevent',
 							'id' => 'commission'
 						]],
-						['type' => 'scanner',
-						'destination' => 'commission'
-						],
 						['type' => 'dateinput',
 						'attributes' => [
 							'name' => LANG::GET('order.delivery_date'),
