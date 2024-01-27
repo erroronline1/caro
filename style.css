@@ -245,10 +245,14 @@ nav {
 
 	label:first-of-type {
 		border-radius: 50%;
-		width: 1.5em;
+		width: 2.4em;
+		height:2.5em;
+		position:relative;
+		top:-.5em;
+		margin-top:-1em;
 
 		input:checked::before {
-			margin: -1.875em -1.35em;
+			margin: -1.375em -1.4em;
 		}
 	}
 
@@ -261,9 +265,9 @@ nav {
 		border: 1px solid var(--green);
 		border-radius: 50%;
 		display: block;
-		width: 2.5em;
-		height: 2.5em;
-		margin: -1.875em -1.625em;
+		width: 2.6em;
+		height: 2.6em;
+		margin: -1.875em -1.675em;
 	}
 
 	ul {
