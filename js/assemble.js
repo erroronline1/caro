@@ -434,6 +434,7 @@ export class Assemble {
 		/*{
 			type: 'textinput',
 			description: 'please provide information about...',
+			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				name: 'variable name' // will be used as an accessible placeholder
 			}
@@ -450,7 +451,7 @@ export class Assemble {
 		this.currentElement.attributes.placeholder = ' '; // to access input:not(:placeholder-shown) query selector 
 		label.classList.add('input-label');
 
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (this.currentElement.description) {
 			div = document.createElement('div');
@@ -507,6 +508,7 @@ export class Assemble {
 	hiddeninput() {
 		/*{
 			type: 'hiddeninput',
+			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				name: 'name',
 				value: '3.14'}
@@ -516,7 +518,7 @@ export class Assemble {
 		input.type = 'hidden';
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if ('attributes' in this.currentElement) input = this.apply_attributes(this.currentElement.attributes, input);
 		return input;
 	}
@@ -651,9 +653,7 @@ export class Assemble {
 		/*{
 			type: 'select',
 			description: 'list',
-			attributes: {
-				name: 'variable name'
-			},
+			numeration: anything resulting in true to prevent enumeration
 			content: {
 				'entry one': {
 					value: '1'
@@ -663,11 +663,14 @@ export class Assemble {
 					selected: true
 				}
 			}
+			attributes: {
+				name: 'variable name'
+			},
 		}*/
 		const groups = {};
 		let select = document.createElement('select'),
 			label, div;
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
+		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, '');
 		if ('attributes' in this.currentElement) select = this.apply_attributes(this.currentElement.attributes, select);
 
@@ -702,6 +705,7 @@ export class Assemble {
 		/*{
 			type: 'textarea',
 			description: 'textarea',
+			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				rows:8,
 				value:'values can be passed with this pseudo attribute'
@@ -712,7 +716,7 @@ export class Assemble {
 		textarea.id = getNextElementID();
 		textarea.autocomplete = 'off';
 		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) {
-			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name);
+			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			label = document.createElement('label');
 			label.htmlFor = textarea.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
@@ -732,6 +736,7 @@ export class Assemble {
 		/*{
 			type: 'checkbox', or 'radio'
 			description:'checkboxes',
+			numeration: anything resulting in true to prevent enumeration
 			content: {
 				'Checkbox 1': {
 					optional attributes
@@ -742,7 +747,7 @@ export class Assemble {
 			}
 		}*/
 		const result = [...this.header()],
-			radioname = this.currentElement.description ? this.names_numerator(this.currentElement.description) : null; // keep same name for current article
+			radioname = this.currentElement.description ? this.names_numerator(this.currentElement.description, this.currentElement.numeration) : null; // keep same name for current article
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');

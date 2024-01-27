@@ -180,6 +180,7 @@ class MESSAGE extends API {
 				'attributes'=>['data-filtered' => $message['id']]
 			],
 				['type' => 'textinput',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'readonly' => true,
 					'data-message' => $message['id'],
@@ -187,6 +188,7 @@ class MESSAGE extends API {
 					'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => LANG::GET('message.message'),
 					'data-message' => $message['id'],
@@ -253,6 +255,7 @@ class MESSAGE extends API {
 				'description' => 'filter',
 				'attributes'=>['data-filtered' => $message['id']]],
 				['type' => 'textinput',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => LANG::GET('message.to'),
 					'readonly' => true,
@@ -260,6 +263,7 @@ class MESSAGE extends API {
 					'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
 				]],
 				['type' => 'textarea',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => LANG::GET('message.message'),
 					'data-message' => $message['id'],
