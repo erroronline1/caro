@@ -8,7 +8,7 @@ const _serviceWorker = {
 			navigator.serviceWorker.ready.then(registration => {
 				setInterval(() => {
 					if (registration) _serviceWorker.postMessage('getnotifications');
-				}, 300000);
+				}, 10000);
 				navigator.serviceWorker.addEventListener('message', (message) => {
 					this.onMessage(message.data);
 				});
@@ -53,16 +53,8 @@ const _serviceWorker = {
 			}
 		}
 		if ('unseen' in data) {
-			document.querySelector('nav div').innerHTML = '&nbsp;';
-			if (parseInt(data.unseen, 10)) {
-				const container = document.createElement('span'),
-					message = document.createElement('img');
-				message.src = './media/envelope.svg';
-				container.setAttribute('data-unreadmessages', data.unseen);
-				container.append(message);
-				document.querySelector('nav div').append(container);
-			}
-			for (const mail of document.querySelectorAll('[data-unreadmessages]')) mail.setAttribute('data-unreadmessages', data.unseen);
+			const mailnotif = document.querySelector('[for=userMenu' + LANG.GET('menu.message_header') + ']');
+			mailnotif.setAttribute('data-notification', data.unseen);
 		}
 	}
 }
@@ -149,7 +141,19 @@ const toolModule = {
 	}
 };
 
+//general
+
+const applicationModule = {
+	clearMenu: (event) => {
+		const inputs = document.getElementsByName('userMenu');
+		for (const input of inputs) {
+			input.checked = false;
+		}
+	}
+}
+
 window.addEventListener('scroll', function () {
-	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight+100)) * 100;
+	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
 	document.querySelector('header>div').style.width = percentScrolled + '%';
 });
+window.addEventListener('pointerup', applicationModule.clearMenu);

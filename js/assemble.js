@@ -73,7 +73,9 @@ export const assemble_helper = {
 		if (!content) return;
 		const menu = document.querySelector('nav'),
 			elements = [],
-		icons = {'default' : "url('media/bars.svg')"};
+			icons = {
+				'default': "url('media/bars.svg')"
+			};
 		icons[LANG.GET('menu.application_header')] = "url('media/bars.svg')";
 		icons[LANG.GET('menu.message_header')] = "url('media/envelope.svg')";
 		icons[LANG.GET('menu.forms_header')] = "url('media/pencil.svg')";
@@ -81,29 +83,30 @@ export const assemble_helper = {
 		icons[LANG.GET('menu.files_header')] = "url('media/cloud-download.svg')";
 		icons[LANG.GET('menu.tools_header')] = "url('media/tools.svg')";
 
-		let label, input,ul,li,link;
+		let label, input, ul, li, link;
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement('label');
 			label.style.backgroundImage = icons[group];
-			label.htmlFor=group;
-			input=document.createElement('input');
-			input.type='checkbox';
-			input.id=group;
+			label.htmlFor = 'userMenu' + group;
+			label.setAttribute('data-notification', 0);
+			input = document.createElement('input');
+			input.type = 'radio';
+			input.name = 'userMenu';
+			input.id = 'userMenu' + group;
 			label.append(input);
-			ul=document.createElement('ul');
-			ul.style.bottom=Object.entries(items).length*2+2+'em';
-			ul.style.minHeight=Object.entries(items).length*2+'em';
+			ul = document.createElement('ul');
+			ul.style.bottom = Object.entries(items).length * 2 + 4 + 'em';
+			ul.style.minHeight = Object.entries(items).length * 2 + 'em';
 			for (const [description, attributes] of Object.entries(items)) {
-				li=document.createElement('li');
-				if ('href' in attributes){
+				li = document.createElement('li');
+				if ('href' in attributes) {
 					link = document.createElement('a');
 					for (const [attribute, value] of Object.entries(attributes)) {
 						link.setAttribute(attribute, value);
 					}
 					link.appendChild(document.createTextNode(description));
-					li.append(link);				
-				}
-				else li.append(document.createTextNode(description))
+					li.append(link);
+				} else li.append(document.createTextNode(description))
 				ul.append(li);
 			}
 			label.append(ul);
@@ -396,8 +399,8 @@ export class Assemble {
 		return node;
 	}
 
-	names_numerator(name) {
-		if ([...name.matchAll(/\[\]/g)].length) return name;
+	names_numerator(name, dontnumerate = undefined) {
+		if (dontnumerate || [...name.matchAll(/\[\]/g)].length) return name;
 		if (name in this.names) {
 			this.names[name] += 1;
 			return name + '(' + this.names[name] + ')';
@@ -847,7 +850,7 @@ export class Assemble {
 		this.currentElement.attributes = {
 			'onpointerup': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
 			'data-type': 'scanner',
-			'type':'button'
+			'type': 'button'
 		};
 		result.push(this.button())
 		return result;

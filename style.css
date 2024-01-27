@@ -214,7 +214,7 @@ nav {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	height: 4em;
+	height: 3em;
 	padding: .75em;
 	vertical-align: top;
 
@@ -223,15 +223,28 @@ nav {
 		background-size: contain;
 		background-repeat: no-repeat;
 		cursor: pointer;
-		margin: 0 1em;
-		width: 3em;
-		height: 2.5em;
+		margin: 0 .75em;
+		width: 2em;
+		height: 1.5em;
 		padding: .2em;
+
+		&[data-notification]::after {
+			content: attr(data-notification);
+			color: var(--red);
+			position: absolute;
+			margin-top: -.5em;
+			margin-left: 2.75em;
+			font-size: .75em;
+		}
+
+		&[data-notification='0']::after {
+			display: none;
+		}
 	}
 
 	label:first-of-type {
 		border-radius: 50%;
-		height: 3.1em;
+		width: 1.5em;
 	}
 
 	input {
@@ -242,17 +255,24 @@ nav {
 		backdrop-filter: blur(10px);
 		z-index: 100;
 		position: relative;
-		left: -3em;
 		/* bottom: 12em;
 		min-height:1em;
 		dynamically set on constructor according to items*/
 		width: 15em;
 		list-style-type: none;
 		display: none;
+		padding: 1em;
+		border: 1px solid var(--3d-border);
+		border-radius: .2em;
+
 
 		li {
 			line-height: 2em;
 		}
+	}
+
+	input:not(:checked)~ul {
+		display: none;
 	}
 
 	input:checked~ul {
@@ -265,51 +285,6 @@ nav {
 	nav {
 		font-size: 1.125em;
 	}
-}
-
-#menu {
-	column-width: 10em;
-	margin-bottom: 4em;
-
-	div {
-		break-inside: avoid
-	}
-
-	a,
-	h3 {
-		color: inherit;
-		display: block;
-		line-height: 2em;
-		white-space: nowrap;
-		width: 100%;
-		margin-left: initial;
-	}
-
-	:first-child {
-		margin-top: 0;
-	}
-}
-
-input:checked~nav {
-	height: calc(100vh - 2em);
-}
-
-[data-unreadmessages]>img {
-	width: 1.5em;
-	height: 1.5em;
-}
-
-[data-unreadmessages]::after {
-	content: attr(data-unreadmessages);
-	color: var(--red);
-	position: absolute;
-	margin-top: -.5em;
-	margin-left: .25em;
-	font-size: .75em;
-}
-
-[data-unreadmessages='0']::after {
-	display: none;
 }
 
 /*************************** input elements and call to action *******************************/
