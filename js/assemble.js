@@ -98,7 +98,10 @@ export const assemble_helper = {
 			label.append(input);
 
 			ul = document.createElement('ul');
-			ul.style.maxHeight = Object.entries(items).length * 2 + 2 + 'em';
+			li = document.createElement('li');
+			li.append(document.createTextNode(group));
+			ul.append(li);
+			ul.style.maxHeight = (Object.entries(items).length+1) * 3 + 2 + 'em';
 			for (const [description, attributes] of Object.entries(items)) {
 				li = document.createElement('li');
 				if ('href' in attributes) {

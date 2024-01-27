@@ -214,7 +214,7 @@ nav {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	height: 3em;
+	height: 4em;
 	padding: .75em;
 	vertical-align: top;
 	text-align: center;
@@ -225,8 +225,8 @@ nav {
 		background-repeat: no-repeat;
 		cursor: pointer;
 		margin: 0 .75em;
-		width: 2em;
-		height: 1.5em;
+		width: 2.5em;
+		height: 3em;
 		padding: .2em;
 
 		&[data-notification]::after {
@@ -243,41 +243,29 @@ nav {
 		}
 	}
 
-	label:first-of-type {
-		border-radius: 50%;
-		width: 2.4em;
-		height:2.5em;
-		position:relative;
-		top:-.5em;
-		margin-top:-1em;
-
-		input:checked::before {
-			margin: -1.375em -1.4em;
-		}
-	}
-
 	input {
 		appearance: none
 	}
 
-	input:checked::before {
-		content: "";
-		border: 1px solid var(--green);
+	label:first-of-type {
 		border-radius: 50%;
-		display: block;
-		width: 2.6em;
-		height: 2.6em;
-		margin: -1.875em -1.675em;
+		width: 2.9em;
+		height:3em;
+		position:relative;
+		top:-.5em;
+		margin-top:-1em;
 	}
 
 	ul {
+		background-color: var(--lightershadow);
 		backdrop-filter: blur(10px);
 		z-index: 100;
 		position: fixed;
-		bottom: 2em;
+		bottom: 3em;
 		left: 50%;
-		transform: translateX(-10em);
-		width: 20em;
+		transform: translateX(-50%);
+		width: 100%;
+		max-width: 44em;
 		list-style-type: none;
 		padding: 0 1em;
 		border: none;
@@ -287,7 +275,7 @@ nav {
 		transition: .3s ease;
 
 		li {
-			line-height: 2em;
+			line-height: 3em;
 		}
 	}
 
