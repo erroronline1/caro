@@ -217,9 +217,10 @@ nav {
 	height: 3em;
 	padding: .75em;
 	vertical-align: top;
+	text-align: center;
 
 	label {
-		float: left;
+		display: inline-block;
 		background-size: contain;
 		background-repeat: no-repeat;
 		cursor: pointer;
@@ -245,6 +246,10 @@ nav {
 	label:first-of-type {
 		border-radius: 50%;
 		width: 1.5em;
+
+		input:checked::before {
+			margin: -1.875em -1.35em;
+		}
 	}
 
 	input {
@@ -258,7 +263,7 @@ nav {
 		display: block;
 		width: 2.5em;
 		height: 2.5em;
-		margin: -1.875em -1.125em;
+		margin: -1.875em -1.625em;
 	}
 
 	ul {
@@ -267,8 +272,8 @@ nav {
 		position: fixed;
 		bottom: 2em;
 		left: 50%;
-		transform: translateX(-7.5em);
-		width: 15em;
+		transform: translateX(-10em);
+		width: 20em;
 		list-style-type: none;
 		padding: 0 1em;
 		border: none;
@@ -678,7 +683,7 @@ section>div>hr {
 
 [data-type]::before,
 [data-menu]~label::before,
-main a::before {
+main a:not([data-type])::before {
 	content: "";
 	display: inline-block;
 	height: 1em;
@@ -688,7 +693,7 @@ main a::before {
 	margin: 0 .75em 0 0;
 }
 
-main a::before {
+main a:not([data-type])::before {
 	background-color: var(--cta_darker);
 	-webkit-mask-image: url('media/external-link-alt.svg');
 	mask-image: url('media/external-link-alt.svg');
