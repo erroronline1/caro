@@ -89,14 +89,16 @@ export const assemble_helper = {
 			label.style.backgroundImage = icons[group];
 			label.htmlFor = 'userMenu' + group;
 			label.setAttribute('data-notification', 0);
+
 			input = document.createElement('input');
 			input.type = 'radio';
 			input.name = 'userMenu';
 			input.id = 'userMenu' + group;
+
 			label.append(input);
+
 			ul = document.createElement('ul');
-			ul.style.bottom = Object.entries(items).length * 2 + 4 + 'em';
-			ul.style.minHeight = Object.entries(items).length * 2 + 'em';
+			ul.style.maxHeight = Object.entries(items).length * 2 + 2 + 'em';
 			for (const [description, attributes] of Object.entries(items)) {
 				li = document.createElement('li');
 				if ('href' in attributes) {
@@ -110,6 +112,7 @@ export const assemble_helper = {
 				ul.append(li);
 			}
 			label.append(ul);
+
 			elements.push(label);
 		}
 		menu.replaceChildren(...elements);

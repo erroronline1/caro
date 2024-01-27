@@ -248,35 +248,44 @@ nav {
 	}
 
 	input {
-		display: none
+		appearance: none
+	}
+
+	input:checked::before {
+		content: "";
+		border: 1px solid var(--green);
+		border-radius: 50%;
+		display: block;
+		width: 2.5em;
+		height: 2.5em;
+		margin: -1.875em -1.125em;
 	}
 
 	ul {
 		backdrop-filter: blur(10px);
 		z-index: 100;
-		position: relative;
-		/* bottom: 12em;
-		min-height:1em;
-		dynamically set on constructor according to items*/
+		position: fixed;
+		bottom: 2em;
+		left: 50%;
+		transform: translateX(-7.5em);
 		width: 15em;
 		list-style-type: none;
-		display: none;
-		padding: 1em;
-		border: 1px solid var(--3d-border);
+		padding: 0 1em;
+		border: none;
 		border-radius: .2em;
-
+		overflow: hidden;
+		height: 0;
+		transition: .3s ease;
 
 		li {
 			line-height: 2em;
 		}
 	}
 
-	input:not(:checked)~ul {
-		display: none;
-	}
-
 	input:checked~ul {
-		display: block
+		border: 1px solid var(--3d-border);
+		padding: 1em 1em;
+		height: 50em;
 	}
 }
 
