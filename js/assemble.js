@@ -318,7 +318,13 @@ export class Assemble {
 
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
-			const nodes = processPanel.call(this, panel);
+			const raw_nodes = processPanel.call(this, panel),
+				nodes = [];
+			// filter undefined
+			raw_nodes.forEach(node => {
+				if (node) nodes.push(node);
+			});
+
 			let frame = false;
 			for (let n = 0; n < nodes.length; n++) {
 				if (!(['DATALIST', 'HR', 'BUTTON'].includes(nodes[n].nodeName) || nodes[n].hidden)) {
@@ -336,6 +342,7 @@ export class Assemble {
 	}
 
 	slider(sectionID, length) {
+		if (length < 2) return;
 		const indicators = document.createElement('div'),
 			toleft = document.createElement('button'),
 			toright = document.createElement('button');
