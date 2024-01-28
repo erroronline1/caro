@@ -99,7 +99,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * filter by fields? dropdown?
 * partial delivery (6 of 10 delivered?) "received"
 * unarchived but received delete after x days
-* bulk approval? (new order alert only one time) checkbox on prepared order block
 * media attachments
 
 

@@ -175,9 +175,9 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_consumables_prepared_orders WHERE CONVERT(VARCHAR, id) = :id"
 		],
-		'order_delete-prepared-order' => [
-			'mysql' => "DELETE FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
-			'sqlsrv' => "DELETE FROM caro_consumables_prepared_orders WHERE id = :id"
+		'order_delete-prepared-orders' => [
+			'mysql' => "DELETE FROM caro_consumables_prepared_orders WHERE id IN (:id)",
+			'sqlsrv' => "DELETE FROM caro_consumables_prepared_orders WHERE id IN (:id)"
 		],
 
 		'order_get-prepared-orders' => [

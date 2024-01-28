@@ -18,6 +18,59 @@ class ORDER extends API {
 
 	public function prepared(){
 		switch ($_SERVER['REQUEST_METHOD']){
+			case 'PUT':
+				if (!(array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+				$approval = false;
+				if (UTILITY::propertySet($this->_payload, 'approval_token')){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
+					$statement->execute([
+						':token' => $this->_payload->approval_token
+					]);
+					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
+						$approval = $result['name'] . LANG::GET('order.token_verified');
+					}
+				}
+				if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
+					$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
+					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
+				}
+				$approvedIDs = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.bulk_approve_order'));
+				if (!$approval || !$approvedIDs) $this->response([], 401);
+
+				$order_data=['items'=>[]];
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-orders'));
+				$statement->execute();
+				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$index=0;
+				foreach ($orders as $order){
+					if (array_search($order['id'], $approvedIDs) === false) continue;
+
+					foreach (json_decode($order['order_data'], true) as $key => $items){ // data
+						if (is_array($items)){
+							foreach($items as $item){
+								foreach($item as $key => $subvalue){
+									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim($subvalue);
+								}
+								$index++;
+							}
+						} else {
+							if (boolval($items)) $order_data[$key] = trim($items);
+						}
+					}
+				}
+
+				if(!count($order_data['items'])) $this->response([], 406);
+				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
+
+				if ($result['status']['msg']==LANG::GET('order.saved')){
+					$query=strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . implode("','", $approvedIDs) . "'"]);
+					$statement = $this->_pdo->prepare($query);
+					$statement->execute();
+				}
+
+				break;
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-orders'));
@@ -43,20 +96,25 @@ class ORDER extends API {
 					$text = '';
 					foreach (json_decode($order['order_data'], true) as $key => $value){ // data
 						if (is_array($value)){
-							foreach($value as $index => $item){ // items
-								foreach ($item as $itemkey => $itemvalue){
-									$text .= $itemkey . ': ' . $itemvalue . '\n';
-								}
-								$text .= '\n';
+							foreach($value as $item){
+							$text .= LANG::GET('order.prepared_order_item', [
+								':quantity' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.quantity_label')) ? : '',
+								':unit' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.unit_label')) ? : '',
+								':number' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+								':name' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.productname_label')) ? : '',
+								':vendor' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.vendor_label')) ? : ''
+							]).'\n';
 							}
-
 						} else {
-							$text .= $key . ': ' . $value . '\n';
+							$text .= str_replace('_', ' ', $key) . ': ' . $value . '\n';
 						}
 					}
 					array_push($result['body']['content'], [
 						['type' => 'text',
 						'content' => $text,
+						],
+						['type' => 'checkbox',
+						'content' => [LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]]
 						],
 						['type' => 'button',
 						'description' => LANG::GET('order.edit_prepared_order'),
@@ -64,10 +122,30 @@ class ORDER extends API {
 						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
 					]);
 				}
-			break;
+				if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions'])) {
+					array_push($result['body']['content'], [
+						[
+							['type' => 'signature',
+							'description' => LANG::GET('order.add_approval_signature'),
+							'attributes' => [
+								'name' => 'approval_signature'
+							]]
+						],
+						[
+							['type' => 'scanner',
+							'attributes' => [
+								'name' => LANG::GET('order.add_approval_token'),
+								'type' => 'password'
+							]]
+						]
+					]);
+					$result['body']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
+				}
+				break;
 		}
 		$this->response($result);
 	}
+
 	public function productsearch(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
@@ -213,6 +291,7 @@ class ORDER extends API {
 				'id' => false,
 				'msg' => LANG::GET('order.saved')
 			]];
+			$statement->closeCursor();
 			$this->alertUserGroup('purchase', LANG::GET('order.alert_purchase'), 'permission');		
 		}
 		else $result=[
@@ -265,10 +344,9 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder($processedOrderData);
 
 				if ($result['status']['msg']==LANG::GET('order.saved')){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-prepared-order'));
-					$statement->execute([
-						':id' => $this->_requestedID
-					]);
+					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
+					$statement = $this->_pdo->prepare($query);
+					$statement->execute();
 				}
 				break;
 			case 'GET':
@@ -521,10 +599,9 @@ class ORDER extends API {
 				break;
 			case 'DELETE':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-prepared-order'));
-				if ($statement->execute([
-					':id' => $this->_requestedID
-					])) {
+				$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
+				$statement = $this->_pdo->prepare($query);
+				if ($statement->execute()) {
 					$result=[
 					'status' => [
 						'id' => false,
@@ -770,7 +847,7 @@ class ORDER extends API {
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',
-							'onpointerup' => "if (confirm(LANG::GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
+							'onpointerup' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
 						]
 					];
 					array_push($result['body']['content'], $content);

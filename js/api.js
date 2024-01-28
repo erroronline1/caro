@@ -496,6 +496,12 @@ export const api = {
 						api.toast(data.status.msg);
 					};
 				}
+				if ($request[1]=='prepared') {
+					successFn = function (data) {
+						api.toast(data.status.msg);
+						api.purchase('get', 'prepared');
+					};
+				}
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'delete':
