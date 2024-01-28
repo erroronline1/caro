@@ -62,54 +62,78 @@ const _serviceWorker = {
 const orderClient = {
 	addProduct: (...data) => {
 		// order to be taken into account in order.php "productsearch" method as well!
+		// cart-content has a twin within order.php "order"-get method
+		if ([...data].length < 6) data = ['', ...data];
+		else data = [...data];
 		const nodes = document.querySelectorAll('main>form>article'),
-			newNode = nodes[nodes.length - 3].cloneNode(true),
-			transfer = ['', ...data]; // first item is supposed to be quantity
-
-		newNode.children[newNode.children.length - 1].remove();
-		for (let i = 2; i < newNode.children.length; i += 4) {
-			if ('value' in newNode.children[i]) newNode.children[i].value = transfer[(i - 2) / 4];
-			newNode.children[i].required = 'required';
-		}
-		const deleteButton = document.createElement('button');
-		deleteButton.appendChild(document.createTextNode(LANG.GET('order.add_delete')));
-		deleteButton.addEventListener('pointerdown', (e) => {
-			newNode.remove()
-		});
-		newNode.append(deleteButton);
-
-		nodes[nodes.length - 3].parentNode.insertBefore(newNode, nodes[nodes.length - 3]);
-	},
-	cloneNew: (node) => {
-		const newNode = node.cloneNode(true),
-			deleteButton = document.createElement('button');
-		newNode.children[node.children.length - 1].remove();
-		deleteButton.appendChild(document.createTextNode(LANG.GET('order.add_delete')));
-		deleteButton.addEventListener('pointerdown', (e) => {
-			newNode.remove()
-		});
-		newNode.append(deleteButton);
-		node.parentNode.insertBefore(newNode, node);
-		for (let i = 0; i < node.children.length; i++) {
-			if (i !== 3) { // distributor remains, see order.php
-				node.children[i].value = '';
-			}
-		}
-	},
-	required: (node) => {
-		let hasValue = false;
-		// check if any field has a value
-		for (let i = 0; i < node.children.length; i++) {
-			if (node.children[i].value) {
-				hasValue = true;
-				break;
-			}
-		}
-		// apply required if so, delete if not
-		for (let i = 0; i < node.children.length; i++) {
-			if (hasValue) node.children[i].setAttribute('required', '');
-			else node.children[i].removeAttribute('required');
-		}
+			cart = {
+				content: [
+					[{
+							type: 'numberinput',
+							attributes: {
+								name: LANG.GET('order.quantity_label') + '[]',
+								value: data[0],
+								min: '1',
+								max: '99999',
+								required: true,
+								'data-loss': 'prevent'
+							}
+						},
+						{
+							type: 'text',
+							description: LANG.GET('order.added_product', {
+								':unit': data[1],
+								':number': data[2],
+								':name': data[3],
+								':vendor': data[5]
+							})
+						},
+						{
+							type: 'hiddeninput',
+							attributes: {
+								name: LANG.GET('order.unit_label') + '[]',
+								value: data[1] ? data[1] : ' '
+							}
+						},
+						{
+							type: 'hiddeninput',
+							attributes: {
+								name: LANG.GET('order.ordernumber_label') + '[]',
+								value: data[2]
+							}
+						},
+						{
+							type: 'hiddeninput',
+							attributes: {
+								name: LANG.GET('order.productname_label') + '[]',
+								value: data[3]
+							}
+						},
+						{
+							type: 'hiddeninput',
+							attributes: {
+								name: LANG.GET('order.barcode') + '[]',
+								value: data[4] ? data[4] : ' '
+							}
+						},
+						{
+							type: 'hiddeninput',
+							attributes: {
+								name: LANG.GET('order.vendor_label') + '[]',
+								value: data[5]
+							}
+						},
+						{
+							type: 'deletebutton',
+							description: LANG.GET('order.add_delete'),
+							attributes: {
+								onpointerup: 'this.parentNode.remove()'
+							}
+						}
+					]
+				]
+			};
+		new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
 	},
 	toClipboard: (node) => {
 		node.select();
