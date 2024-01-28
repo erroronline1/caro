@@ -6,7 +6,6 @@ class CONSUMABLES extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
-	private $_subMethod = null;
 	private $filtersample = <<<'END'
 	{
 		"info": "more rules may apply, see documentation if neccessary",
@@ -32,7 +31,6 @@ class CONSUMABLES extends API {
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
 	private function update_pricelist($file, $filter, $vendorID){
@@ -52,7 +50,7 @@ class CONSUMABLES extends API {
 			]);
 			// retrieve left items
 			$remainder=[];
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-search'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
 			$statement->execute([
 				':search' => $vendorID
 			]);
@@ -503,7 +501,8 @@ class CONSUMABLES extends API {
 				$options = [LANG::GET('consumables.edit_product_vendor_select_default') => []];
 				$datalist_unit = [];
 				$result = [];
-				
+				$vendors=[];
+
 				// select single product based on id or name
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
 				$statement->execute([
@@ -522,7 +521,7 @@ class CONSUMABLES extends API {
 					'active' => 1,
 					'protected' => 0
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id'] && !$this->_subMethod) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
 
 				$isactive = $product['active'] ? ['checked' => true] : [];
 				$isinactive = !$product['active'] ? ['checked' => true] : [];
@@ -544,10 +543,15 @@ class CONSUMABLES extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
 				$statement->execute();
 				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+				$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
+
 				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = [];
 					if ($row['name'] === $product['vendor_name']) $options[$row['name']]['selected'] = true;
+					$vendors[$row['name']] = ['value' => $row['id']];
+
 				}
 
 				// prepare existing unit lists
@@ -557,7 +561,6 @@ class CONSUMABLES extends API {
 				foreach($vendor as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
-
 
 				// display form for adding or editing a product
 				$result['body']=['content' => [
@@ -573,14 +576,19 @@ class CONSUMABLES extends API {
 							'id' => 'units'
 						]],
 						['type' => 'scanner',
-						'description' => LANG::GET('consumables.edit_product_search_scan'),
 						'destination' => LANG::GET('consumables.edit_product_search')
+						],
+						['type' => 'select',
+						'content' => $vendors,
+						'attributes' => [
+							'id' => 'productsearchvendor',
+							'name' => LANG::GET('consumables.edit_product_vendor_select')
+							]
 						],
 						['type' => 'searchinput',
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_search'),
-							'value' => $this->_requestedID && $this->_subMethod === 'search' ? $this->_requestedID : '',
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'product', this.value, 'search'); return false;}"
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'editconsumables'); return false;}"
 						]],
 					],
 					[
@@ -588,6 +596,7 @@ class CONSUMABLES extends API {
 					],
 					[
 						['type' => 'select',
+						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_vendor_select'),
 						],
@@ -613,7 +622,6 @@ class CONSUMABLES extends API {
 						["type" => "textinput",
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_article_alias'),
-							'required' => true,
 							'value' => $product['article_alias']
 						]],
 						["type" => "textinput",
@@ -670,25 +678,6 @@ class CONSUMABLES extends API {
 						]]
 					]
 				);
-				if ($this->_subMethod === 'search'){
-					$matches = [];
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-search'));
-					$statement->execute([
-						':search' => $this->_requestedID
-					]);
-					$search = $statement->fetchAll(PDO::FETCH_ASSOC);
-					foreach($search as $key => $row) {
-						$matches[$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")", 'data-filtered' => 'breakline'];
-					}
-					array_splice($result['body']['content'], 1, 0,
-						[[
-							['type' => 'links',
-							'description' => LANG::GET('consumables.edit_product_search_matches', [':number' => count($matches)]),
-							'content' => $matches
-							]
-						]]
-					);
-				}
 				$this->response($result);
 				break;
 		case 'DELETE':

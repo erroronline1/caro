@@ -5,6 +5,7 @@ class ORDER extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_subMethod = null;
+	private $_borrowedModule = null;
 
 	private $fields = null;
 
@@ -12,6 +13,7 @@ class ORDER extends API {
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
+		$this->_borrowedModule = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	public function prepared(){
@@ -71,11 +73,20 @@ class ORDER extends API {
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$result = ['body'=>[]];
+				if (!$this->_subMethod) {
+					$result['body']['content'] = [];
+					break;
+				}
+				// because in clause doesn't work
+				$query= strtr(SQLQUERY::PREPARE('order_get-product-search'),
+					[
+						':vendors' => "'" . implode("','", explode('_', $this->_requestedID)) . "'",
+						':search' => "'" . $this->_subMethod . "'"
+					]
+				);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-product-search'));
-				$statement->execute([
-					':search' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare($query);
+				$statement->execute();
 				$search = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 				$productsPerSlide = 0;
@@ -95,7 +106,11 @@ class ORDER extends API {
 						];
 					}
 					$slide = intval(count($matches[$article]) - 1);
-					$matches[$article][$slide][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'data-filtered' => 'breakline', 'data-type' => 'cart', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['vendor_name'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "'); return false;"];
+					if ($this->_borrowedModule == 'editconsumables') // consumables.php can make good use of this method!
+						$matches[$article][$slide][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")", 'data-filtered' => 'breakline'];
+					else
+						$matches[$article][$slide][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'data-filtered' => 'breakline', 'data-type' => 'cart', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;"];
+
 				}
 				if (!$matches[0]) $matches[0][] = [
 					['type' => 'links',
@@ -139,6 +154,8 @@ class ORDER extends API {
 	private function processOrderForm(){
 		$unset=LANG::PROPERTY('consumables.edit_product_search');
 		unset ($this->_payload->$unset);
+		$unset=LANG::PROPERTY('consumables.edit_product_vendor_select');
+		unset ($this->_payload->$unset);
 
 		$approval = false;
 		if (UTILITY::propertySet($this->_payload, 'approval_token')){
@@ -161,10 +178,10 @@ class ORDER extends API {
 		foreach ($this->_payload as $key => $value){
 			if (is_array($value)){
 				foreach($value as $index => $subvalue){
-					if (boolval($subvalue)) $order_data['items'][intval($index)][$key] = $subvalue;
+					if (boolval($subvalue)) $order_data['items'][intval($index)][$key] = trim($subvalue);
 				}
 			} else {
-				if (boolval($value)) $order_data[$key] = $value;
+				if (boolval($value)) $order_data[$key] = trim($value);
 			}
 		}
 		$order_data[LANG::GET('order.orderer')]=$_SESSION['user']['name'];
@@ -210,7 +227,6 @@ class ORDER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
 				$processedOrderData =$this->processOrderForm();
 
 				if (!$processedOrderData['approval']){
@@ -259,13 +275,18 @@ class ORDER extends API {
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
 				$datalist_unit = [];
+				$vendors=[];
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
 				$statement->execute();
+
 				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
+				
 				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
+					$vendors[$row['name']] = ['value' => $row['id']];
 				}
 				// prepare existing unit lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-units'));
@@ -301,15 +322,20 @@ class ORDER extends API {
 				'content' => [
 					[
 						['type' => 'scanner',
-						'description' => LANG::GET('consumables.edit_product_search_scan'),
 						'destination' => LANG::GET('consumables.edit_product_search')
+						],
+						['type' => 'select',
+						'content' => $vendors,
+						'attributes' => [
+							'id' => 'productsearchvendor',
+							'name' => LANG::GET('consumables.edit_product_vendor_select')
+							]
 						],
 						['type' => 'searchinput',
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_search'),
-							'value' => $this->_requestedID && $this->_subMethod === 'search' ? $this->_requestedID : '',
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', this.value); return false;}",
-							'onblur' => "if (this.value) {api.purchase('get', 'productsearch', this.value); return false;}",
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
+							'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
 							'id' => 'productsearch'
 						]]
 					],[
@@ -324,40 +350,34 @@ class ORDER extends API {
 						'content' => $datalist_unit,
 						'attributes' => [
 							'id' => 'units'
-						]]
-					],[
+						]],
 						['type' => 'numberinput',
 						'attributes' => [
 							'name' => LANG::GET('order.quantity_label') . '[]',
 							'min' => '1',
 							'max' => '99999',
-							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'attributes' => [
 							'name' => LANG::GET('order.unit_label') . '[]',
 							'list' => 'units',
-							'onblur' => 'orderClient.required(this.parentNode)',
+							'data-loss' => 'prevent'
+						]],
+						['type' => 'textinput',
+						'attributes' => [
+							'name' => LANG::GET('order.ordernumber_label') . '[]',
+							'data-loss' => 'prevent'
+						]],
+						['type' => 'textinput',
+						'attributes' => [
+							'name' => LANG::GET('order.productname_label') . '[]',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'textinput',
 						'attributes' => [
 							'name' => LANG::GET('order.vendor_label') . '[]',
 							'list' => 'vendors',
-							'onblur' => 'orderClient.required(this.parentNode)',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('order.ordernumber_label') . '[]',
-							'onblur' => 'orderClient.required(this.parentNode)',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('order.productname_label') . '[]',
-							'onblur' => 'orderClient.required(this.parentNode)',
 							'data-loss' => 'prevent'
 						]],
 						['type' => 'hiddeninput',
@@ -369,15 +389,9 @@ class ORDER extends API {
 						'attributes' => [
 							'value' => LANG::GET('order.add_button'),
 							'type' => 'button',
-							'onpointerup' => 'orderClient.cloneNew(this.parentNode)'
+							'onpointerup' => "orderClient.addProduct(this.parentNode.children[2].value, this.parentNode.children[6].value, this.parentNode.children[10].value, this.parentNode.children[14].value, '', this.parentNode.children[18].value); for (const e of this.parentNode.children) e.value=''"
 						]]
 					],[
-						['type' => 'textarea',
-						'attributes' => [
-							'name' => LANG::GET('order.additional_info'),
-							'value' => array_key_exists(LANG::PROPERTY('order.additional_info'), $order) ? $order[LANG::PROPERTY('order.additional_info')] : '',
-							'data-loss' => 'prevent'
-						]],
 						['type' => 'radio',
 						'description' => LANG::GET('order.unit'),
 						'content' => $organizational_units
@@ -398,6 +412,12 @@ class ORDER extends API {
 						'attributes' => [
 							'name' => LANG::GET('order.delivery_date'),
 							'value' => array_key_exists(LANG::PROPERTY('order.delivery_date'), $order) ? $order[LANG::PROPERTY('order.delivery_date')] : ''
+						]],
+						['type' => 'textarea',
+						'attributes' => [
+							'name' => LANG::GET('order.additional_info'),
+							'value' => array_key_exists(LANG::PROPERTY('order.additional_info'), $order) ? $order[LANG::PROPERTY('order.additional_info')] : '',
+							'data-loss' => 'prevent'
 						]]
 					],[
 						[
@@ -416,64 +436,78 @@ class ORDER extends API {
 						]
 					],
 				]];
+				
+				// cart-content has a twin within utility.js orderClient.addProduct() method
 				if ($order['items']){
 					$items=[];
 					for ($i = 0; $i < count($order['items']); $i++){
 						array_push($items,
 						[
-							['type' => 'numberinput',
-							'attributes' => [
-								'min' => '1',
-								'max' => '99999',
-								'name' => LANG::GET('order.quantity_label') . '[]',
-								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i][LANG::PROPERTY('order.quantity_label')],
-								'data-loss' => 'prevent'
-								]],
-							['type' => 'textinput',
-							'attributes' => [
-								'list' => 'units',
-								'name' => LANG::GET('order.unit_label') . '[]',
-								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i][LANG::PROPERTY('order.unit_label')],
-								'data-loss' => 'prevent'
-								]],
-							['type' => 'textinput',
-							'attributes' => [
-								'list' => 'vendors',
-								'name' => LANG::GET('order.vendor_label') . '[]',
-								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i][LANG::PROPERTY('order.vendor_label')],
-								'data-loss' => 'prevent'
-								]],
-							['type' => 'textinput',
-							'attributes' => [
-								'name' => LANG::GET('order.ordernumber_label') . '[]',
-								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i][LANG::PROPERTY('order.ordernumber_label')],
-								'data-loss' => 'prevent'
-								]],
-							['type' => 'textinput',
-							'attributes' => [
-								'name' => LANG::GET('order.productname_label') . '[]',
-								'onblur' => 'orderClient.required(this.parentNode)',
-								'value' => $order['items'][$i][LANG::PROPERTY('order.productname_label')],
-								'data-loss' => 'prevent'
-								]],
-							['type' => 'hiddeninput',
-							'attributes' => [
-								'name' => LANG::GET('order.barcode') . '[]',
-								'value' => array_key_exists (LANG::PROPERTY('order.barcode'), $order['items'][$i]) ? $order['items'][$i][LANG::PROPERTY('order.barcode')] : ''
-							]],
-							['type' => 'button',
-							'attributes' => [
-								'value' => LANG::GET('order.add_delete'),
-								'type' => 'button',
-								'onpointerup' => 'this.parentNode.remove()'
-							]]
+							[
+								'type' => 'numberinput',
+								'attributes' => [
+									'name' => LANG::GET('order.quantity_label') . '[]',
+									'value' => $order['items'][$i][LANG::PROPERTY('order.quantity_label')],
+									'min' => '1',
+									'max' => '99999',
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							],
+							[
+								'type' => 'text',
+								'description' => LANG::GET('order.added_product', [
+									':unit' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.unit_label')),
+									':number' => $order['items'][$i][LANG::PROPERTY('order.ordernumber_label')],
+									':name' => $order['items'][$i][LANG::PROPERTY('order.productname_label')],
+									':vendor' => $order['items'][$i][LANG::PROPERTY('order.vendor_label')]
+								])
+							],
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => LANG::GET('order.unit_label') . '[]',
+									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.unit_label')) ? : ' '
+								]
+							],
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => LANG::GET('order.ordernumber_label') . '[]',
+									'value' => $order['items'][$i][LANG::PROPERTY('order.ordernumber_label')]
+								]
+							],
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => LANG::GET('order.productname_label') . '[]',
+									'value' => $order['items'][$i][LANG::PROPERTY('order.productname_label')]
+								]
+							],
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => LANG::GET('order.barcode') . '[]',
+									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.barcode')) ?  : ' '
+								]
+							],
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => LANG::GET('order.vendor_label') . '[]',
+									'value' => $order['items'][$i][LANG::PROPERTY('order.vendor_label')]
+								]
+							],
+							[
+								'type' => 'deletebutton',
+								'description' => LANG::GET('order.add_delete'),
+								'attributes' => [
+									'onpointerup' => 'this.parentNode.remove()'
+								]
+							]
 						]);
 					}
-					array_splice($result['body']['content'], 3, 0, $items);
+					array_splice($result['body']['content'], 2, 0, $items);
 				}
 				if ($this->_requestedID) array_push($result['body']['content'], [
 					['type' => 'deletebutton',
@@ -736,7 +770,7 @@ class ORDER extends API {
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',
-							'onpointerup' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
+							'onpointerup' => "if (confirm(LANG::GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
 						]
 					];
 					array_push($result['body']['content'], $content);

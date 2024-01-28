@@ -119,8 +119,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id"
 		],
 		'consumables_get-vendor-datalist' => [
-			'mysql' => "SELECT name FROM caro_consumables_vendors ORDER BY name ASC",
-			'sqlsrv' => "SELECT name as name FROM caro_consumables_vendors ORDER BY name ASC"
+			'mysql' => "SELECT id, name FROM caro_consumables_vendors ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name FROM caro_consumables_vendors ORDER BY name ASC"
 		],
 		'consumables_get-vendor' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id LIMIT 1",
@@ -146,9 +146,9 @@ class SQLQUERY {
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC"
 		],
-		'consumables_get-product-search' => [
-			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (prod.id = :search OR LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (CONVERT(VARCHAR, prod.id) = :search OR LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id = dist.id"
+		'consumables_get-products-by-vendor-id' => [
+			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE dist.id = :search AND prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) = :search AND prod.vendor_id = dist.id"
 		],
 		'consumables_delete-all-unprotected-products' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND protected = 0",
@@ -160,8 +160,8 @@ class SQLQUERY {
 		],
 
 		'order_get-product-search' => [
-			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (prod.id = :search OR LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id = dist.id AND prod.active = 1",
-			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (CONVERT(VARCHAR, prod.id) = :search OR LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id = dist.id AND prod.active = 1"
+			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND prod.active = 1",
+			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND prod.active = 1"
 		],
 		'order_post-prepared-order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",
