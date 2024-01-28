@@ -455,9 +455,9 @@ export const api = {
 					case 'productsearch':
 						api.preventDataloss.monitor = false;
 						successFn = function (data) {
-							if (data.body) {
-								let list = document.querySelector('[data-type=links]');
-								if (list) list.parentNode.parentNode.parentNode.remove();
+							let list = document.querySelector('[data-type=links]');
+							if (list) list.parentNode.parentNode.parentNode.remove();
+							if (data.body.content) {
 								new Assemble(data.body).initializeSection('hr');
 							}
 							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
