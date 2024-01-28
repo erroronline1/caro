@@ -778,9 +778,9 @@ export class Assemble {
 			}
 			input = this.apply_attributes(attributes, input);
 			if (radio) {
-				label.append(input, document.createTextNode(checkbox));
+				label.append(input, document.createTextNode(checkbox.replace(/\[\]/g,'')));
 			} else {
-				label.append(document.createTextNode(checkbox), input);
+				label.append(document.createTextNode(checkbox.replace(/\[\]/g,'')), input);
 			}
 			result.push(label);
 		}
