@@ -773,7 +773,6 @@ export class Assemble {
 			} else {
 				label.classList.add('checkbox');
 				input.type = 'checkbox';
-				console.log(checkbox);
 				input.name = this.names_numerator(checkbox);
 			}
 			input = this.apply_attributes(attributes, input);
