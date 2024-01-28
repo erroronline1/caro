@@ -101,7 +101,7 @@ export const assemble_helper = {
 			li = document.createElement('li');
 			li.append(document.createTextNode(group));
 			ul.append(li);
-			ul.style.maxHeight = (Object.entries(items).length+1) * 3 + 2 + 'em';
+			ul.style.maxHeight = (Object.entries(items).length + 1) * 3 + 2 + 'em';
 			for (const [description, attributes] of Object.entries(items)) {
 				li = document.createElement('li');
 				if ('href' in attributes) {
@@ -183,7 +183,7 @@ export class Assemble {
 	}
 
 	initializeSection(nextSibling = null) {
-		nextSibling = document.querySelector(nextSibling);
+		if (typeof nextSibling === 'string') nextSibling = document.querySelector(nextSibling);
 		if (this.form && !nextSibling) {
 			this.section = document.createElement('form');
 			this.section.method = 'post';
@@ -428,16 +428,17 @@ export class Assemble {
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 		}*/
-		const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
 		let result = [];
 		if (this.currentElement.description) {
 			result = result.concat(this.header());
 		}
-
-		for (const part of content) {
-			if (!part[1].length) continue;
-			result.push(document.createTextNode(part[1]));
-			result.push(document.createElement('br'));
+		if (this.currentElement.content) {
+			const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+			for (const part of content) {
+				if (!part[1].length) continue;
+				result.push(document.createTextNode(part[1]));
+				result.push(document.createElement('br'));
+			}
 		}
 		result.push(document.createElement('br'));
 		return result;
