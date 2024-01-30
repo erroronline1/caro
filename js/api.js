@@ -115,7 +115,12 @@ export const api = {
 						}));
 						return;
 					}
-					if (data.body.image) document.querySelector('nav>label:first-child').style.backgroundImage = "url('" + data.body.image + "')";
+					if (data.body.image) {
+						const firstLabel = document.querySelector('nav>label:first-child');
+						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
+						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = 'none';
+						document.querySelector('nav>label:first-child').style.backgroundImage = "url('" + data.body.image + "')";
+					}
 					api.application('get', 'start');
 				}
 				break;
@@ -496,7 +501,7 @@ export const api = {
 						api.toast(data.status.msg);
 					};
 				}
-				if ($request[1]=='prepared') {
+				if ($request[1] == 'prepared') {
 					successFn = function (data) {
 						api.toast(data.status.msg);
 						api.purchase('get', 'prepared');

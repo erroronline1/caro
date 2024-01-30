@@ -221,12 +221,11 @@ nav {
 
 	label {
 		display: inline-block;
-		background-size: contain;
-		background-repeat: no-repeat;
+		background-color: var(--cta_darker);
 		cursor: pointer;
 		margin: 0 .75em;
 		width: 2.5em;
-		height: 3em;
+		height: 2.5em;
 		padding: .2em;
 
 		&[data-notification]::after {
@@ -244,16 +243,14 @@ nav {
 	}
 
 	input {
-		appearance: none
+		appearance: none;
+		width:auto;
 	}
 
 	label:first-of-type {
 		border-radius: 50%;
-		width: 2.9em;
-		height:3em;
-		position:relative;
-		top:-.5em;
-		margin-top:-1em;
+		background-size:cover;
+		background-repeat: no-repeat;
 	}
 
 	ul {
@@ -279,7 +276,7 @@ nav {
 		}
 	}
 
-	input:checked~ul {
+	input:checked+ul {
 		border: 1px solid var(--3d-border);
 		padding: 1em 1em;
 		height: 50em;

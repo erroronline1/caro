@@ -86,7 +86,8 @@ export const assemble_helper = {
 		let label, input, ul, li, link;
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement('label');
-			label.style.backgroundImage = icons[group];
+
+			label.style.maskImage = label.style.webkitMaskImage = icons[group];
 			label.htmlFor = 'userMenu' + group;
 			label.setAttribute('data-notification', 0);
 
@@ -94,8 +95,6 @@ export const assemble_helper = {
 			input.type = 'radio';
 			input.name = 'userMenu';
 			input.id = 'userMenu' + group;
-
-			label.append(input);
 
 			ul = document.createElement('ul');
 			li = document.createElement('li');
@@ -114,9 +113,10 @@ export const assemble_helper = {
 				} else li.append(document.createTextNode(description))
 				ul.append(li);
 			}
-			label.append(ul);
 
 			elements.push(label);
+			elements.push(input);
+			elements.push(ul);
 		}
 		menu.replaceChildren(...elements);
 	}
@@ -777,9 +777,9 @@ export class Assemble {
 			}
 			input = this.apply_attributes(attributes, input);
 			if (radio) {
-				label.append(input, document.createTextNode(checkbox.replace(/\[\]/g,'')));
+				label.append(input, document.createTextNode(checkbox.replace(/\[\]/g, '')));
 			} else {
-				label.append(document.createTextNode(checkbox.replace(/\[\]/g,'')), input);
+				label.append(document.createTextNode(checkbox.replace(/\[\]/g, '')), input);
 			}
 			result.push(label);
 		}
