@@ -254,7 +254,7 @@ nav {
 	}
 
 	ul {
-		background-color: var(--lightershadow);
+		background-color: var(--lightshadow);
 		backdrop-filter: blur(10px);
 		z-index: 100;
 		position: fixed;
@@ -280,6 +280,8 @@ nav {
 		border: 1px solid var(--3d-border);
 		padding: 1em 1em;
 		height: 50em;
+		box-shadow: var(--shadow);
+
 	}
 }
 
