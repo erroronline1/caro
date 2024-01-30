@@ -119,6 +119,18 @@ class API {
 		}
 	}
 
+	public function noContentAvailable($type){
+		return [[
+			['type' => 'image',
+			'attributes' => [
+				'url' => './media/box-open.svg',
+				'imageonly' => [] 
+				]],
+			['type' => 'text',
+			'content' => LANG::GET('general.no_content_available', [':content' => $type])]
+		]];
+	}
+
 }
 
 if (in_array(REQUEST[0], ['application', 'form', 'user', 'consumables', 'order', 'message', 'file', 'tool'])) require_once(REQUEST[0] . '.php');
