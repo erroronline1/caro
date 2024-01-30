@@ -93,11 +93,11 @@ class ORDER extends API {
 				}
 				$result=['body' => ['content' => []]];
 				foreach($organizational_orders as $order){ // order
-					$text = '';
+					$items = $info = '';
 					foreach (json_decode($order['order_data'], true) as $key => $value){ // data
 						if (is_array($value)){
 							foreach($value as $item){
-							$text .= LANG::GET('order.prepared_order_item', [
+							$items .= LANG::GET('order.prepared_order_item', [
 								':quantity' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.quantity_label')) ? : '',
 								':unit' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.unit_label')) ? : '',
 								':number' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.ordernumber_label')) ? : '',
@@ -106,12 +106,15 @@ class ORDER extends API {
 							]).'\n';
 							}
 						} else {
-							$text .= str_replace('_', ' ', $key) . ': ' . $value . '\n';
+							$info .= str_replace('_', ' ', $key) . ': ' . $value . '\n';
 						}
 					}
 					array_push($result['body']['content'], [
 						['type' => 'text',
-						'content' => $text,
+						'content' => $items,
+						],
+						['type' => 'text',
+						'content' => $info,
 						],
 						['type' => 'checkbox',
 						'content' => [LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]]
@@ -122,7 +125,7 @@ class ORDER extends API {
 						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
 					]);
 				}
-				if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions'])) {
+				if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']) && count($organizational_orders)) {
 					array_push($result['body']['content'], [
 						[
 							['type' => 'signature',
