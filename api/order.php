@@ -92,58 +92,61 @@ class ORDER extends API {
 					}
 				}
 				$result=['body' => ['content' => []]];
-				foreach($organizational_orders as $order){ // order
-					$items = $info = '';
-					foreach (json_decode($order['order_data'], true) as $key => $value){ // data
-						if (is_array($value)){
-							foreach($value as $item){
-							$items .= LANG::GET('order.prepared_order_item', [
-								':quantity' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.quantity_label')) ? : '',
-								':unit' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.unit_label')) ? : '',
-								':number' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.ordernumber_label')) ? : '',
-								':name' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.productname_label')) ? : '',
-								':vendor' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.vendor_label')) ? : ''
-							]).'\n';
+				if (count($organizational_orders)){
+					foreach($organizational_orders as $order){ // order
+						$items = $info = '';
+						foreach (json_decode($order['order_data'], true) as $key => $value){ // data
+							if (is_array($value)){
+								foreach($value as $item){
+								$items .= LANG::GET('order.prepared_order_item', [
+									':quantity' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.quantity_label')) ? : '',
+									':unit' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.unit_label')) ? : '',
+									':number' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+									':name' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.productname_label')) ? : '',
+									':vendor' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.vendor_label')) ? : ''
+								]).'\n';
+								}
+							} else {
+								$info .= str_replace('_', ' ', $key) . ': ' . $value . '\n';
 							}
-						} else {
-							$info .= str_replace('_', ' ', $key) . ': ' . $value . '\n';
 						}
+						array_push($result['body']['content'], [
+							['type' => 'text',
+							'content' => $items,
+							],
+							['type' => 'text',
+							'content' => $info,
+							],
+							['type' => 'checkbox',
+							'content' => [LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]]
+							],
+							['type' => 'button',
+							'description' => LANG::GET('order.edit_prepared_order'),
+							'attributes' =>['type' => 'button',
+							'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
+						]);
 					}
-					array_push($result['body']['content'], [
-						['type' => 'text',
-						'content' => $items,
-						],
-						['type' => 'text',
-						'content' => $info,
-						],
-						['type' => 'checkbox',
-						'content' => [LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]]
-						],
-						['type' => 'button',
-						'description' => LANG::GET('order.edit_prepared_order'),
-						'attributes' =>['type' => 'button',
-						'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
-					]);
+					if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']) && count($organizational_orders)) {
+						array_push($result['body']['content'], [
+							[
+								['type' => 'signature',
+								'description' => LANG::GET('order.add_approval_signature'),
+								'attributes' => [
+									'name' => 'approval_signature'
+								]]
+							],
+							[
+								['type' => 'scanner',
+								'attributes' => [
+									'name' => LANG::GET('order.add_approval_token'),
+									'type' => 'password'
+								]]
+							]
+						]);
+						$result['body']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
+					}
 				}
-				if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']) && count($organizational_orders)) {
-					array_push($result['body']['content'], [
-						[
-							['type' => 'signature',
-							'description' => LANG::GET('order.add_approval_signature'),
-							'attributes' => [
-								'name' => 'approval_signature'
-							]]
-						],
-						[
-							['type' => 'scanner',
-							'attributes' => [
-								'name' => LANG::GET('order.add_approval_token'),
-								'type' => 'password'
-							]]
-						]
-					]);
-					$result['body']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
-				}
+				else $result['body']['content'] = $this->noContentAvailable(LANG::GET('order.no_orders'));
 				break;
 		}
 		$this->response($result);

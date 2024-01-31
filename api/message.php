@@ -164,67 +164,69 @@ class MESSAGE extends API {
 		]);
 		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		$content=[[
-				['type' => 'filterinput',
-				'attributes' => [
-					'name' => LANG::GET('message.message_filter_label'),
-					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
-					'onblur' => "api.message('get', 'filter', this.value); return false;",
-					'id' => 'productsearch'
-				]]
-		]];
-		foreach($messages as $message) {
-			$content[]= [
-				['type' => 'hiddeninput',
-				'description' => 'filter',
-				'attributes'=>['data-filtered' => $message['id']]
-			],
-				['type' => 'textinput',
-				'numeration' => 'prevent',
-				'attributes' => [
-					'readonly' => true,
-					'data-message' => $message['id'],
-					'name' => LANG::GET('message.from'),
-					'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
-				]],
-				['type' => 'textarea',
-				'numeration' => 'prevent',
-				'attributes' => [
-					'name' => LANG::GET('message.message'),
-					'data-message' => $message['id'],
-					'readonly' => true,
-					'value' => $message['message'],
-					'rows' => 7
-				]],
-				['type' => 'text',
-				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
-				],
-				['type' => 'deletebutton',
-				'description' => LANG::GET('message.delete'),
-				'attributes' => [
-					'type' => 'button',
-					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
-				]]
-			];
-			if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
-				['type' => 'button',
-				'description' => LANG::GET('message.reply'),
-				'attributes' => [
-					'type' => 'button',
-					'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'reply')" 
+		if (count($messages)){
+			$content=[[
+					['type' => 'filterinput',
+					'attributes' => [
+						'name' => LANG::GET('message.message_filter_label'),
+						'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
+						'onblur' => "api.message('get', 'filter', this.value); return false;",
+						'id' => 'productsearch'
 					]]
-				]);
-			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
-				['type' => 'image',
-				'attributes' => [
-					'url' => $message['image'],
-					'imageonly' => ['width' => '3em', 'height' => '3em'] 
+			]];
+			foreach($messages as $message) {
+				$content[]= [
+					['type' => 'hiddeninput',
+					'description' => 'filter',
+					'attributes'=>['data-filtered' => $message['id']]
+				],
+					['type' => 'textinput',
+					'numeration' => 'prevent',
+					'attributes' => [
+						'readonly' => true,
+						'data-message' => $message['id'],
+						'name' => LANG::GET('message.from'),
+						'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
 					]],
-					['type' => 'br'],
-					['type' => 'br'],
-				]);
+					['type' => 'textarea',
+					'numeration' => 'prevent',
+					'attributes' => [
+						'name' => LANG::GET('message.message'),
+						'data-message' => $message['id'],
+						'readonly' => true,
+						'value' => $message['message'],
+						'rows' => 7
+					]],
+					['type' => 'text',
+					'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
+					],
+					['type' => 'deletebutton',
+					'description' => LANG::GET('message.delete'),
+					'attributes' => [
+						'type' => 'button',
+						'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
+					]]
+				];
+				if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
+					['type' => 'button',
+					'description' => LANG::GET('message.reply'),
+					'attributes' => [
+						'type' => 'button',
+						'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'reply')" 
+						]]
+					]);
+				if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
+					['type' => 'image',
+					'attributes' => [
+						'url' => $message['image'],
+						'imageonly' => ['width' => '3em', 'height' => '3em'] 
+						]],
+						['type' => 'br'],
+						['type' => 'br'],
+					]);
+			}
 		}
-		
+		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
 		$result['body']['content'] = $content;
 		$this->response($result);
 	}
@@ -239,64 +241,66 @@ class MESSAGE extends API {
 			':user' => $_SESSION['user']['id']
 		]);
 		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		$content=[[
-			['type' => 'filterinput',
-			'attributes' => [
-				'name' => LANG::GET('message.message_filter_label'),
-				'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
-				'onblur' => "api.message('get', 'filter', this.value); return false;",
-				'id' => 'productsearch'
-			]]
-		]];
-		foreach($messages as $key => $message) {
-			$content[]= [
-				['type' => 'hiddeninput',
-				'description' => 'filter',
-				'attributes'=>['data-filtered' => $message['id']]],
-				['type' => 'textinput',
-				'numeration' => 'prevent',
+		if (count($messages)){
+			$content=[[
+				['type' => 'filterinput',
 				'attributes' => [
-					'name' => LANG::GET('message.to'),
-					'readonly' => true,
-					'data-message' => $message['id'],
-					'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
-				]],
-				['type' => 'textarea',
-				'numeration' => 'prevent',
-				'attributes' => [
-					'name' => LANG::GET('message.message'),
-					'data-message' => $message['id'],
-					'readonly' => true,
-					'value' => $message['message'],
-					'rows' => 7
-				]],
-				['type' => 'text',
-				'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
-				],
-				['type' => 'button',
-				'description' => LANG::GET('message.forward'),
-				'attributes' => [
-					'type' => 'button',
-					'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'sent')" 
-				]],
-				['type' => 'deletebutton',
-				'description' => LANG::GET('message.delete'),
-				'attributes' => [
-					'type' => 'button',
-					'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
+					'name' => LANG::GET('message.message_filter_label'),
+					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
+					'onblur' => "api.message('get', 'filter', this.value); return false;",
+					'id' => 'productsearch'
 				]]
-			];
-			if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
-				['type' => 'image',
-				'attributes' => [
-					'url' => $message['image'],
-					'imageonly' => ['width' => '3em', 'height' => '3em'] 
+			]];
+			foreach($messages as $key => $message) {
+				$content[]= [
+					['type' => 'hiddeninput',
+					'description' => 'filter',
+					'attributes'=>['data-filtered' => $message['id']]],
+					['type' => 'textinput',
+					'numeration' => 'prevent',
+					'attributes' => [
+						'name' => LANG::GET('message.to'),
+						'readonly' => true,
+						'data-message' => $message['id'],
+						'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
 					]],
+					['type' => 'textarea',
+					'numeration' => 'prevent',
+					'attributes' => [
+						'name' => LANG::GET('message.message'),
+						'data-message' => $message['id'],
+						'readonly' => true,
+						'value' => $message['message'],
+						'rows' => 7
+					]],
+					['type' => 'text',
+					'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
+					],
+					['type' => 'button',
+					'description' => LANG::GET('message.forward'),
+					'attributes' => [
+						'type' => 'button',
+						'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'sent')" 
+					]],
+					['type' => 'deletebutton',
+					'description' => LANG::GET('message.delete'),
+					'attributes' => [
+						'type' => 'button',
+						'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
+					]]
+				];
+				if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
+					['type' => 'image',
+					'attributes' => [
+						'url' => $message['image'],
+						'imageonly' => ['width' => '3em', 'height' => '3em'] 
+						]],
 					['type' => 'br'],
 					['type' => 'br'],
-				]);
+					]);
+			}
 		}
+		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
 		$result['body']['content'] = $content;
 		$this->response($result);
 	}	
