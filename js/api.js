@@ -19,9 +19,22 @@ export const api = {
 			document.removeEventListener('input', api.preventDataloss.event);
 			api.preventDataloss.monitor = false;
 		},
-		proceedAnyway: function (method) {
-			if (api.preventDataloss.monitor && method.toUpperCase() === 'GET')
-				return confirm(LANG.GET('general.prevent_dataloss'))
+		proceedAnyway: async function (method) {
+			if (api.preventDataloss.monitor && method.toUpperCase() === 'GET') {
+				const options = {};
+				options[LANG.GET('general.prevent_dataloss_cancel')] = false;
+				options[LANG.GET('general.prevent_dataloss_ok')] = {
+					value: true,
+					class: 'reducedCTA'
+				};
+				return await new Dialog({
+					type: 'confirm',
+					header: LANG.GET('general.prevent_dataloss'),
+					options: options
+				}).then(function (r) {
+					return (r.target.returnValue === 'true')
+				})
+			}
 			return true;
 		}
 	},
@@ -29,7 +42,7 @@ export const api = {
 		// default disable camera stream
 		const scanner = document.querySelector('video');
 		if (scanner) scanner.srcObject.getTracks()[0].stop();
-		if (!api.preventDataloss.proceedAnyway(method)) return false;
+		if (!await api.preventDataloss.proceedAnyway(method)) return false;
 		api.preventDataloss.stop()
 		api.loadindicator(true);
 		await _.api(method, 'api/api.php/' + request.join('/'), payload, form_data)
@@ -545,7 +558,6 @@ export const api = {
 				};
 				if (request[3] === 'display') {
 					payload = _.getInputs('[data-usecase=tool_create_code]');
-					console.log(payload);
 				}
 				break;
 			case 'post':
