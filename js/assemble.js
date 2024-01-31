@@ -132,10 +132,7 @@ export class Dialog {
 	 * 		doSomethingWith(response.target.returnValue);
 	 * 	});
 	 * 
-	 * for select:
-	 * onpointerdown: event.preventDefault(); new Dialog({options}).then((response) => {
-	 * 		this.value(response.target.returnValue);
-	 * 	});
+	 * select will be implemented by Assemble
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
@@ -817,7 +814,8 @@ export class Assemble {
 		}*/
 		const groups = {};
 		let select = document.createElement('select'),
-			label, div;
+			label, div,
+			selectModal={};
 		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, '');
 		if ('attributes' in this.currentElement) select = this.apply_attributes(this.currentElement.attributes, select);
@@ -827,6 +825,7 @@ export class Assemble {
 				[key, element]
 			];
 			else groups[key[0]].push([key, element]);
+			selectModal[key]=element.value || key;
 		}
 		for (const [group, elements] of Object.entries(groups)) {
 			let optgroup = document.createElement('optgroup');
@@ -846,6 +845,18 @@ export class Assemble {
 			div = document.createElement('div');
 			div.appendChild(document.createTextNode(this.currentElement.description));
 		}
+		select.addEventListener('pointerdown', (e) => {
+			e.preventDefault();
+			console.log(e);
+			new Dialog({
+				type: 'select',
+				header: select.title,
+				options: selectModal
+			}).then(response => {
+				e.target.value = response.target.returnValue;
+				e.target.dispatchEvent(new Event('change'));
+			});
+		});
 		return [...this.icon(), select, label, div];
 	}
 

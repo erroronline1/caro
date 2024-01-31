@@ -135,6 +135,8 @@ dialog {
 
 dialog[open] {
 	opacity: 1;
+	max-height: 75vh;
+	overflow-y: auto;
 }
 
 .loader {
