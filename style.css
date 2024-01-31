@@ -757,42 +757,42 @@ main a:not([data-type])::before {
 
 [data-type=toleft]::before {
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediaarrow-left.svg');
-	mask-image: url('./mediaarrow-left.svg');
+	-webkit-mask-image: url('./media/arrow-left.svg');
+	mask-image: url('./media/arrow-left.svg');
 }
 
 [data-type=toright]::before {
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediaarrow-right.svg');
-	mask-image: url('./mediaarrow-right.svg');
+	-webkit-mask-image: url('./media/arrow-right.svg');
+	mask-image: url('./media/arrow-right.svg');
 }
 
 [data-type=text]::before {
-	background-image: url("media/info-circle.svg");
+	background-image: url('./media/info-circle.svg');
 }
 
 [data-type=textinput]::before {
-	background-image: url("media/pencil.svg");
+	background-image: url('./media/pencil.svg');
 }
 
 [data-type=searchinput]::before {
-	background-image: url("media/search.svg");
+	background-image: url('./media/search.svg');
 }
 
 [data-type=numberinput]::before {
-	background-image: url("media/hashtag.svg");
+	background-image: url('./media/hashtag.svg');
 }
 
 [data-type=dateinput]::before {
-	background-image: url("media/calendar-alt.svg");
+	background-image: url('./media/calendar-alt.svg');
 }
 
 [data-type=timeinput]::before {
-	background-image: url("media/clock.svg");
+	background-image: url('./media/clock.svg');
 }
 
 [data-type=file]::before {
-	background-image: url("media/upload.svg");
+	background-image: url('./media/upload.svg');
 }
 
 button[data-type=file]::before {
@@ -803,7 +803,7 @@ button[data-type=file]::before {
 }
 
 [data-type=photo]::before {
-	background-image: url("media/camera.svg");
+	background-image: url('./media/camera.svg');
 }
 
 button[data-type=photo]::before {
@@ -814,91 +814,91 @@ button[data-type=photo]::before {
 }
 
 [data-type=select]::before {
-	background-image: url("media/list.svg");
+	background-image: url('./media/list.svg');
 }
 
 [data-type=textarea]::before {
-	background-image: url("media/pencil.svg");
+	background-image: url('./media/pencil.svg');
 }
 
 [data-type=checkbox]::before {
-	background-image: url("media/check-double.svg");
+	background-image: url('./media/check-double.svg');
 }
 
 [data-type=radio]::before {
-	background-image: url("media/check.svg");
+	background-image: url('./media/check.svg');
 }
 
 [data-type=links]::before {
-	background-image: url("media/link.svg");
+	background-image: url('./media/link.svg');
 }
 
 [data-type=signature]::before {
-	background-image: url("media/signature.svg");
+	background-image: url('./media/signature.svg');
 }
 
 [data-type=scanner]::before {
-	background-image: url("media/qrcode.svg");
+	background-image: url('./media/qrcode.svg');
 }
 
 button[data-type=scanner]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediaqrcode.svg');
-	mask-image: url('./mediaqrcode.svg');
+	-webkit-mask-image: url('./media/qrcode.svg');
+	mask-image: url('./media/qrcode.svg');
 }
 
 [data-type=deletebutton]::before,
 [data-type=trash]::before {
-	background-image: url("media/trash-alt.svg");
+	background-image: url('./media/trash-alt.svg');
 }
 
 button[data-type=deletebutton]::before,
 button[data-type=trash]::before {
 	background-image: none;
 	background-color: var(--red);
-	-webkit-mask-image: url('./mediatrash-alt.svg');
-	mask-image: url('./mediatrash-alt.svg');
+	-webkit-mask-image: url('./media/trash-alt.svg');
+	mask-image: url('./media/trash-alt.svg');
 }
 
 [data-type=hiddeninput]::before,
 [data-type=password]::before {
-	background-image: url("media/user-secret.svg");
+	background-image: url('./media/user-secret.svg');
 }
 
 [data-type=additem]::before {
-	background-image: url("media/plus.svg");
+	background-image: url('./media/plus.svg');
 }
 
 button[data-type=additem]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediaplus.svg');
-	mask-image: url('./mediaplus.svg');
+	-webkit-mask-image: url('./media/plus.svg');
+	mask-image: url('./media/plus.svg');
 }
 
 
 [data-type=addblock]::before {
-	background-image: url("media/arrow-alt-from-top.svg");
+	background-image: url('./media/arrow-alt-from-top.svg');
 }
 
 [data-type=reset]::before,
 [data-type=generateupdate]::before {
-	background-image: url("media/repeat-alt.svg");
+	background-image: url('./media/repeat-alt.svg');
 }
 
 button[data-type=reset]::before,
 button[data-type=generateupdate]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediarepeat-alt.svg');
-	mask-image: url('./mediarepeat-alt.svg');
+	-webkit-mask-image: url('./media/repeat-alt.svg');
+	mask-image: url('./media/check-double.svg');
 }
 
 
 [data-type=savebutton]::before,
 [data-type=save]::before {
-	background-image: url("media/save.svg");
+	background-image: url('./media/save.svg');
 }
 
 button[data-type=savebutton]::before,
@@ -910,7 +910,7 @@ button[data-type=save]::before {
 }
 
 [data-type=image]::before {
-	background-image: url("media/image.svg");
+	background-image: url('./media/image.svg');
 }
 
 button[data-type=image]::before {
@@ -921,7 +921,7 @@ button[data-type=image]::before {
 }
 
 [data-type=submitbutton]::before {
-	background-image: url("media/paper-plane.svg");
+	background-image: url('./media/paper-plane.svg');
 }
 
 button[data-type=submitbutton]::before {
@@ -932,13 +932,13 @@ button[data-type=submitbutton]::before {
 }
 
 [data-type=cart]::before {
-	background-image: url("media/shopping-cart.svg");
+	background-image: url('./media/shopping-cart.svg');
 }
 
 [data-type=message]::before {
-	background-image: url("media/envelope.svg");
+	background-image: url('./media/envelope.svg');
 }
 
 [data-type=filterinput]::before {
-	background-image: url("media/filter.svg");
+	background-image: url('./media/filter.svg');
 }
