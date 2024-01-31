@@ -121,12 +121,7 @@ class API {
 
 	public function noContentAvailable($type){
 		return [[
-			['type' => 'image',
-			'attributes' => [
-				'url' => './media/box-open.svg',
-				'imageonly' => [] 
-				]],
-			['type' => 'text',
+			['type' => 'nocontent',
 			'content' => LANG::GET('general.no_content_available', [':content' => $type])]
 		]];
 	}

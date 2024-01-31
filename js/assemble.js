@@ -1105,6 +1105,15 @@ export class Assemble {
 		return div;
 	}
 
+	nocontent() {
+		const img = document.createElement('div');
+		const span = document.createElement('span');
+		span.append(document.createTextNode(this.currentElement.content));
+		img.classList.add('nocontent');
+		span.classList.add('nocontent');
+		return [img, span];
+	}
+
 	trash() {
 		// empty method but necessary to display the delete-area for composer or other future use
 	}

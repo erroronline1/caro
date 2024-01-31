@@ -59,7 +59,7 @@ body {
 }
 
 body::before {
-	background: url('media/favicon/logo.svg');
+	background: url('./mediafavicon/logo.svg');
 	/*1086x570*/
 	background-size: 100%;
 	background-repeat: no-repeat;
@@ -718,6 +718,21 @@ section>div>hr {
 
 /*************************** icons and cursors ******************************/
 
+div.nocontent {
+	width:12em;
+	height:10em;
+	display:block;
+	margin:1em auto;
+	mask-size:cover;
+	background-color: var(--cta_darker);
+	-webkit-mask-image: url('./media/box-open.svg');
+	mask-image: url('./media/box-open.svg');
+}
+span.nocontent{
+	display:block;
+	width:fit-content;
+	margin:1em auto;
+}
 [draggable=true]:active {
 	cursor: move;
 }
@@ -736,20 +751,20 @@ main a:not([data-type])::before {
 
 main a:not([data-type])::before {
 	background-color: var(--cta_darker);
-	-webkit-mask-image: url('media/external-link-alt.svg');
-	mask-image: url('media/external-link-alt.svg');
+	-webkit-mask-image: url('./media/external-link-alt.svg');
+	mask-image: url('./media/external-link-alt.svg');
 }
 
 [data-type=toleft]::before {
 	background-color: var(--article);
-	-webkit-mask-image: url('media/arrow-left.svg');
-	mask-image: url('media/arrow-left.svg');
+	-webkit-mask-image: url('./mediaarrow-left.svg');
+	mask-image: url('./mediaarrow-left.svg');
 }
 
 [data-type=toright]::before {
 	background-color: var(--article);
-	-webkit-mask-image: url('media/arrow-right.svg');
-	mask-image: url('media/arrow-right.svg');
+	-webkit-mask-image: url('./mediaarrow-right.svg');
+	mask-image: url('./mediaarrow-right.svg');
 }
 
 [data-type=text]::before {
@@ -783,8 +798,8 @@ main a:not([data-type])::before {
 button[data-type=file]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/upload.svg');
-	mask-image: url('media/upload.svg');
+	-webkit-mask-image: url('./mediaupload.svg');
+	mask-image: url('./mediaupload.svg');
 }
 
 [data-type=photo]::before {
@@ -794,8 +809,8 @@ button[data-type=file]::before {
 button[data-type=photo]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/camera.svg');
-	mask-image: url('media/camera.svg');
+	-webkit-mask-image: url('./mediacamera.svg');
+	mask-image: url('./mediacamera.svg');
 }
 
 [data-type=select]::before {
@@ -829,8 +844,8 @@ button[data-type=photo]::before {
 button[data-type=scanner]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/qrcode.svg');
-	mask-image: url('media/qrcode.svg');
+	-webkit-mask-image: url('./mediaqrcode.svg');
+	mask-image: url('./mediaqrcode.svg');
 }
 
 [data-type=deletebutton]::before,
@@ -842,8 +857,8 @@ button[data-type=deletebutton]::before,
 button[data-type=trash]::before {
 	background-image: none;
 	background-color: var(--red);
-	-webkit-mask-image: url('media/trash-alt.svg');
-	mask-image: url('media/trash-alt.svg');
+	-webkit-mask-image: url('./mediatrash-alt.svg');
+	mask-image: url('./mediatrash-alt.svg');
 }
 
 [data-type=hiddeninput]::before,
@@ -858,8 +873,8 @@ button[data-type=trash]::before {
 button[data-type=additem]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/plus.svg');
-	mask-image: url('media/plus.svg');
+	-webkit-mask-image: url('./mediaplus.svg');
+	mask-image: url('./mediaplus.svg');
 }
 
 
@@ -876,8 +891,8 @@ button[data-type=reset]::before,
 button[data-type=generateupdate]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/repeat-alt.svg');
-	mask-image: url('media/repeat-alt.svg');
+	-webkit-mask-image: url('./mediarepeat-alt.svg');
+	mask-image: url('./mediarepeat-alt.svg');
 }
 
 
@@ -890,8 +905,8 @@ button[data-type=savebutton]::before,
 button[data-type=save]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/save.svg');
-	mask-image: url('media/save.svg');
+	-webkit-mask-image: url('./mediasave.svg');
+	mask-image: url('./mediasave.svg');
 }
 
 [data-type=image]::before {
@@ -901,8 +916,8 @@ button[data-type=save]::before {
 button[data-type=image]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/image.svg');
-	mask-image: url('media/image.svg');
+	-webkit-mask-image: url('./mediaimage.svg');
+	mask-image: url('./mediaimage.svg');
 }
 
 [data-type=submitbutton]::before {
@@ -912,8 +927,8 @@ button[data-type=image]::before {
 button[data-type=submitbutton]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('media/paper-plane.svg');
-	mask-image: url('media/paper-plane.svg');
+	-webkit-mask-image: url('./mediapaper-plane.svg');
+	mask-image: url('./mediapaper-plane.svg');
 }
 
 [data-type=cart]::before {
