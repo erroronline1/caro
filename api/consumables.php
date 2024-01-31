@@ -674,7 +674,10 @@ class CONSUMABLES extends API {
 						'description' => LANG::GET('consumables.edit_product_delete'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerup' => $product['id'] ? "if (confirm('" . LANG::GET('consumables.edit_product_delete_confirm', [':name' => $product['article_name']]) ."')) {api.purchase('delete', 'product', " . $product['id'] . ")}" : ""
+							'onpointerup' => $product['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('consumables.edit_product_delete_confirm_header', [':name' => $product['article_name']]) ."', 'options':{".
+								"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
+								"'".LANG::GET('consumables.edit_product_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
 						]]
 					]
 				);

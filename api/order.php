@@ -598,7 +598,10 @@ class ORDER extends API {
 					'description' => LANG::GET('order.delete_prepared_order'),
 					'attributes' => [
 						'type' => 'button', // apparently defaults to submit otherwise
-						'onpointerup' => 'if (confirm("'. LANG::GET('order.delete_prepared_order_confirm') .'")) {api.purchase("delete", "order", ' . $this->_requestedID . ')}'
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
+							"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
+							"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+							"}}).then(function(r){if (r.target.returnValue==='true') {api.purchase('delete', 'order', " . $this->_requestedID . ")})"
 					]]
 				]);
 
@@ -853,7 +856,11 @@ class ORDER extends API {
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',
-							'onpointerup' => "if (confirm(LANG.GET('order.delete_prepared_order_confirm'))) api.purchase('delete', 'approved', " . $row['id'] . ")" 
+							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
+								"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
+								"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'approved', " . $row['id'] . ")})"
+	
 						]
 					];
 					array_push($result['body']['content'], $content);

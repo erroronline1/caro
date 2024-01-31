@@ -13,7 +13,7 @@
 	--green: rgb(153, 179, 132);
 	--purple: rgb(180, 142, 173);
 	--cta: rgb(136, 192, 208);
-	--evenDiscreetButton: rgba(136, 192, 208,.2);
+	--evenDiscreetButton: rgba(136, 192, 208, .2);
 	--cta_darker: rgb(80, 155, 176);
 	--cta_active: rgb(161, 227, 246);
 	--shadow: 2px 2px 6px rgba(76, 86, 106, .3);
@@ -126,17 +126,25 @@ dialog {
 	border-radius: 1em;
 	border: 1px solid var(--lightershadow);
 	backdrop-filter: blur(10px);
-	background-color: transparent;
+	background-color: var(--article);
 	box-shadow: var(--shadow);
 	color: var(--foreground);
 	opacity: 0;
 	transition: ease .3s;
+	pointer-events: none;
 }
 
 dialog[open] {
 	opacity: 1;
 	max-height: 75vh;
 	overflow-y: auto;
+	pointer-events: all;
+
+	.confirmButton {
+		width: auto;
+		margin-left:1em;
+		float:right;
+	}
 }
 
 .loader {
@@ -452,7 +460,7 @@ button {
 	background: transparent;
 	color: var(--foreground);
 	font-weight: initial;
-	border-radius:0
+	border-radius: 0
 }
 
 .discreetButton:nth-of-type(even) {
@@ -480,7 +488,8 @@ button:disabled {
 	padding-left: 2em
 }
 
-[data-type=deletebutton] {
+[data-type=deletebutton],
+.reducedCTA {
 	color: var(--foreground);
 	background-color: var(--article);
 	border: 1px solid var(--cta);

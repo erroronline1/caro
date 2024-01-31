@@ -125,7 +125,7 @@ export const assemble_helper = {
 export class Dialog {
 	/**
 	 * 
-	 * @param {type: str, icon: str, header: str, body: str, options:{displayText: value str|bool}} options 
+	 * @param {type: str, icon: str, header: str, body: str, options:{displayText: value str|bool|{value, class}}} options 
 	 * @returns promise
 	 * 
 	 * new Dialog({options}).then((response) => {
@@ -183,7 +183,12 @@ export class Dialog {
 		for (const [option, value] of Object.entries(this.options)) {
 			button = document.createElement('button');
 			button.append(document.createTextNode(option));
-			button.value = value;
+			button.classList.add('confirmButton');
+			if (typeof value === 'string' || typeof value === 'boolean') button.value = value;
+			else {
+				button.value=value.value;
+				if(value.class)button.classList.add(value.class);
+			}
 			buttons.push(button);
 		}
 		return buttons;
@@ -847,7 +852,6 @@ export class Assemble {
 		}
 		select.addEventListener('pointerdown', (e) => {
 			e.preventDefault();
-			console.log(e);
 			new Dialog({
 				type: 'select',
 				header: select.title,

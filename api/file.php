@@ -143,7 +143,10 @@ class FILE extends API {
 								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $foldername]) . "')) api.file('delete', 'filemanager', '" . $foldername . "')"
+									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $foldername]) ."', 'options':{".
+										"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
+										"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
+										"}}).then(function(r){if (r.target.returnValue==='true') api.file('delete', 'filemanager', '" . $foldername . "')})"
 								]]
 							);
 						}
@@ -184,8 +187,11 @@ class FILE extends API {
 								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
 									'type' => 'button',
-									'onpointerup' => "if (confirm('" . LANG::GET('file.manager_delete_file_confirmation', [':file' => $file['name']]) . "')) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')",
-									'data-filtered' => $file['path']
+									'data-filtered' => $file['path'],
+									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', 'options':{".
+										"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
+										"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
+										"}}).then(function(r){if (r.target.returnValue==='true') api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
 								]]
 							);
 						}

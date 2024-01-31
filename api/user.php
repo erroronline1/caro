@@ -339,7 +339,10 @@ class USER extends API {
 						'description' => LANG::GET('user.edit_delete_button'),
 						'attributes' => [
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerup' => $user['id'] ? "if (confirm('". LANG::GET('user.edit_delete_confirm', [':name' => $user['name']]) ."')) {api.user('delete', 'user', ". $user['id'] . ")}" : ''
+							'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
+								"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
+								"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(function(r){if (r.target.returnValue==='true') api.user('delete', 'user', ". $user['id'] . ")})" : ''
 						]]
 					]],
 					'form' => [
