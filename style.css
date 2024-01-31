@@ -121,7 +121,6 @@ dialog {
 	position: fixed;
 	display: block;
 	bottom: 6em;
-	height: fit-content;
 	width: 30em;
 	border-radius: 1em;
 	border: 1px solid var(--lightershadow);
@@ -132,19 +131,44 @@ dialog {
 	opacity: 0;
 	transition: ease .3s;
 	pointer-events: none;
+	overflow: hidden;
+
+	.confirmButton {
+		width: auto;
+		margin-left: 1em;
+		float: right;
+		flex: none;
+	}
+
+	img.close {
+		width: 1.5em;
+		height: 1.5em;
+		position:absolute;
+		top:1em;
+		right:1em;
+	}
+
+	form {
+		/*display: flex; added dynamically according to content*/
+		flex-flow: column;
+		max-height: 75vh;
+
+		header {
+			flex: 0 0 auto;
+			display:inline-block;
+		}
+
+		div {
+			flex: 1 1 auto;
+			overflow: scroll;
+		}
+
+	}
 }
 
 dialog[open] {
 	opacity: 1;
-	max-height: 75vh;
-	overflow-y: auto;
 	pointer-events: all;
-
-	.confirmButton {
-		width: auto;
-		margin-left:1em;
-		float:right;
-	}
 }
 
 .loader {
