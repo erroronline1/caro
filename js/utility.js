@@ -8,7 +8,7 @@ const _serviceWorker = {
 			navigator.serviceWorker.ready.then(registration => {
 				setInterval(() => {
 					if (registration) _serviceWorker.postMessage('getnotifications');
-				}, 10000);
+				}, 300000);
 				navigator.serviceWorker.addEventListener('message', (message) => {
 					this.onMessage(message.data);
 				});
