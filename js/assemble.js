@@ -4,7 +4,8 @@ this module helps to assemble forms according to the passed simplified object no
 import SignaturePad from '../libraries/signature_pad.umd.js';
 import QrCreator from '../libraries/qr-creator.js';
 
-var ElementID = 0;
+var ElementID = 0,
+signaturecanvas = null;
 
 export function getNextElementID() {
 	return 'elementID' + ++ElementID;
@@ -122,46 +123,6 @@ export const assemble_helper = {
 	}
 }
 
-const sectionScroller = (e) => {
-	/* event handler for horizontal scrolling of multiple panels */
-	setTimeout(() => {
-		let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
-		for (let panel = 0; panel < e.target.children.length + 1; panel++) {
-			try {
-				if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth) + 1) indicator.children[
-					panel].firstChild.classList.add('articleactive');
-				else indicator.children[panel].firstChild.classList.remove('articleactive');
-			} catch (err) {
-				continue;
-			}
-		}
-	}, 300)
-};
-
-function prepareForm() {
-	/* check non typical input fields for presence of required content */
-	const signature = document.getElementById('signaturecanvas'),
-		required = document.querySelector('[data-required=required]');
-	if (signature) {
-		if (signaturePad.isEmpty()) {
-			if (signature == required) {
-				signature.classList.add("signature_required_alert");
-				return false;
-			}
-			document.getElementById('signature').value = null;
-			return;
-		}
-		let file = new File([dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
-			type: "image/png",
-			lastModified: new Date().getTime()
-		});
-		let section = new DataTransfer();
-		section.items.add(file);
-		document.getElementById('signature').files = section.files;
-	}
-	return;
-};
-
 export class Assemble {
 	/* 
 	assembles forms and screen elements.
@@ -189,7 +150,7 @@ export class Assemble {
 			this.section.method = 'post';
 			this.section.enctype = 'multipart/form-data';
 			this.section.onsubmit = () => {
-				return prepareForm()
+				return this.prepareForm()
 			};
 			this.apply_attributes(this.form, this.section);
 
@@ -216,12 +177,12 @@ export class Assemble {
 
 		let scrollables = document.querySelectorAll('section');
 		for (const section of scrollables) {
-			if (section.childNodes.length > 1) section.addEventListener('scroll', sectionScroller);
+			if (section.childNodes.length > 1) section.addEventListener('scroll', this.sectionScroller);
 			section.dispatchEvent(new Event('scroll'));
 		}
 
 		if (this.signaturePad) {
-			initialize_SignaturePad();
+			this.initialize_SignaturePad();
 		}
 		if (this.imageQrCode.length) {
 			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
@@ -344,6 +305,30 @@ export class Assemble {
 		return assembledPanels;
 	}
 
+	prepareForm() {
+		/* check non typical input fields for presence of required content */
+		const signature = document.getElementById('signaturecanvas'),
+			required = document.querySelector('[data-required=required]');
+		if (signature) {
+			if (signaturePad.isEmpty()) {
+				if (signature == required) {
+					signature.classList.add("signature_required_alert");
+					return false;
+				}
+				document.getElementById('signature').value = null;
+				return;
+			}
+			let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
+				type: "image/png",
+				lastModified: new Date().getTime()
+			});
+			let section = new DataTransfer();
+			section.items.add(file);
+			document.getElementById('signature').files = section.files;
+		}
+		return;
+	}
+
 	slider(sectionID, length) {
 		if (length < 2) return;
 		const indicators = document.createElement('div'),
@@ -386,6 +371,73 @@ export class Assemble {
 		toright.type = 'button';
 		indicators.appendChild(toright);
 		return indicators;
+	}
+
+	sectionScroller(e) {
+		/* event handler for horizontal scrolling of multiple panels */
+		setTimeout(() => {
+			let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
+			for (let panel = 0; panel < e.target.children.length + 1; panel++) {
+				try {
+					if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth) + 1) indicator.children[
+						panel].firstChild.classList.add('articleactive');
+					else indicator.children[panel].firstChild.classList.remove('articleactive');
+				} catch (err) {
+					continue;
+				}
+			}
+		}, 300)
+	}
+
+	initialize_SignaturePad() {
+		signaturecanvas = document.getElementById("signaturecanvas");
+		window.signaturePad = new SignaturePad(signaturecanvas, {
+			// It's Necessary to use an opaque color when saving image as JPEG;
+			// this option can be omitted if only saving as PNG or SVG
+			//backgroundColor: 'rgb(255, 255, 255)'
+			penColor: "rgb(46, 52, 64)"
+		});
+		// On mobile devices it might make more sense to listen to orientation change,
+		// rather than window resize events.
+		window.onresize = this.resizeSignatureCanvas;
+		this.resizeSignatureCanvas();
+	}
+	// Adjust canvas coordinate space taking into account pixel ratio,
+	// to make it look crisp on mobile devices.
+	// This also causes canvas to be cleared.
+	resizeSignatureCanvas() {
+		// When zoomed out to less than 100%, for some very strange reason,
+		// some browsers report devicePixelRatio as less than 1
+		// and only part of the canvas is cleared then.
+		const ratio = Math.max(window.devicePixelRatio || 1, 1);
+		// This part causes the canvas to be cleared
+		signaturecanvas.width = signaturecanvas.offsetWidth * ratio;
+		signaturecanvas.height = signaturecanvas.offsetHeight * ratio;
+		signaturecanvas.getContext("2d").scale(ratio, ratio);
+		// This library does not listen for canvas changes, so after the canvas is automatically
+		// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+		// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+		// that the state of this library is consistent with visual state of the canvas, you
+		// have to clear it manually.
+		//signaturePad.clear();
+		// If you want to keep the drawing on resize instead of clearing it you can reset the data.
+		signaturePad.fromData(signaturePad.toData());
+	}
+	// One could simply use Canvas#toBlob method instead, but it's just to show
+	// that it can be done using result of SignaturePad#toDataURL.
+	dataURLToBlob(dataURL) {
+		// Code taken from https://github.com/ebidel/filer.js
+		const parts = dataURL.split(';base64,');
+		const contentType = parts[0].split(":")[1];
+		const raw = window.atob(parts[1]);
+		const rawLength = raw.length;
+		const uInt8Array = new Uint8Array(rawLength);
+		for (let i = 0; i < rawLength; ++i) {
+			uInt8Array[i] = raw.charCodeAt(i);
+		}
+		return new Blob([uInt8Array], {
+			type: contentType
+		});
 	}
 
 	icon() {
@@ -969,57 +1021,4 @@ export class Assemble {
 	filter() {
 		// empty method but neccessary for styling reasons (icon)
 	}
-}
-
-var signaturecanvas = null;
-
-function initialize_SignaturePad() {
-	signaturecanvas = document.getElementById("signaturecanvas");
-	window.signaturePad = new SignaturePad(signaturecanvas, {
-		// It's Necessary to use an opaque color when saving image as JPEG;
-		// this option can be omitted if only saving as PNG or SVG
-		//backgroundColor: 'rgb(255, 255, 255)'
-		penColor: "rgb(46, 52, 64)"
-	});
-	// On mobile devices it might make more sense to listen to orientation change,
-	// rather than window resize events.
-	window.onresize = resizeSignatureCanvas;
-	resizeSignatureCanvas();
-}
-// Adjust canvas coordinate space taking into account pixel ratio,
-// to make it look crisp on mobile devices.
-// This also causes canvas to be cleared.
-function resizeSignatureCanvas() {
-	// When zoomed out to less than 100%, for some very strange reason,
-	// some browsers report devicePixelRatio as less than 1
-	// and only part of the canvas is cleared then.
-	const ratio = Math.max(window.devicePixelRatio || 1, 1);
-	// This part causes the canvas to be cleared
-	signaturecanvas.width = signaturecanvas.offsetWidth * ratio;
-	signaturecanvas.height = signaturecanvas.offsetHeight * ratio;
-	signaturecanvas.getContext("2d").scale(ratio, ratio);
-	// This library does not listen for canvas changes, so after the canvas is automatically
-	// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
-	// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
-	// that the state of this library is consistent with visual state of the canvas, you
-	// have to clear it manually.
-	//signaturePad.clear();
-	// If you want to keep the drawing on resize instead of clearing it you can reset the data.
-	signaturePad.fromData(signaturePad.toData());
-}
-// One could simply use Canvas#toBlob method instead, but it's just to show
-// that it can be done using result of SignaturePad#toDataURL.
-function dataURLToBlob(dataURL) {
-	// Code taken from https://github.com/ebidel/filer.js
-	const parts = dataURL.split(';base64,');
-	const contentType = parts[0].split(":")[1];
-	const raw = window.atob(parts[1]);
-	const rawLength = raw.length;
-	const uInt8Array = new Uint8Array(rawLength);
-	for (let i = 0; i < rawLength; ++i) {
-		uInt8Array[i] = raw.charCodeAt(i);
-	}
-	return new Blob([uInt8Array], {
-		type: contentType
-	});
 }
