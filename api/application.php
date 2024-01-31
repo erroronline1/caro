@@ -67,7 +67,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.message_sent') => ['href' => "javascript:api.message('get', 'sent')"]
 			],
 			LANG::GET('menu.forms_header') => [
-				LANG::GET('menu.forms_forms') => ['href' => "javascript:alert('not implemented yet!')"]
+				LANG::GET('menu.forms_forms') => ['href' => "javascript:new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
 			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['href' => "javascript:api.file('get', 'files')"],

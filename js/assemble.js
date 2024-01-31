@@ -5,7 +5,7 @@ import SignaturePad from '../libraries/signature_pad.umd.js';
 import QrCreator from '../libraries/qr-creator.js';
 
 var ElementID = 0,
-signaturecanvas = null;
+	signaturecanvas = null;
 
 export function getNextElementID() {
 	return 'elementID' + ++ElementID;
@@ -114,12 +114,94 @@ export const assemble_helper = {
 				} else li.append(document.createTextNode(description))
 				ul.append(li);
 			}
-
 			elements.push(label);
 			elements.push(input);
 			elements.push(ul);
 		}
 		menu.replaceChildren(...elements);
+	}
+}
+
+export class Dialog {
+	/**
+	 * 
+	 * @param {type: str, icon: str, header: str, body: str, options:{displayText: value str|bool}} options 
+	 * @returns promise
+	 * 
+	 * new Dialog({options}).then((response) => {
+	 * 		doSomethingWith(response.target.returnValue);
+	 * 	});
+	 * 
+	 * for select:
+	 * onpointerdown: event.preventDefault(); new Dialog({options}).then((response) => {
+	 * 		this.value(response.target.returnValue);
+	 * 	});
+	 */
+	constructor(options = {}) {
+		this.type = options.type || null;
+		this.icon = options.icon || null;
+		this.header = options.header || null;
+		this.body = options.body || null;
+		this.options = options.options || {};
+
+		const dialog = document.querySelector('dialog');
+		if (this.type) {
+			const form = document.createElement('form');
+			form.method = 'dialog';
+			if (this.icon) {
+				const icon = document.createElement('img');
+				img.src = this.icon;
+				form.append(icon);
+			}
+			if (this.header) {
+				const header = document.createElement('header');
+				header.append(document.createTextNode(this.header));
+				form.append(header);
+			}
+			if (this.body) {
+				form.append(document.createTextNode(this.body));
+			}
+			for (const element of this[this.type]()) {
+				if (element) form.append(element);
+			}
+			dialog.replaceChildren(form);
+
+			return new Promise((resolve, reject) => {
+				dialog.showModal();
+				dialog.onclose = resolve;
+			});
+		}
+		dialog.close();
+	}
+
+	alert() {
+		const button = document.createElement('button');
+		button.value = true;
+		button.append(document.createTextNode(LANG.GET('general.ok_button')));
+		return [button];
+	}
+	confirm() {
+		const buttons = [];
+		let button;
+		for (const [option, value] of Object.entries(this.options)) {
+			button = document.createElement('button');
+			button.append(document.createTextNode(option));
+			button.value = value;
+			buttons.push(button);
+		}
+		return buttons;
+	}
+	select() {
+		const buttons = [];
+		let button;
+		for (const [option, value] of Object.entries(this.options)) {
+			button = document.createElement('button');
+			button.classList.add('discreetButton');
+			button.append(document.createTextNode(option));
+			button.value = value;
+			buttons.push(button);
+		}
+		return buttons;
 	}
 }
 

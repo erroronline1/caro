@@ -1,9 +1,11 @@
 //import relevant functions and set global scope
 
 import {
+	Dialog,
 	Assemble,
 	assemble_helper
 } from '../js/assemble.js';
+window.Dialog = Dialog;
 window.Assemble = Assemble;
 window.assemble_helper = assemble_helper;
 
