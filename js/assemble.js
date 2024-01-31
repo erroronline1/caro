@@ -145,19 +145,29 @@ export class Dialog {
 		if (this.type) {
 			const form = document.createElement('form');
 			form.method = 'dialog';
-			if (this.icon) {
-				const icon = document.createElement('img');
-				img.src = this.icon;
-				form.append(icon);
-			}
-			if (this.header) {
+			const img = document.createElement('img');
+			img.classList.add('close');
+			img.src = './media/close.svg';
+			img.onpointerdown = new Function("document.querySelector('dialog').close()");
+			form.append(img);
+			if (this.header || this.body || this.icon) {
 				const header = document.createElement('header');
-				header.append(document.createTextNode(this.header));
+				if (this.icon) {
+					const icon = document.createElement('img');
+					img.src = this.icon;
+					header.append(icon);
+				}
+				if (this.header) {
+					const h3 = document.createElement('h3');
+					h3.append(document.createTextNode(this.header));
+					header.append(h3);
+				}
+				if (this.body) {
+					header.append(document.createTextNode(this.body));
+				}
 				form.append(header);
 			}
-			if (this.body) {
-				form.append(document.createTextNode(this.body));
-			}
+			if (this.type === 'select') form.style.display = 'flex';
 			for (const element of this[this.type]()) {
 				if (element) form.append(element);
 			}
@@ -186,24 +196,24 @@ export class Dialog {
 			button.classList.add('confirmButton');
 			if (typeof value === 'string' || typeof value === 'boolean') button.value = value;
 			else {
-				button.value=value.value;
-				if(value.class)button.classList.add(value.class);
+				button.value = value.value;
+				if (value.class) button.classList.add(value.class);
 			}
 			buttons.push(button);
 		}
 		return buttons;
 	}
 	select() {
-		const buttons = [];
+		const buttons = document.createElement('div');
 		let button;
 		for (const [option, value] of Object.entries(this.options)) {
 			button = document.createElement('button');
 			button.classList.add('discreetButton');
 			button.append(document.createTextNode(option));
 			button.value = value;
-			buttons.push(button);
+			buttons.append(button);
 		}
-		return buttons;
+		return [buttons];
 	}
 }
 
@@ -820,7 +830,7 @@ export class Assemble {
 		const groups = {};
 		let select = document.createElement('select'),
 			label, div,
-			selectModal={};
+			selectModal = {};
 		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, '');
 		if ('attributes' in this.currentElement) select = this.apply_attributes(this.currentElement.attributes, select);
@@ -830,7 +840,7 @@ export class Assemble {
 				[key, element]
 			];
 			else groups[key[0]].push([key, element]);
-			selectModal[key]=element.value || key;
+			selectModal[key] = element.value || key;
 		}
 		for (const [group, elements] of Object.entries(groups)) {
 			let optgroup = document.createElement('optgroup');
