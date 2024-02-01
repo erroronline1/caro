@@ -71,20 +71,23 @@ class FILE extends API {
 				$files[$folder] = UTILITY::listFiles($folder ,'asc');
 			}
 		}
-		foreach ($files as $folder => $content){
-			$matches = [];
-			foreach ($content as $file){
-				$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
-				$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
+		if ($files){
+			foreach ($files as $folder => $content){
+				$matches = [];
+				foreach ($content as $file){
+					$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
+					$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
+				}
+				$result['body']['content'][]=
+				[
+					['type' => 'links',
+					'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+					'content' => $matches
+					]
+				];
 			}
-			$result['body']['content'][]=
-			[
-				['type' => 'links',
-				'description' => LANG::GET('file.file_list', [':folder' => $folder]),
-				'content' => $matches
-				]
-			];
 		}
+		else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 		$this->response($result);
 	}
 
@@ -196,6 +199,7 @@ class FILE extends API {
 							);
 						}
 					}
+					else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 					if ($this->_requestedFolder === 'sharepoint') unset ($result['body']['form']);
 					else $result['body']['content'][]=[
 						['type' => 'hiddeninput',
@@ -446,6 +450,7 @@ class FILE extends API {
 						'content' => $display]
 					];
 				}
+				else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 				$result['body']['content'][]=[
 					['type' => 'file',
 					'description' => LANG::GET('file.sharepoint_upload_header'),

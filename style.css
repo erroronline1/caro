@@ -725,7 +725,7 @@ div.nocontent {
 	display: block;
 	margin: 1em auto;
 	mask-size: cover;
-	background-color: var(--cta_darker);
+	background-color: var(--cta);
 	-webkit-mask-image: url('./media/box-open.svg');
 	mask-image: url('./media/box-open.svg');
 }
