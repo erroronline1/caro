@@ -59,7 +59,7 @@ body {
 }
 
 body::before {
-	background: url('./mediafavicon/logo.svg');
+	background: url('./media/favicon/logo.svg');
 	/*1086x570*/
 	background-size: 100%;
 	background-repeat: no-repeat;
