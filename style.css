@@ -801,8 +801,8 @@ main a:not([data-type])::before {
 button[data-type=file]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediaupload.svg');
-	mask-image: url('./mediaupload.svg');
+	-webkit-mask-image: url('./media/upload.svg');
+	mask-image: url('./media/upload.svg');
 }
 
 [data-type=photo]::before {
@@ -812,8 +812,8 @@ button[data-type=file]::before {
 button[data-type=photo]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediacamera.svg');
-	mask-image: url('./mediacamera.svg');
+	-webkit-mask-image: url('./media/camera.svg');
+	mask-image: url('./media/camera.svg');
 }
 
 [data-type=select]::before {
@@ -908,8 +908,8 @@ button[data-type=savebutton]::before,
 button[data-type=save]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediasave.svg');
-	mask-image: url('./mediasave.svg');
+	-webkit-mask-image: url('./media/save.svg');
+	mask-image: url('./media/save.svg');
 }
 
 [data-type=image]::before {
@@ -919,8 +919,8 @@ button[data-type=save]::before {
 button[data-type=image]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediaimage.svg');
-	mask-image: url('./mediaimage.svg');
+	-webkit-mask-image: url('./media/image.svg');
+	mask-image: url('./media/image.svg');
 }
 
 [data-type=submitbutton]::before {
@@ -930,8 +930,8 @@ button[data-type=image]::before {
 button[data-type=submitbutton]::before {
 	background-image: none;
 	background-color: var(--article);
-	-webkit-mask-image: url('./mediapaper-plane.svg');
-	mask-image: url('./mediapaper-plane.svg');
+	-webkit-mask-image: url('./media/paper-plane.svg');
+	mask-image: url('./media/paper-plane.svg');
 }
 
 [data-type=cart]::before {
