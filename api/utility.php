@@ -135,7 +135,7 @@ class UTILITY {
 				$clean_input[$k] = self::cleanInputs($v);
 			}
 		} else {
-			$clean_input = trim($data);
+			if ($data) $clean_input = trim($data);
 		}
 		return $clean_input;
 	}
