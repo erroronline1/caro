@@ -746,82 +746,76 @@ class ORDER extends API {
 						['type' => 'hiddeninput',
 						'description' => 'filter',
 						'attributes' => ['data-filtered' => $row['id']]];
-					foreach ($decoded_order_data as $key => $value){ // data
-						if (!in_array($key,[LANG::PROPERTY('order.barcode'), LANG::PROPERTY('order.orderer')])) $content[]=[
-							'type' => 'textinput',
-							'attributes' => [
-								'value' => $value,
-								'name' => $key,
-								'readonly' => true,
-								'onpointerup' => 'orderClient.toClipboard(this)'
-							]
-						];
-						if ($key == LANG::PROPERTY('order.orderer')) {
-							$fields=[
-								'name' => LANG::PROPERTY('order.productname_label'),
-								'unit' => LANG::PROPERTY('order.unit_label'),
-								'number' => LANG::PROPERTY('order.ordernumber_label'),
-								'quantity' => LANG::PROPERTY('order.quantity_label'),
-								'vendor' => LANG::PROPERTY('order.vendor_label'),
-								'commission' => LANG::PROPERTY('order.commission'),
-							];
-							$messagepayload=[];
-							foreach ($fields as $replace => $with){
-								if (array_key_exists($with, $decoded_order_data)) $messagepayload[':' . $replace] = $decoded_order_data[$with];
-							}
-							$content[]=[
-								'type' => 'hiddeninput',
-								'attributes' => [
-									'name' => LANG::PROPERTY('message.to'),
-									'value' => $value,
-									'data-message' => $row['id']
-								]
-							];
-							$content[]=[
-								'type' => 'hiddeninput',
-								'attributes' => [
-									'name' => LANG::PROPERTY('message.message'),
-									'value' => LANG::GET('order.message', $messagepayload),
-									'data-message' => $row['id']
-								]
-							];
-	
-							$content[]=[
-								'type' => 'textinput',
-								'attributes' => [
-									'value' => $value,
-									'name' => LANG::GET('order.message_orderer'),
-									'readonly' => true,
-									'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"
-								]
-/*								'type' => 'links',
-								'content' => [
-									LANG::GET('order.message_orderer') . ' ' . $this->fields['orderer'] . ' ' . $value => ['href' => '#', 'onpointerup' => "api.message('get', 'message' , '0', '0', '" . $value . "', '" . LANG::GET('order.message', $messagepayload) . "')"]
-								]*/
 
-							];
-						}
+					$fields=[
+						'name' => LANG::PROPERTY('order.productname_label'),
+						'unit' => LANG::PROPERTY('order.unit_label'),
+						'number' => LANG::PROPERTY('order.ordernumber_label'),
+						'quantity' => LANG::PROPERTY('order.quantity_label'),
+						'vendor' => LANG::PROPERTY('order.vendor_label'),
+						'commission' => LANG::PROPERTY('order.commission'),
+					];
+					$messagepayload=[];
+					foreach ($fields as $replace => $with){
+						if (array_key_exists($with, $decoded_order_data)) $messagepayload[':' . $replace] = $decoded_order_data[$with];
 					}
+					$messageorderer=UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '';
+					$content[]=[
+						'type' => 'hiddeninput',
+						'numeration' => 'none',
+						'attributes' => [
+							'name' => LANG::PROPERTY('message.to'),
+							'value' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '',
+							'data-message' => $row['id']
+						]
+					];
+					$content[]=[
+						'type' => 'hiddeninput',
+						'numeration' => 'none',
+						'attributes' => [
+							'name' => LANG::PROPERTY('message.message'),
+							'value' => LANG::GET('order.message', $messagepayload),
+							'data-message' => $row['id']
+						]
+					];
 
-					if (str_contains($row['approval'], 'data:image/png')){
-						$content[]=[
-							'type' => 'image',
-							'attributes' => [
-								'imageonly' => ['width' => '10em', 'marginTop' => '1em'],
-								'name' => LANG::GET('order.approval_image'),
-								'url' => $row['approval']],
-						];
-					}
+					$text .= LANG::GET('order.prepared_order_item', [
+						':quantity' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.quantity_label')) ? : '',
+						':unit' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.unit_label')) ? : '',
+						':number' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+						':name' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
+						':vendor' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''
+					]).'\n';
 
+					$text .= '\n';
 					$text .= LANG::GET('order.unit') . ': ' . $row['organizational_unit'] . '\n';
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
+
+					$copy = [
+						[
+							'type' => 'textinput',
+							'attributes' => [
+								'value' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+								'name' => LANG::GET('order.ordernumber_label'),
+								'readonly' => true,
+								'onpointerup' => 'orderClient.toClipboard(this)'
+						]],
+						[
+							'type' => 'textinput',
+							'attributes' => [
+								'value' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.commission')) ? : '',
+								'name' => LANG::GET('order.commission'),
+								'readonly' => true,
+								'onpointerup' => 'orderClient.toClipboard(this)'
+						]],
+					];
 
 					$status=[];
 					foreach(['ordered','received','archived'] as $s){
 						if (boolval($row[$s])) {
 							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true, 'data-' . $s => true];
-							$text .= LANG::GET('order.' . $s) . ': ' . $row[$s] . '\n';
+							$text .= '\n' . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
 						else {
 							if (
@@ -842,11 +836,31 @@ class ORDER extends API {
 						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.setAttribute('data-disapproved', 'true');"
 					];
 
-					$content[]=[
+					$content[] = [
 						'type' => 'text',
 						'content' => $text,
 					];
+					if (str_contains($row['approval'], 'data:image/png')){
+						$content[]=[
+							'type' => 'image',
+							'attributes' => [
+								'imageonly' => ['width' => '10em'],
+								'name' => LANG::GET('order.approval_image'),
+								'url' => $row['approval']],
+						];
+					}
 					$content[]=[
+						'type' => 'links',
+						'content' => [
+							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"]
+						]
+					];
+					$content[] = $copy;
+					$content[] = [
+						'type' => 'br'
+					];
+
+					$content[] = [
 						'type' => 'checkbox',
 						'content' => $status
 					];
