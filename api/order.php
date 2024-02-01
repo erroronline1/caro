@@ -6,14 +6,13 @@ class ORDER extends API {
 	private $_requestedID = null;
 	private $_subMethod = null;
 	private $_borrowedModule = null;
-
-	private $fields = null;
+	private $_disapprovalMessage = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_borrowedModule = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_borrowedModule = $this->_disapprovalMessage = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	public function prepared(){
@@ -644,11 +643,11 @@ class ORDER extends API {
 					// prepare possible keys
 					$prepared = [
 						'items' => [[]],
-						'info' => null,
-						'organizational_unit' => $order[LANG::PROPERTY('order.unit')],
-						'commission' => null,
-						'orderer' => null,
-						'deliverydate' => null
+						LANG::PROPERTY('order.additional_info') => null,
+						LANG::PROPERTY('order.unit') => $order['organizational_unit'],
+						LANG::PROPERTY('order.commission') => null,
+						LANG::PROPERTY('order.orderer') => null,
+						LANG::PROPERTY('order.delivery_date') => null
 					];
 					// fill possible keys
 					foreach ($decoded_order_data as $key => $value){
@@ -673,14 +672,19 @@ class ORDER extends API {
 					]);
 					// inform user group
 					$messagepayload=[];
-					foreach (['quantity', 'unit', 'number', 'name', 'vendor', 'commission'] as $key){
-						if (array_key_exists($key, $decoded_order_data)) $messagepayload[':' . $key] = $decoded_order_data[$key];
+					foreach (['quantity'=> LANG::PROPERTY('order.quantity_label'),
+						'unit' => LANG::PROPERTY('order.unit_label'),
+						'number' => LANG::PROPERTY('order.ordernumber_label'),
+						'name' => LANG::PROPERTY('order.productname_label'),
+						'vendor' => LANG::PROPERTY('order.vendor_label'),
+						'commission' => LANG::PROPERTY('order.commission')] as $key => $value){
+						if (array_key_exists($value, $decoded_order_data)) $messagepayload[':' . $key] = $decoded_order_data[$value];
 					}
-					$this->alertUserGroup(array_search($order[LANG::PROPERTY('order.unit')], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
+					$this->alertUserGroup(array_search($prepared[LANG::PROPERTY('order.unit')], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
 						':order' => LANG::GET('order.message', $messagepayload),
-						':unit' => $order[LANG::PROPERTY('order.unit')],
+						':unit' => $prepared[LANG::PROPERTY('order.unit')],
 						':user' => $_SESSION['user']['name']
-					]), 'unit');
+					]) . "\n\n" . $this->_disapprovalMessage, 'unit');
 				}
 				$result=[
 					'status' => [
@@ -833,7 +837,12 @@ class ORDER extends API {
 					}
 					if (!($row['ordered'] || $row['received'] || $row['archived']))	$status[LANG::GET('order.disapprove')]=[
 						'data_disapproved' => 'false',
-						'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved'); this.disabled=true; this.setAttribute('data-disapproved', 'true');"
+						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', body:'" . LANG::GET('order.disapprove_message', [':unit' => $row['organizational_unit']]) . "', " .
+							"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('order.disapprove_message_ok') . "': {'value': true, class: 'reducedCTA'}}}).then((response) => {" .
+							"if (response.target.returnValue==='true') {" .
+							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', document.querySelector('dialog>form>textarea').value); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
+							"} else this.checked = false;});"
+						//'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', document.querySelector('dialog>form>textarea').value); this.disabled=true; this.setAttribute('data-disapproved', 'true');"
 					];
 
 					$content[] = [

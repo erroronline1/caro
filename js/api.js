@@ -443,7 +443,7 @@ export const api = {
 		delete order/order/{id}
 
 		get order/approved/
-		put order/approved/{id}/{ordered|received|archived|disapproved}
+		put order/approved/{id}/{ordered|received|archived|disapproved}/{message}
 		delete order/approved/{id}
 
 		get order/filtered/{filter}
@@ -520,7 +520,7 @@ export const api = {
 						api.purchase('get', 'prepared');
 					};
 				}
-				if (!request[1] == 'approved') payload = _.getInputs('[data-usecase=purchase]', true);
+				if (request[1] !== 'approved') payload = _.getInputs('[data-usecase=purchase]', true); // exclude status updates
 				break;
 			case 'delete':
 				break;

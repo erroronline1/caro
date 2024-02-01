@@ -93,8 +93,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 # open tasks
 * case number as order verification
-* orderer within approved orders (more visible, not input field) -> api call partially broken
-* comments on order disapproval
 * filter length string orders
 * filter by fields? dropdown?
 * partial delivery (6 of 10 delivered?) "received"
