@@ -924,6 +924,7 @@ export class Assemble {
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
+				label.htmlFor=input.id=getNextElementID();
 			if (radio) {
 				label.classList.add('radio');
 				input.type = 'radio';
@@ -934,12 +935,9 @@ export class Assemble {
 				input.type = 'checkbox';
 				input.name = this.names_numerator(checkbox);
 			}
+			label.append(document.createTextNode(checkbox.replace(/\[\]/g, '')));
 			input = this.apply_attributes(attributes, input);
-			if (radio) {
-				label.append(input, document.createTextNode(checkbox.replace(/\[\]/g, '')));
-			} else {
-				label.append(document.createTextNode(checkbox.replace(/\[\]/g, '')), input);
-			}
+			result.push(input);
 			result.push(label);
 		}
 		return result;
