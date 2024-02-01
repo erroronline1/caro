@@ -39,9 +39,6 @@ export const api = {
 		}
 	},
 	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
-		// default disable camera stream
-		const scanner = document.querySelector('video');
-		if (scanner) scanner.srcObject.getTracks()[0].stop();
 		if (!await api.preventDataloss.proceedAnyway(method)) return false;
 		api.preventDataloss.stop()
 		api.loadindicator(true);

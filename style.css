@@ -570,13 +570,7 @@ input[type=radio]+label+div {
 	font-size: .75em;
 }
 
-.scanner {
-	display: none;
-	border: none !important;
-}
-
-canvas,
-.scanner.active {
+canvas {
 	display: block;
 	height: 15em;
 	margin-bottom: 2em;

@@ -15,52 +15,6 @@ const events = ['onclick', 'onmouseover', 'onmouseout', 'onchange', 'onpointerdo
 
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
-	initialize_scanner: async function (videostream, resultTo) {
-		/*
-		// todo: get pure scanner api working...
-		const scanner = {
-				canvas: document.getElementById(videostream),
-				output: document.getElementById(resultTo),
-				config: {
-					videoConstraints: {
-						height: 250,
-						aspectRatio: 1,
-						frameRate: 10
-					}
-				},
-				scanner: new Html5Qrcode(videostream)
-			},
-			camera = await Html5Qrcode.getCameras();
-		console.log(camera);
-		scanner.canvas.classList.add('active');
-		scanner.canvas.nextElementSibling.nextElementSibling.disabled = 'true';
-
-		function scanSuccess(decodedText, decodedResult) {
-			scanner.output.value = decodedText;
-			scanner.canvas.classList.remove('active');
-			scanner.scanner.stop();
-		}
-		scanner.scanner.start(camera[0].id, scanner.config, scanSuccess);
-		//scanner.scanner.render(scanSuccess);
-		*/
-		const scanner = {
-			canvas: document.getElementById(videostream),
-			output: document.getElementById(resultTo),
-			scanner: new Html5QrcodeScanner(videostream, {
-				fps: 10,
-				qrbox: 350
-			})
-		};
-		scanner.canvas.classList.add('active');
-
-		function scanSuccess(decodedText, decodedResult) {
-			scanner.output.value = decodedText;
-			scanner.canvas.classList.remove('active');
-			scanner.scanner.html5Qrcode.stop();
-			scanner.canvas.innerHTML = '';
-		}
-		scanner.scanner.render(scanSuccess);
-	},
 	exportCanvas: function (id, name) {
 		document.getElementById(id).toBlob(function (blob) {
 			const blobUrl = URL.createObjectURL(blob),
@@ -138,6 +92,11 @@ export class Dialog {
 	 * new Dialog({type:'input', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then((response) => {
 	 *  	if (response.target.returnValue==='true') console.log('this is the text input:', document.querySelector('dialog>form>textarea').value);
 	 * 	});
+	 * 
+	 * new Dialog({type:'scanner'}).then((response) => {
+	 *  	if (response.target.returnValue==='true') console.log('this is the text input:', document.querySelector('dialog>form>input').value);
+	 * 	});
+
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
@@ -145,6 +104,7 @@ export class Dialog {
 		this.header = options.header || null;
 		this.body = options.body || null;
 		this.options = options.options || {};
+		this.scannerElements = {};
 
 		const dialog = document.querySelector('dialog');
 		if (this.type) {
@@ -153,7 +113,7 @@ export class Dialog {
 			const img = document.createElement('img');
 			img.classList.add('close');
 			img.src = './media/close.svg';
-			img.onpointerdown = new Function("document.querySelector('dialog').close()");
+			img.onpointerdown = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.querySelector('dialog').close()");
 			form.append(img);
 			if (this.header || this.body || this.icon) {
 				const header = document.createElement('header');
@@ -177,7 +137,31 @@ export class Dialog {
 				if (element) form.append(element);
 			}
 			dialog.replaceChildren(form);
+			if (this.type === 'scanner') {
+				const scanner = {
+					canvas: this.scannerElements.canvas,
+					output: this.scannerElements.output,
+					button: this.scannerElements.button,
+					scanner: new Html5QrcodeScanner(this.scannerElements.canvas.id, {
+						fps: 10,
+						qrbox: {
+							width: 300,
+							height: 300
+						},
+						rememberLastUsedCamera: true,
+						aspectRatio: 1.0
+					})
+				};
 
+				function scanSuccess(decodedText, decodedResult) {
+					scanner.output.value = decodedText;
+					scanner.button.removeAttribute('disabled');
+					scanner.scanner.html5Qrcode.stop();
+					scanner.canvas.style.border = 'none';
+					scanner.canvas.replaceChildren(document.createTextNode(LANG.GET('general.scan_successful')));
+				}
+				scanner.scanner.render(scanSuccess);
+			}
 			return new Promise((resolve, reject) => {
 				dialog.showModal();
 				dialog.onclose = resolve;
@@ -220,9 +204,9 @@ export class Dialog {
 		}
 		return [buttons];
 	}
-	input(){
-		const textarea=document.createElement('textarea'),
-		 buttons = [];
+	input() {
+		const textarea = document.createElement('textarea'),
+			buttons = [];
 		let button;
 		for (const [option, value] of Object.entries(this.options)) {
 			button = document.createElement('button');
@@ -236,6 +220,23 @@ export class Dialog {
 			buttons.push(button);
 		}
 		return [textarea, ...buttons];
+	}
+	scanner() {
+		const div = document.createElement('div'),
+			input = document.createElement('input'),
+			button = document.createElement('button');
+		div.classList.add('scanner');
+		div.id = getNextElementID();
+		input.type = 'hidden';
+		button.append(document.createTextNode(LANG.GET('general.import_scan_result_button_from_modal')));
+		button.classList.add('confirmButton');
+		button.disabled = true;
+		this.scannerElements = {
+			canvas: div,
+			output: input,
+			button: button
+		};
+		return [div, input, button];
 	}
 }
 
@@ -674,7 +675,7 @@ export class Assemble {
 		let button = document.createElement('button');
 		button.id = getNextElementID();
 		if (this.currentElement.description) button.appendChild(document.createTextNode(this.currentElement.description));
-		if (this.currentElement.attributes && 'value' in this.currentElement.attributes) {
+		if (this.currentElement.attributes.value !== undefined) {
 			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
 			delete this.currentElement.attributes.value;
 		}
@@ -703,8 +704,8 @@ export class Assemble {
 		input.type = 'hidden';
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		if ('attributes' in this.currentElement) input = this.apply_attributes(this.currentElement.attributes, input);
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
 		return input;
 	}
 	datalist() {
@@ -737,7 +738,7 @@ export class Assemble {
 		input.id = getNextElementID();
 		input.name = this.currentElement.description;
 		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
-		if ('attributes' in this.currentElement && 'multiple' in this.currentElement.attributes) input.onchange = function () {
+		if (this.currentElement.attributes.multiple !== undefined) input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' ' + LANG.GET('assemble.files_rechoose') : LANG.GET('assemble.files_choose');
 		}
@@ -749,7 +750,7 @@ export class Assemble {
 		label.type = 'button';
 		label.setAttribute('data-type', 'file');
 		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode(('attributes' in this.currentElement && 'multiple' in this.currentElement.attributes) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
+		label.appendChild(document.createTextNode((this.currentElement.attributes.multiple !== undefined) ? LANG.GET('assemble.files_choose') : LANG.GET('assemble.file_choose')));
 
 		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
@@ -919,8 +920,8 @@ export class Assemble {
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
 			label.classList.add('textarea-label');
 		}
-		if ('attributes' in this.currentElement) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
-		if ('attributes' in this.currentElement && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
+		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 
 		return [...this.icon(), label, textarea, ...this.hint()];
 	}
@@ -945,7 +946,7 @@ export class Assemble {
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
-				label.htmlFor=input.id=getNextElementID();
+			label.htmlFor = input.id = getNextElementID();
 			if (radio) {
 				label.classList.add('radio');
 				input.type = 'radio';
@@ -982,7 +983,7 @@ export class Assemble {
 			hint: 'these links serve the purpose of...'
 		}*/
 		let result = [...this.header()];
-		if ('attributes' in this.currentElement) result.push(this.hiddeninput());
+		if (this.currentElement.attributes !== undefined) result.push(this.hiddeninput());
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement('a');
 			a = this.apply_attributes(attributes, a);
@@ -1018,7 +1019,7 @@ export class Assemble {
 		input.id = input.name = 'signature';
 		input.hidden = true;
 		result.push(input);
-		result=result.concat(this.hint());
+		result = result.concat(this.hint());
 		this.signaturePad = true;
 		return result;
 	}
@@ -1030,16 +1031,12 @@ export class Assemble {
 			attributes:{type:'password'} // to override e.g. for logins
 			destination: elementId // force output to other input, e.g. search
 		} */
-		const stream = document.createElement('div');
 		let result = [],
 			input, inputid;
-		stream.id = getNextElementID();
-		stream.classList.add('scanner');
-		result.push(stream);
-		if ('destination' in this.currentElement) {
+		if (this.currentElement.destination !== undefined) {
 			inputid = this.currentElement.destination;
 		} else {
-			if ('attributes' in this.currentElement && 'type' in this.currentElement.attributes) input = [...this.input(this.currentElement.attributes.type)];
+			if (this.currentElement.attributes.type !== undefined) input = [...this.input(this.currentElement.attributes.type)];
 			else input = [...this.input('text')];
 			inputid = input[1].id ? input[1].id : input[2].id;
 			result = result.concat(input);
@@ -1047,7 +1044,9 @@ export class Assemble {
 		//attributes are processed already, therefore they can be reassigned
 		this.currentElement.description = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
 		this.currentElement.attributes = {
-			'onpointerup': "assemble_helper.initialize_scanner('" + stream.id + "','" + inputid + "')",
+			'onpointerup': "new Dialog({type:'scanner'}).then((response) => {" +
+				"document.getElementById('" + inputid + "').value = document.querySelector('dialog>form>input').value;" +
+				"});",
 			'data-type': 'scanner',
 			'type': 'button'
 		};

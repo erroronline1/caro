@@ -405,7 +405,7 @@ class ORDER extends API {
 				'content' => [
 					[
 						['type' => 'scanner',
-						'destination' => LANG::GET('consumables.edit_product_search')
+						'destination' => 'productsearch'
 						],
 						['type' => 'select',
 						'content' => $vendors,

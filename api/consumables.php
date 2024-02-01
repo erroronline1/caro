@@ -576,7 +576,7 @@ class CONSUMABLES extends API {
 							'id' => 'units'
 						]],
 						['type' => 'scanner',
-						'destination' => LANG::GET('consumables.edit_product_search')
+						'destination' => 'productsearch'
 						],
 						['type' => 'select',
 						'content' => $vendors,
@@ -588,7 +588,8 @@ class CONSUMABLES extends API {
 						['type' => 'searchinput',
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_search'),
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'editconsumables'); return false;}"
+							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'editconsumables'); return false;}",
+							'id' => 'productsearch'
 						]],
 					],
 					[
