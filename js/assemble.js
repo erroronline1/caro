@@ -129,10 +129,15 @@ export class Dialog {
 	 * @returns promise
 	 * 
 	 * new Dialog({options}).then((response) => {
-	 * 		doSomethingWith(response.target.returnValue);
+	 * 		doSomethingWithButtonValue(response.target.returnValue);
 	 * 	});
 	 * 
 	 * select will be implemented by Assemble
+	 * 
+	 * input needs button options as well
+	 * new Dialog({type:'input', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then((response) => {
+	 *  	if (response.target.returnValue==='true') console.log('this is the text input:', document.querySelector('dialog>form>textarea').value);
+	 * 	});
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
@@ -214,6 +219,23 @@ export class Dialog {
 			buttons.append(button);
 		}
 		return [buttons];
+	}
+	input(){
+		const textarea=document.createElement('textarea'),
+		 buttons = [];
+		let button;
+		for (const [option, value] of Object.entries(this.options)) {
+			button = document.createElement('button');
+			button.append(document.createTextNode(option));
+			button.classList.add('confirmButton');
+			if (typeof value === 'string' || typeof value === 'boolean') button.value = value;
+			else {
+				button.value = value.value;
+				if (value.class) button.classList.add(value.class);
+			}
+			buttons.push(button);
+		}
+		return [textarea, ...buttons];
 	}
 }
 
