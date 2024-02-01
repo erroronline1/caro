@@ -576,8 +576,7 @@ input[type=radio]+label+div {
 }
 
 canvas,
-.scanner.active,
-#scanner>video {
+.scanner.active {
 	display: block;
 	height: 15em;
 	margin-bottom: 2em;

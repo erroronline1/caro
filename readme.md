@@ -98,7 +98,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * unarchived but received delete after x days
 * media attachments
 
-
+* scanner modal?
 * forms and contexts
 * pdf export
 * vendor list
