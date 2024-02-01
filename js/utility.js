@@ -143,10 +143,10 @@ const orderClient = {
 	},
 	filter: (type = undefined) => {
 		document.querySelectorAll('[data-ordered]').forEach(article => {
-			article.parentNode.parentNode.style.display = 'none';
+			article.parentNode.style.display = 'none';
 		});
 		(type ? display = document.querySelectorAll(`[data-${type}=true]`) : document.querySelectorAll('[data-ordered=false]')).forEach(article => {
-			article.parentNode.parentNode.style.display = 'block';
+			article.parentNode.style.display = 'block';
 		});
 	}
 };

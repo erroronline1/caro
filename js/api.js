@@ -520,7 +520,7 @@ export const api = {
 						api.purchase('get', 'prepared');
 					};
 				}
-				payload = _.getInputs('[data-usecase=purchase]', true);
+				if (!request[1] == 'approved') payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'delete':
 				break;

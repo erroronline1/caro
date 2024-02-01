@@ -401,7 +401,7 @@ class ORDER extends API {
 
 				$result['body'] = ['form'=>[
 					'data-usecase'=> 'purchase',
-					'action' => $this->_requestedID ? 'javascript:api.purchase("put", "order", "' . $this->_requestedID . '")' : 'javascript:api.purchase("post", "order")'
+					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
 				],
 				'content' => [
 					[
@@ -601,7 +601,7 @@ class ORDER extends API {
 						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
 							"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
 							"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(function(r){if (r.target.returnValue==='true') {api.purchase('delete', 'order', " . $this->_requestedID . ")})"
+							"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'order', " . $this->_requestedID . ")})"
 					]]
 				]);
 
@@ -694,10 +694,10 @@ class ORDER extends API {
 						['type' => 'radio',
 						'description' => LANG::GET('order.order_filter'),
 						'content' => [
-							LANG::GET('order.untreated')=>['checked' => true, 'onfocus' => 'orderClient.filter()'],
-							LANG::GET('order.ordered')=>['onfocus' => 'orderClient.filter("ordered")'],
-							LANG::GET('order.received')=>['onfocus' => 'orderClient.filter("received")'],
-							LANG::GET('order.archived')=>['onfocus' => 'orderClient.filter("archived")'],
+							LANG::GET('order.untreated')=>['checked' => true, 'onchange' => 'orderClient.filter()'],
+							LANG::GET('order.ordered')=>['onchange' => 'orderClient.filter("ordered")'],
+							LANG::GET('order.received')=>['onchange' => 'orderClient.filter("received")'],
+							LANG::GET('order.archived')=>['onchange' => 'orderClient.filter("archived")'],
 						]],
 						['type' => 'searchinput',
 						'attributes' => [
