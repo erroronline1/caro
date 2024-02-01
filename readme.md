@@ -92,7 +92,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* case number as order verification
 * filter length string orders
 * filter by fields? dropdown?
 * partial delivery (6 of 10 delivered?) "received"
