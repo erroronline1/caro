@@ -46,7 +46,7 @@ class TOOL extends API {
 						]
 					],
 					['type' => 'textinput',
-					'description' => LANG::GET('tool.qrcode_appointment_occasion_description'),
+					'hint' => LANG::GET('tool.qrcode_appointment_occasion_hint'),
 					'attributes' => [
 						'name' => LANG::GET('tool.qrcode_appointment_occasion'),
 						'data-usecase' => 'tool_create_code',
@@ -54,7 +54,7 @@ class TOOL extends API {
 						]
 					],
 					['type' => 'textinput',
-					'description' => LANG::GET('tool.qrcode_appointment_reminder_description'),
+					'hint' => LANG::GET('tool.qrcode_appointment_reminder_hint'),
 					'attributes' => [
 						'name' => LANG::GET('tool.qrcode_appointment_reminder'),
 						'data-usecase' => 'tool_create_code',
@@ -84,7 +84,7 @@ class TOOL extends API {
 			'barcode_code128' => ['name' => LANG::GET('tool.barcode_code128'),
 				'content'=>[
 					['type' => 'textinput',
-					'description' => LANG::GET('tool.barcode_code128_placeholder'),
+					'hint' => LANG::GET('tool.barcode_code128_hint'),
 					'attributes' => [
 						'name' => LANG::GET('tool.barcode_description'),
 						'data-usecase' => 'tool_create_code',
@@ -96,7 +96,7 @@ class TOOL extends API {
 			'barcode_ean13' => ['name' => LANG::GET('tool.barcode_ean13'),
 				'content'=>[
 					['type' => 'numberinput',
-					'description' => LANG::GET('tool.barcode_ean13_placeholder'),
+					'hint' => LANG::GET('tool.barcode_ean13_hint'),
 					'attributes' => [
 						'name' => LANG::GET('tool.barcode_description'),
 						'data-usecase' => 'tool_create_code',

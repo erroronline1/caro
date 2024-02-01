@@ -564,11 +564,18 @@ export class Assemble {
 	}
 
 	header() {
-		if (this.currentElement.description == undefined) return [];
+		if (this.currentElement.description === undefined) return [];
 		let header = document.createElement('header');
 		header.appendChild(document.createTextNode(this.currentElement.description));
 		header.setAttribute('data-type', this.currentElement.type);
 		return [header];
+	}
+
+	hint() {
+		if (this.currentElement.hint === undefined) return [];
+		let div = document.createElement('div');
+		div.appendChild(document.createTextNode(this.currentElement.hint));
+		return [div];
 	}
 
 	apply_attributes(setup, node) {
@@ -615,14 +622,14 @@ export class Assemble {
 	input(type) {
 		/*{
 			type: 'textinput',
-			description: 'please provide information about...',
+			hint: 'please provide information about...',
 			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				name: 'variable name' // will be used as an accessible placeholder
 			}
 		}*/
 		let input = document.createElement('input'),
-			label, div;
+			label;
 		input.type = type;
 		if (type === 'password') this.currentElement.type = 'password';
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
@@ -633,14 +640,10 @@ export class Assemble {
 		this.currentElement.attributes.placeholder = ' '; // to access input:not(:placeholder-shown) query selector 
 		label.classList.add('input-label');
 
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		if (this.currentElement.description) {
-			div = document.createElement('div');
-			div.appendChild(document.createTextNode(this.currentElement.description));
-		}
 		if (this.currentElement.attributes.hidden !== undefined) return input;
-		return [...this.icon(), input, label, div];
+		return [...this.icon(), input, label, ...this.hint()];
 	}
 	textinput() {
 		return this.input('text');
@@ -725,6 +728,7 @@ export class Assemble {
 				name: 'variable name',
 				multiple: true
 			}
+			hint: 'this file serves as...'
 		}*/
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
@@ -751,7 +755,7 @@ export class Assemble {
 		button.appendChild(document.createTextNode('Reset'));
 		button.setAttribute('data-type', 'reset');
 		button.classList.add('inlinebutton');
-		return [...this.header(), input, label, button];
+		return [...this.header(), input, label, button, ...this.hint()];
 	}
 
 	photo() {
@@ -761,6 +765,7 @@ export class Assemble {
 			attributes: {
 				name: 'photo'
 			}
+			hint: 'this photo serves as...'
 		}*/
 		let input = document.createElement('input'),
 			label = document.createElement('button'),
@@ -828,13 +833,13 @@ export class Assemble {
 		addbutton.classList.add('inlinebutton');
 		addbutton.type = 'button';
 
-		return [...this.header(), input, img, label, addbutton, resetbutton];
+		return [...this.header(), input, img, label, addbutton, resetbutton, ...this.hint()];
 	}
 
 	select() {
 		/*{
 			type: 'select',
-			description: 'list',
+			hint: 'this is a list',
 			numeration: anything resulting in true to prevent enumeration
 			content: {
 				'entry one': {
@@ -851,11 +856,11 @@ export class Assemble {
 		}*/
 		const groups = {};
 		let select = document.createElement('select'),
-			label, div,
+			label,
 			selectModal = {};
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, '');
-		if ('attributes' in this.currentElement) select = this.apply_attributes(this.currentElement.attributes, select);
+		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
 		for (const [key, element] of Object.entries(this.currentElement.content)) {
 			if (groups[key[0]] === undefined) groups[key[0]] = [
@@ -878,10 +883,6 @@ export class Assemble {
 		label = document.createElement('label');
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
 		label.classList.add('input-label');
-		if (this.currentElement.description) {
-			div = document.createElement('div');
-			div.appendChild(document.createTextNode(this.currentElement.description));
-		}
 		select.addEventListener('pointerdown', (e) => {
 			e.preventDefault();
 			new Dialog({
@@ -893,24 +894,25 @@ export class Assemble {
 				e.target.dispatchEvent(new Event('change'));
 			});
 		});
-		return [...this.icon(), select, label, div];
+		return [...this.icon(), select, label, ...this.hint()];
 	}
 
 	textarea() {
 		/*{
 			type: 'textarea',
-			description: 'textarea',
+			hint: 'enter a lot of text',
 			numeration: anything resulting in true to prevent enumeration
 			attributes: {
+				name:'somename'
 				rows:8,
 				value:'values can be passed with this pseudo attribute'
 			}
 		}*/
 		let textarea = document.createElement('textarea'),
-			label, div;
+			label;
 		textarea.id = getNextElementID();
 		textarea.autocomplete = 'off';
-		if ('attributes' in this.currentElement && 'name' in this.currentElement.attributes) {
+		if (this.currentElement.attributes.name !== undefined) {
 			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			label = document.createElement('label');
 			label.htmlFor = textarea.id;
@@ -920,11 +922,7 @@ export class Assemble {
 		if ('attributes' in this.currentElement) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if ('attributes' in this.currentElement && 'value' in this.currentElement.attributes) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 
-		if (this.currentElement.description) {
-			div = document.createElement('div');
-			div.appendChild(document.createTextNode(this.currentElement.description));
-		}
-		return [...this.icon(), label, textarea, div];
+		return [...this.icon(), label, textarea, ...this.hint()];
 	}
 
 	checkbox(radio = null) {
@@ -939,7 +937,8 @@ export class Assemble {
 				'Checkbox 2': {
 					optional attributes
 				}
-			}
+			},
+			hint: 'this selection is for...'
 		}*/
 		const result = [...this.header()],
 			radioname = this.currentElement.description ? this.names_numerator(this.currentElement.description, this.currentElement.numeration) : null; // keep same name for current article
@@ -962,7 +961,7 @@ export class Assemble {
 			result.push(input);
 			result.push(label);
 		}
-		return result;
+		return [...result, ...this.hint()];
 	}
 	radio() {
 		return this.checkbox('radioinstead');
@@ -979,7 +978,8 @@ export class Assemble {
 					href: '#',
 					onpointerdown: 'alert(\'hello\')'
 				}
-			}
+			},
+			hint: 'these links serve the purpose of...'
 		}*/
 		let result = [...this.header()];
 		if ('attributes' in this.currentElement) result.push(this.hiddeninput());
@@ -990,14 +990,15 @@ export class Assemble {
 			a.appendChild(document.createTextNode(link));
 			result.push(a);
 		}
-		return result;
+		return [...result, ...this.hint()];
 	}
 
 	signature() {
 		/*{
 			type: 'signature',
 			description:'signature',
-			required: optional boolean
+			required: optional boolean,
+			hint: 'this signature is for...'
 		} */
 		let result = [...this.header()];
 		const canvas = document.createElement('canvas');
@@ -1017,6 +1018,7 @@ export class Assemble {
 		input.id = input.name = 'signature';
 		input.hidden = true;
 		result.push(input);
+		result=result.concat(this.hint());
 		this.signaturePad = true;
 		return result;
 	}

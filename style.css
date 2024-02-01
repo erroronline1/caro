@@ -385,13 +385,13 @@ input[type=checkbox] {
 .checkbox {
 	display: inline-block;
 	margin: .5em;
-	padding: .5em 1em ;
+	padding: .5em 1em;
 	border-radius: 2em;
 	background-color: var(--article);
 	width: fit-content;
 	border: 1px solid var(--darkshadow);
 	vertical-align: middle;
-	
+
 }
 
 .checkbox {
@@ -402,22 +402,22 @@ input[type=checkbox] {
 	content: "\2713";
 	font-weight: bold;
 	position: relative;
-	display:inline-block;
+	display: inline-block;
 	width: .5em;
 	height: .5em;
 	top: 0;
 	left: -.75em;
-	padding:.1em .6em .9em .4em;
+	padding: .1em .6em .9em .4em;
 	border: 1px solid var(--darkshadow);
 	border-radius: 50%;
-	color:transparent;
+	color: transparent;
 }
 
 input:checked+.checkbox,
 input:checked+.checkbox::before {
 	background-color: var(--green);
-	color:var(--article);
-	border-color:var(--article);
+	color: var(--article);
+	border-color: var(--article);
 }
 
 input:checked+.radio {
@@ -442,7 +442,7 @@ select+label.input-label {
 	font-size: .75em;
 	top: -5em;
 	margin: 0 0 0 3.7em;
-	padding: 0 .25em;
+	padding: 0 .5em;
 	opacity: 1;
 	background-color: var(--article);
 }
@@ -556,9 +556,17 @@ article>span[data-type] {
 	width: 0;
 }
 
+/* hint messages below */
 label+div,
 textarea+div {
 	margin: -1em 0 0 2.3em;
+	font-size: .75em;
+}
+
+button+div,
+input[type=checkbox]+label+div,
+input[type=radio]+label+div {
+	margin: 1em 0 0 2.3em;
 	font-size: .75em;
 }
 

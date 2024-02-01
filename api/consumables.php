@@ -643,7 +643,8 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'name' => 'documents[]',
 							'multiple' => true
-						]]
+						],
+						'hint' => LANG::GET('consumables.edit_product_documents_update_hint')]
 					],
 					[
 						["type" => "radio",

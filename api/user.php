@@ -77,7 +77,8 @@ class USER extends API {
 						'description' => LANG::GET('user.edit_take_photo'),
 						'attributes' => [
 							'name' => 'photo'
-						]],
+						],
+						'hint' => LANG::GET('user.edit_take_photo_hint')],
 					]
 					],
 					'form' => [
@@ -322,14 +323,16 @@ class USER extends API {
 						],
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_units'),
-						'content' => $units
+						'content' => $units,
+						'hint' => LANG::GET('user.edit_units_hint')
 						]
 					],[
 						['type' => 'photo',
 						'description' => LANG::GET('user.edit_take_photo'),
 						'attributes' => [
 							'name' => 'photo'
-						]],
+						],
+						'hint' => LANG::GET('user.edit_take_photo_hint')],
 					],[
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_token'),

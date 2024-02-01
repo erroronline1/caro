@@ -483,7 +483,7 @@ class ORDER extends API {
 						'destination' => 'commission'
 						],
 						['type' => 'textinput',
-						'description' => LANG::GET('order.add_commission_label'),
+						'hint' => LANG::GET('order.commission_hint'),
 						'attributes' => [
 							'required' => true,
 							'name' => LANG::GET('order.commission'),
@@ -804,7 +804,8 @@ class ORDER extends API {
 								'name' => LANG::GET('order.ordernumber_label'),
 								'readonly' => true,
 								'onpointerup' => 'orderClient.toClipboard(this)'
-						]],
+							]
+						],
 						[
 							'type' => 'textinput',
 							'attributes' => [
@@ -812,7 +813,9 @@ class ORDER extends API {
 								'name' => LANG::GET('order.commission'),
 								'readonly' => true,
 								'onpointerup' => 'orderClient.toClipboard(this)'
-						]],
+							],
+							'hint' => LANG::GET('order.copy_values')
+						],
 					];
 
 					$status=[];
