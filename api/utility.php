@@ -297,6 +297,7 @@ class UTILITY {
 				if (stristr($path, self::directory($fileserver))) $allowed = true;
 			}
 			if (stristr($path, INI['sharepoint']['folder'])) $allowed = true;
+			if (stristr($path, INI['order']['attachment_folder'])) $allowed = true;
 			if (!$allowed) return false;
 			if (is_file($path)){
 				$result = unlink($path);

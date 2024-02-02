@@ -94,9 +94,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 # open tasks
 * filter length string orders
 * filter by fields? dropdown?
-* partial delivery (6 of 10 delivered?) "received"
 * unarchived but received delete after x days
-* media attachments
 
 * forms and contexts
 * pdf export

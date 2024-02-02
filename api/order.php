@@ -477,12 +477,10 @@ class ORDER extends API {
 							'attributes' => [
 								'id' => 'units'
 							]],
-							['type' => 'numberinput',
+							['type' => 'hiddeninput',
 							'attributes' => [
 								'name' => LANG::GET('order.quantity_label') . '[]',
-								'min' => '1',
-								'max' => '99999',
-								'data-loss' => 'prevent'
+								'value' => ''
 							]],
 							['type' => 'textinput',
 							'attributes' => [
@@ -515,7 +513,7 @@ class ORDER extends API {
 							'attributes' => [
 								'value' => LANG::GET('order.add_button'),
 								'type' => 'button',
-								'onpointerup' => "orderClient.addProduct(this.parentNode.children[2].value, this.parentNode.children[6].value, this.parentNode.children[10].value, this.parentNode.children[14].value, '', this.parentNode.children[18].value); for (const e of this.parentNode.children) e.value=''"
+								'onpointerup' => "orderClient.addProduct(this.parentNode.children[2].value, this.parentNode.children[5].value, this.parentNode.children[9].value, this.parentNode.children[13].value, '', this.parentNode.children[17].value); for (const e of this.parentNode.children) e.value=''"
 							]]
 						]
 					],[
@@ -687,6 +685,20 @@ class ORDER extends API {
 				break;
 			case 'DELETE':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				
+				// delete attachments
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-order'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				$order = $statement->fetch(PDO::FETCH_ASSOC);
+				$order = json_decode($order['order_data'], true);
+				if (array_key_exists('attachments', $order)){
+					$files = explode(',', $order['attachments']);
+					UTILITY::delete($files);
+				}
+
+				// delete prepared order
 				$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
 				$statement = $this->_pdo->prepare($query);
 				if ($statement->execute()) {
@@ -1011,6 +1023,26 @@ class ORDER extends API {
 				break;
 			case 'DELETE':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+				// delete attachments if not used by any other approved order
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				$order = $statement->fetch(PDO::FETCH_ASSOC);
+				$order = json_decode($order['order_data'], true);
+				if (array_key_exists('attachments', $order)){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
+					$statement->execute([
+						':substr' => $order['attachments']
+					]);
+					$others =$statement->fetchAll(PDO::FETCH_ASSOC);
+					if (count($others)<2){
+						$files = explode(',', $order['attachments']);
+						UTILITY::delete($files);
+					}
+				}
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
 				if ($statement->execute([
 					':id' => $this->_requestedID

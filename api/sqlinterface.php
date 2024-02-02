@@ -214,6 +214,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id"
 		],
+		'order_get-approved-order-by-substr' => [ // CASE SENSITIVE JUST TO BE SURE
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data CONCAT('%', :substr, '%')",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
+		],
 		'order_delete-approved-order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
