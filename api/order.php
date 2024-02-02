@@ -94,7 +94,8 @@ class ORDER extends API {
 				if (count($organizational_orders)){
 					foreach($organizational_orders as $order){ // order
 						$items = $info = '';
-						foreach (json_decode($order['order_data'], true) as $key => $value){ // data
+						$processedOrderData = json_decode($order['order_data'], true);
+						foreach ($processedOrderData as $key => $value){ // data
 							if (is_array($value)){
 								foreach($value as $item){
 								$items .= LANG::GET('order.prepared_order_item', [
@@ -124,6 +125,25 @@ class ORDER extends API {
 							'attributes' =>['type' => 'button',
 							'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
 						]);
+						if (array_key_exists('attachments', $processedOrderData)){
+							$files = [];
+							foreach(explode(',', $processedOrderData['attachments']) as $file){
+								$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
+							}
+							array_splice($result['body']['content'][count($result['body']['content']) - 1], 2, 0, [
+								[
+									['type' => 'links',
+									'description' => LANG::GET('order.attached_files'),
+									'content' => $files],
+									['type' => 'hiddeninput',
+									'attributes' => [
+										'name' => 'existingattachments',
+										'value' => $processedOrderData['attachments']
+									]],
+									['type' => 'br']
+								]
+							]);		
+						}
 					}
 					if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']) && count($organizational_orders)) {
 						array_push($result['body']['content'], [
@@ -240,8 +260,9 @@ class ORDER extends API {
 		$unset=LANG::PROPERTY('consumables.edit_product_vendor_select');
 		unset ($this->_payload->$unset);
 
+		// detect approval
 		$approval = false;
-		if (UTILITY::propertySet($this->_payload, 'approval_token')){
+		if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.add_approval_token'))){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
 			$statement->execute([
 				':token' => $this->_payload->approval_token
@@ -249,19 +270,43 @@ class ORDER extends API {
 			if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
 				$approval = $result['name'] . LANG::GET('order.token_verified');
 			}
+			$unset=LANG::PROPERTY('consumables.add_approval_token');
+			unset ($this->_payload->$unset);
 		}
-
 		if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
 		}
-		$unset=LANG::PROPERTY('consumables.add_approval_token');
-		unset ($this->_payload->$unset);
-		$order_data=['items'=>[]];
+		
+		// initiate data
+		$order_data = ['items' => []];
+		
+		// handle attachments
+		$attachments = [];
+		if (array_key_exists('attachments', $_FILES) && $_FILES['attachments']['tmp_name'][0]){
+			$attachments = UTILITY::storeUploadedFiles(['attachments'], '../' . INI['order']['attachment_folder'], [time()]);
+			foreach($attachments as $key => $value){
+				if ($value)	$attachments[$key] = substr($value, 1);
+				else unset($attachments[$key]);
+			}
+		}
+		$existingattachments = UTILITY::propertySet($this->_payload, 'existingattachments') ? : '';
+		if ($attachments || $existingattachments) {
+			$order_data['attachments'] = trim(implode(',', array_merge($attachments, explode(',', $existingattachments))), ',');
+			unset ($this->_payload->existingattachments);
+		}
+
+		// set data
 		foreach ($this->_payload as $key => $value){
 			if (is_array($value)){
 				foreach($value as $index => $subvalue){
-					if (boolval($subvalue)) $order_data['items'][intval($index)][$key] = trim($subvalue);
+					// manual adding has the same names but has to be ignores
+					// as per layout these names appear before actual ordered items
+					// being ignored the items keys are reduced by 1
+					if (boolval($subvalue)) {
+						if (!array_key_exists(intval($index) - 1, $order_data['items'])) $order_data['items'][]=[];
+						$order_data['items'][intval($index) - 1][$key] = trim($subvalue);
+					}
 				}
 			} else {
 				if (boolval($value)) $order_data[$key] = trim($value);
@@ -277,7 +322,7 @@ class ORDER extends API {
 		$keys = array_keys($processedOrderData['order_data']);
 		$order_data2 = [];
 		$query = '';
-		for ($i = 0; $i<count($processedOrderData['order_data']['items']);$i++){
+		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
 				if (!in_array($key, ['items',LANG::PROPERTY('order.unit')])) $order_data2[$key] = $processedOrderData['order_data'][$key];
@@ -312,7 +357,6 @@ class ORDER extends API {
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$processedOrderData =$this->processOrderForm();
-
 				if (!$processedOrderData['approval']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
 					$statement->execute([
@@ -404,76 +448,78 @@ class ORDER extends API {
 				],
 				'content' => [
 					[
-						['type' => 'scanner',
-						'destination' => 'productsearch'
-						],
-						['type' => 'select',
-						'content' => $vendors,
-						'attributes' => [
-							'id' => 'productsearchvendor',
-							'name' => LANG::GET('consumables.edit_product_vendor_select')
-							]
-						],
-						['type' => 'searchinput',
-						'attributes' => [
-							'name' => LANG::GET('consumables.edit_product_search'),
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
-							'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
-							'id' => 'productsearch'
-						]]
+						[
+							['type' => 'scanner',
+							'destination' => 'productsearch'
+							],
+							['type' => 'select',
+							'content' => $vendors,
+							'attributes' => [
+								'id' => 'productsearchvendor',
+								'name' => LANG::GET('consumables.edit_product_vendor_select')
+								]
+							],
+							['type' => 'searchinput',
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_product_search'),
+								'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
+								'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
+								'id' => 'productsearch'
+							]]
+						],[
+							['type' => 'datalist',
+							'content' => $datalist,
+							'attributes' => [
+								'id' => 'vendors'
+							]],
+							['type' => 'datalist',
+							'content' => $datalist_unit,
+							'attributes' => [
+								'id' => 'units'
+							]],
+							['type' => 'numberinput',
+							'attributes' => [
+								'name' => LANG::GET('order.quantity_label') . '[]',
+								'min' => '1',
+								'max' => '99999',
+								'data-loss' => 'prevent'
+							]],
+							['type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('order.unit_label') . '[]',
+								'list' => 'units',
+								'data-loss' => 'prevent'
+							]],
+							['type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('order.ordernumber_label') . '[]',
+								'data-loss' => 'prevent'
+							]],
+							['type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('order.productname_label') . '[]',
+								'data-loss' => 'prevent'
+							]],
+							['type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('order.vendor_label') . '[]',
+								'list' => 'vendors',
+								'data-loss' => 'prevent'
+							]],
+							['type' => 'hiddeninput',
+							'attributes' => [
+								'name' => LANG::GET('order.barcode') . '[]',
+								'value' => '' // otherwise undefined messes up
+							]],
+							['type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('order.add_button'),
+								'type' => 'button',
+								'onpointerup' => "orderClient.addProduct(this.parentNode.children[2].value, this.parentNode.children[6].value, this.parentNode.children[10].value, this.parentNode.children[14].value, '', this.parentNode.children[18].value); for (const e of this.parentNode.children) e.value=''"
+							]]
+						]
 					],[
 						['type' => 'hr']
-					],[
-						['type' => 'datalist',
-						'content' => $datalist,
-						'attributes' => [
-							'id' => 'vendors'
-						]],
-						['type' => 'datalist',
-						'content' => $datalist_unit,
-						'attributes' => [
-							'id' => 'units'
-						]],
-						['type' => 'numberinput',
-						'attributes' => [
-							'name' => LANG::GET('order.quantity_label') . '[]',
-							'min' => '1',
-							'max' => '99999',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('order.unit_label') . '[]',
-							'list' => 'units',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('order.ordernumber_label') . '[]',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('order.productname_label') . '[]',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('order.vendor_label') . '[]',
-							'list' => 'vendors',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'hiddeninput',
-						'attributes' => [
-							'name' => LANG::GET('order.barcode') . '[]',
-							'value' => '' // otherwise undefined messes up
-						]],
-						['type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('order.add_button'),
-							'type' => 'button',
-							'onpointerup' => "orderClient.addProduct(this.parentNode.children[2].value, this.parentNode.children[6].value, this.parentNode.children[10].value, this.parentNode.children[14].value, '', this.parentNode.children[18].value); for (const e of this.parentNode.children) e.value=''"
-						]]
 					],[
 						['type' => 'radio',
 						'description' => LANG::GET('order.unit'),
@@ -504,6 +550,22 @@ class ORDER extends API {
 						]]
 					],[
 						[
+							['type' => 'file',
+							'description' => LANG::GET('order.attach_file'),
+							'attributes' => [
+								'name' => 'attachments[]',
+								'multiple' => true
+							]]
+						],[
+							['type' => 'photo',
+							'description' => LANG::GET('order.attach_photo'),
+							'attributes' => [
+								'name' => 'attachments[]'
+							]]
+						]
+					],
+					[
+						[
 							['type' => 'signature',
 							'description' => LANG::GET('order.add_approval_signature'),
 							'attributes' => [
@@ -519,7 +581,25 @@ class ORDER extends API {
 						]
 					],
 				]];
-				
+				if (array_key_exists('attachments', $order)){
+					$files = [];
+					foreach(explode(',', $order['attachments']) as $file){
+						$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
+					}
+					array_splice($result['body']['content'], 4, 0, [
+						[
+							['type' => 'links',
+							'description' => LANG::GET('order.attached_files'),
+							'content' => $files],
+							['type' => 'hiddeninput',
+							'attributes' => [
+								'name' => 'existingattachments',
+								'value' => $order['attachments']
+							]]
+						]
+					]);
+				}
+
 				// cart-content has a twin within utility.js orderClient.addProduct() method
 				if ($order['items']){
 					$items=[];
@@ -648,7 +728,8 @@ class ORDER extends API {
 						LANG::PROPERTY('order.unit') => $order['organizational_unit'],
 						LANG::PROPERTY('order.commission') => null,
 						LANG::PROPERTY('order.orderer') => null,
-						LANG::PROPERTY('order.delivery_date') => null
+						LANG::PROPERTY('order.delivery_date') => null,
+						'attachments' => null
 					];
 					// fill possible keys
 					foreach ($decoded_order_data as $key => $value){
@@ -883,6 +964,18 @@ class ORDER extends API {
 						]
 					];
 					$content[] = $copy;
+
+					if (array_key_exists('attachments', $decoded_order_data)){
+						$files = [];
+						foreach(explode(',', $decoded_order_data['attachments']) as $file){
+							$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
+						}
+						$content[]=[
+							['type' => 'links',
+							'description' => LANG::GET('order.attached_files'),
+							'content' => $files]
+						];
+					}
 
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'button',
