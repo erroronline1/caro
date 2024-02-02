@@ -806,7 +806,6 @@ class ORDER extends API {
 						':vendor' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''
 					])."\n";
 
-					$text .= "\n";
 					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.additional_info')))
 						$text .= LANG::GET('order.additional_info') . ': ' . $additional_information . "\n \n";
 					$text .= LANG::GET('order.unit') . ': ' . $row['organizational_unit'] . "\n";
@@ -884,9 +883,6 @@ class ORDER extends API {
 						]
 					];
 					$content[] = $copy;
-					$content[] = [
-						'type' => 'br'
-					];
 
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'button',
