@@ -32,7 +32,7 @@ class ORDER extends API {
 				}
 				if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
 					$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 512, UTILITY_IMAGE_RESOURCE, 'png'));
 				}
 				$approvedIDs = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.bulk_approve_order'));
 				if (!$approval || !$approvedIDs) $this->response([], 401);
@@ -275,7 +275,7 @@ class ORDER extends API {
 		}
 		if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
-			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 256, UTILITY_IMAGE_RESOURCE, 'png'));
+			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 512, UTILITY_IMAGE_RESOURCE, 'png'));
 		}
 		
 		// initiate data
@@ -850,7 +850,7 @@ class ORDER extends API {
 						'type' => 'image',
 						'attributes' => [
 							'barcode' => ['value' => $decoded_order_data[LANG::PROPERTY('order.barcode')]],
-							'imageonly' => ['width' => '10em', 'height' => '4em']
+							'imageonly' => ['width' => '15em', 'height' => '6em']
 							]
 					];
 					
@@ -964,7 +964,7 @@ class ORDER extends API {
 						$content[]=[
 							'type' => 'image',
 							'attributes' => [
-								'imageonly' => ['width' => '10em'],
+								'imageonly' => ['width' => '10em', 'height' => '6em', 'margin-top' => '-4em'],
 								'name' => LANG::GET('order.approval_image'),
 								'url' => $row['approval']],
 						];
