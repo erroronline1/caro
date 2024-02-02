@@ -66,37 +66,38 @@ class USER extends API {
 					$units .= in_array($unit, explode(',', $user['units'])) ? ', ' . $description : '';
 				}
 				$result['body']=['content' => [
-					[
-						['type' => 'text',
-						'description' => LANG::GET('user.display_user'),
-						'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
-							LANG::GET('user.display_permissions') . ': ' . substr($permissions, 2) . "\n" .
-							LANG::GET('user.edit_units') . ': ' . substr($units, 2) . "\n"]
-					],[
-						['type' => 'photo',
-						'description' => LANG::GET('user.edit_take_photo'),
-						'attributes' => [
-							'name' => 'photo'
-						],
-						'hint' => LANG::GET('user.edit_take_photo_hint')],
-					]
+						[
+							['type' => 'text',
+							'description' => LANG::GET('user.display_user'),
+							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
+								LANG::GET('user.display_permissions') . ': ' . substr($permissions, 2) . "\n" .
+								LANG::GET('user.edit_units') . ': ' . substr($units, 2) . "\n"]
+						],[
+							['type' => 'photo',
+							'description' => LANG::GET('user.edit_take_photo'),
+							'attributes' => [
+								'name' => 'photo'
+							],
+							'hint' => LANG::GET('user.edit_take_photo_hint')],
+						]
 					],
 					'form' => [
 						'data-usecase' => 'user',
 						'action' => "javascript:api.user('put', 'profile')"
-					]];
+					]
+				];
 
-					if ($user['image']) $result['body']['content'][1]=[
-						[
-							['type' => 'image',
-							'description' => LANG::GET('user.edit_export_user_image'),
-							'attributes' => [
-								'name' => $user['name'] . '_pic',
-								'url' => $user['image']]
-							]
-						],
-						$result['body']['content'][1]
-					];
+				if ($user['image']) $result['body']['content'][1]=[
+					[
+						['type' => 'image',
+						'description' => LANG::GET('user.edit_export_user_image'),
+						'attributes' => [
+							'name' => $user['name'] . '_pic',
+							'url' => $user['image']]
+						]
+					],
+					$result['body']['content'][1]
+				];
 
 				$this->response($result);
 				break;
