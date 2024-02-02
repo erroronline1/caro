@@ -506,7 +506,7 @@ export const api = {
 				payload = _.getInputs('[data-usecase=purchase]', true);
 				break;
 			case 'put':
-				if (['ordered', 'received', 'archived', 'disapproved'].includes(request[3])) {
+				if (['ordered', 'received', 'archived', 'disapproved', 'addinformation'].includes(request[3])) {
 					successFn = function (data) {
 						api.toast(data.status.msg);
 					};

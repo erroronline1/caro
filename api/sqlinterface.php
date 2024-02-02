@@ -201,6 +201,11 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_approved_orders SET archived = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET archived = CURRENT_TIMESTAMP WHERE id = :id"
 		],
+		'order_put-approved-order-addinformation' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id"
+		],
+
 		'order_get-approved-order-by-unit' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC"

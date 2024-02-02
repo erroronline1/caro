@@ -6,13 +6,13 @@ class ORDER extends API {
 	private $_requestedID = null;
 	private $_subMethod = null;
 	private $_borrowedModule = null;
-	private $_disapprovalMessage = null;
+	private $_message = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_borrowedModule = $this->_disapprovalMessage = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_borrowedModule = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	public function prepared(){
@@ -103,10 +103,10 @@ class ORDER extends API {
 									':number' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.ordernumber_label')) ? : '',
 									':name' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.productname_label')) ? : '',
 									':vendor' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.vendor_label')) ? : ''
-								]).'\n';
+								])."\n";
 								}
 							} else {
-								$info .= str_replace('_', ' ', $key) . ': ' . $value . '\n';
+								$info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";
 							}
 						}
 						array_push($result['body']['content'], [
@@ -633,6 +633,7 @@ class ORDER extends API {
 				if ($this->_subMethod == 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
 				if ($this->_subMethod == 'archived') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
 				if ($this->_subMethod == 'disapproved') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
+				if ($this->_subMethod == 'addinformation') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
 				$statement->execute([
 					':id' => $this->_requestedID
 					]);
@@ -684,7 +685,21 @@ class ORDER extends API {
 						':order' => LANG::GET('order.message', $messagepayload),
 						':unit' => $prepared[LANG::PROPERTY('order.unit')],
 						':user' => $_SESSION['user']['name']
-					]) . "\n\n" . $this->_disapprovalMessage, 'unit');
+					]) . "\n \n" . $this->_message, 'unit');
+				}
+				if ($this->_subMethod == 'addinformation'){
+					$order = $statement->fetch(PDO::FETCH_ASSOC);
+					$decoded_order_data = json_decode($order['order_data'], true);
+					if (array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data)){
+						$decoded_order_data[LANG::PROPERTY('order.additional_info')] .= "\n".$this->_message;
+					}
+					else $decoded_order_data[LANG::PROPERTY('order.additional_info')]=$this->_message;
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-addinformation'));
+					$statement->execute([
+						':order_data' => json_encode($decoded_order_data),
+						':id' => $this->_requestedID
+					]);
+					$this->_subMethod = 'add_information_confirmation';
 				}
 				$result=[
 					'status' => [
@@ -736,7 +751,7 @@ class ORDER extends API {
 				$order = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($order as $row) {
 					$content = [];
-					$text = '\n';
+					$text = "\n";
 					$decoded_order_data = json_decode($row['order_data'], true);
 					if (array_key_exists(LANG::PROPERTY('order.barcode'), $decoded_order_data) && strlen($decoded_order_data[LANG::PROPERTY('order.barcode')])) $content[]=[
 						'type' => 'image',
@@ -789,12 +804,14 @@ class ORDER extends API {
 						':number' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
 						':name' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
 						':vendor' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''
-					]).'\n';
+					])."\n";
 
-					$text .= '\n';
-					$text .= LANG::GET('order.unit') . ': ' . $row['organizational_unit'] . '\n';
+					$text .= "\n";
+					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.additional_info')))
+						$text .= LANG::GET('order.additional_info') . ': ' . $additional_information . "\n \n";
+					$text .= LANG::GET('order.unit') . ': ' . $row['organizational_unit'] . "\n";
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
-					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . '\n';
+					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . "\n";
 
 					$copy = [
 						[
@@ -822,7 +839,7 @@ class ORDER extends API {
 					foreach(['ordered','received','archived'] as $s){
 						if (boolval($row[$s])) {
 							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true, 'data-' . $s => true];
-							$text .= '\n' . LANG::GET('order.' . $s) . ': ' . $row[$s];
+							$text .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
 						else {
 							if (
@@ -845,7 +862,6 @@ class ORDER extends API {
 							"if (response.target.returnValue==='true') {" .
 							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', document.querySelector('dialog>form>textarea').value); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
-						//'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', document.querySelector('dialog>form>textarea').value); this.disabled=true; this.setAttribute('data-disapproved', 'true');"
 					];
 
 					$content[] = [
@@ -872,6 +888,18 @@ class ORDER extends API {
 						'type' => 'br'
 					];
 
+					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
+						'type' => 'button',
+						'description' => LANG::GET('order.add_information'),
+						'attributes' => [
+							'type' => 'button',
+							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', body: '". LANG::GET('order.add_information_modal_body') ."', options:{".
+								"'".LANG::GET('order.add_information_cancel')."': false,".
+								"'".LANG::GET('order.add_information_ok')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', document.querySelector('dialog>form>textarea').value)})"
+						]
+					];
+
 					$content[] = [
 						'type' => 'checkbox',
 						'content' => $status
@@ -882,7 +910,7 @@ class ORDER extends API {
 						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
 							'type' => 'button',
-							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
+							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
 								"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
 								"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'approved', " . $row['id'] . ")})"
