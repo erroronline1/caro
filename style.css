@@ -120,8 +120,6 @@ main {
 dialog {
 	position: fixed;
 	display: block;
-	bottom: 6em;
-	width: 30em;
 	border-radius: 1em;
 	border: 1px solid var(--lightershadow);
 	backdrop-filter: blur(10px);
@@ -132,6 +130,11 @@ dialog {
 	transition: ease .3s;
 	pointer-events: none;
 	overflow: hidden;
+	width: 30em;
+
+	&#toast {
+		bottom: 6em;
+	}
 
 	.confirmButton {
 		width: auto;
