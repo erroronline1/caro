@@ -45,9 +45,10 @@ export const assemble_helper = {
 
 			label.htmlFor = 'userMenu' + group;
 			label.style.maskImage = label.style.webkitMaskImage = icons[group];
+			div.setAttribute('data-for', 'userMenu' + group);
 			div.setAttribute('data-notification', 0);
 			div.append(label);
-			
+
 			input = document.createElement('input');
 			input.type = 'radio';
 			input.name = 'userMenu';

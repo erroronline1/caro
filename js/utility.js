@@ -53,7 +53,7 @@ const _serviceWorker = {
 			}
 		}
 		if ('unseen' in data) {
-			const mailnotif = document.querySelector('[for=userMenu' + LANG.GET('menu.message_header') + ']');
+			const mailnotif = document.querySelector('[data-for=userMenu' + LANG.GET('menu.message_header') + ']');
 			mailnotif.setAttribute('data-notification', data.unseen);
 		}
 	}
