@@ -356,10 +356,10 @@ a:visited {
 	color: var(--cta_darker);
 	text-decoration: none;
 	outline: none;
+	display: block;
 }
 
 a[data-filtered] {
-	display: block;
 	line-height: 3em;
 }
 
