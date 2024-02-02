@@ -802,6 +802,35 @@ class ORDER extends API {
 				break;
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+				// delete old received unarchived orders
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-received'));
+				$statement->execute([
+					':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24)),
+				]);
+				$old = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach ($old as $row){
+					/**
+					 * also see delete method!
+					 */
+					$order = json_decode($row['order_data'], true);
+					if (array_key_exists('attachments', $order)){
+						$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
+						$statement->execute([
+							':substr' => $order['attachments']
+						]);
+						$others = $statement->fetchAll(PDO::FETCH_ASSOC);
+						if (count($others)<2){
+							$files = explode(',', $order['attachments']);
+							UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+						}
+					}
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
+					$statement->execute([
+						':id' => $row['id']
+					]);
+				}
+
 				$result=['body'=>['content'=>[
 					[
 						['type' => 'radio',

@@ -218,6 +218,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
 		],
+		'order_get-approved-order-by-received' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE received < :date_time AND archived IS NULL",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE received < :date_time AND archived IS NULL"
+		],		
 		'order_delete-approved-order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"

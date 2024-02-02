@@ -94,10 +94,9 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 # open tasks
 * filter length string orders
 * filter by fields? dropdown?
-* unarchived but received delete after x days
 
 * forms and contexts
-* pdf export
+* pdf export (https://github.com/tecnickcom/TCPDF?tab=readme-ov-file)
 * vendor list
 * user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
