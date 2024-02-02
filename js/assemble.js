@@ -109,7 +109,7 @@ export class Dialog {
 		this.options = options.options || {};
 		this.scannerElements = {};
 
-		const dialog = document.querySelector('dialog');
+		const dialog = document.getElementById('modal');
 		if (this.type) {
 			const form = document.createElement('form');
 			form.method = 'dialog';

@@ -78,7 +78,7 @@ export const api = {
 	},
 	loadindicatorTimeout: [],
 	toast: function (msg) {
-		const toast = document.querySelector('dialog');
+		const toast = document.getElementById('toast');
 		if (typeof msg !== 'undefined') {
 			toast.innerHTML = msg;
 			toast.show();
