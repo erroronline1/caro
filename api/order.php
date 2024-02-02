@@ -285,7 +285,7 @@ class ORDER extends API {
 		// handle attachments
 		$attachments = [];
 		if (array_key_exists('attachments', $_FILES) && $_FILES['attachments']['tmp_name'][0]){
-			$attachments = UTILITY::storeUploadedFiles(['attachments'], '../' . INI['order']['attachment_folder'], [time()]);
+			$attachments = UTILITY::storeUploadedFiles(['attachments'], UTILITY::directory('order_attachments'), [time()]);
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, 1);
 				else unset($attachments[$key]);

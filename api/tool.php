@@ -182,7 +182,7 @@ class TOOL extends API {
 	public function stlviewer(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 
-		$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+		$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
 		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 		foreach ($folders as $folder) {
 			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));

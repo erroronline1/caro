@@ -13,7 +13,7 @@ class FILE extends API {
 	}
 
 	public function filter(){
-		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
 		else {
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			$files = [];
@@ -167,7 +167,7 @@ class FILE extends API {
 					];
 				}
 				else {
-					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
 					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						$result['body']['content'][]=[
@@ -217,7 +217,7 @@ class FILE extends API {
 				$this->response($result);
 				break;
 			case 'DELETE':
-				if ($this->_requestedFolder === 'sharepoint') $success = UTILITY::delete('../' . INI['sharepoint']['folder'] . '/' . $this->_requestedFile);
+				if ($this->_requestedFolder === 'sharepoint') $success = UTILITY::delete(UTILITY::directory('sharepoint') . '/' . $this->_requestedFile);
 				else $success = UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
 				if ($success) $this->response(['status' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
@@ -402,7 +402,7 @@ class FILE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['files'], '../' . INI['sharepoint']['folder'], [$_SESSION['user']['name']]);
+					UTILITY::storeUploadedFiles(['files'], UTILITY::directory('sharepoint'), [$_SESSION['user']['name']]);
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['sharepoint']
@@ -420,17 +420,17 @@ class FILE extends API {
 					'content'=>[]]
 				];
 
-				$files = UTILITY::listFiles('../' . INI['sharepoint']['folder'] ,'asc');
+				$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
 				$display=[];
 				if ($files){
 					foreach ($files as $file){
 						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
 						$filetime=filemtime($file['path']);
-						if ((time()-$filetime)/3600 > INI['sharepoint']['lifespan']) {
+						if ((time()-$filetime)/3600 > INI['lifespan']['sharepoint']) {
 							UTILITY::delete($file['path']);
 						}
 						else {
-							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['sharepoint']['lifespan']*3600 - time()) / 3600, 1)]);
+							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
 							$display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
 						}
 					}
