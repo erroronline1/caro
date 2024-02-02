@@ -900,7 +900,7 @@ button[data-type=generateupdate]::before {
 	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url('./media/repeat-alt.svg');
-	mask-image: url('./media/check-double.svg');
+	mask-image: url('./media/repeat-double.svg');
 }
 
 
