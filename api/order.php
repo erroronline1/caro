@@ -107,6 +107,7 @@ class ORDER extends API {
 								])."\n";
 								}
 							} else {
+								if ($key=='attachments') continue;
 								$info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";
 							}
 						}
@@ -305,11 +306,11 @@ class ORDER extends API {
 					// being ignored the items keys are reduced by 1
 					if (boolval($subvalue)) {
 						if (!array_key_exists(intval($index) - 1, $order_data['items'])) $order_data['items'][]=[];
-						$order_data['items'][intval($index) - 1][$key] = trim($subvalue);
+						$order_data['items'][intval($index) - 1][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
 					}
 				}
 			} else {
-				if (boolval($value)) $order_data[$key] = trim($value);
+				if (boolval($value)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
 			}
 		}
 		$order_data[LANG::GET('order.orderer')]=$_SESSION['user']['name'];
@@ -321,15 +322,14 @@ class ORDER extends API {
 	private function postApprovedOrder($processedOrderData){
 		$keys = array_keys($processedOrderData['order_data']);
 		$order_data2 = [];
-		$query = '';
 		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
 				if (!in_array($key, ['items',LANG::PROPERTY('order.unit')])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
-			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
+			$query = strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 			[
-				':order_data' => "'" . json_encode($order_data2) . "'",
+				':order_data' => "'" . json_encode($order_data2, JSON_UNESCAPED_SLASHES) . "'",
 				':organizational_unit' => "'" . $processedOrderData['order_data'][LANG::PROPERTY('order.unit')] . "'",
 				':approval' => "'" . $processedOrderData['approval'] . "'",
 			]) . '; ';
@@ -356,13 +356,14 @@ class ORDER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				$processedOrderData =$this->processOrderForm();
+				$processedOrderData = $this->processOrderForm();
+
 				if (!$processedOrderData['approval']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
 					$statement->execute([
-						':order_data' => json_encode($processedOrderData['order_data'])
+						':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES)
 					]);
-					$result=[
+					$result = [
 						'status' => [
 							'id' => $this->_pdo->lastInsertId(),
 							'msg' => LANG::GET('order.saved_to_prepared')
@@ -379,10 +380,10 @@ class ORDER extends API {
 				if (!$processedOrderData['approval']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-prepared-order'));
 					$statement->execute([
-						':order_data' => json_encode($processedOrderData['order_data']),
+						':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES),
 						':id' => $this->_requestedID
 					]);
-					$result=[
+					$result = [
 						'status' => [
 							'id' => $this->_requestedID,
 							'msg' => LANG::GET('order.saved_to_prepared')
@@ -392,7 +393,7 @@ class ORDER extends API {
 				
 				$result = $this->postApprovedOrder($processedOrderData);
 
-				if ($result['status']['msg']==LANG::GET('order.saved')){
+				if ($result['status']['msg'] == LANG::GET('order.saved')){
 					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
 					$statement = $this->_pdo->prepare($query);
 					$statement->execute();
@@ -402,7 +403,7 @@ class ORDER extends API {
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
 				$datalist_unit = [];
-				$vendors=[];
+				$vendors = [];
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
@@ -695,7 +696,7 @@ class ORDER extends API {
 				$order = json_decode($order['order_data'], true);
 				if (array_key_exists('attachments', $order)){
 					$files = explode(',', $order['attachments']);
-					UTILITY::delete($files);
+					UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
 				}
 
 				// delete prepared order
@@ -757,7 +758,7 @@ class ORDER extends API {
 					// add to prepared orders
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
 					$statement->execute([
-						':order_data' => json_encode($prepared)
+						':order_data' => json_encode($prepared, JSON_UNESCAPED_SLASHES)
 					]);
 					// delete approved order
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
@@ -789,7 +790,7 @@ class ORDER extends API {
 					else $decoded_order_data[LANG::PROPERTY('order.additional_info')]=$this->_message;
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-addinformation'));
 					$statement->execute([
-						':order_data' => json_encode($decoded_order_data),
+						':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
 						':id' => $this->_requestedID
 					]);
 					$this->_subMethod = 'add_information_confirmation';
@@ -1036,10 +1037,10 @@ class ORDER extends API {
 					$statement->execute([
 						':substr' => $order['attachments']
 					]);
-					$others =$statement->fetchAll(PDO::FETCH_ASSOC);
+					$others = $statement->fetchAll(PDO::FETCH_ASSOC);
 					if (count($others)<2){
 						$files = explode(',', $order['attachments']);
-						UTILITY::delete($files);
+						UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
 					}
 				}
 
@@ -1047,13 +1048,13 @@ class ORDER extends API {
 				if ($statement->execute([
 					':id' => $this->_requestedID
 					])) {
-					$result=[
+					$result = [
 					'status' => [
 						'id' => false,
 						'msg' => LANG::GET('order.deleted')
 					]];
 				}
-				else $result=[
+				else $result = [
 					'status' => [
 						'id' => $this->_requestedID,
 						'msg' => LANG::GET('order.failed_delete')

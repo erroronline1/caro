@@ -754,6 +754,7 @@ export class Assemble {
 
 		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode('Reset'));
+		button.type = 'button';
 		button.setAttribute('data-type', 'reset');
 		button.classList.add('inlinebutton');
 		return [...this.header(), input, label, button, ...this.hint()];

@@ -382,7 +382,8 @@ input[type=number] {
 
 input[type=radio],
 input[type=checkbox] {
-	display: none
+	appearance: none;
+	display: initial
 }
 
 .radio,
@@ -395,7 +396,6 @@ input[type=checkbox] {
 	width: fit-content;
 	border: 1px solid var(--darkshadow);
 	vertical-align: middle;
-
 }
 
 .checkbox {
