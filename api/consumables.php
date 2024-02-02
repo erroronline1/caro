@@ -673,8 +673,8 @@ class CONSUMABLES extends API {
 				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
 					[
 						['type' => 'deletebutton',
-						'description' => LANG::GET('consumables.edit_product_delete'),
 						'attributes' => [
+							'value' => LANG::GET('consumables.edit_product_delete'),
 							'type' => 'button', // apparently defaults to submit otherwise
 							'onpointerup' => $product['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('consumables.edit_product_delete_confirm_header', [':name' => $product['article_name']]) ."', 'options':{".
 								"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".

@@ -122,9 +122,11 @@ class ORDER extends API {
 							'content' => [LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]]
 							],
 							['type' => 'button',
-							'description' => LANG::GET('order.edit_prepared_order'),
-							'attributes' =>['type' => 'button',
-							'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]]
+							'attributes' =>[
+								'value' => LANG::GET('order.edit_prepared_order'),
+								'type' => 'button',
+								'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]
+							]
 						]);
 						if (array_key_exists('attachments', $processedOrderData)){
 							$files = [];
@@ -662,8 +664,8 @@ class ORDER extends API {
 							],
 							[
 								'type' => 'deletebutton',
-								'description' => LANG::GET('order.add_delete'),
 								'attributes' => [
+									'value' => LANG::GET('order.add_delete'),
 									'onpointerup' => 'this.parentNode.remove()'
 								]
 							]
@@ -673,8 +675,8 @@ class ORDER extends API {
 				}
 				if ($this->_requestedID) array_push($result['body']['content'], [
 					['type' => 'deletebutton',
-					'description' => LANG::GET('order.delete_prepared_order'),
 					'attributes' => [
+						'value' => LANG::GET('order.delete_prepared_order'),
 						'type' => 'button', // apparently defaults to submit otherwise
 						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
 							"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
@@ -1021,8 +1023,8 @@ class ORDER extends API {
 
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'button',
-						'description' => LANG::GET('order.add_information'),
 						'attributes' => [
+							'value' => LANG::GET('order.add_information'),
 							'type' => 'button',
 							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', body: '". LANG::GET('order.add_information_modal_body') ."', options:{".
 								"'".LANG::GET('order.add_information_cancel')."': false,".
@@ -1038,8 +1040,8 @@ class ORDER extends API {
 
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'deletebutton',
-						'description' => LANG::GET('order.delete_prepared_order'),
 						'attributes' => [
+							'value' => LANG::GET('order.delete_prepared_order'),
 							'type' => 'button',
 							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
 								"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".

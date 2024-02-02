@@ -340,8 +340,8 @@ class USER extends API {
 						'content' => [LANG::GET('user.edit_token_renew') => []]
 						],
 						['type' => 'deletebutton',
-						'description' => LANG::GET('user.edit_delete_button'),
 						'attributes' => [
+							'value' => LANG::GET('user.edit_delete_button'),
 							'type' => 'button', // apparently defaults to submit otherwise
 							'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
 								"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".

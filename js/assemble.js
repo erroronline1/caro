@@ -276,8 +276,8 @@ export class Assemble {
 
 			this.content.push([{
 				type: 'submitbutton',
-				description: LANG.GET('general.submit_button'),
 				attributes: {
+					value: LANG.GET('general.submit_button'),
 					type: 'submit',
 				}
 			}]);
@@ -677,7 +677,6 @@ export class Assemble {
 		}*/
 		let button = document.createElement('button');
 		button.id = getNextElementID();
-		if (this.currentElement.description) button.appendChild(document.createTextNode(this.currentElement.description));
 		if (this.currentElement.attributes.value !== undefined) {
 			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
 			delete this.currentElement.attributes.value;
@@ -1011,11 +1010,10 @@ export class Assemble {
 		if (this.currentElement.attributes && this.currentElement.attributes.required) canvas.setAttribute('data-required', 'required');
 		result.push(canvas);
 		//this tile does not process attributes, therefore they can be reassigned
-		this.currentElement.description = LANG.GET('assemble.clear_signature');
 		this.currentElement.attributes = {
-			'type': 'button',
-			'name': '',
-			'onpointerup': 'signaturePad.clear()'
+			value: LANG.GET('assemble.clear_signature'),
+			type: 'button',
+			onpointerup: 'signaturePad.clear()'
 		};
 		result = result.concat(this.deletebutton());
 		const input = document.createElement('input');
@@ -1046,13 +1044,13 @@ export class Assemble {
 			result = result.concat(input);
 		}
 		//attributes are processed already, therefore they can be reassigned
-		this.currentElement.description = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
 		this.currentElement.attributes = {
-			'onpointerup': "new Dialog({type:'scanner'}).then((response) => {" +
+			value: this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button'),
+			onpointerup: "new Dialog({type:'scanner'}).then((response) => {" +
 				"document.getElementById('" + inputid + "').value = document.querySelector('dialog>form>input').value;" +
 				"});",
 			'data-type': 'scanner',
-			'type': 'button'
+			type: 'button'
 		};
 		result.push(this.button())
 		return result;
@@ -1108,10 +1106,11 @@ export class Assemble {
 		if (!this.currentElement.attributes.imageonly) {
 			//this tile does not process attributes, therefore they can be reassigned
 			this.currentElement.attributes = {
-				'type': 'button',
-				'class': 'inlinebutton',
+				value: this.currentElement.description,
+				type: 'button',
+				class: 'inlinebutton',
 				'data-type': this.currentElement.type,
-				'onpointerup': 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")'
+				onpointerup: 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")'
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
 			result = result.concat(this.button());

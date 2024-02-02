@@ -124,8 +124,8 @@ class TOOL extends API {
 				'content' => $options],
 				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content'],
 				['type' => 'submitbutton',
-				'description' => LANG::GET('tool.code_create_button'),
 				'attributes' =>[
+					'value' => LANG::GET('tool.code_create_button'),
 					'type' => 'button',
 					'onpointerup' =>  "api.tool('get', 'code', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "', 'display')"
 				]]

@@ -262,8 +262,8 @@ class APPLICATION extends API {
 				];
 				if ($entry['id']) $result['body']['content'][] = [
 						['type' => 'deletebutton',
-						'description' => LANG::GET('application.edit_manual_delete'),
 						'attributes' => [
+							'value' => LANG::GET('application.edit_manual_delete'),
 							'type' => 'button',
 							'onpointerup' => "if (confirm('" . LANG::GET('application.edit_manual_delete_confirm') . "')) api.application('delete', 'manual', " . $entry['id'] . ")"
 						]

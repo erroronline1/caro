@@ -201,8 +201,8 @@ class MESSAGE extends API {
 					'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
 					],
 					['type' => 'deletebutton',
-					'description' => LANG::GET('message.delete'),
 					'attributes' => [
+						'value' => LANG::GET('message.delete'),
 						'type' => 'button',
 						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
 							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
@@ -212,8 +212,8 @@ class MESSAGE extends API {
 				];
 				if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
 					['type' => 'button',
-					'description' => LANG::GET('message.reply'),
 					'attributes' => [
+						'value' => LANG::GET('message.reply'),
 						'type' => 'button',
 						'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'reply')" 
 						]]
@@ -280,16 +280,19 @@ class MESSAGE extends API {
 					'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
 					],
 					['type' => 'button',
-					'description' => LANG::GET('message.forward'),
 					'attributes' => [
+						'value' => LANG::GET('message.forward'),
 						'type' => 'button',
 						'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'sent')" 
 					]],
 					['type' => 'deletebutton',
-					'description' => LANG::GET('message.delete'),
 					'attributes' => [
+						'value' => LANG::GET('message.delete'),
 						'type' => 'button',
-						'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'sent')" 
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
+							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
+							"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+							"}}).then(function(r){if (r.target.returnValue==='true') api.message('delete', 'message', " . $message['id'] . ", 'sent')})"
 					]]
 				];
 				if ($message['image']) array_splice($content[count($content)-1], 0, 0, [

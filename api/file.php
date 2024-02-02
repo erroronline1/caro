@@ -143,8 +143,8 @@ class FILE extends API {
 								'description' => LANG::GET('file.manager_folder_header', [':date' => date('Y-m-d H:i', filemtime($folder))]),
 								'content' => [$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]]],
 								['type' => 'deletebutton',
-								'description' => LANG::GET('file.manager_delete_folder'),
 								'attributes' => [
+									'value' => LANG::GET('file.manager_delete_folder'),
 									'type' => 'button',
 									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $foldername]) ."', 'options':{".
 										"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
@@ -187,8 +187,8 @@ class FILE extends API {
 								'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
 								'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]]],
 								['type' => 'deletebutton',
-								'description' => LANG::GET('file.manager_delete_file'),
 								'attributes' => [
+									'value' => LANG::GET('file.manager_delete_file'),
 									'type' => 'button',
 									'data-filtered' => $file['path'],
 									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', 'options':{".
