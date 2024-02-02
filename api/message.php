@@ -204,7 +204,10 @@ class MESSAGE extends API {
 					'description' => LANG::GET('message.delete'),
 					'attributes' => [
 						'type' => 'button',
-						'onpointerup' => "api.message('delete', 'message', " . $message['id'] . ", 'inbox')" 
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
+							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
+							"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+							"}}).then(function(r){if (r.target.returnValue==='true') api.message('delete', 'message', " . $message['id'] . ", 'inbox')})"
 					]]
 				];
 				if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
