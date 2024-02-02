@@ -38,14 +38,16 @@ export const assemble_helper = {
 		icons[LANG.GET('menu.files_header')] = "url('media/cloud-download.svg')";
 		icons[LANG.GET('menu.tools_header')] = "url('media/tools.svg')";
 
-		let label, input, ul, li, link;
+		let label, div, input, ul, li, link;
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement('label');
+			div = document.createElement('div');
 
-			label.style.maskImage = label.style.webkitMaskImage = icons[group];
 			label.htmlFor = 'userMenu' + group;
-			label.setAttribute('data-notification', 0);
-
+			label.style.maskImage = label.style.webkitMaskImage = icons[group];
+			div.setAttribute('data-notification', 0);
+			div.append(label);
+			
 			input = document.createElement('input');
 			input.type = 'radio';
 			input.name = 'userMenu';
@@ -68,7 +70,7 @@ export const assemble_helper = {
 				} else li.append(document.createTextNode(description))
 				ul.append(li);
 			}
-			elements.push(label);
+			elements.push(div);
 			elements.push(input);
 			elements.push(ul);
 		}

@@ -26,7 +26,7 @@ class APPLICATION extends API {
 				'name' => $result['name'],
 				'permissions' => explode(',', $result['permissions']),
 				'units' => explode(',', $result['units']),
-				'image' => $result['image'],
+				'image' => './' . $result['image'],
 				'id' => $result['id']
 			];
 			$this->response(['body' => $_SESSION['user']]);

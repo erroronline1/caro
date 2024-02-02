@@ -252,26 +252,32 @@ nav {
 	vertical-align: top;
 	text-align: center;
 
-	label {
+	div[data-notification]::after {
+		content: attr(data-notification);
+		color: var(--red);
+		position: absolute;
+		margin-top: -3.5em;
+		margin-left: 2em;
+		font-size: .75em;
+	}
+
+	div[data-notification='0']::after {
+		display: none;
+	}
+
+	div {
 		display: inline-block;
-		background-color: var(--cta_darker);
-		cursor: pointer;
 		margin: 0 .75em;
-		width: 2.5em;
-		height: 2.5em;
-		padding: .2em;
+		width: fit-content;
+		height: fit-content;
 
-		&[data-notification]::after {
-			content: attr(data-notification);
-			color: var(--red);
-			position: absolute;
-			margin-top: -.5em;
-			margin-left: 1.75em;
-			font-size: .75em;
-		}
-
-		&[data-notification='0']::after {
-			display: none;
+		label {
+			display: block;
+			background-color: var(--cta_darker);
+			cursor: pointer;
+			width: 2.5em;
+			height: 2.5em;
+			padding: .2em;
 		}
 	}
 
@@ -280,7 +286,7 @@ nav {
 		width: auto;
 	}
 
-	label:first-of-type {
+	div:first-of-type>label {
 		border-radius: 50%;
 		background-size: cover;
 		background-repeat: no-repeat;
