@@ -13,47 +13,56 @@ export const compose_helper = {
 	newFormComponents: {},
 	newFormElements: new Set(),
 	getNextElementID: getNextElementID,
-	composeNewElementCallback: function (e) {
-		e = document.getElementById(e).childNodes[0];
-		let sibling = e.nextSibling,
-			property, value, element = {},
-			attributes = {};
+	composeNewElementCallback: function (parent) {
+		let sibling = parent.childNodes[0].nextSibling,
+			setTo, name, value, element = {
+				attributes: {}
+			};
+		const setName = {
+			name: ['select', 'signature', 'scanner'],
+			description: ['links', 'photo', 'file', 'checkbox', 'radio']
+		};
 		do {
-			if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header'].includes(sibling.localName)) {
+			if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header', 'br'].includes(sibling.localName)) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
-			element['type'] = sibling.name.match(/(_(.+)-)/)[2];
-			property = sibling.name.match(/(-(.+)$)/)[2];
+			if (sibling.localName === 'span') {
+				if (element.type === undefined) element['type'] = sibling.dataset.type;
+				sibling = sibling.nextSibling;
+				continue;
+			}
+			name = sibling.name.replace(/\(.*?\)|\[\]/g, '');
 			value = sibling.value;
-			if (['links', 'checkbox', 'radio', 'select'].includes(element['type'])) {
-				if (property === 'description')
-					if (value) element[property] = value;
+
+			//names
+
+			if (['links', 'radio', 'select', 'checkbox'].includes(element.type)) {
+				if (name === LANG.GET('assemble.compose_multilist_name')) {
+					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
+					if (value && setTo === 'name') element.attributes['name'] = value;
+					else if (value && setTo === 'description') element['description'] = value;
 					else return;
-				if (property === 'attributes' && value) {
-					try {
-						attributes = JSON.parse(value);
-					} catch (err) {
-						return
-					};
-					sibling = sibling.nextSibling;
-					continue;
 				}
-				if (property === 'content' && value) {
+				if (name === LANG.GET('assemble.compose_multilist_add_item') && value) {
 					if (element.content === undefined) element.content = {};
-					element.content[value] = attributes;
+					element.content[value] = {};
+				}
+			} else if (['file', 'photo', 'signature', 'scanner'].includes(element.type)) {
+				if (name === LANG.GET('assemble.compose_simple_element')) {
+					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
+					if (value && setTo === 'name') element.attributes['name'] = value;
+					else if (value && setTo === 'description') element['description'] = value;
+					else return;
 				}
 			} else {
-				if (property === 'attributes' && value.length) try {
-					value = JSON.parse(value);
-				} catch {
-					return;
-				};
-				if (value) element[property] = value;
+				if (name === LANG.GET('assemble.compose_field_name'))
+					if (value) element.attributes['name'] = value;
+					else return;
 			}
-			if (element['type']==='signature'){
-				element['attributes']={'required':'required'};
-			}
+			if (name === LANG.GET('assemble.compose_field_hint') && value) element['hint'] = value;
+			if (name === 'required' && sibling.checked) element.attributes['required'] = true;
+			if (name === 'multiple' && sibling.checked) element.attributes['multiple'] = true;
 			sibling = sibling.nextSibling;
 		} while (sibling !== undefined && sibling != null);
 
@@ -230,7 +239,7 @@ export const compose_helper = {
 export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
-		this.createDraggable = this.setup.draggable;
+		this.createDraggable = setup.draggable;
 		this.createdArticles = [];
 
 		this.initializeSection();
@@ -238,308 +247,281 @@ export class Compose extends Assemble {
 		return this.createdArticles;
 	}
 
-	single(tileProperties, oneOfFew = false) { // overriding parent method
-		let dragContainer = document.createElement('div');
-		const article = document.createElement('article'),
-			form = document.createElement('form');
-		article.setAttribute('data-type', this.tile.type);
-		article.id = getNextElementID();
-		form.action = "javascript:compose_helper.composeNewElementCallback('" + article.id + "')";
-		article.append(...this.elements);
-		if (this.tile.type === 'trash') compose_helper.composer_add_trash(article);
-		form.append(article);
-		form.setAttribute('data-type', 'composer-form');
-		this.createdArticles.push({
-			id: article.id,
-			content: tileProperties
-		});
-		if (tileProperties.form) return form;
-		if (this.createDraggable && oneOfFew) {
-			compose_helper.create_draggable(dragContainer);
-			dragContainer.append(article);
-			return dragContainer;
-		}
-		return article;
-	}
-
 	compose_text() {
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'name': 'compose_text-description',
-				'placeholder': LANG.GET('assemble.compose_text_description_label'),
-				'required': true
+		let result = [];
+		this.currentElement = {
+			type: 'text',
+			attributes: {
+				name: LANG.GET('assemble.compose_text_description'),
+				required: true
 			}
 		};
-		this.textinput();
-		this.tile = {
-			'type': 'textarea',
-			'description': 'compose_text-content',
-			'attributes': {
-				'name:': 'compose_text-content',
-				'placeholder': LANG.GET('assemble.compose_text_content_label'),
-				'rows': 5
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			type: 'textarea',
+			attributes: {
+				name: LANG.GET('assemble.compose_text_content'),
+				rows: 5
 			}
 		};
-		this.textarea();
-		// due to the assembler, type (for icon) has to be in the last element
-		this.tile = {
-			'type': 'text',
-			'description': LANG.GET('assemble.compose_add_block', {
-				':type': 'text'
-			}),
-			'attributes': {
+		result = result.concat(...this.textarea());
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET('assemble.compose_text'),
 				'data-type': 'addblock',
-				'type': 'submit'
+				type: 'submit',
+				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
-		this.button();
+		result.push(this.button());
+		return result;
 	}
 
 	compose_input(type) {
-		/* type{type, description, addblock} */
-
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'name': 'compose_' + type.type + '-description',
-				'placeholder': LANG.GET('assemble.compose_description_label'),
-				'required': true
+		let result = [];
+		this.currentElement = {
+			type: type.type,
+			attributes: {
+				name: LANG.GET('assemble.compose_field_name'),
+				required: true
 			}
 		};
-		this.textinput();
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'name': 'compose_' + type.type + '-attributes',
-				'placeholder': LANG.GET('assemble.compose_attributes_label'),
-				'pattern': '^\\{.+\\}$|^$',
-				'title': 'json object with double quotes'
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			type: 'text',
+			attributes: {
+				name: LANG.GET('assemble.compose_field_hint'),
 			}
 		};
-		if (type.attributes) this.tile.attributes.value = type.attributes;
-		this.textinput();
-		// due to the assembler, type (for icon) has to be in the last element
-		this.tile = {
-			'type': type.type,
-			'description': LANG.GET('assemble.compose_add_block', {
-				':type': type.addblock
-			}),
-			'attributes': {
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			content: {}
+		};
+		this.currentElement.content[LANG.GET('assemble.compose_required')] = {
+			name: 'required'
+		};
+		result = result.concat(this.br(), ...this.checkbox());
+		this.currentElement = {
+			attributes: {
+				value: type.description,
 				'data-type': 'addblock',
-				'type': 'submit'
+				type: 'submit',
+				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
-		this.button();
+		result.push(this.button());
+		return result;
 	}
 	compose_textinput() {
-		this.compose_input({
+		return this.compose_input({
 			type: 'textinput',
 			description: LANG.GET('assemble.compose_textinput'),
-			addblock: 'text input'
 		});
 	}
 	compose_numberinput() {
-		this.compose_input({
+		return this.compose_input({
 			type: 'numberinput',
 			description: LANG.GET('assemble.compose_numberinput'),
-			addblock: 'number input'
 		});
 	}
 	compose_dateinput() {
-		this.compose_input({
+		return this.compose_input({
 			type: 'dateinput',
 			description: LANG.GET('assemble.compose_dateinput'),
-			addblock: 'date input'
-		});
-	}
-	compose_submit() {
-		this.compose_input({
-			type: 'submit'
 		});
 	}
 	compose_textarea() {
-		this.compose_input({
+		return this.compose_input({
 			type: 'textarea',
 			description: LANG.GET('assemble.compose_textarea'),
-			addblock: 'multiline text input'
-		});
-	}
-	compose_hiddeninput() {
-		this.compose_input({
-			type: 'hiddeninput',
-			description: LANG.GET('assemble.compose_hiddeninput'),
-			addblock: 'hidden field',
-			attributes: '{"value":"usecase"}'
 		});
 	}
 
 	compose_multilist(type) {
-		/* type{type, description, additem, addblock} */
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'name': 'compose_' + type.type + '-description',
-				'placeholder': LANG.GET('assemble.compose_description_label'),
-				'required': true
+		let result = [];
+		this.currentElement = {
+			type: type.type,
+			attributes: {
+				name: LANG.GET('assemble.compose_multilist_name'),
+				required: true
 			}
 		};
-		this.textinput();
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'name': 'compose_' + type.type + '-content',
-				'placeholder': LANG.GET('assemble.compose_multilist_add_item')
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			type: 'text',
+			attributes: {
+				name: LANG.GET('assemble.compose_field_hint'),
 			}
 		};
-		this.textinput();
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'name': 'compose_' + type.type + '-attributes',
-				'placeholder': LANG.GET('assemble.compose_attributes_label'),
-				'pattern': '^\\{.+\\}$|^$',
-				'title': 'json object with double quotes'
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			type: 'textinput',
+			attributes: {
+				name: LANG.GET('assemble.compose_multilist_add_item') + '[]'
 			}
 		};
-		this.textinput();
-		this.tile = {
-			'type': type.type,
-			'description': LANG.GET('assemble.compose_multilist_add_item_button', {
-				':type': type.additem
-			}),
-			'attributes': {
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET('assemble.compose_multilist_add_item_button'),
 				'data-type': 'additem',
-				'onpointerdown': cloneItems
+				type: 'button',
+				onpointerdown: cloneItems
 			}
 		};
-		this.button();
-		// due to the assembler, type (for icon) has to be in the last element
-		this.tile = {
-			'type': type.type,
-			'description': LANG.GET('assemble.compose_multilist_add_block_button', {
-				':type': type.addblock
-			}),
-			'attributes': {
+		result.push(this.button());
+		if (type.required !== undefined) {
+			this.currentElement = {
+				content: {}
+			};
+			this.currentElement.content[LANG.GET('assemble.compose_required')] = {
+				name: 'required'
+			};
+			result = result.concat(this.br(), ...this.checkbox());
+		}
+		this.currentElement = {
+			attributes: {
+				value: type.description,
 				'data-type': 'addblock',
-				'type': 'submit'
+				type: 'submit',
+				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
-		this.button();
+		result.push(this.button());
+		return result;
 	}
 	compose_select() {
-		this.compose_multilist({
+		return this.compose_multilist({
 			type: 'select',
 			description: LANG.GET('assemble.compose_select'),
-			additem: 'selection',
-			addblock: 'dropdown'
+			required: 'optional'
 		});
 	}
 	compose_checkbox() {
-		this.compose_multilist({
+		return this.compose_multilist({
 			type: 'checkbox',
 			description: LANG.GET('assemble.compose_checkbox'),
-			additem: 'selection',
-			addblock: 'multiple selection'
 		});
 	}
 	compose_radio() {
-		this.compose_multilist({
+		return this.compose_multilist({
 			type: 'radio',
 			description: LANG.GET('assemble.compose_radio'),
-			additem: 'selection',
-			addblock: 'single selection'
+			required: 'optional'
 		});
 	}
 	compose_links() {
-		this.compose_multilist({
+		return this.compose_multilist({
 			type: 'links',
 			description: LANG.GET('assemble.compose_links'),
-			additem: 'link',
-			addblock: 'link'
 		});
 	}
 
 	compose_simpleElement(type) {
-		/* type{type, description, addblock} */
-		this.tile = {
-			'type': 'textinput',
+		let result = [];
+		this.currentElement = {
+			'type': type.type,
 			'attributes': {
-				'name': 'compose_' + type.type + '-description',
-				'placeholder': LANG.GET('assemble.compose_description_label'),
+				'name': LANG.GET('assemble.compose_simple_element'),
 				'required': true
 			}
 		};
-		this.textinput();
-		// due to the assembler, type (for icon) has to be in the last element
-		this.tile = {
-			'type': type.type,
-			'description': LANG.GET('assemble.compose_simpleElement_add_button', {
-				':type': type.addblock
-			}),
-			'attributes': {
-				'data-type': 'addblock',
-				'type': 'submit'
+		result = result.concat(...this.textinput());
+		this.currentElement = {
+			type: 'text',
+			attributes: {
+				name: LANG.GET('assemble.compose_field_hint'),
 			}
 		};
-		this.button();
+		result = result.concat(...this.textinput());
+		if (type.required !== undefined) {
+			this.currentElement = {
+				content: {}
+			};
+			this.currentElement.content[LANG.GET('assemble.compose_required')] = {
+				name: 'required'
+			};
+			result = result.concat(this.br(), ...this.checkbox());
+		}
+		if (type.multiple !== undefined) {
+			this.currentElement = {
+				content: {}
+			};
+			this.currentElement.content[LANG.GET('assemble.compose_multiple')] = {
+				name: 'multiple'
+			};
+			result = result.concat(this.br(), ...this.checkbox());
+		}
+		this.currentElement = {
+			attributes: {
+				value: type.description,
+				'data-type': 'addblock',
+				type: 'submit',
+				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
+			}
+		};
+		result.push(this.button());
+		return result;
 	}
 
 	compose_file() {
-		this.compose_simpleElement({
+		return this.compose_simpleElement({
 			type: 'file',
 			description: LANG.GET('assemble.compose_file'),
-			addblock: 'file upload'
+			multiple: 'optional'
 		});
 	}
 	compose_photo() {
-		this.compose_simpleElement({
+		return this.compose_simpleElement({
 			type: 'photo',
 			description: LANG.GET('assemble.compose_photo'),
-			addblock: 'photo upload'
 		});
 	}
 	compose_signature() {
-		this.compose_simpleElement({
+		return this.compose_simpleElement({
 			type: 'signature',
 			description: LANG.GET('assemble.compose_signature'),
-			addblock: 'signature pad'
+			required: 'optional'
 		});
 	}
 	compose_scanner() {
-		this.compose_simpleElement({
+		return this.compose_simpleElement({
 			type: 'scanner',
 			description: LANG.GET('assemble.compose_scanner'),
-			addblock: 'qr-scanner'
 		});
 	}
 
 	compose_component(std = {
-		placeholder: LANG.GET('assemble.compose_component_label'),
+		name: LANG.GET('assemble.compose_component_name'),
 		description: LANG.GET('assemble.compose_component'),
 		action: 'api.form("post", "component")'
 	}) {
-		this.tile = {
-			'type': 'textinput',
-			'attributes': {
-				'id': 'ComponentName',
-				'name': 'setname',
-				'value': this.tile.value,
-				'placeholder': std.placeholder,
-				'required': true,
+		let result = [];
+		this.currentElement = {
+			content: std.description
+		};
+		result = result.concat(...this.text());
+		this.currentElement = {
+			type: 'textinput',
+			attributes: {
+				id: 'ComponentName',
+				value: this.currentElement.value || '',
+				name: std.name,
+				required: true,
 			}
 		};
-		this.textinput();
+		result = result.concat(...this.textinput());
 		// due to the assembler, type (for icon) has to be in the last element
-		this.tile = {
-			'type': 'save',
-			'description': std.description,
-			'attributes': {
-				'onpointerdown': std.action,
-				'type': 'button'
+		this.currentElement = {
+			type: 'save',
+			attributes: {
+				value: std.description,
+				onpointerdown: std.action,
+				type: 'button'
 			}
 		};
-		this.button();
+		result.push(this.button());
+		return result;
 	}
 	compose_form() {
 		this.compose_component({

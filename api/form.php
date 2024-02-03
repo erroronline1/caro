@@ -72,82 +72,86 @@ class FORMS extends API {
 		$return['body'] = [
 			'content' => [
 				[
-					['type' => 'datalist',
-					'content' => $datalist,
-					'attributes' => [
-						'id' => 'components'
-					]]
-				],[
-					['type' => 'searchinput',
-					'description' => LANG::GET('assemble.edit_existing_components'),
-					'attributes' => [
-						'placeholder' => LANG::GET('assemble.edit_existing_components_label'),
-						'list' => 'components',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component_editor', this.value); return false;}"
-					]],
-					['type' => 'select',
-					'description' => LANG::GET('assemble.edit_existing_components'),
-					'attributes' => [
-						'onchange' => "api.form('get', 'component_editor', this.value)"
+					[
+						'type' => 'datalist',
+						'content' => $datalist,
+						'attributes' => [
+							'id' => 'components'
+						]
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_existing_components_select'),
+							'onchange' => "api.form('get', 'component_editor', this.value)"
+						],
+						'content' => $options
+					], [
+						'type' => 'searchinput',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_existing_components'),
+							'list' => 'components',
+							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component_editor', this.value); return false;}"
+						]
 					],
-					'content' => $options]
-				],[[
-					'type' => 'text',
-					'description' => LANG::GET('assemble.edit_components_info_description'),
-					'content' => LANG::GET('assemble.edit_components_info_content')
-				], [
-					'form' => true,
-					'type' => 'compose_text',
-					'description' => LANG::GET('assemble.compose_text')
-				], [
-					'form' => true,
-					'type' => 'compose_textinput',
-					'description' => LANG::GET('assemble.compose_textinput')
-				], [
-					'form' => true,
-					'type' => 'compose_textarea',
-					'description' => LANG::GET('assemble.compose_textarea')
-				], [
-					'form' => true,
-					'type' => 'compose_numberinput',
-					'description' => LANG::GET('assemble.compose_numberinput')
-				], [
-					'form' => true,
-					'type' => 'compose_dateinput',
-					'description' => LANG::GET('assemble.compose_dateinput')
-				], [
-					'form' => true,
-					'type' => 'compose_links',
-					'description' => LANG::GET('assemble.compose_links')
-				], [
-					'form' => true,
-					'type' => 'compose_radio',
-					'description' => LANG::GET('assemble.compose_radio')
-				], [
-					'form' => true,
-					'type' => 'compose_checkbox',
-					'description' => LANG::GET('assemble.compose_checkbox')
-				], [
-					'form' => true,
-					'type' => 'compose_select',
-					'description' => LANG::GET('assemble.compose_select')
-				], [
-					'form' => true,
-					'type' => 'compose_file',
-					'description' => LANG::GET('assemble.compose_file')
-				], [
-					'form' => true,
-					'type' => 'compose_photo',
-					'description' => LANG::GET('assemble.compose_photo')
-				], [
-					'form' => true,
-					'type' => 'compose_signature',
-					'description' => LANG::GET('assemble.compose_signature')
-				], [
-					'form' => true,
-					'type' => 'compose_scanner',
-					'description' => LANG::GET('assemble.compose_scanner')
-				]],
+				],[
+					[[
+						'type' => 'text',
+						'description' => LANG::GET('assemble.edit_components_info_description'),
+						'content' => LANG::GET('assemble.edit_components_info_content')
+					]], [[
+						'form' => true,
+						'type' => 'compose_text',
+						'description' => LANG::GET('assemble.compose_text')
+					]], [[
+						'form' => true,
+						'type' => 'compose_textinput',
+						'description' => LANG::GET('assemble.compose_textinput')
+					]], [[
+						'form' => true,
+						'type' => 'compose_textarea',
+						'description' => LANG::GET('assemble.compose_textarea')
+					]], [[
+						'form' => true,
+						'type' => 'compose_numberinput',
+						'description' => LANG::GET('assemble.compose_numberinput')
+					]], [[
+						'form' => true,
+						'type' => 'compose_dateinput',
+						'description' => LANG::GET('assemble.compose_dateinput')
+					]], [[
+						'form' => true,
+						'type' => 'compose_links',
+						'description' => LANG::GET('assemble.compose_links')
+					]], [[
+						'form' => true,
+						'type' => 'compose_checkbox',
+						'description' => LANG::GET('assemble.compose_checkbox')
+					]], [[
+						'form' => true,
+						'type' => 'compose_radio',
+						'description' => LANG::GET('assemble.compose_radio')
+					]], [[
+						'form' => true,
+						'type' => 'compose_select',
+						'description' => LANG::GET('assemble.compose_select')
+					]], [[
+						'form' => true,
+						'type' => 'compose_file',
+						'description' => LANG::GET('assemble.compose_file')
+					]], [[
+						'form' => true,
+						'type' => 'compose_photo',
+						'description' => LANG::GET('assemble.compose_photo')
+					]], [[
+						'form' => true,
+						'type' => 'compose_signature',
+						'description' => LANG::GET('assemble.compose_signature')
+					]], [[
+						'form' => true,
+						'type' => 'compose_scanner',
+						'description' => LANG::GET('assemble.compose_scanner')
+					]]
+				],
 				[[
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
@@ -157,7 +161,8 @@ class FORMS extends API {
 					'type' => 'trash',
 					'description' => LANG::GET('assemble.edit_trash')
 				]]
-				]];
+			]
+		];
 
 		if (array_key_exists('content', $component)) $return['body']['component'] = json_decode($component['content']);
 
@@ -242,11 +247,6 @@ class FORMS extends API {
 						'onchange' => "api.form('get', 'component', this.value)"
 					],
 					'content' => $componentoptions],
-					/*[
-						'form' => true,
-						'type' => 'compose_hiddeninput',
-						'description' => LANG::GET('assemble.compose_hiddeninput'),
-					]*/
 					],
 					[[
 						'type' => 'compose_form',

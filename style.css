@@ -896,7 +896,10 @@ button[data-type=additem]::before {
 
 
 [data-type=addblock]::before {
-	background-image: url('./media/arrow-alt-from-top.svg');
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url('./media/arrow-alt-from-top.svg');
+	mask-image: url('./media/arrow-alt-from-top.svg');
 }
 
 [data-type=reset]::before,

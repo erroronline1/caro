@@ -382,8 +382,16 @@ export class Assemble {
 					if (!typeof widget === 'array') widget = [widget];
 					if (elements[0].constructor.name === 'Array') {
 						const article = document.createElement('article');
-						for (const e of widget) {
-							if (e) article.append(e);
+						if (element[0].form) { // from compose.js
+							const form = document.createElement('form');
+							for (const e of widget) {
+								if (e) form.append(e);
+							}
+							article.append(form);
+						} else {
+							for (const e of widget) {
+								if (e) article.append(e);
+							}
 						}
 						section.append(article);
 					} else {
