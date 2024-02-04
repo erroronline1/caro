@@ -55,6 +55,14 @@ export const compose_helper = {
 					else if (value && setTo === 'description') element['description'] = value;
 					else return;
 				}
+			} else if (['text'].includes(element.type)) {
+				if (name === LANG.GET('assemble.compose_text_description')) {
+					if (value) element['description'] = value;
+					else return;
+				}
+				if (name === LANG.GET('assemble.compose_text_content') && value) {
+					element['content'] = value;
+				}
 			} else {
 				if (name === LANG.GET('assemble.compose_field_name'))
 					if (value) element.attributes['name'] = value;
@@ -64,19 +72,17 @@ export const compose_helper = {
 			if (name === 'required' && sibling.checked) element.attributes['required'] = true;
 			if (name === 'multiple' && sibling.checked) element.attributes['multiple'] = true;
 			sibling = sibling.nextSibling;
-		} while (sibling !== undefined && sibling != null);
+		}
+		while (sibling !== undefined && sibling != null);
 
 		if (Object.keys(element).length > 1) {
-			const newElements = new Compose({
-				'visible': true,
+			const newElement = new Compose({
 				'draggable': true,
 				'content': [
 					[element]
 				]
 			});
-			newElements.forEach(r_element => {
-				compose_helper.newFormComponents[r_element.id] = r_element.content;
-			});
+			compose_helper.newFormComponents[newElement.generatedElementID] = element;
 		}
 	},
 
@@ -86,33 +92,32 @@ export const compose_helper = {
 			componentContent,
 			name = document.getElementById('ComponentName').value;
 
-		function nodechildren(node, recursion = false) {
-			const nodes = node.childNodes;
+		function nodechildren(parent, recursion = false) {
 			let content = [],
 				isSection;
-			for (let i = 0; i < nodes.length; i++) {
-				if (nodes[i].draggable) {
-					isSection = nodes[i].children[1].firstChild;
+			[...parent.childNodes].forEach(node => {
+				if (node.draggable) {
+					isSection = node.children[1].firstChild;
 					if (isSection.localName === 'section') {
 						content.push(nodechildren(isSection, true));
-						continue;
-					}
-					if (nodes[i].children[1].id in compose_helper.newFormComponents) {
-						if (recursion) content.push(compose_helper.newFormComponents[nodes[i].children[1].id]);
-						else content.push([compose_helper.newFormComponents[nodes[i].children[1].id]]);
-						if ('dataset' in nodes[i].children[1] && 'type' in nodes[i].children[1].dataset && nodes[i].children[1].dataset.type != 'text') isForm = true;
+					} else
+					if (node.id in compose_helper.newFormComponents) {
+						if (recursion) content.push(compose_helper.newFormComponents[node.id]);
+						else content.push([compose_helper.newFormComponents[node.id]]);
+						if ('dataset' in node.children[1] && 'type' in node.children[1].dataset && node.children[1].dataset.type != 'text') isForm = true;
 					}
 				}
-			}
+			});
 			return content;
 		}
-		componentContent = nodechildren(document.getElementById('main'));
+		componentContent = nodechildren(document.querySelector('main>div'));
 		const answer = {
 			'name': name,
 			'content': componentContent
 		};
 		if (isForm) answer.form = {};
-		if (name && componentContent) return answer;
+		console.log(compose_helper.newFormComponents, answer);
+		//if (name && componentContent) return answer;
 		return null;
 	},
 	composeNewForm: function () {
@@ -166,41 +171,72 @@ export const compose_helper = {
 			evnt.preventDefault();
 			if (!evnt.dataTransfer.getData('text')) return;
 
-			const draggedTile = document.getElementById(evnt.dataTransfer.getData('text')),
-				newtile = draggedTile.cloneNode(true), // cloned for most likely descendant issues
-				originParent = draggedTile.parentNode;
-			//console.log('dragged', draggedTile.id, 'dropped on', droppedUpon.id);
-			if (!draggedTile || this.stopParentDropEvent || draggedTile.id === droppedUpon.id) return;
-			if (evnt.target.localName === 'hr') {
-				// handle only if dropped within the reorder area
-				droppedUpon.parentNode.insertBefore(newtile, droppedUpon);
-				droppedUpon.firstChild.classList.remove('hrhover');
-				this.stopParentDropEvent = true;
-				// sanitize multiple section on lack of elements
-				if (originParent.children.length < 2) {
-					const section = originParent.parentNode.parentNode; // adapt to changes in section creation!
-					section.parentNode.insertBefore(originParent.children[0], section);
-					section.remove();
+			const draggedElement = document.getElementById(evnt.dataTransfer.getData('text')),
+				draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
+				originParent = draggedElement.parentNode;
+			//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
+			if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
+
+			// dragging single element
+			if (draggedElement.classList.contains('draggableFormElement')) {
+				// dropping on single element
+				if (droppedUpon.classList.contains('draggableFormElement')) {
+					droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
 				}
-				draggedTile.remove(); // do not remove earlier! insertBefore might reference to this object by chance
+				// dropping on hr creating a new article
+				else if (evnt.target.localName === 'hr') {
+					let container = document.createElement('div'),
+						article = document.createElement('article'),
+						insertionarea = document.createElement('hr');
+					container = compose_helper.create_draggable(container, false);
+					article.append(draggedElementClone);
+					insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+					insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+					insertionarea.classList.add('insertionarea');
+					container.append(insertionarea, article);
+					droppedUpon.parentNode.insertBefore(container, droppedUpon);
+					droppedUpon.firstChild.classList.remove('hrhover');
+				}
+				// avoid dropping elsewhere (main, article borders, etc.)
+				else return;
+				// dropping on self or own container
+				this.stopParentDropEvent = true;
+				// sanitize article on lack of elements
+				if (originParent.children.length < 2) {
+					originParent.parentNode.remove(); // adapt to changes in section creation!
+				}
+				draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
 				return;
 			}
-			if (droppedUpon.parentNode.localName === 'main' && draggedTile.parentNode.localName === 'main' &&
-				!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedTile.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
+
+			// dragging articles
+			// dropping on hr for reordering
+			if (evnt.target.localName === 'hr') {
+				// handle only if dropped within the reorder area
+				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
+				droppedUpon.firstChild.classList.remove('hrhover');
+				this.stopParentDropEvent = true;
+				draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
+				// sanitize section on lack of articles
+				if (originParent.children.length < 2) {
+					//                                                                                        section    article    container  
+					document.getElementById('main').insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
+					originParent.parentNode.parentNode.remove();
+				}
+				return;
+			}
+			// dropping on article to create a slider
+			if (droppedUpon.parentNode.localName === 'main' && draggedElement.parentNode.localName === 'main' &&
+				!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedElement.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
 				// create a multiple article tile if dropped on a tile
-				const container = document.createElement('div'),
+				let container = document.createElement('div'),
 					article = document.createElement('article'),
 					section = document.createElement('section'),
 					insertionarea = document.createElement('hr'),
 					previousSibling = droppedUpon.previousElementSibling;
-				container.id = getNextElementID();
-				container.setAttribute('draggable', 'true');
-				container.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
-				container.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
-				container.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
+				container = compose_helper.create_draggable(container, false);
 
-				section.classList = 'inset';
-				section.append(newtile, droppedUpon);
+				section.append(draggedElementClone, droppedUpon);
 				article.append(section);
 				container.append(article);
 
@@ -209,30 +245,40 @@ export const compose_helper = {
 				insertionarea.classList.add('insertionarea');
 				container.insertBefore(insertionarea, container.firstChild);
 				previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
-				draggedTile.remove(); // do not remove earlier! inserBefore might reference to this object by chance
+				draggedElement.remove(); // do not remove earlier! inserBefore might reference to this object by chance
 				return;
 			}
 		},
 		drop_delete: function (evnt) {
-			document.getElementById(evnt.dataTransfer.getData('text')).remove();
+			const draggedElement = document.getElementById(evnt.dataTransfer.getData('text')),
+				originParent = draggedElement.parentNode;
+			// sanitize article on lack of elements
+			if (originParent.children.length < 2) {
+				originParent.parentNode.remove(); // adapt to changes in section creation!
+			}
+			draggedElement.remove();
 		}
 	},
-	create_draggable: function (element) {
+
+	create_draggable: function (element, insertionarea = true) {
 		element.id = getNextElementID();
 		element.setAttribute('draggable', 'true');
 		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
 		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
 		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
-		const insertionarea = document.createElement('hr');
-		insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-		insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-		insertionarea.classList.add('insertionarea');
-		element.insertBefore(insertionarea, element.firstChild);
+		if (insertionarea) {
+			const insertionarea = document.createElement('hr');
+			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
+			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
+			insertionarea.classList.add('insertionarea');
+			element.insertBefore(insertionarea, element.firstChild);
+		}
+		return element;
 	},
-	composer_add_trash: function (section) {
-		section.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
-		section.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
-		section.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_delete(event)');
+	composer_add_trash: function (element) {
+		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
+		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
+		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_delete(event)');
 	}
 };
 
@@ -240,11 +286,79 @@ export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
 		this.createDraggable = setup.draggable;
-		this.createdArticles = [];
-
+		this.generatedElementID = null;
 		this.initializeSection();
-		if (this.createDraggable) compose_helper.create_draggable(this.section);
-		return this.createdArticles;
+		this.returnID();
+	}
+	returnID() {
+		if (this.createDraggable) {
+			compose_helper.create_draggable(this.section);
+			// idk why, but the passed object is always the whole class, no use trying to pass any individual properties...
+			return this;
+		}
+	}
+
+	processPanel(elements) { // overriding parent method
+		/**
+		 * content to exist of three nestings
+		 * [ panel
+		 * 		[ slide
+		 * 			{ element },
+		 * 			{ element }
+		 * 		],
+		 * 		[ slide ...],
+		 * ],
+		 * [ panel ...]
+		 * 
+		 * or two nestings
+		 * [ panel
+		 * 		{ element },
+		 * 		{ element }
+		 * ]
+		 */
+		let content = [],
+			widget;
+		if (elements.constructor.name === 'Array') {
+			const section = document.createElement('section');
+			section.id = getNextElementID();
+			elements.forEach(element => {
+				widget = this.processPanel(element);
+				if (elements[0].constructor.name === 'Array') {
+					const article = document.createElement('article');
+					if (element[0].form) { // from compose.js
+						const form = document.createElement('form');
+						form.onsubmit = new Function('compose_helper.composeNewElementCallback(this); return true;')
+						form.action = 'javascript:void(0);';
+						for (const e of widget) {
+							if (e) form.append(e);
+						}
+						article.append(form);
+					} else {
+						for (const e of widget) {
+							if (e) article.append(e);
+						}
+					}
+					section.append(article);
+				} else {
+					for (const e of widget) {
+						if (e) content.push(e);
+					}
+				}
+			});
+			if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
+		} else {
+			this.currentElement = elements;
+
+			if (this.createDraggable) {
+				let frame = document.createElement('div');
+				frame.classList.add('draggableFormElement');
+				frame.append(...this[elements.type]());
+				frame = compose_helper.create_draggable(frame, false);
+				this.generatedElementID = frame.id;
+				content.push(frame);
+			} else content = content.concat(this[elements.type]());
+		}
+		return content;
 	}
 
 	compose_text() {
@@ -269,8 +383,6 @@ export class Compose extends Assemble {
 			attributes: {
 				value: LANG.GET('assemble.compose_text'),
 				'data-type': 'addblock',
-				type: 'submit',
-				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
 		result.push(this.button());
@@ -305,8 +417,6 @@ export class Compose extends Assemble {
 			attributes: {
 				value: type.description,
 				'data-type': 'addblock',
-				type: 'submit',
-				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
 		result.push(this.button());
@@ -383,8 +493,6 @@ export class Compose extends Assemble {
 			attributes: {
 				value: type.description,
 				'data-type': 'addblock',
-				type: 'submit',
-				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
 		result.push(this.button());
@@ -456,8 +564,6 @@ export class Compose extends Assemble {
 			attributes: {
 				value: type.description,
 				'data-type': 'addblock',
-				type: 'submit',
-				onpointerup: 'compose_helper.composeNewElementCallback(this.parentNode)'
 			}
 		};
 		result.push(this.button());
@@ -498,10 +604,6 @@ export class Compose extends Assemble {
 	}) {
 		let result = [];
 		this.currentElement = {
-			content: std.description
-		};
-		result = result.concat(...this.text());
-		this.currentElement = {
 			type: 'textinput',
 			attributes: {
 				id: 'ComponentName',
@@ -513,14 +615,13 @@ export class Compose extends Assemble {
 		result = result.concat(...this.textinput());
 		// due to the assembler, type (for icon) has to be in the last element
 		this.currentElement = {
-			type: 'save',
 			attributes: {
 				value: std.description,
 				onpointerdown: std.action,
 				type: 'button'
 			}
 		};
-		result.push(this.button());
+		result.push(this.submitbutton());
 		return result;
 	}
 	compose_form() {

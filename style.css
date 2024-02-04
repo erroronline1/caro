@@ -576,6 +576,10 @@ textarea+div {
 	font-size: .75em;
 }
 
+.textarea-hint {
+	margin-top: 1;
+}
+
 button+div,
 input[type=checkbox]+label+div,
 input[type=radio]+label+div {
@@ -654,14 +658,6 @@ section>div>article {
 	box-shadow: none;
 	border: none;
 	background: none;
-}
-
-.inset,
-[data-type=trash] {
-	box-shadow: inset 3px 3px 5px var(--darkshadow);
-	/* 	box-shadow: inset var(--shadow);
-	test later if this will work
-	*/
 }
 
 .sectionindicator {
@@ -752,6 +748,10 @@ span.nocontent {
 
 [draggable=true]:active {
 	cursor: move;
+}
+
+.draggableFormElement {
+	border: 1px solid var(--cta_darker);
 }
 
 [data-type]::before,
@@ -916,7 +916,7 @@ button[data-type=generateupdate]::before {
 }
 
 
-[data-type=savebutton]::before,
+/*[data-type=savebutton]::before/*,
 [data-type=save]::before {
 	background-image: url('./media/save.svg');
 }
@@ -928,7 +928,7 @@ button[data-type=save]::before {
 	-webkit-mask-image: url('./media/save.svg');
 	mask-image: url('./media/save.svg');
 }
-
+*/
 [data-type=image]::before {
 	background-image: url('./media/image.svg');
 }

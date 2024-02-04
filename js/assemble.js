@@ -301,6 +301,9 @@ export class Assemble {
 			section.dispatchEvent(new Event('scroll'));
 		}
 
+		const trash = document.querySelector('[data-type=trash');
+		if (trash) compose_helper.composer_add_trash(trash.parentNode);
+
 		if (this.signaturePad) {
 			this.initialize_SignaturePad();
 		}
@@ -353,7 +356,7 @@ export class Assemble {
 		}
 	}
 
-	processContent() {
+	processPanel(elements) {
 		/**
 		 * content to exist of three nestings
 		 * [ panel
@@ -371,46 +374,37 @@ export class Assemble {
 		 * 		{ element }
 		 * ]
 		 */
-		function processPanel(elements) {
-			let content = [],
-				widget;
-			if (elements.constructor.name === 'Array') {
-				const section = document.createElement('section');
-				section.id = getNextElementID();
-				elements.forEach(element => {
-					widget = processPanel.call(this, element);
-					if (!typeof widget === 'array') widget = [widget];
-					if (elements[0].constructor.name === 'Array') {
-						const article = document.createElement('article');
-						if (element[0].form) { // from compose.js
-							const form = document.createElement('form');
-							for (const e of widget) {
-								if (e) form.append(e);
-							}
-							article.append(form);
-						} else {
-							for (const e of widget) {
-								if (e) article.append(e);
-							}
-						}
-						section.append(article);
-					} else {
-						for (const e of widget) {
-							if (e) content.push(e);
-						}
+		let content = [],
+			widget;
+		if (elements.constructor.name === 'Array') {
+			const section = document.createElement('section');
+			section.id = getNextElementID();
+			elements.forEach(element => {
+				widget = this.processPanel(element);
+				if (elements[0].constructor.name === 'Array') {
+					const article = document.createElement('article');
+					for (const e of widget) {
+						if (e) article.append(e);
 					}
-				});
-				if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
-			} else {
-				this.currentElement = elements;
-				content = content.concat(this[elements.type]());
-			}
-			return content;
+					section.append(article);
+				} else {
+					for (const e of widget) {
+						if (e) content.push(e);
+					}
+				}
+			});
+			if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
+		} else {
+			this.currentElement = elements;
+			content = content.concat(this[elements.type]());
 		}
+		return content;
+	}
 
+	processContent() {
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
-			const raw_nodes = processPanel.call(this, panel),
+			const raw_nodes = this.processPanel.call(this, panel),
 				nodes = [];
 			// filter undefined
 			raw_nodes.forEach(node => {
@@ -504,6 +498,7 @@ export class Assemble {
 	sectionScroller(e) {
 		/* event handler for horizontal scrolling of multiple panels */
 		setTimeout(() => {
+			if (!e.target.attributes.id) return;
 			let indicator = document.getElementById(e.target.attributes.id.value + 'indicator');
 			for (let panel = 0; panel < e.target.children.length + 1; panel++) {
 				try {
@@ -587,6 +582,7 @@ export class Assemble {
 		if (this.currentElement.hint === undefined) return [];
 		let div = document.createElement('div');
 		div.appendChild(document.createTextNode(this.currentElement.hint));
+		if (this.currentElement.type === 'textarea') div.classList.add('textarea-hint');
 		return [div];
 	}
 
@@ -1148,6 +1144,7 @@ export class Assemble {
 
 	trash() {
 		// empty method but necessary to display the delete-area for composer or other future use
+		return [...this.icon(), document.createTextNode(this.currentElement.description)];
 	}
 
 	hr() {
