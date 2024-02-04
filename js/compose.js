@@ -89,35 +89,36 @@ export const compose_helper = {
 	composeNewComponent: function () {
 		// set dragged/dropped order of elements - wohoo, recursion!
 		let isForm = false,
-			componentContent,
+			componentContent = [],
 			name = document.getElementById('ComponentName').value;
 
-		function nodechildren(parent, recursion = false) {
+		function nodechildren(parent) {
 			let content = [],
-				isSection;
+				container;
 			[...parent.childNodes].forEach(node => {
 				if (node.draggable) {
-					isSection = node.children[1].firstChild;
-					if (isSection.localName === 'section') {
-						content.push(nodechildren(isSection, true));
-					} else
-					if (node.id in compose_helper.newFormComponents) {
-						if (recursion) content.push(compose_helper.newFormComponents[node.id]);
-						else content.push([compose_helper.newFormComponents[node.id]]);
-						if ('dataset' in node.children[1] && 'type' in node.children[1].dataset && node.children[1].dataset.type != 'text') isForm = true;
+					container = node.children[1];
+					if (container.localName === 'article') {
+						if (container.firstChild.localName === 'section') content.push(nodechildren(container.firstChild));
+						else content.push(nodechildren(container));
+					} else {
+						if (node.id in compose_helper.newFormComponents) {
+							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes['placeholder'];
+							content.push(compose_helper.newFormComponents[node.id]);
+							if (compose_helper.newFormComponents[node.id].type != 'text') isForm = true;
+						}
 					}
 				}
 			});
 			return content;
 		}
-		componentContent = nodechildren(document.querySelector('main>div'));
+		componentContent = nodechildren(document.querySelector('main'));
 		const answer = {
 			'name': name,
 			'content': componentContent
 		};
 		if (isForm) answer.form = {};
-		console.log(compose_helper.newFormComponents, answer);
-		//if (name && componentContent) return answer;
+		if (name && componentContent) return answer;
 		return null;
 	},
 	composeNewForm: function () {
@@ -626,7 +627,7 @@ export class Compose extends Assemble {
 	}
 	compose_form() {
 		this.compose_component({
-			placeholder: LANG.GET('assemble.compose_form_label'),
+			name: LANG.GET('assemble.compose_form_label'),
 			description: LANG.GET('assemble.compose_form'),
 			action: 'api.form("post","form")'
 		});
