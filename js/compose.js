@@ -82,7 +82,7 @@ export const compose_helper = {
 					[element]
 				]
 			});
-			compose_helper.newFormComponents[newElement.generatedElementID] = element;
+			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] = element;
 		}
 	},
 
@@ -140,18 +140,32 @@ export const compose_helper = {
 	},
 
 	importComponent: function (form) {
+		alert('heres some work to do');
+
 		compose_helper.newFormComponents = {};
-		for (const [key, element] of Object.entries(form.content)) {
 			const newElements = new Compose({
 				'draggable': true,
 				'content': [
-					element
+					form.content
 				]
 			});
+			const elementIds=newElements.generatedElementIDs;
+			let i=0;
+
+			//recursive function
+
+			for (const container of Object.entries(form.content)){
+				if (typeof container[0] === 'array'){
+
+				}
+
+			}
+
+
+
 			newElements.forEach(r_element => {
 				compose_helper.newFormComponents[r_element.id] = r_element.content;
 			});
-		};
 	},
 	importForm: function (form) {
 		form.draggable = true;
@@ -287,7 +301,7 @@ export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
 		this.createDraggable = setup.draggable;
-		this.generatedElementID = null;
+		this.generatedElementIDs = [];
 		this.initializeSection();
 		this.returnID();
 	}
@@ -355,7 +369,7 @@ export class Compose extends Assemble {
 				frame.classList.add('draggableFormElement');
 				frame.append(...this[elements.type]());
 				frame = compose_helper.create_draggable(frame, false);
-				this.generatedElementID = frame.id;
+				this.generatedElementIDs.push(frame.id);
 				content.push(frame);
 			} else content = content.concat(this[elements.type]());
 		}
