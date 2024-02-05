@@ -922,20 +922,6 @@ button[data-type=generateupdate]::before {
 	mask-image: url('./media/repeat-alt.svg');
 }
 
-
-/*[data-type=savebutton]::before/*,
-[data-type=save]::before {
-	background-image: url('./media/save.svg');
-}
-
-button[data-type=savebutton]::before,
-button[data-type=save]::before {
-	background-image: none;
-	background-color: var(--article);
-	-webkit-mask-image: url('./media/save.svg');
-	mask-image: url('./media/save.svg');
-}
-*/
 [data-type=image]::before {
 	background-image: url('./media/image.svg');
 }
