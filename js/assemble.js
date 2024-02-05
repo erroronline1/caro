@@ -38,7 +38,7 @@ export const assemble_helper = {
 		icons[LANG.GET('menu.files_header')] = "url('media/cloud-download.svg')";
 		icons[LANG.GET('menu.tools_header')] = "url('media/tools.svg')";
 
-		let label, div, input, ul, li, link;
+		let label, div, input, div2, button, span;
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement('label');
 			div = document.createElement('div');
@@ -54,26 +54,31 @@ export const assemble_helper = {
 			input.name = 'userMenu';
 			input.id = 'userMenu' + group;
 
-			ul = document.createElement('ul');
-			li = document.createElement('li');
-			li.append(document.createTextNode(group));
-			ul.append(li);
-			ul.style.maxHeight = (Object.entries(items).length + 1) * 3 + 2 + 'em';
+			div2 = document.createElement('div');
+			div2.classList.add('options');
+			span = document.createElement('span');
+			span.append(document.createTextNode(group));
+			div2.append(span);
+			div2.style.maxHeight = (Object.entries(items).length + 1) * 3 + 2 + 'em';
 			for (const [description, attributes] of Object.entries(items)) {
-				li = document.createElement('li');
-				if ('href' in attributes) {
-					link = document.createElement('a');
+				if ('onpointerup' in attributes) {
+					button = document.createElement('button');
 					for (const [attribute, value] of Object.entries(attributes)) {
-						link.setAttribute(attribute, value);
+						button.setAttribute(attribute, value);
 					}
-					link.appendChild(document.createTextNode(description));
-					li.append(link);
-				} else li.append(document.createTextNode(description))
-				ul.append(li);
+					button.type='button';
+					button.classList.add('discreetButton');
+					button.appendChild(document.createTextNode(description));
+					div2.append(button);
+				} else {
+					span = document.createElement('span');
+					span.append(document.createTextNode(description));
+					div2.append(span);		
+				}
 			}
 			elements.push(div);
 			elements.push(input);
-			elements.push(ul);
+			elements.push(div2);
 		}
 		menu.replaceChildren(...elements);
 	}

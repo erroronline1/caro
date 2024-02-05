@@ -271,7 +271,7 @@ nav {
 		display: none;
 	}
 
-	div {
+	div[data-for] {
 		display: inline-block;
 		margin: 0 .75em;
 		width: fit-content;
@@ -292,18 +292,18 @@ nav {
 		width: auto;
 	}
 
-	div:first-of-type>label {
+	div[data-for]:first-of-type>label {
 		border-radius: 50%;
 		background-size: cover;
 		background-repeat: no-repeat;
 	}
 
-	ul {
+	div.options {
 		background-color: var(--lightshadow);
 		backdrop-filter: blur(10px);
 		z-index: 100;
 		position: fixed;
-		bottom: 3em;
+		bottom: 4em;
 		left: 50%;
 		transform: translateX(-50%);
 		width: 100%;
@@ -321,8 +321,7 @@ nav {
 		}
 	}
 
-	input:checked+ul {
-		border: 1px solid var(--3d-border);
+	input:checked+div.options {
 		padding: 1em 1em;
 		height: 50em;
 		box-shadow: var(--shadow);

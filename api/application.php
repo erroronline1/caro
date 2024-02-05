@@ -57,45 +57,45 @@ class APPLICATION extends API {
 		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
 		$menu=[
 			LANG::GET('menu.application_header') => [
-				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['href' => "javascript:api.application('get','login', 'null')"],
-				LANG::GET('menu.application_start') => ['href' => "javascript:api.application('get', 'start')"],			
-				LANG::GET('menu.application_user_profile') => ['href' => "javascript:api.user('get', 'profile')"],			
+				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('get','login', 'null')"],
+				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
+				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
 			],
 			LANG::GET('menu.message_header') => [
-				LANG::GET('menu.message_inbox') => ['href' => "javascript:api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
-				LANG::GET('menu.message_new') => ['href' => "javascript:api.message('get', 'message')"],
-				LANG::GET('menu.message_sent') => ['href' => "javascript:api.message('get', 'sent')"]
+				LANG::GET('menu.message_inbox') => ['onpointerup' => "api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
+				LANG::GET('menu.message_new') => ['onpointerup' => "api.message('get', 'message')"],
+				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"]
 			],
 			LANG::GET('menu.forms_header') => [
-				LANG::GET('menu.forms_forms') => ['href' => "javascript:new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
+				LANG::GET('menu.forms_forms') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
 			],
 			LANG::GET('menu.files_header') => [
-				LANG::GET('menu.files_files') => ['href' => "javascript:api.file('get', 'files')"],
-				LANG::GET('menu.files_bundles') => ['href' => "javascript:api.file('get', 'bundle')"],
-				LANG::GET('menu.files_sharepoint') => ['href' => "javascript:api.file('get', 'sharepoint')"],
+				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
+				LANG::GET('menu.files_bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
+				LANG::GET('menu.files_sharepoint') => ['onpointerup' => "api.file('get', 'sharepoint')"],
 			],
 			LANG::GET('menu.purchase_header') => [
-				LANG::GET('menu.purchase_order') => ['href' => "javascript:api.purchase('get', 'order')"],
-				LANG::GET('menu.purchase_prepared_orders') => ['href' => "javascript:api.purchase('get', 'prepared')"],
-				LANG::GET('menu.purchase_approved_orders') => ['href' => "javascript:api.purchase('get', 'approved')"]
+				LANG::GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
+				LANG::GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
+				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"]
 			],
 			LANG::GET('menu.tools_header') => [
-				LANG::GET('menu.tools_digital_codes') => ['href' => "javascript:api.tool('get', 'code')"],
-				LANG::GET('menu.tools_scanner') => ['href' => "javascript:api.tool('get', 'scanner')"],
-				LANG::GET('menu.tool_stl_viewer') => ['href' => "javascript:api.tool('get', 'stlviewer')"],
+				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
+				LANG::GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
+				LANG::GET('menu.tool_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"],
 			],
 		];
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.forms_header')][LANG::GET('menu.forms_manage_components')] = ['href' => "javascript:api.form('get', 'component_editor')"];
-			$menu[LANG::GET('menu.forms_header')][LANG::GET('menu.forms_manage_forms')] = ['href' => "javascript:api.form('get', 'form_editor')"];
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['href' => "javascript:api.file('get', 'filemanager')"];
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['href' => "javascript:api.file('get', 'bundlemanager')"];
-			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['href' => "javascript:api.user('get', 'user')"];
-			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['href' => "javascript:api.application('get', 'manual')"];
+			$menu[LANG::GET('menu.forms_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
+			$menu[LANG::GET('menu.forms_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
+			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
+			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['href' => "javascript:api.purchase('get', 'vendor')"];
-			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['href' => "javascript:api.purchase('get', 'product')"];
+			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
+			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['onpointerup' => "api.purchase('get', 'product')"];
 		}
 
 		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
