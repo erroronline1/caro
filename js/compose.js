@@ -15,15 +15,17 @@ export const compose_helper = {
 	getNextElementID: getNextElementID,
 	composeNewElementCallback: function (parent) {
 		let sibling = parent.childNodes[0].nextSibling,
-			setTo, name, value, element = {
+			setTo, elementName, value;
+		const setName = {
+				name: ['select', 'scanner'],
+				description: ['links', 'photo', 'file', 'checkbox', 'radio']
+			},
+			element = {
 				attributes: {}
 			};
-		const setName = {
-			name: ['select', 'signature', 'scanner'],
-			description: ['links', 'photo', 'file', 'checkbox', 'radio']
-		};
+		console.log(element, parent);
 		do {
-			if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header', 'br'].includes(sibling.localName)) {
+			if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header', 'br', 'button'].includes(sibling.localName)) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
@@ -32,44 +34,46 @@ export const compose_helper = {
 				sibling = sibling.nextSibling;
 				continue;
 			}
-			name = sibling.name.replace(/\(.*?\)|\[\]/g, '');
+			elementName = sibling.name.replace(/\(.*?\)|\[\]/g, '');
 			value = sibling.value;
 
 			if (['links', 'radio', 'select', 'checkbox'].includes(element.type)) {
-				if (name === LANG.GET('assemble.compose_multilist_name')) {
+				if (elementName === LANG.GET('assemble.compose_multilist_name')) {
 					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
 					if (value && setTo === 'name') element.attributes['name'] = value;
 					else if (value && setTo === 'description') element['description'] = value;
 					else return;
 				}
-				if (name === LANG.GET('assemble.compose_multilist_add_item') && value) {
+				if (elementName === LANG.GET('assemble.compose_multilist_add_item') && value) {
 					if (element.content === undefined) element.content = {};
 					element.content[value] = {};
 				}
-			} else if (['file', 'photo', 'signature', 'scanner'].includes(element.type)) {
-				if (name === LANG.GET('assemble.compose_simple_element')) {
+			} else if (['file', 'photo', 'scanner'].includes(element.type)) {
+				if (elementName === LANG.GET('assemble.compose_simple_element')) {
 					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
 					if (value && setTo === 'name') element.attributes['name'] = value;
 					else if (value && setTo === 'description') element['description'] = value;
 					else return;
 				}
 			} else if (['text'].includes(element.type)) {
-				if (name === LANG.GET('assemble.compose_text_description')) {
+				if (elementName === LANG.GET('assemble.compose_text_description')) {
 					if (value) element['description'] = value;
 					else return;
 				}
-				if (name === LANG.GET('assemble.compose_text_content') && value) {
+				if (elementName === LANG.GET('assemble.compose_text_content') && value) {
 					element['content'] = value;
 				}
 			} else {
-				if (name === LANG.GET('assemble.compose_field_name'))
+				if (elementName === LANG.GET('assemble.compose_field_name')) {
 					if (value) element.attributes['name'] = value;
 					else return;
+				}
 			}
-			if (name === LANG.GET('assemble.compose_field_hint') && value) element['hint'] = value;
-			if (name === 'required' && sibling.checked) element.attributes['required'] = true;
-			if (name === 'multiple' && sibling.checked) element.attributes['multiple'] = true;
+			if (elementName === LANG.GET('assemble.compose_field_hint') && value) element['hint'] = value;
+			if (elementName === 'required' && sibling.checked) element.attributes['required'] = true;
+			if (elementName === 'multiple' && sibling.checked) element.attributes['multiple'] = true;
 			sibling = sibling.nextSibling;
+
 		}
 		while (sibling !== undefined && sibling != null);
 
@@ -367,7 +371,7 @@ export class Compose extends Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === 'Array') content = content.concat(section);
+			if (elements[0].constructor.name === 'Array') content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements

@@ -572,13 +572,13 @@ article>span[data-type] {
 }
 
 /* hint messages below */
-label+div,
-textarea+div {
+.hint {
 	margin: -1em 0 0 2.3em;
 	font-size: .75em;
 }
 
-.textarea-hint {
+.textarea-hint,
+.links-hint {
 	margin-top: 1;
 }
 

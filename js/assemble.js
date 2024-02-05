@@ -588,8 +588,10 @@ export class Assemble {
 	hint() {
 		if (this.currentElement.hint === undefined) return [];
 		let div = document.createElement('div');
+		div.classList.add('hint');
 		div.appendChild(document.createTextNode(this.currentElement.hint));
 		if (this.currentElement.type === 'textarea') div.classList.add('textarea-hint');
+		if (this.currentElement.type === 'links') div.classList.add('links-hint');
 		return [div];
 	}
 
@@ -1002,6 +1004,7 @@ export class Assemble {
 			let a = document.createElement('a');
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
+			if (!a.href.includes('javascript:') && !a.target) a.target = '_blank';
 			a.appendChild(document.createTextNode(link));
 			result.push(a);
 		}
@@ -1049,6 +1052,8 @@ export class Assemble {
 		if (this.currentElement.destination !== undefined) {
 			inputid = this.currentElement.destination;
 		} else {
+			if (!this.currentElement.attributes) this.currentElement['attributes']={};
+			if (!this.currentElement.attributes.name) this.currentElement.attributes['name'] = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
 			if (this.currentElement.attributes.type !== undefined) input = [...this.input(this.currentElement.attributes.type)];
 			else input = [...this.input('text')];
 			inputid = input[1].id ? input[1].id : input[2].id;
