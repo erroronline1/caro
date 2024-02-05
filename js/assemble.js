@@ -364,22 +364,22 @@ export class Assemble {
 	processPanel(elements) {
 		/**
 		 * content to exist of three nestings
-		 * [ panel
-		 * 		[ slide
+		 * [ panel article>section
+		 * 		[ slide article
 		 * 			{ element },
 		 * 			{ element }
 		 * 		],
-		 * 		[ slide ...],
+		 * 		[ slide article
+		 *		...],
 		 * ],
-		 * [ panel ...]
 		 * 
 		 * or two nestings
-		 * [ panel
+		 * [ panel article
 		 * 		{ element },
 		 * 		{ element }
 		 * ]
 		 */
-		let content = [],
+		 let content = [],
 			widget;
 		if (elements.constructor.name === 'Array') {
 			const section = document.createElement('section');
