@@ -76,6 +76,7 @@ export const compose_helper = {
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
 				'draggable': true,
+				'composer': 'component',
 				'content': [
 					[element]
 				]
@@ -141,6 +142,7 @@ export const compose_helper = {
 		compose_helper.newFormComponents = {};
 		const newElements = new Compose({
 			'draggable': true,
+			'composer': 'component',
 			'content': form.content
 		});
 		// recursive function to assign created ids to form content elements in order of appearance
@@ -294,6 +296,7 @@ export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
 		this.createDraggable = setup.draggable;
+		this.composer = setup.composer;
 		this.generatedElementIDs = [];
 		this.initializeSection();
 		this.returnID();
@@ -387,7 +390,7 @@ export class Compose extends Assemble {
 	processContent() {
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
-			const raw_nodes = this.processPanel.call(this, panel),
+			const raw_nodes = this.processPanel(panel),
 				nodes = [];
 			// filter undefined
 			raw_nodes.forEach(node => {

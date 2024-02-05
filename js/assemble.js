@@ -32,10 +32,10 @@ export const assemble_helper = {
 				'default': "url('media/bars.svg')"
 			};
 		icons[LANG.GET('menu.application_header')] = "url('media/bars.svg')";
-		icons[LANG.GET('menu.message_header')] = "url('media/envelope.svg')";
-		icons[LANG.GET('menu.forms_header')] = "url('media/pencil.svg')";
-		icons[LANG.GET('menu.purchase_header')] = "url('media/shopping-cart.svg')";
-		icons[LANG.GET('menu.files_header')] = "url('media/cloud-download.svg')";
+		icons[LANG.GET('menu.message_header')] = "url('media/comment.svg')";
+		icons[LANG.GET('menu.forms_header')] = "url('media/file-alt.svg')";
+		icons[LANG.GET('menu.purchase_header')] = "url('media/shopping-bag.svg')";
+		icons[LANG.GET('menu.files_header')] = "url('media/folders.svg')";
 		icons[LANG.GET('menu.tools_header')] = "url('media/tools.svg')";
 
 		let label, div, input, div2, button, span;
@@ -66,14 +66,14 @@ export const assemble_helper = {
 					for (const [attribute, value] of Object.entries(attributes)) {
 						button.setAttribute(attribute, value);
 					}
-					button.type='button';
+					button.type = 'button';
 					button.classList.add('discreetButton');
 					button.appendChild(document.createTextNode(description));
 					div2.append(button);
 				} else {
 					span = document.createElement('span');
 					span.append(document.createTextNode(description));
-					div2.append(span);		
+					div2.append(span);
 				}
 			}
 			elements.push(div);
@@ -120,7 +120,7 @@ export class Dialog {
 			form.method = 'dialog';
 			const img = document.createElement('img');
 			img.classList.add('close');
-			img.src = './media/close.svg';
+			img.src = './media/times.svg';
 			img.onpointerdown = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.querySelector('dialog').close()");
 			form.append(img);
 			if (this.header || this.body || this.icon) {
@@ -266,6 +266,7 @@ export class Assemble {
 		this.imageBarCode = [];
 		this.imageUrl = [];
 		this.names = {};
+		this.composer = undefined; // from composer.js
 	}
 
 	initializeSection(nextSibling = null) {
@@ -286,13 +287,14 @@ export class Assemble {
 					type: 'submit',
 				}
 			}]);
-		} else this.section = document.createElement('div');
+		} else if (!this.composer) this.section = document.createElement('div');
+		else if (this.composer) this.section = document.getElementById('main');
 
 		this.assembledPanels = this.processContent();
 
 		if (!nextSibling) {
 			this.section.append(...this.assembledPanels);
-			document.getElementById('main').insertAdjacentElement('beforeend', this.section);
+			if (!this.composer) document.getElementById('main').insertAdjacentElement('beforeend', this.section);
 		} else {
 			const tiles = Array.from(this.assembledPanels);
 			for (let i = 0; i < tiles.length; i++) {
@@ -379,7 +381,7 @@ export class Assemble {
 		 * 		{ element }
 		 * ]
 		 */
-		 let content = [],
+		let content = [],
 			widget;
 		if (elements.constructor.name === 'Array') {
 			const section = document.createElement('section');
@@ -409,7 +411,7 @@ export class Assemble {
 	processContent() {
 		let assembledPanels = new Set();
 		this.content.forEach(panel => {
-			const raw_nodes = this.processPanel.call(this, panel),
+			const raw_nodes = this.processPanel(panel),
 				nodes = [];
 			// filter undefined
 			raw_nodes.forEach(node => {
