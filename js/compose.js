@@ -145,27 +145,24 @@ export const compose_helper = {
 		compose_helper.newFormComponents = {};
 			const newElements = new Compose({
 				'draggable': true,
-				'content': [
-					form.content
-				]
+				'content': form.content
 			});
-			const elementIds=newElements.generatedElementIDs;
-			let i=0;
 
-			//recursive function
-
-			for (const container of Object.entries(form.content)){
-				if (typeof container[0] === 'array'){
-
+			// recursive function to assign ids to form content elements in order of appearance
+			const elementIDs=newElements.generatedElementIDs;
+			let i = 0;
+			function assignIDs (element) {
+				for (const container of Object.entries(element)){
+					if (typeof container[0] === 'array'){
+						assignIDs(container);
+					}
+					else {
+						compose_helper.newFormComponents[elementIDs] = container;
+						i++;
+					}
 				}
-
 			}
-
-
-
-			newElements.forEach(r_element => {
-				compose_helper.newFormComponents[r_element.id] = r_element.content;
-			});
+			assignIDs(form.content);
 	},
 	importForm: function (form) {
 		form.draggable = true;
