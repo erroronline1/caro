@@ -256,12 +256,15 @@ nav {
 	text-align: center;
 
 	div[data-notification]::after {
-		content: attr(data-notification);
-		color: var(--red);
-		position: absolute;
-		margin-top: -3.5em;
-		margin-left: 2em;
-		font-size: .75em;
+			content: attr(data-notification);
+			color: var(--article);
+			position: absolute;
+			margin-top: -3.5em;
+			margin-left: 1.25em;
+			font-size: .5em;
+			background-color: var(--red);
+			padding: 0 .25em;
+			border-radius: 3px;
 	}
 
 	div[data-notification='0']::after {
