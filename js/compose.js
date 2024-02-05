@@ -35,8 +35,6 @@ export const compose_helper = {
 			name = sibling.name.replace(/\(.*?\)|\[\]/g, '');
 			value = sibling.value;
 
-			//names
-
 			if (['links', 'radio', 'select', 'checkbox'].includes(element.type)) {
 				if (name === LANG.GET('assemble.compose_multilist_name')) {
 					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
@@ -140,29 +138,26 @@ export const compose_helper = {
 	},
 
 	importComponent: function (form) {
-		alert('heres some work to do');
-
 		compose_helper.newFormComponents = {};
-			const newElements = new Compose({
-				'draggable': true,
-				'content': form.content
-			});
+		const newElements = new Compose({
+			'draggable': true,
+			'content': form.content
+		});
+		// recursive function to assign created ids to form content elements in order of appearance
+		const elementIDs = newElements.generatedElementIDs;
+		let i = 0;
 
-			// recursive function to assign ids to form content elements in order of appearance
-			const elementIDs=newElements.generatedElementIDs;
-			let i = 0;
-			function assignIDs (element) {
-				for (const container of Object.entries(element)){
-					if (typeof container[0] === 'array'){
-						assignIDs(container);
-					}
-					else {
-						compose_helper.newFormComponents[elementIDs] = container;
-						i++;
-					}
+		function assignIDs(element) {
+			for (const container of Object.entries(element)) {
+				if (typeof container[0] === 'array') {
+					assignIDs(container);
+				} else {
+					compose_helper.newFormComponents[elementIDs] = container;
+					i++;
 				}
 			}
-			assignIDs(form.content);
+		}
+		assignIDs(form.content);
 	},
 	importForm: function (form) {
 		form.draggable = true;
@@ -265,7 +260,7 @@ export const compose_helper = {
 			const draggedElement = document.getElementById(evnt.dataTransfer.getData('text')),
 				originParent = draggedElement.parentNode;
 			// sanitize article on lack of elements
-			if (originParent.children.length < 2) {
+			if (originParent.parentNode != document.getElementById('main') && originParent.children.length < 2) {
 				originParent.parentNode.remove(); // adapt to changes in section creation!
 			}
 			draggedElement.remove();
@@ -303,27 +298,25 @@ export class Compose extends Assemble {
 		this.returnID();
 	}
 	returnID() {
-		if (this.createDraggable) {
-			compose_helper.create_draggable(this.section);
-			// idk why, but the passed object is always the whole class, no use trying to pass any individual properties...
-			return this;
-		}
+		// a constructor must not return anything
+		// idk why, but the passed object is always the whole class, no use trying to pass any individual properties...
+		return this;
 	}
 
 	processPanel(elements) { // overriding parent method
 		/**
 		 * content to exist of three nestings
-		 * [ panel
-		 * 		[ slide
+		 * [ panel article>section
+		 * 		[ slide article
 		 * 			{ element },
 		 * 			{ element }
 		 * 		],
-		 * 		[ slide ...],
+		 * 		[ slide article
+		 *		...],
 		 * ],
-		 * [ panel ...]
 		 * 
 		 * or two nestings
-		 * [ panel
+		 * [ panel article
 		 * 		{ element },
 		 * 		{ element }
 		 * ]
@@ -335,9 +328,10 @@ export class Compose extends Assemble {
 			section.id = getNextElementID();
 			elements.forEach(element => {
 				widget = this.processPanel(element);
-				if (elements[0].constructor.name === 'Array') {
+				if (elements[0].constructor.name === 'Array') { // article
 					const article = document.createElement('article');
-					if (element[0].form) { // from compose.js
+					// creation form for adding elements
+					if (element[0].form) {
 						const form = document.createElement('form');
 						form.onsubmit = new Function('compose_helper.composeNewElementCallback(this); return true;')
 						form.action = 'javascript:void(0);';
@@ -345,32 +339,79 @@ export class Compose extends Assemble {
 							if (e) form.append(e);
 						}
 						article.append(form);
-					} else {
+					}
+					// element created
+					else {
 						for (const e of widget) {
 							if (e) article.append(e);
 						}
 					}
-					section.append(article);
-				} else {
+					// creation form for adding elements
+					if (!this.createDraggable) {
+						section.append(article);
+					}
+					// element created
+					else {
+						let div = document.createElement('div');
+						div = compose_helper.create_draggable(div);
+						div.append(article);
+						section.append(div);
+					}
+				} else { // single element, last in chain
 					for (const e of widget) {
 						if (e) content.push(e);
 					}
 				}
 			});
-			if (elements[0].constructor.name === 'Array') content = content.concat(section, this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === 'Array') content = content.concat(section);
 		} else {
 			this.currentElement = elements;
-
-			if (this.createDraggable) {
+			// creation form for adding elements
+			if (!this.createDraggable) {
+				content = content.concat(this[this.currentElement.type]());
+			}
+			// element created
+			else {
 				let frame = document.createElement('div');
 				frame.classList.add('draggableFormElement');
-				frame.append(...this[elements.type]());
+				frame.append(...this[this.currentElement.type]());
 				frame = compose_helper.create_draggable(frame, false);
 				this.generatedElementIDs.push(frame.id);
 				content.push(frame);
-			} else content = content.concat(this[elements.type]());
+			}
 		}
 		return content;
+	}
+
+	processContent() {
+		let assembledPanels = new Set();
+		this.content.forEach(panel => {
+			const raw_nodes = this.processPanel.call(this, panel),
+				nodes = [];
+			// filter undefined
+			raw_nodes.forEach(node => {
+				if (node) nodes.push(node);
+			});
+
+			let frame = false;
+			for (let n = 0; n < nodes.length; n++) {
+				if (!(['DATALIST', 'HR', 'BUTTON'].includes(nodes[n].nodeName) || nodes[n].hidden)) {
+					frame = true;
+					break;
+				}
+			}
+			if (frame) {
+				const article = document.createElement('article');
+				article.append(...nodes);
+				if (this.createDraggable) {
+					let container = document.createElement('div');
+					container = compose_helper.create_draggable(container);
+					container.append(article);
+					assembledPanels.add(container);
+				} else assembledPanels.add(article);
+			} else assembledPanels.add(...nodes);
+		})
+		return assembledPanels;
 	}
 
 	compose_text() {
