@@ -256,15 +256,15 @@ nav {
 	text-align: center;
 
 	div[data-notification]::after {
-			content: attr(data-notification);
-			color: var(--article);
-			position: absolute;
-			margin-top: -3.5em;
-			margin-left: 1.25em;
-			font-size: .75em;
-			background-color: var(--red);
-			padding: 0 .25em;
-			border-radius: 3px;
+		content: attr(data-notification);
+		color: var(--article);
+		position: absolute;
+		margin-top: -3.5em;
+		margin-left: 1.25em;
+		font-size: .75em;
+		background-color: var(--red);
+		padding: 0 .25em;
+		border-radius: 3px;
 	}
 
 	div[data-notification='0']::after {
@@ -701,7 +701,7 @@ hr {
 	border-color: var(--darkshadow);
 }
 
-hr.insertionarea {
+hr.insertionArea {
 	margin: 1em auto;
 	height: 1em;
 	width: 100%;
@@ -709,12 +709,12 @@ hr.insertionarea {
 	border-radius: .5em;
 }
 
-section>div>hr {
-	width: 95%
+.insertionAreaHover {
+	background-color: var(--green);
 }
 
-.hrhover {
-	background-color: var(--green);
+section>div>hr {
+	width: 95% !important;
 }
 
 .articleindicator {
@@ -753,7 +753,12 @@ span.nocontent {
 }
 
 .draggableFormElement {
-	border: 1px solid var(--cta_darker);
+	border: 1px solid var(--cta);
+	border-radius: .5em;
+}
+
+.draggableFormElementHover {
+	border-color: var(--green);
 }
 
 [data-type]::before,

@@ -194,15 +194,15 @@ export const compose_helper = {
 				else if (evnt.target.localName === 'hr') {
 					let container = document.createElement('div'),
 						article = document.createElement('article'),
-						insertionarea = document.createElement('hr');
+						insertionArea = document.createElement('hr');
 					container = compose_helper.create_draggable(container, false);
 					article.append(draggedElementClone);
-					insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-					insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-					insertionarea.classList.add('insertionarea');
-					container.append(insertionarea, article);
+					insertionArea.setAttribute('ondragover', 'this.classList.add(\'insertionAreaHover\')');
+					insertionArea.setAttribute('ondragleave', 'this.classList.remove(\'insertionAreaHover\')');
+					insertionArea.classList.add('insertionArea');
+					container.append(insertionArea, article);
 					droppedUpon.parentNode.insertBefore(container, droppedUpon);
-					droppedUpon.firstChild.classList.remove('hrhover');
+					droppedUpon.firstChild.classList.remove('insertionAreaHover');
 				}
 				// avoid dropping elsewhere (main, article borders, etc.)
 				else return;
@@ -221,7 +221,7 @@ export const compose_helper = {
 			if (evnt.target.localName === 'hr') {
 				// handle only if dropped within the reorder area
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
-				droppedUpon.firstChild.classList.remove('hrhover');
+				droppedUpon.firstChild.classList.remove('insertionAreaHover');
 				this.stopParentDropEvent = true;
 				draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
 				// sanitize section on lack of articles
@@ -239,7 +239,7 @@ export const compose_helper = {
 				let container = document.createElement('div'),
 					article = document.createElement('article'),
 					section = document.createElement('section'),
-					insertionarea = document.createElement('hr'),
+					insertionArea = document.createElement('hr'),
 					previousSibling = droppedUpon.previousElementSibling;
 				container = compose_helper.create_draggable(container, false);
 
@@ -247,10 +247,10 @@ export const compose_helper = {
 				article.append(section);
 				container.append(article);
 
-				insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-				insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-				insertionarea.classList.add('insertionarea');
-				container.insertBefore(insertionarea, container.firstChild);
+				insertionArea.setAttribute('ondragover', 'this.classList.add(\'insertionAreaHover\')');
+				insertionArea.setAttribute('ondragleave', 'this.classList.remove(\'insertionAreaHover\')');
+				insertionArea.classList.add('insertionArea');
+				container.insertBefore(insertionArea, container.firstChild);
 				previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
 				draggedElement.remove(); // do not remove earlier! inserBefore might reference to this object by chance
 				return;
@@ -267,18 +267,19 @@ export const compose_helper = {
 		}
 	},
 
-	create_draggable: function (element, insertionarea = true) {
+	create_draggable: function (element, insertionArea = true) {
 		element.id = getNextElementID();
 		element.setAttribute('draggable', 'true');
 		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
-		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event)');
-		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this)');
-		if (insertionarea) {
-			const insertionarea = document.createElement('hr');
-			insertionarea.setAttribute('ondragover', 'this.classList.add(\'hrhover\')');
-			insertionarea.setAttribute('ondragleave', 'this.classList.remove(\'hrhover\')');
-			insertionarea.classList.add('insertionarea');
-			element.insertBefore(insertionarea, element.firstChild);
+		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event); this.classList.add(\'draggableFormElementHover\')');
+		element.setAttribute('ondragleave', 'this.classList.remove(\'draggableFormElementHover\')');
+		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this), this.classList.remove(\'draggableFormElementHover\')');
+		if (insertionArea) {
+			const insertionArea = document.createElement('hr');
+			insertionArea.setAttribute('ondragover', 'this.classList.add(\'insertionAreaHover\')');
+			insertionArea.setAttribute('ondragleave', 'this.classList.remove(\'insertionAreaHover\')');
+			insertionArea.classList.add('insertionArea');
+			element.insertBefore(insertionArea, element.firstChild);
 		}
 		return element;
 	},
