@@ -885,7 +885,6 @@ button[data-type=trash]::before {
 	mask-image: url('./media/trash-alt.svg');
 }
 
-[data-type=hiddeninput]::before,
 [data-type=password]::before {
 	background-image: url('./media/user-secret.svg');
 }
