@@ -266,10 +266,11 @@ export class Assemble {
 		this.imageBarCode = [];
 		this.imageUrl = [];
 		this.names = {};
-		this.composer = undefined; // from composer.js
+		this.composer = setup.composer;
 	}
 
-	initializeSection(nextSibling = null) {
+	initializeSection(nextSibling = null, formerSibling = null) {
+		console.log(formerSibling, this.content);
 		if (typeof nextSibling === 'string') nextSibling = document.querySelector(nextSibling);
 		if (this.form && !nextSibling) {
 			this.section = document.createElement('form');
@@ -288,17 +289,29 @@ export class Assemble {
 				}
 			}]);
 		} else if (!this.composer) this.section = document.createElement('div');
-		else if (this.composer) this.section = document.getElementById('main');
+		else if (this.composer == 'photoOrScanner') this.section = formerSibling.parentNode;
+		else if (this.composer) this.section = document.getElementById('main'); // from composer.js
 
 		this.assembledPanels = this.processContent();
 
-		if (!nextSibling) {
+		if (!nextSibling && !formerSibling) {
 			this.section.append(...this.assembledPanels);
 			if (!this.composer) document.getElementById('main').insertAdjacentElement('beforeend', this.section);
-		} else {
+		} else if (nextSibling) {
 			const tiles = Array.from(this.assembledPanels);
 			for (let i = 0; i < tiles.length; i++) {
 				nextSibling.parentNode.insertBefore(tiles[i], nextSibling);
+			}
+		} else if (formerSibling) {
+			const tiles = Array.from(this.assembledPanels);
+			for (let i = 0; i < tiles.length; i++) {
+				// extract article children, there are unlikely sections
+				let article = [...tiles[i].children];
+				console.log(article);
+				for (let j = 0; j < article.length; j++) {
+					formerSibling.after(article[j]);
+					formerSibling = article[j];
+				}
 			}
 		}
 
@@ -598,8 +611,10 @@ export class Assemble {
 	apply_attributes(setup, node) {
 		for (const [key, attribute] of Object.entries(setup)) {
 			if (events.includes(key)) {
-				node[key] = new Function(attribute);
-			} else node.setAttribute(key, attribute);
+				if (attribute) node[key] = new Function(attribute);
+			} else {
+				if (attribute) node.setAttribute(key, attribute);
+			}
 		}
 		return node;
 	}
@@ -780,7 +795,8 @@ export class Assemble {
 			type: 'photo',
 			description: 'photo upload',
 			attributes: {
-				name: 'photo'
+				name: 'photo',
+				multiple: true|undefined
 			}
 			hint: 'this photo serves as...'
 		}*/
@@ -788,7 +804,15 @@ export class Assemble {
 			label = document.createElement('button'),
 			img = document.createElement('img'),
 			resetbutton = document.createElement('button'),
-			addbutton = document.createElement('button');
+			addbutton = document.createElement('button'),
+			hint = [...this.hint()],
+			multiple;
+		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
+			multiple = true;
+			if (this.currentElement.attributes.name && !this.currentElement.attributes.name.endsWith('[]')) this.currentElement.attributes.name += '[]';
+			// delete for input apply_attributes
+			delete this.currentElement.attributes.multiple;
+		}
 
 		function changeEvent() {
 			this.nextSibling.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(', ') + ' ' + LANG.GET('assemble.photo_rechoose') : LANG.GET('assemble.photo_choose');
@@ -796,37 +820,9 @@ export class Assemble {
 			else this.nextSibling.src = '';
 		}
 
-		function cloneNode() {
-			const nextPhoto = this.parentNode.cloneNode(true);
-			// input type file
-			nextPhoto.childNodes[1].id = getNextElementID();
-			nextPhoto.childNodes[1].files = null;
-			nextPhoto.childNodes[1].onchange = changeEvent;
-			// preview image
-			nextPhoto.childNodes[2].src = '';
-			// label
-			nextPhoto.childNodes[3].innerHTML = LANG.GET('assemble.photo_choose');
-			nextPhoto.childNodes[3].onclick = new Function("document.getElementById('" + nextPhoto.childNodes[1].id + "').click();");
-			// delete button
-			if (nextPhoto.childNodes.length < 7) {
-				const deletebutton = document.createElement('button');
-				deletebutton.setAttribute('data-type', 'deletebutton');
-				deletebutton.classList.add('inlinebutton');
-				deletebutton.type = 'button';
-				nextPhoto.insertBefore(deletebutton, nextPhoto.childNodes[4]);
-			}
-			nextPhoto.childNodes[4].onpointerup = new Function('this.parentNode.remove();');
-			// add button
-			nextPhoto.childNodes[5].onpointerup = cloneNode;
-			// reset button
-			nextPhoto.childNodes[6].onpointerup = new Function("let e=document.getElementById('" + nextPhoto.childNodes[1].id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
-
-			this.parentNode.after(nextPhoto);
-		}
-
 		input.type = 'file';
 		input.id = getNextElementID();
-		input.name = this.currentElement.description + '[]';
+		input.name = this.currentElement.description + multiple ? '[]' : '';
 		input.accept = 'image/*';
 		input.capture = true;
 		input.onchange = changeEvent;
@@ -845,12 +841,21 @@ export class Assemble {
 		resetbutton.classList.add('inlinebutton');
 		resetbutton.type = 'button';
 
-		addbutton.onpointerup = cloneNode;
+		if (multiple) this.currentElement.attributes.multiple = true;
+		const photoElementClone = structuredClone(this.currentElement);
+		addbutton.onpointerup = function () {
+			new Assemble({
+				content: [
+					[photoElementClone]
+				],
+				composer: 'photoOrScanner'
+			}).initializeSection(null, hint.length ? hint : resetbutton)
+		};
 		addbutton.setAttribute('data-type', 'additem');
 		addbutton.classList.add('inlinebutton');
 		addbutton.type = 'button';
 
-		return [...this.header(), input, img, label, addbutton, resetbutton, ...this.hint()];
+		return [...this.header(), input, img, label, multiple ? addbutton : [], resetbutton, ...hint];
 	}
 
 	select() {
@@ -1044,31 +1049,63 @@ export class Assemble {
 		/*{
 			type: 'scanner',
 			description:'access credentials' (e.g.),
-			attributes:{type:'password'} // to override e.g. for logins
+			attributes:{name: 'input name', type:'password', multiple: true|undefined} // type: to override e.g. for logins, multiple: to clone after successful import
 			destination: elementId // force output to other input, e.g. search
 		} */
 		let result = [],
-			input, inputid;
+			input, inputid, label,
+			multiple;
+		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
+			multiple = true;
+			// delete for input apply_attributes
+			delete this.currentElement.attributes.multiple;
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + ' ' + LANG.GET('assemble.scan_multiple') : LANG.GET('assemble.scan_multiple');
+		}
+
 		if (this.currentElement.destination !== undefined) {
 			inputid = this.currentElement.destination;
 		} else {
-			if (!this.currentElement.attributes) this.currentElement['attributes']={};
-			if (!this.currentElement.attributes.name) this.currentElement.attributes['name'] = this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button');
-			if (this.currentElement.attributes.type !== undefined) input = [...this.input(this.currentElement.attributes.type)];
-			else input = [...this.input('text')];
-			inputid = input[1].id ? input[1].id : input[2].id;
-			result = result.concat(input);
+			input = document.createElement('input');
+			input.type = 'text';
+			input.id = inputid = getNextElementID();
+			input.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+			input.placeholder = ' '; // to access input:not(:placeholder-shown) query selector 
+			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
+			input.autocomplete = input.type === 'password' ? 'one-time-code' : 'off';
+
+			label = document.createElement('label');
+			label.htmlFor = input.id;
+			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
+			label.classList.add('input-label');
+			if (input.type === 'password') this.currentElement.type = 'password'; // for icon
+			result = result.concat([...this.icon(), input, label, ...this.hint()]);
+			this.currentElement.type = 'scanner';
 		}
-		//attributes are processed already, therefore they can be reassigned
-		this.currentElement.attributes = {
-			value: this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button'),
-			onpointerup: "new Dialog({type:'scanner'}).then((response) => {" +
-				"document.getElementById('" + inputid + "').value = document.querySelector('dialog>form>input').value;" +
-				"});",
-			'data-type': 'scanner',
-			type: 'button'
+
+		if (multiple) this.currentElement.attributes.multiple = true;
+		const scannerElementClone = structuredClone(this.currentElement);
+
+		let button = document.createElement('button');
+		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.scan_button')));
+		button.type = 'button';
+		button.setAttribute('data-type', 'scanner');
+
+		button.onpointerup = function () {
+			new Dialog({
+				type: 'scanner'
+			}).then((response) => {
+				document.getElementById(inputid).value = document.querySelector('dialog>form>input').value;
+				if (multiple) {
+					new Assemble({
+						content: [
+							[scannerElementClone]
+						],
+						composer: 'photoOrScanner'
+					}).initializeSection(null, button)
+				}
+			});
 		};
-		result.push(this.button())
+		result.push(button);
 		return result;
 	}
 	image() {

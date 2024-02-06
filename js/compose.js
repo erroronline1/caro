@@ -640,6 +640,7 @@ export class Compose extends Assemble {
 		return this.compose_simpleElement({
 			type: 'photo',
 			description: LANG.GET('assemble.compose_photo'),
+			multiple: 'optional'
 		});
 	}
 	compose_signature() {
@@ -653,6 +654,7 @@ export class Compose extends Assemble {
 		return this.compose_simpleElement({
 			type: 'scanner',
 			description: LANG.GET('assemble.compose_scanner'),
+			multiple: 'optional'
 		});
 	}
 

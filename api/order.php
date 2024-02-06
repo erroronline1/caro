@@ -561,7 +561,8 @@ class ORDER extends API {
 							['type' => 'photo',
 							'description' => LANG::GET('order.attach_photo'),
 							'attributes' => [
-								'name' => 'attachments[]'
+								'name' => 'attachments[]',
+								'multiple' => true
 							]]
 						]
 					],
