@@ -73,9 +73,8 @@ export const compose_helper = {
 			if (elementName === 'required' && sibling.checked) element.attributes['required'] = true;
 			if (elementName === 'multiple' && sibling.checked) element.attributes['multiple'] = true;
 			sibling = sibling.nextSibling;
-
 		}
-		while (sibling !== undefined && sibling != null);
+		while (sibling);
 
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
@@ -341,7 +340,9 @@ export class Compose extends Assemble {
 					// creation form for adding elements
 					if (element[0].form) {
 						const form = document.createElement('form');
-						form.onsubmit = new Function('compose_helper.composeNewElementCallback(this); return true;')
+						form.onsubmit = () => {
+							compose_helper.composeNewElementCallback(form);
+						};
 						form.action = 'javascript:void(0);';
 						for (const e of widget) {
 							if (e) form.append(e);
@@ -537,7 +538,7 @@ export class Compose extends Assemble {
 				value: LANG.GET('assemble.compose_multilist_add_item_button'),
 				'data-type': 'additem',
 				type: 'button',
-				onpointerdown: cloneItems
+				onpointerup: cloneItems
 			}
 		};
 		result.push(this.button());
@@ -678,7 +679,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			attributes: {
 				value: std.description,
-				onpointerdown: std.action,
+				onpointerup: std.action,
 				type: 'button'
 			}
 		};
