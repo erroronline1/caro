@@ -23,9 +23,8 @@ export const compose_helper = {
 			element = {
 				attributes: {}
 			};
-		console.log(element, parent);
 		do {
-			if (sibling.type === 'button' || sibling.type === 'submit' || ['label', 'header', 'br', 'button'].includes(sibling.localName)) {
+			if (!(['span', 'input'].includes(sibling.localName))) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
@@ -36,12 +35,11 @@ export const compose_helper = {
 			}
 			elementName = sibling.name.replace(/\(.*?\)|\[\]/g, '');
 			value = sibling.value;
-
 			if (['links', 'radio', 'select', 'checkbox'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_multilist_name')) {
 					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
-					if (value && setTo === 'name') element.attributes['name'] = value;
-					else if (value && setTo === 'description') element['description'] = value;
+					if (value && setTo === 'name') element.attributes.name = value;
+					else if (value && setTo === 'description') element.description = value;
 					else return;
 				}
 				if (elementName === LANG.GET('assemble.compose_multilist_add_item') && value) {
@@ -51,37 +49,36 @@ export const compose_helper = {
 			} else if (['file', 'photo', 'scanner'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_simple_element')) {
 					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
-					if (value && setTo === 'name') element.attributes['name'] = value;
-					else if (value && setTo === 'description') element['description'] = value;
+					if (value && setTo === 'name') element.attributes.name = value;
+					else if (value && setTo === 'description') element.description = value;
 					else return;
 				}
 			} else if (['text'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_text_description')) {
-					if (value) element['description'] = value;
+					if (value) element.description = value;
 					else return;
 				}
 				if (elementName === LANG.GET('assemble.compose_text_content') && value) {
-					element['content'] = value;
+					element.content = value;
 				}
 			} else {
 				if (elementName === LANG.GET('assemble.compose_field_name')) {
-					if (value) element.attributes['name'] = value;
+					if (value) element.attributes.name = value;
 					else return;
 				}
 			}
-			if (elementName === LANG.GET('assemble.compose_field_hint') && value) element['hint'] = value;
-			if (elementName === 'required' && sibling.checked) element.attributes['required'] = true;
-			if (elementName === 'multiple' && sibling.checked) element.attributes['multiple'] = true;
+			if (elementName === LANG.GET('assemble.compose_field_hint') && value) element.hint = value;
+			if (elementName === LANG.GET('assemble.compose_required') && sibling.checked) element.attributes.required = true;
+			if (elementName === LANG.GET('assemble.compose_multiple') && sibling.checked) element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		}
 		while (sibling);
-
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
 				'draggable': true,
 				'composer': 'component',
 				'content': [
-					[element]
+					[structuredClone(element)] // element receives attributes from currentElement otherwise
 				]
 			});
 			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] = element;
@@ -472,7 +469,7 @@ export class Compose extends Assemble {
 			content: {}
 		};
 		this.currentElement.content[LANG.GET('assemble.compose_required')] = {
-			name: 'required'
+			name: LANG.GET('assemble.compose_required')
 		};
 		result = result.concat(this.br(), ...this.checkbox());
 		this.currentElement = {
@@ -547,7 +544,7 @@ export class Compose extends Assemble {
 				content: {}
 			};
 			this.currentElement.content[LANG.GET('assemble.compose_required')] = {
-				name: 'required'
+				name: LANG.GET('assemble.compose_required')
 			};
 			result = result.concat(this.br(), ...this.checkbox());
 		}
@@ -609,7 +606,7 @@ export class Compose extends Assemble {
 				content: {}
 			};
 			this.currentElement.content[LANG.GET('assemble.compose_required')] = {
-				name: 'required'
+				name: LANG.GET('assemble.compose_required')
 			};
 			result = result.concat(this.br(), ...this.checkbox());
 		}
@@ -618,7 +615,7 @@ export class Compose extends Assemble {
 				content: {}
 			};
 			this.currentElement.content[LANG.GET('assemble.compose_multiple')] = {
-				name: 'multiple'
+				name: LANG.GET('assemble.compose_multiple')
 			};
 			result = result.concat(this.br(), ...this.checkbox());
 		}

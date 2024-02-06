@@ -167,7 +167,7 @@ export const api = {
 						break;
 					default:
 						successFn = function (data) {
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 							api.application('get', request[1], data.status.id);
 						};
 						payload = _.getInputs('[data-usecase=manual]', true);
@@ -205,8 +205,8 @@ export const api = {
 					document.getElementById('main').replaceChildren();
 					new Assemble(data.body).initializeSection();
 				}
-				if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
-				if ('status' in data && 'redirect' in data.status) api.file('get', ...data.status.redirect);
+				if (data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.status.redirect !== undefined) api.file('get', ...data.status.redirect);
 			},
 			payload,
 			title = {
@@ -230,7 +230,7 @@ export const api = {
 									} else file.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case 'bundlefilter':
@@ -242,15 +242,15 @@ export const api = {
 									list.parentNode.style.display = data.status.data.includes(list.dataset.filtered) ? 'block' : 'none';
 								}
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 				}
 				break;
 			case 'post':
 				successFn = function (data) {
-					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
-					if ('status' in data && 'redirect' in data.status) api.file('get', ...data.status.redirect);
+					if (data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.status.redirect !== undefined) api.file('get', ...data.status.redirect);
 				};
 				payload = _.getInputs('[data-usecase=file]', true);
 				break;
@@ -288,7 +288,7 @@ export const api = {
 								data.body.content.name = data.name;
 								if (data.body.content) compose_helper.importForm(data.body.content);
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						}
 						break;
 					case 'component_editor':
@@ -299,7 +299,7 @@ export const api = {
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importComponent(data.body.component);
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						}
 						break;
 					case 'form':
@@ -308,7 +308,7 @@ export const api = {
 								document.getElementById('main').replaceChildren();
 								new Assemble(data.body).initializeSection();
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						}
 						break;
 					case 'form_editor':
@@ -319,7 +319,7 @@ export const api = {
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importForm(data.body.component);
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						}
 						break;
 				}
@@ -328,8 +328,7 @@ export const api = {
 				switch (request[1]) {
 					case 'component':
 						successFn = function (data) {
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
-							if ('status' in data && 'name' in data.status && data.status.name) api.form('get', 'component', data.status.name);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						}
 						if (!(payload = compose_helper.composeNewComponent())) return;
 						break;
@@ -338,7 +337,7 @@ export const api = {
 						// TO DO: implement usecases to select from, e.g. in setup.ini? 
 						////////////////////////////////////////////
 						successFn = function (data) {
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						}
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
@@ -369,7 +368,7 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				api.toast(data.status.msg);
-				if ('redirect' in data.status && data.status.redirect)
+				if (data.status.redirect !== undefined)
 					api.message('get', data.status.redirect);
 			},
 			title = {
@@ -389,7 +388,7 @@ export const api = {
 									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? 'block' : 'none';
 								}
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					default:
@@ -400,7 +399,7 @@ export const api = {
 								new Assemble(data.body).initializeSection();
 								api.preventDataloss.start();
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 							if (request[1] === 'inbox' && _serviceWorker.worker) _serviceWorker.onMessage({
 								unseen: 0
 							});
@@ -474,7 +473,7 @@ export const api = {
 							if (data.body.content) {
 								new Assemble(data.body).initializeSection('hr');
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case 'filter':
@@ -485,7 +484,7 @@ export const api = {
 									order.parentNode.style.display = data.status.data.includes(order.dataset.filtered) ? 'block' : 'none';
 								}
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					default:
@@ -497,7 +496,7 @@ export const api = {
 								if (request[1] === 'approved') orderClient.filter();
 								api.preventDataloss.start();
 							}
-							if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+							if (data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 				}
 				break;
@@ -550,7 +549,7 @@ export const api = {
 						document.getElementById('main').replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
-					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+					if (data.status.msg !== undefined) api.toast(data.status.msg);
 				};
 				if (request[3] === 'display') {
 					payload = _.getInputs('[data-usecase=tool_create_code]');
@@ -591,7 +590,7 @@ export const api = {
 						document.getElementById('main').replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
-					if ('status' in data && 'msg' in data.status) api.toast(data.status.msg);
+					if (data.status.msg !== undefined) api.toast(data.status.msg);
 				};
 				break;
 			case 'post':
