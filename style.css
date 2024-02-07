@@ -500,7 +500,8 @@ button {
 	background: transparent;
 	color: var(--foreground);
 	font-weight: initial;
-	border-radius: 0
+	border-radius: 0;
+	margin:.25em;
 }
 
 .discreetButton:nth-of-type(even) {
@@ -578,8 +579,9 @@ article>span[data-type] {
 }
 
 .textarea-hint,
-.links-hint {
-	margin-top: 1;
+.links-hint,
+.photo-hint {
+	margin-top: 1em;
 }
 
 button+div,
