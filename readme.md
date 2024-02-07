@@ -95,17 +95,16 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * filter length string orders
 * filter by fields? dropdown?
 
+* settings? force desktop mode for small window? themes?
 * forms and contexts
 * pdf export (https://github.com/tecnickcom/TCPDF?tab=readme-ov-file)
 * vendor list
 * user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
-* qr-code reader raw implementation
 * sample check MDR §14
 * caro audit
-* manuals
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * text recommendations
 * calendar and alerts
-
+* md mermaid flowcharts
