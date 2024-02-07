@@ -603,8 +603,7 @@ export class Assemble {
 		let div = document.createElement('div');
 		div.classList.add('hint');
 		div.appendChild(document.createTextNode(this.currentElement.hint));
-		if (this.currentElement.type === 'textarea') div.classList.add('textarea-hint');
-		if (this.currentElement.type === 'links') div.classList.add('links-hint');
+		if (['textarea', 'links', 'photo'].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + '-hint');
 		return [div];
 	}
 
@@ -801,17 +800,21 @@ export class Assemble {
 			hint: 'this photo serves as...'
 		}*/
 		let input = document.createElement('input'),
-			label = document.createElement('button'),
+			button = document.createElement('button'),
 			img = document.createElement('img'),
 			resetbutton = document.createElement('button'),
 			addbutton = document.createElement('button'),
 			hint = [...this.hint()],
 			multiple;
-		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
-			multiple = true;
-			if (this.currentElement.attributes.name && !this.currentElement.attributes.name.endsWith('[]')) this.currentElement.attributes.name += '[]';
-			// delete for input apply_attributes
-			delete this.currentElement.attributes.multiple;
+
+		if (this.currentElement.attributes) {
+			if (!this.currentElement.attributes.name) this.currentElement.attributes.name = this.currentElement.description;
+			if (this.currentElement.attributes.multiple) {
+				multiple = true;
+				if (this.currentElement.attributes.name && !this.currentElement.attributes.name.endsWith('[]')) this.currentElement.attributes.name += '[]';
+				// delete for input apply_attributes
+				delete this.currentElement.attributes.multiple;
+			}
 		}
 
 		function changeEvent() {
@@ -822,16 +825,15 @@ export class Assemble {
 
 		input.type = 'file';
 		input.id = getNextElementID();
-		input.name = this.currentElement.description + multiple ? '[]' : '';
 		input.accept = 'image/*';
 		input.capture = true;
 		input.onchange = changeEvent;
-		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
-		label.onclick = new Function("document.getElementById('" + input.id + "').click();");
-		label.type = 'button';
-		label.setAttribute('data-type', 'photo');
-		label.classList.add('inlinebutton');
-		label.appendChild(document.createTextNode(LANG.GET('assemble.photo_choose')));
+		if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
+		button.onclick = new Function("document.getElementById('" + input.id + "').click();");
+		button.type = 'button';
+		button.setAttribute('data-type', 'photo');
+		button.classList.add('inlinebutton');
+		button.appendChild(document.createTextNode(LANG.GET('assemble.photo_choose')));
 
 		img.classList.add('photoupload');
 
@@ -855,7 +857,7 @@ export class Assemble {
 		addbutton.classList.add('inlinebutton');
 		addbutton.type = 'button';
 
-		return [...this.header(), input, img, label, multiple ? addbutton : [], resetbutton, ...hint];
+		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
 	}
 
 	select() {
