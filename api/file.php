@@ -81,7 +81,7 @@ class FILE extends API {
 				$result['body']['content'][]=
 				[
 					['type' => 'links',
-					'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+					'description' => LANG::GET('file.file_list', [':folder' => pathinfo($folder)['filename']]),
 					'content' => $matches
 					]
 				];
