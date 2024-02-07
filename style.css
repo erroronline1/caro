@@ -531,6 +531,8 @@ button:disabled {
 
 [data-type=deletebutton],
 .reducedCTA {
+	width:auto;
+	float: right;
 	color: var(--foreground);
 	background-color: var(--article);
 	border: 1px solid var(--cta);
