@@ -18,13 +18,13 @@ export const compose_helper = {
 			setTo, elementName, value;
 		const setName = {
 				name: ['select', 'scanner'],
-				description: ['links', 'photo', 'file', 'checkbox', 'radio']
+				description: ['links', 'photo', 'file', 'checkbox', 'radio', 'signature']
 			},
 			element = {
 				attributes: {}
 			};
 		do {
-			if (!(['span', 'input'].includes(sibling.localName))) {
+			if (!(['span', 'input', 'textarea'].includes(sibling.localName))) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
@@ -46,7 +46,7 @@ export const compose_helper = {
 					if (element.content === undefined) element.content = {};
 					element.content[value] = {};
 				}
-			} else if (['file', 'photo', 'scanner'].includes(element.type)) {
+			} else if (['file', 'photo', 'scanner', 'signature'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_simple_element')) {
 					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
 					if (value && setTo === 'name') element.attributes.name = value;
@@ -143,18 +143,18 @@ export const compose_helper = {
 		const newElements = new Compose({
 			'draggable': true,
 			'composer': 'component',
-			'content': form.content
+			'content': structuredClone(form.content)
 		});
 		// recursive function to assign created ids to form content elements in order of appearance
 		const elementIDs = newElements.generatedElementIDs;
 		let i = 0;
 
 		function assignIDs(element) {
-			for (const container of Object.entries(element)) {
-				if (typeof container[0] === 'array') {
+			for (const container of element) {
+				if (container.constructor.name === 'Array') {
 					assignIDs(container);
 				} else {
-					compose_helper.newFormComponents[elementIDs] = container;
+					compose_helper.newFormComponents[elementIDs[i]] = container;
 					i++;
 				}
 			}
