@@ -597,7 +597,7 @@ export class Assemble {
 	}
 
 	hint() {
-		if (this.currentElement.hint === undefined) return [];
+		if (!this.currentElement.hint) return [];
 		let div = document.createElement('div');
 		div.classList.add('hint');
 		div.appendChild(document.createTextNode(this.currentElement.hint));
@@ -696,6 +696,7 @@ export class Assemble {
 		/*{
 			type: 'button',
 			description: 'some button',
+			hint: 'this button does this or that'
 			attributes: {
 				onpointerdown: 'alert("hello")'
 			}
@@ -707,7 +708,7 @@ export class Assemble {
 			delete this.currentElement.attributes.value;
 		}
 		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
-		return button;
+		return [button, ...this.hint()];
 	}
 	deletebutton() { // to style it properly by adding data-type to article container
 		this.currentElement.attributes['data-type'] = 'deletebutton';
