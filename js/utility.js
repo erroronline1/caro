@@ -125,8 +125,8 @@ const orderClient = {
 						},
 						{
 							type: 'deletebutton',
-							description: LANG.GET('order.add_delete'),
 							attributes: {
+								value: LANG.GET('order.add_delete'),
 								onpointerup: 'this.parentNode.remove()'
 							}
 						}
