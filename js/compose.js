@@ -444,7 +444,7 @@ export class Compose extends Assemble {
 				'data-type': 'addblock',
 			}
 		};
-		result.push(this.button());
+		result = result.concat(...this.button());
 		return result;
 	}
 
@@ -478,7 +478,7 @@ export class Compose extends Assemble {
 				'data-type': 'addblock',
 			}
 		};
-		result.push(this.button());
+		result = result.concat(...this.button());
 		return result;
 	}
 	compose_textinput() {
@@ -538,7 +538,7 @@ export class Compose extends Assemble {
 				onpointerup: cloneItems
 			}
 		};
-		result.push(this.button());
+		result = result.concat(...this.button());
 		if (type.required !== undefined) {
 			this.currentElement = {
 				content: {}
@@ -554,7 +554,7 @@ export class Compose extends Assemble {
 				'data-type': 'addblock',
 			}
 		};
-		result.push(this.button());
+		result = result.concat(...this.button());
 		return result;
 	}
 	compose_select() {
@@ -625,7 +625,7 @@ export class Compose extends Assemble {
 				'data-type': 'addblock',
 			}
 		};
-		result.push(this.button());
+		result = result.concat(...this.button());
 		return result;
 	}
 
@@ -682,7 +682,7 @@ export class Compose extends Assemble {
 				type: 'button'
 			}
 		};
-		result.push(this.submitbutton());
+		result = result.concat(...this.submitbutton());
 		return result;
 	}
 	compose_form() {
