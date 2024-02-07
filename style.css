@@ -84,6 +84,7 @@ body::before {
 header {
 	margin: .75em auto;
 	width: 100%;
+	clear:both;
 }
 
 body>header {
