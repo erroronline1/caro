@@ -601,7 +601,7 @@ export class Assemble {
 		let div = document.createElement('div');
 		div.classList.add('hint');
 		div.appendChild(document.createTextNode(this.currentElement.hint));
-		if (['textarea', 'links', 'photo'].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + '-hint');
+		if (['textarea', 'links'].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + '-hint');
 		return [div];
 	}
 
@@ -1035,13 +1035,12 @@ export class Assemble {
 			type: 'button',
 			onpointerup: 'signaturePad.clear()'
 		};
-		result = result.concat(this.deletebutton());
+		result = result.concat(this.deletebutton()); // hint will be added here as well
 		const input = document.createElement('input');
 		input.type = 'file';
 		input.id = input.name = 'signature';
 		input.hidden = true;
 		result.push(input);
-		result = result.concat(this.hint());
 		this.signaturePad = true;
 		return result;
 	}
