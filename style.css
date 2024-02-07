@@ -501,7 +501,7 @@ button {
 	color: var(--foreground);
 	font-weight: initial;
 	border-radius: 0;
-	margin:.25em;
+	margin: .25em;
 }
 
 .discreetButton:nth-of-type(even) {
@@ -531,7 +531,7 @@ button:disabled {
 
 [data-type=deletebutton],
 .reducedCTA {
-	width:auto;
+	width: auto;
 	float: right;
 	color: var(--foreground);
 	background-color: var(--article);
@@ -540,6 +540,10 @@ button:disabled {
 
 button:active {
 	background-color: var(--cta_active);
+}
+
+#signaturecanvas {
+	border-bottom: 1px solid var(--foreground);
 }
 
 .signature_required_alert {
