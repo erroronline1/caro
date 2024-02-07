@@ -206,7 +206,7 @@ export const api = {
 					new Assemble(data.body).initializeSection();
 				}
 				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
-				if (data.status.redirect !== undefined) api.file('get', ...data.status.redirect);
+				if (data.status !== undefined && data.status.redirect !== undefined) api.file('get', ...data.status.redirect);
 			},
 			payload,
 			title = {
