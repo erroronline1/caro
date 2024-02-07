@@ -306,13 +306,13 @@ class ORDER extends API {
 					// manual adding has the same names but has to be ignores
 					// as per layout these names appear before actual ordered items
 					// being ignored the items keys are reduced by 1
-					if (boolval($subvalue)) {
+					if (boolval($subvalue) && $subvalue !== 'undefined') {
 						if (!array_key_exists(intval($index) - 1, $order_data['items'])) $order_data['items'][]=[];
 						$order_data['items'][intval($index) - 1][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
 					}
 				}
 			} else {
-				if (boolval($value)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
+				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
 			}
 		}
 		$order_data[LANG::GET('order.orderer')]=$_SESSION['user']['name'];
@@ -809,7 +809,7 @@ class ORDER extends API {
 				// delete old received unarchived orders
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-received'));
 				$statement->execute([
-					':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24)),
+					':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24 * 3600)),
 				]);
 				$old = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($old as $row){
@@ -963,7 +963,7 @@ class ORDER extends API {
 					$status=[];
 					foreach(['ordered','received','archived'] as $s){
 						if (boolval($row[$s])) {
-							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true, 'data-' . $s => true];
+							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true, 'data-' . $s => 'true'];
 							$text .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
 						else {
@@ -972,11 +972,11 @@ class ORDER extends API {
 								|| (in_array($s, ['ordered']) && (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])))
 							) $status[LANG::GET('order.' . $s)] = [
 								'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.setAttribute('data-".$s."', 'true');",
-								'data-'.$s => false
+								'data-'.$s => 'false'
 							];
 							else $status[LANG::GET('order.' . $s)] = [
 								'disabled' => true,
-								'data-'.$s => false
+								'data-'.$s => 'false'
 							];
 						}
 					}
@@ -1038,12 +1038,16 @@ class ORDER extends API {
 						'type' => 'checkbox',
 						'content' => $status
 					];
-
+					$autodelete='';
+					if ($row['received'] && !$row['archived']){
+						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
+					}
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
 						'type' => 'deletebutton',
+						'hint' => $autodelete,
 						'attributes' => [
-							'value' => LANG::GET('order.delete_prepared_order'),
 							'type' => 'button',
+							'value' => LANG::GET('order.delete_prepared_order'),
 							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
 								"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
 								"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
