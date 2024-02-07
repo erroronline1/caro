@@ -580,7 +580,7 @@ article>span[data-type] {
 
 .textarea-hint,
 .links-hint,
-.photo-hint {
+button+.hint {
 	margin-top: 1em;
 }
 
