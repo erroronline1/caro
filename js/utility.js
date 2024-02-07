@@ -145,8 +145,25 @@ const orderClient = {
 		document.querySelectorAll('[data-ordered]').forEach(article => {
 			article.parentNode.style.display = 'none';
 		});
-		(type ? display = document.querySelectorAll(`[data-${type}=true]`) : document.querySelectorAll('[data-ordered=false]')).forEach(article => {
-			article.parentNode.style.display = 'block';
+		const filters = {
+			ordered: document.querySelectorAll('[data-ordered=true]'),
+			received: document.querySelectorAll('[data-received=true]'),
+			archived: document.querySelectorAll('[data-archived=true]')
+		};
+		let display = [...document.querySelectorAll('[data-ordered=false]')].map(function (node) {
+			return node.parentNode
+		});
+		if (type === 'ordered') display = [...filters.ordered].map(function (node) {
+			return [...filters.received].map(n => n.parentNode).concat([...filters.archived].map(n => n.parentNode)).includes(node.parentNode) ? undefined : node.parentNode;
+		});
+		if (type === 'received') display = [...filters.received].map(function (node) {
+			return [...filters.archived].map(n => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
+		});
+		if (type === 'archived') display = [...filters.archived].map(function (node) {
+			return node.parentNode
+		});
+		display.forEach(article => {
+			if (article) article.style.display = 'block';
 		});
 	}
 };
