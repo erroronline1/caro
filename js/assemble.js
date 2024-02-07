@@ -270,7 +270,6 @@ export class Assemble {
 	}
 
 	initializeSection(nextSibling = null, formerSibling = null) {
-		console.log(formerSibling, this.content);
 		if (typeof nextSibling === 'string') nextSibling = document.querySelector(nextSibling);
 		if (this.form && !nextSibling) {
 			this.section = document.createElement('form');
@@ -307,7 +306,6 @@ export class Assemble {
 			for (let i = 0; i < tiles.length; i++) {
 				// extract article children, there are unlikely sections
 				let article = [...tiles[i].children];
-				console.log(article);
 				for (let j = 0; j < article.length; j++) {
 					formerSibling.after(article[j]);
 					formerSibling = article[j];
