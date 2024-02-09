@@ -8,7 +8,7 @@ export const api = {
 		// on appending queries (e.g. searches) set api.preventDataloss.monitor = false within query routing
 		monitor: false,
 		event: function (event) {
-			// api must define data-loss=prevent for formfields that should be tracked
+			// api must define data-loss=prevent for formfields that should be tracked once changed
 			if (event.target.dataset.loss !== 'prevent') return;
 			api.preventDataloss.monitor = true;
 		},
@@ -31,8 +31,8 @@ export const api = {
 					type: 'confirm',
 					header: LANG.GET('general.prevent_dataloss'),
 					options: options
-				}).then(function (r) {
-					return (r.target.returnValue === 'true')
+				}).then(response => {
+					return response;
 				})
 			}
 			return true;
