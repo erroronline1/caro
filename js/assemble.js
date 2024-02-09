@@ -1011,7 +1011,7 @@ export class Assemble {
 			result.push(input);
 			result.push(label);
 		}
-		return [...result, ...this.hint()];
+		return [...result, ...this.hint(), document.createElement('br')];
 	}
 	radio() {
 		return this.checkbox('radioinstead');
