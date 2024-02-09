@@ -324,12 +324,13 @@ class ORDER extends API {
 	private function postApprovedOrder($processedOrderData){
 		$keys = array_keys($processedOrderData['order_data']);
 		$order_data2 = [];
+		$query = '';
 		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
 				if (!in_array($key, ['items',LANG::PROPERTY('order.unit')])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
-			$query = strtr(SQLQUERY::PREPARE('order_post-approved-order'),
+			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 			[
 				':order_data' => "'" . json_encode($order_data2, JSON_UNESCAPED_SLASHES) . "'",
 				':organizational_unit' => "'" . $processedOrderData['order_data'][LANG::PROPERTY('order.unit')] . "'",
@@ -813,25 +814,7 @@ class ORDER extends API {
 				]);
 				$old = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($old as $row){
-					/**
-					 * also see delete method!
-					 */
-					$order = json_decode($row['order_data'], true);
-					if (array_key_exists('attachments', $order)){
-						$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
-						$statement->execute([
-							':substr' => $order['attachments']
-						]);
-						$others = $statement->fetchAll(PDO::FETCH_ASSOC);
-						if (count($others)<2){
-							$files = explode(',', $order['attachments']);
-							UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
-						}
-					}
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
-					$statement->execute([
-						':id' => $row['id']
-					]);
+					$this->delete_approved_order($row);
 				}
 
 				$result=['body'=>['content'=>[
@@ -1042,48 +1025,37 @@ class ORDER extends API {
 					if ($row['received'] && !$row['archived']){
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
 					}
-					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
-						'type' => 'deletebutton',
-						'hint' => $autodelete,
-						'attributes' => [
-							'type' => 'button',
-							'value' => LANG::GET('order.delete_prepared_order'),
-							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
-								"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
-								"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'approved', " . $row['id'] . ")})"
-	
-						]
-					];
+					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) {
+						$content[]=[
+							'type' => 'deletebutton',
+							'hint' => $autodelete,
+							'attributes' => [
+								'type' => 'button',
+								'value' => LANG::GET('order.delete_prepared_order'),
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
+									"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
+									"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+									"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'approved', " . $row['id'] . ")})"
+		
+							]
+						];
+						$content[] = [
+							'type' => 'br' // to clear after floating delete button
+						];
+					}
 					array_push($result['body']['content'], $content);
 				}
 				break;
 			case 'DELETE':
 				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
-				// delete attachments if not used by any other approved order
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				$order = $statement->fetch(PDO::FETCH_ASSOC);
-				$order = json_decode($order['order_data'], true);
-				if (array_key_exists('attachments', $order)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
-					$statement->execute([
-						':substr' => $order['attachments']
-					]);
-					$others = $statement->fetchAll(PDO::FETCH_ASSOC);
-					if (count($others)<2){
-						$files = explode(',', $order['attachments']);
-						UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
-					}
-				}
-
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
-				if ($statement->execute([
-					':id' => $this->_requestedID
-					])) {
+				$row = $statement->fetch(PDO::FETCH_ASSOC);
+				
+				if ($this->delete_approved_order($row)) {
 					$result = [
 					'status' => [
 						'id' => false,
@@ -1098,6 +1070,27 @@ class ORDER extends API {
 				break;
 			}
 		$this->response($result);
+	}
+
+	private function delete_approved_order($row){
+		// delete order and attachments if not used by any other approved order
+		$order = json_decode($row['order_data'], true);
+		if (array_key_exists('attachments', $order)){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
+			$statement->execute([
+				':substr' => $order['attachments']
+			]);
+			$others = $statement->fetchAll(PDO::FETCH_ASSOC);
+			if (count($others)<2){
+				$files = explode(',', $order['attachments']);
+				UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+			}
+		}
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
+		return $statement->execute([
+			':id' => $row['id']
+		]);
+
 	}
 }
 
