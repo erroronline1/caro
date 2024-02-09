@@ -88,23 +88,25 @@ export class Dialog {
 	/**
 	 * 
 	 * @param {type: str, icon: str, header: str, body: str, options:{displayText: value str|bool|{value, class}}} options 
-	 * @returns promise
+	 * @returns promise, prepared answer on resolve according to type
 	 * 
-	 * new Dialog({options}).then((response) => {
-	 * 		doSomethingWithButtonValue(response.target.returnValue);
+	 * new Dialog({options}).then(response => {
+	 * 		doSomethingWithButtonValue(response);
 	 * 	});
 	 * 
-	 * select will be implemented by Assemble
+	 * select and scanner will be implemented by Assemble
+	 * 
+	 * options with boolean values true|false as well as 'true'|'false' return selected booleans not strings. other strings will be returned as such.
+	 * 
+	 * new Dialog({type:'confirm', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
+	 *  	if (confirmation) huzzah());
+	 * 	});
 	 * 
 	 * input needs button options as well
-	 * new Dialog({type:'input', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then((response) => {
-	 *  	if (response.target.returnValue==='true') console.log('this is the text input:', document.querySelector('dialog>form>textarea').value);
+	 * new Dialog({type:'input', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then(response => {
+	 *  	if (response.simpleinput) console.log('this is the text input:', response.simpleinput);
 	 * 	});
 	 * 
-	 * new Dialog({type:'scanner'}).then((response) => {
-	 *  	if (response.target.returnValue==='true') console.log('this is the text input:', document.querySelector('dialog>form>input').value);
-	 * 	});
-
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
@@ -173,6 +175,28 @@ export class Dialog {
 			return new Promise((resolve, reject) => {
 				dialog.showModal();
 				dialog.onclose = resolve;
+			}).then(response => {
+				let result
+				switch (this.type) {
+					case 'select':
+						return response.target.returnValue;
+					case 'confirm':
+						result = response.target.returnValue;
+						if (result === 'true') return true;
+						else if (result === 'false') return false;
+						return result;
+					default:
+						result = {};
+						if (response.target.returnValue === 'true') {
+							document.querySelector('dialog>form').childNodes.forEach(input => {
+								//console.log(input);
+								if (['input', 'textarea'].includes(input.localName)) {
+									result[input.name] = input.value;
+								}
+							});
+						}
+						return result;
+				}
 			});
 		}
 		dialog.close();
@@ -216,6 +240,7 @@ export class Dialog {
 		const textarea = document.createElement('textarea'),
 			buttons = [];
 		let button;
+		textarea.name = 'simpleinput';
 		for (const [option, value] of Object.entries(this.options)) {
 			button = document.createElement('button');
 			button.append(document.createTextNode(option));
@@ -236,9 +261,11 @@ export class Dialog {
 		div.classList.add('scanner');
 		div.id = getNextElementID();
 		input.type = 'hidden';
+		input.name = 'scanner';
 		button.append(document.createTextNode(LANG.GET('general.import_scan_result_button_from_modal')));
 		button.classList.add('confirmButton');
 		button.disabled = true;
+		button.value = true;
 		this.scannerElements = {
 			canvas: div,
 			output: input,
@@ -913,7 +940,7 @@ export class Assemble {
 				header: select.title,
 				options: selectModal
 			}).then(response => {
-				e.target.value = response.target.returnValue;
+				e.target.value = response;
 				e.target.dispatchEvent(new Event('change'));
 			});
 		});
@@ -1094,14 +1121,16 @@ export class Assemble {
 			new Dialog({
 				type: 'scanner'
 			}).then((response) => {
-				document.getElementById(inputid).value = document.querySelector('dialog>form>input').value;
-				if (multiple) {
-					new Assemble({
-						content: [
-							[scannerElementClone]
-						],
-						composer: 'photoOrScanner'
-					}).initializeSection(null, button)
+				if (response.scanner) {
+					document.getElementById(inputid).value = response.scanner;
+					if (multiple) {
+						new Assemble({
+							content: [
+								[scannerElementClone]
+							],
+							composer: 'photoOrScanner'
+						}).initializeSection(null, button)
+					}
 				}
 			});
 		};

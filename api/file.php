@@ -149,7 +149,7 @@ class FILE extends API {
 									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $foldername]) ."', 'options':{".
 										"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
 										"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
-										"}}).then(function(r){if (r.target.returnValue==='true') api.file('delete', 'filemanager', '" . $foldername . "')})"
+										"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $foldername . "')})"
 								]]
 							);
 						}
@@ -194,7 +194,7 @@ class FILE extends API {
 									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', 'options':{".
 										"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
 										"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
-										"}}).then(function(r){if (r.target.returnValue==='true') api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
+										"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
 								]]
 							);
 						}

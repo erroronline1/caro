@@ -679,7 +679,7 @@ class CONSUMABLES extends API {
 							'onpointerup' => $product['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('consumables.edit_product_delete_confirm_header', [':name' => $product['article_name']]) ."', 'options':{".
 								"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
 								"'".LANG::GET('consumables.edit_product_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
+								"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
 						]]
 					]
 				);

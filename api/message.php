@@ -207,7 +207,7 @@ class MESSAGE extends API {
 						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
 							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
 							"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(function(r){if (r.target.returnValue==='true') api.message('delete', 'message', " . $message['id'] . ", 'inbox')})"
+							"}}).then(confirmation => {if (confirmation) api.message('delete', 'message', " . $message['id'] . ", 'inbox')})"
 					]]
 				];
 				if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
@@ -292,7 +292,7 @@ class MESSAGE extends API {
 						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
 							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
 							"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(function(r){if (r.target.returnValue==='true') api.message('delete', 'message', " . $message['id'] . ", 'sent')})"
+							"}}).then(confirmation => {if (confirmation) api.message('delete', 'message', " . $message['id'] . ", 'sent')})"
 					]]
 				];
 				if ($message['image']) array_splice($content[count($content)-1], 0, 0, [

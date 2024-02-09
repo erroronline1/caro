@@ -346,7 +346,7 @@ class USER extends API {
 							'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
 								"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
 								"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(function(r){if (r.target.returnValue==='true') api.user('delete', 'user', ". $user['id'] . ")})" : ''
+								"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : ''
 						]]
 					]],
 					'form' => [

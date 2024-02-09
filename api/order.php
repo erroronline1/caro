@@ -682,7 +682,7 @@ class ORDER extends API {
 						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
 							"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
 							"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'order', " . $this->_requestedID . ")})"
+							"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
 					]]
 				]);
 
@@ -983,9 +983,9 @@ class ORDER extends API {
 					if (!($row['ordered'] || $row['received'] || $row['archived']))	$status[LANG::GET('order.disapprove')]=[
 						'data_disapproved' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', body:'" . LANG::GET('order.disapprove_message', [':unit' => $row['organizational_unit']]) . "', " .
-							"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('order.disapprove_message_ok') . "': {'value': true, class: 'reducedCTA'}}}).then((response) => {" .
-							"if (response.target.returnValue==='true') {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', document.querySelector('dialog>form>textarea').value); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
+							"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('order.disapprove_message_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(response => {" .
+							"if (response.simpleinput) {" .
+							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', response.simpleinput); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
 					];
 
@@ -1030,7 +1030,7 @@ class ORDER extends API {
 							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', body: '". LANG::GET('order.add_information_modal_body') ."', options:{".
 								"'".LANG::GET('order.add_information_cancel')."': false,".
 								"'".LANG::GET('order.add_information_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', document.querySelector('dialog>form>textarea').value)})"
+								"}}).then(response => {if (response.simpleinput) api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', response.simpleinput)})"
 						]
 					];
 
@@ -1051,7 +1051,7 @@ class ORDER extends API {
 							'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
 								"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
 								"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(function(r){if (r.target.returnValue==='true') api.purchase('delete', 'approved', " . $row['id'] . ")})"
+								"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'approved', " . $row['id'] . ")})"
 	
 						]
 					];
