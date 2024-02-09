@@ -87,7 +87,7 @@ export const assemble_helper = {
 export class Dialog {
 	/**
 	 * 
-	 * @param {type: str, icon: str, header: str, body: str, options:{displayText: value str|bool|{value, class}}} options 
+	 * @param {type: str, icon: str, header: str, body: str|array, options:{displayText: value str|bool|{value, class}}} options 
 	 * @returns promise, prepared answer on resolve according to type
 	 * 
 	 * new Dialog({options}).then(response => {
@@ -98,13 +98,20 @@ export class Dialog {
 	 * 
 	 * options with boolean values true|false as well as 'true'|'false' return selected booleans not strings. other strings will be returned as such.
 	 * 
-	 * new Dialog({type:'confirm', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
+	 * new Dialog({type:'alert', header:'acknowledge this!', body:'infotext'})
+	 * 
+	 * new Dialog({type:'confirm', header:'confirm this', options:{'abort': false, 'yes, i agree': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
 	 *  	if (confirmation) huzzah());
 	 * 	});
 	 * 
-	 * input needs button options as well
-	 * new Dialog({type:'input', header:'textinput', options:{'abort': false, 'send with text': {'value': true, class: 'reducedCTA'}}}).then(response => {
-	 *  	if (response.simpleinput) console.log('this is the text input:', response.simpleinput);
+	 * input needs button options as well, response keys in accordance to assemble content input names
+	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
+	 * scanner and select will NOT work for using this modal as well overriding its content and losing their response target
+	 * multiple articles and sections are NOT supported due to simplified query selector
+	 * THIS IS FOR SIMPLE INPUTS ONLY
+	 * 
+	 * new Dialog({type:'input', header:'fill out assembled form', 'body': [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}}).then(response => {
+	 *  	if (Object.keys(response)) console.log('these are the results of the form:', response);
 	 * 	});
 	 * 
 	 */
@@ -137,9 +144,7 @@ export class Dialog {
 					h3.append(document.createTextNode(this.header));
 					header.append(h3);
 				}
-				if (this.body) {
-					header.append(document.createTextNode(this.body));
-				}
+				if (this.body && this.body.constructor.name === 'String') header.append(document.createTextNode(this.body));
 				form.append(header);
 			}
 			if (this.type === 'select') form.style.display = 'flex';
@@ -186,16 +191,17 @@ export class Dialog {
 						else if (result === 'false') return false;
 						return result;
 					default:
-						result = {};
 						if (response.target.returnValue === 'true') {
-							document.querySelector('dialog>form').childNodes.forEach(input => {
+							result = {};
+							document.querySelector('dialog>form>article').childNodes.forEach(input => {
 								//console.log(input);
 								if (['input', 'textarea'].includes(input.localName)) {
 									result[input.name] = input.value;
 								}
 							});
+							return result;
 						}
-						return result;
+						return false;
 				}
 			});
 		}
@@ -237,22 +243,9 @@ export class Dialog {
 		return [buttons];
 	}
 	input() {
-		const textarea = document.createElement('textarea'),
-			buttons = [];
-		let button;
-		textarea.name = 'simpleinput';
-		for (const [option, value] of Object.entries(this.options)) {
-			button = document.createElement('button');
-			button.append(document.createTextNode(option));
-			button.classList.add('confirmButton');
-			if (typeof value === 'string' || typeof value === 'boolean') button.value = value;
-			else {
-				button.value = value.value;
-				if (value.class) button.classList.add(value.class);
-			}
-			buttons.push(button);
-		}
-		return [textarea, ...buttons];
+		return [...new Assemble({
+			content: this.body
+		}).initializeSection(null, null, 'iCanHasNodes'), ...this.confirm()];
 	}
 	scanner() {
 		const div = document.createElement('div'),
@@ -296,9 +289,9 @@ export class Assemble {
 		this.composer = setup.composer;
 	}
 
-	initializeSection(nextSibling = null, formerSibling = null) {
+	initializeSection(nextSibling = null, formerSibling = null, returnNodes = null) {
 		if (typeof nextSibling === 'string') nextSibling = document.querySelector(nextSibling);
-		if (this.form && !nextSibling) {
+		if (this.form && !nextSibling && !returnNodes) {
 			this.section = document.createElement('form');
 			this.section.method = 'post';
 			this.section.enctype = 'multipart/form-data';
@@ -314,13 +307,13 @@ export class Assemble {
 					type: 'submit',
 				}
 			}]);
-		} else if (!this.composer) this.section = document.createElement('div');
+		} else if (!this.composer && !returnNodes) this.section = document.createElement('div');
 		else if (this.composer == 'photoOrScanner') this.section = formerSibling.parentNode;
 		else if (this.composer) this.section = document.getElementById('main'); // from composer.js
 
 		this.assembledPanels = this.processContent();
 
-		if (!nextSibling && !formerSibling) {
+		if (!nextSibling && !formerSibling && !returnNodes) {
 			this.section.append(...this.assembledPanels);
 			if (!this.composer) document.getElementById('main').insertAdjacentElement('beforeend', this.section);
 		} else if (nextSibling) {
@@ -338,6 +331,8 @@ export class Assemble {
 					formerSibling = article[j];
 				}
 			}
+		} else if (returnNodes) {
+			return this.assembledPanels;
 		}
 
 		let scrollables = document.querySelectorAll('section');

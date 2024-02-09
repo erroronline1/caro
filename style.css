@@ -167,6 +167,11 @@ dialog {
 			overflow: scroll;
 		}
 
+		article {
+			margin:0;
+			padding:0;
+		}
+
 	}
 }
 
