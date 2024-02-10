@@ -346,7 +346,8 @@ class USER extends API {
 							'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
 								"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
 								"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : ''
+								"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
+							'disabled' => $user['id'] < 2
 						]]
 					]],
 					'form' => [
@@ -387,7 +388,7 @@ class USER extends API {
 					':id' => $this->_requestedID
 				]);
 				$user = $statement->fetch(PDO::FETCH_ASSOC);
-
+				if ($user['id'] < 2) $this->response([], 401);
 				if ($user['image'] && $user['id'] > 1) UTILITY::delete($user['image']);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));
