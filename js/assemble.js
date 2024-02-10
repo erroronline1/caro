@@ -59,7 +59,7 @@ export const assemble_helper = {
 			span = document.createElement('span');
 			span.append(document.createTextNode(group));
 			div2.append(span);
-			div2.style.maxHeight = (Object.entries(items).length + 1) * 3 + 2 + 'em';
+			div2.style.maxHeight = (Object.entries(items).length + 1) * 3.5 + 2 + 'em';
 			for (const [description, attributes] of Object.entries(items)) {
 				if ('onpointerup' in attributes) {
 					button = document.createElement('button');

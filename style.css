@@ -314,16 +314,15 @@ nav {
 		transform: translateX(-50%);
 		width: 100%;
 		max-width: 44em;
-		list-style-type: none;
 		padding: 0 1em;
 		border: none;
 		border-radius: .2em;
 		overflow: hidden;
 		height: 0;
 		transition: .3s ease;
-
-		li {
-			line-height: 3em;
+		span{
+			font-size: 1.15em;
+			font-weight: bold;
 		}
 	}
 
@@ -495,19 +494,28 @@ button {
 	transition: ease .15s;
 	color: var(--article);
 	font-weight: bold;
+	font-size: 1.15em;
 }
+/* Large devices such as laptops (1024px and up) */
+@media only screen and (min-width: 64em) {
+	button {
+		font-size: .9em;
+	}
+}
+
 
 .discreetButton {
 	/**
 	within modal and menu
 	*/
+	font-size: 1.15em;
 	width: 100%;
 	border: none;
 	background: transparent;
 	color: var(--foreground);
 	font-weight: initial;
 	border-radius: 0;
-	margin: .25em;
+	margin: .175em;
 }
 
 .discreetButton:nth-of-type(even) {
