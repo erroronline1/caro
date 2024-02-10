@@ -23,6 +23,7 @@ class FORMS extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-post'));
 				if ($statement->execute([
 					':name' => $this->_payload->name,
+					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($content)
 					])) $this->response([
 						'status' => [
@@ -42,7 +43,7 @@ class FORMS extends API {
 				]);
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
 				$component['content'] = json_decode($component['content']);
-				$this->response(['body' => $component]);
+				$this->response(['body' => $component, 'name' => $this->_requestedName]);
 				break;
 		}
 	}
@@ -155,7 +156,8 @@ class FORMS extends API {
 				[[
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
-					'value' => $component['name']
+					'value' => $component['name'],
+					'hint' => $component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']]) : ''
 				]],
 				[[
 					'type' => 'trash',
@@ -178,7 +180,7 @@ class FORMS extends API {
 		$return = [];
 		
 		// prepare existing component lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($result as $key => $row) {
@@ -195,7 +197,7 @@ class FORMS extends API {
 		}
 			
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get'));
 		$statement->execute([
 			':name' => $this->_requestedName
 		]);
@@ -205,68 +207,77 @@ class FORMS extends API {
 		$return['body'] = [
 			'content' => [
 				[
-					['type' => 'datalist',
-					'content' => $formdatalist,
-					'attributes' => [
-						'id' => 'forms'
-					]],
-					['type' => 'datalist',
-					'content' => $componentdatalist,
-					'attributes' => [
-						'id' => 'components'
-					]]
-				],[
-					['type' => 'searchinput',
-					'description' => LANG::GET('assemble.edit_existing_forms'),
-					'attributes' => [
-						'placeholder' => LANG::GET('assemble.edit_existing_forms_label'),
-						'list' => 'forms',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'form_editor', this.value); return false;}"
-					]],
-					['type' => 'select',
-					'description' => LANG::GET('assemble.edit_existing_forms'),
-					'attributes' => [
-						'onchange' => "api.form('get', 'form_editor', this.value)"
-					],
-					'content' => $formoptions]
-					],[[
+					[
+						'type' => 'datalist',
+						'content' => $formdatalist,
+						'attributes' => [
+							'id' => 'forms'
+						]
+					], [
+						'type' => 'datalist',
+						'content' => $componentdatalist,
+						'attributes' => [
+							'id' => 'components'
+						]
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_existing_forms_select'),
+							'onchange' => "api.form('get', 'form_editor', this.value)"
+						],
+						'content' => $formoptions
+					], [
+						'type' => 'searchinput',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_existing_forms'),
+							'list' => 'forms',
+							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'form_editor', this.value); return false;}"
+						]
+					]
+				], [
+					[
 						"type" => "text",
 						"description" => LANG::GET('assemble.edit_forms_info_description'),
 						"content" => LANG::GET('assemble.edit_forms_info_content')
-					],
-					['type' => 'searchinput',
-					'description' => LANG::GET('assemble.edit_add_component'),
-					'attributes' => [
-						'placeholder' => LANG::GET('assemble.edit_add_component_label'),
-						'list' => 'components',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component', this.value); return false;}"
-					]],
-					['type' => 'select',
-					'description' => LANG::GET('assemble.edit_add_component'),
-					'attributes' => [
-						'onchange' => "api.form('get', 'component', this.value)"
-					],
-					'content' => $componentoptions],
-					],
-					[[
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_add_component_select'),
+							'onchange' => "api.form('get', 'component', this.value)"
+						],
+						'content' => $componentoptions
+					], [
+						'type' => 'searchinput',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_add_component'),
+							'list' => 'components',
+							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component', this.value); return false;}"
+						]
+					]
+				], [
+					[
 						'type' => 'compose_form',
 						'description' => LANG::GET('assemble.compose_form'),
 						'value' => $result['name'] ? : ''
-					]],
-					[[
+					]
+				], [
+					[
 						'type' => 'trash',
 						'description' => LANG::GET('assemble.edit_trash')
-					]]
-				]];
+					]
+				]
+			]
+		];
 
 		if (array_key_exists('content', $result)) $return['body']['component'] = json_decode($result['content']);
 		$this->response($return);
 	}
+
 	public function form(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				
+				// content : {'context':'...', 'components': [array]}
 				break;
 			case 'GET':
 			// retrieve latest active entries according to requested names

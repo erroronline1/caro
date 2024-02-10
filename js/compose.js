@@ -122,17 +122,14 @@ export const compose_helper = {
 	},
 	composeNewForm: function () {
 		// set dragged/dropped order of elements
-		const nodes = document.getElementById('main').childNodes,
+		const nodes = document.getElementById('main').children,
 			name = document.getElementById('ComponentName').value;
-		let content = [],
-			hidden = {};
+		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
-			if ('dataset' in nodes[i] && 'name' in nodes[i].dataset) content.push(nodes[i].dataset.name);
-			if (nodes[i].childNodes.length && nodes[i].childNodes[1].dataset.type === 'hiddeninput') hidden[nodes[i].childNodes[1].childNodes[2].name] = nodes[i].childNodes[1].childNodes[2].value;
+			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
 		if (name && content.length) return {
-			'hidden': hidden,
-			'forms': content,
+			'components': content,
 			'name': name
 		};
 		return null;
@@ -176,7 +173,7 @@ export const compose_helper = {
 			evnt.dataTransfer.setData('text', evnt.target.id);
 			this.stopParentDropEvent = false;
 		},
-		drop_insert: function (evnt, droppedUpon) {
+		drop_insert: function (evnt, droppedUpon, allowSections) {
 			evnt.preventDefault();
 			if (!evnt.dataTransfer.getData('text')) return;
 
@@ -220,7 +217,7 @@ export const compose_helper = {
 
 			// dragging articles
 			// dropping on hr for reordering
-			if (evnt.target.localName === 'hr') {
+			if (evnt.target.localName === 'hr' || !allowSections) {
 				// handle only if dropped within the reorder area
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
 				droppedUpon.firstChild.classList.remove('insertionAreaHover');
@@ -235,7 +232,7 @@ export const compose_helper = {
 				return;
 			}
 			// dropping on article to create a slider
-			if (droppedUpon.parentNode.localName === 'main' && draggedElement.parentNode.localName === 'main' &&
+			if (allowSections && droppedUpon.parentNode.localName === 'main' && draggedElement.parentNode.localName === 'main' &&
 				!(droppedUpon.children.item(1).firstChild.localName === 'section' || draggedElement.children.item(1).firstChild.localName === 'section')) { // avoid recursive multiples
 				// create a multiple article tile if dropped on a tile
 				let container = document.createElement('div'),
@@ -269,13 +266,13 @@ export const compose_helper = {
 		}
 	},
 
-	create_draggable: function (element, insertionArea = true) {
+	create_draggable: function (element, insertionArea = true, allowSections = true) {
 		element.id = getNextElementID();
 		element.setAttribute('draggable', 'true');
 		element.setAttribute('ondragstart', 'compose_helper.dragNdrop.drag(event)');
 		element.setAttribute('ondragover', 'compose_helper.dragNdrop.allowDrop(event); this.classList.add(\'draggableFormElementHover\')');
 		element.setAttribute('ondragleave', 'this.classList.remove(\'draggableFormElementHover\')');
-		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event,this), this.classList.remove(\'draggableFormElementHover\')');
+		element.setAttribute('ondrop', 'compose_helper.dragNdrop.drop_insert(event, this, ' + allowSections + '), this.classList.remove(\'draggableFormElementHover\')');
 		if (insertionArea) {
 			const insertionArea = document.createElement('hr');
 			insertionArea.setAttribute('ondragover', 'this.classList.add(\'insertionAreaHover\')');
@@ -666,6 +663,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: 'textinput',
+			hint: this.currentElement.hint,
 			attributes: {
 				id: 'ComponentName',
 				value: this.currentElement.value || '',
@@ -674,7 +672,6 @@ export class Compose extends Assemble {
 			}
 		};
 		result = result.concat(...this.textinput());
-		// due to the assembler, type (for icon) has to be in the last element
 		this.currentElement = {
 			attributes: {
 				value: std.description,
@@ -686,7 +683,7 @@ export class Compose extends Assemble {
 		return result;
 	}
 	compose_form() {
-		this.compose_component({
+		return this.compose_component({
 			name: LANG.GET('assemble.compose_form_label'),
 			description: LANG.GET('assemble.compose_form'),
 			action: 'api.form("post","form")'
@@ -700,7 +697,7 @@ export class MetaCompose extends Assemble {
 		super(setup);
 
 		this.initializeSection();
-		if (setup.draggable) compose_helper.create_draggable(this.section);
+		if (setup.draggable) compose_helper.create_draggable(this.section, true, false);
 		this.section.setAttribute('data-name', setup.name);
 	}
 }
