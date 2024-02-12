@@ -217,7 +217,7 @@ class CONSUMABLES extends API {
 			case 'GET':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
-				$options = [LANG::GET('consumables.edit_existing_vendors_new') => []];
+				$options = ['...' . LANG::GET('consumables.edit_existing_vendors_new') => (!$this->_requestedID) ? ['selected' => true] : []];
 				$result = [];
 				
 				// select single vendor based on id or name
@@ -233,7 +233,7 @@ class CONSUMABLES extends API {
 					'certificate' => '{"validity":""}',
 					'pricelist' => '{"validity":"", "filter": ""}'
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
+				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
 					$result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID])];
 
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
@@ -575,6 +575,12 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'id' => 'units'
 						]],
+						['type' => 'button',
+						'attributes' => [
+							'value' => LANG::GET('consumables.edit_product_add_new'),
+							'type' => 'button',
+							'onpointerup' => "api.purchase('get', 'product')",
+						]],
 						['type' => 'scanner',
 						'destination' => 'productsearch'
 						],
@@ -590,7 +596,7 @@ class CONSUMABLES extends API {
 							'name' => LANG::GET('consumables.edit_product_search'),
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'editconsumables'); return false;}",
 							'id' => 'productsearch'
-						]],
+						]]
 					],
 					[
 						['type' => 'hr']

@@ -256,16 +256,16 @@ class USER extends API {
 
 			case 'GET':
 				$datalist = [];
-				$options = ['...' => []];
+				$options = ['...' . LANG::GET('user.edit_existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
 				$result = [];
 				
 				// prepare existing users lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 				$statement->execute();
 				$user = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($user as $key => $row) {
+				foreach($user as $row) {
 					$datalist[] = $row['name'];
-					$options[$row['name']] = [];
+					$options[$row['name']] = ($row['name'] === $this->_requestedID) ? ['selected' => true] : [];
 				}
 		
 				// select single user based on id or name
@@ -281,7 +281,7 @@ class USER extends API {
 					'token' => '',
 					'image' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id']) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID])];
 		
 				// display form for adding a new user with ini related permissions
 				$permissions = [];

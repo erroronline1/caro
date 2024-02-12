@@ -52,6 +52,7 @@ class FORMS extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$datalist = [];
 		$options = ['...' => []];
+		$options = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedName) ? ['selected' => true] : []];
 		$return = [];
 		
 		// prepare existing component lists
@@ -60,7 +61,7 @@ class FORMS extends API {
 		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($components as $key => $row) {
 			$datalist[] = $row['name'];
-			$options[$row['name']] = [];
+			$options[$row['name']] = ($row['name'] === $this->_requestedName) ? ['selected' => true] : [];
 		}
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
@@ -68,7 +69,7 @@ class FORMS extends API {
 			':name' => $this->_requestedName
 		]);
 		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['name' =>''];
-		if($this->_requestedName && $this->_requestedName !== 'false' && !$component['name']) $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedName])];
+		if($this->_requestedName && $this->_requestedName !== 'false' && !$component['name'] && $this->_requestedName !== '...' . LANG::GET('assemble.edit_existing_components_new')) $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedName])];
 
 		$return['body'] = [
 			'content' => [
@@ -175,7 +176,8 @@ class FORMS extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		// form to add and edit form components. 
 		$formdatalist = $componentdatalist = [];
-		$formoptions = ['...' => []];
+		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedName) ? ['selected' => true] : []];
+
 		$componentoptions = ['...' => []];
 		$return = [];
 		
@@ -185,7 +187,7 @@ class FORMS extends API {
 		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($result as $key => $row) {
 			$formdatalist[] = $row['name'];
-			$formoptions[$row['name']] = [];
+			$formoptions[$row['name']] = ($row['name'] === $this->_requestedName) ? ['selected' => true] : [];
 		}
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
@@ -196,13 +198,12 @@ class FORMS extends API {
 			$componentoptions[$row['name']] = [];
 		}
 			
-
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get'));
 		$statement->execute([
 			':name' => $this->_requestedName
 		]);
 		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => ''];
-		if($this->_requestedName && $this->_requestedName !== 'false' && !$result['name']) $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedName])];
+		if($this->_requestedName && $this->_requestedName !== 'false' && !$result['name'] && $this->_requestedName !== '...' . LANG::GET('assemble.edit_existing_forms_new')) $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedName])];
 
 		$return['body'] = [
 			'content' => [
