@@ -92,19 +92,22 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* filter length string orders
-* filter by fields? dropdown?
+* order pin, drop authorize order auth, check for pin
+* create random unique pin, while not found in table
+* access csv filter, store filter rules
+* vendor address, email, phone, customer id
+* vendor list
+* vendor mailto (certificates)
+* text recommendations
 
 * settings? force desktop mode for small window? themes?
 * forms and contexts
 * pdf export (https://github.com/tecnickcom/TCPDF?tab=readme-ov-file)
-* vendor list
 * user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
 * caro audit
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
-* text recommendations
 * calendar and alerts
 * md mermaid flowcharts
