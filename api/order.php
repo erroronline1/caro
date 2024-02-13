@@ -18,16 +18,16 @@ class ORDER extends API {
 	public function prepared(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 				$approval = false;
-				if (UTILITY::propertySet($this->_payload, 'approval_token')){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
+				if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-orderauth'));
 					$statement->execute([
-						':token' => $this->_payload->approval_token
+						':orderauth' => $this->_payload->{LANG::PROPERTY('user.edit_order_authorization')}
 					]);
 					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
-						$approval = $result['name'] . LANG::GET('order.token_verified');
+						$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 					}
 				}
 				if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
@@ -71,7 +71,7 @@ class ORDER extends API {
 
 				break;
 			case 'GET':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-orders'));
 				$statement->execute();
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -148,7 +148,7 @@ class ORDER extends API {
 							]);		
 						}
 					}
-					if (array_intersect(['admin', 'purchase', 'order_authorization'], $_SESSION['user']['permissions']) && count($organizational_orders)) {
+					if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']) && count($organizational_orders)) {
 						array_push($result['body']['content'], [
 							[
 								['type' => 'signature',
@@ -158,9 +158,9 @@ class ORDER extends API {
 								]]
 							],
 							[
-								['type' => 'scanner',
+								['type' => 'numberinput',
 								'attributes' => [
-									'name' => LANG::GET('order.add_approval_token'),
+									'name' => LANG::GET('user.edit_order_authorization'),
 									'type' => 'password'
 								]]
 							]
@@ -177,7 +177,7 @@ class ORDER extends API {
 	public function productsearch(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$result = ['body'=>[]];
 				if (!$this->_subMethod) {
 					$result['body']['content'] = [];
@@ -265,16 +265,15 @@ class ORDER extends API {
 
 		// detect approval
 		$approval = false;
-		if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.add_approval_token'))){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
+		if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-orderauth'));
 			$statement->execute([
-				':token' => $this->_payload->approval_token
+				':orderauth' => $this->_payload->{LANG::PROPERTY('user.edit_order_authorization')}
 			]);
 			if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
-				$approval = $result['name'] . LANG::GET('order.token_verified');
+				$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 			}
-			$unset=LANG::PROPERTY('consumables.add_approval_token');
-			unset ($this->_payload->$unset);
+			unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
 		}
 		if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
@@ -355,7 +354,7 @@ class ORDER extends API {
 	public function order(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$processedOrderData = $this->processOrderForm();
 
 				if (!$processedOrderData['approval']){
@@ -374,7 +373,7 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder($processedOrderData);
 				break;
 			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$processedOrderData = $this->processOrderForm();
 
 				if (!$processedOrderData['approval']){
@@ -400,7 +399,7 @@ class ORDER extends API {
 				}
 				break;
 			case 'GET':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$datalist = [];
 				$datalist_unit = [];
 				$vendors = [];
@@ -571,9 +570,9 @@ class ORDER extends API {
 							]]
 						],
 						[
-							['type' => 'scanner',
+							['type' => 'numberinput',
 							'attributes' => [
-								'name' => LANG::GET('order.add_approval_token'),
+								'name' => LANG::GET('user.edit_order_authorization'),
 								'type' => 'password'
 							]]
 						]
@@ -684,7 +683,7 @@ class ORDER extends API {
 
 				break;
 			case 'DELETE':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				
 				// delete attachments
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-order'));
@@ -720,7 +719,7 @@ class ORDER extends API {
 	public function approved(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				if ($this->_subMethod == 'ordered') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
 				if ($this->_subMethod == 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
 				if ($this->_subMethod == 'archived') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
@@ -800,7 +799,7 @@ class ORDER extends API {
 					]];
 				break;
 			case 'GET':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 				// delete old received unarchived orders
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-received'));
@@ -1062,7 +1061,7 @@ class ORDER extends API {
 				}
 				break;
 			case 'DELETE':
-				if (!(array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
 				$statement->execute([

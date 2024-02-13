@@ -102,7 +102,6 @@ class USER extends API {
 				$this->response($result);
 				break;
 		}
-
 	}
 
 	public function user(){
@@ -113,10 +112,11 @@ class USER extends API {
 				$permissions = [];
 				$units = [];
 				$user = [
-					'name' => UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name')),
+					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_name')),
 					'permissions' => '',
 					'units' => '',
 					'token' => '',
+					'orderauth' => '',
 					'image' => ''
 				];
 		
@@ -140,8 +140,22 @@ class USER extends API {
 				}
 				$user['units'] = implode(',', $units);
 
+				// generate order auth
+				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+					$statement->execute();
+					$orderauths = [];
+					$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+					foreach ($users as $row){
+						$orderauths[] = $row['orderauth'];
+					}
+					do {
+						$user['orderauth'] = random_int(10000,99999);
+					} while (in_array($user['orderauth'], $orderauths));
+				}
+
 				// generate token
-				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
+				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
@@ -165,6 +179,7 @@ class USER extends API {
 					':permissions' => $user['permissions'],
 					':units' => $user['units'],
 					':token' => $user['token'],
+					':orderauth' => $user['orderauth'],
 					':image' => $user['image']
 				])) $this->response([
 					'status' => [
@@ -212,6 +227,23 @@ class USER extends API {
 				}
 				$user['units'] = implode(',', $units);
 
+				// generate order auth
+				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_revoke')){
+					$user['orderauth'] = '';
+				}
+				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+					$statement->execute();
+					$orderauths = [];
+					$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+					foreach ($users as $row){
+						$orderauths[] = $row['orderauth'];
+					}
+					do {
+						$user['orderauth'] = random_int(10000,99999);
+					} while (in_array($user['orderauth'], $orderauths));
+				}
+
 				// generate token
 				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
@@ -241,6 +273,7 @@ class USER extends API {
 					':permissions' => $user['permissions'],
 					':units' => $user['units'],
 					':token' => $user['token'],
+					':orderauth' => $user['orderauth'],
 					':image' => $user['image']
 				])) $this->response([
 					'status' => [
@@ -279,6 +312,7 @@ class USER extends API {
 					'permissions' => '',
 					'units' => '',
 					'token' => '',
+					'orderauth' => '',
 					'image' => ''
 				];}
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID])];
@@ -335,6 +369,14 @@ class USER extends API {
 						],
 						'hint' => LANG::GET('user.edit_take_photo_hint')],
 					],[
+						['type' => 'radio',
+						'description' => LANG::GET('user.edit_order_authorization'),
+						'content' => [
+							LANG::GET('user.edit_order_authorization_generate') => [],
+							LANG::GET('user.edit_order_authorization_revoke') => []
+							]
+						]
+					],[
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_token'),
 						'content' => [LANG::GET('user.edit_token_renew') => []]
@@ -366,7 +408,18 @@ class USER extends API {
 						],
 						$result['body']['content'][2]
 					];
-					if ($user['token']) $result['body']['content'][3]=[
+					if ($user['orderauth']) $result['body']['content'][3]=[
+						[
+							['type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_order_authorization_current'),
+								'value' => $user['orderauth']
+								]
+							]
+						],
+						$result['body']['content'][3]
+					];
+					if ($user['token']) $result['body']['content'][4]=[
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
@@ -375,7 +428,7 @@ class USER extends API {
 							'qrcode' => $user['token']]
 							]
 						],
-						$result['body']['content'][3]
+						$result['body']['content'][4]
 					];
 
 				$this->response($result);

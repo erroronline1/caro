@@ -92,8 +92,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* order pin, drop authorize order auth, check for pin
-* create random unique pin, while not found in table
 * access csv filter, store filter rules
 * vendor address, email, phone, customer id
 * vendor list

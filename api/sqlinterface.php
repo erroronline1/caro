@@ -91,20 +91,24 @@ class SQLQUERY {
 		],
 
 		'user_post' => [
-			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, image) VALUES ( NULL, :name, :permissions, :units, :token, :image)",
-			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, image) VALUES ( :name, :permissions, :units, :token, :image)"
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image)",
+			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ( :name, :permissions, :units, :token, :orderauth, :image)"
 		],
 		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, image = :image WHERE id = :id LIMIT 1",
-			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, image = :image WHERE id = :id"
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image WHERE id = :id LIMIT 1",
+			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image WHERE id = :id"
 		],
 		'user_get-datalist' => [
-			'mysql' => "SELECT id, name FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name FROM caro_user ORDER BY name ASC"
+			'mysql' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
+		],
+		'user_get-orderauth' => [
+			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth LIMIT 1",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
 		],
 		'user_delete' => [
 			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id",
