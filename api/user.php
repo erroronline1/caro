@@ -71,7 +71,8 @@ class USER extends API {
 							'description' => LANG::GET('user.display_user'),
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . substr($permissions, 2) . "\n" .
-								LANG::GET('user.edit_units') . ': ' . substr($units, 2) . "\n"]
+								LANG::GET('user.edit_units') . ': ' . substr($units, 2) . "\n" .
+								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '')]
 						],[
 							['type' => 'photo',
 							'description' => LANG::GET('user.edit_take_photo'),
