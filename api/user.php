@@ -166,7 +166,7 @@ class USER extends API {
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
 					$_FILES['photo'] = [
 						'name' => 'defaultpic.png',
-						'type' => 'imgae/png',
+						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
@@ -249,14 +249,13 @@ class USER extends API {
 				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
-				// save and convert image
 				// save and convert image or create default
 				if (!(array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) && $updateName) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
 					$_FILES['photo'] = [
 						'name' => 'defaultpic.png',
-						'type' => 'imgae/png',
+						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
