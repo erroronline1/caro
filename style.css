@@ -971,7 +971,7 @@ button[data-type=submitbutton]::before {
 }
 
 [data-type=message]::before {
-	background-image: url('./media/envelope.svg');
+	background-image: url('./media/comment.svg');
 }
 
 [data-type=filterinput]::before {

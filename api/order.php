@@ -279,7 +279,7 @@ class ORDER extends API {
 			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 512, UTILITY_IMAGE_RESOURCE, 'png'));
 		}
-		
+
 		// initiate data
 		$order_data = ['items' => []];
 		
@@ -992,7 +992,7 @@ class ORDER extends API {
 					$content[]=[
 						'type' => 'links',
 						'content' => [
-							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"]
+							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'message', 'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"]
 						]
 					];
 					$content[] = $copy;
