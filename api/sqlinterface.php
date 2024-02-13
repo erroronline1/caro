@@ -221,7 +221,7 @@ class SQLQUERY {
 		],
 		'order_get-approved-order-by-received' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE received < :date_time AND archived IS NULL",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE received < :date_time AND archived IS NULL"
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE received < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
 		],		
 		'order_delete-approved-order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
