@@ -193,7 +193,9 @@ export class Dialog {
 					default:
 						if (response.target.returnValue === 'true') {
 							result = {};
-							document.querySelector('dialog>form>article').childNodes.forEach(input => {
+							let content = document.querySelector('dialog>form>article');
+							if (!content) content = document.querySelector('dialog>form'); //scanner
+							content.childNodes.forEach(input => {
 								//console.log(input);
 								if (['input', 'textarea'].includes(input.localName)) {
 									result[input.name] = input.value;
