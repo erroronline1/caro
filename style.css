@@ -1,5 +1,5 @@
 :root {
-	--background: rgb(229, 233, 240);
+	--background: #D8DEE9;
 	--foreground: rgb(46, 52, 64);
 	--article: rgb(236, 239, 244);
 	--3d-border: rgba(255, 255, 255, .3);
@@ -94,7 +94,7 @@ body>header {
 	position: fixed;
 	top: 0;
 	left: 0;
-	background: var(--frostgreen);
+	background: var(--cta);
 	text-align: center;
 	z-index: 98;
 	box-shadow: var(--shadow);
