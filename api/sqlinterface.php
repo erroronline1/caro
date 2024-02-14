@@ -69,12 +69,16 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_form_components (name, date, author, content) VALUES (:name, CURRENT_TIMESTAMP, :author, :content)"
 		],
 		'form_component-datalist' => [
-			'mysql' => "SELECT name FROM caro_form_components GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT name FROM caro_form_components GROUP BY name ORDER BY name ASC"
+			'mysql' => "SELECT * FROM caro_form_components ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form_components name ORDER BY name ASC, date DESC"
+		],
+		'form_component-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form_components WHERE name= :name ORDER BY id DESC"
 		],
 		'form_component-get' => [
-			'mysql' => "SELECT * FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form_components WHERE name = :name ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_form_components WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_form_components WHERE id = :id"
 		],
 
 		'form_form-post' => [
@@ -82,12 +86,16 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_form_forms (name, date, author, content) VALUES (:name, CURRENT_TIMESTAMP, :author, :content)"
 		],
 		'form_form-datalist' => [
-			'mysql' => "SELECT name FROM caro_form_forms GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT name FROM caro_form_forms GROUP BY name ORDER BY name ASC"
+			'mysql' => "SELECT name FROM caro_form_forms ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT name FROM caro_form_forms ORDER BY name ASC, date DESC"
+		],
+		'form_form-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form_forms WHERE name= :name ORDER BY id DESC"
 		],
 		'form_form-get' => [
-			'mysql' => "SELECT * FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form_forms WHERE name = :name ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_form_forms WHERE id = :id ",
+			'sqlsrv' => "SELECT * FROM caro_form_forms WHERE id = :id"
 		],
 
 		'user_post' => [

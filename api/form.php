@@ -5,13 +5,12 @@
 class FORMS extends API {
    // processed parameters for readability
    public $_requestedMethod = REQUEST[1];
-   private $_requestedName = null;
+   private $_requestedID = null;
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedName = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
-
 
 	public function component(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
@@ -37,64 +36,95 @@ class FORMS extends API {
 						]]);
 				break;
 			case 'GET':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
-				$statement->execute([
-					':name' => $this->_requestedName
-				]);
-				$component = $statement->fetch(PDO::FETCH_ASSOC);
-				$component['content'] = json_decode($component['content']);
-				$this->response(['body' => $component, 'name' => $this->_requestedName]);
+				if ($this->_requestedID == '0' || intval($this->_requestedID)){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
+					$statement->execute([
+						':id' => $this->_requestedID
+					]);
+				} else {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+					$statement->execute([
+						':name' => $this->_requestedID
+					]);
+				}
+				if ($component = $statement->fetch(PDO::FETCH_ASSOC)){
+					$component['content'] = json_decode($component['content']);
+					$this->response(['body' => $component, 'name' => $component['name']]);
+				}
+				else $this->response([]);
 				break;
 		}
 	}
 
 	public function component_editor(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-		$datalist = [];
-		$options = ['...' => []];
-		$options = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedName) ? ['selected' => true] : []];
+		$componentdatalist = [];
+		$options = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		$alloptions = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$return = [];
 		
+		// get selected component
+		if ($this->_requestedID == '0' || intval($this->_requestedID)){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
+			$statement->execute([
+				':id' => $this->_requestedID
+			]);
+		} else {
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+			$statement->execute([
+				':name' => $this->_requestedID
+			]);
+		}
+		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['name' =>''];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID])];
+
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($components as $key => $row) {
-			$datalist[] = $row['name'];
-			$options[$row['name']] = ($row['name'] === $this->_requestedName) ? ['selected' => true] : [];
+			if (!array_key_exists($row['name'], $options)) {
+				$componentdatalist[] = $row['name'];
+				$options[$row['name']] = ($row['name'] === $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			}
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] === $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
-
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
-		$statement->execute([
-			':name' => $this->_requestedName
-		]);
-		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['name' =>''];
-		if($this->_requestedName && $this->_requestedName !== 'false' && !$component['name'] && $this->_requestedName !== '...' . LANG::GET('assemble.edit_existing_components_new')) $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedName])];
 
 		$return['body'] = [
 			'content' => [
 				[
 					[
-						'type' => 'datalist',
-						'content' => $datalist,
-						'attributes' => [
-							'id' => 'components'
+						[
+							'type' => 'datalist',
+							'content' => $componentdatalist,
+							'attributes' => [
+								'id' => 'components'
+							]
+						], [
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('assemble.edit_existing_components_select'),
+								'onchange' => "api.form('get', 'component_editor', this.value)"
+							],
+							'content' => $options
+						],[
+							'type' => 'searchinput',
+							'attributes' => [
+								'name' => LANG::GET('assemble.edit_existing_forms'),
+								'list' => 'components',
+								'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component_editor', this.value); return false;}"
+							]
 						]
-					], [
-						'type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('assemble.edit_existing_components_select'),
-							'onchange' => "api.form('get', 'component_editor', this.value)"
+					],[
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('assemble.edit_existing_components_all'),
+								'onchange' => "api.form('get', 'component_editor', this.value)"
+							],
+							'content' => $alloptions
 						],
-						'content' => $options
-					], [
-						'type' => 'searchinput',
-						'attributes' => [
-							'name' => LANG::GET('assemble.edit_existing_components'),
-							'list' => 'components',
-							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component_editor', this.value); return false;}"
-						]
-					],
+					]
 				],[
 					[[
 						'type' => 'text',
@@ -176,63 +206,87 @@ class FORMS extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		// form to add and edit form components. 
 		$formdatalist = $componentdatalist = [];
-		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedName) ? ['selected' => true] : []];
-
-		$componentoptions = ['...' => []];
+		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		$alloptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		$componentoptions = ['...' => ['value' => '0']];
 		$return = [];
 		
+		// get selected form
+		if ($this->_requestedID == '0' || intval($this->_requestedID)){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get'));
+			$statement->execute([
+				':id' => $this->_requestedID
+			]);
+		} else{
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
+			$statement->execute([
+				':name' => $this->_requestedID
+			]);
+		}
+		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => ''];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID])];
+
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
-		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($result as $key => $row) {
-			$formdatalist[] = $row['name'];
-			$formoptions[$row['name']] = ($row['name'] === $this->_requestedName) ? ['selected' => true] : [];
+		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($fd as $key => $row) {
+			if (!array_key_exists($row['name'], $formoptions)) {
+				$formdatalist[] = $row['name'];
+				$formoptions[$row['name']] = ($row['name'] === $result['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			}
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']])] = ($row['name'] === $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
-		$result = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($result as $key => $row) {
-			$componentdatalist[] =$row['name'];
-			$componentoptions[$row['name']] = [];
+		$cd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($cd as $key => $row) {
+			if (!array_key_exists($row['name'], $componentoptions)) {
+				$componentdatalist[] = $row['name'];
+				$componentoptions[$row['name']] = ['value' => $row['id']];
+			}
 		}
-			
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get'));
-		$statement->execute([
-			':name' => $this->_requestedName
-		]);
-		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => ''];
-		if($this->_requestedName && $this->_requestedName !== 'false' && !$result['name'] && $this->_requestedName !== '...' . LANG::GET('assemble.edit_existing_forms_new')) $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedName])];
-
+		
 		$return['body'] = [
 			'content' => [
 				[
 					[
-						'type' => 'datalist',
-						'content' => $formdatalist,
-						'attributes' => [
-							'id' => 'forms'
+						[
+							'type' => 'datalist',
+							'content' => $formdatalist,
+							'attributes' => [
+								'id' => 'forms'
+							]
+						], [
+							'type' => 'datalist',
+							'content' => $componentdatalist,
+							'attributes' => [
+								'id' => 'components'
+							]
+						], [
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('assemble.edit_existing_forms_select'),
+								'onchange' => "api.form('get', 'form_editor', this.value)"
+							],
+							'content' => $formoptions
+						], [
+							'type' => 'searchinput',
+							'attributes' => [
+								'name' => LANG::GET('assemble.edit_existing_forms'),
+								'list' => 'forms',
+								'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'form_editor', this.value); return false;}"
+							]
 						]
-					], [
-						'type' => 'datalist',
-						'content' => $componentdatalist,
-						'attributes' => [
-							'id' => 'components'
-						]
-					], [
-						'type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('assemble.edit_existing_forms_select'),
-							'onchange' => "api.form('get', 'form_editor', this.value)"
-						],
-						'content' => $formoptions
-					], [
-						'type' => 'searchinput',
-						'attributes' => [
-							'name' => LANG::GET('assemble.edit_existing_forms'),
-							'list' => 'forms',
-							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'form_editor', this.value); return false;}"
+					],[
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('assemble.edit_existing_forms_all'),
+								'onchange' => "api.form('get', 'form_editor', this.value)"
+							],
+							'content' => $alloptions
 						]
 					]
 				], [
