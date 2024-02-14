@@ -151,7 +151,7 @@ class USER extends API {
 						$orderauths[] = $row['orderauth'];
 					}
 					do {
-						$user['orderauth'] = random_int(10000,99999);
+						$user['orderauth'] = random_int(10000, max(99999, count($users)*100)); 
 					} while (in_array($user['orderauth'], $orderauths));
 				}
 
@@ -241,7 +241,7 @@ class USER extends API {
 						$orderauths[] = $row['orderauth'];
 					}
 					do {
-						$user['orderauth'] = random_int(10000,99999);
+						$user['orderauth'] = random_int(10000, max(99999, count($users)*100));
 					} while (in_array($user['orderauth'], $orderauths));
 				}
 
