@@ -748,7 +748,7 @@ class ORDER extends API {
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
-					$prepared[LANG::PROPERTY('order.additional_info')] .= ($prepared[LANG::PROPERTY('order.additional_info')] ? "\n": '') . LANG::GET('order.initially_approved') . ': ' . $order['approved'];
+					$prepared[LANG::PROPERTY('order.additional_info')] .= ($prepared[LANG::PROPERTY('order.additional_info')] ? "\n": '') . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 					// clear unused keys
 					foreach ($prepared as $key => $value) {
 						if (!$value) unset($prepared[$key]);
@@ -773,11 +773,12 @@ class ORDER extends API {
 						'commission' => LANG::PROPERTY('order.commission')] as $key => $value){
 						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
 					}
-					$this->alertUserGroup(array_search($prepared[LANG::PROPERTY('order.unit')], LANGUAGEFILE['units']), LANG::GET('order.alert_disapprove_order',[
+					$messagepayload[':info'] = array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data) ? $decoded_order_data[LANG::PROPERTY('order.additional_info')] : '';
+					$this->alertUserGroup(array_search($prepared[LANG::PROPERTY('order.unit')], LANGUAGEFILE['units']), str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order',[
 						':order' => LANG::GET('order.message', $messagepayload),
 						':unit' => $prepared[LANG::PROPERTY('order.unit')],
 						':user' => $_SESSION['user']['name']
-					]) . "\n \n" . $this->_message, 'unit');
+					])) . "\n \n" . $this->_message, 'unit');
 				}
 				if ($this->_subMethod == 'addinformation'){
 					$order = $statement->fetch(PDO::FETCH_ASSOC);
