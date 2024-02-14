@@ -658,7 +658,10 @@ export class Compose extends Assemble {
 	compose_component(std = {
 		name: LANG.GET('assemble.compose_component_name'),
 		description: LANG.GET('assemble.compose_component'),
-		action: 'api.form("post", "component")'
+		action: "new Dialog({type: 'confirm', header: '" + LANG.GET('assemble.compose_component') + "', options:{" +
+			"'" + LANG.GET('assemble.compose_component_cancel') + "': false," +
+			"'" + LANG.GET('assemble.compose_component_confirm') + "': {value: true, class: 'reducedCTA'}," +
+			"}}).then(confirmation => {if (confirmation) api.form('post', 'component')})"
 	}) {
 		let result = [];
 		this.currentElement = {
@@ -686,7 +689,10 @@ export class Compose extends Assemble {
 		return this.compose_component({
 			name: LANG.GET('assemble.compose_form_label'),
 			description: LANG.GET('assemble.compose_form'),
-			action: 'api.form("post","form")'
+			action: "new Dialog({type: 'confirm', header: '" + LANG.GET('assemble.compose_form') + "', options:{" +
+			"'" + LANG.GET('assemble.compose_form_cancel') + "': false," +
+			"'" + LANG.GET('assemble.compose_form_confirm') + "': {value: true, class: 'reducedCTA'}," +
+			"}}).then(confirmation => {if (confirmation) api.form('post', 'form')})"
 		});
 	}
 }
