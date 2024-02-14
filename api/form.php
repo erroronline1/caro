@@ -18,6 +18,9 @@ class FORMS extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$content=['content' => $this->_payload->content];
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
+				}
 				if (property_exists($this->_payload, 'form')) $content['form'] = $this->_payload->form; 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-post'));
 				if ($statement->execute([
@@ -332,6 +335,9 @@ class FORMS extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
+				}
 				// content : {'context':'...', 'components': [array]}
 				break;
 			case 'GET':
