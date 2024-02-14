@@ -51,7 +51,7 @@ class FORMS extends API {
 					$component['content'] = json_decode($component['content']);
 					$this->response(['body' => $component, 'name' => $component['name']]);
 				}
-				else $this->response([]);
+				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID])]]);
 				break;
 		}
 	}
