@@ -124,13 +124,15 @@ export const compose_helper = {
 		// set dragged/dropped order of elements
 		const nodes = document.getElementById('main').children,
 			name = document.getElementById('ComponentName').value;
+		alias = document.getElementById('ComponentAlias').value;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
 		if (name && content.length) return {
 			'components': content,
-			'name': name
+			'name': name,
+			'alias': alias
 		};
 		return null;
 	},
@@ -663,7 +665,8 @@ export class Compose extends Assemble {
 			"'" + LANG.GET('assemble.compose_component_confirm') + "': {value: true, class: 'reducedCTA'}," +
 			"}}).then(confirmation => {if (confirmation) api.form('post', 'component')})"
 	}) {
-		let result = [];
+		let result = [],
+			alias = this.currentElement.alias;
 		this.currentElement = {
 			type: 'textinput',
 			hint: this.currentElement.hint,
@@ -675,6 +678,20 @@ export class Compose extends Assemble {
 			}
 		};
 		result = result.concat(...this.textinput());
+		if (alias) {
+			this.currentElement = {
+				type: 'textinput',
+				hint: alias.hint || null,
+				attributes: {
+					id: 'ComponentAlias',
+					value: alias.value || '',
+					name: alias.name,
+					required: true,
+				}
+			};
+			result = result.concat(...this.textinput());
+
+		}
 		this.currentElement = {
 			attributes: {
 				value: std.description,
@@ -690,9 +707,9 @@ export class Compose extends Assemble {
 			name: LANG.GET('assemble.compose_form_label'),
 			description: LANG.GET('assemble.compose_form'),
 			action: "new Dialog({type: 'confirm', header: '" + LANG.GET('assemble.compose_form') + "', options:{" +
-			"'" + LANG.GET('assemble.compose_form_cancel') + "': false," +
-			"'" + LANG.GET('assemble.compose_form_confirm') + "': {value: true, class: 'reducedCTA'}," +
-			"}}).then(confirmation => {if (confirmation) api.form('post', 'form')})"
+				"'" + LANG.GET('assemble.compose_form_cancel') + "': false," +
+				"'" + LANG.GET('assemble.compose_form_confirm') + "': {value: true, class: 'reducedCTA'}," +
+				"}}).then(confirmation => {if (confirmation) api.form('post', 'form')})"
 		});
 	}
 }

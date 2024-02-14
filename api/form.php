@@ -226,7 +226,7 @@ class FORMS extends API {
 				':name' => $this->_requestedID
 			]);
 		}
-		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => ''];
+		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => '', 'alias' => ''];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID])];
 
 		// prepare existing component lists
@@ -316,7 +316,11 @@ class FORMS extends API {
 					[
 						'type' => 'compose_form',
 						'description' => LANG::GET('assemble.compose_form'),
-						'value' => $result['name'] ? : ''
+						'value' => $result['name'] ? : '',
+						'alias' => [
+							'name' => LANG::GET('assemble.edit_form_alias'),
+							'value' => $result['alias'] ? : ''
+						]
 					]
 				], [
 					[
