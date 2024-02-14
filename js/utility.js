@@ -171,6 +171,7 @@ const orderClient = {
 const toolModule = {
 	stlviewer: null,
 	initStlViewer: function (file) {
+		if (file === '../null') return;
 		const canvas = document.getElementById('stlviewer_canvas');
 		canvas.replaceChildren();
 		this.stlviewer = new StlViewer(canvas, {

@@ -181,17 +181,15 @@ class TOOL extends API {
 	
 	public function stlviewer(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-
 		$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
 		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 		foreach ($folders as $folder) {
 			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 		}
-		$options = ['...'=>[]];
+		$options = ['...' => ['value' => 'null']];
 		foreach ($files as $path){
-			if (pathinfo($path)['extension'] === 'stl') $options[$path] = [];
+			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => $path];
 		}
-
 		$result['body']=['content' => [
 			[
 				['type' => 'select',
