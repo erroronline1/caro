@@ -17,20 +17,53 @@ class FORMS extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$content=['content' => $this->_payload->content];
+				$component = json_decode($this->_payload->composedComponent, true);
+				$component_name = $component['name'];
+				unset($component['name']);
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
+					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name])]]);
 				}
-				if (property_exists($this->_payload, 'form')) $content['form'] = $this->_payload->form; 
+				// recursively replace images with actual $_FILES content according to content nesting
+				if (array_key_exists('composedComponent_files', $_FILES)){
+					$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [time()]);
+					$files=[];
+					foreach($uploads as $path){
+						UTILITY::resizeImage($path, 2048, UTILITY_IMAGE_REPLACE);
+						preg_match_all('/[\w\s\d\.]+/m', $path, $filename);
+						$files[substr(stristr($filename[0][count($filename[0]) - 1], '_'), 1)] = substr($path, 1);
+					}
+
+					function replace_images($element, $filearray){
+						$result = [];
+						foreach($element as $sub){
+							if (array_is_list($sub)){
+								$result[] = replace_images($sub, $filearray);
+							} else {
+								if ($sub['type'] === 'image'){
+									preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
+									$filename = $fakefilename[0][count($fakefilename[0])-1];
+									if ($filename && array_key_exists($filename, $filearray)){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
+										$sub['attributes']['name'] = $filename;
+										$sub['attributes']['url'] = $filearray[$filename];
+									}
+									$result[] = $sub;
+								}
+							}
+						}
+						return $result;
+					}
+					$component['content'] = replace_images($component['content'], $files);
+				}
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-post'));
 				if ($statement->execute([
-					':name' => $this->_payload->name,
+					':name' => $component_name,
 					':author' => $_SESSION['user']['name'],
-					':content' => json_encode($content)
+					':content' => json_encode($component)
 					])) $this->response([
 						'status' => [
-							'name' => $this->_payload->name,
-							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $this->_payload->name])
+							'name' => $component_name,
+							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name])
 						]]);
 					else $this->response([
 						'status' => [
@@ -137,6 +170,10 @@ class FORMS extends API {
 						'form' => true,
 						'type' => 'compose_text',
 						'description' => LANG::GET('assemble.compose_text')
+					]], [[
+						'form' => true,
+						'type' => 'compose_image',
+						'description' => LANG::GET('assemble.compose_image')
 					]], [[
 						'form' => true,
 						'type' => 'compose_textinput',

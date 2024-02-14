@@ -61,6 +61,20 @@ export const compose_helper = {
 				if (elementName === LANG.GET('assemble.compose_text_content') && value) {
 					element.content = value;
 				}
+			} else if (['image'].includes(element.type)) {
+				if (elementName === LANG.GET('assemble.compose_image_description') && value) element.description = value;
+				if (elementName === 'compose_image' && value) {
+					element.attributes = {
+						name: value,
+						url: URL.createObjectURL(sibling.files[0])
+					};
+					// add component structure to multipart form
+					const input = document.createElement('input');
+					input.type = 'file';
+					input.name = 'composedComponent_files[]';
+					input.files = sibling.files;
+					document.querySelector('[data-usecase=component_editor_form]').append(input);
+				}
 			} else {
 				if (elementName === LANG.GET('assemble.compose_field_name')) {
 					if (value) element.attributes.name = value;
@@ -83,6 +97,27 @@ export const compose_helper = {
 			});
 			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] = element;
 		}
+	},
+
+	addComponentMultipartFormToMain: function () {
+		const form = document.createElement('form');
+		form.style.display = 'hidden';
+		form.dataset.usecase = 'component_editor_form';
+		form.enctype = 'multipart/form-data';
+		form.method = 'post';
+		document.getElementById('main').insertAdjacentElement('afterbegin', form);
+	},
+	addComponentStructureToComponentForm: function (composedComponent) {
+		const cc=document.querySelector('[name=composedComponent]');
+		if (cc) {
+			cc.value=JSON.stringify(composedComponent);
+			return;
+		}
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = 'composedComponent';
+		input.value = JSON.stringify(composedComponent);
+		document.querySelector('[data-usecase=component_editor_form]').append(input);
 	},
 
 	composeNewComponent: function () {
@@ -440,6 +475,32 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET('assemble.compose_text'),
+				'data-type': 'addblock',
+			}
+		};
+		result = result.concat(...this.button());
+		return result;
+	}
+
+	compose_image() {
+		let result = [];
+		this.currentElement = {
+			type: 'image',
+			attributes: {
+				name: LANG.GET('assemble.compose_image_description'),
+			}
+		};
+		result = result.concat(...this.textinput(), this.br());
+		this.currentElement = {
+			type: 'photo',
+			attributes: {
+				name: 'compose_image[]',
+			}
+		};
+		result = result.concat(...this.photo(), this.br());
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET('assemble.compose_image'),
 				'data-type': 'addblock',
 			}
 		};

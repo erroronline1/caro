@@ -1,6 +1,7 @@
 import {
 	assemble_helper
 } from './assemble.js';
+import { compose_helper } from './compose.js';
 
 export const api = {
 	preventDataloss: {
@@ -277,7 +278,8 @@ export const api = {
 			title = {
 				'component_editor': LANG.GET('menu.forms_manage_components'),
 				'form_editor': LANG.GET('menu.forms_manage_forms')
-			};
+			},
+			composedComponent;
 
 		switch (method) {
 			case 'get':
@@ -298,6 +300,8 @@ export const api = {
 								document.getElementById('main').replaceChildren();
 								new Compose(data.body);
 								if (data.body.component) compose_helper.importComponent(data.body.component);
+								// create multipart form for file uploads
+								compose_helper.addComponentMultipartFormToMain();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}
@@ -330,7 +334,10 @@ export const api = {
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}
-						if (!(payload = compose_helper.composeNewComponent())) return;
+						composedComponent = compose_helper.composeNewComponent();
+						if (!composedComponent) return;
+						compose_helper.addComponentStructureToComponentForm(composedComponent);
+						payload = _.getInputs('[data-usecase=component_editor_form]', true);
 						break;
 					case 'form':
 						////////////////////////////////////////////
@@ -344,7 +351,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload);
+		api.send(method, request, successFn, null, payload, composedComponent);
 	},
 	message: (method, ...request) => {
 		/*
