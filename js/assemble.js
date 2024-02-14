@@ -126,6 +126,10 @@ export class Dialog {
 		const dialog = document.getElementById('modal');
 		if (this.type) {
 			const form = document.createElement('form');
+			if (this.type === 'message') {
+				form.dataset.usecase = 'message';
+				this.type = 'input';
+			}
 			form.method = 'dialog';
 			const img = document.createElement('img');
 			img.classList.add('close');

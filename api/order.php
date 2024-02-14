@@ -869,38 +869,6 @@ class ORDER extends API {
 						'description' => 'filter',
 						'attributes' => ['data-filtered' => $row['id']]];
 
-					$fields=[
-						'name' => LANG::PROPERTY('order.productname_label'),
-						'unit' => LANG::PROPERTY('order.unit_label'),
-						'number' => LANG::PROPERTY('order.ordernumber_label'),
-						'quantity' => LANG::PROPERTY('order.quantity_label'),
-						'vendor' => LANG::PROPERTY('order.vendor_label'),
-						'commission' => LANG::PROPERTY('order.commission'),
-					];
-					$messagepayload=[];
-					foreach ($fields as $replace => $with){
-						$messagepayload[':' . $replace] = array_key_exists($with, $decoded_order_data) ? $decoded_order_data[$with]: '';
-					}
-					$messageorderer=UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '';
-					$content[]=[
-						'type' => 'hiddeninput',
-						'numeration' => 'none',
-						'attributes' => [
-							'name' => LANG::PROPERTY('message.to'),
-							'value' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '',
-							'data-message' => $row['id']
-						]
-					];
-					$content[]=[
-						'type' => 'hiddeninput',
-						'numeration' => 'none',
-						'attributes' => [
-							'name' => LANG::PROPERTY('message.message'),
-							'value' => LANG::GET('order.message', $messagepayload),
-							'data-message' => $row['id']
-						]
-					];
-
 					$text .= LANG::GET('order.prepared_order_item', [
 						':quantity' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.quantity_label')) ? : '',
 						':unit' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.unit_label')) ? : '',
@@ -989,10 +957,47 @@ class ORDER extends API {
 								'url' => $row['approval']],
 						];
 					}
+
+					$fields=[
+						'name' => LANG::PROPERTY('order.productname_label'),
+						'unit' => LANG::PROPERTY('order.unit_label'),
+						'number' => LANG::PROPERTY('order.ordernumber_label'),
+						'quantity' => LANG::PROPERTY('order.quantity_label'),
+						'vendor' => LANG::PROPERTY('order.vendor_label'),
+						'commission' => LANG::PROPERTY('order.commission'),
+					];
+
+					$messagepayload=[];
+					foreach ($fields as $replace => $with){
+						$messagepayload[':' . $replace] = array_key_exists($with, $decoded_order_data) ? $decoded_order_data[$with]: '';
+					}
+					$messagepayload[':info'] = array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data) ? $decoded_order_data[LANG::PROPERTY('order.additional_info')]: '';
+					$messageorderer=UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '';
+
 					$content[]=[
 						'type' => 'links',
 						'content' => [
-							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'message', 'onpointerup' => "api.message('get', 'message' , '[data-message=\"" . $row['id'] . "\"]')"]
+							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'message', 'onpointerup' => "new Dialog({type: 'message', header: '". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', body: JSON.parse('" . 
+								json_encode(
+									[[
+										['type' => 'hiddeninput',
+										'attributes' => [
+											'name' => LANG::GET('message.to'),
+											'value' => $messageorderer
+											]
+										],
+										['type' => 'textarea',
+										'attributes' => [
+											'name' => LANG::GET('message.message'),
+											'value' => LANG::GET('order.message', $messagepayload),
+											'rows' => 8
+											]
+										]
+									]]
+								 ) . "'), options:{".
+								"'".LANG::GET('order.add_information_cancel')."': false,".
+								"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(response => {if (response[LANG.GET('message.message')]) api.message('post', 'message')})"]
 						]
 					];
 					$content[] = $copy;
