@@ -69,8 +69,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_form_components (name, date, author, content) VALUES (:name, CURRENT_TIMESTAMP, :author, :content)"
 		],
 		'form_component-datalist' => [
-			'mysql' => "SELECT * FROM caro_form_components ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form_components name ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT id, name, date, author FROM caro_form_components ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT id, name, date, author FROM caro_form_components name ORDER BY name ASC, date DESC"
 		],
 		'form_component-get-latest-by-name' => [
 			'mysql' => "SELECT * FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
