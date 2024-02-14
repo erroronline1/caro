@@ -92,6 +92,9 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* form alias search terms
+* components add images (store, duplicate with component id, do not delete)
+
 * access csv filter, store filter rules
 * vendor address, email, phone, customer id
 * vendor list
@@ -109,3 +112,17 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * ...material tracing within documentation
 * calendar and alerts
 * md mermaid flowcharts
+
+## form contexts ##
+### treatment ###
+* strain identifier unix timestamp of creation in hex
+* initialize treatment form for patient, print qr code labels with name, dob, date
+* documentation form, scan strain qr code, fill, save a (unfinished with percentage) dataset, who filled out
+* view other forms (e.g. instructions, modal? prevent filling out)
+* import from other strain (anamnesis) (same form field names)
+* append other forms (prefill strain identifier possible?)
+* check incomplete strains, alert supervisor, admin
+* required forms (like document bundles) optional selector unneccessary? - with "marked as unneccessary by ... on ..."
+* join datasets, close case, check for completeness
+* export anytime (reuse join method)
+* user manual
