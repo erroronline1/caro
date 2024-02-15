@@ -172,7 +172,10 @@ class UTILITY {
 			elseif ($owidth < $oheight && $oheight > $maxSize) $resize = $maxSize/$oheight;
 			else $resize = 1;
 			$image2 = imagecreatetruecolor(ceil($owidth * $resize), ceil($oheight * $resize));
-			imagecolortransparent($image2, imagecolorallocate($image2, 0, 0, 0));
+			imagealphablending($image2, false);
+			imagesavealpha($image2, true);
+			$transparent = imagecolorallocatealpha($image2, 255, 255, 255, 127);
+			imagefilledrectangle($image2, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $transparent);
 			imagecopyresampled($image2, $image, 0, 0, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $owidth, $oheight);
 			imagedestroy($image);
 
