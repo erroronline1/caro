@@ -37,6 +37,7 @@ class USER extends API {
 					':permissions' => $user['permissions'],
 					':units' => $user['units'],
 					':token' => $user['token'],
+					':orderauth' => $user['orderauth'],
 					':image' => $user['image']
 				])) $this->response([
 					'status' => [
