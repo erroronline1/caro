@@ -35,7 +35,8 @@ class ORDER extends API {
 					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 512, UTILITY_IMAGE_RESOURCE, 'png'));
 				}
 				$approvedIDs = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.bulk_approve_order'));
-				if (!$approval || !$approvedIDs) $this->response([], 401);
+				if (!$approval) $this->response([], 401);
+				if (!$approvedIDs) $this->response([], 406);
 
 				$order_data=['items'=>[]];
 
