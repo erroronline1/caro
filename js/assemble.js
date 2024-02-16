@@ -483,7 +483,7 @@ export class Assemble {
 					signature.classList.add("signature_required_alert");
 					return false;
 				}
-				document.getElementById('signature').value = null;
+				document.getElementById('SIGNATURE').value = null;
 				return;
 			}
 			let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
@@ -492,7 +492,7 @@ export class Assemble {
 			});
 			let section = new DataTransfer();
 			section.items.add(file);
-			document.getElementById('signature').files = section.files;
+			document.getElementById('SIGNATURE').files = section.files;
 		}
 		return;
 	}
@@ -780,9 +780,8 @@ export class Assemble {
 	file() {
 		/*{
 			type: 'file',
-			description: 'file upload',
 			attributes: {
-				name: 'variable name',
+				name: 'file upload',
 				multiple: true
 			}
 			hint: 'this file serves as...'
@@ -792,8 +791,12 @@ export class Assemble {
 			button = document.createElement('button');
 		input.type = 'file';
 		input.id = getNextElementID();
-		input.name = this.currentElement.description;
-		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, '');
+		if (this.currentElement.attributes.multiple) {
+			if (!this.currentElement.attributes.name.endsWith('[]')) this.currentElement.attributes.name += '[]';
+		}
+
+		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (this.currentElement.attributes.multiple !== undefined) input.onchange = function () {
 			this.nextSibling.innerHTML = this.files.length ? Array.from(this.files).map(x => x.name).join(
 				', ') + ' ' + LANG.GET('assemble.files_rechoose') : LANG.GET('assemble.files_choose');
@@ -819,9 +822,8 @@ export class Assemble {
 	photo() {
 		/*{
 			type: 'photo',
-			description: 'photo upload',
 			attributes: {
-				name: 'photo',
+				name: 'photo upload',
 				multiple: true|undefined
 			}
 			hint: 'this photo serves as...'
@@ -833,15 +835,12 @@ export class Assemble {
 			addbutton = document.createElement('button'),
 			hint = [...this.hint()],
 			multiple;
-
-		if (this.currentElement.attributes) {
-			if (!this.currentElement.attributes.name) this.currentElement.attributes.name = this.currentElement.description;
-			if (this.currentElement.attributes.multiple) {
-				multiple = true;
-				if (this.currentElement.attributes.name && !this.currentElement.attributes.name.endsWith('[]')) this.currentElement.attributes.name += '[]';
-				// delete for input apply_attributes
-				delete this.currentElement.attributes.multiple;
-			}
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, '');
+		if (this.currentElement.attributes.multiple) {
+			multiple = true;
+			if (!this.currentElement.attributes.name.endsWith('[]')) this.currentElement.attributes.name += '[]';
+			// delete for input apply_attributes
+			delete this.currentElement.attributes.multiple;
 		}
 
 		function changeEvent() {
@@ -855,7 +854,7 @@ export class Assemble {
 		input.accept = 'image/*';
 		input.capture = true;
 		input.onchange = changeEvent;
-		if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
+		input = this.apply_attributes(this.currentElement.attributes, input);
 		button.onclick = new Function("document.getElementById('" + input.id + "').click();");
 		button.type = 'button';
 		button.setAttribute('data-type', 'photo');
@@ -870,7 +869,7 @@ export class Assemble {
 		resetbutton.classList.add('inlinebutton');
 		resetbutton.type = 'button';
 
-		if (multiple) this.currentElement.attributes.multiple = true;
+		if (multiple) this.currentElement.attributes.multiple = true; // reapply after input apply_attributes
 		const photoElementClone = structuredClone(this.currentElement);
 		addbutton.onpointerup = function () {
 			new Assemble({
@@ -992,7 +991,7 @@ export class Assemble {
 			hint: 'this selection is for...'
 		}*/
 		const result = [...this.header()],
-			radioname = this.currentElement.description ? this.names_numerator(this.currentElement.description, this.currentElement.numeration) : null; // keep same name for current article
+			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement('label'),
 				input = document.createElement('input');
@@ -1015,6 +1014,7 @@ export class Assemble {
 		return [...result, ...this.hint(), document.createElement('br')];
 	}
 	radio() {
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, '');
 		return this.checkbox('radioinstead');
 	}
 	links() {
@@ -1048,27 +1048,30 @@ export class Assemble {
 	signature() {
 		/*{
 			type: 'signature',
-			description:'signature',
-			required: optional boolean,
+			attributes: {
+				name: 'signature',
+				required: optional boolean
+			},
 			hint: 'this signature is for...'
 		} */
+		this.currentElement.description=this.currentElement.attributes.name.replace(/\[\]/g, '');
 		let result = [...this.header()];
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
-		if (this.currentElement.attributes && this.currentElement.attributes.required) canvas.setAttribute('data-required', 'required');
+		if (this.currentElement.attributes.required) canvas.setAttribute('data-required', 'required');
 		result.push(canvas);
-		//this tile does not process attributes, therefore they can be reassigned
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.id = 'SIGNATURE';
+		input.name = this.currentElement.attributes.name;
+		input.hidden = true;
+		result.push(input);
 		this.currentElement.attributes = {
 			value: LANG.GET('assemble.clear_signature'),
 			type: 'button',
 			onpointerup: 'signaturePad.clear()'
 		};
 		result = result.concat(this.deletebutton()); // hint will be added here as well
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.id = input.name = 'signature';
-		input.hidden = true;
-		result.push(input);
 		this.signaturePad = true;
 		return result;
 	}

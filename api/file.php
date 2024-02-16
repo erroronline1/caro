@@ -112,8 +112,8 @@ class FILE extends API {
 						]]);
 				}
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
-				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name'] && $destination) {
-					UTILITY::storeUploadedFiles(['files'], UTILITY::directory('files_documents', [':category' => $destination]));
+				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name'] && $destination) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('files_documents', [':category' => $destination]));
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['filemanager', $destination]
@@ -207,9 +207,8 @@ class FILE extends API {
 							'name' => 'destination',
 							'value' => $this->_requestedFolder]],
 						['type' => 'file',
-						'description' => LANG::GET('file.manager_new_file'),
 						'attributes' => [
-							'name' => 'files[]',
+							'name' => LANG::GET('file.manager_new_file'),
 							'multiple' => true,
 							'required' => true]]
 					];
@@ -386,7 +385,9 @@ class FILE extends API {
 						'value' => $bundle['name']]
 					],
 					['type' => 'radio',
-					'description' => LANG::GET('file.edit_bundle_active'),
+					'attributes' => [
+						'name' => LANG::GET('file.edit_bundle_active')
+					],
 					'content'=>[
 						LANG::GET('file.edit_active_bundle')=>$isactive,
 						LANG::GET('file.edit_inactive_bundle')=>$isinactive,
@@ -401,8 +402,8 @@ class FILE extends API {
 		if (!$_SESSION['user']) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (array_key_exists('files', $_FILES) && $_FILES['files']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['files'], UTILITY::directory('sharepoint'), [$_SESSION['user']['name']]);
+				if (array_key_exists(LANG::PROPERTY('file.sharepoint_upload_header'), $_FILES) && $_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.sharepoint_upload_header')], UTILITY::directory('sharepoint'), [$_SESSION['user']['name']]);
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['sharepoint']
@@ -453,9 +454,8 @@ class FILE extends API {
 				else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 				$result['body']['content'][]=[
 					['type' => 'file',
-					'description' => LANG::GET('file.sharepoint_upload_header'),
 					'attributes' => [
-						'name' => 'files[]',
+						'name' => LANG::GET('file.sharepoint_upload_header'),
 						'multiple' => true,
 						'required' => true]]
 				];

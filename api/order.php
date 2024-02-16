@@ -30,8 +30,8 @@ class ORDER extends API {
 						$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 					}
 				}
-				if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
-					$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
+				if (array_key_exists(LANG::PROPERTY('order.add_approval_signature'), $_FILES) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
+					$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
 					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 512, UTILITY_IMAGE_RESOURCE, 'png'));
 				}
 				$approvedIDs = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.bulk_approve_order'));
@@ -153,9 +153,8 @@ class ORDER extends API {
 						array_push($result['body']['content'], [
 							[
 								['type' => 'signature',
-								'description' => LANG::GET('order.add_approval_signature'),
 								'attributes' => [
-									'name' => 'approval_signature'
+									'name' => LANG::GET('order.add_approval_signature')
 								]]
 							],
 							[
@@ -276,8 +275,8 @@ class ORDER extends API {
 			}
 			unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
 		}
-		if (array_key_exists('signature', $_FILES) && $_FILES['signature']['tmp_name']){
-			$signature = gettype($_FILES['signature']['tmp_name'])=='array' ? $_FILES['signature']['tmp_name'][0] : $_FILES['signature']['tmp_name'];
+		if (array_key_exists(LANG::PROPERTY('order.add_approval_signature'), $_FILES) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
+			$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, 512, UTILITY_IMAGE_RESOURCE, 'png'));
 		}
 
@@ -286,10 +285,17 @@ class ORDER extends API {
 		
 		// handle attachments
 		$attachments = [];
-		if (array_key_exists('attachments', $_FILES) && $_FILES['attachments']['tmp_name'][0]){
-			$attachments = UTILITY::storeUploadedFiles(['attachments'], UTILITY::directory('order_attachments'), [time()]);
+		if (array_key_exists(LANG::PROPERTY('order.attach_photo'), $_FILES) && $_FILES[LANG::PROPERTY('order.attach_photo')]['tmp_name'][0]){
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [time()]));
 			foreach($attachments as $key => $value){
-				if ($value)	$attachments[$key] = substr($value, 1);
+				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
+				else unset($attachments[$key]);
+			}
+		}
+		if (array_key_exists(LANG::PROPERTY('order.attach_file'), $_FILES) && $_FILES[LANG::PROPERTY('order.attach_file')]['tmp_name'][0]){
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [time()]));
+			foreach($attachments as $key => $value){
+				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
@@ -519,7 +525,9 @@ class ORDER extends API {
 						['type' => 'hr']
 					],[
 						['type' => 'radio',
-						'description' => LANG::GET('order.unit'),
+						'attributes' => [
+							'name' => LANG::GET('order.unit')
+						],
 						'content' => $organizational_units
 						],
 						['type' => 'scanner',
@@ -548,16 +556,14 @@ class ORDER extends API {
 					],[
 						[
 							['type' => 'file',
-							'description' => LANG::GET('order.attach_file'),
 							'attributes' => [
-								'name' => 'attachments[]',
+								'name' => LANG::GET('order.attach_file'),
 								'multiple' => true
 							]]
 						],[
 							['type' => 'photo',
-							'description' => LANG::GET('order.attach_photo'),
 							'attributes' => [
-								'name' => 'attachments[]',
+								'name' => LANG::GET('order.attach_photo'),
 								'multiple' => true
 							]]
 						]
@@ -565,9 +571,8 @@ class ORDER extends API {
 					[
 						[
 							['type' => 'signature',
-							'description' => LANG::GET('order.add_approval_signature'),
 							'attributes' => [
-								'name' => 'approval_signature'
+								'name' => LANG::GET('order.add_approval_signature')
 							]]
 						],
 						[
@@ -816,7 +821,9 @@ class ORDER extends API {
 				$result=['body'=>['content'=>[
 					[
 						['type' => 'radio',
-						'description' => LANG::GET('order.order_filter'),
+						'attributes' => [
+							'name' => LANG::GET('order.order_filter')
+						],
 						'content' => [
 							LANG::GET('order.untreated')=>['checked' => true, 'onchange' => 'orderClient.filter()'],
 							LANG::GET('order.ordered')=>['onchange' => 'orderClient.filter("ordered")'],

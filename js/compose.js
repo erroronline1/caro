@@ -17,8 +17,8 @@ export const compose_helper = {
 		let sibling = parent.childNodes[0].nextSibling,
 			setTo, elementName, value;
 		const setName = {
-				name: ['select', 'scanner'],
-				description: ['links', 'photo', 'file', 'checkbox', 'radio', 'signature']
+				name: ['select', 'scanner', 'radio', 'photo', 'file', 'signature'],
+				description: ['links', 'checkbox']
 			},
 			element = {
 				attributes: {}
@@ -48,9 +48,7 @@ export const compose_helper = {
 				}
 			} else if (['file', 'photo', 'scanner', 'signature'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_simple_element')) {
-					setTo = Object.keys(setName).find(key => setName[key].includes(element.type));
-					if (value && setTo === 'name') element.attributes.name = value;
-					else if (value && setTo === 'description') element.description = value;
+					if (value) element.attributes.name = value;
 					else return;
 				}
 			} else if (['text'].includes(element.type)) {
@@ -63,7 +61,7 @@ export const compose_helper = {
 				}
 			} else if (['image'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_image_description') && value) element.description = value;
-				if (elementName === 'compose_image' && value) {
+				if (elementName === LANG.GET('assemble.compose_image') && value) {
 					element.attributes = {
 						name: value,
 						url: URL.createObjectURL(sibling.files[0])
@@ -75,7 +73,7 @@ export const compose_helper = {
 					input.files = sibling.files;
 					document.querySelector('[data-usecase=component_editor_form]').append(input);
 				}
-			} else {
+			} else { // ...input
 				if (elementName === LANG.GET('assemble.compose_field_name')) {
 					if (value) element.attributes.name = value;
 					else return;
@@ -108,9 +106,9 @@ export const compose_helper = {
 		document.getElementById('main').insertAdjacentElement('afterbegin', form);
 	},
 	addComponentStructureToComponentForm: function (composedComponent) {
-		const cc=document.querySelector('[name=composedComponent]');
+		const cc = document.querySelector('[name=composedComponent]');
 		if (cc) {
-			cc.value=JSON.stringify(composedComponent);
+			cc.value = JSON.stringify(composedComponent);
 			return;
 		}
 		const input = document.createElement('input');
@@ -139,7 +137,7 @@ export const compose_helper = {
 						if (node.id in compose_helper.newFormComponents) {
 							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes['placeholder'];
 							content.push(compose_helper.newFormComponents[node.id]);
-							if (compose_helper.newFormComponents[node.id].type != 'text') isForm = true;
+							if (!(['text', 'links', 'image'].includes(compose_helper.newFormComponents[node.id].type))) isForm = true;
 						}
 					}
 				}
@@ -494,7 +492,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: 'photo',
 			attributes: {
-				name: 'compose_image[]',
+				name: LANG.GET('assemble.compose_image'),
 			}
 		};
 		result = result.concat(...this.photo(), this.br());

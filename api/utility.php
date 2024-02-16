@@ -265,7 +265,17 @@ class UTILITY {
 		/* process $_FILES, store to folder and return an array of destination paths */
 		if (!file_exists($folder)) mkdir($folder, 0777, true);
 		$targets = [];
-		function handle ($tmpname, $name, $i, $prefix, $folder){
+		for ($i = 0; $i < count($name); $i++) {
+			if (gettype($_FILES[$name[$i]]['name'])!=='array') $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder);
+			else {
+				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
+					$targets[] = self::handle($_FILES[$name[$i]]['tmp_name'][$j], $_FILES[$name[$i]]['name'][$j], $i, $prefix, $folder);
+				}
+			}
+		}
+		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
+	}
+	private static function handle($tmpname, $name, $i, $prefix, $folder){
 			$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
 			$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $name;
 			// move_uploaded_file is for post only, else rename for put files
@@ -273,16 +283,6 @@ class UTILITY {
 				return $target;
 			}
 		}
-		for ($i = 0; $i < count($name); $i++) {
-			if (gettype($_FILES[$name[$i]]['name'])!=='array') $targets[] = handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder);
-			else {
-				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
-					$targets[] = handle($_FILES[$name[$i]]['tmp_name'][$j], $_FILES[$name[$i]]['name'][$j], $i, $prefix, $folder);
-				}
-			}
-		}
-		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
-	}
 
 	/**
 	 * deletes files and folders recursively unregarding of content!

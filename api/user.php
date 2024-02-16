@@ -23,10 +23,10 @@ class USER extends API {
 
 				// convert image
 				// save and convert image
-				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
+				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
-					$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [$user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
@@ -76,9 +76,8 @@ class USER extends API {
 								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '')]
 						],[
 							['type' => 'photo',
-							'description' => LANG::GET('user.edit_take_photo'),
 							'attributes' => [
-								'name' => 'photo'
+								'name' => LANG::GET('user.edit_take_photo')
 							],
 							'hint' => LANG::GET('user.edit_take_photo_hint')],
 						]
@@ -162,16 +161,16 @@ class USER extends API {
 				}
 
 				// save and convert image or create default
-				if (!(array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name'])) {
+				if (!(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name'])) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES['photo'] = [
+					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
+				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [$user['name']])[0];
 				UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
@@ -251,18 +250,18 @@ class USER extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// save and convert image or create default
-				if (!(array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) && $updateName) {
+				if (!(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES['photo'] = [
+					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if (array_key_exists('photo', $_FILES) && $_FILES['photo']['tmp_name']) {
+				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
-					$user['image'] = UTILITY::storeUploadedFiles(['photo'], UTILITY::directory('user_photos'), [$user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [$user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
@@ -364,14 +363,15 @@ class USER extends API {
 						]
 					],[
 						['type' => 'photo',
-						'description' => LANG::GET('user.edit_take_photo'),
 						'attributes' => [
-							'name' => 'photo'
+							'name' => LANG::GET('user.edit_take_photo')
 						],
 						'hint' => LANG::GET('user.edit_take_photo_hint')],
 					],[
 						['type' => 'radio',
-						'description' => LANG::GET('user.edit_order_authorization'),
+						'attributes' => [
+							'name' => LANG::GET('user.edit_order_authorization')
+						],
 						'content' => [
 							LANG::GET('user.edit_order_authorization_generate') => [],
 							LANG::GET('user.edit_order_authorization_revoke') => []
@@ -443,7 +443,7 @@ class USER extends API {
 				]);
 				$user = $statement->fetch(PDO::FETCH_ASSOC);
 				if ($user['id'] < 2) $this->response([], 401);
-				if ($user['image'] && $user['id'] > 1) UTILITY::delete($user['image']);
+				if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));
 				if ($statement->execute([
