@@ -92,8 +92,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* components add images (store, duplicate with component id, do not delete)
-
 * components used in forms
 * forms used in context
 * deactivate forms and components
