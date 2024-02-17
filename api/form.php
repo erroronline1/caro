@@ -18,8 +18,29 @@ class FORMS extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$component = json_decode($this->_payload->composedComponent, true);
-				$component_name = $component['name'];
+				$component_name = $component['name'];			
 				unset($component['name']);
+				$component_hidden = intval($component['hidden']);			
+				unset($component['hidden']);
+
+				// put hidden attribute if anything else remains the same
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement->execute([
+					':name' => $component_name
+				]);
+				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($exists && json_decode($exists['content'], true) == $component) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-put'));
+					if ($statement->execute([
+						':hidden' => $component_hidden,
+						':id' => $exists['id']
+						])) $this->response([
+							'status' => [
+								'name' => $component_name,
+								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name])
+							]]);	
+				}
+
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name])]]);
 				}
@@ -65,14 +86,14 @@ class FORMS extends API {
 							'name' => $component_name,
 							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name])
 						]]);
-					else $this->response([
-						'status' => [
-							'name' => false,
-							'name' => LANG::GET('assemble.edit_component_not_saved')
-						]]);
+				else $this->response([
+					'status' => [
+						'name' => false,
+						'name' => LANG::GET('assemble.edit_component_not_saved')
+					]]);
 				break;
 			case 'GET':
-				if ($this->_requestedID == '0' || intval($this->_requestedID)){
+				if (intval($this->_requestedID)){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
 					$statement->execute([
 						':id' => $this->_requestedID
@@ -111,19 +132,36 @@ class FORMS extends API {
 				':name' => $this->_requestedID
 			]);
 		}
-		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['name' =>''];
+		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['id' => '', 'name' =>''];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID])];
 
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
 		foreach($components as $key => $row) {
-			if (!array_key_exists($row['name'], $options)) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
 				$componentdatalist[] = $row['name'];
-				$options[$row['name']] = ($row['name'] === $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				$options[$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] === $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+		}
+
+		// check for dependencies in forms
+		$dependedforms = [];
+		if (array_key_exists('content', $component)){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+			$statement->execute();
+			$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+			$hidden = [];
+			foreach($fd as $key => $row) {
+				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+				if (!in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+					$dependedforms[] = $row['name'];
+				}
+			}
 		}
 
 		$return['body'] = [
@@ -228,7 +266,9 @@ class FORMS extends API {
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
 					'value' => $component['name'],
-					'hint' => $component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']]) : ''
+					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']]) . '<br>' : '') .
+						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
+					'hidden' => $component['name'] ? $component['hidden'] : 1
 				]],
 				[[
 					'type' => 'trash',
@@ -244,11 +284,11 @@ class FORMS extends API {
 
 	public function form_editor(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-		// form to add and edit form components. 
 		$formdatalist = $componentdatalist = [];
 		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$alloptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$componentoptions = ['...' => ['value' => '0']];
+		$contextoptions = ['...' . LANG::GET('assemble.edit_form_context_default') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$return = [];
 		
 		// get selected form
@@ -263,31 +303,45 @@ class FORMS extends API {
 				':name' => $this->_requestedID
 			]);
 		}
-		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = ['name' => '', 'alias' => ''];
+		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = [
+			'name' => '',
+			'alias' => '',
+			'context' => ''
+		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID])];
 
-		// prepare existing component lists
+		// prepare existing forms lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
 		foreach($fd as $key => $row) {
-			if (!array_key_exists($row['name'], $formoptions)) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!array_key_exists($row['name'], $formoptions) && !in_array($row['name'], $hidden)) {
 				$formdatalist[] = $row['name'];
 				$formoptions[$row['name']] = ($row['name'] === $result['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']])] = ($row['name'] === $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] === $result['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
+		// prepare existing component list
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$cd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
 		foreach($cd as $key => $row) {
-			if (!array_key_exists($row['name'], $componentoptions)) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!array_key_exists($row['name'], $componentoptions) && !in_array($row['name'], $hidden)) {
 				$componentdatalist[] = $row['name'];
 				$componentoptions[$row['name']] = ['value' => $row['id']];
 			}
 		}
 		
+		// prepare existing context list
+		foreach(LANGUAGEFILE['formcontext'] as $context => $display){
+			$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
+		}
+
 		$return['body'] = [
 			'content' => [
 				[
@@ -357,6 +411,10 @@ class FORMS extends API {
 						'alias' => [
 							'name' => LANG::GET('assemble.edit_form_alias'),
 							'value' => $result['alias'] ? : ''
+						],
+						'context' => [
+							'name' => LANG::GET('assemble.edit_form_context'),
+							'content' => $contextoptions
 						]
 					]
 				], [
@@ -368,7 +426,20 @@ class FORMS extends API {
 			]
 		];
 
-		if (array_key_exists('content', $result)) $return['body']['component'] = json_decode($result['content']);
+		// add used components to response
+		if (array_key_exists('content', $result)) {
+			$return['body']['components'] = [];
+			foreach(explode(',', $result['content']) as $usedcomponent) {
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement->execute([
+					':name' => $usedcomponent
+				]);
+				$component = $statement->fetch(PDO::FETCH_ASSOC);
+				$component['content'] = json_decode($component['content'], true);
+				$component['content']['name'] = $usedcomponent;
+				$return['body']['components'][] = $component['content'];
+			}
+		}
 		$this->response($return);
 	}
 
@@ -376,42 +447,51 @@ class FORMS extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
+				$statement->execute([
+					':name' => $this->_payload->name
+				]);
+				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($exists && json_decode($exists['content'], true) == $this->_payload->content) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-put'));
+					if ($statement->execute([
+						':alias' => $this->_payload->alias,
+						':context' => $this->_payload->context,
+						':hidden' => $this->_payload->hidden,
+						':id' => $exists['id']
+						])) $this->response([
+							'status' => [
+								'name' => $this->_payload->name,
+								'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name])
+							]]);	
+				}
+
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
 				}
-				// content : {'context':'...', 'components': [array]}
-				break;
-			case 'GET':
-			// retrieve latest active entries according to requested names
-			/*$requestedNames = explode(',',SQLQUERY::SANITIZE($this->_payload->content));
-			$statement = $this->_pdo->prepare("SELECT * FROM form_components WHERE id IN (SELECT MAX(id) FROM forms WHERE name IN ('". implode("','", $requestedNames)."') GROUP BY name)");
-			$statement->execute();
-			$result = $statement->fetchAll(PDO::FETCH_ASSOC);
-			// order by $this->_payload->content sequence with anonymous function passing $this->_payload into scope
-			usort($result, function ($a, $b) use ($requestedNames){
-				if (array_search($a['name'], $requestedNames) <= array_search($b['name'], $requestedNames)) return -1;
-				return 1;
-				});
-			// rebuild result array
-			$form = false;
-			$content = [];
-			foreach($result as $key => $row) {
-				$currentcontent=json_decode($row['content'], true);
-				// notice optional form attributes will be overwritten with the latest value
-				if (array_key_exists('form', $currentcontent)) $form = array_merge(gettype($form)==='boolean'? []: $form, $currentcontent['form']);
-				array_push($content, ...$currentcontent['content']);
-			}
-			// reassign $result
-			$result=[];
-			if ($form!==false) $result['form'] = $form;
-			$result['content'] = $content;
-			echo json_encode($result);*/
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-post'));
+				if ($statement->execute([
+					':name' => $this->_payload->name,
+					':alias' => $this->_payload->alias,
+					':context' => $this->_payload->context,
+					':author' => $_SESSION['user']['name'],
+					':content' => implode(',', $this->_payload->content)
+					])) $this->response([
+						'status' => [
+							'name' => $this->_payload->name,
+							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name])
+						]]);
+				else $this->response([
+					'status' => [
+						'name' => false,
+						'name' => LANG::GET('assemble.edit_form_not_saved')
+					]]);
 				break;
 		}
-
 	}
-		//case 'form_get':
-
 }
 
 $api = new FORMS();

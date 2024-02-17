@@ -87,9 +87,9 @@ export const compose_helper = {
 		while (sibling);
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
-				'draggable': true,
-				'composer': 'component',
-				'content': [
+				draggable: true,
+				composer: 'component',
+				content: [
 					[structuredClone(element)] // element receives attributes from currentElement otherwise
 				]
 			});
@@ -122,7 +122,8 @@ export const compose_helper = {
 		// set dragged/dropped order of elements - wohoo, recursion!
 		let isForm = false,
 			componentContent = [],
-			name = document.getElementById('ComponentName').value;
+			name = document.getElementById('ComponentName').value,
+			hidden = document.querySelector('[data-hiddenradio]').checked;
 
 		function nodechildren(parent) {
 			let content = [],
@@ -146,36 +147,43 @@ export const compose_helper = {
 		}
 		componentContent = nodechildren(document.querySelector('main'));
 		const answer = {
-			'name': name,
-			'content': componentContent
+			name: name,
+			content: componentContent,
+			hidden: hidden
 		};
 		if (isForm) answer.form = {};
 		if (name && componentContent) return answer;
+		api.toast(LANG.GET('assemble.edit_component_not_saved_missing'));
 		return null;
 	},
 	composeNewForm: function () {
 		// set dragged/dropped order of elements
 		const nodes = document.getElementById('main').children,
-			name = document.getElementById('ComponentName').value;
-		alias = document.getElementById('ComponentAlias').value;
+			name = document.getElementById('ComponentName').value,
+			alias = document.getElementById('ComponentAlias').value,
+			context = document.getElementById('ComponentContext').value,
+			hidden = document.querySelector('[data-hiddenradio]').checked;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
-		if (name && content.length) return {
-			'components': content,
-			'name': name,
-			'alias': alias
+		if (name && context && content.length) return {
+			name: name,
+			alias: alias,
+			context: context,
+			content: content,
+			hidden: hidden
 		};
+		api.toast(LANG.GET('assemble.edit_form_not_saved_missing'));
 		return null;
 	},
 
 	importComponent: function (form) {
 		compose_helper.newFormComponents = {};
 		const newElements = new Compose({
-			'draggable': true,
-			'composer': 'component',
-			'content': structuredClone(form.content)
+			draggable: true,
+			composer: 'component',
+			content: structuredClone(form.content)
 		});
 		// recursive function to assign created ids to form content elements in order of appearance
 		const elementIDs = newElements.generatedElementIDs;
@@ -193,10 +201,12 @@ export const compose_helper = {
 		}
 		assignIDs(form.content);
 	},
-	importForm: function (form) {
-		form.draggable = true;
-		new MetaCompose(form);
-		compose_helper.newFormElements.add(form.name);
+	importForm: function (components) {
+		for (const component of components){
+		component.draggable = true;
+		new MetaCompose(component);
+		compose_helper.newFormElements.add(component.name);
+		}
 	},
 
 	dragNdrop: {
@@ -722,10 +732,17 @@ export class Compose extends Assemble {
 		action: "new Dialog({type: 'confirm', header: '" + LANG.GET('assemble.compose_component') + "', options:{" +
 			"'" + LANG.GET('assemble.compose_component_cancel') + "': false," +
 			"'" + LANG.GET('assemble.compose_component_confirm') + "': {value: true, class: 'reducedCTA'}," +
-			"}}).then(confirmation => {if (confirmation) api.form('post', 'component')})"
+			"}}).then(confirmation => {if (confirmation) api.form('post', 'component')})",
+		hidden: {
+			name: LANG.GET('assemble.edit_component_hidden'),
+			hint: LANG.GET('assemble.edit_component_hidden_hint')
+		}
 	}) {
 		let result = [],
-			alias = this.currentElement.alias;
+			alias = this.currentElement.alias,
+			context = this.currentElement.context,
+			prefilled = Boolean(this.currentElement.value),
+			hidden = Boolean(this.currentElement.hidden);
 		this.currentElement = {
 			type: 'textinput',
 			hint: this.currentElement.hint,
@@ -749,6 +766,40 @@ export class Compose extends Assemble {
 				}
 			};
 			result = result.concat(...this.textinput());
+		}
+		if (context) {
+			this.currentElement = {
+				type: 'select',
+				hint: context.hint || null,
+				attributes: {
+					id: 'ComponentContext',
+					name: context.name,
+					required: true,
+				},
+				content: context.content
+			};
+			result = result.concat(...this.select());
+		}
+		if (prefilled) {
+			const options = {};
+			options[LANG.GET('assemble.edit_component_form_hidden_visible')] = !hidden ? {
+				checked: true
+			} : {};
+			options[LANG.GET('assemble.edit_component_form_hidden_hidden')] = hidden ? {
+				checked: true,
+				'data-hiddenradio': 'ComponentHidden'
+			} : {
+				'data-hiddenradio': 'ComponentHidden'
+			};
+			this.currentElement = {
+				type: 'radio',
+				hint: std.hidden.hint,
+				attributes: {
+					name: std.hidden.name,
+				},
+				content: options
+			};
+			result = result.concat(...this.radio());
 
 		}
 		this.currentElement = {
@@ -768,7 +819,11 @@ export class Compose extends Assemble {
 			action: "new Dialog({type: 'confirm', header: '" + LANG.GET('assemble.compose_form') + "', options:{" +
 				"'" + LANG.GET('assemble.compose_form_cancel') + "': false," +
 				"'" + LANG.GET('assemble.compose_form_confirm') + "': {value: true, class: 'reducedCTA'}," +
-				"}}).then(confirmation => {if (confirmation) api.form('post', 'form')})"
+				"}}).then(confirmation => {if (confirmation) api.form('post', 'form')})",
+			hidden: {
+				name: LANG.GET('assemble.edit_form_hidden'),
+				hint: LANG.GET('assemble.edit_form_hidden_hint')
+			}
 		});
 	}
 }

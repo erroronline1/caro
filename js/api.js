@@ -1,7 +1,9 @@
 import {
 	assemble_helper
 } from './assemble.js';
-import { compose_helper } from './compose.js';
+import {
+	compose_helper
+} from './compose.js';
 
 export const api = {
 	preventDataloss: {
@@ -288,7 +290,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								data.body.content.name = data.name;
-								if (data.body.content) compose_helper.importForm(data.body.content);
+								if (data.body.content) compose_helper.importForm([data.body.content]);
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}
@@ -321,7 +323,7 @@ export const api = {
 								api.update_header(title[request[1]]);
 								document.getElementById('main').replaceChildren();
 								new Compose(data.body);
-								if (data.body.component) compose_helper.importForm(data.body.component);
+								if (data.body.components) compose_helper.importForm(data.body.components);
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}
@@ -340,9 +342,6 @@ export const api = {
 						payload = _.getInputs('[data-usecase=component_editor_form]', true);
 						break;
 					case 'form':
-						////////////////////////////////////////////
-						// TO DO: implement usecases to select from, e.g. in setup.ini? 
-						////////////////////////////////////////////
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}

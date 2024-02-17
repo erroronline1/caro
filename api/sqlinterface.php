@@ -65,12 +65,16 @@ class SQLQUERY {
 		],
 
 		'form_component-post' => [
-			'mysql' => "INSERT INTO caro_form_components (id, name, date, author, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content)",
-			'sqlsrv' => "INSERT INTO caro_form_components (name, date, author, content) VALUES (:name, CURRENT_TIMESTAMP, :author, :content)"
+			'mysql' => "INSERT INTO caro_form_components (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, 0)",
+			'sqlsrv' => "INSERT INTO caro_form_components (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, 0)"
+		],
+		'form_component-put' => [
+			'mysql' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id",
+			'mysql' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id"
 		],
 		'form_component-datalist' => [
-			'mysql' => "SELECT id, name, date, author FROM caro_form_components ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT id, name, date, author FROM caro_form_components name ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT id, name, date, author, hidden FROM caro_form_components ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT id, name, date, author, hidden FROM caro_form_components name ORDER BY name ASC, date DESC"
 		],
 		'form_component-get-latest-by-name' => [
 			'mysql' => "SELECT * FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
@@ -82,12 +86,16 @@ class SQLQUERY {
 		],
 
 		'form_form-post' => [
-			'mysql' => "INSERT INTO caro_form_forms (id, name, date, author, content) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content)",
-			'sqlsrv' => "INSERT INTO caro_form_forms (name, date, author, content) VALUES (:name, CURRENT_TIMESTAMP, :author, :content)"
+			'mysql' => "INSERT INTO caro_form_forms (id, name, alias, context, date, author, content, hidden) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)",
+			'sqlsrv' => "INSERT INTO caro_form_forms (name, alias, context, date, author, content, hidden) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)"
+		],
+		'form_form-put' => [
+			'mysql' => "UPDATE caro_form_forms alias = :alias, context = :context, hidden = :hidden WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form_forms alias = :alias, context = :context, hidden = :hidden WHERE id = :id"
 		],
 		'form_form-datalist' => [
-			'mysql' => "SELECT name FROM caro_form_forms ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT name FROM caro_form_forms ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT * FROM caro_form_forms ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form_forms ORDER BY name ASC, date DESC"
 		],
 		'form_form-get-latest-by-name' => [
 			'mysql' => "SELECT * FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
