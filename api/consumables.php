@@ -301,7 +301,7 @@ class CONSUMABLES extends API {
 						]],
 						["type" => "radio",
 						"attributes" => [
-							LANG::GET('consumables.edit_vendor_active')
+							'name' => LANG::GET('consumables.edit_vendor_active')
 						],
 						"content" => [
 							LANG::GET('consumables.edit_vendor_isactive') => $isactive,
