@@ -628,7 +628,12 @@ export class Assemble {
 		if (!this.currentElement.hint) return [];
 		let div = document.createElement('div');
 		div.classList.add('hint');
-		div.appendChild(document.createTextNode(this.currentElement.hint));
+		const content = this.currentElement.hint.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+		for (const part of content) {
+			if (!part[1].length) continue;
+			div.appendChild(document.createTextNode(part[1]));
+			div.appendChild(document.createElement('br'));
+		}
 		if (['textarea', 'links'].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + '-hint');
 		return [div];
 	}
