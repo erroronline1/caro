@@ -31,3 +31,39 @@ graph TD;
     product_inactive-->inorderable;
     edit_product-->product_inactive;
 ```
+
+### order ###
+
+```mermaid
+graph TD;
+    new_order((new order))-->search_products[(search products)];
+    search_products-->product_found{product found};
+    product_found-->|yes|add_product[add product to order];
+    new_order-->add_manually[add manually];
+    product_found-->|no|add_manually;
+    product_found-->|no|manage_products((manage products));
+    add_manually-->add_product;
+    add_product-->search_products;
+    add_product-->add_info["set unit,
+    justification,
+    add files"];
+    add_info-->approve_order{approve order};
+    approve_order-->|by signature|approved_orders((approved orders));
+    approve_order-->|by pin|approved_orders((approved orders));
+    approve_order-->|no|prepared_orders((prepared orders));
+
+    approved_orders-->process_order{process order};
+    process_order-->|disapprove|prepared_orders;
+    process_order-->|processed|auto_delete[auto delete after X days];
+    process_order-->|retrieved|auto_delete;
+    process_order-->|archived|archived(archived);
+    process_order-->|delete|delete[delete manually];
+    archived-->delete;
+    process_order-->|add info|process_order;
+    process_order-->message((message user))
+
+    prepared_orders-->mark_bulk{mark orders};
+    mark_bulk-->|yes|approve_order;
+    mark_bulk-->|no|prepared_orders;
+    prepared_orders-->add_product;
+```
