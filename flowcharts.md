@@ -48,17 +48,32 @@ graph TD;
     justification,
     add files"];
     add_info-->approve_order{approve order};
-    approve_order-->|by signature|approved_orders((approved orders));
-    approve_order-->|by pin|approved_orders((approved orders));
-    approve_order-->|no|prepared_orders((prepared orders));
+    approve_order-->|by signature|approved_orders(("approved orders,
+    only from own unit
+    unless admin
+    or purchase"));
+    approve_order-->|by pin|approved_orders;
+    approve_order-->|no|prepared_orders(("prepared orders,
+    only from own unit
+    unless admin"));
 
     approved_orders-->process_order{process order};
-    process_order-->|disapprove|prepared_orders;
-    process_order-->|processed|auto_delete[auto delete after X days];
-    process_order-->|retrieved|auto_delete;
-    process_order-->|archived|archived(archived);
-    process_order-->|delete|delete[delete manually];
-    archived-->delete;
+    process_order-->disapprove[divapprove];
+    disapprove-->append_message[append message];
+    append_message-->message_unit[message all unit members];
+    disapprove-->message_unit;
+    message_unit-->prepared_orders
+    process_order-->mark[mark];
+    mark-->|processed|auto_delete[auto delete after X days];
+    mark-->|retrieved|auto_delete;
+    mark-->|archived|delete[delete manually];
+    process_order-->|delete|delete;
+    delete-->delete_permission{permission to delete};
+    delete_permission-->|is admin|order_deleted(order deleted);
+    delete_permission-->|is unit member|order_deleted;
+    delete_permission-->|purchase member, unprocessed order|order_deleted;
+    delete_permission-->|purchase member, processed order|approved_orders;
+    
     process_order-->|add info|process_order;
     process_order-->message((message user))
 
@@ -66,4 +81,40 @@ graph TD;
     mark_bulk-->|yes|approve_order;
     mark_bulk-->|no|prepared_orders;
     prepared_orders-->add_product;
+```
+
+### users ###
+
+```mermaid
+graph TD;
+    application((application))-->login[login];
+    login-->scan_code;
+    scan_code{scan code}-->user_db[(user database)];
+    user_db-->|found|logged_in[logged in];
+    user_db-->|not found|login;
+    logged_in-->manage_users((manage users));
+    manage_users-->new_user[new user];
+    manage_users-->edit_user[edit user];
+    new_user-->user_settings["set name, authorization,
+    unit, photo, order auth pin,
+    login token"];
+    edit_user-->user_settings;
+    user_settings-->export_token[export token];
+    export_token-->user(((user)));
+    user-->login;
+    user_settings-->user;
+
+    logged_in-->own_profile((profile));
+    own_profile-->profile["view information,
+    renew photo"];
+    profile-->user;
+
+    edit_user-->delete_user[delete user];
+    delete_user-->user;
+
+    user-->|has pin|orders((approve orders))
+    user-->|authorized|authorized(("see content based
+    on authorization"))
+    user-->|units|units(("see content based
+    on units"))
 ```
