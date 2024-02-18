@@ -68,7 +68,8 @@ graph TD;
     mark-->|retrieved|auto_delete;
     mark-->|archived|delete[delete manually];
     process_order-->|delete|delete;
-    delete-->delete_permission{permission to delete};
+    delete-->delete_permission{"permission
+    to delete"};
     delete_permission-->|is admin|order_deleted(order deleted);
     delete_permission-->|is unit member|order_deleted;
     delete_permission-->|purchase member, unprocessed order|order_deleted;
@@ -77,7 +78,8 @@ graph TD;
     process_order-->|add info|process_order;
     process_order-->message((message user))
 
-    prepared_orders-->mark_bulk{mark orders};
+    prepared_orders-->mark_bulk{"mark orders
+    for approval"};
     mark_bulk-->|yes|approve_order;
     mark_bulk-->|no|prepared_orders;
     prepared_orders-->add_product;
