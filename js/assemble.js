@@ -284,21 +284,25 @@ export class Toast {
 	 * duration is a bit fuzzy, idk why
 	 * 
 	 */
-	constructor(message = '', duration = 5000) {
+	constructor(message = '', duration = 4000) {
 		this.message = message || undefined;
 		this.duration = duration;
 		this.timeout;
 
 		this.toast = document.getElementById('toast');
 		if (typeof this.message !== 'undefined') {
-			const img = document.createElement('img'),
+			const closeimg = document.createElement('img'),
+			pauseimg = document.createElement('img'),
 				msg = document.createElement('span'),
 				div = document.createElement('div');
-			img.classList.add('close');
-			img.src = './media/times.svg';
-			img.onpointerdown = new Function("document.getElementById('toast').close();");
+				closeimg.classList.add('close');
+				closeimg.src = './media/times.svg';
+				closeimg.onpointerdown = new Function("document.getElementById('toast').close();");
+				pauseimg.classList.add('pause');
+				pauseimg.src = './media/equals.svg';
+				pauseimg.onpointerdown = new Function("window.clearTimeout(window.toasttimeout);");
 			msg.innerHTML = message;
-			this.toast.replaceChildren(img, msg, div);
+			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
 			this.toast.show();
 			this.countdown();
 		} else this.toast.close();
@@ -306,9 +310,9 @@ export class Toast {
 	countdown(percent = 100) {
 		const countdowndiv = document.querySelector('#toast>div');
 		countdowndiv.style.width = percent + "%";
-		this.timeout = window.setTimeout(this.countdown.bind(this), this.duration / 1000, percent - 1000 / this.duration);
+		window.toasttimeout = window.setTimeout(this.countdown.bind(this), this.duration / 1000, percent - 1000 / this.duration);
 		if (percent < 0) {
-			window.clearTimeout(this.timeout);
+			window.clearTimeout(window.toasttimeout);
 			this.toast.close();
 		}
 	}

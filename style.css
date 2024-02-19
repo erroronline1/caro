@@ -122,7 +122,7 @@ dialog {
 	position: fixed;
 	display: block;
 	border-radius: 1em;
-	border: 1px solid var(--lightershadow);
+	border: 1px solid var(--lightershadow) !important;
 	backdrop-filter: blur(10px);
 	background-color: var(--article);
 	box-shadow: var(--shadow);
@@ -159,9 +159,16 @@ dialog {
 	img.close {
 		width: 1.5em;
 		height: 1.5em;
-		position: absolute;
-		top: 1em;
-		right: 1em;
+		float:right;
+		margin:.5em;
+	}
+
+	img.pause {
+		width: 1.5em;
+		height: 1.5em;
+		float:right;
+		margin:.5em;
+		transform: rotate(90deg);
 	}
 
 	form {
@@ -169,6 +176,14 @@ dialog {
 		flex-flow: column;
 		max-height: 75vh;
 
+		img.close {
+			width: 1.5em;
+			height: 1.5em;
+			position: absolute;
+			top: 1em;
+			right: 1em;
+		}
+	
 		header {
 			flex: 0 0 auto;
 			display: inline-block;
