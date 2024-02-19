@@ -1,5 +1,5 @@
 import {
-	assemble_helper
+	assemble_helper, Toast
 } from './assemble.js';
 import {
 	compose_helper
@@ -81,12 +81,7 @@ export const api = {
 	},
 	loadindicatorTimeout: [],
 	toast: function (msg) {
-		const toast = document.getElementById('toast');
-		if (typeof msg !== 'undefined') {
-			toast.innerHTML = msg;
-			toast.show();
-			window.setTimeout(api.toast, 3000);
-		} else toast.close();
+		new Toast(msg)
 	},
 	update_header: function (string = '') {
 		document.querySelector('header>h1').innerHTML = string;

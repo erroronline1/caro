@@ -84,7 +84,7 @@ body::before {
 header {
 	margin: .75em auto;
 	width: 100%;
-	clear:both;
+	clear: both;
 }
 
 body>header {
@@ -135,6 +135,18 @@ dialog {
 
 	&#toast {
 		bottom: 6em;
+
+		span {
+			display: block;
+			margin-bottom: 1em;
+		}
+
+		div {
+			left: 0;
+			height: .2em;
+			position: fixed;
+			background: var(--yellow);
+		}
 	}
 
 	.confirmButton {
@@ -168,8 +180,8 @@ dialog {
 		}
 
 		article {
-			margin:0;
-			padding:0;
+			margin: 0;
+			padding: 0;
 		}
 
 	}
@@ -320,7 +332,8 @@ nav {
 		overflow: hidden;
 		height: 0;
 		transition: .3s ease;
-		span{
+
+		span {
 			font-size: 1.15em;
 			font-weight: bold;
 		}
@@ -469,7 +482,7 @@ select+label.input-label {
 
 .textarea-label {
 	position: relative;
-	pointer-events: none;
+	pointer-events: all;
 	font-size: .75em;
 	top: -1.25em;
 	margin: 0 0 0 1.7em;
@@ -496,6 +509,7 @@ button {
 	font-weight: bold;
 	font-size: 1.15em;
 }
+
 /* Large devices such as laptops (1024px and up) */
 @media only screen and (min-width: 64em) {
 	button {
@@ -596,7 +610,7 @@ article>span[data-type] {
 .hint {
 	margin: -1em 0 0 2.3em;
 	font-size: .75em;
-	clear:both;
+	clear: both;
 }
 
 .textarea-hint,

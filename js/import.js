@@ -2,10 +2,12 @@
 
 import {
 	Dialog,
+	Toast,
 	Assemble,
 	assemble_helper
 } from '../js/assemble.js';
 window.Dialog = Dialog;
+window.Toast = Toast;
 window.Assemble = Assemble;
 window.assemble_helper = assemble_helper;
 

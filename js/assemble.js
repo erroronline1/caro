@@ -274,6 +274,46 @@ export class Dialog {
 	}
 }
 
+export class Toast {
+	/**
+	 * 
+	 * @param str message 
+	 * 
+	 * new Toast('message')
+	 * 
+	 * duration is a bit fuzzy, idk why
+	 * 
+	 */
+	constructor(message = '', duration = 5000) {
+		this.message = message || undefined;
+		this.duration = duration;
+		this.timeout;
+
+		this.toast = document.getElementById('toast');
+		if (typeof this.message !== 'undefined') {
+			const img = document.createElement('img'),
+				msg = document.createElement('span'),
+				div = document.createElement('div');
+			img.classList.add('close');
+			img.src = './media/times.svg';
+			img.onpointerdown = new Function("document.getElementById('toast').close();");
+			msg.innerHTML = message;
+			this.toast.replaceChildren(img, msg, div);
+			this.toast.show();
+			this.countdown();
+		} else this.toast.close();
+	}
+	countdown(percent = 100) {
+		const countdowndiv = document.querySelector('#toast>div');
+		countdowndiv.style.width = percent + "%";
+		this.timeout = window.setTimeout(this.countdown.bind(this), this.duration / 1000, percent - 1000 / this.duration);
+		if (percent < 0) {
+			window.clearTimeout(this.timeout);
+			this.toast.close();
+		}
+	}
+}
+
 export class Assemble {
 	/* 
 	assembles forms and screen elements.
@@ -1059,7 +1099,7 @@ export class Assemble {
 			},
 			hint: 'this signature is for...'
 		} */
-		this.currentElement.description=this.currentElement.attributes.name.replace(/\[\]/g, '');
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, '');
 		let result = [...this.header()];
 		const canvas = document.createElement('canvas');
 		canvas.id = 'signaturecanvas';
