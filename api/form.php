@@ -206,6 +206,10 @@ class FORMS extends API {
 						'content' => LANG::GET('assemble.edit_components_info_content')
 					]], [[
 						'form' => true,
+						'type' => 'compose_scanner',
+						'description' => LANG::GET('assemble.compose_scanner')
+					]], [[
+						'form' => true,
 						'type' => 'compose_text',
 						'description' => LANG::GET('assemble.compose_text')
 					]], [[
@@ -256,10 +260,6 @@ class FORMS extends API {
 						'form' => true,
 						'type' => 'compose_signature',
 						'description' => LANG::GET('assemble.compose_signature')
-					]], [[
-						'form' => true,
-						'type' => 'compose_scanner',
-						'description' => LANG::GET('assemble.compose_scanner')
 					]]
 				],
 				[[

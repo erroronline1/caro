@@ -46,10 +46,15 @@ export const compose_helper = {
 					if (element.content === undefined) element.content = {};
 					element.content[value] = {};
 				}
-			} else if (['file', 'photo', 'scanner', 'signature'].includes(element.type)) {
+			} else if (['file', 'photo', 'scanner', 'signature', 'identify'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_simple_element')) {
 					if (value) element.attributes.name = value;
 					else return;
+				}
+				if (elementName === LANG.GET('assemble.compose_context_identify') && sibling.checked) {
+					element.attributes.required = true;
+					element.attributes.multiple = false;
+					element.type = 'identify';
 				}
 			} else if (['text'].includes(element.type)) {
 				if (elementName === LANG.GET('assemble.compose_text_description')) {
@@ -80,8 +85,8 @@ export const compose_helper = {
 				}
 			}
 			if (elementName === LANG.GET('assemble.compose_field_hint') && value) element.hint = value;
-			if (elementName === LANG.GET('assemble.compose_required') && sibling.checked) element.attributes.required = true;
-			if (elementName === LANG.GET('assemble.compose_multiple') && sibling.checked) element.attributes.multiple = true;
+			if (elementName === LANG.GET('assemble.compose_required') && sibling.checked && !('required' in element.attributes)) element.attributes.required = true;
+			if (elementName === LANG.GET('assemble.compose_multiple') && sibling.checked && !('multiple' in element.attributes)) element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		}
 		while (sibling);
@@ -202,10 +207,10 @@ export const compose_helper = {
 		assignIDs(form.content);
 	},
 	importForm: function (components) {
-		for (const component of components){
-		component.draggable = true;
-		new MetaCompose(component);
-		compose_helper.newFormElements.add(component.name);
+		for (const component of components) {
+			component.draggable = true;
+			new MetaCompose(component);
+			compose_helper.newFormElements.add(component.name);
 		}
 	},
 
@@ -665,7 +670,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: 'text',
 			attributes: {
-				name: LANG.GET('assemble.compose_field_hint'),
+				name: LANG.GET('assemble.compose_field_hint')
 			}
 		};
 		result = result.concat(...this.textinput());
@@ -678,15 +683,23 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(this.br(), ...this.checkbox());
 		}
+
+		this.currentElement = {
+			type: 'checkbox',
+			content: {}
+		};
 		if (type.multiple !== undefined) {
-			this.currentElement = {
-				content: {}
-			};
 			this.currentElement.content[LANG.GET('assemble.compose_multiple')] = {
 				name: LANG.GET('assemble.compose_multiple')
 			};
-			result = result.concat(this.br(), ...this.checkbox());
 		}
+		if (type.type === 'scanner') {
+			this.currentElement.content[LANG.GET('assemble.compose_context_identify')] = {
+				name: LANG.GET('assemble.compose_context_identify')
+			};
+		}
+		if (Object.keys(this.currentElement.content).length) result = result.concat(this.br(), ...this.checkbox());
+
 		this.currentElement = {
 			attributes: {
 				value: type.description,

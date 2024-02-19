@@ -924,6 +924,16 @@ button[data-type=scanner]::before {
 	mask-image: url('./media/qrcode.svg');
 }
 
+[data-type=identify]::before {
+	background-image: url('./media/database.svg');
+}
+button[data-type=merge]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url('./media/code-merge.svg');
+	mask-image: url('./media/code-merge.svg');
+}
+
 [data-type=deletebutton]::before,
 [data-type=trash]::before {
 	background-image: url('./media/trash-alt.svg');

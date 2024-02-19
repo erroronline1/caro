@@ -287,20 +287,18 @@ export class Toast {
 	constructor(message = '', duration = 4000) {
 		this.message = message || undefined;
 		this.duration = duration;
-		this.timeout;
-
 		this.toast = document.getElementById('toast');
 		if (typeof this.message !== 'undefined') {
 			const closeimg = document.createElement('img'),
-			pauseimg = document.createElement('img'),
+				pauseimg = document.createElement('img'),
 				msg = document.createElement('span'),
 				div = document.createElement('div');
-				closeimg.classList.add('close');
-				closeimg.src = './media/times.svg';
-				closeimg.onpointerdown = new Function("document.getElementById('toast').close();");
-				pauseimg.classList.add('pause');
-				pauseimg.src = './media/equals.svg';
-				pauseimg.onpointerdown = new Function("window.clearTimeout(window.toasttimeout);");
+			closeimg.classList.add('close');
+			closeimg.src = './media/times.svg';
+			closeimg.onpointerdown = new Function("document.getElementById('toast').close();");
+			pauseimg.classList.add('pause');
+			pauseimg.src = './media/equals.svg';
+			pauseimg.onpointerdown = new Function("window.clearTimeout(window.toasttimeout);");
 			msg.innerHTML = message;
 			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
 			this.toast.show();
@@ -1134,7 +1132,7 @@ export class Assemble {
 		} */
 		let result = [],
 			input, inputid, label,
-			multiple;
+			multiple, originaltype = this.currentElement.type;
 		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
 			multiple = true;
 			// delete for input apply_attributes
@@ -1155,11 +1153,11 @@ export class Assemble {
 
 			label = document.createElement('label');
 			label.htmlFor = input.id;
-			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, '')));
+			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, '')));
 			label.classList.add('input-label');
 			if (input.type === 'password') this.currentElement.type = 'password'; // for icon
 			result = result.concat([...this.icon(), input, label, ...this.hint()]);
-			this.currentElement.type = 'scanner';
+			this.currentElement.type = originaltype;
 		}
 
 		if (multiple) this.currentElement.attributes.multiple = true;
@@ -1188,8 +1186,29 @@ export class Assemble {
 			});
 		};
 		result.push(button);
+
+		if (originaltype === 'identify') {
+			let button = document.createElement('button');
+			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET('assemble.compose_merge')));
+			button.type = 'button';
+			button.setAttribute('data-type', 'merge');
+			button.onpointerup = function () {
+				new Dialog({
+					type: 'alert',
+					header: 'acknowledge this!',
+					body: 'this has yet to be implemented'
+				});
+			};
+			result.push(button);
+		}
 		return result;
 	}
+
+	identify() {
+		this.currentElement.attributes.name = 'IDENTIFY_BY_' + this.currentElement.attributes.name;
+		return this.scanner();
+	}
+
 	image() {
 		/*{
 			type: 'image',
