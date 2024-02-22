@@ -472,6 +472,33 @@ class FORMS extends API {
 					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
 				}
 
+				// recursively check for identifier
+				function check4identifier($element){
+					$hasindentifier=false;
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							$hasindentifier = check4identifier($sub);
+						} else {
+								if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasindentifier = true;
+						}
+					}
+					return $hasindentifier;
+				}
+				$hasindentifier = false;
+				foreach($this->_payload->content as $component){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+					$statement->execute([
+						':name' => $component
+					]);
+					$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
+					if (check4identifier(json_decode($latestcomponent['content'], true))) $hasindentifier = true;
+				}
+				//contexts that need an identifier
+				$contexts=[
+					'casedocumentation'
+				];
+				if (in_array($this->_payload->context, $contexts) && !$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-post'));
 				if ($statement->execute([
 					':name' => $this->_payload->name,

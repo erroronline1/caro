@@ -128,7 +128,7 @@ export const compose_helper = {
 		let isForm = false,
 			componentContent = [],
 			name = document.getElementById('ComponentName').value,
-			hidden = document.querySelector('[data-hiddenradio]').checked;
+			hidden = document.querySelector('[data-hiddenradio]') ? document.querySelector('[data-hiddenradio]').checked : false;
 
 		function nodechildren(parent) {
 			let content = [],
@@ -167,7 +167,7 @@ export const compose_helper = {
 			name = document.getElementById('ComponentName').value,
 			alias = document.getElementById('ComponentAlias').value,
 			context = document.getElementById('ComponentContext').value,
-			hidden = document.querySelector('[data-hiddenradio]').checked;
+			hidden = document.querySelector('[data-hiddenradio]') ? document.querySelector('[data-hiddenradio]').checked : false;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
