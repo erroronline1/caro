@@ -33,7 +33,7 @@ export const assemble_helper = {
 			};
 		icons[LANG.GET('menu.application_header')] = "url('media/bars.svg')";
 		icons[LANG.GET('menu.message_header')] = "url('media/comment.svg')";
-		icons[LANG.GET('menu.forms_header')] = "url('media/file-alt.svg')";
+		icons[LANG.GET('menu.forms_header')] = "url('media/file-signature.svg')";
 		icons[LANG.GET('menu.purchase_header')] = "url('media/shopping-bag.svg')";
 		icons[LANG.GET('menu.files_header')] = "url('media/folders.svg')";
 		icons[LANG.GET('menu.tools_header')] = "url('media/tools.svg')";
