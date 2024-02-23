@@ -64,6 +64,31 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
 		],
 
+		'user_post' => [
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image)",
+			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ( :name, :permissions, :units, :token, :orderauth, :image)"
+		],
+		'user_put' => [
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image WHERE id = :id LIMIT 1",
+			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image WHERE id = :id"
+		],
+		'user_get-datalist' => [
+			'mysql' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC"
+		],
+		'user_get' => [
+			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
+		],
+		'user_get-orderauth' => [
+			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth LIMIT 1",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
+		],
+		'user_delete' => [
+			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id",
+			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id"
+		],
+
 		'form_component-post' => [
 			'mysql' => "INSERT INTO caro_form_components (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, 0)",
 			'sqlsrv' => "INSERT INTO caro_form_components (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, 0)"
@@ -106,29 +131,66 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_form_forms WHERE id = :id"
 		],
 
-		'user_post' => [
-			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image)",
-			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ( :name, :permissions, :units, :token, :orderauth, :image)"
+		'message_get_message' => [
+			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",
+			'sqlsrv' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id"
 		],
-		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image WHERE id = :id LIMIT 1",
-			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image WHERE id = :id"
+		'message_get_unnotified' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"
 		],
-		'user_get-datalist' => [
-			'mysql' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC"
+		'message_get_unseen' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
 		],
-		'user_get' => [
-			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
+		'message_get_filter' => [
+			'mysql' => "SELECT id FROM caro_messages WHERE user_id = :user AND LOWER(message) LIKE LOWER(CONCAT('%', :msgfilter, '%'))",
+			'sqlsrv' => "SELECT id FROM caro_messages WHERE user_id = :user AND LOWER(message) LIKE LOWER(CONCAT('%', :msgfilter, '%'))"
 		],
-		'user_get-orderauth' => [
-			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth LIMIT 1",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
+		'message_post_message' => [
+			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (:from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1, 1), (:to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)"
 		],
-		'user_delete' => [
-			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id",
-			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id"
+		'message_post_system_message' => [
+			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (NULL, :to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (:to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)"
+		],
+		'message_delete_message' => [
+			'mysql' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user LIMIT 1",
+			'sqlsrv' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user"
+		],
+		'message_get_inbox' => [
+			'mysql' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC",
+			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC"
+		],
+		'message_put_notified' => [
+			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
+			'sqlsrv' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user"
+		],		
+		'message_put_seen' => [
+			'mysql' => "UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user",
+			'sqlsrv' => "UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user"
+		],		
+		'message_get_sent' => [
+			'mysql' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC",
+			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC"
+		],
+
+		'file_bundles-post' => [
+			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
+			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
+		],
+		'file_bundles-datalist' => [
+			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
+			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
+		],
+		'file_bundles-get' => [
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
+		],
+		'file_bundles-get-active' => [
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
+			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
 		],
 
 		'consumables_post-vendor' => [
@@ -250,68 +312,6 @@ class SQLQUERY {
 		'order_get_filter' => [
 			'mysql' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))",
 			'sqlsrv' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
-		],
-
-		'message_get_message' => [
-			'mysql' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id LIMIT 1",
-			'sqlsrv' => "SELECT t1.*, t2.name as from_user, t3.name as to_user FROM caro_messages as t1, caro_user as t2, caro_user as t3 WHERE t1.id = :id AND t1.user_id = :user AND t1.from_user = t2.id AND t1.to_user = t3.id"
-		],
-		'message_get_unnotified' => [
-			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
-			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"
-		],
-		'message_get_unseen' => [
-			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
-			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
-		],
-		'message_get_filter' => [
-			'mysql' => "SELECT id FROM caro_messages WHERE user_id = :user AND LOWER(message) LIKE LOWER(CONCAT('%', :msgfilter, '%'))",
-			'sqlsrv' => "SELECT id FROM caro_messages WHERE user_id = :user AND LOWER(message) LIKE LOWER(CONCAT('%', :msgfilter, '%'))"
-		],
-		'message_post_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (NULL, :from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)",
-			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (:from_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 1, 1), (:to_user, :from_user, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)"
-		],
-		'message_post_system_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (NULL, :to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)",
-			'sqlsrv' => "INSERT INTO caro_messages (user_id, from_user, to_user, message, timestamp, notified, seen) VALUES (:to_user, 1, :to_user, :message, CURRENT_TIMESTAMP, 0, 0)"
-		],
-		'message_delete_message' => [
-			'mysql' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user LIMIT 1",
-			'sqlsrv' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user"
-		],
-		'message_get_inbox' => [
-			'mysql' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC",
-			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC"
-		],
-		'message_put_notified' => [
-			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
-			'sqlsrv' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user"
-		],		
-		'message_put_seen' => [
-			'mysql' => "UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user",
-			'sqlsrv' => "UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user"
-		],		
-		'message_get_sent' => [
-			'mysql' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC",
-			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC"
-		],
-
-		'file_bundles-post' => [
-			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
-			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
-		],
-		'file_bundles-datalist' => [
-			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
-		],
-		'file_bundles-get' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
-		],
-		'file_bundles-get-active' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
-			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
 		],
 
 	];
