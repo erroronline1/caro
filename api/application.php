@@ -67,7 +67,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"],
 				LANG::GET('menu.texttemplate_template') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"],
 			],
-			LANG::GET('menu.forms_header') => [
+			LANG::GET('menu.documentation_header') => [
 				LANG::GET('menu.forms_forms') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
 			],
 			LANG::GET('menu.files_header') => [
@@ -87,8 +87,8 @@ class APPLICATION extends API {
 			],
 		];
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.forms_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
-			$menu[LANG::GET('menu.forms_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
+			$menu[LANG::GET('menu.documentation_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
+			$menu[LANG::GET('menu.documentation_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
