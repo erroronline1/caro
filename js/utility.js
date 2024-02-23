@@ -49,11 +49,11 @@ const _serviceWorker = {
 				let body = data.unnotified > 1 ? LANG.GET('message.new_messages', {
 					':amount': data.unnotified
 				}) : LANG.GET('message.new_message');
-				this.showLocalNotification(LANG.GET('menu.message_header'), body);
+				this.showLocalNotification(LANG.GET('menu.communication_header'), body);
 			}
 		}
 		if ('unseen' in data) {
-			const mailnotif = document.querySelector('[data-for=userMenu' + LANG.GET('menu.message_header') + ']');
+			const mailnotif = document.querySelector('[data-for=userMenu' + LANG.GET('menu.communication_header') + ']');
 			mailnotif.setAttribute('data-notification', data.unseen);
 		}
 	}
