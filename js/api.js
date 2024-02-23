@@ -525,6 +525,50 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
 	},
+	texttemplate: (method, ...request) => {
+		/*
+		post texttemplate/chunk
+		put texttemplate/chunk
+		get texttemplate/chunk
+		delete texttemplate/chunk
+
+		post texttemplate/text
+		put texttemplate/text
+		get texttemplate/text
+		delete texttemplate/text
+
+		get texttemplate/template
+		*/
+		request = [...request];
+		request.splice(0, 0, 'texttemplate');
+		let payload,
+			successFn = function (data) {
+				api.toast(data.status.msg);
+			},
+			title = {
+				'template': LANG.GET('menu.texttemplate_template'),
+				'chunk': LANG.GET('menu.texttemplate_chunks'),
+				'text': LANG.GET('menu.texttemplate_texts')
+			};;
+		switch (method) {
+			case 'get':
+				successFn = function (data) {
+					if (data.body) {
+						api.update_header(title[request[1]]);
+						document.getElementById('main').replaceChildren();
+						new Assemble(data.body).initializeSection();
+					}
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				};
+				break;
+			case 'post':
+				payload = _.getInputs('[data-usecase=user]', true);
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === 'post' || method === 'put');
+	},
 	tool: (method, ...request) => {
 		/*
 		get tool/code
@@ -563,8 +607,7 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, method === 'post');
-	},
-	user: (method, ...request) => {
+	},	user: (method, ...request) => {
 		/*
 		get user/profile
 		get user/user/{id|name}

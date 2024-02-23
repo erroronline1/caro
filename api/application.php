@@ -61,10 +61,11 @@ class APPLICATION extends API {
 				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
 				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
 			],
-			LANG::GET('menu.message_header') => [
+			LANG::GET('menu.communication_header') => [
 				LANG::GET('menu.message_inbox') => ['onpointerup' => "api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
 				LANG::GET('menu.message_new') => ['onpointerup' => "api.message('get', 'message')"],
-				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"]
+				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"],
+				LANG::GET('menu.texttemplate_template') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"],
 			],
 			LANG::GET('menu.forms_header') => [
 				LANG::GET('menu.forms_forms') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
@@ -92,6 +93,8 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
+			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
+			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_texts')] =['onpointerup' => "api.texttemplate('get', 'text')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
