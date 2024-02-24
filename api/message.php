@@ -210,7 +210,7 @@ class MESSAGE extends API {
 							"}}).then(confirmation => {if (confirmation) api.message('delete', 'message', " . $message['id'] . ", 'inbox')})"
 					]]
 				];
-				if ($message['from_user'] && $message['from_user'] != INI['caroapp']) array_splice($content[count($content)-1], 4, 0, [
+				if ($message['from_user'] && $message['from_user'] != INI['system']['caroapp']) array_splice($content[count($content)-1], 4, 0, [
 					['type' => 'button',
 					'attributes' => [
 						'value' => LANG::GET('message.reply'),
