@@ -222,7 +222,7 @@ class TEXTTEMPLATE extends API {
 						'hint' => LANG::GET('texttemplate.edit_chunk_hidden_hint')
 					];
 					if ($chunk['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_chunk_hidden_hidden')]['checked'] = true;
-					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . LANG::GET('texttemplate.edit_chunk_hidden_hint_used_by', [':templates' => implode(', ', $dependedtemplates)]);
+					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . LANG::GET('texttemplate.edit_chunk_dependencies', [':templates' => implode(', ', $dependedtemplates)]);
 					array_push($return['body']['content'][1], $hidden);
 				}
 				$this->response($return);
