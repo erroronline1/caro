@@ -80,7 +80,7 @@ const texttemplateClient = {
 		}
 		for (const block of blocks) {
 			if (block.checked) {
-				blockcontent = texttemplateClient.data.blocks[':' + block.name];
+				blockcontent = texttemplateClient.data.blocks[':' + block.name.replaceAll(/\(.*?\)/g, '')];
 				for (const input of placeholder) {
 					if (input.value) blockcontent = blockcontent.replaceAll(':' + input.id, input.value);
 				}

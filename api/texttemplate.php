@@ -174,7 +174,7 @@ class TEXTTEMPLATE extends API {
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_chunk_content'),
 									'value' => $chunk['content'],
-									'rows' => 6,
+									'rows' => 8,
 									'id' => 'content',
 									'required' => true,
 									'data-loss' => 'prevent'
@@ -502,7 +502,7 @@ class TEXTTEMPLATE extends API {
 			$inputs = [];
 			// match placeholders
 			preg_match_all('/(:.+?)\W/m', strtr($template['content'], $texts), $placeholders);
-			$undefined = array_diff($placeholders[1], array_keys($replacements));
+			$undefined = array_unique(array_diff($placeholders[1], array_keys($replacements)));
 			foreach ($undefined as $placeholder) {
 				$inputs[] = [
 					'type' => 'textinput',
@@ -528,16 +528,18 @@ class TEXTTEMPLATE extends API {
 				'content' => $usegenus
 			];
 
-			$useblocks = [];
-			foreach($texts as $key => $text){
-				$useblocks[preg_replace('/\W/', '', $key)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
+			foreach (preg_split('/\n+/', $template['content']) as $block){
+				$useblocks = [];
+				preg_match_all('/:[\w\d]+/', $block, $blocktexts);
+				foreach($blocktexts[0] as $key => $value){
+					$useblocks[preg_replace('/\W/', '', $value)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
+				}
+				if (count($useblocks)) $inputs[] = [
+					'type' => 'checkbox',
+					'description' => LANG::GET('texttemplate.use_blocks'),
+					'content' => $useblocks
+				];
 			}
-			$inputs[] = [
-				'type' => 'checkbox',
-				'description' => LANG::GET('texttemplate.use_blocks'),
-				'content' => $useblocks
-			];
-
 			$inputs[] = [
 				'type' => 'button',
 				'attributes' => [
