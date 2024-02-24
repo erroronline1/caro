@@ -98,7 +98,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
-* text recommendations
 
 * settings? force desktop mode for small window? themes?
 * forms and contexts

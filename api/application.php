@@ -65,7 +65,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.message_inbox') => ['onpointerup' => "api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
 				LANG::GET('menu.message_new') => ['onpointerup' => "api.message('get', 'message')"],
 				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"],
-				LANG::GET('menu.texttemplate_template') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"],
+				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
 			LANG::GET('menu.documentation_header') => [
 				LANG::GET('menu.forms_forms') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
@@ -94,7 +94,7 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
-			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_texts')] =['onpointerup' => "api.texttemplate('get', 'text')"];
+			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];

@@ -11,48 +11,560 @@ class TEXTTEMPLATE extends API {
 	}
 
 	public function chunk(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			case 'PUT':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				$chunk = [
+					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_name')),
+					':author' => $_SESSION['user']['name'],
+					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_content')),
+					':language' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_language')),
+					':type' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_type')),
+					':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_hidden')) === LANG::PROPERTY('texttemplate.edit_chunk_hidden_hidden')? 1 : 0,
+				];
+
+				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language'])) $this->response([], 400);
+
+				// put hidden attribute if anything else remains the same
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
+				$statement->execute([
+					':name' => $chunk[':name']
+				]);
+				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($exists && $exists['content'] === $chunk[':content'] && $exists['language'] === $chunk[':language'] && $exists['type'] === $chunk[':type']) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-put'));
+					if ($statement->execute([
+						':hidden' => $chunk[':hidden'],
+						':id' => $exists['id']
+						])) $this->response([
+							'status' => [
+								'name' => $chunk[':name'],
+								'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']])
+							]]);	
+				}
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']])]]);
+				}
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-post'));
+				if ($statement->execute($chunk)) $this->response([
+						'status' => [
+							'name' => $chunk[':name'],
+							'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']])
+						]]);
+				else $this->response([
+					'status' => [
+						'name' => false,
+						'name' => LANG::GET('texttemplate.edit_chunk_not_saved')
+					]]);
 				break;
 			case 'GET':
-				$result = [
-					'body' => ['content' => []]
+				$chunkdatalist = [];
+				$options = ['...' . LANG::GET('texttemplate.edit_chunk_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$alloptions = ['...' . LANG::GET('texttemplate.edit_chunk_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$insertreplacement = ['...' . LANG::GET('texttemplate.edit_chunk_insert_default') => ['value' => ' ']];
+				$languagedatalist = [];
+				$return = [];
+
+				// get selected chunk
+				if (intval($this->_requestedID)){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get_chunk'));
+					$statement->execute([
+						':id' => $this->_requestedID
+					]);
+				} else {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
+					$statement->execute([
+						':name' => $this->_requestedID
+					]);
+				}
+				if (!$chunk = $statement->fetch(PDO::FETCH_ASSOC)) $chunk = [
+					'id' => '',
+					'name' => '',
+					'content' => '',
+					'language' => '',
+					'type' => ''
 				];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_chunk_not_found', [':name' => $this->_requestedID])];
 		
-				break;
-			case 'DELETE':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				// prepare existing chunks lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
+				$statement->execute();
+				$chunks = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$hidden = [];
+				foreach($chunks as $key => $row) {
+					if ($row['type'] !== 'replacement' && $row['type'] !== 'text') continue;
+
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
+						$chunkdatalist[] = $row['name'];
+						$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						if ($row['type'] === 'replacement') $insertreplacement[$row['name']] = ['value' => ':' . $row['name']];
+					}
+					$alloptions[$row['name'] . ' (' . $row['language'] . ') ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
+				}
+
+				$return['body'] = [
+					'form' => [
+						'data-usecase' => 'texttemplate',
+						'action' => "javascript:api.texttemplate('post', 'chunk')"],
+					'content' => [
+						[
+							[
+								[
+									'type' => 'datalist',
+									'content' => $chunkdatalist,
+									'attributes' => [
+										'id' => 'chunks'
+									]
+								], [
+									'type' => 'datalist',
+									'content' => $languagedatalist,
+									'attributes' => [
+										'id' => 'languages'
+									]
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('texttemplate.edit_chunk_select'),
+										'onchange' => "api.texttemplate('get', 'chunk', this.value)"
+									],
+									'content' => $options
+								], [
+									'type' => 'searchinput',
+									'attributes' => [
+										'name' => LANG::GET('texttemplate.edit_chunk'),
+										'list' => 'chunks',
+										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+									]
+								]
+							], [
+								[
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('texttemplate.edit_chunk_all'),
+										'onchange' => "api.texttemplate('get', 'chunk', this.value)"
+									],
+									'content' => $alloptions
+								]
+							]
+						], [
+							[
+								'type' => 'textinput',
+								'hint' => LANG::GET('texttemplate.edit_chunk_name_hint'),
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_name'),
+									'value' => $chunk['name'],
+									'pattern' => '[A-Za-z0-9]+',
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_insert_name'),
+									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
+								],
+								'content' => $insertreplacement
+							], [
+								'type' => 'textarea',
+								'hint' => LANG::GET('texttemplate.edit_chunk_content_hint', [':genus' => implode(', ', LANGUAGEFILE['texttemplate']['use_genus'])]),
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_content'),
+									'value' => $chunk['content'],
+									'rows' => 6,
+									'id' => 'content',
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'textinput',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_language'),
+									'list' => 'languages',
+									'value' => $chunk['language'],
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_type')
+								],
+								'content' => [
+									LANG::GET('texttemplate.edit_chunk_type_replacement') => ['value' => 'replacement'],
+									LANG::GET('texttemplate.edit_chunk_type_text') => ['value' => 'text'],
+								]
+							]
+						]
+					]
+				];
+				if ($chunk['type'] === 'text') $return['body']['content'][1][4]['content'][LANG::GET('texttemplate.edit_chunk_type_text')]['selected'] = true;
+				if ($chunk['id']){
+					$hidden=[
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('texttemplate.edit_chunk_hidden')
+						],
+						'content' => [
+							LANG::GET('texttemplate.edit_chunk_hidden_visible') => ['checked' => true],
+							LANG::GET('texttemplate.edit_chunk_hidden_hidden') => []
+						]
+					];
+					if ($chunk['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_chunk_hidden_hidden')]['checked'] = true;
+					array_push($return['body']['content'][1], $hidden);
+				}
+				$this->response($return);
 				break;
 		}					
 	}
 
-	public function text(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
+	public function template(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;
-			case 'PUT':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+				$template = [
+					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_name')),
+					':author' => $_SESSION['user']['name'],
+					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_content')),
+					':language' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_language')),
+					':type' => 'template',
+					':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_hidden')) === LANG::PROPERTY('texttemplate.edit_template_hidden_hidden')? 1 : 0,
+				];
+
+				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
+
+				// put hidden attribute if anything else remains the same
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
+				$statement->execute([
+					':name' => $template[':name']
+				]);
+				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($exists && $exists['content'] === $template[':content']) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-put'));
+					if ($statement->execute([
+						':hidden' => $template[':hidden'],
+						':id' => $exists['id']
+						])) $this->response([
+							'status' => [
+								'name' => $template[':name'],
+								'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']])
+							]]);	
+				}
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $template[':name']])]]);
+				}
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-post'));
+				if ($statement->execute($template)) $this->response([
+						'status' => [
+							'name' => $template[':name'],
+							'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']])
+						]]);
+				else $this->response([
+					'status' => [
+						'name' => false,
+						'name' => LANG::GET('texttemplate.edit_template_not_saved')
+					]]);
 				break;
 			case 'GET':
-				$result = [
-					'body' => ['content' => []]
+				$templatedatalist = [];
+				$options = ['...' . LANG::GET('texttemplate.edit_template_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$alloptions = ['...' . LANG::GET('texttemplate.edit_template_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$insertreplacement = ['...' . LANG::GET('texttemplate.edit_template_insert_default') => ['value' => ' ']];
+				$languagedatalist = [];
+				$return = [];
+
+				// get selected template
+				if (intval($this->_requestedID)){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get_chunk'));
+					$statement->execute([
+						':id' => $this->_requestedID
+					]);
+				} else {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
+					$statement->execute([
+						':name' => $this->_requestedID
+					]);
+				}
+				if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
+					'id' => '',
+					'name' => '',
+					'content' => '',
+					'language' => '',
+					'type' => ''
 				];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
+		
+				// prepare existing templates lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
+				$statement->execute();
+				$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$hidden = [];
+				foreach($templates as $key => $row) {
+					if ($row['type'] === 'replacement') continue;
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if ($row['type'] === 'template'){
+						if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
+							$templatedatalist[] = $row['name'];
+							$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						}
+						$alloptions[$row['name'] . ' (' . $row['language'] . ') ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+					if ($row['type'] === 'text') $insertreplacement[$row['name'] . ' - ' . substr($row['content'], 0, 50) . (strlen($row['content']) > 50 ? '...' : '')] = ['value' => ':' . $row['name']];
+					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
+				}
+
+				$return['body'] = [
+					'form' => [
+						'data-usecase' => 'texttemplate',
+						'action' => "javascript:api.texttemplate('post', 'template')"],
+					'content' => [
+						[
+							[
+								[
+									'type' => 'datalist',
+									'content' => $templatedatalist,
+									'attributes' => [
+										'id' => 'templates'
+									]
+								], [
+									'type' => 'datalist',
+									'content' => $languagedatalist,
+									'attributes' => [
+										'id' => 'languages'
+									]
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('texttemplate.edit_template_select'),
+										'onchange' => "api.texttemplate('get', 'template', this.value)"
+									],
+									'content' => $options
+								], [
+									'type' => 'searchinput',
+									'attributes' => [
+										'name' => LANG::GET('texttemplate.edit_template'),
+										'list' => 'templates',
+										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+									]
+								]
+							], [
+								[
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('texttemplate.edit_template_all'),
+										'onchange' => "api.texttemplate('get', 'template', this.value)"
+									],
+									'content' => $alloptions
+								]
+							]
+						], [
+							[
+								'type' => 'textinput',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_template_name'),
+									'value' => $template['name'],
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_template_insert_name'),
+									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
+								],
+								'content' => $insertreplacement
+							], [
+								'type' => 'textarea',
+								'hint' => LANG::GET('texttemplate.edit_template_content_hint'),
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_template_content'),
+									'value' => $template['content'],
+									'rows' => 6,
+									'id' => 'content',
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'textinput',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_template_language'),
+									'list' => 'languages',
+									'value' => $template['language'],
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							]
+						]
+					]
+				];
+				if ($template['id']){
+					$hidden=[
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('texttemplate.edit_template_hidden')
+						],
+						'content' => [
+							LANG::GET('texttemplate.edit_template_hidden_visible') => ['checked' => true],
+							LANG::GET('texttemplate.edit_template_hidden_hidden') => []
+						]
+					];
+					if ($template['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_template_hidden_hidden')]['checked'] = true;
+					array_push($return['body']['content'][1], $hidden);
+				}
+
+				$this->response($return);
 				break;
-			case 'DELETE':
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				break;						
 		}
 	}
 
-	public function template(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
+	public function text(){
+		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);
+		$templatedatalist = [];
+		$options = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		$return = [];
+
+		// get selected template
+		//if (intval($this->_requestedID)){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get_chunk'));
+			$statement->execute([
+				':id' => $this->_requestedID
+			]);
+		/*} else {
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
+			$statement->execute([
+				':name' => $this->_requestedID
+			]);
+		}*/
+		if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
+			'name' => '',
+		];
+
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
+
+		// prepare existing templates lists
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
+		$statement->execute();
+		$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
+		$texts = [];
+		$replacements = [];
+		foreach($templates as $key => $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if ($row['type'] !== 'template' && !in_array($row['name'], $hidden)) {
+				// prepare in case of template request
+				// set up array for strtr on content
+				if ($row['type']==='text' && !array_key_exists(':' . $row['name'], $texts)) $texts[':' . $row['name']] = $row['content'];
+				// set up array with valid replacements
+				if ($row['type']==='replacement' && !array_key_exists(':' . $row['name'], $replacements)) $replacements[':' . $row['name']] = $row['content'];
+				// skip for datalist and options 
+				continue;
+			}
+			if ($row['type'] !== 'template') continue;
+			if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
+				$templatedatalist[] = $row['name'];
+				$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			}
+		}
+
+		$return['body'] = [
+			'content' => [
+				[
+					[
+						'type' => 'datalist',
+						'content' => $templatedatalist,
+						'attributes' => [
+							'id' => 'templates'
+						]
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('texttemplate.use_text_select'),
+							'onchange' => "api.texttemplate('get', 'text', this.value)"
+						],
+						'content' => $options
+					/*], [
+						'type' => 'searchinput',
+						'attributes' => [
+							'name' => LANG::GET('texttemplate.use_text'),
+							'list' => 'templates',
+							'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'text', this.value); return false;}"
+						]*/
+					]
+				]
+			]
+		];
+		if ($template['name']){
+			$inputs = [];
+			// match placeholders
+			preg_match_all('/(:.+?)\W/m', strtr($template['content'], $texts), $placeholders);
+			$undefined = array_diff($placeholders[1], array_keys($replacements));
+			foreach ($undefined as $placeholder) {
+				$inputs[] = [
+					'type' => 'textinput',
+					'attributes' => [
+						'name' => LANG::GET('texttemplate.use_fill_placeholder') . ' ' . $placeholder,
+						'id' => preg_replace('/\W/', '', $placeholder),
+						'data-usecase' => 'undefinedplaceholder',
+						'data-loss' => 'prevent'
+					]
+				];
+			}
+
+			$usegenus = [];
+			foreach(LANGUAGEFILE['texttemplate']['use_genus'] as $key => $genus){
+				$usegenus[$genus] = ['value' => $key, 'data-loss' => 'prevent'];
+			}
+			$inputs[] = [
+				'type' => 'radio',
+				'attributes' => [
+					'name' => LANG::GET('texttemplate.use_person'),
+					'id' => 'genus'
+				],
+				'content' => $usegenus
+			];
+
+			$useblocks = [];
+			foreach($texts as $key => $text){
+				$useblocks[preg_replace('/\W/', '', $key)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
+			}
+			$inputs[] = [
+				'type' => 'checkbox',
+				'description' => LANG::GET('texttemplate.use_blocks'),
+				'content' => $useblocks
+			];
+
+			$inputs[] = [
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'value' => LANG::GET('texttemplate.use_refresh'),
+					'onpointerup' => 'texttemplateClient.update();'
+				],
+				'hint' => LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
+			];
+			$return['body']['content'][] = $inputs;
+
+			$return['body']['content'][]=[
+				[
+					'type' => 'textarea',
+					'attributes' => [
+						'id' => 'texttemplate',
+						'name' => LANG::GET('texttemplate.use_template'),
+						'value' => strtr($template['content'], $texts),
+						'rows' => 13,
+						'readonly' => true,
+						'onpointerup' => 'orderClient.toClipboard(this)'
+						]
+				]
+			];
+			$return['data'] = ['blocks' => $texts, 'replacements' => $replacements];
+		}
+		$this->response($return);
 	}
 }
 

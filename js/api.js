@@ -17,9 +17,11 @@ export const api = {
 		},
 		start: function () {
 			document.addEventListener('input', api.preventDataloss.event);
+			document.addEventListener('textarea', api.preventDataloss.event);
 		},
 		stop: function () {
 			document.removeEventListener('input', api.preventDataloss.event);
+			document.removeEventListener('textarea', api.preventDataloss.event);
 			api.preventDataloss.monitor = false;
 		},
 		proceedAnyway: async function (method) {
@@ -299,6 +301,7 @@ export const api = {
 								if (data.body.component) compose_helper.importComponent(data.body.component);
 								// create multipart form for file uploads
 								compose_helper.addComponentMultipartFormToMain();
+								api.preventDataloss.start();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}
@@ -319,6 +322,7 @@ export const api = {
 								document.getElementById('main').replaceChildren();
 								new Compose(data.body);
 								if (data.body.components) compose_helper.importForm(data.body.components);
+								api.preventDataloss.start();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						}
@@ -528,16 +532,12 @@ export const api = {
 	texttemplate: (method, ...request) => {
 		/*
 		post texttemplate/chunk
-		put texttemplate/chunk
 		get texttemplate/chunk
-		delete texttemplate/chunk
 
-		post texttemplate/text
-		put texttemplate/text
-		get texttemplate/text
-		delete texttemplate/text
-
+		post texttemplate/template
 		get texttemplate/template
+
+		get texttemplate/text
 		*/
 		request = [...request];
 		request.splice(0, 0, 'texttemplate');
@@ -546,10 +546,10 @@ export const api = {
 				api.toast(data.status.msg);
 			},
 			title = {
-				'template': LANG.GET('menu.texttemplate_template'),
 				'chunk': LANG.GET('menu.texttemplate_chunks'),
+				'template': LANG.GET('menu.texttemplate_templates'),
 				'text': LANG.GET('menu.texttemplate_texts')
-			};;
+			};
 		switch (method) {
 			case 'get':
 				successFn = function (data) {
@@ -559,10 +559,12 @@ export const api = {
 						new Assemble(data.body).initializeSection();
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.data !== undefined) texttemplateClient.data = data.data;
+					api.preventDataloss.start();
 				};
 				break;
 			case 'post':
-				payload = _.getInputs('[data-usecase=user]', true);
+				payload = _.getInputs('[data-usecase=texttemplate]', true);
 				break;
 			default:
 				return;

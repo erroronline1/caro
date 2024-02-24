@@ -59,6 +59,41 @@ const _serviceWorker = {
 	}
 }
 
+const texttemplateClient = {
+	data: null,
+	update: () => {
+		const replacements = {},
+			genii = document.getElementsByName(LANG.GET('texttemplate.use_person')),
+			blocks = document.querySelectorAll('[data-usecase=useblocks]'),
+			placeholder = document.querySelectorAll('[data-usecase=undefinedplaceholder]');
+		let selectedgenus = 0,
+			output = '',
+			blockcontent;
+		for (const [key, value] of Object.entries(texttemplateClient.data.replacements)) {
+			replacements[key] = value.split(/\r\n|\n/);
+		};
+		for (let i = 0; i < genii.length; i++) {
+			if (genii[i].checked) {
+				selectedgenus = i;
+				break;
+			}
+		}
+		for (const block of blocks) {
+			if (block.checked) {
+				blockcontent = texttemplateClient.data.blocks[':' + block.name];
+				for (const input of placeholder) {
+					if (input.value) blockcontent = blockcontent.replaceAll(':' + input.id, input.value);
+				}
+				for (const [key, replacement] of Object.entries(replacements)) {
+					blockcontent = blockcontent.replaceAll(key, replacement[selectedgenus]);
+				}
+				output += blockcontent + '\n';
+			}
+		}
+		document.getElementById('texttemplate').value = output;
+	}
+};
+
 const orderClient = {
 	addProduct: (...data) => {
 		// order to be taken into account in order.php "productsearch" method as well!
