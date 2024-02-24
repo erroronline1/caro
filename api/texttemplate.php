@@ -93,10 +93,16 @@ class TEXTTEMPLATE extends API {
 				$statement->execute();
 				$chunks = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$hidden = [];
+				$dependedtemplates = [];
 				foreach($chunks as $key => $row) {
-					if ($row['type'] !== 'replacement' && $row['type'] !== 'text') continue;
-
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (in_array($row['type'], ['template', 'text'])){
+						if (!in_array($row['name'], $dependedtemplates) && !in_array($row['name'], $hidden) && strpos($row['content'], $chunk['name']) !== false) {
+							$dependedtemplates[] = $row['name'];
+						}
+					}
+					if (!in_array($row['type'], ['replacement', 'text'])) continue;
+
 					if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
 						$chunkdatalist[] = $row['name'];
 						$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
@@ -203,7 +209,8 @@ class TEXTTEMPLATE extends API {
 				];
 				if ($chunk['type'] === 'text') $return['body']['content'][1][4]['content'][LANG::GET('texttemplate.edit_chunk_type_text')]['selected'] = true;
 				if ($chunk['id']){
-					$hidden=[
+
+					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
 							'name' => LANG::GET('texttemplate.edit_chunk_hidden')
@@ -211,9 +218,11 @@ class TEXTTEMPLATE extends API {
 						'content' => [
 							LANG::GET('texttemplate.edit_chunk_hidden_visible') => ['checked' => true],
 							LANG::GET('texttemplate.edit_chunk_hidden_hidden') => []
-						]
+						],
+						'hint' => LANG::GET('texttemplate.edit_chunk_hidden_hint')
 					];
 					if ($chunk['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_chunk_hidden_hidden')]['checked'] = true;
+					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . LANG::GET('texttemplate.edit_chunk_hidden_hint_used_by', [':templates' => implode(', ', $dependedtemplates)]);
 					array_push($return['body']['content'][1], $hidden);
 				}
 				$this->response($return);
@@ -411,7 +420,8 @@ class TEXTTEMPLATE extends API {
 						'content' => [
 							LANG::GET('texttemplate.edit_template_hidden_visible') => ['checked' => true],
 							LANG::GET('texttemplate.edit_template_hidden_hidden') => []
-						]
+						],
+						'hint' => LANG::GET('texttemplate.edit_template_hidden_hint')
 					];
 					if ($template['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_template_hidden_hidden')]['checked'] = true;
 					array_push($return['body']['content'][1], $hidden);
