@@ -89,7 +89,7 @@ class FORMS extends API {
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'name' => LANG::GET('assemble.edit_component_not_saved')
+						'msg' => LANG::GET('assemble.edit_component_not_saved')
 					]]);
 				break;
 			case 'GET':
@@ -514,7 +514,7 @@ class FORMS extends API {
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'name' => LANG::GET('assemble.edit_form_not_saved')
+						'msg' => LANG::GET('assemble.edit_form_not_saved')
 					]]);
 				break;
 		}

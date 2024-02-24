@@ -56,7 +56,7 @@ class TEXTTEMPLATE extends API {
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'name' => LANG::GET('texttemplate.edit_chunk_not_saved')
+						'msg' => LANG::GET('texttemplate.edit_chunk_not_saved')
 					]]);
 				break;
 			case 'GET':
@@ -276,7 +276,7 @@ class TEXTTEMPLATE extends API {
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'name' => LANG::GET('texttemplate.edit_template_not_saved')
+						'msg' => LANG::GET('texttemplate.edit_template_not_saved')
 					]]);
 				break;
 			case 'GET':
