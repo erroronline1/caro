@@ -69,7 +69,7 @@ class TEXTTEMPLATE extends API {
 
 				// get selected chunk
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get_chunk'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
@@ -289,7 +289,7 @@ class TEXTTEMPLATE extends API {
 
 				// get selected template
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get_chunk'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
@@ -440,7 +440,7 @@ class TEXTTEMPLATE extends API {
 
 		// get selected template
 		//if (intval($this->_requestedID)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get_chunk'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
 			$statement->execute([
 				':id' => $this->_requestedID
 			]);
