@@ -1,5 +1,5 @@
 <?php
-// add, edit and delete users
+// add and edit text recommendations
 class TEXTTEMPLATE extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];

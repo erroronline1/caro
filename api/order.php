@@ -1,5 +1,5 @@
 <?php 
-
+// place and process orders
 class ORDER extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
