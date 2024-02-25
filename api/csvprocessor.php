@@ -159,6 +159,7 @@ class Listprocessor {
 		$first = implode('-', $first);
 		$last = implode('-', $last);
 		$dateformat = implode('-', $dateformat);
+		if (strlen($first) < 6) return 365 * 10000; // if not a valid date return a ridiculous timespan
 		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
 		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
 		return round($processedmonth->diff($backthen, true)->days / (365 / 12));
@@ -245,6 +246,7 @@ class Listprocessor {
 					$this->_log[] = '[*] applying filter: '. $listfilter['apply'] . ' ' . $listfilter['comment'] . '...';
 
 				if (method_exists($this, $listfilter['apply'])) {
+					var_dump($listfilter);
 					$this->{$listfilter['apply']}($listfilter);
 					$this->_log[] = '[*] remaining filtered: '. count($this->_list);
 				} else $this->_log[] = '[~] ' . $listfilter['apply'] . ' does not exist and could not be applied!';
@@ -397,11 +399,11 @@ class Listprocessor {
 			}
 		},
 		*/
-		if (($key = array_search($rule['date']['format'], 'y')) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
+		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => &$row){
 			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
 			if (count($entrydate) < 1) continue;
-			$entrydate[1][array_search($rule['date']['format'], 'd')] = '01';
+			$entrydate[0][array_search('d', $rule['date']['format'])] = '01';
 			$d = 0;
 			$thismonth = [];
 			foreach ($rule['date']['format'] as $key){
@@ -417,7 +419,7 @@ class Listprocessor {
 						break;
 				}
 			}
-			$timespan = $this->monthdiff($entrydate[1], $thismonth, $rule['date']['format']);
+			$timespan = $this->monthdiff($entrydate[0], $thismonth, $rule['date']['format']);
 			$filtermatch = ($rule['date']['bias'] === '<' && $timespan <= $rule['date']['threshold']) || ($rule['date']['bias'] === '>' && $timespan >= $rule['date']['threshold']);
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track=[
@@ -445,11 +447,11 @@ class Listprocessor {
 			}
 		},
 		*/
-		if (($key = array_search($rule['date']['format'], 'y')) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
+		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => &$row){
 			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
 			if (count($entrydate) < 1) continue;
-			$entrydate[1][array_search($rule['date']['format'], 'd')] = '01';
+			$entrydate[1][array_search('d', $rule['date']['format'])] = '01';
 			$d = 0;
 			$thismonth = [];
 			foreach ($rule['date']['format'] as $key){
@@ -509,14 +511,16 @@ class Listprocessor {
 		},
 		*/
 		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_setting['filesetting']['source'];
-		$rule['translations'] = $this->_setting['translations'];
+		if (array_key_exists('translations', $this->_setting)) $rule['translations'] = $this->_setting['translations'];
+		if (array_key_exists('encoding', $this->_setting['filesetting']) && !array_key_exists('encoding', $rule['filesetting'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
+		if (array_key_exists('dialect', $this->_setting['filesetting']) && !array_key_exists('dialect', $rule['filesetting'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
 		$this->_log[] = '[*] comparing with '. $rule['filesetting']['source'];
-		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_.argument['processedYear']], True);
-		$equals = new \DS\Set();
+		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']], True);
+		$equals = [];
 		$transfercolumns = array_key_exists('transfer', $rule) ? $rule['transfer']: null;
 
-		foreach ($rule['match'] as $any_or_all){
-			$compare_columns = rule['match'][$any_or_all];
+		foreach ($rule['match'] as $any_or_all => $any_or_allcolumns){
+			$compare_columns = $any_or_allcolumns;
 			# prepare possibly needed amount of matches
 			$correspond = [];
 			for ($i = 0; $i < count($compare_columns); $i++) {
@@ -534,7 +538,7 @@ class Listprocessor {
 						if ($any_or_all === 'any') break;
 					}
 					if ($any_or_all === 'any' && in_array(true, $correspond) || ($any_or_all === 'all' && !in_array(false, $correspond))) {
-						$equals->add($i);
+						if (!in_array($i, $equals)) $equals[]=$i;
 						if ($transfercolumns){
 							foreach ($transfercolumns as $transfer){
 								if (!array_key_exists($transfer, $this->setting['filesetting']['columns']))
@@ -547,7 +551,7 @@ class Listprocessor {
 			}
 		}
 		foreach ($this->_list as &$i){
-			if ($equals->contains($i) !== $rule['keep']){
+			if (in_array($i, $equals) !== $rule['keep']){
 				$track=[
 					'filter' => 'filter_by_comparison_file',
 					'kept' => $rule['keep'],
