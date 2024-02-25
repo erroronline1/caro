@@ -131,6 +131,16 @@ $queries = [
 				"   `hidden` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_csvfilter` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` timestamp NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not json to avoid messing up any almost comprehensible structure
+				"   `hidden` tinyint NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
@@ -255,6 +265,16 @@ $queries = [
 				"	content varchar(MAX) NOT NULL," .
 				"	language varchar(MAX) NOT NULL," .
 				"	type varchar(MAX) NOT NULL," .
+				"	hidden tinyint NOT NULL" .
+				");" 
+				,
+				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
+				"CREATE TABLE caro_csvfilter (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	name varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
 				"	hidden tinyint NOT NULL" .
 				");" 
 				],

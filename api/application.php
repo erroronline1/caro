@@ -1,5 +1,5 @@
 <?php
-// add, edit and delete users
+// login handler, menu and landing page methods
 class APPLICATION extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
@@ -83,9 +83,12 @@ class APPLICATION extends API {
 			LANG::GET('menu.tools_header') => [
 				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
 				LANG::GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
-				LANG::GET('menu.tool_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"],
+				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"]
 			],
 		];
+		if (array_intersect(['admin', 'office'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
+		}
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.documentation_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
 			$menu[LANG::GET('menu.documentation_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
@@ -95,6 +98,7 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
+			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];

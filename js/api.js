@@ -1,5 +1,6 @@
 import {
-	assemble_helper, Toast
+	assemble_helper,
+	Toast
 } from './assemble.js';
 import {
 	compose_helper
@@ -178,6 +179,47 @@ export const api = {
 				return;
 		}
 		await api.send(method, request, successFn, null, payload, (method === 'post' || method === 'put'));
+	},
+	csvfilter: (method, ...request) => {
+		/*
+		post csvfilter/rule
+		get csvfilter/rule
+
+		post csvfilter/filter
+		get csvfilter/filter
+		*/
+		request = [...request];
+		request.splice(0, 0, 'csvfilter');
+		let payload,
+			successFn = function (data) {
+				api.toast(data.status.msg);
+			},
+			title = {
+				'rule': LANG.GET('menu.csvfilter_filter_manager'),
+				'filter': LANG.GET('menu.csvfilter_filter')
+			};
+		switch (method) {
+			case 'get':
+				successFn = function (data) {
+					if (data.body) {
+						api.update_header(title[request[1]]);
+						document.getElementById('main').replaceChildren();
+						new Assemble(data.body).initializeSection();
+					}
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.log !== undefined) new Dialog({
+						type: 'alert',
+						body: data.log
+					});
+				};
+				break;
+			case 'post':
+				payload = _.getInputs('[data-usecase=csvfilter]', true);
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === 'post');
 	},
 	file: async (method, ...request) => {
 		/*
@@ -569,7 +611,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === 'post' || method === 'put');
+		api.send(method, request, successFn, null, payload, method === 'post');
 	},
 	tool: (method, ...request) => {
 		/*
@@ -586,7 +628,7 @@ export const api = {
 			title = {
 				'code': LANG.GET('menu.tools_digital_codes'),
 				'scanner': LANG.GET('menu.tools_scanner'),
-				'stlviewer': LANG.GET('menu.tool_stl_viewer')
+				'stlviewer': LANG.GET('menu.tools_stl_viewer')
 			};;
 		switch (method) {
 			case 'get':
@@ -609,7 +651,8 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, method === 'post');
-	},	user: (method, ...request) => {
+	},
+	user: (method, ...request) => {
 		/*
 		get user/profile
 		get user/user/{id|name}

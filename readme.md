@@ -17,7 +17,9 @@ tested devices:
 * smartphone android12 firefox-browser
 
 ## installation
-* php.ini memory_limit ~1024MB for processing of large csv-files, disable open_basedir at least for local iis for file handlers
+* php.ini memory_limit ~2048M for processing of large csv-files, disable open_basedir at least for local iis for file handlers
+* php.ini upload_max_filesize & post_max_size according to your expected filesize for e.g. sharepoint- and csv-files ~128MB
+* php.ini max_execution_time ~ 300 for csv processing may take a while depending on your data amount
 * my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manually set mime type for site-webmanifest as application/manifest+json for iis servers
 * set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
@@ -94,7 +96,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 # open tasks
 * forms used in context
 
-* access csv filter, store filter rules
+* export filtered csv, fix timeout issue on huge lists
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)

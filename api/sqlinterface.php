@@ -141,7 +141,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_texttemplates ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_texttemplates name ORDER BY name ASC, date DESC"
 		],
-		'texttemplate_get_chunk' => [
+		'texttemplate_get-chunk' => [
 			'mysql' => "SELECT * FROM caro_texttemplates WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_texttemplates WHERE id = :id"
 		],
@@ -328,6 +328,27 @@ class SQLQUERY {
 		'order_get_filter' => [
 			'mysql' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))",
 			'sqlsrv' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
+		],
+
+		'csvfilter-post' => [
+			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_csvfilter (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
+		],
+		'csvfilter-put' => [
+			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id",
+			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
+		],
+		'csvfilter-datalist' => [
+			'mysql' => "SELECT * FROM caro_csvfilter ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_csvfilter name ORDER BY name ASC, date DESC"
+		],
+		'csvfilter_get-filter' => [
+			'mysql' => "SELECT * FROM caro_csvfilter WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_csvfilter WHERE id = :id"
+		],
+		'csvfilter_get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name= :name ORDER BY id DESC"
 		],
 
 	];
