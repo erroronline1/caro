@@ -172,19 +172,20 @@ class CONSUMABLES extends API {
 				}
 
 				// save certificate
-				if (array_key_exists('certificate', $_FILES) && $_FILES['certificate']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['certificate'], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// save documents
-				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name']) {
-					UTILITY::storeUploadedFiles(['documents'], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 				// update pricelist
 				$pricelistImportError = '';
-				if (array_key_exists('pricelist', $_FILES) && $_FILES['pricelist']['tmp_name']) {
-					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES['pricelist']['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
+					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
 				}
+
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
@@ -466,8 +467,8 @@ class CONSUMABLES extends API {
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
-				if (array_key_exists('documents', $_FILES) && $_FILES['documents']['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles(['documents'], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_product_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_product_documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
