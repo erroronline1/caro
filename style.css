@@ -1,6 +1,7 @@
 :root {
 	--background: #D8DEE9;
 	--foreground: rgb(46, 52, 64);
+	--lighterforeground: rgb(92, 97, 109);
 	--article: rgb(236, 239, 244);
 	--3d-border: rgba(255, 255, 255, .3);
 	--lightshadow: rgba(255, 255, 255, .9);
@@ -159,15 +160,15 @@ dialog {
 	img.close {
 		width: 1.5em;
 		height: 1.5em;
-		float:right;
-		margin:.5em;
+		float: right;
+		margin: .5em;
 	}
 
 	img.pause {
 		width: 1.5em;
 		height: 1.5em;
-		float:right;
-		margin:.5em;
+		float: right;
+		margin: .5em;
 		transform: rotate(90deg);
 	}
 
@@ -183,7 +184,7 @@ dialog {
 			top: 1em;
 			right: 1em;
 		}
-	
+
 		header {
 			flex: 0 0 auto;
 			display: inline-block;
@@ -564,6 +565,12 @@ button:disabled {
 	color: var(--red);
 }
 
+input:disabled,
+input:read-only {
+	color: var(--lighterforeground);
+	cursor: copy;
+}
+
 .inlinebutton {
 	width: fit-content;
 	display: inline-block;
@@ -800,8 +807,12 @@ span.nocontent {
 	margin: 1em auto;
 }
 
+[draggable=true] {
+	cursor: grab;
+}
+
 [draggable=true]:active {
-	cursor: move;
+	cursor: grabbing;
 }
 
 .draggableFormElement {
@@ -927,6 +938,7 @@ button[data-type=scanner]::before {
 [data-type=identify]::before {
 	background-image: url('./media/database.svg');
 }
+
 button[data-type=merge]::before {
 	background-image: none;
 	background-color: var(--article);
