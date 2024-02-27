@@ -92,46 +92,6 @@ export const assemble_helper = {
 		}
 		menu.replaceChildren(...elements);
 	},
-	prepareForm: (form) => {
-		/* check input fields for presence of required content */
-		const signature = document.getElementById("signaturecanvas"),
-			requiredsignature = document.querySelector("[data-required=required]"),
-			required = document.querySelectorAll("[required]");
-		let missing_required = false;
-
-		if (signature) {
-			if (signaturePad.isEmpty()) {
-				if (signature == requiredsignature) {
-					signature.classList.add("input_required_alert");
-					missing_required = true;
-				}
-				document.getElementById("SIGNATURE").value = null;
-			} else {
-				let file = new File(
-					[this.dataURLToBlob(signaturePad.toDataURL())],
-					"signature.png",
-					{
-						type: "image/png",
-						lastModified: new Date().getTime(),
-					}
-				);
-				let section = new DataTransfer();
-				section.items.add(file);
-				document.getElementById("SIGNATURE").files = section.files;
-			}
-		}
-		for (const element of required) {
-			if (element.validity.valueMissing && element.form === form) {
-				if (["file", "checkbox", "radio"].includes(element.type))
-					element.nextElementSibling.classList.add("input_required_alert");
-				else element.classList.add("input_required_alert");
-				missing_required = true;
-			}
-			console.log(element, element.validity);
-		}
-		if (!missing_required) form.submit();
-		else new Toast(LANG.GET("general.missing_form_data"));
-	},
 };
 
 export class Dialog {
@@ -686,6 +646,46 @@ export class Assemble {
 		}, 300);
 	}
 
+	prepareForm(event) {
+		/* check input fields for presence of required content */
+		const signature = document.getElementById("signaturecanvas"),
+			requiredsignature = document.querySelector("[data-required=required]"),
+			required = document.querySelectorAll("[required]");
+		let missing_required = false;
+
+		if (signature) {
+			if (signaturePad.isEmpty()) {
+				if (signature == requiredsignature) {
+					signature.classList.add("input_required_alert");
+					missing_required = true;
+				}
+				document.getElementById("SIGNATURE").value = null;
+			} else {
+				let file = new File(
+					[this.dataURLToBlob(signaturePad.toDataURL())],
+					"signature.png",
+					{
+						type: "image/png",
+						lastModified: new Date().getTime(),
+					}
+				);
+				let section = new DataTransfer();
+				section.items.add(file);
+				document.getElementById("SIGNATURE").files = section.files;
+			}
+		}
+		for (const element of required) {
+			if (element.validity.valueMissing && element.form === event.target.form) {
+				if (["file", "checkbox", "radio"].includes(element.type))
+					element.nextElementSibling.classList.add("input_required_alert");
+				else element.classList.add("input_required_alert");
+				missing_required = true;
+			}
+		}
+		if (!missing_required) form.submit();
+		else new Toast(LANG.GET("general.missing_form_data"));
+	}
+
 	initialize_SignaturePad() {
 		signaturecanvas = document.getElementById("signaturecanvas");
 		window.signaturePad = new SignaturePad(signaturecanvas, {
@@ -894,6 +894,8 @@ export class Assemble {
 		}
 		if (this.currentElement.attributes !== undefined)
 			button = this.apply_attributes(this.currentElement.attributes, button);
+		if (this.currentElement.type === "submitbutton")
+			button.onpointerup = this.prepareForm.bind(this);
 		return [button, ...this.hint()];
 	}
 	deletebutton() {
@@ -902,9 +904,8 @@ export class Assemble {
 		return this.button();
 	}
 	submitbutton() {
+		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "submitbutton";
-		this.currentElement.attributes["onpointerup"] =
-			"return assemble_helper.prepareForm(this.form)";
 		return this.button();
 	}
 
