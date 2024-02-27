@@ -641,8 +641,11 @@ button:active {
 	border-bottom: 1px solid var(--foreground);
 }
 
-.input_required_alert {
-	border: 1px solid var(--red) !important;
+input:invalid.input_required_alert,
+input:invalid+button.input_required_alert,
+input:invalid+label.input_required_alert,
+#signaturecanvas.input_required_alert {
+	border: 2px solid var(--red) !important;
 }
 
 [data-type="toleft"],
