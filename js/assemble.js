@@ -679,8 +679,16 @@ export class Assemble {
 				if (["file", "checkbox", "radio"].includes(element.type))
 					element.nextElementSibling.classList.add("input_required_alert");
 				else element.classList.add("input_required_alert");
+				if (!missing_required) {
+					element.scrollIntoView({
+						behavior: "smooth",
+						block: "center",
+						inline: "nearest",
+					});
+				}
 				missing_required = true;
-			}
+			} else
+				element.nextElementSibling.classList.remove("input_required_alert");
 		}
 		if (!missing_required) form.submit();
 		else new Toast(LANG.GET("general.missing_form_data"));
