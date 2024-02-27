@@ -1,47 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, user-scalable=no"
+		/>
+		<link type="text/css" href="style.css" rel="stylesheet" />
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="./media/favicon/ios/180.png"
+		/>
+		<link rel="icon" type="image/png" sizes="32x32"
+		href="./media/favicon/ios/32.png"">
+		<link
+			rel=" icon"
+			type="image/png"
+			sizes="16x16"
+			href="./media/favicon/ios/16.png"
+		/>
+		<link rel="mask-icon" href="./media/favicon/favicon.svg" color="#E5E9F0" />
+		<link rel="shortcut icon" href="./media/favicon/favicon.ico" />
+		<meta name="msapplication-TileColor" content="#E5E9F0" />
+		<meta
+			name="msapplication-config"
+			content="./assets/favicon/browserconfig.xml"
+		/>
+		<meta name="theme-color" content="#E5E9F0" />
+		<link rel="manifest" href="./site.webmanifest" />
+		<title>CARO</title>
+	</head>
+	<script src="./js/import.js" type="module"></script>
+	<script src="./js/utility.js" type="text/javascript"></script>
+	<script src="./libraries/erroronline1.js" type="text/javascript"></script>
+	<script src="./libraries/html5-qrcode.min.js" type="text/javascript"></script>
+	<script
+		src="./libraries/JsBarcode.all.min.js"
+		type="text/javascript"
+	></script>
+	<script
+		src="./libraries/viewstl/stl_viewer.min.js"
+		type="text/javascript"
+	></script>
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-	<link type="text/css" href="style.css" rel="stylesheet" />
-	<link rel="apple-touch-icon" sizes="180x180" href="./media/favicon/ios/180.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="./media/favicon/ios/32.png"">
-	<link rel=" icon" type="image/png" sizes="16x16" href="./media/favicon/ios/16.png">
-	<link rel="mask-icon" href="./media/favicon/favicon.svg" color="#E5E9F0">
-	<link rel="shortcut icon" href="./media/favicon/favicon.ico">
-	<meta name="msapplication-TileColor" content="#E5E9F0">
-	<meta name="msapplication-config" content="./assets/favicon/browserconfig.xml">
-	<meta name="theme-color" content="#E5E9F0">
-	<link rel="manifest" href="./site.webmanifest">
-	<title>
-		CARO
-	</title>
-</head>
-<script src="./js/import.js" type="module"></script>
-<script src="./js/utility.js" type="text/javascript"></script>
-<script src="./libraries/erroronline1.js" type="text/javascript"></script>
-<script src="./libraries/html5-qrcode.min.js" type="text/javascript"></script>
-<script src="./libraries/JsBarcode.all.min.js" type="text/javascript"></script>
-<script src="./libraries/viewstl/stl_viewer.min.js" type="text/javascript"></script>
-
-<body>
-	<nav>
-	</nav>
-	<header>
-		<h1></h1>
-		<div></div>
-	</header>
-	<main id="main">
-	</main>
-	<div class="loader"></div>
-	<dialog id="modal"></dialog>
-	<dialog id="toast"></dialog>
-	<script>
-		window.addEventListener("load", async () => {
-			await _serviceWorker.register();
-		});
-	</script>
-</body>
-
+	<body>
+		<nav></nav>
+		<header>
+			<h1></h1>
+			<div></div>
+		</header>
+		<main id="main"></main>
+		<div class="loader"></div>
+		<dialog id="modal"></dialog>
+		<dialog id="toast"></dialog>
+		<script>
+			window.addEventListener("load", async () => {
+				await _serviceWorker.register();
+			});
+		</script>
+	</body>
 </html>

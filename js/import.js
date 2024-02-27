@@ -1,33 +1,20 @@
 //import relevant functions and set global scope
 
-import {
-	Dialog,
-	Toast,
-	Assemble,
-	assemble_helper
-} from '../js/assemble.js';
+import { Dialog, Toast, Assemble, assemble_helper } from "../js/assemble.js";
 window.Dialog = Dialog;
 window.Toast = Toast;
 window.Assemble = Assemble;
 window.assemble_helper = assemble_helper;
 
-import {
-	api
-} from '../js/api.js';
+import { api } from "../js/api.js";
 window.api = api;
 
-import {
-	Compose,
-	MetaCompose,
-	compose_helper
-} from '../js/compose.js';
+import { Compose, MetaCompose, compose_helper } from "../js/compose.js";
 window.Compose = Compose;
 window.MetaCompose = MetaCompose;
 window.compose_helper = compose_helper;
 
-import {
-	LANG
-} from '../js/language.js';
+import { LANG } from "../js/language.js";
 window.LANG = LANG;
 
-api.application('get', 'login');
+api.application("get", "login");

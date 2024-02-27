@@ -1,8 +1,6 @@
-import {
-	api
-} from '../js/api.js';
+import { api } from "../js/api.js";
 
-await api.application('get', 'language');
+await api.application("get", "language");
 // assignment of variable needs suprisingly long and i have not been able to manage this reliable with await
 await _.sleep(50);
 
@@ -14,19 +12,21 @@ class Lang {
 	*/
 	constructor() {}
 	GET(request, replace = {}) {
-		request = request.split('.');
-		if (!(request[0] in LANGUAGEFILE) || !(request[1] in LANGUAGEFILE[request[0]])) {
-			return 'undefined language';
+		request = request.split(".");
+		if (
+			!(request[0] in LANGUAGEFILE) ||
+			!(request[1] in LANGUAGEFILE[request[0]])
+		) {
+			return "undefined language";
 		}
-		let result = LANGUAGEFILE[request[0]][request[1]]
+		let result = LANGUAGEFILE[request[0]][request[1]];
 		for (const [pattern, replacement] of Object.entries(replace)) {
 			result = result.replaceAll(pattern, replacement);
 		}
 		return result;
 	}
 	PROPERTY(request, replace = {}) {
-		return this.GET(request, replace).replace(' ', '_');
+		return this.GET(request, replace).replace(" ", "_");
 	}
-
 }
 export var LANG = new Lang();
