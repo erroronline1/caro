@@ -192,8 +192,12 @@ export const api = {
 		request.splice(0, 0, 'csvfilter');
 		let payload,
 			successFn = function (data) {
-				api.toast(data.status.msg);
-			},
+				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.log !== undefined) new Dialog({
+					type: 'alert',
+					body: data.log.join('\n')
+				});
+		},
 			title = {
 				'rule': LANG.GET('menu.csvfilter_filter_manager'),
 				'filter': LANG.GET('menu.csvfilter_filter')
@@ -207,10 +211,6 @@ export const api = {
 						new Assemble(data.body).initializeSection();
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
-					if (data.log !== undefined) new Dialog({
-						type: 'alert',
-						body: data.log
-					});
 				};
 				break;
 			case 'post':
