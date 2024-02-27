@@ -256,7 +256,7 @@ $queries = [
 				"	permissions varchar(MAX) NOT NULL" .
 				");"
 				,
-				"IF OBJECT_ID(N'caro_text_templates', N'U') IS NULL " .
+				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
 				"CREATE TABLE caro_text_templates (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
