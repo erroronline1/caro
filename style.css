@@ -397,10 +397,6 @@ input[type=file] {
 	height:0;
 }
 
-input[type=file]:invalid+button {
-	border-color:1px solid var(--red);
-}
-
 a,
 a:active,
 a:visited {
@@ -602,8 +598,8 @@ button:active {
 	border-bottom: 1px solid var(--foreground);
 }
 
-.signature_required_alert {
-	border: 1px solid var(--red);
+.input_required_alert {
+	border: 1px solid var(--red) !important;
 }
 
 [data-type=toleft],

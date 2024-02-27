@@ -79,6 +79,42 @@ export const assemble_helper = {
 			elements.push(div2);
 		}
 		menu.replaceChildren(...elements);
+	},
+	prepareForm: (form) => {
+		/* check input fields for presence of required content */
+		const signature = document.getElementById('signaturecanvas'),
+			requiredsignature = document.querySelector('[data-required=required]'),
+			required = document.querySelectorAll('[required]');
+		let missing_required = false;
+
+		if (signature) {
+			if (signaturePad.isEmpty()) {
+				if (signature == requiredsignature) {
+					signature.classList.add("input_required_alert");
+					missing_required = true;
+				}
+				document.getElementById('SIGNATURE').value = null;
+			} else {
+				let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
+					type: "image/png",
+					lastModified: new Date().getTime()
+				});
+				let section = new DataTransfer();
+				section.items.add(file);
+				document.getElementById('SIGNATURE').files = section.files;
+			}
+		}
+		for (const element of required) {
+			if (element.validity.valueMissing && element.form === form) {
+				if (['file', 'checkbox', 'radio'].includes(element.type))
+					element.nextElementSibling.classList.add("input_required_alert");
+				else element.classList.add("input_required_alert");
+				missing_required = true;
+			}
+			console.log(element, element.validity);
+		}
+		if (!missing_required) form.submit();
+		else new Toast(LANG.GET('general.missing_form_data'));
 	}
 }
 
@@ -341,11 +377,7 @@ export class Assemble {
 			this.section = document.createElement('form');
 			this.section.method = 'post';
 			this.section.enctype = 'multipart/form-data';
-			this.section.onsubmit = () => {
-				return this.prepareForm()
-			};
 			this.section = this.apply_attributes(this.form, this.section);
-
 			this.content.push([{
 				type: 'submitbutton',
 				attributes: {
@@ -511,42 +543,6 @@ export class Assemble {
 			} else assembledPanels.add(...nodes);
 		})
 		return assembledPanels;
-	}
-
-	prepareForm() {
-		/* check input fields for presence of required content */
-		const signature = document.getElementById('signaturecanvas'),
-			requiredsignature = document.querySelector('[data-required=required]'),
-			required = document.querySelectorAll('[required]');
-		console.log('hello', required);
-
-		if (signature) {
-			if (signaturePad.isEmpty()) {
-				if (signature == requiredsignature) {
-					signature.classList.add("signature_required_alert");
-					return false;
-				}
-				document.getElementById('SIGNATURE').value = null;
-				return;
-			}
-			let file = new File([this.dataURLToBlob(signaturePad.toDataURL())], "signature.png", {
-				type: "image/png",
-				lastModified: new Date().getTime()
-			});
-			let section = new DataTransfer();
-			section.items.add(file);
-			document.getElementById('SIGNATURE').files = section.files;
-		}
-		let missing_required = false;
-		for (const element of required) {
-			if (!element.value) {
-				element.setCustomValidity('invalid');
-				element.reportValidity();
-				missing_required = true;
-			}
-			console.log(element, element.validity);
-		}
-		return !missing_required;
 	}
 
 	slider(sectionID, length) {
@@ -801,6 +797,7 @@ export class Assemble {
 	}
 	submitbutton() {
 		this.currentElement.attributes['data-type'] = 'submitbutton';
+		this.currentElement.attributes['onpointerup'] = 'return assemble_helper.prepareForm(this.form)'
 		return this.button();
 	}
 
