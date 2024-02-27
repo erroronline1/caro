@@ -392,7 +392,13 @@ canvas,
 }
 
 input[type=file] {
-	display: none;
+	/* avoid non focusable error*/
+	width: 0;
+	height:0;
+}
+
+input[type=file]:invalid+button {
+	border-color:1px solid var(--red);
 }
 
 a,
