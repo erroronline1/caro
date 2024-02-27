@@ -8,7 +8,7 @@ filters and returns a named array according to setup.
     filters and modifications are processed in order of appearance.
     modifications take place with the filtered list only for performance reasons.
     compare lists can be filtered and manipulated likewise. due to recursive implementation the origin list
-    can be used as a filter by itself.
+    can be used as a filter by itself filtering with remaining entries.
 
 	"postProcessing": optional string as hint what to do with the result file
     "filesetting":
@@ -149,7 +149,7 @@ class Listprocessor {
 		if (!array_key_exists('processedMonth', $this->_argument)) $this->_argument['processedMonth'] = date('m');
 		if (!array_key_exists('processedYear', $this->_argument)) $this->_argument['processedMonth'] = date('Y');
 
-		if (is_file($this->_setting['filesetting']['source'])) $this->importFile();
+		if (gettype($this->_setting['filesetting']['source']) === 'string' && is_file($this->_setting['filesetting']['source'])) $this->importFile();
 		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = $this->_setting['filesetting']['source'];
 		if ($this->_list) $this->filter();
 	}
@@ -447,14 +447,14 @@ class Listprocessor {
 			}
 		},
 		*/
-		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
+		if (($key = array_search('y', $rule['interval']['format'])) !== false) $rule['interval']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => &$row){
-			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
+			preg_match_all('/\d+/mi', $row[$rule['interval']['column']], $entrydate);
 			if (count($entrydate) < 1) continue;
-			$entrydate[1][array_search('d', $rule['date']['format'])] = '01';
+			$entrydate[1][array_search('d', $rule['interval']['format'])] = '01';
 			$d = 0;
 			$thismonth = [];
-			foreach ($rule['date']['format'] as $key){
+			foreach ($rule['interval']['format'] as $key){
 				switch($key){
 					case 'd':
 						$thismonth[] = '01';
@@ -467,15 +467,15 @@ class Listprocessor {
 						break;
 				}
 			}
-			$offset_edate = $this->monthdelta($entrydate[1], $rule['interval']['offset']);
-			$timespan = monthdiff($offset_edate, $thismonth, $rule['date']['format']);
+			$offset_edate = $this->monthdelta($entrydate[1], $rule['interval']['format'], $rule['interval']['offset']);
+			$timespan = $this->monthdiff($offset_edate, $thismonth, $rule['interval']['format']);
 			$filtermatch = boolval($timespan % $rule['interval']['interval']);
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track=[
 					'filter' => 'filter_by_monthinterval',
 					'kept' => $rule['keep'],
-					'column' => $rule['date']['column'],
-					'value' => $row[$rule['date']['column']],
+					'column' => $rule['interval']['column'],
+					'value' => $row[$rule['interval']['column']],
 					'matched' => $rule['interval']['interval'] . ' remainder ' . $filtermatch];
 				$this->delete($i);
 			}
@@ -510,7 +510,8 @@ class Listprocessor {
 			}
 		},
 		*/
-		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_setting['filesetting']['source'];
+		//if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_setting['filesetting']['source'];
+		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_list;
 		if (array_key_exists('translations', $this->_setting)) $rule['translations'] = $this->_setting['translations'];
 		if (array_key_exists('encoding', $this->_setting['filesetting']) && !array_key_exists('encoding', $rule['filesetting'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
 		if (array_key_exists('dialect', $this->_setting['filesetting']) && !array_key_exists('dialect', $rule['filesetting'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
@@ -550,6 +551,7 @@ class Listprocessor {
 				}
 			}
 		}
+		$compare_list = null; //release ressources
 		foreach ($this->_list as &$i){
 			if (in_array($i, $equals) !== $rule['keep']){
 				$track=[
