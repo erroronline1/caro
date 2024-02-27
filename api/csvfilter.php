@@ -303,7 +303,8 @@ class CSVFILTER extends API {
 							'hint' => LANG::GET('csvfilter.use_filter_input_file_hint', [':name' => $content['filesetting']['source']]),
 							'attributes' => [
 								'name' => LANG::GET('csvfilter.use_filter_input_file'),
-								'required' => true
+								'required' => true,
+								'accept' => '.csv'
 							]
 						], [
 							'type' => 'br'
@@ -329,7 +330,8 @@ class CSVFILTER extends API {
 							'hint' => LANG::GET('csvfilter.use_filter_input_file_hint', [':name' => $filtertype['filesetting']['source']]),
 							'attributes' => [
 								'name' => LANG::GET('csvfilter.use_filter_compare_file') . '[]',
-								'required' => true
+								'required' => true,
+								'accept' => '.csv'
 							]
 						]);
 					}
