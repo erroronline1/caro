@@ -690,7 +690,7 @@ export class Assemble {
 			} else
 				element.nextElementSibling.classList.remove("input_required_alert");
 		}
-		if (!missing_required) form.submit();
+		if (!missing_required) event.target.form.submit();
 		else new Toast(LANG.GET("general.missing_form_data"));
 	}
 
