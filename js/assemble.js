@@ -344,7 +344,7 @@ export class Assemble {
 			this.section.onsubmit = () => {
 				return this.prepareForm()
 			};
-			this.apply_attributes(this.form, this.section);
+			this.section = this.apply_attributes(this.form, this.section);
 
 			this.content.push([{
 				type: 'submitbutton',
@@ -514,12 +514,15 @@ export class Assemble {
 	}
 
 	prepareForm() {
-		/* check non typical input fields for presence of required content */
+		/* check input fields for presence of required content */
 		const signature = document.getElementById('signaturecanvas'),
-			required = document.querySelector('[data-required=required]');
+			requiredsignature = document.querySelector('[data-required=required]'),
+			required = document.querySelectorAll('[required]');
+		console.log('hello', required);
+
 		if (signature) {
 			if (signaturePad.isEmpty()) {
-				if (signature == required) {
+				if (signature == requiredsignature) {
 					signature.classList.add("signature_required_alert");
 					return false;
 				}
@@ -534,7 +537,16 @@ export class Assemble {
 			section.items.add(file);
 			document.getElementById('SIGNATURE').files = section.files;
 		}
-		return;
+		let missing_required = false;
+		for (const element of required) {
+			if (!element.value) {
+				element.setCustomValidity('invalid');
+				element.reportValidity();
+				missing_required = true;
+			}
+			console.log(element, element.validity);
+		}
+		return !missing_required;
 	}
 
 	slider(sectionID, length) {

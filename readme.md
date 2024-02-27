@@ -95,6 +95,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 # open tasks
 * forms used in context
+* check assemble prepareForm method not being applied
 
 * export filtered csv, fix timeout issue on huge lists
 * vendor address, email, phone, customer id
