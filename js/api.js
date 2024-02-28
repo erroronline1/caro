@@ -215,11 +215,20 @@ export const api = {
 			successFn = function (data) {
 				if (data.status !== undefined && data.status.msg !== undefined)
 					api.toast(data.status.msg);
-				if (data.log !== undefined)
-					new Dialog({
-						type: "alert",
-						body: data.log.join("<br />"),
-					});
+				if (data.log !== undefined) {
+					const dialog = {
+						type: "input",
+						body: [
+							{ type: "text", content: data.log.join("\n") },
+							{ type: "links", content: {} },
+						],
+					};
+					dialog.body[1].content[data.link.name] = {
+						href: data.link.url,
+						download: data.link.name,
+					};
+					new Dialog(dialog);
+				}
 			},
 			title = {
 				rule: LANG.GET("menu.csvfilter_filter_manager"),
