@@ -131,7 +131,6 @@ dialog {
 	opacity: 0;
 	transition: ease 0.3s;
 	pointer-events: none;
-	overflow: hidden;
 	width: 30em;
 
 	&#toast {
@@ -516,8 +515,9 @@ input:checked + .checkbox::before {
 }
 
 input:checked + .radio {
-	padding: calc(0.5em - 3px) calc(1em - 3px);
-	border: 4px solid var(--green);
+	color: var(--article);
+	background-color: var(--green);
+	border-color: var(--article);
 }
 
 .input-label {
@@ -642,8 +642,8 @@ button:active {
 }
 
 input:invalid.input_required_alert,
-input:invalid+button.input_required_alert,
-input:invalid+label.input_required_alert,
+input:invalid + button.input_required_alert,
+input:invalid + label.input_required_alert,
 #signaturecanvas.input_required_alert {
 	border: 2px solid var(--red) !important;
 }
