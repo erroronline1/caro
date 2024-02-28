@@ -265,12 +265,14 @@ export class Dialog {
 		return [buttons];
 	}
 	input() {
-		return [
+		let result = [
 			...new Assemble({
 				content: this.body,
 			}).initializeSection(null, null, "iCanHasNodes"),
-			...this.confirm(),
 		];
+		if (!Object.keys(this.options)) result = result.concat(this.confirm());
+		else result = result.concat(this.alert());
+		return result;
 	}
 	scanner() {
 		const div = document.createElement("div"),
