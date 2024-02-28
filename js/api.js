@@ -223,7 +223,7 @@ export const api = {
 							{ type: "links", content: {} },
 						],
 					};
-					dialog.body[1].content[data.link.name] = {
+					dialog.body[1].content[data.link.display] = {
 						href: data.link.url,
 						download: data.link.name,
 					};

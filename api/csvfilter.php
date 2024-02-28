@@ -229,12 +229,11 @@ class CSVFILTER extends API {
 
 				// clear up tmp folder
 				$files = UTILITY::listFiles(UTILITY::directory('tmp'),'asc');
-				$display=[];
+				$display = [];
 				if ($files){
 					foreach ($files as $file){
-						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
-						$filetime=filemtime($file['path']);
-						if ((time()-$filetime)/3600 > INI['lifespan']['tmp']) {
+						$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
+						if ((time() - filemtime($file['path'])) / 3600 > INI['lifespan']['tmp']) {
 							UTILITY::delete($file['path']);
 						}
 					}
@@ -257,7 +256,11 @@ class CSVFILTER extends API {
 				
 				$this->response([
 					'log' => $pricelist->_log,
-					'link' => ['url' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempCSV)['basename'], 'name' => $content['filesetting']['destination']]
+					'link' => [
+						'display' => LANG::GET('csvfilter.use_filter_download', [':file' => $content['filesetting']['destination']]),
+						'url' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempCSV)['basename'],
+						'name' => $content['filesetting']['destination']
+					]
 				]);
 				break;
 			case 'GET':
