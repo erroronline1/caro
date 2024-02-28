@@ -246,7 +246,6 @@ class Listprocessor {
 					$this->_log[] = '[*] applying filter: '. $listfilter['apply'] . ' ' . $listfilter['comment'] . '...';
 
 				if (method_exists($this, $listfilter['apply'])) {
-					var_dump($listfilter);
 					$this->{$listfilter['apply']}($listfilter);
 					$this->_log[] = '[*] remaining filtered: '. count($this->_list);
 				} else $this->_log[] = '[~] ' . $listfilter['apply'] . ' does not exist and could not be applied!';
@@ -451,7 +450,7 @@ class Listprocessor {
 		foreach ($this->_list as $i => &$row){
 			preg_match_all('/\d+/mi', $row[$rule['interval']['column']], $entrydate);
 			if (count($entrydate) < 1) continue;
-			$entrydate[1][array_search('d', $rule['interval']['format'])] = '01';
+			$entrydate[0][array_search('d', $rule['interval']['format'])] = '01';
 			$d = 0;
 			$thismonth = [];
 			foreach ($rule['interval']['format'] as $key){
@@ -467,7 +466,7 @@ class Listprocessor {
 						break;
 				}
 			}
-			$offset_edate = $this->monthdelta($entrydate[1], $rule['interval']['format'], $rule['interval']['offset']);
+			$offset_edate = $this->monthdelta($entrydate[0], $rule['interval']['format'], $rule['interval']['offset']);
 			$timespan = $this->monthdiff($offset_edate, $thismonth, $rule['interval']['format']);
 			$filtermatch = boolval($timespan % $rule['interval']['interval']);
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
@@ -515,7 +514,7 @@ class Listprocessor {
 		if (array_key_exists('translations', $this->_setting)) $rule['translations'] = $this->_setting['translations'];
 		if (array_key_exists('encoding', $this->_setting['filesetting']) && !array_key_exists('encoding', $rule['filesetting'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
 		if (array_key_exists('dialect', $this->_setting['filesetting']) && !array_key_exists('dialect', $rule['filesetting'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
-		$this->_log[] = '[*] comparing with '. $rule['filesetting']['source'];
+		$this->_log[] = '[*] comparing with '. (gettype($rule['filesetting']['source']) === 'string' ? $rule['filesetting']['source'] : 'self');
 		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']], True);
 		$equals = [];
 		$transfercolumns = array_key_exists('transfer', $rule) ? $rule['transfer']: null;
