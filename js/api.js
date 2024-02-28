@@ -218,7 +218,7 @@ export const api = {
 				if (data.log !== undefined)
 					new Dialog({
 						type: "alert",
-						body: data.log.join("\n"),
+						body: data.log.join("<br />"),
 					});
 			},
 			title = {
