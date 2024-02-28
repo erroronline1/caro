@@ -103,7 +103,7 @@ class Listprocessor {
 	 * 
 	 * @var array
 	 */
-	private $_setting = [];
+	public $_setting = [];
 
 	/**
 	 * define result
