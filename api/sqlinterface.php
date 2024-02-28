@@ -135,7 +135,7 @@ class SQLQUERY {
 		],
 		'texttemplate-put' => [
 			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden WHERE id = :id",
-			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_texttemplates SET hidden = :hidden WHERE id = :id"
 		],
 		'texttemplate-datalist' => [
 			'mysql' => "SELECT * FROM caro_texttemplates ORDER BY name ASC, date DESC",
@@ -173,7 +173,7 @@ class SQLQUERY {
 		],
 		'form_component-put' => [
 			'mysql' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id",
-			'mysql' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id"
 		],
 		'form_component-datalist' => [
 			'mysql' => "SELECT id, name, date, author, hidden FROM caro_form_components ORDER BY name ASC, date DESC",
@@ -336,7 +336,7 @@ class SQLQUERY {
 		],
 		'csvfilter-put' => [
 			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id",
-			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
 		],
 		'csvfilter-datalist' => [
 			'mysql' => "SELECT * FROM caro_csvfilter ORDER BY name ASC, date DESC",
