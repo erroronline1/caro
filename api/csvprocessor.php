@@ -8,7 +8,7 @@ filters and returns a named array according to setup.
     filters and modifications are processed in order of appearance.
     modifications take place with the filtered list only for performance reasons.
     compare lists can be filtered and manipulated likewise. due to recursive implementation the origin list
-    can be used as a filter by itself filtering with remaining entries.
+    can be used as a filter by itself.
 
 	"postProcessing": optional string as hint what to do with the result file
     "filesetting":
@@ -111,6 +111,7 @@ class Listprocessor {
 	 * @var array
 	 */
 	public $_list = [];
+	public $_originallist = [];
 
 	/**
 	 * define arguments
@@ -151,6 +152,7 @@ class Listprocessor {
 
 		if (gettype($this->_setting['filesetting']['source']) === 'string' && is_file($this->_setting['filesetting']['source'])) $this->importFile();
 		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = $this->_setting['filesetting']['source'];
+		$this->_originallist = $this->_list;
 		if ($this->_list) $this->filter();
 	}
 
@@ -509,8 +511,7 @@ class Listprocessor {
 			}
 		},
 		*/
-		//if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_setting['filesetting']['source'];
-		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_list;
+		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_originallist;
 		if (array_key_exists('translations', $this->_setting)) $rule['translations'] = $this->_setting['translations'];
 		if (array_key_exists('encoding', $this->_setting['filesetting']) && !array_key_exists('encoding', $rule['filesetting'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
 		if (array_key_exists('dialect', $this->_setting['filesetting']) && !array_key_exists('dialect', $rule['filesetting'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
