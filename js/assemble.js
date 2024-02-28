@@ -914,6 +914,7 @@ export class Assemble {
 	submitbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "submitbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return this.button();
 	}
 
