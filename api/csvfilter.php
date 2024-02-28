@@ -227,8 +227,37 @@ class CSVFILTER extends API {
 					'processedYear' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.use_filter_year'))
 				]);
 
+				// clear up tmp folder
+				$files = UTILITY::listFiles(UTILITY::directory('tmp'),'asc');
+				$display=[];
+				if ($files){
+					foreach ($files as $file){
+						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
+						$filetime=filemtime($file['path']);
+						if ((time()-$filetime)/3600 > INI['lifespan']['tmp']) {
+							UTILITY::delete($file['path']);
+						}
+					}
+				}
+				//create and write to file
+				if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
+				$tempCSV = UTILITY::directory('tmp') . '/' . time() . '.csv';
+				$file = fopen($tempCSV, 'w');
+				fputcsv($file, $pricelist->_setting['filesetting']['columns'],
+					$pricelist->_setting['filesetting']['dialect']['separator'],
+					$pricelist->_setting['filesetting']['dialect']['enclosure'],
+					$pricelist->_setting['filesetting']['dialect']['escape']);
+				foreach($pricelist->_list as $line) {
+					fputcsv($file, $line,
+					$pricelist->_setting['filesetting']['dialect']['separator'],
+					$pricelist->_setting['filesetting']['dialect']['enclosure'],
+					$pricelist->_setting['filesetting']['dialect']['escape']);
+				}
+				fclose($file);
+				
 				$this->response([
-					'log' => $pricelist->_log
+					'log' => $pricelist->_log,
+					'link' => ['url' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempCSV)['basename'], 'name' => $content['filesetting']['destination']]
 				]);
 				break;
 			case 'GET':
