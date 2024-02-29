@@ -173,7 +173,7 @@ class Listprocessor {
 		$dateformat = implode('-', $dateformat);
 		$offset_date = new DateTime(DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
 		$day = $offset_date->format('j');
-		$offset_date->modify('first day of +1 month')->modify('+' . (min($day, $offset_date->format('t')) - 1) . ' days');
+		$offset_date->modify('first day of +1 month')->modify(($delta - 1 < 0 ? '-' . $delta - 1 : '+' . $delta - 1) . ' months');
 		return explode('-', $offset_date->format($dateformat));
 	}
 
