@@ -242,6 +242,7 @@ class CSVFILTER extends API {
 				if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
 				$tempCSV = UTILITY::directory('tmp') . '/' . time() . '.csv';
 				$file = fopen($tempCSV, 'w');
+				fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 				fputcsv($file, $pricelist->_setting['filesetting']['columns'],
 					$pricelist->_setting['filesetting']['dialect']['separator'],
 					$pricelist->_setting['filesetting']['dialect']['enclosure'],
