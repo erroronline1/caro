@@ -1147,6 +1147,7 @@ export class Assemble {
 				this.currentElement.numeration
 			);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		select.id = getNextElementID();
 		if (this.currentElement.attributes !== undefined)
 			select = this.apply_attributes(this.currentElement.attributes, select);
 
@@ -1167,6 +1168,7 @@ export class Assemble {
 			select.appendChild(optgroup);
 		}
 		label = document.createElement("label");
+		label.htmlFor = select.id;
 		label.appendChild(
 			document.createTextNode(
 				this.currentElement.attributes.name.replace(/\[\]/g, "")
