@@ -158,10 +158,17 @@ class Listprocessor {
 
 	public function monthdiff($first = [], $last = [], $dateformat = []){
 		/* determine approximately difference of months (not taking leap years into account) */
+		// force days and months two digit
+		$day = array_search('d', $dateformat);
+		$first[$day] = strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
+		$last[$day] = strlen($last[$day]) < 2 ? '0' . $last[$day] : $last[$day];
+		$month = array_search('m', $dateformat);
+		$first[$month] = strlen($first[$month]) < 2 ? '0' . $first[$month] : $first[$month];
+		$last[$month] = strlen($last[$month]) < 2 ? '0' . $last[$month] : $last[$month];
+		
 		$first = implode('-', $first);
 		$last = implode('-', $last);
 		$dateformat = implode('-', $dateformat);
-		if (strlen($first) < 6) return 365 * 10000; // if not a valid date return a ridiculous timespan
 		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
 		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
 		return round($processedmonth->diff($backthen, true)->days / (365 / 12));
@@ -169,6 +176,12 @@ class Listprocessor {
 
 	public function monthdelta($date = [], $dateformat = [], $delta = 0){
 		/* adds a delta to a passed date */
+		// force days and months two digit
+		$day = array_search('d', $dateformat);
+		$date[$day] = strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
+		$month = array_search('m', $dateformat);
+		$date[$month] = strlen($date[$month]) < 2 ? '0' . $date[$month] : $date[$month];
+
 		$date = implode('-', $date);
 		$dateformat = implode('-', $dateformat);
 		$offset_date = new DateTime(DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
@@ -299,7 +312,7 @@ class Listprocessor {
 		/* delete row and add tracking to log if applicable */
 		if ($track && array_key_exists('track', $this->_argument)){
 			foreach($this->_argument['track'] as $column => $values)
-				$tracked=array_search($this->_list[$row][$column], $values);
+				$tracked = array_search($this->_list[$row][$column], $values);
 				if ($tracked || $tracked === 0)
 					$this->_log[] = "[!] tracked " . $values[$tracked] . ' in ' . $column . ': ' . json_encode($track);
 		}
@@ -371,7 +384,7 @@ class Listprocessor {
 						$keep = $rule['keep'];
 						if (!boolval(preg_match('/' . $rule['match']['all'][$column] . '/mi', $row[$column]))){
 							$keep = !$rule['keep'];
-							$track=[
+							$track = [
 								'filter' => 'filter_by_expression',
 								'kept' => $rule['keep'],
 								'column' => $column,
@@ -403,7 +416,7 @@ class Listprocessor {
 		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => &$row){
 			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
-			if (count($entrydate) < 1) continue;
+			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['date']['format'])] = '01';
 			$d = 0;
 			$thismonth = [];
@@ -423,7 +436,7 @@ class Listprocessor {
 			$timespan = $this->monthdiff($entrydate[0], $thismonth, $rule['date']['format']);
 			$filtermatch = ($rule['date']['bias'] === '<' && $timespan <= $rule['date']['threshold']) || ($rule['date']['bias'] === '>' && $timespan >= $rule['date']['threshold']);
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
-				$track=[
+				$track = [
 					'filter' => 'filter_by_monthdiff',
 					'kept' => $rule['keep'],
 					'column' => $rule['date']['column'],
@@ -451,7 +464,7 @@ class Listprocessor {
 		if (($key = array_search('y', $rule['interval']['format'])) !== false) $rule['interval']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => &$row){
 			preg_match_all('/\d+/mi', $row[$rule['interval']['column']], $entrydate);
-			if (count($entrydate) < 1) continue;
+			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['interval']['format'])] = '01';
 			$d = 0;
 			$thismonth = [];
@@ -472,7 +485,7 @@ class Listprocessor {
 			$timespan = $this->monthdiff($offset_edate, $thismonth, $rule['interval']['format']);
 			$filtermatch = boolval($timespan % $rule['interval']['interval']);
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
-				$track=[
+				$track = [
 					'filter' => 'filter_by_monthinterval',
 					'kept' => $rule['keep'],
 					'column' => $rule['interval']['column'],
@@ -552,12 +565,11 @@ class Listprocessor {
 			}
 		}
 		$compare_list = null; //release ressources
-		foreach ($this->_list as &$i){
-			if (in_array($i, $equals) !== $rule['keep']){
-				$track=[
+		foreach ($equals as $i){
+			if (!$rule['keep']){
+				$track = [
 					'filter' => 'filter_by_comparison_file',
 					'kept' => $rule['keep'],
-					'column' => $rule['date']['column'],
 					'matched' => json_encode($rule['match'])];
 				$this->delete($i, $track);
 			}
@@ -588,22 +600,21 @@ class Listprocessor {
 			if (!array_key_exists($identifier, $duplicates)) $duplicates[$identifier] = [[implode('', $orderby), $i]];
 			else array_push($duplicates[$identifier], [implode('', $orderby), $i]);
 		}
-		$descending=$rule['duplicates']['descending'];
+		$descending = $rule['duplicates']['descending'];
 		
-		foreach($duplicates as $i => &$double){
-			usort($double, function ($a, $b) use ($descending){
+		foreach($duplicates as &$multiple){
+			usort($multiple, function ($a, $b) use ($descending){
 				if ($a[0] === $b[0]) return 0;
-				if ($descending) return ($a[0] < $b[0]) ? -1: 1;
-				return ($a[0] < $b[0]) ? 1: -1;
+				if ($descending) return ($a[0] < $b[0]) ? 1: -1;
+				return ($a[0] < $b[0]) ? -1: 1;
 			});
-			foreach ($double as $j => $k){
-				if ($j < $rule['duplicates']['amount'])	
-				continue; //self.argument['track']['cause']['kept'] = double[j]
+			foreach ($multiple as $index => $k){
+				if ($index < $rule['duplicates']['amount'])	continue;
 				else {
-					$track=[
+					$track = [
 						'filter' => 'filter_by_duplicates',
 						'value' => $k[0],
-						'matched' => $j . ' of ' . $rule['duplicates']['amount']];
+						'matched' => $index + 1 . ' of ' . $rule['duplicates']['amount']];
 					$this->delete($k[1], $track);
 				}
 			}
@@ -644,7 +655,7 @@ class Listprocessor {
 				if ($rule['keep']) continue;
 			else
 				if (!$rule['keep'])	continue;
-			$track=[
+			$track = [
 				'filter' => 'filter_by_rand',
 				'kept' => $rule['keep'],
 				'matched' => 'randomly selected'];
@@ -682,7 +693,7 @@ class Listprocessor {
 							if (is_array($modifications[$modify][$key])){
 								$expression = [];
 								foreach ($modifications[$modify][$key] as $possible_col){
-									$expression[] =  array_key_exists($possible_col, $this->_list[$i]) ? $this->_list[$i][$possible_col] : $possible_col;
+									$expression[] = array_key_exists($possible_col, $this->_list[$i]) ? $this->_list[$i][$possible_col] : $possible_col;
 								}
 							}
 							else
@@ -692,7 +703,7 @@ class Listprocessor {
 						break;
 					case 'replace':
 						foreach ($this->_list as $i => &$row){
-							foreach ($row as $column=>$value) {
+							foreach ($row as $column => $value) {
 								if (!$rule[0] || $rule[0] == $column)
 									$this->_list[$i][$column] = trim(preg_replace('/' . $rule[1] . '/', $rule[2], $value));
 							}
