@@ -20,7 +20,14 @@ tested devices:
 * php.ini memory_limit ~2048M for processing of large csv-files, disable open_basedir at least for local iis for file handlers
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for iis according to your expected filesize for e.g. sharepoint- and csv-files ~128MB
 * php.ini max_execution_time / fastCGI timeout (iis) ~ 300 for csv processing may take a while depending on your data amount
-* php.ini enable extension=zip (or install ZipArchive class for php)
+* php.ini enable extensions:
+    * gd
+    * gettext
+    * mbstring
+    * exif
+    * pdo_odbc
+    * zip
+    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manually set mime type for site-webmanifest as application/manifest+json for iis servers
 * set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
