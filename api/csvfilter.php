@@ -1,6 +1,7 @@
 <?php
 // add filters and filter csv-files
 include_once('csvprocessor.php');
+include_once("../libraries/xlsxwriter.class.php");
 
 class CSVFILTER extends API {
     // processed parameters for readability
@@ -240,26 +241,41 @@ class CSVFILTER extends API {
 				}
 				//create and write to file
 				if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
-				$tempCSV = UTILITY::directory('tmp') . '/' . time() . '.csv';
-				$file = fopen($tempCSV, 'w');
-				fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-				fputcsv($file, $pricelist->_setting['filesetting']['columns'],
-					$pricelist->_setting['filesetting']['dialect']['separator'],
-					$pricelist->_setting['filesetting']['dialect']['enclosure'],
-					$pricelist->_setting['filesetting']['dialect']['escape']);
-				foreach($pricelist->_list as $line) {
-					fputcsv($file, $line,
-					$pricelist->_setting['filesetting']['dialect']['separator'],
-					$pricelist->_setting['filesetting']['dialect']['enclosure'],
-					$pricelist->_setting['filesetting']['dialect']['escape']);
+				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
+					case 'csv':
+						$tempFile = UTILITY::directory('tmp') . '/' . time() . '.csv';
+						$file = fopen($tempFile, 'w');
+						fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+						fputcsv($file, $pricelist->_setting['filesetting']['columns'],
+							$pricelist->_setting['filesetting']['dialect']['separator'],
+							$pricelist->_setting['filesetting']['dialect']['enclosure'],
+							$pricelist->_setting['filesetting']['dialect']['escape']);
+						foreach($pricelist->_list as $line) {
+							fputcsv($file, $line,
+							$pricelist->_setting['filesetting']['dialect']['separator'],
+							$pricelist->_setting['filesetting']['dialect']['enclosure'],
+							$pricelist->_setting['filesetting']['dialect']['escape']);
+						}
+						fclose($file);
+						break;
+					case 'xls': // do nothing, let xlsx catch
+					case 'xlsx':
+						$tempFile = UTILITY::directory('tmp') . '/' . time() . '.xlsx';
+						$writer = new XLSXWriter();
+						$writer->setAuthor($_SESSION['user']['name']); 
+						$writer->writeSheetRow('Sheet1', $pricelist->_setting['filesetting']['columns']);
+						foreach($pricelist->_list as $line)
+							$writer->writeSheetRow('Sheet1', $line);
+						$writer->writeToFile($tempFile);
+						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
+						break;
 				}
-				fclose($file);
 				
 				$this->response([
 					'log' => $pricelist->_log,
 					'link' => [
 						'display' => LANG::GET('csvfilter.use_filter_download', [':file' => $content['filesetting']['destination']]),
-						'url' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempCSV)['basename'],
+						'url' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 						'name' => $content['filesetting']['destination']
 					]
 				]);
