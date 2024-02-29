@@ -84,6 +84,8 @@ filters and returns a named array according to setup.
                    original columns will be omitted, nested within a list to make sure to order as given
         "translate": column values to be translated according to specified translation object
 
+    "split": split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+
     "evaluate": object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
 
     translations can replace e.g. numerical values with legible translations.
@@ -301,6 +303,9 @@ class Listprocessor {
 
 			$this->_log[] = '[*] result - final rows: ' . count($this->_list);
 
+			// split list or at least elevate to n = 1 for output
+			if (!$this->_isChild) $this->split();
+
 			/* add postprocessing message to log if applicable */
 			if (array_key_exists('postProcessing',$this->_setting)){
 				$this->_log[] = '[*] done! '. $this->_setting['postProcessing'];
@@ -319,6 +324,27 @@ class Listprocessor {
 		unset ($this->_list[$row]);
 	}
 
+	public function split() {
+		/* split list as desired or at least nest one layer */
+		$split_list = [];
+		foreach ($this->_list as $i => &$row){
+			if (array_key_exists('split', $this->_setting)){
+				// create sorting key by matched patterns, mandatory translated if applicable
+				$sorting = '';
+				foreach ($this->_setting['split'] as $key => $pattern){
+					preg_match_all($pattern, $row[$key], $match);
+					if (count($match)) $sorting += implode(' ', $match);
+				}
+				$sorting = trim($sorting);
+				if (!array_key_exists($sorting, $split_list)) $split_list[$sorting] = [$row];
+				else array_push($split_list[$sorting], $row);
+			} else {
+				if (!array_key_exists(1, $split_list)) $split_list[1] = [$row];
+				else array_push($split_list[1], $row);
+			}
+		}
+		$this->_list = $split_list;
+	}
 	public function filter_by_expression($rule){
 		/* keep or discard all entries where column values match regex pattern 
 		{

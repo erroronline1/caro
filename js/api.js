@@ -220,12 +220,8 @@ export const api = {
 						type: "input",
 						body: [
 							{ type: "text", content: data.log.join("\n") },
-							{ type: "links", content: {} },
+							{ type: "links", content: data.links },
 						],
-					};
-					dialog.body[1].content[data.link.display] = {
-						href: data.link.url,
-						download: data.link.name,
 					};
 					new Dialog(dialog);
 				}

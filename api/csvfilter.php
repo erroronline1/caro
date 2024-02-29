@@ -229,7 +229,8 @@ class CSVFILTER extends API {
 				]);
 
 				// clear up tmp folder
-				$files = UTILITY::listFiles(UTILITY::directory('tmp'),'asc');
+				if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
+				$files = UTILITY::listFiles(UTILITY::directory('tmp'), 'asc');
 				$display = [];
 				if ($files){
 					foreach ($files as $file){
@@ -240,44 +241,54 @@ class CSVFILTER extends API {
 					}
 				}
 				//create and write to file
-				if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
+				$downloadfiles=[];
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
 					case 'csv':
-						$tempFile = UTILITY::directory('tmp') . '/' . time() . '.csv';
-						$file = fopen($tempFile, 'w');
-						fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-						fputcsv($file, $pricelist->_setting['filesetting']['columns'],
-							$pricelist->_setting['filesetting']['dialect']['separator'],
-							$pricelist->_setting['filesetting']['dialect']['enclosure'],
-							$pricelist->_setting['filesetting']['dialect']['escape']);
-						foreach($pricelist->_list as $line) {
-							fputcsv($file, $line,
-							$pricelist->_setting['filesetting']['dialect']['separator'],
-							$pricelist->_setting['filesetting']['dialect']['enclosure'],
-							$pricelist->_setting['filesetting']['dialect']['escape']);
+						foreach($pricelist->_list as $subsetname => $subset){
+							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
+							$tempFile = UTILITY::directory('tmp') . '/' . time() . $subsetname . '.csv';
+							$file = fopen($tempFile, 'w');
+							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+							fputcsv($file, $pricelist->_setting['filesetting']['columns'],
+								$pricelist->_setting['filesetting']['dialect']['separator'],
+								$pricelist->_setting['filesetting']['dialect']['enclosure'],
+								$pricelist->_setting['filesetting']['dialect']['escape']);
+							foreach($subset as $line) {
+								fputcsv($file, $line,
+								$pricelist->_setting['filesetting']['dialect']['separator'],
+								$pricelist->_setting['filesetting']['dialect']['enclosure'],
+								$pricelist->_setting['filesetting']['dialect']['escape']);
+							}
+							fclose($file);
+							$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => preg_replace('/.csv$/', (count($pricelist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])])] = [
+								'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+								'download' => preg_replace('/.csv$/', (count($pricelist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])
+							];
 						}
-						fclose($file);
 						break;
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
 						$tempFile = UTILITY::directory('tmp') . '/' . time() . '.xlsx';
 						$writer = new XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
-						$writer->writeSheetRow('Sheet1', $pricelist->_setting['filesetting']['columns']);
-						foreach($pricelist->_list as $line)
-							$writer->writeSheetRow('Sheet1', $line);
+						foreach($pricelist->_list as $subsetname => $subset){
+							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
+							$writer->writeSheetRow($subsetname, $pricelist->_setting['filesetting']['columns']);
+							foreach ($subset as $line)
+								$writer->writeSheetRow($subsetname, $line);
+						}
 						$writer->writeToFile($tempFile);
 						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
+						$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => $content['filesetting']['destination']])] = [
+							'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+							'download' => $content['filesetting']['destination']
+						];
 						break;
 				}
 				
 				$this->response([
 					'log' => $pricelist->_log,
-					'link' => [
-						'display' => LANG::GET('csvfilter.use_filter_download', [':file' => $content['filesetting']['destination']]),
-						'url' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'name' => $content['filesetting']['destination']
-					]
+					'links' => $downloadfiles
 				]);
 				break;
 			case 'GET':
