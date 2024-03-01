@@ -126,6 +126,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * initialize treatment form for patient, print qr code labels with name, dob, date
 * documentation form, scan strain qr code, fill, save a (unfinished with percentage) dataset, who filled out
 * view other forms (e.g. instructions, modal? prevent filling out)
+* import texttemplates
 * import from other strain (anamnesis) (same form field names)
 * append other forms (prefill strain identifier possible?)
 * check incomplete strains, alert supervisor, admin
