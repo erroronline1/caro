@@ -112,7 +112,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * settings? force desktop mode for small window? themes?
 * forms and contexts
 * pdf export (https://github.com/tecnickcom/TCPDF?tab=readme-ov-file)
-* user qualifications, certificates
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
 * caro audit

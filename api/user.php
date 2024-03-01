@@ -26,7 +26,7 @@ class USER extends API {
 				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
-					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [time() .'_' . $user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
@@ -100,6 +100,22 @@ class USER extends API {
 					$result['body']['content'][1]
 				];
 
+				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
+				$userfiles = [];
+				foreach ($storedfiles as $file){
+					if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+						$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
+					}
+				}
+				if ($userfiles) {
+					array_push($result['body']['content'][0], 
+					['type' => 'br'],
+					[
+						'type' => 'links',
+						'content' => $userfiles
+					]);
+				}
+
 				$this->response($result);
 				break;
 		}
@@ -170,9 +186,14 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [time() .'_' . $user['name']])[0];
+				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 				UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
+
+				// add user documents
+				if (array_key_exists(LANG::PROPERTY('user.edit_add_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_document')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
+				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_post'));
 				if ($statement->execute([
@@ -261,9 +282,14 @@ class USER extends API {
 				}
 				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
-					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [time() .'_' . $user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
+				}
+
+				// add user documents
+				if (array_key_exists(LANG::PROPERTY('user.edit_add_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_document')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
@@ -368,6 +394,18 @@ class USER extends API {
 						],
 						'hint' => LANG::GET('user.edit_take_photo_hint')],
 					],[
+						['type' => 'file',
+						'attributes' => [
+							'name' => LANG::GET('user.edit_add_document')
+						],
+						'hint' => LANG::GET('user.edit_add_document_hint')
+						], [
+							'type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_document_rename')
+							]
+						]
+					],[
 						['type' => 'radio',
 						'attributes' => [
 							'name' => LANG::GET('user.edit_order_authorization')
@@ -409,7 +447,24 @@ class USER extends API {
 						],
 						$result['body']['content'][2]
 					];
-					if ($user['orderauth']) $result['body']['content'][3]=[
+
+					$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
+					$userfiles = [];
+					foreach ($storedfiles as $file){
+						if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+							$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
+						}
+					}
+					if ($userfiles) {
+						array_push($result['body']['content'][3], 
+						['type' => 'br'],
+						[
+							'type' => 'links',
+							'content' => $userfiles
+						]);
+					}
+
+					if ($user['orderauth']) $result['body']['content'][4]=[
 						[
 							['type' => 'textinput',
 							'attributes' => [
@@ -418,9 +473,9 @@ class USER extends API {
 								]
 							]
 						],
-						$result['body']['content'][3]
+						$result['body']['content'][4]
 					];
-					if ($user['token']) $result['body']['content'][4]=[
+					if ($user['token']) $result['body']['content'][5]=[
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
@@ -429,7 +484,7 @@ class USER extends API {
 							'qrcode' => $user['token']]
 							]
 						],
-						$result['body']['content'][4]
+						$result['body']['content'][5]
 					];
 
 				$this->response($result);

@@ -159,6 +159,11 @@ class FILE extends API {
 						'description' => LANG::GET('menu.files_sharepoint'),
 						'content' => [LANG::GET('menu.files_sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]]]
 					);
+					array_push($result['body']['content'][0],
+						['type' => 'links',
+						'description' => LANG::GET('menu.application_user_manager'),
+						'content' => [LANG::GET('menu.application_user_manager') => ['href' => "javascript:api.file('get', 'filemanager', 'users')"]]]
+					);
 					$result['body']['content'][]=[
 						['type' => 'textinput',
 						'attributes' => [
@@ -168,6 +173,10 @@ class FILE extends API {
 				}
 				else {
 					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
+					if ($this->_requestedFolder === 'users') {
+						$files = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
+						$files = array_filter($files, fn($file) => substr(pathinfo($file)['filename'], 0, 10) !== 'profilepic');
+					}
 					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						$result['body']['content'][]=[
@@ -181,26 +190,28 @@ class FILE extends API {
 						];
 						$result['body']['content'][] = [];
 						foreach ($files as $file){
-							$file=['path' => substr($file,1), 'name' => pathinfo($file)['basename']];
-							array_push($result['body']['content'][1],
-								['type' => 'links',
-								'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
-								'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]]],
-								['type' => 'deletebutton',
-								'attributes' => [
-									'value' => LANG::GET('file.manager_delete_file'),
-									'type' => 'button',
-									'data-filtered' => $file['path'],
-									'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', 'options':{".
-										"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
-										"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
-										"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
-								]]
-							);
+							if ($file) {
+								$file = ['path' => substr($file, 1), 'name' => pathinfo($file)['basename']];
+								array_push($result['body']['content'][1],
+									['type' => 'links',
+									'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
+									'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]]],
+									['type' => 'deletebutton',
+									'attributes' => [
+										'value' => LANG::GET('file.manager_delete_file'),
+										'type' => 'button',
+										'data-filtered' => $file['path'],
+										'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', 'options':{".
+											"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
+											"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
+											"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
+									]]
+								);
+							}
 						}
 					}
 					else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-					if ($this->_requestedFolder === 'sharepoint') unset ($result['body']['form']);
+					if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) unset ($result['body']['form']);
 					else $result['body']['content'][]=[
 						['type' => 'hiddeninput',
 						'attributes' => [
@@ -216,7 +227,7 @@ class FILE extends API {
 				$this->response($result);
 				break;
 			case 'DELETE':
-				if ($this->_requestedFolder === 'sharepoint') $success = UTILITY::delete(UTILITY::directory('sharepoint') . '/' . $this->_requestedFile);
+				if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) $success = UTILITY::delete(UTILITY::directory($this->_requestedFolder) . '/' . $this->_requestedFile);
 				else $success = UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
 				if ($success) $this->response(['status' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
