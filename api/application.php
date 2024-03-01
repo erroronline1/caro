@@ -68,7 +68,8 @@ class APPLICATION extends API {
 				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
 			LANG::GET('menu.documentation_header') => [
-				LANG::GET('menu.forms_forms') => ['onpointerup' => "new Dialog({'type':'alert', 'header':'not implemented yet!'})"]
+				LANG::GET('menu.documentation_create_identifier') => ['onpointerup' => "api.documentation('get', 'identifier')"],
+				LANG::GET('menu.documentation_documentation') => ['onpointerup' => "api.documentation('get', 'forms')"]
 			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
