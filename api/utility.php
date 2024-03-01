@@ -258,10 +258,11 @@ class UTILITY {
 	 * @param array $name mandatory array of input names
 	 * @param string $folder where to store
 	 * @param array $prefix to add to filename, length according to $files
+	 * @param array $rename to rename file, length according to $files
 	 * 
 	 * @return array paths of stored files
 	 */
-	public static function storeUploadedFiles($name = [], $folder = '', $prefix = []){
+	public static function storeUploadedFiles($name = [], $folder = '', $prefix = [], $rename = []){
 		/* process $_FILES, store to folder and return an array of destination paths */
 		if (!file_exists($folder)) mkdir($folder, 0777, true);
 		$targets = [];
@@ -269,7 +270,9 @@ class UTILITY {
 			if (gettype($_FILES[$name[$i]]['name'])!=='array') $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder);
 			else {
 				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
-					$targets[] = self::handle($_FILES[$name[$i]]['tmp_name'][$j], $_FILES[$name[$i]]['name'][$j], $i, $prefix, $folder);
+					$file = pathinfo($_FILES[$name[$i]]['name'][$j]);
+					if ($rename && array_key_exists($i, $rename) && $rename[$i]) $file['filename'] = $rename[$i];
+					$targets[] = self::handle($_FILES[$name[$i]]['tmp_name'][$j], $file['filename'] . '.' . $file['extension'], $i, $prefix, $folder);
 				}
 			}
 		}
