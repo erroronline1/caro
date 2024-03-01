@@ -167,46 +167,33 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
 		],
 
-		'form_component-post' => [
-			'mysql' => "INSERT INTO caro_form_components (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, 0)",
-			'sqlsrv' => "INSERT INTO caro_form_components (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, 0)"
+		'form_post' => [
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)"
 		],
-		'form_component-put' => [
-			'mysql' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form_components SET hidden = :hidden WHERE id = :id"
-		],
-		'form_component-datalist' => [
-			'mysql' => "SELECT id, name, date, author, hidden FROM caro_form_components ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT id, name, date, author, hidden FROM caro_form_components name ORDER BY name ASC, date DESC"
-		],
-		'form_component-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form_components WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form_components WHERE name= :name ORDER BY id DESC"
-		],
-		'form_component-get' => [
-			'mysql' => "SELECT * FROM caro_form_components WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_form_components WHERE id = :id"
-		],
-
-		'form_form-post' => [
-			'mysql' => "INSERT INTO caro_form_forms (id, name, alias, context, date, author, content, hidden) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)",
-			'sqlsrv' => "INSERT INTO caro_form_forms (name, alias, context, date, author, content, hidden) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)"
-		],
-		'form_form-put' => [
-			'mysql' => "UPDATE caro_form_forms alias = :alias, context = :context, hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form_forms alias = :alias, context = :context, hidden = :hidden WHERE id = :id"
+		'form_put' => [
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id"
 		],
 		'form_form-datalist' => [
-			'mysql' => "SELECT * FROM caro_form_forms ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form_forms ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC"
+		],
+		'form_component-datalist' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
 		],
 		'form_form-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form_forms WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form_forms WHERE name= :name ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context != 'component' ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context != 'component'  ORDER BY id DESC"
 		],
-		'form_form-get' => [
-			'mysql' => "SELECT * FROM caro_form_forms WHERE id = :id ",
-			'sqlsrv' => "SELECT * FROM caro_form_forms WHERE id = :id"
+		'form_component-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' ORDER BY id DESC"
+		],
+		'form_get' => [
+			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
 
 		'consumables_post-vendor' => [

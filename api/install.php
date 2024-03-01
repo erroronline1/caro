@@ -27,17 +27,7 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
-				"CREATE TABLE IF NOT EXISTS `caro_form_components` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` json NOT NULL," .
-				"	`hidden` tinyint NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_form_forms` (" .
+				"CREATE TABLE IF NOT EXISTS `caro_form` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -144,8 +134,8 @@ $queries = [
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
-				'component' => "INSERT INTO `caro_form_components` (`id`, `name`, `date`, `author`, `content`, `hidden`) VALUES " .
-					"(NULL, 'template', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
+				'component' => "INSERT INTO `caro_form` (`id`, `name`, `alias`, `context`, `date`, `author`, `content`, `hidden`) VALUES " .
+					"(NULL, 'template', '', 'component', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
 				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
 			]
 		]
@@ -163,18 +153,8 @@ $queries = [
 				"	image varchar(MAX) NOT NULL" .
 				");"
 				,
-				"IF OBJECT_ID(N'caro_form_components', N'U') IS NULL " .
-				"CREATE TABLE caro_form_components (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_form_forms', N'U') IS NULL " .
-				"CREATE TABLE caro_form_forms (" .
+				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .
+				"CREATE TABLE caro_form (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
 				"	alias varchar(MAX) NOT NULL," .
@@ -280,8 +260,10 @@ $queries = [
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
-				'component' => "INSERT INTO caro_form_components (name, date, author, content, hidden) VALUES " .
-					"('template', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
+				'component' => "INSERT INTO `caro_form` (`id`, `name`, `alias`, `context`, `date`, `author`, `content`, `hidden`) VALUES " .
+					"('template', '', 'component', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
+				'component' => "INSERT INTO caro_form_components (name, date, alias, context, author, content, hidden) VALUES " .
+					"('template', '', 'component', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
 				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
 			]
 		]

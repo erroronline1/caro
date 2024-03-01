@@ -30,8 +30,10 @@ class FORMS extends API {
 				]);
 				$exists = $statement->fetch(PDO::FETCH_ASSOC);
 				if ($exists && json_decode($exists['content'], true) == $component) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-put'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
+						':alias' => '',
+						':context' => 'component',
 						':hidden' => $component_hidden,
 						':id' => $exists['id']
 						])) $this->response([
@@ -76,9 +78,11 @@ class FORMS extends API {
 					$component['content'] = replace_images($component['content'], $files);
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-post'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
 					':name' => $component_name,
+					':alias' => '',
+					':context' => 'component',
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($component)
 					])) $this->response([
@@ -94,7 +98,7 @@ class FORMS extends API {
 				break;
 			case 'GET':
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
@@ -122,7 +126,7 @@ class FORMS extends API {
 		
 		// get selected component
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 			$statement->execute([
 				':id' => $this->_requestedID
 			]);
@@ -140,7 +144,7 @@ class FORMS extends API {
 		$statement->execute();
 		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = [];
-		foreach($components as $key => $row) {
+		foreach($components as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
 				$componentdatalist[] = $row['name'];
@@ -156,7 +160,7 @@ class FORMS extends API {
 			$statement->execute();
 			$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
 			$hidden = [];
-			foreach($fd as $key => $row) {
+			foreach($fd as $row) {
 				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 				if (!in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
 					$dependedforms[] = $row['name'];
@@ -293,7 +297,7 @@ class FORMS extends API {
 		
 		// get selected form
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 			$statement->execute([
 				':id' => $this->_requestedID
 			]);
@@ -455,7 +459,7 @@ class FORMS extends API {
 				]);
 				$exists = $statement->fetch(PDO::FETCH_ASSOC);
 				if ($exists && json_decode($exists['content'], true) == $this->_payload->content) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-put'));
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
 						':alias' => $this->_payload->alias,
 						':context' => $this->_payload->context,
@@ -491,7 +495,7 @@ class FORMS extends API {
 						':name' => $component
 					]);
 					$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
-					if (check4identifier(json_decode($latestcomponent['content'], true))) $hasindentifier = true;
+					if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
 				}
 				//contexts that need an identifier
 				$contexts=[
@@ -499,7 +503,7 @@ class FORMS extends API {
 				];
 				if (in_array($this->_payload->context, $contexts) && !$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-post'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
 					':name' => $this->_payload->name,
 					':alias' => $this->_payload->alias,
