@@ -94,6 +94,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * https://github.com/lindell/JsBarcode/
 * https://github.com/omrips/viewstl
 * https://github.com/mk-j/PHP_XLSXWriter
+* https://github.com/tecnickcom/TCPDF
 
 ### kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
@@ -111,7 +112,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 * settings? force desktop mode for small window? themes?
 * forms and contexts
-* pdf export (https://github.com/tecnickcom/TCPDF?tab=readme-ov-file)
+* pdf export
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
 * caro audit
