@@ -93,7 +93,7 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
-				"CREATE TABLE IF NOT EXISTS `caro_form_components` (" .
+				"CREATE TABLE IF NOT EXISTS `caro_file_bundles` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` timestamp NOT NULL," .
