@@ -196,6 +196,13 @@ class FILE extends API {
 									['type' => 'links',
 									'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
 									'content' => [$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]]],
+									['type' => 'button',
+									'attributes' => [
+										'value' => LANG::GET('file.manager_copy_path'),
+										'type' => 'button',
+										'onpointerup' => "orderClient.toClipboard('" . $file['path'] . "')",
+										'class' => 'inlinebutton'
+									]],
 									['type' => 'deletebutton',
 									'attributes' => [
 										'value' => LANG::GET('file.manager_delete_file'),

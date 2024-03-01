@@ -9,11 +9,15 @@ const _serviceWorker = {
 			this.permission = await window.Notification.requestPermission();
 			navigator.serviceWorker.ready.then((registration) => {
 				setInterval(() => {
-					if (registration) _serviceWorker.postMessage("getnotifications");
+					if (registration)
+						_serviceWorker.postMessage("getnotifications");
 				}, 300000);
-				navigator.serviceWorker.addEventListener("message", (message) => {
-					this.onMessage(message.data);
-				});
+				navigator.serviceWorker.addEventListener(
+					"message",
+					(message) => {
+						this.onMessage(message.data);
+					}
+				);
 			});
 		} else throw new Error("No Service Worker support!");
 	},
@@ -53,12 +57,17 @@ const _serviceWorker = {
 								":amount": data.unnotified,
 						  })
 						: LANG.GET("message.new_message");
-				this.showLocalNotification(LANG.GET("menu.communication_header"), body);
+				this.showLocalNotification(
+					LANG.GET("menu.communication_header"),
+					body
+				);
 			}
 		}
 		if ("unseen" in data) {
 			const mailnotif = document.querySelector(
-				"[data-for=userMenu" + LANG.GET("menu.communication_header") + "]"
+				"[data-for=userMenu" +
+					LANG.GET("menu.communication_header") +
+					"]"
 			);
 			mailnotif.setAttribute("data-notification", data.unseen);
 		}
@@ -69,7 +78,9 @@ const texttemplateClient = {
 	data: null,
 	update: () => {
 		const replacements = {},
-			genii = document.getElementsByName(LANG.GET("texttemplate.use_person")),
+			genii = document.getElementsByName(
+				LANG.GET("texttemplate.use_person")
+			),
 			blocks = document.querySelectorAll("[data-usecase=useblocks]"),
 			placeholder = document.querySelectorAll(
 				"[data-usecase=undefinedplaceholder]"
@@ -96,7 +107,10 @@ const texttemplateClient = {
 					];
 				for (const input of placeholder) {
 					if (input.value)
-						blockcontent = blockcontent.replaceAll(":" + input.id, input.value);
+						blockcontent = blockcontent.replaceAll(
+							":" + input.id,
+							input.value
+						);
 				}
 				for (const [key, replacement] of Object.entries(replacements)) {
 					blockcontent = blockcontent.replaceAll(
@@ -151,14 +165,16 @@ const orderClient = {
 						{
 							type: "hiddeninput",
 							attributes: {
-								name: LANG.GET("order.ordernumber_label") + "[]",
+								name:
+									LANG.GET("order.ordernumber_label") + "[]",
 								value: data[2],
 							},
 						},
 						{
 							type: "hiddeninput",
 							attributes: {
-								name: LANG.GET("order.productname_label") + "[]",
+								name:
+									LANG.GET("order.productname_label") + "[]",
 								value: data[3],
 							},
 						},
@@ -189,9 +205,11 @@ const orderClient = {
 		new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
 	},
 	toClipboard: (node) => {
-		node.select();
-		node.setSelectionRange(0, 99999); // For mobile devices
-		navigator.clipboard.writeText(node.value);
+		if (node.constructor.name === "HTMLInputElement") {
+			node.select();
+			node.setSelectionRange(0, 99999); // For mobile devices
+			navigator.clipboard.writeText(node.value);
+		} else navigator.clipboard.writeText(node); // passed string
 		api.toast(LANG.GET("general.copied_to_clipboard"));
 	},
 	filter: (type = undefined) => {
@@ -203,11 +221,11 @@ const orderClient = {
 			received: document.querySelectorAll("[data-received=true]"),
 			archived: document.querySelectorAll("[data-archived=true]"),
 		};
-		let display = [...document.querySelectorAll("[data-ordered=false]")].map(
-			function (node) {
-				return node.parentNode;
-			}
-		);
+		let display = [
+			...document.querySelectorAll("[data-ordered=false]"),
+		].map(function (node) {
+			return node.parentNode;
+		});
 		if (type === "ordered")
 			display = [...filters.ordered].map(function (node) {
 				return [...filters.received]
@@ -265,7 +283,8 @@ const applicationModule = {
 
 window.addEventListener("scroll", function () {
 	const percentScrolled =
-		(window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) *
+		(window.scrollY /
+			(document.body.clientHeight - window.innerHeight + 100)) *
 		100;
 	document.querySelector("header>div").style.width = percentScrolled + "%";
 });
