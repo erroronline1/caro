@@ -26,7 +26,7 @@ class USER extends API {
 				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
-					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [$user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [time() .'_' . $user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
@@ -170,7 +170,7 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [$user['name']])[0];
+				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [time() .'_' . $user['name']])[0];
 				UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
@@ -261,7 +261,7 @@ class USER extends API {
 				}
 				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
-					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [$user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('user_photos'), [time() .'_' . $user['name']])[0];
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
