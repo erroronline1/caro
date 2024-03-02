@@ -60,9 +60,7 @@ const _ = {
 	},
 	contains: function (obj, values) {
 		// searches if at least one element of values (string or array) occurs in obj (string or array)
-		return Array.isArray(values)
-			? values.some((value) => obj.includes(value))
-			: obj.includes(values);
+		return Array.isArray(values) ? values.some((value) => obj.includes(value)) : obj.includes(values);
 	},
 	api: async function (method, destination, payload, form_data = false) {
 		method = method.toUpperCase();
@@ -76,21 +74,14 @@ const _ = {
 		const response = await fetch(destination + query, {
 			method: method, // *GET, POST, PUT, DELETE, etc.
 			cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-			body:
-				method == "GET" ? null : form_data ? payload : JSON.stringify(payload), // body data type must match "Content-Type" header
+			body: method == "GET" ? null : form_data ? payload : JSON.stringify(payload), // body data type must match "Content-Type" header
 		}).then(async (response) => {
 			if (response.statusText === "OK")
 				return {
 					status: response.status,
 					body: await response.json(),
 				};
-			else
-				throw new Error(
-					"server responded " +
-						response.status +
-						": " +
-						httpResponse[response.status]
-				);
+			else throw new Error("server responded " + response.status + ": " + httpResponse[response.status]);
 		});
 		return response;
 		/* use like 
@@ -105,15 +96,10 @@ const _ = {
 		oldCPos = el.selectionStart;
 		if (characters == "\b") {
 			// backspace to delete
-			el.value =
-				el.value.substring(0, el.selectionStart - 1) +
-				el.value.substring(el.selectionStart, el.value.length);
+			el.value = el.value.substring(0, el.selectionStart - 1) + el.value.substring(el.selectionStart, el.value.length);
 			el.selectionStart = el.selectionEnd = oldCPos - 1;
 		} else {
-			el.value =
-				el.value.substring(0, el.selectionStart) +
-				characters +
-				el.value.substring(el.selectionStart, el.value.length);
+			el.value = el.value.substring(0, el.selectionStart) + characters + el.value.substring(el.selectionStart, el.value.length);
 			el.selectionStart = el.selectionEnd = oldCPos + characters.length;
 		}
 		el.focus();
@@ -126,10 +112,7 @@ const _ = {
 			element.setAttribute("draggable", "true");
 			element.setAttribute("ondragstart", "_.dragNdrop.drag(event)");
 			element.setAttribute("ondragover", "_.dragNdrop.allowDrop(event)");
-			element.setAttribute(
-				"ondrop",
-				"_.dragNdrop.drop_insertbefore(event,this)"
-			);
+			element.setAttribute("ondrop", "_.dragNdrop.drop_insertbefore(event,this)");
 		},
 		allowDrop: function (evnt) {
 			evnt.preventDefault();
@@ -140,9 +123,7 @@ const _ = {
 		drop_insertbefore: function (evnt, that) {
 			evnt.preventDefault();
 			const data = evnt.dataTransfer.getData("text");
-			document
-				.getElementById(data)
-				.parentNode.insertBefore(document.getElementById(data), that);
+			document.getElementById(data).parentNode.insertBefore(document.getElementById(data), that);
 		},
 		drop_delete: function (evnt) {
 			const data = evnt.dataTransfer.getData("text");
@@ -153,32 +134,36 @@ const _ = {
 		let fields;
 		if (form_data) {
 			fields = new FormData(document.querySelector(querySelector));
+			// add special comma separated dataset for checkboxes with data-grouped attribute
+			const grouped = document.querySelectorAll("[data-grouped]"),
+				groups = {};
+			for (const checkbox of grouped) {
+				if (checkbox.form === document.querySelector(querySelector) && checkbox.checked) {
+					if (groups[checkbox.dataset.grouped]) groups[checkbox.dataset.grouped].push(checkbox.name);
+					else groups[checkbox.dataset.grouped] = [checkbox.name];
+				}
+			}
+			for (const [group, values] of Object.entries(groups)) {
+				fields.append(group, values.join(", "));
+			}
 		} else {
 			fields = {};
-			let inputs = document.querySelectorAll(querySelector),
+			let inputs = document.querySelectorAll(querySelector), // inputs must have their own grouping querySelector
 				sanitizedname;
 			for (const input of inputs) {
 				input.value = encodeURIComponent(input.value);
 				sanitizedname = input.name.replaceAll(/\W/g, "_");
-				if (input.type == "radio" && input.checked)
-					fields[sanitizedname] = input.value;
+				if (input.type == "radio" && input.checked) fields[sanitizedname] = input.value;
 				else if (input.type == "checkbox") {
 					if (input.name.contains("[]")) {
 						input.name = input.name.replace("[]", "");
-						if (typeof fields[sanitizedname] === "object" && input.value)
-							fields[sanitizedname].push(input.checked ? input.value : 0);
-						else if (input.value)
-							fields[sanitizedname] = [input.checked ? input.value : 0];
+						if (typeof fields[sanitizedname] === "object" && input.value) fields[sanitizedname].push(input.checked ? input.value : 0);
+						else if (input.value) fields[sanitizedname] = [input.checked ? input.value : 0];
 					} else fields[sanitizedname] = input.checked ? input.value : 0;
-				} else if (
-					["text", "tel", "time", "date", "number", "hidden", "email"].contains(
-						input.type
-					)
-				) {
+				} else if (["text", "tel", "time", "date", "number", "hidden", "email"].contains(input.type)) {
 					if (input.name.contains("[]")) {
 						input.name = input.name.replace("[]", "");
-						if (typeof fields[sanitizedname] === "object" && input.value)
-							fields[sanitizedname].push(input.value);
+						if (typeof fields[sanitizedname] === "object" && input.value) fields[sanitizedname].push(input.value);
 						else if (input.value) fields[sanitizedname] = [input.value];
 					} else fields[sanitizedname] = input.value;
 				} else fields[sanitizedname] = input.value;

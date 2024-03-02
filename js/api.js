@@ -39,32 +39,15 @@ export const api = {
 			return true;
 		},
 	},
-	send: async (
-		method,
-		request,
-		successFn = null,
-		errorFn = null,
-		payload = {},
-		form_data = false
-	) => {
+	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
 		api.loadindicator(true);
-		await _.api(
-			method,
-			"api/api.php/" + request.join("/"),
-			payload,
-			form_data
-		)
+		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {
-				if (data.status === 203)
-					api.toast(
-						LANG.GET("general.service_worker_get_cache_fallback")
-					);
+				if (data.status === 203) api.toast(LANG.GET("general.service_worker_get_cache_fallback"));
 				if (data.status === 207) {
-					api.toast(
-						LANG.GET("general.service_worker_post_cache_fallback")
-					);
+					api.toast(LANG.GET("general.service_worker_post_cache_fallback"));
 					_serviceWorker.onPostCache();
 					return;
 				}
@@ -124,9 +107,7 @@ export const api = {
 				};
 				break;
 			case "login":
-				const logintoken = document.querySelector(
-					"[data-usecase=login]"
-				);
+				const logintoken = document.querySelector("[data-usecase=login]");
 				if (logintoken) {
 					request.push(logintoken.value ? logintoken.value : null);
 				}
@@ -136,10 +117,7 @@ export const api = {
 					if (data.body.form) {
 						new Assemble(data.body).initializeSection();
 						let signin = LANG.GET("menu.application_signin"),
-							greeting =
-								", " +
-								signin.charAt(0).toLowerCase() +
-								signin.slice(1);
+							greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 						api.update_header(
 							LANG.GET("general.welcome_header", {
 								":user": greeting,
@@ -148,13 +126,9 @@ export const api = {
 						return;
 					}
 					if (data.body.image) {
-						const firstLabel = document.querySelector(
-							"nav>div:first-child>label"
-						);
-						firstLabel.style.backgroundImage =
-							"url('" + data.body.image + "')";
-						firstLabel.style.maskImage =
-							firstLabel.style.webkitMaskImage = "none";
+						const firstLabel = document.querySelector("nav>div:first-child>label");
+						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
+						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
 					}
 					api.application("get", "start");
 				};
@@ -167,10 +141,7 @@ export const api = {
 			case "start":
 				successFn = function (data) {
 					let signin = LANG.GET("menu.application_signin"),
-						greeting =
-							", " +
-							signin.charAt(0).toLowerCase() +
-							signin.slice(1);
+						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 					if (data.user) greeting = " " + data.user;
 					api.update_header(
 						LANG.GET("general.welcome_header", {
@@ -185,9 +156,7 @@ export const api = {
 				switch (method) {
 					case "get":
 						successFn = function (data) {
-							api.update_header(
-								LANG.GET("menu.application_manual_manager")
-							);
+							api.update_header(LANG.GET("menu.application_manual_manager"));
 							document.getElementById("main").replaceChildren();
 							new Assemble(data.body).initializeSection();
 						};
@@ -200,11 +169,7 @@ export const api = {
 						break;
 					default:
 						successFn = function (data) {
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 							api.application("get", request[1], data.status.id);
 						};
 						payload = _.getInputs("[data-usecase=manual]", true);
@@ -214,14 +179,7 @@ export const api = {
 			default:
 				return;
 		}
-		await api.send(
-			method,
-			request,
-			successFn,
-			null,
-			payload,
-			method === "post" || method === "put"
-		);
+		await api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
 	csvfilter: (method, ...request) => {
 		/*
@@ -235,8 +193,7 @@ export const api = {
 		request.splice(0, 0, "csvfilter");
 		let payload,
 			successFn = function (data) {
-				if (data.status !== undefined && data.status.msg !== undefined)
-					api.toast(data.status.msg);
+				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				if (data.log !== undefined) {
 					const dialog = {
 						type: "input",
@@ -260,11 +217,7 @@ export const api = {
 						document.getElementById("main").replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
-					if (
-						data.status !== undefined &&
-						data.status.msg !== undefined
-					)
-						api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};
 				break;
 			case "post":
@@ -301,13 +254,8 @@ export const api = {
 					document.getElementById("main").replaceChildren();
 					new Assemble(data.body).initializeSection();
 				}
-				if (data.status !== undefined && data.status.msg !== undefined)
-					api.toast(data.status.msg);
-				if (
-					data.status !== undefined &&
-					data.status.redirect !== undefined
-				)
-					api.file("get", ...data.status.redirect);
+				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.status !== undefined && data.status.redirect !== undefined) api.file("get", ...data.status.redirect);
 			},
 			payload,
 			title = {
@@ -324,72 +272,34 @@ export const api = {
 					case "filter":
 						successFn = function (data) {
 							if (data.status) {
-								const all =
-									document.querySelectorAll(
-										"[data-filtered]"
-									);
+								const all = document.querySelectorAll("[data-filtered]");
 								for (const file of all) {
 									if (request[1] === "bundle") {
-										file.parentNode.style.display =
-											data.status.data.includes(
-												file.dataset.filtered
-											)
-												? "block"
-												: "none";
-									} else
-										file.style.display =
-											data.status.data.includes(
-												file.dataset.filtered
-											)
-												? "block"
-												: "none";
+										file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? "block" : "none";
+									} else file.style.display = data.status.data.includes(file.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case "bundlefilter":
 						successFn = function (data) {
 							if (data.status) {
-								const all =
-									document.querySelectorAll(
-										"[data-filtered]"
-									);
+								const all = document.querySelectorAll("[data-filtered]");
 								for (const list of all) {
 									if (isNaN(list.dataset.filtered)) continue;
-									list.parentNode.style.display =
-										data.status.data.includes(
-											list.dataset.filtered
-										)
-											? "block"
-											: "none";
+									list.parentNode.style.display = data.status.data.includes(list.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 				}
 				break;
 			case "post":
 				successFn = function (data) {
-					if (
-						data.status !== undefined &&
-						data.status.msg !== undefined
-					)
-						api.toast(data.status.msg);
-					if (
-						data.status !== undefined &&
-						data.status.redirect !== undefined
-					)
-						api.file("get", ...data.status.redirect);
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.redirect !== undefined) api.file("get", ...data.status.redirect);
 				};
 				payload = _.getInputs("[data-usecase=file]", true);
 				break;
@@ -427,75 +337,44 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								data.body.content.name = data.name;
-								if (data.body.content)
-									compose_helper.importForm([
-										data.body.content,
-									]);
+								if (data.body.content) compose_helper.importForm([data.body.content]);
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case "component_editor":
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document
-									.getElementById("main")
-									.replaceChildren();
+								document.getElementById("main").replaceChildren();
 								new Compose(data.body);
-								if (data.body.component)
-									compose_helper.importComponent(
-										data.body.component
-									);
+								if (data.body.component) compose_helper.importComponent(data.body.component);
 								// create multipart form for file uploads
 								compose_helper.addComponentMultipartFormToMain();
 								api.preventDataloss.start();
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case "form":
 						successFn = function (data) {
 							if (data.body) {
-								document
-									.getElementById("main")
-									.replaceChildren();
+								document.getElementById("main").replaceChildren();
 								new Assemble(data.body).initializeSection();
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case "form_editor":
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document
-									.getElementById("main")
-									.replaceChildren();
+								document.getElementById("main").replaceChildren();
 								new Compose(data.body);
-								if (data.body.components)
-									compose_helper.importForm(
-										data.body.components
-									);
+								if (data.body.components) compose_helper.importForm(data.body.components);
 								api.preventDataloss.start();
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 				}
@@ -504,33 +383,18 @@ export const api = {
 				switch (request[1]) {
 					case "component":
 						successFn = function (data) {
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
-						composedComponent =
-							compose_helper.composeNewComponent();
+						composedComponent = compose_helper.composeNewComponent();
 						if (!composedComponent) return;
-						compose_helper.addComponentStructureToComponentForm(
-							composedComponent
-						);
-						payload = _.getInputs(
-							"[data-usecase=component_editor_form]",
-							true
-						);
+						compose_helper.addComponentStructureToComponentForm(composedComponent);
+						payload = _.getInputs("[data-usecase=component_editor_form]", true);
 						break;
 					case "form":
 						successFn = function (data) {
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
-						if (!(payload = compose_helper.composeNewForm()))
-							return;
+						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
 				}
 				break;
@@ -559,11 +423,7 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				api.toast(data.status.msg);
-				if (
-					data.status !== undefined &&
-					data.status.redirect !== undefined
-				)
-					api.message("get", data.status.redirect);
+				if (data.status !== undefined && data.status.redirect !== undefined) api.message("get", data.status.redirect);
 			},
 			title = {
 				inbox: LANG.GET("menu.message_inbox"),
@@ -577,41 +437,23 @@ export const api = {
 					case "filter":
 						successFn = function (data) {
 							if (data.status) {
-								const all =
-									document.querySelectorAll(
-										"[data-filtered]"
-									);
+								const all = document.querySelectorAll("[data-filtered]");
 								for (const file of all) {
-									file.parentNode.style.display =
-										data.status.data.includes(
-											file.dataset.filtered
-										)
-											? "block"
-											: "none";
+									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document
-									.getElementById("main")
-									.replaceChildren();
+								document.getElementById("main").replaceChildren();
 								new Assemble(data.body).initializeSection();
 								api.preventDataloss.start();
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 							if (request[1] === "inbox" && _serviceWorker.worker)
 								_serviceWorker.onMessage({
 									unseen: 0,
@@ -657,8 +499,7 @@ export const api = {
 		get order/filtered/{filter}
 		*/
 		request = [...request];
-		if (["vendor", "product"].includes(request[0]))
-			request.splice(0, 0, "consumables");
+		if (["vendor", "product"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -673,68 +514,42 @@ export const api = {
 				prepared: LANG.GET("menu.purchase_prepared_orders"),
 				approved: LANG.GET("menu.purchase_approved_orders"),
 			};
-		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new"))
-			request.splice(2, 1);
+		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {
 			case "get":
 				switch (request[1]) {
 					case "productsearch":
 						api.preventDataloss.monitor = false;
 						successFn = function (data) {
-							let list =
-								document.querySelector("[data-type=links]");
-							if (list)
-								list.parentNode.parentNode.parentNode.remove();
+							let list = document.querySelector("[data-type=links]");
+							if (list) list.parentNode.parentNode.parentNode.remove();
 							if (data.body.content) {
 								new Assemble(data.body).initializeSection("hr");
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					case "filter":
 						successFn = function (data) {
 							if (data.status) {
-								const all =
-									document.querySelectorAll(
-										"[data-filtered]"
-									);
+								const all = document.querySelectorAll("[data-filtered]");
 								for (const order of all) {
-									order.parentNode.style.display =
-										data.status.data.includes(
-											order.dataset.filtered
-										)
-											? "block"
-											: "none";
+									order.parentNode.style.display = data.status.data.includes(order.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document
-									.getElementById("main")
-									.replaceChildren();
+								document.getElementById("main").replaceChildren();
 								new Assemble(data.body).initializeSection();
-								if (request[1] === "approved")
-									orderClient.filter();
+								if (request[1] === "approved") orderClient.filter();
 								api.preventDataloss.start();
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 				}
 				break;
@@ -742,15 +557,7 @@ export const api = {
 				payload = _.getInputs("[data-usecase=purchase]", true);
 				break;
 			case "put":
-				if (
-					[
-						"ordered",
-						"received",
-						"archived",
-						"disapproved",
-						"addinformation",
-					].includes(request[3])
-				) {
+				if (["ordered", "received", "archived", "disapproved", "addinformation"].includes(request[3])) {
 					successFn = function (data) {
 						api.toast(data.status.msg);
 					};
@@ -761,22 +568,14 @@ export const api = {
 						api.purchase("get", "prepared");
 					};
 				}
-				if (request[1] !== "approved")
-					payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+				if (request[1] !== "approved") payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
 				break;
 			case "delete":
 				break;
 			default:
 				return;
 		}
-		api.send(
-			method,
-			request,
-			successFn,
-			null,
-			payload,
-			method === "post" || method === "put"
-		);
+		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
 	record: (method, ...request) => {
 		/*
@@ -790,18 +589,7 @@ export const api = {
 		request.splice(0, 0, "record");
 		let payload,
 			successFn = function (data) {
-				if (data.status !== undefined && data.status.msg !== undefined)
-					api.toast(data.status.msg);
-				if (data.log !== undefined) {
-					const dialog = {
-						type: "input",
-						body: [
-							{ type: "text", content: data.log },
-							{ type: "links", content: data.links },
-						],
-					};
-					new Dialog(dialog);
-				}
+				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 			},
 			title = {
 				identifier: LANG.GET("menu.record_create_identifier"),
@@ -813,17 +601,9 @@ export const api = {
 					case "filter":
 						successFn = function (data) {
 							if (data.status) {
-								const all =
-									document.querySelectorAll(
-										"[data-filtered]"
-									);
+								const all = document.querySelectorAll("[data-filtered]");
 								for (const form of all) {
-									form.style.display =
-										data.status.data.includes(
-											form.dataset.filtered
-										)
-											? "block"
-											: "none";
+									form.style.display = data.status.data.includes(form.dataset.filtered) ? "block" : "none";
 								}
 							}
 						};
@@ -831,43 +611,22 @@ export const api = {
 					case "import":
 						successFn = function (data) {
 							if (data.status !== undefined) {
-								if (data.status.msg !== undefined)
-									api.toast(data.status.msg);
+								if (data.status.msg !== undefined) api.toast(data.status.msg);
 								if (data.status.data !== undefined) {
-									let inputs = document.querySelectorAll(
-										"input, textarea, select"
-									);
-									let inputname;
+									let inputs = document.querySelectorAll("input, textarea, select");
+									let inputname, groupname;
 									for (const input of inputs) {
-										inputname = input.name.replaceAll(
-											" ",
-											"_"
-										);
-										console.log(
-											inputname,
-											Object.keys(
-												data.status.data
-											).includes(inputname)
-										);
-										if (
-											!Object.keys(
-												data.status.data
-											).includes(inputname) ||
-											input.type === "file"
-										)
-											continue;
+										inputname = input.name.replaceAll(" ", "_");
+										if (input.type === "file") continue;
 										if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											if (
-												data.status.data[inputname] ===
-												input.value
-											)
-												input.checked = true;
+											if (Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value) input.checked = true;
 										} else if (input.type === "checkbox") {
-											//if (Object.keys(data.status.data).includes(input.name) && data.status.data[input.name] === input.value) input.checked = true;
+											groupname = input.dataset.grouped.replaceAll(" ", "_");
+											console.log(data.status.data[groupname].split(", "), input.name);
+											if (Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name)) input.checked = true;
 										} else {
-											input.value =
-												data.status.data[inputname];
+											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}
 									}
 								}
@@ -878,19 +637,11 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.body) {
-								api.update_header(
-									title[request[1]] || data.title
-								);
-								document
-									.getElementById("main")
-									.replaceChildren();
+								api.update_header(title[request[1]] || data.title);
+								document.getElementById("main").replaceChildren();
 								new Assemble(data.body).initializeSection();
 							}
-							if (
-								data.status !== undefined &&
-								data.status.msg !== undefined
-							)
-								api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 				}
 				break;
@@ -931,13 +682,8 @@ export const api = {
 						document.getElementById("main").replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
-					if (
-						data.status !== undefined &&
-						data.status.msg !== undefined
-					)
-						api.toast(data.status.msg);
-					if (data.data !== undefined)
-						texttemplateClient.data = data.data;
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.data !== undefined) texttemplateClient.data = data.data;
 					api.preventDataloss.start();
 				};
 				break;
@@ -974,11 +720,7 @@ export const api = {
 						document.getElementById("main").replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
-					if (
-						data.status !== undefined &&
-						data.status.msg !== undefined
-					)
-						api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};
 				if (request[3] === "display") {
 					payload = _.getInputs("[data-usecase=tool_create_code]");
@@ -1019,11 +761,7 @@ export const api = {
 						document.getElementById("main").replaceChildren();
 						new Assemble(data.body).initializeSection();
 					}
-					if (
-						data.status !== undefined &&
-						data.status.msg !== undefined
-					)
-						api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};
 				break;
 			case "post":
@@ -1037,13 +775,6 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(
-			method,
-			request,
-			successFn,
-			null,
-			payload,
-			method === "post" || method === "put"
-		);
+		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
 };

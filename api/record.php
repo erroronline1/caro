@@ -154,7 +154,6 @@ class record extends API {
 			]);
 			$component = $statement->fetch(PDO::FETCH_ASSOC);
 			$component['content'] = json_decode($component['content'], true);
-			//$component['content']['name'] = $usedcomponent;
 			array_push($return['body']['content'], ...$component['content']['content']);
 		}
 		$context = [
@@ -171,30 +170,40 @@ class record extends API {
 
 	public function record(){
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
-		$context = $identifier = null;
-		if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
-		foreach($this->_payload as $key => &$value){
-			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
-				$identifier = $value;
-				unset ($this->_payload->$key);
-			}
-			if (gettype($value) === 'array') $value = trim(implode(' ', $value));
-			if (!$value) unset($this->_payload->$key);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$context = $identifier = null;
+				$grouped_checkboxes = [];
+				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
+				foreach($this->_payload as $key => &$value){
+					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
+						$identifier = $value;
+						unset ($this->_payload->$key);
+					}
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					/////////////////////////////////////////
+					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+					////////////////////////////////////////
+					if (!$value || $value == 'on') unset($this->_payload->$key);
+				}
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
+				if ($statement->execute([
+					':context' => $context,
+					':identifier' => $identifier,
+					':author' => $_SESSION['user']['name'],
+					':content' => json_encode($this->_payload)
+				])) $this->response([
+					'status' => [
+						'msg' => LANG::GET('record.record_saved')
+					]]);
+				else $this->response([
+					'status' => [
+						'msg' => LANG::GET('record.record_error')
+					]]);
+				break;
+			default:
+			$this->response([], 401);
 		}
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
-		if ($statement->execute([
-			':context' => $context,
-			':identifier' => $identifier,
-			':author' => $_SESSION['user']['name'],
-			':content' => json_encode($this->_payload)
-		])) $this->response([
-			'status' => [
-				'msg' => LANG::GET('record.record_saved')
-			]]);
-		else $this->response([
-			'status' => [
-				'msg' => LANG::GET('record.record_error')
-			]]);
 	}
 
 	public function import(){
