@@ -39,6 +39,16 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
+				"CREATE TABLE IF NOT EXISTS `caro_records` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` timestamp NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` json NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_vendors` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`active` tinyint(1) NOT NULL," .
@@ -163,6 +173,16 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	hidden tinyint NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
+				"CREATE TABLE caro_records (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	context varchar(MAX) NOT NULL," .
+				"	identifier varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .

@@ -275,58 +275,6 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
-	documentation: (method, ...request) => {
-		/*
-		post documentation/identifier
-		get documentation/identifier
-
-		post documentation/forms
-		get documentation/forms
-		*/
-		request = [...request];
-		request.splice(0, 0, "documentation");
-		let payload,
-			successFn = function (data) {
-				if (data.status !== undefined && data.status.msg !== undefined)
-					api.toast(data.status.msg);
-				if (data.log !== undefined) {
-					const dialog = {
-						type: "input",
-						body: [
-							{ type: "text", content: data.log },
-							{ type: "links", content: data.links },
-						],
-					};
-					new Dialog(dialog);
-				}
-			},
-			title = {
-				identifier: LANG.GET("menu.documentation_create_identifier"),
-				forms: LANG.GET("menu.documentation_documentation"),
-			};
-		switch (method) {
-			case "get":
-				successFn = function (data) {
-					if (data.body) {
-						api.update_header(title[request[1]]);
-						document.getElementById("main").replaceChildren();
-						new Assemble(data.body).initializeSection();
-					}
-					if (
-						data.status !== undefined &&
-						data.status.msg !== undefined
-					)
-						api.toast(data.status.msg);
-				};
-				break;
-			case "post":
-				payload = _.getInputs("[data-usecase=documentation]", true);
-				break;
-			default:
-				return;
-		}
-		api.send(method, request, successFn, null, payload, method === "post");
-	},
 	file: async (method, ...request) => {
 		/*
 		get file/filter/{directory}
@@ -829,6 +777,83 @@ export const api = {
 			payload,
 			method === "post" || method === "put"
 		);
+	},
+	record: (method, ...request) => {
+		/*
+		post record/identifier
+		get record/identifier
+
+		post record/forms
+		get record/forms
+		*/
+		request = [...request];
+		request.splice(0, 0, "record");
+		let payload,
+			successFn = function (data) {
+				if (data.status !== undefined && data.status.msg !== undefined)
+					api.toast(data.status.msg);
+				if (data.log !== undefined) {
+					const dialog = {
+						type: "input",
+						body: [
+							{ type: "text", content: data.log },
+							{ type: "links", content: data.links },
+						],
+					};
+					new Dialog(dialog);
+				}
+			},
+			title = {
+				identifier: LANG.GET("menu.record_create_identifier"),
+				forms: LANG.GET("menu.record_record"),
+			};
+		switch (method) {
+			case "get":
+				switch (request[1]) {
+					case "filter":
+						successFn = function (data) {
+							if (data.status) {
+								const all =
+									document.querySelectorAll(
+										"[data-filtered]"
+									);
+								for (const form of all) {
+									form.style.display =
+										data.status.data.includes(
+											form.dataset.filtered
+										)
+											? "block"
+											: "none";
+								}
+							}
+						};
+						break;
+					default:
+						successFn = function (data) {
+							if (data.body) {
+								api.update_header(
+									title[request[1]] || data.title
+								);
+								document
+									.getElementById("main")
+									.replaceChildren();
+								new Assemble(data.body).initializeSection();
+							}
+							if (
+								data.status !== undefined &&
+								data.status.msg !== undefined
+							)
+								api.toast(data.status.msg);
+						};
+				}
+				break;
+			case "post":
+				payload = _.getInputs("[data-usecase=record]", true);
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === "post");
 	},
 	texttemplate: (method, ...request) => {
 		/*

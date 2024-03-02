@@ -104,14 +104,11 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* forms used in context
-
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
 
 * settings? force desktop mode for small window? themes?
-* forms and contexts
 * pdf export
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
@@ -123,8 +120,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 ## form contexts ##
 ### treatment ###
-* strain identifier unix timestamp of creation in hex
-* initialize treatment form for patient, print qr code labels with name, dob, date
 * documentation form, scan strain qr code, fill, save a (unfinished with percentage) dataset, who filled out
 * view other forms (e.g. instructions, modal? prevent filling out)
 * import texttemplates

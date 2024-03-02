@@ -42,7 +42,7 @@ export const assemble_helper = {
 			icons = {};
 		icons[LANG.GET("menu.application_header")] = "url('media/bars.svg')";
 		icons[LANG.GET("menu.communication_header")] = "url('media/comment.svg')";
-		icons[LANG.GET("menu.documentation_header")] =
+		icons[LANG.GET("menu.record_header")] =
 			"url('media/file-signature.svg')";
 		icons[LANG.GET("menu.purchase_header")] = "url('media/shopping-bag.svg')";
 		icons[LANG.GET("menu.files_header")] = "url('media/folders.svg')";

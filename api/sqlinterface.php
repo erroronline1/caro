@@ -196,6 +196,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
 
+		'records_import' => [
+			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier ",
+			'sqlsrv' => "SELECT * FROM caro_records WHERE identifier = :identifier"
+		],
+
+
 		'consumables_post-vendor' => [
 			'mysql' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
 			'sqlsrv' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)"

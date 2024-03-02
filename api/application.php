@@ -67,9 +67,9 @@ class APPLICATION extends API {
 				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"],
 				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
-			LANG::GET('menu.documentation_header') => [
-				LANG::GET('menu.documentation_create_identifier') => ['onpointerup' => "api.documentation('get', 'identifier')"],
-				LANG::GET('menu.documentation_documentation') => ['onpointerup' => "api.documentation('get', 'forms')"]
+			LANG::GET('menu.record_header') => [
+				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
+				LANG::GET('menu.record_record') => ['onpointerup' => "api.record('get', 'forms')"]
 			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
@@ -91,8 +91,8 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
 		}
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.documentation_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
-			$menu[LANG::GET('menu.documentation_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
 			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
