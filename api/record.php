@@ -157,9 +157,45 @@ class record extends API {
 			//$component['content']['name'] = $usedcomponent;
 			array_push($return['body']['content'], ...$component['content']['content']);
 		}
+		$context = [
+			'type' => 'hiddeninput',
+			'attributes' => [
+				'name' => 'context',
+				'value' => $form['context']
+			]
+		];
+		if (array_key_exists(0, $return['body']['content'][0][0])) array_push($return['body']['content'][0][0], $context);
+		else array_push($return['body']['content'][0], $context);
 		$this->response($return);
 	}
 
+	public function record(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$context = $identifier = null;
+		if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
+		foreach($this->_payload as $key => &$value){
+			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
+				$identifier = $value;
+				unset ($this->_payload->$key);
+			}
+			if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+			if (!$value) unset($this->_payload->$key);
+		}
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
+		if ($statement->execute([
+			':context' => $context,
+			':identifier' => $identifier,
+			':author' => $_SESSION['user']['name'],
+			':content' => json_encode($this->_payload)
+		])) $this->response([
+			'status' => [
+				'msg' => LANG::GET('record.record_saved')
+			]]);
+		else $this->response([
+			'status' => [
+				'msg' => LANG::GET('record.record_error')
+			]]);
+	}
 
 	private function identifierPDF($content){
 		// create a pdf for a label sheet with qr code and plain text

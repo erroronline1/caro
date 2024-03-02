@@ -196,8 +196,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
 
+		'records_post' => [
+			'mysql' => "INSERT INTO caro_records (id, context, identifier, date, author, content) VALUES (NULL, :context, :identifier, CURRENT_TIMESTAMP, :author, :content)",
+			'sqlsrv' => "INSERT INTO caro_records (context, identifier, date, author, content) VALUES (:context, :identifier, CURRENT_TIMESTAMP, :author, :content)"
+		],
 		'records_import' => [
-			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier ",
+			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier",
 			'sqlsrv' => "SELECT * FROM caro_records WHERE identifier = :identifier"
 		],
 
