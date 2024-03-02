@@ -297,7 +297,6 @@ class UTILITY {
 	}
 	private static function enumerate($target, $withinfiles){
 		if (in_array($target, $withinfiles)){
-			echo "found";
 			$pi_target = pathinfo($target);
 			preg_match('/\((\d)\)$/m', $pi_target['filename'], $matches, PREG_OFFSET_CAPTURE, 0);
 			if ($matches) $enumeratedTarget = str_replace($matches[0][0], '(' . (intval($matches[1][0]) + 1) . ')', $pi_target['filename']);
