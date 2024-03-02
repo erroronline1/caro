@@ -259,33 +259,57 @@ class UTILITY {
 	 * @param string $folder where to store
 	 * @param array $prefix to add to filename, length according to $files
 	 * @param array $rename to rename file, length according to $files
+	 * @param bool $replace to replace files, false adds an enumerator
 	 * 
 	 * @return array paths of stored files
 	 */
-	public static function storeUploadedFiles($name = [], $folder = '', $prefix = [], $rename = []){
+	public static function storeUploadedFiles($name = [], $folder = '', $prefix = [], $rename = [], $replace = true){
 		/* process $_FILES, store to folder and return an array of destination paths */
 		if (!file_exists($folder)) mkdir($folder, 0777, true);
 		$targets = [];
 		for ($i = 0; $i < count($name); $i++) {
-			if (gettype($_FILES[$name[$i]]['name'])!=='array') $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder);
+			if (gettype($_FILES[$name[$i]]['name'])!=='array') {
+				if ($_FILES[$name[$i]]['tmp_name']) $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder, $replace);
+			}
 			else {
 				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
+					if (!$_FILES[$name[$i]]['tmp_name'][$j]) continue;
 					$file = pathinfo($_FILES[$name[$i]]['name'][$j]);
 					if ($rename && array_key_exists($i, $rename) && $rename[$i]) $file['filename'] = $rename[$i];
-					$targets[] = self::handle($_FILES[$name[$i]]['tmp_name'][$j], $file['filename'] . '.' . $file['extension'], $i, $prefix, $folder);
+					$targets[] = self::handle($_FILES[$name[$i]]['tmp_name'][$j], $file['filename'] . '.' . $file['extension'], $i, $prefix, $folder, $replace);
 				}
 			}
 		}
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
-	private static function handle($tmpname, $name, $i, $prefix, $folder){
-			$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
-			$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $name;
-			// move_uploaded_file is for post only, else rename for put files
-			if ($tmpname && (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
-				return $target;
-			}
+	private static function handle($tmpname, $name, $i, $prefix, $folder, $replace = false){
+		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
+		$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $name;
+		if (!$replace){
+			$extension = '.' . pathinfo($target)['extension'];
+			$files = glob(str_replace($extension, '*' . $extension, $target));
+						
+			//var_dump($files, $target, self::enumerate($target, $files));
+			//return;
+			$target = self::enumerate($target, $files);
 		}
+		// move_uploaded_file is for post only, else rename for put files
+		if ($tmpname && (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
+			return $target;
+		}
+	}
+	private static function enumerate($target, $withinfiles){
+		if (in_array($target, $withinfiles)){
+			echo "found";
+			$pi_target = pathinfo($target);
+			preg_match('/\((\d)\)$/m', $pi_target['filename'], $matches, PREG_OFFSET_CAPTURE, 0);
+			if ($matches) $enumeratedTarget = str_replace($matches[0][0], '(' . (intval($matches[1][0]) + 1). ')', $pi_target['filename']);
+			else $enumeratedTarget = $pi_target['filename'] . '(2)';
+			$target = self::enumerate(str_replace($pi_target['filename'], $enumeratedTarget, $target), $withinfiles);
+		}
+		return $target;
+	}
+
 
 	/**
 	 * deletes files and folders recursively unregarding of content!
