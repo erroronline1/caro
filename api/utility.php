@@ -288,9 +288,6 @@ class UTILITY {
 		if (!$replace){
 			$extension = '.' . pathinfo($target)['extension'];
 			$files = glob(str_replace($extension, '*' . $extension, $target));
-						
-			//var_dump($files, $target, self::enumerate($target, $files));
-			//return;
 			$target = self::enumerate($target, $files);
 		}
 		// move_uploaded_file is for post only, else rename for put files
@@ -303,13 +300,12 @@ class UTILITY {
 			echo "found";
 			$pi_target = pathinfo($target);
 			preg_match('/\((\d)\)$/m', $pi_target['filename'], $matches, PREG_OFFSET_CAPTURE, 0);
-			if ($matches) $enumeratedTarget = str_replace($matches[0][0], '(' . (intval($matches[1][0]) + 1). ')', $pi_target['filename']);
+			if ($matches) $enumeratedTarget = str_replace($matches[0][0], '(' . (intval($matches[1][0]) + 1) . ')', $pi_target['filename']);
 			else $enumeratedTarget = $pi_target['filename'] . '(2)';
 			$target = self::enumerate(str_replace($pi_target['filename'], $enumeratedTarget, $target), $withinfiles);
 		}
 		return $target;
 	}
-
 
 	/**
 	 * deletes files and folders recursively unregarding of content!
