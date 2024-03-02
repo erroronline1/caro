@@ -461,7 +461,7 @@ class FORMS extends API {
 				if ($exists && json_decode($exists['content'], true) == $this->_payload->content) {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
-						':alias' => $this->_payload->alias,
+						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): '',
 						':context' => $this->_payload->context,
 						':hidden' => $this->_payload->hidden,
 						':id' => $exists['id']
@@ -506,7 +506,7 @@ class FORMS extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
 					':name' => $this->_payload->name,
-					':alias' => $this->_payload->alias,
+					':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): '',
 					':context' => $this->_payload->context,
 					':author' => $_SESSION['user']['name'],
 					':content' => implode(',', $this->_payload->content)
