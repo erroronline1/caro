@@ -26,7 +26,7 @@ class Lang {
 		return result;
 	}
 	PROPERTY(request, replace = {}) {
-		return this.GET(request, replace).replace(" ", "_");
+		return this.GET(request, replace).replaceAll(" ", "_");
 	}
 }
 export var LANG = new Lang();
