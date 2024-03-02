@@ -197,6 +197,29 @@ class record extends API {
 			]]);
 	}
 
+	public function import(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
+		$statement->execute([
+			':identifier' => $this->_payload->IDENTIFY_BY_
+		]);
+		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		if ($data) {
+			$result = [];
+			foreach($data as $row)
+				foreach(json_decode($row['content'], true) as $key => $value) $result[$key] = $value;
+			$this->response([
+			'status' => [
+				'msg' => LANG::GET('record.record_import_success'),
+				'data' => $result
+			]]);
+		}
+		else $this->response([
+			'status' => [
+				'msg' => LANG::GET('record.record_import_error')
+			]]);
+
+	}
+
 	private function identifierPDF($content){
 		// create a pdf for a label sheet with qr code and plain text
 		require_once($this->PDFLIBRARY);

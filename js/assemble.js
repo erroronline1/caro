@@ -41,10 +41,12 @@ export const assemble_helper = {
 			elements = [],
 			icons = {};
 		icons[LANG.GET("menu.application_header")] = "url('media/bars.svg')";
-		icons[LANG.GET("menu.communication_header")] = "url('media/comment.svg')";
+		icons[LANG.GET("menu.communication_header")] =
+			"url('media/comment.svg')";
 		icons[LANG.GET("menu.record_header")] =
 			"url('media/file-signature.svg')";
-		icons[LANG.GET("menu.purchase_header")] = "url('media/shopping-bag.svg')";
+		icons[LANG.GET("menu.purchase_header")] =
+			"url('media/shopping-bag.svg')";
 		icons[LANG.GET("menu.files_header")] = "url('media/folders.svg')";
 		icons[LANG.GET("menu.tools_header")] = "url('media/tools.svg')";
 
@@ -69,11 +71,14 @@ export const assemble_helper = {
 			span = document.createElement("span");
 			span.append(document.createTextNode(group));
 			div2.append(span);
-			div2.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+			div2.style.maxHeight =
+				(Object.entries(items).length + 1) * 4 + "em";
 			for (const [description, attributes] of Object.entries(items)) {
 				if ("onpointerup" in attributes) {
 					button = document.createElement("button");
-					for (const [attribute, value] of Object.entries(attributes)) {
+					for (const [attribute, value] of Object.entries(
+						attributes
+					)) {
 						button.setAttribute(attribute, value);
 					}
 					button.type = "button";
@@ -174,15 +179,18 @@ export class Dialog {
 					canvas: this.scannerElements.canvas,
 					output: this.scannerElements.output,
 					button: this.scannerElements.button,
-					scanner: new Html5QrcodeScanner(this.scannerElements.canvas.id, {
-						fps: 10,
-						qrbox: {
-							width: 300,
-							height: 300,
-						},
-						rememberLastUsedCamera: true,
-						aspectRatio: 1.0,
-					}),
+					scanner: new Html5QrcodeScanner(
+						this.scannerElements.canvas.id,
+						{
+							fps: 10,
+							qrbox: {
+								width: 300,
+								height: 300,
+							},
+							rememberLastUsedCamera: true,
+							aspectRatio: 1.0,
+						}
+					),
 				};
 
 				function scanSuccess(decodedText, decodedResult) {
@@ -191,7 +199,9 @@ export class Dialog {
 					scanner.scanner.html5Qrcode.stop();
 					scanner.canvas.style.border = "none";
 					scanner.canvas.replaceChildren(
-						document.createTextNode(LANG.GET("general.scan_successful"))
+						document.createTextNode(
+							LANG.GET("general.scan_successful")
+						)
 					);
 				}
 				scanner.scanner.render(scanSuccess);
@@ -212,11 +222,18 @@ export class Dialog {
 					default:
 						if (response.target.returnValue === "true") {
 							result = {};
-							let content = document.querySelector("dialog>form>article");
-							if (!content) content = document.querySelector("dialog>form"); //scanner
+							let content = document.querySelector(
+								"dialog>form>article"
+							);
+							if (!content)
+								content = document.querySelector("dialog>form"); //scanner
 							content.childNodes.forEach((input) => {
 								//console.log(input);
-								if (["input", "textarea"].includes(input.localName)) {
+								if (
+									["input", "textarea"].includes(
+										input.localName
+									)
+								) {
 									result[input.name] = input.value;
 								}
 							});
@@ -486,7 +503,9 @@ export class Assemble {
 						y = imgcanvas.height;
 						xoffset = (y - x) / 2;
 					}
-					imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
+					imgcanvas
+						.getContext("2d")
+						.drawImage(this, xoffset, yoffset, x, y);
 				});
 				img.dispatchEvent(new Event("load"));
 			}
@@ -556,8 +575,9 @@ export class Assemble {
 			for (let n = 0; n < nodes.length; n++) {
 				if (
 					!(
-						["DATALIST", "HR", "BUTTON"].includes(nodes[n].nodeName) ||
-						nodes[n].hidden
+						["DATALIST", "HR", "BUTTON"].includes(
+							nodes[n].nodeName
+						) || nodes[n].hidden
 					)
 				) {
 					frame = true;
@@ -634,9 +654,12 @@ export class Assemble {
 				try {
 					if (
 						panel ==
-						Math.round(e.target.scrollLeft / e.target.clientWidth) + 1
+						Math.round(e.target.scrollLeft / e.target.clientWidth) +
+							1
 					)
-						indicator.children[panel].firstChild.classList.add("articleactive");
+						indicator.children[panel].firstChild.classList.add(
+							"articleactive"
+						);
 					else
 						indicator.children[panel].firstChild.classList.remove(
 							"articleactive"
@@ -651,7 +674,9 @@ export class Assemble {
 	prepareForm(event) {
 		/* check input fields for presence of required content */
 		const signature = document.getElementById("signaturecanvas"),
-			requiredsignature = document.querySelector("[data-required=required]"),
+			requiredsignature = document.querySelector(
+				"[data-required=required]"
+			),
 			required = document.querySelectorAll("[required]");
 		let missing_required = false;
 
@@ -677,9 +702,14 @@ export class Assemble {
 			}
 		}
 		for (const element of required) {
-			if (element.validity.valueMissing && element.form === event.target.form) {
+			if (
+				element.validity.valueMissing &&
+				element.form === event.target.form
+			) {
 				if (["file", "checkbox", "radio"].includes(element.type))
-					element.nextElementSibling.classList.add("input_required_alert");
+					element.nextElementSibling.classList.add(
+						"input_required_alert"
+					);
 				else element.classList.add("input_required_alert");
 				if (!missing_required) {
 					element.scrollIntoView({
@@ -690,7 +720,9 @@ export class Assemble {
 				}
 				missing_required = true;
 			} else
-				element.nextElementSibling.classList.remove("input_required_alert");
+				element.nextElementSibling.classList.remove(
+					"input_required_alert"
+				);
 		}
 		if (!missing_required) event.target.form.submit();
 		else new Toast(LANG.GET("general.missing_form_data"));
@@ -903,7 +935,10 @@ export class Assemble {
 			delete this.currentElement.attributes.value;
 		}
 		if (this.currentElement.attributes !== undefined)
-			button = this.apply_attributes(this.currentElement.attributes, button);
+			button = this.apply_attributes(
+				this.currentElement.attributes,
+				button
+			);
 		if (this.currentElement.type === "submitbutton")
 			button.onpointerup = this.prepareForm.bind(this);
 		return [button, ...this.hint()];
@@ -939,7 +974,10 @@ export class Assemble {
 				this.currentElement.numeration
 			);
 		if (this.currentElement.attributes !== undefined)
-			input = this.apply_attributes(this.currentElement.attributes, input);
+			input = this.apply_attributes(
+				this.currentElement.attributes,
+				input
+			);
 		return input;
 	}
 	datalist() {
@@ -1149,9 +1187,14 @@ export class Assemble {
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		select.id = getNextElementID();
 		if (this.currentElement.attributes !== undefined)
-			select = this.apply_attributes(this.currentElement.attributes, select);
+			select = this.apply_attributes(
+				this.currentElement.attributes,
+				select
+			);
 
-		for (const [key, element] of Object.entries(this.currentElement.content)) {
+		for (const [key, element] of Object.entries(
+			this.currentElement.content
+		)) {
 			if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
 			else groups[key[0]].push([key, element]);
 			selectModal[key] = element.value || key;
@@ -1248,7 +1291,8 @@ export class Assemble {
 		}*/
 		const result = [...this.header()],
 			radioname =
-				this.currentElement.attributes && this.currentElement.attributes.name
+				this.currentElement.attributes &&
+				this.currentElement.attributes.name
 					? this.names_numerator(
 							this.currentElement.attributes.name,
 							this.currentElement.numeration
@@ -1270,7 +1314,9 @@ export class Assemble {
 				input.type = "checkbox";
 				input.name = this.names_numerator(checkbox);
 			}
-			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
+			label.append(
+				document.createTextNode(checkbox.replace(/\[\]/g, ""))
+			);
 			input = this.apply_attributes(attributes, input);
 			result.push(input);
 			result.push(label);
@@ -1306,7 +1352,8 @@ export class Assemble {
 			let a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
-			if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
+			if (!a.href.includes("javascript:") && !a.target)
+				a.target = "_blank";
 			a.appendChild(document.createTextNode(link));
 			result.push(a);
 		}
@@ -1367,7 +1414,9 @@ export class Assemble {
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
 			this.currentElement.hint = this.currentElement.hint
-				? this.currentElement.hint + " " + LANG.GET("assemble.scan_multiple")
+				? this.currentElement.hint +
+				  " " +
+				  LANG.GET("assemble.scan_multiple")
 				: LANG.GET("assemble.scan_multiple");
 		}
 
@@ -1383,19 +1432,32 @@ export class Assemble {
 			);
 			input.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 			if (this.currentElement.attributes)
-				input = this.apply_attributes(this.currentElement.attributes, input);
-			input.autocomplete = input.type === "password" ? "one-time-code" : "off";
+				input = this.apply_attributes(
+					this.currentElement.attributes,
+					input
+				);
+			input.autocomplete =
+				input.type === "password" ? "one-time-code" : "off";
 
 			label = document.createElement("label");
 			label.htmlFor = input.id;
 			label.appendChild(
 				document.createTextNode(
-					this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")
+					this.currentElement.attributes.name.replace(
+						/\[\]|IDENTIFY_BY_/g,
+						""
+					)
 				)
 			);
 			label.classList.add("input-label");
-			if (input.type === "password") this.currentElement.type = "password"; // for icon
-			result = result.concat([...this.icon(), input, label, ...this.hint()]);
+			if (input.type === "password")
+				this.currentElement.type = "password"; // for icon
+			result = result.concat([
+				...this.icon(),
+				input,
+				label,
+				...this.hint(),
+			]);
 			this.currentElement.type = originaltype;
 		}
 
@@ -1442,11 +1504,12 @@ export class Assemble {
 			button.type = "button";
 			button.setAttribute("data-type", "merge");
 			button.onpointerup = function () {
-				new Dialog({
-					type: "alert",
-					header: "acknowledge this!",
-					body: "this has yet to be implemented",
-				});
+				if (document.getElementById(inputid).value)
+					api.record(
+						"get",
+						"import",
+						document.getElementById(inputid).value
+					);
 			};
 			result.push(button);
 		}

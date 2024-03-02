@@ -828,6 +828,53 @@ export const api = {
 							}
 						};
 						break;
+					case "import":
+						successFn = function (data) {
+							if (data.status !== undefined) {
+								if (data.status.msg !== undefined)
+									api.toast(data.status.msg);
+								if (data.status.data !== undefined) {
+									let inputs = document.querySelectorAll(
+										"input, textarea, select"
+									);
+									let inputname;
+									for (const input of inputs) {
+										inputname = input.name.replaceAll(
+											" ",
+											"_"
+										);
+										console.log(
+											inputname,
+											Object.keys(
+												data.status.data
+											).includes(inputname)
+										);
+										if (
+											!Object.keys(
+												data.status.data
+											).includes(inputname) ||
+											input.type === "file"
+										)
+											continue;
+										if (input.type === "radio") {
+											// nest to avoid overriding values of other radio elements
+											if (
+												data.status.data[inputname] ===
+												input.value
+											)
+												input.checked = true;
+										} else if (input.type === "checkbox") {
+											//if (Object.keys(data.status.data).includes(input.name) && data.status.data[input.name] === input.value) input.checked = true;
+										} else {
+											input.value =
+												data.status.data[inputname];
+										}
+									}
+								}
+							}
+						};
+						payload = { IDENTIFY_BY_: request[2] };
+						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {
