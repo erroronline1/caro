@@ -235,6 +235,7 @@ class record extends API {
 	}
 
 	public function import(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
 		$statement->execute([
 			':identifier' => $this->_payload->IDENTIFY_BY_
@@ -258,6 +259,7 @@ class record extends API {
 	}
 
 	public function records(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
 		$statement->execute();
 		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -267,7 +269,7 @@ class record extends API {
 			$identifiers = [];
 			foreach($data as $row) {
 				$recorddatalist[] = $row['identifier'];
-				$identifiers[$row['identifier']] = ['href' => "javascript:api.records('get', 'export', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+				$identifiers[$row['identifier']] = ['href' => "javascript:api.record('get', 'export', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
 			}
 			$content=[
 				[
@@ -293,7 +295,7 @@ class record extends API {
 					]
 				], [
 					'type' => 'links',
-					'description' => LANG::GET('menu.record_all'),
+					'description' => LANG::GET('record.record_all'),
 					'content' => $identifiers
 				]
 			];
@@ -301,6 +303,54 @@ class record extends API {
 		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
 		$result['body']['content'] = $content;
 		$this->response($result);		
+	}
+
+	public function export(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_export')] = [
+			'href' => $this->recordsPDF($this->_requestedID)
+		];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
+		$statement->execute([
+			':identifier' => $this->_requestedID
+		]);
+
+		// todo: append all (but images?) 
+
+		$this->response([
+			'log' => LANG::GET('record.record_export_proceed'),
+			'links' => $downloadfiles
+		]);
+	}
+
+	private function summarizeRecord(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
+		$statement->execute([
+			':identifier' => $this->_requestedID
+		]);
+		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$summary = ['filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . date('Y-m-d H:i')), 'content' => []];
+		$accumulatedcontent = [];
+		foreach ($data as $row){
+			$content = json_decode($row['content'], true);
+			foreach($content as $key => $value){
+				$key = str_replace('_', ' ', $key);
+				if (!array_key_exists($key, $accumulatedcontent)) $accumulatedcontent[$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])]];
+				else $accumulatedcontent[$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])];
+			}
+		}
+		foreach($accumulatedcontent as $key => $entries){
+			$summary['content'][$key] = '';
+			$value = '';
+			foreach($entries as $entry){
+				if ($entry['value'] !== $value){
+					$summary['content'][$key] .= $entry['value'] . ' (' . $entry['author'] . ")\n";
+					$value = $entry['value'];
+				}
+			}
+		}
+		return $summary;
 	}
 
 	private function identifierPDF($content){
@@ -347,7 +397,6 @@ class record extends API {
 
 		for ($row = 0; $row < INI['pdf']['labelsheet']['rows']; $row++){
 			for ($column = 0; $column < INI['pdf']['labelsheet']['columns']; $column++){
-
 				$pdf->write2DBarcode($content, 'QRCODE,H', $column * $columnwidth, $row * $rowheight, $codesize, $codesize, $style, 'N');
 				//$pdf->Text($column * $columnwidth, $row * $rowheight + $codesize, $content);
 				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === INI['pdf']['labelsheet']['columns'] - 1), $column * $columnwidth + $codesize, $row * $rowheight, true, 0, false, true, 24, 'T', true);
@@ -361,6 +410,52 @@ class record extends API {
 		$filename = preg_replace('/[^\w\d]/', '', $content);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
+	}
+
+	private function recordsPDF(){
+		// create a pdf for a record summary
+		$content = $this->summarizeRecord();
+
+
+		require_once($this->PDFLIBRARY);
+		// create new PDF document
+		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false);
+
+		// set document information
+		$pdf->SetCreator(INI['system']['caroapp']);
+		$pdf->SetAuthor($_SESSION['user']['name']);
+		$pdf->SetTitle(LANG::GET('menu.record_export'));
+
+		// set margins
+		$pdf->SetMargins(INI['pdf']['record']['marginleft'], INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		// set auto page breaks
+		$pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
+		// set font
+		$pdf->SetFont('helvetica', '', 10); // font size
+		// add a page
+		$pdf->AddPage();
+		// set cell padding
+		$pdf->setCellPaddings(5, 5, 5, 5);
+		// set cell margins
+		$pdf->setCellMargins(0, 0, 0, 0);
+		// set color for background
+		$pdf->SetFillColor(255, 255, 255);
+
+		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		foreach ($content['content'] as $key => $value) {
+			$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+			$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+		}
+
+		// move pointer to last page
+		$pdf->lastPage();
+
+		//Close and output PDF document
+		if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
+		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
 
 }

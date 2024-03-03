@@ -201,8 +201,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_records (context, identifier, date, author, content) VALUES (:context, :identifier, CURRENT_TIMESTAMP, :author, :content)"
 		],
 		'records_import' => [
-			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier",
-			'sqlsrv' => "SELECT * FROM caro_records WHERE identifier = :identifier"
+			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier ORDER BY id ASC",
+			'sqlsrv' => "SELECT * FROM caro_records WHERE identifier = :identifier ORDER BY id ASC"
 		],
 		'records_identifiers' => [
 			'mysql' => "SELECT id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc",

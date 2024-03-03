@@ -613,7 +613,7 @@ export const api = {
 			title = {
 				identifier: LANG.GET("menu.record_create_identifier"),
 				forms: LANG.GET("menu.record_record"),
-				records: LANG.GET("menu.record_all"),
+				records: LANG.GET("menu.record_export"),
 			};
 		switch (method) {
 			case "get":
@@ -667,6 +667,9 @@ export const api = {
 							}
 						};
 						payload = { IDENTIFY_BY_: request[2] };
+						break;
+					case "export":
+						//prevent default successFn
 						break;
 					default:
 						successFn = function (data) {
