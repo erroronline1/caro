@@ -582,28 +582,50 @@ export const api = {
 		post record/identifier
 		get record/identifier
 
-		post record/forms
 		get record/forms
+		get record/form
+
+		get record/formfilter
+		get record/identifierfilter
+
+		post record/record
+
+		get record/import
+		get record/records
+		get records/export
 		*/
 		request = [...request];
 		request.splice(0, 0, "record");
 		let payload,
 			successFn = function (data) {
 				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.log !== undefined) {
+					const dialog = {
+						type: "input",
+						body: [
+							{ type: "text", content: data.log },
+							{ type: "links", content: data.links },
+						],
+					};
+					new Dialog(dialog);
+				}
 			},
 			title = {
 				identifier: LANG.GET("menu.record_create_identifier"),
 				forms: LANG.GET("menu.record_record"),
+				records: LANG.GET("menu.record_all"),
 			};
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "filter":
+					case "recordfilter":
+					case "formfilter":
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll("[data-filtered]");
-								for (const form of all) {
-									form.style.display = data.status.data.includes(form.dataset.filtered) ? "block" : "none";
+								for (const element of all) {
+									console.log(element, data.status.data.includes(element.dataset.filtered));
+									element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
 								}
 							}
 						};

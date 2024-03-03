@@ -60,7 +60,7 @@ class record extends API {
 		}
 	}
 
-	public function filter(){
+	public function formfilter(){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -81,6 +81,19 @@ class record extends API {
 		]]);
 	}
 
+	public function recordfilter(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
+		$statement->execute();
+		$records = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$matches = [];
+		foreach($records as $row) {
+			similar_text($this->_requestedID, $row['identifier'], $percent);
+			if (($percent >= INI['likeliness']['records_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
+		}
+		$this->response(['status' => [
+			'data' => $matches
+		]]);
+	}
 
 	public function forms(){
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
@@ -114,8 +127,8 @@ class record extends API {
 						'attributes' => [
 							'name' => LANG::GET('record.form_filter'),
 							'list' => 'forms',
-							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'filter', this.value); return false;}",
-							'onblur' => "api.record('get', 'filter', this.value); return false;",
+							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}",
+							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
 							]
 					]
 				], [
@@ -242,6 +255,52 @@ class record extends API {
 				'msg' => LANG::GET('record.record_import_error')
 			]]);
 
+	}
+
+	public function records(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
+		$statement->execute();
+		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$recorddatalist = [];
+		$return = ['body' => ['content' => []]];
+		if ($data) {
+			$identifiers = [];
+			foreach($data as $row) {
+				$recorddatalist[] = $row['identifier'];
+				$identifiers[$row['identifier']] = ['href' => "javascript:api.records('get', 'export', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+			}
+			$content=[
+				[
+					[
+						'type' => 'datalist',
+						'content' => $recorddatalist,
+						'attributes' => [
+							'id' => 'records'
+						]
+					], [
+						'type' => 'scanner',
+						'destination' => 'recordfilter',
+						'description' => LANG::GET('record.record_scan')
+					], [
+						'type' => 'filterinput',
+						'attributes' => [
+							'id' => 'recordfilter',
+							'name' => LANG::GET('record.form_filter'),
+							'list' => 'records',
+							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'recordfilter', this.value); return false;}",
+							'onblur' => "api.record('get', 'recordfilter', this.value); return false;",
+							]
+					]
+				], [
+					'type' => 'links',
+					'description' => LANG::GET('menu.record_all'),
+					'content' => $identifiers
+				]
+			];
+		}
+		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
+		$result['body']['content'] = $content;
+		$this->response($result);		
 	}
 
 	private function identifierPDF($content){

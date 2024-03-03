@@ -204,7 +204,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier",
 			'sqlsrv' => "SELECT * FROM caro_records WHERE identifier = :identifier"
 		],
-
+		'records_identifiers' => [
+			'mysql' => "SELECT id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc",
+			'sqlsrv' => "SELECT id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc"
+		],
 
 		'consumables_post-vendor' => [
 			'mysql' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
