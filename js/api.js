@@ -614,17 +614,27 @@ export const api = {
 								if (data.status.msg !== undefined) api.toast(data.status.msg);
 								if (data.status.data !== undefined) {
 									let inputs = document.querySelectorAll("input, textarea, select");
-									let inputname, groupname;
+									let inputname, groupname, files, a;
 									for (const input of inputs) {
 										inputname = input.name.replaceAll(" ", "_");
-										if (input.type === "file") continue;
-										if (input.type === "radio") {
+										if (input.type === "file") {
+											if (Object.keys(data.status.data).includes(inputname.replace("[]", ""))) {
+												files = data.status.data[inputname.replace("[]", "")].split(", ");
+												for (const file of files) {
+													a = document.createElement("a");
+													a.href = file;
+													a.target = "_blank";
+													a.append(document.createTextNode(file));
+													input.parentNode.insertBefore(a, input);
+												}
+												if (files) input.parentNode.insertBefore(document.createElement("br"), input);
+											}
+										} else if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											if (Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value) input.checked = true;
+											input.checked = Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
 										} else if (input.type === "checkbox") {
 											groupname = input.dataset.grouped.replaceAll(" ", "_");
-											console.log(data.status.data[groupname].split(", "), input.name);
-											if (Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name)) input.checked = true;
+											input.checked = Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name);
 										} else {
 											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}

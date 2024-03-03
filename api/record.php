@@ -2,8 +2,6 @@
 // add and export records
 // Y U NO DELETE? because of audit safety, that's why!
 
-
-
 class record extends API {
    // processed parameters for readability
    public $_requestedMethod = REQUEST[1];
@@ -185,6 +183,23 @@ class record extends API {
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
+				}
+
+				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
+				$attachments = [];
+				foreach ($_FILES as $fileinput => $files){
+					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $fileinput)], null, false)){
+						if (gettype($files['name']) === 'array'){
+							for($i = 0; $i < count($files['name']); $i++){
+								if (array_key_exists($fileinput, $attachments)) $attachments[$fileinput][]= substr($uploaded[$i], 1);
+								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
+							}
+						}
+						else $attachments[$fileinput] = [substr($uploaded[0], 1)];
+					}
+				}
+				foreach($attachments as $input => $files){
+					$this->_payload->$input = implode(', ', $files);
 				}
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
 				if ($statement->execute([
