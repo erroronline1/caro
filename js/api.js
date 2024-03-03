@@ -617,9 +617,11 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
+				api.preventDataloss.start();
 				switch (request[1]) {
 					case "recordfilter":
 					case "formfilter":
+						api.preventDataloss.monitor = false;
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll("[data-filtered]");
