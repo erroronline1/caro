@@ -104,6 +104,13 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* records by unit? (add unit/user units) select by permissions
+* filter by context
+* export append all files that are not embedded (aka !images)
+* add prevent data loss to form fields within records
+
+* input type email (multiple), phone
+
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
@@ -123,7 +130,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * documentation form, scan strain qr code, fill, save a (unfinished with percentage) dataset, who filled out
 * view other forms (e.g. instructions, modal? prevent filling out)
 * import texttemplates
-* import from other strain (anamnesis) (same form field names)
 * append other forms (prefill strain identifier possible?)
 * check incomplete strains, alert supervisor, admin
 * required forms (like document bundles) optional selector unneccessary? - with "marked as unneccessary by ... on ..."
