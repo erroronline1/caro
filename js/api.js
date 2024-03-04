@@ -619,11 +619,11 @@ export const api = {
 			title = {
 				identifier: LANG.GET("menu.record_create_identifier"),
 				forms: LANG.GET("menu.record_record"),
-				records: LANG.GET("menu.record_export"),
+				records: LANG.GET("menu.record_summary"),
+				record: LANG.GET("menu.record_summary")
 			};
 		switch (method) {
 			case "get":
-				api.preventDataloss.start();
 				switch (request[1]) {
 					case "recordfilter":
 					case "formfilter":
@@ -678,6 +678,7 @@ export const api = {
 						payload = { IDENTIFY_BY_: request[2] };
 						break;
 					case "export":
+					case "matchbundles":
 						//prevent default successFn
 						break;
 					default:
@@ -686,6 +687,7 @@ export const api = {
 								api.update_header(title[request[1]] || data.title);
 								document.getElementById("main").replaceChildren();
 								new Assemble(data.body).initializeSection();
+								api.preventDataloss.start();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};

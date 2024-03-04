@@ -19,7 +19,7 @@ class RECORDTCPDF extends TCPDF {
         // Title
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->SetFont('helvetica', 'B', 20); // font size
-		$this->MultiCell(110, 0, LANG::GET('menu.record_export'), 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+		$this->MultiCell(110, 0, LANG::GET('menu.record_summary'), 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
 		$this->SetFont('helvetica', '', 10); // font size
 		$this->MultiCell(110, 0, date('y-m-d H:i'), 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
 
@@ -220,7 +220,10 @@ class record extends API {
 					if ($subs['type'] === 'identify'){
 						$subs['attributes']['value'] = $identify;
 					}
-					$content = $subs;
+					if (in_array($subs['type'], ['textarea', 'textinput', 'scanner', 'textinput', 'numberinput', 'dateinput', 'timeinput'])){
+						$subs['attributes']['data-loss'] = 'prevent';
+					}
+					$content[] = $subs;
 				}
 			}
 			return $content;
@@ -233,7 +236,6 @@ class record extends API {
 			]);
 			$component = $statement->fetch(PDO::FETCH_ASSOC);
 			$component['content'] = json_decode($component['content'], true);
-
 			array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify));
 		}
 		$context = [
@@ -251,8 +253,50 @@ class record extends API {
 				]
 			]
 		];
-		if (array_key_exists(0, $return['body']['content'][0])) array_push($return['body']['content'][0][0], ...$context);
-		else array_push($return['body']['content'][0], ...$context);
+		if (array_key_exists('type', $return['body']['content'][0][0])) array_push($return['body']['content'][0], ...$context);
+		else array_push($return['body']['content'][0][0], ...$context);
+		$this->response($return);
+	}
+
+	public function matchbundles(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$forms = [];
+		$return = [];
+
+		// prepare existing bundle lists
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-latest-by-name'));
+		$statement->execute([
+			':name' => $this->_requestedID
+		]);
+		$bundle = $statement->fetch(PDO::FETCH_ASSOC);
+		$necessaryforms = explode(',', $bundle['content']);
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
+		$statement->execute([
+			':identifier' => $this->_passedIdentify
+		]);
+		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$considered = [];
+		foreach($data as $row){
+			$considered[] = $row['form'];
+		}
+		foreach(array_diff($necessaryforms, $considered) as $needed){
+			$forms[$needed] = ['href' => "javascript:api.record('get', 'form', '" . $needed . "', '" . $this->_passedIdentify . "')"];
+		}
+
+		if ($forms) $return['body'] = [
+			[
+					'type' => 'links',
+					'description' => LANG::GET('record.record_append_missing_form'),
+					'content' => $forms
+			]
+		];
+		else  $return['body'] =[
+			[
+					'type' => 'text',
+					'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
+			]
+		];
 		$this->response($return);
 	}
 
@@ -308,8 +352,56 @@ class record extends API {
 						'msg' => LANG::GET('record.record_error')
 					]]);
 				break;
+			case 'GET':
+				$return = ['body' =>[]];
+				$body = [];
+				// summarize content
+				$content = $this->summarizeRecord();
+				foreach ($content['content'] as $key => $value) {
+					$body[] = [
+						'type' => 'text',
+						'description' => $key,
+						'content' => $value
+					];
+				}
+				$return['body']['content'] = [$body];
+
+				$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
+				// match against bundles
+				// prepare existing bundle lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+				$statement->execute();
+				$bd = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$hidden = [];
+				foreach($bd as $key => $row) {
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!in_array($row['name'], $bundles) && !in_array($row['name'], $hidden)) {
+						$bundles[$row['name']] = ['value' => $row['name']];
+					}
+				}
+				$return['body']['content'][] = [
+					[
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('record.record_match_bundles'),
+								'onchange' => "if (this.value != '0') api.record('get', 'matchbundles', this.value, '" . $this->_requestedID . "')"
+							],
+							'hint' => LANG::GET('record.record_match_bundles_hint'),
+							'content' => $bundles
+						], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('record.record_export'),
+								'onpointerup' => "api.record('get', 'export', '" . $this->_requestedID . "')"
+							]
+						]
+					]
+				];
+				$this->response($return);
+				break;
 			default:
-			$this->response([], 401);
+				$this->response([], 401);
 		}
 	}
 
@@ -348,7 +440,7 @@ class record extends API {
 			$identifiers = [];
 			foreach($data as $row) {
 				$recorddatalist[] = $row['identifier'];
-				$identifiers[$row['identifier']] = ['href' => "javascript:api.record('get', 'export', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+				$identifiers[$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
 			}
 			$content=[
 				[
@@ -389,7 +481,7 @@ class record extends API {
 		$bundles = [];
 		$return = [];
 
-		// prepare existing forms lists
+		// prepare existing bundle lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
 		$statement->execute();
 		$bd = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -417,19 +509,12 @@ class record extends API {
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$content = $this->summarizeRecord();
 		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.record_export')] = [
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
 			'href' => $this->recordsPDF($content)
 		];
 
 		// todo: append all (but images?) 
 		$body = [];
-		foreach ($content['content'] as $key => $value) {
-			$body[] = [
-				'type' => 'text',
-				'description' => $key,
-				'content' => $value
-			];
-		}
 		array_push($body, 
 			[
 				'type' => 'links',
@@ -540,7 +625,7 @@ class record extends API {
 		// set document information
 		$pdf->SetCreator(INI['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
-		$pdf->SetTitle(LANG::GET('menu.record_export'));
+		$pdf->SetTitle(LANG::GET('menu.record_summary'));
 
 		// set margins
 		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
