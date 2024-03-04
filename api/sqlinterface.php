@@ -183,9 +183,13 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
 		],
-		'form_bundle-datalist' => [
+		'form_bundle-datalist-edit' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC"
+		],
+		'form_bundle-datalist' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
 		],
 		'form_form-get-latest-by-name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context != 'component' AND context != 'bundle' ORDER BY id DESC LIMIT 1",

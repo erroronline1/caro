@@ -608,7 +608,7 @@ class FORMS extends API {
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
 		
 				// prepare existing templates lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist-edit'));
 				$statement->execute();
 				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$hidden = [];

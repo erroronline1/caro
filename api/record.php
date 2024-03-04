@@ -201,7 +201,8 @@ class record extends API {
 		$statement->execute([
 			':name' => $this->_requestedID
 		]);
-		$form = $statement->fetch(PDO::FETCH_ASSOC);
+		if (!$form = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID])]]);
+
 		$return = ['title'=> $form['name'], 'body' => [
 			'form' => [
 				'data-usecase' => 'record',
@@ -381,6 +382,35 @@ class record extends API {
 		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
 		$result['body']['content'] = $content;
 		$this->response($result);		
+	}
+
+	public function bundles(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$bundles = [];
+		$return = [];
+
+		// prepare existing forms lists
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+		$statement->execute();
+		$bd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
+		foreach($bd as $key => $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $bundles) && !in_array($row['name'], $hidden)) {
+				$bundles[$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')"];
+			}
+		}
+		$return['body'] = [
+			'content' => [
+				[
+					[
+						'type' => 'links',
+						'description' => LANG::GET('record.form_all'),
+						'content' => $bundles
+					]
+				]
+			]];
+		$this->response($return);
 	}
 
 	public function export(){
