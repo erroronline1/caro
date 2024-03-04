@@ -69,10 +69,8 @@ class record extends API {
 					];
 					$body = [
 						[
-							'type' => 'text',
-							'content' => LANG::GET('record.create_identifier_proceed')
-						], [
 							'type' => 'links',
+							'description' => LANG::GET('record.create_identifier_proceed'),
 							'content' => $downloadfiles
 						]
 					];
@@ -385,10 +383,8 @@ class record extends API {
 		}
 		array_push($body, 
 			[
-				'type' => 'text',
-				'content' => LANG::GET('record.record_export_proceed')
-			], [
 				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
 				'content' => $downloadfiles
 			]
 		);
