@@ -51,10 +51,12 @@ class record extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_passedIdentify = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_passedIdentify = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
 	}
 
 	public function identifier(){
@@ -207,6 +209,22 @@ class record extends API {
 			'content' => []
 			]];
 
+		function setidentifier($element, $identify){
+			$content = [];
+			foreach($element as $subs){
+				if (!array_key_exists('type', $subs)){
+					$content[] = setidentifier($subs, $identify);
+				}
+				else {
+					if ($subs['type'] === 'identify'){
+						$subs['attributes']['value'] = $identify;
+					}
+					$content = $subs;
+				}
+			}
+			return $content;
+		};
+
 		foreach(explode(',', $form['content']) as $usedcomponent) {
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
 			$statement->execute([
@@ -214,7 +232,8 @@ class record extends API {
 			]);
 			$component = $statement->fetch(PDO::FETCH_ASSOC);
 			$component['content'] = json_decode($component['content'], true);
-			array_push($return['body']['content'], ...$component['content']['content']);
+
+			array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify));
 		}
 		$context = [
 			[
@@ -231,7 +250,7 @@ class record extends API {
 				]
 			]
 		];
-		if (array_key_exists(0, $return['body']['content'][0][0])) array_push($return['body']['content'][0][0], ...$context);
+		if (array_key_exists(0, $return['body']['content'][0])) array_push($return['body']['content'][0][0], ...$context);
 		else array_push($return['body']['content'][0], ...$context);
 		$this->response($return);
 	}

@@ -590,7 +590,7 @@ export const api = {
 		get record/identifier
 
 		get record/forms
-		get record/form
+		get record/form/{optional identifier}
 
 		get record/formfilter
 		get record/identifierfilter
