@@ -507,7 +507,7 @@ class FORMS extends API {
 				if ($statement->execute([
 					':name' => $this->_payload->name,
 					':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): '',
-					':context' => $this->_payload->context,
+					':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
 					':author' => $_SESSION['user']['name'],
 					':content' => implode(',', $this->_payload->content)
 					])) $this->response([
