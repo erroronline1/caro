@@ -523,6 +523,197 @@ class FORMS extends API {
 				break;
 		}
 	}
+
+	public function bundle(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_content'))) $content = implode(',', preg_split('/[^\w\d]{1,}/', $content));
+				else $content = '';
+				$bundle = [
+					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_name')),
+					':alias' => '',
+					':context' => 'bundle',
+					':author' => $_SESSION['user']['name'],
+					':content' => $content
+				];
+
+				if (!trim($bundle[':name']) || !trim($bundle[':content'])) $this->response([], 400);
+
+				// put hidden attribute if anything else remains the same
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-latest-by-name'));
+				$statement->execute([
+					':name' => $bundle[':name']
+				]);
+				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($exists && $exists['content'] === $bundle[':content']) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
+					if ($statement->execute([
+						':alias' => $exists['alias'],
+						':context' => $exists['context'],
+						':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_hidden')) === LANG::PROPERTY('assemble.edit_bundle_hidden_hidden')? 1 : 0,
+						':id' => $exists['id']
+						])) $this->response([
+							'status' => [
+								'name' => $bundle[':name'],
+								'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']])
+							]]);	
+				}
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']])]]);
+				}
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
+				if ($statement->execute($bundle)) $this->response([
+						'status' => [
+							'name' => $bundle[':name'],
+							'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']])
+						]]);
+				else $this->response([
+					'status' => [
+						'name' => false,
+						'msg' => LANG::GET('assemble.edit_bundle_not_saved')
+					]]);
+				break;
+			case 'GET':
+				$bundledatalist = [];
+				$options = ['...' . LANG::GET('assemble.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$alloptions = ['...' . LANG::GET('assemble.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$insertform = ['...' . LANG::GET('assemble.edit_bundle_insert_default') => ['value' => ' ']];
+				$return = [];
+
+				// get selected bundle
+				if (intval($this->_requestedID)){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+					$statement->execute([
+						':id' => $this->_requestedID
+					]);
+				} else {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-latest-by-name'));
+					$statement->execute([
+						':name' => $this->_requestedID
+					]);
+				}
+				if (!$bundle = $statement->fetch(PDO::FETCH_ASSOC)) $bundle = [
+					'id' => '',
+					'name' => '',
+					'alias' => '',
+					'context' => '',
+					'date' => '',
+					'author' => '',
+					'content' => '',
+					'hidden' => 0
+				];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
+		
+				// prepare existing templates lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+				$statement->execute();
+				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$hidden = [];
+				foreach($bundles as $key => $row) {
+					if ($row['context'] === 'component') continue;
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if ($row['context'] === 'bundle'){
+						if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
+							$bundledatalist[] = $row['name'];
+							$options[$row['name']] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						}
+						$alloptions[$row['name'] . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+					if (!in_array($row['context'] , ['bundle', 'template'])) $insertform[$row['name']] = ['value' => $row['name'] . "\n"];
+				}
+
+				$return['body'] = [
+					'form' => [
+						'data-usecase' => 'bundle',
+						'action' => "javascript:api.form('post', 'bundle')"],
+					'content' => [
+						[
+							[
+								[
+									'type' => 'datalist',
+									'content' => $bundledatalist,
+									'attributes' => [
+										'id' => 'templates'
+									]
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('assemble.edit_existing_bundle_select'),
+										'onchange' => "api.form('get', 'bundle', this.value)"
+									],
+									'content' => $options
+								], [
+									'type' => 'searchinput',
+									'attributes' => [
+										'name' => LANG::GET('assemble.edit_existing_bundle'),
+										'list' => 'templates',
+										'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'bundle', this.value); return false;}"
+									]
+								]
+							], [
+								[
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('assemble.edit_existing_bundle_all'),
+										'onchange' => "api.form('get', 'bundle', this.value)"
+									],
+									'content' => $alloptions
+								]
+							]
+						], [
+							[
+								'type' => 'textinput',
+								'attributes' => [
+									'name' => LANG::GET('assemble.edit_bundle_name'),
+									'value' => $bundle['name'],
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('assemble.edit_bundle_insert_name'),
+									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
+								],
+								'content' => $insertform
+							], [
+								'type' => 'textarea',
+								'hint' => LANG::GET('assemble.edit_bundle_content_hint'),
+								'attributes' => [
+									'name' => LANG::GET('assemble.edit_bundle_content'),
+									'value' => implode("\n", explode(",", $bundle['content'])),
+									'rows' => 6,
+									'id' => 'content',
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							]
+						]
+					]
+				];
+				if ($bundle['id']){
+					$hidden=[
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_bundle_hidden')
+						],
+						'content' => [
+							LANG::GET('assemble.edit_bundle_hidden_visible') => ['checked' => true],
+							LANG::GET('assemble.edit_bundle_hidden_hidden') => []
+						],
+						'hint' => LANG::GET('assemble.edit_bundle_hidden_hint')
+					];
+					if ($bundle['hidden']) $hidden['content'][LANG::GET('assemble.edit_bundle_hidden_hidden')]['checked'] = true;
+					array_push($return['body']['content'][1], $hidden);
+				}
+
+				$this->response($return);
+				break;
+		}
+	}
 }
 
 $api = new FORMS();

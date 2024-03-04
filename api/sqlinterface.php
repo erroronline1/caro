@@ -176,20 +176,28 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id"
 		],
 		'form_form-datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' AND context != 'bundle' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' AND context != 'bundle' ORDER BY name ASC, date DESC"
 		],
 		'form_component-datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
 		],
+		'form_bundle-datalist' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' ORDER BY name ASC, date DESC"
+		],
 		'form_form-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context != 'component' ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context != 'component'  ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context != 'component' AND context != 'bundle' ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context != 'component' AND context != 'bundle' ORDER BY id DESC"
 		],
 		'form_component-get-latest-by-name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' ORDER BY id DESC"
+		],
+		'form_bundle-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'bundle' ORDER BY id DESC"
 		],
 		'form_get' => [
 			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",

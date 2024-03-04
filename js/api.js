@@ -356,6 +356,7 @@ export const api = {
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
+					case "bundle":
 					case "form":
 						successFn = function (data) {
 							if (data.body) {
@@ -396,10 +397,16 @@ export const api = {
 						};
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
+					case "bundle":
+						successFn = function (data) {
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+						};
+						payload = _.getInputs("[data-usecase=bundle]", true);
+						break;
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, composedComponent);
+		api.send(method, request, successFn, null, payload, composedComponent || request[1] === 'bundle');
 	},
 	message: (method, ...request) => {
 		/*
