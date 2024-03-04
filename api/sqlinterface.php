@@ -197,8 +197,8 @@ class SQLQUERY {
 		],
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, identifier, date, author, content) VALUES (NULL, :context, :identifier, CURRENT_TIMESTAMP, :author, :content)",
-			'sqlsrv' => "INSERT INTO caro_records (context, identifier, date, author, content) VALUES (:context, :identifier, CURRENT_TIMESTAMP, :author, :content)"
+			'mysql' => "INSERT INTO caro_records (id, context, form, identifier, date, author, content) VALUES (NULL, :context, :form, :identifier, CURRENT_TIMESTAMP, :author, :content)",
+			'sqlsrv' => "INSERT INTO caro_records (context, form, identifier, date, author, content) VALUES (:context, :form, :identifier, CURRENT_TIMESTAMP, :author, :content)"
 		],
 		'records_import' => [
 			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier ORDER BY id ASC",
@@ -206,7 +206,7 @@ class SQLQUERY {
 		],
 		'records_identifiers' => [
 			'mysql' => "SELECT id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc",
-			'sqlsrv' => "SELECT id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc"
+			'sqlsrv' => "SELECT MAX(id) as id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc"
 		],
 
 		'consumables_post-vendor' => [

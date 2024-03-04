@@ -42,6 +42,7 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_records` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`form` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` timestamp NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -179,6 +180,7 @@ $queries = [
 				"CREATE TABLE caro_records (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	context varchar(MAX) NOT NULL," .
+				"	form varchar(MAX) NOT NULL," .
 				"	identifier varchar(MAX) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .

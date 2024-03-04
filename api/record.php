@@ -168,14 +168,22 @@ class record extends API {
 			array_push($return['body']['content'], ...$component['content']['content']);
 		}
 		$context = [
-			'type' => 'hiddeninput',
-			'attributes' => [
-				'name' => 'context',
-				'value' => $form['context']
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'name' => 'context',
+					'value' => $form['context']
+				]
+			], [
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'name' => 'form',
+					'value' => $form['name']
+				]
 			]
 		];
-		if (array_key_exists(0, $return['body']['content'][0][0])) array_push($return['body']['content'][0][0], $context);
-		else array_push($return['body']['content'][0], $context);
+		if (array_key_exists(0, $return['body']['content'][0][0])) array_push($return['body']['content'][0][0], ...$context);
+		else array_push($return['body']['content'][0], ...$context);
 		$this->response($return);
 	}
 
@@ -183,9 +191,10 @@ class record extends API {
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$context = $identifier = null;
+				$context = $form = $identifier = null;
 				$grouped_checkboxes = [];
 				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
+				if ($form = UTILITY::propertySet($this->_payload, 'form')) unset($this->_payload->form);
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
@@ -217,6 +226,7 @@ class record extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
 				if ($statement->execute([
 					':context' => $context,
+					':form' => $form,
 					':identifier' => $identifier,
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($this->_payload)
