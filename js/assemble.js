@@ -796,9 +796,9 @@ export class Assemble {
 	button() {
 		/*{
 			type: 'button',
-			description: 'some button',
 			hint: 'this button does this or that'
 			attributes: {
+				value: 'this is displayed on the button',
 				onpointerdown: 'alert("hello")'
 			}
 		}*/
