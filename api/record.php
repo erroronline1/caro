@@ -1,12 +1,56 @@
 <?php
 // add and export records
 // Y U NO DELETE? because of audit safety, that's why!
+require_once('../libraries/TCPDF/tcpdf_import.php');
+
+class RECORDTCPDF extends TCPDF {
+	// custom pdf header and footer
+	public $qrcodesize = null;
+	public $qrcodecontent = null;
+
+	public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false, $qrcodesize=20, $qrcodecontent=''){
+		parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache, $pdfa);
+		$this->qrcodesize = $qrcodesize;
+		$this->qrcodecontent = $qrcodecontent;
+	}
+
+    //Page header
+    public function Header() {
+        // Title
+		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		$this->SetFont('helvetica', 'B', 20); // font size
+		$this->MultiCell(110, 0, LANG::GET('menu.record_export'), 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+		$this->SetFont('helvetica', '', 10); // font size
+		$this->MultiCell(110, 0, date('y-m-d H:i'), 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
+
+		$style = array(
+			'border' => 0,
+			'vpadding' => 'auto',
+			'hpadding' => 'auto',
+			'fgcolor' => array(0,0,0),
+			'bgcolor' => false, //array(255,255,255)
+			'module_width' => 1, // width of a single module in points
+			'module_height' => 1 // height of a single module in points
+		);
+		$this->write2DBarcode($this->qrcodecontent, 'QRCODE,H', 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
+		$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
+	}
+
+    // Page footer
+    public function Footer() {
+        // Position at 15 mm from bottom
+        $this->SetY(-15);
+        // Set font
+        $this->SetFont('helvetica', 'I', 8);
+        // Page number
+        $this->Cell(0, 10, LANG::GET('company.location') . ' | '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }
+}
 
 class record extends API {
-   // processed parameters for readability
-   public $_requestedMethod = REQUEST[1];
-   private $_requestedID = null;
-   private $PDFLIBRARY = '../libraries/TCPDF/tcpdf_import.php';
+	// processed parameters for readability
+	public $_requestedMethod = REQUEST[1];
+	private $_requestedID = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -359,7 +403,11 @@ class record extends API {
 			':identifier' => $this->_requestedID
 		]);
 		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$summary = ['filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . date('Y-m-d H:i')), 'content' => []];
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . date('Y-m-d H:i')),
+			'identifier' => $this->_requestedID,
+			'content' => []
+		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
 			$content = json_decode($row['content'], true);
@@ -384,7 +432,6 @@ class record extends API {
 
 	private function identifierPDF($content){
 		// create a pdf for a label sheet with qr code and plain text
-		require_once($this->PDFLIBRARY);
 		// create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['labelsheet']['format'], true, 'UTF-8', false);
 
@@ -427,7 +474,6 @@ class record extends API {
 		for ($row = 0; $row < INI['pdf']['labelsheet']['rows']; $row++){
 			for ($column = 0; $column < INI['pdf']['labelsheet']['columns']; $column++){
 				$pdf->write2DBarcode($content, 'QRCODE,H', $column * $columnwidth, $row * $rowheight, $codesize, $codesize, $style, 'N');
-				//$pdf->Text($column * $columnwidth, $row * $rowheight + $codesize, $content);
 				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === INI['pdf']['labelsheet']['columns'] - 1), $column * $columnwidth + $codesize, $row * $rowheight, true, 0, false, true, 24, 'T', true);
 			}
 		}
@@ -443,9 +489,8 @@ class record extends API {
 
 	private function recordsPDF($content){
 		// create a pdf for a record summary
-		require_once($this->PDFLIBRARY);
 		// create new PDF document
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false);
+		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false, 20, $content['identifier']);
 
 		// set document information
 		$pdf->SetCreator(INI['system']['caroapp']);
@@ -453,13 +498,11 @@ class record extends API {
 		$pdf->SetTitle(LANG::GET('menu.record_export'));
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
 		$pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
-		// set font
-		$pdf->SetFont('helvetica', '', 10); // font size
 		// add a page
 		$pdf->AddPage();
 		// set cell padding
@@ -471,7 +514,9 @@ class record extends API {
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		foreach ($content['content'] as $key => $value) {
+			$pdf->SetFont('helvetica', 'B', 10); // font size
 			$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+			$pdf->SetFont('helvetica', '', 10); // font size
 			$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 		}
 
