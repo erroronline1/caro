@@ -23,11 +23,18 @@ class record extends API {
 					$downloadfiles[LANG::GET('record.create_identifier')] = [
 						'href' => $this->identifierPDF($content)
 					];
+					$body = [
+						[
+							'type' => 'text',
+							'content' => LANG::GET('record.create_identifier_proceed')
+						], [
+							'type' => 'links',
+							'content' => $downloadfiles
+						]
+					];
 					$this->response([
-						'log' => LANG::GET('record.create_identifier_proceed'),
-						'links' => $downloadfiles
+						'body' => $body
 					]);
-	
 				}
 				else $this->response(['status' => [
 					'msg' => LANG::GET('record.create_identifier_error')
@@ -317,20 +324,32 @@ class record extends API {
 
 	public function export(){
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$content = $this->summarizeRecord();
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_export')] = [
-			'href' => $this->recordsPDF($this->_requestedID)
+			'href' => $this->recordsPDF($content)
 		];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
-		$statement->execute([
-			':identifier' => $this->_requestedID
-		]);
 
 		// todo: append all (but images?) 
-
+		$body = [];
+		foreach ($content['content'] as $key => $value) {
+			$body[] = [
+				'type' => 'text',
+				'description' => $key,
+				'content' => $value
+			];
+		}
+		array_push($body, 
+			[
+				'type' => 'text',
+				'content' => LANG::GET('record.record_export_proceed')
+			], [
+				'type' => 'links',
+				'content' => $downloadfiles
+			]
+		);
 		$this->response([
-			'log' => LANG::GET('record.record_export_proceed'),
-			'links' => $downloadfiles
+			'body' => $body,
 		]);
 	}
 
@@ -417,16 +436,13 @@ class record extends API {
 
 		//Close and output PDF document
 		if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
-		$filename = preg_replace('/[^\w\d]/', '', $content);
+		$filename = preg_replace('/[^\w\d]/', '', $content) . '.pdf';
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
 	}
 
-	private function recordsPDF(){
+	private function recordsPDF($content){
 		// create a pdf for a record summary
-		$content = $this->summarizeRecord();
-
-
 		require_once($this->PDFLIBRARY);
 		// create new PDF document
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false);

@@ -599,15 +599,14 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
-				if (data.log !== undefined) {
-					const dialog = {
+				if (data.body !== undefined) {
+					const options = {};
+					options[LANG.GET("general.prevent_dataloss_ok")] = false;
+					new Dialog({
 						type: "input",
-						body: [
-							{ type: "text", content: data.log },
-							{ type: "links", content: data.links },
-						],
-					};
-					new Dialog(dialog);
+						body: data.body,
+						options: options,
+					});
 				}
 			},
 			title = {
@@ -655,10 +654,13 @@ export const api = {
 											}
 										} else if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											input.checked = Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
+											input.checked =
+												Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
 										} else if (input.type === "checkbox") {
 											groupname = input.dataset.grouped.replaceAll(" ", "_");
-											input.checked = Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name);
+											input.checked =
+												Object.keys(data.status.data).includes(groupname) &&
+												data.status.data[groupname].split(", ").includes(input.name);
 										} else {
 											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}
