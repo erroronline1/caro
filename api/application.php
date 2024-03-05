@@ -69,7 +69,6 @@ class APPLICATION extends API {
 			],
 			LANG::GET('menu.record_header') => [
 				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
-				LANG::GET('menu.record_bundles') => ['onpointerup' => "api.record('get', 'bundles')"],
 				LANG::GET('menu.record_record') => ['onpointerup' => "api.record('get', 'forms')"],
 				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
