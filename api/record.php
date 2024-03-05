@@ -357,6 +357,11 @@ class record extends API {
 				$body = [];
 				// summarize content
 				$content = $this->summarizeRecord();
+				$body[] = [
+					'type' => 'text',
+					'description' => LANG::GET('record.create_identifier'),
+					'content' => $this->_requestedID
+				];
 				foreach ($content['content'] as $key => $value) {
 					$body[] = [
 						'type' => 'text',
