@@ -67,7 +67,7 @@ graph TD;
     unless admin"));
 
     approved_orders-->process_order{process order};
-    process_order-->disapprove[divapprove];
+    process_order-->disapprove[disapprove];
     disapprove-->append_message[append message];
     append_message-->message_unit[message all unit members];
     disapprove-->message_unit;
@@ -128,4 +128,76 @@ graph TD;
     on authorization"))
     user-->|units|units(("see content based
     on units"))
+```
+
+### text recommendations ###
+
+```mermaid
+graph TD;
+    textrecommendation(("text
+    recommendation")) -->select[select template];
+    select -->chunks[(chunks)];
+    chunks-->|get recent by name|display["display template
+    and inputs"];
+    display -->|input|render(rendered text);
+
+    managechunks(("manage
+    text chunks")) -->select2["select recent
+    by name or new"];
+    managechunks(("manage
+    text chunks")) -->select3["select any or new"];
+    select2-->chunks2[(chunks)];
+    select3-->chunks2;
+    chunks2 -->editchunk[edit chunk];
+    editchunk -->type{type};
+    type -->|replacement|chunks2;
+    type -->|text|chunks2;
+    
+    managetemplates(("manage
+    text templates")) -->select4["select recent
+    by name or new"];
+    managetemplates(("manage
+    text chunks")) -->select5["select any or new"];
+    select4-->chunks3[(chunks)];
+    select5-->chunks3;
+    chunks3 -->edittemplate[edit template];
+    edittemplate -->|add template|chunks3;
+```
+
+### records ###
+
+```mermaid
+graph TD;
+    records((records))-->identifiersheet(("create
+    identifier
+    sheet"));
+    identifiersheet-->input[input data];
+    input-->|generate|print("print sheet,
+    handout to workmates");
+
+    records-->fillform((fill out form));
+    fillform-->selectform[select form];
+    selectform-->forms[(forms)];
+    forms-->|get recent by name|displayform[display form];
+    displayform-->inputdata[add data];
+    inputdata-->|input new dataset with form name|recorddb[(record database)];
+    displayform-->idimport[import by identifier];
+    idimport-->recorddb2[(record database)];;
+    recorddb2-->selectbyid[retrieve all with identifier];
+    selectbyid-->|render last appended data|inputdata;
+
+    print-.->idimport;
+
+    records-->summaries((record summary));
+    summaries-->recorddb3[(record database)]
+    recorddb3-->displayids[display identifier];
+    displayids-->|select|summary[display summary];
+    summary-->export[export];
+    export-->pdf("summary as pdf,
+    attached files");
+    summary-->matchbundles[match with form bundles];
+    matchbundles-->missing{missing form};
+    missing-->|yes|appenddata[append form];
+    appenddata-->forms;
+    missing-->|no|nonemissing(status message);
 ```
