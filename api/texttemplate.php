@@ -23,7 +23,7 @@ class TEXTTEMPLATE extends API {
 					':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_hidden')) === LANG::PROPERTY('texttemplate.edit_chunk_hidden_hidden')? 1 : 0,
 				];
 
-				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language'])) $this->response([], 400);
+				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 
 				// put hidden attribute if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
@@ -170,6 +170,20 @@ class TEXTTEMPLATE extends API {
 							], [
 								'type' => 'select',
 								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_type'),
+									'onchange' => "document.getElementById('insertchunk').disabled = this.value == 'text';",
+									'required' => true
+								],
+								'content' => [
+									'...' . LANG::GET('texttemplate.edit_template_insert_default') => ['value' => '0'],
+									LANG::GET('texttemplate.edit_chunk_type_replacement') => ['value' => 'replacement'],
+									LANG::GET('texttemplate.edit_chunk_type_text') => ['value' => 'text'],
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'id' => 'insertchunk',
+									'disabled' => true,
 									'name' => LANG::GET('texttemplate.edit_chunk_insert_name'),
 									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
 								],
@@ -193,15 +207,6 @@ class TEXTTEMPLATE extends API {
 									'value' => $chunk['language'],
 									'required' => true,
 									'data-loss' => 'prevent'
-								]
-							], [
-								'type' => 'select',
-								'attributes' => [
-									'name' => LANG::GET('texttemplate.edit_chunk_type')
-								],
-								'content' => [
-									LANG::GET('texttemplate.edit_chunk_type_replacement') => ['value' => 'replacement'],
-									LANG::GET('texttemplate.edit_chunk_type_text') => ['value' => 'text'],
 								]
 							]
 						]
