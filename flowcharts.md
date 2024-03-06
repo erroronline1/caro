@@ -1,4 +1,11 @@
-### vendor and product management ###
+## content
+* [vendor and product management](#vendor-and-product-management)
+* [order](#order)
+* [users](#users)
+* [text recommendations](#text-recommendations)
+* [records](#records)
+
+### vendor and product management
 
 ```mermaid
 graph TD;
@@ -40,8 +47,9 @@ graph TD;
     product_inactive-->inorderable;
     edit_product-->product_inactive;
 ```
+[content](#content)
 
-### order ###
+### order
 
 ```mermaid
 graph TD;
@@ -93,8 +101,9 @@ graph TD;
     mark_bulk-->|no|prepared_orders;
     prepared_orders-->add_product;
 ```
+[content](#content)
 
-### users ###
+### users
 
 ```mermaid
 graph TD;
@@ -129,8 +138,9 @@ graph TD;
     user-->|units|units(("see content based
     on units"))
 ```
+[content](#content)
 
-### text recommendations ###
+### text recommendations
 
 ```mermaid
 graph TD;
@@ -163,6 +173,7 @@ graph TD;
     chunks3 -->edittemplate[edit template];
     edittemplate -->|add template|chunks3;
 ```
+[content](#content)
 
 ### records ###
 
