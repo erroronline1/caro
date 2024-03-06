@@ -1028,7 +1028,7 @@ export class Assemble {
 		label.classList.add("input-label");
 		select.addEventListener("pointerdown", (e) => {
 			e.preventDefault();
-			new Dialog({
+			if (!e.target.disabled) new Dialog({
 				type: "select",
 				header: select.title,
 				options: selectModal,
