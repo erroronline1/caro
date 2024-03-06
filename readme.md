@@ -104,6 +104,9 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+
+* text template editor display added chunks, drag drop like form composer, placeholders are way too abstract
+
 * records by unit? (add unit/user units) select by permissions
 * filter by context
 * export append all files that are not embedded (aka !images)
