@@ -212,7 +212,7 @@ class TEXTTEMPLATE extends API {
 						]
 					]
 				];
-				if ($chunk['type'] === 'text') $return['body']['content'][1][4]['content'][LANG::GET('texttemplate.edit_chunk_type_text')]['selected'] = true;
+				if ($chunk['type'] === 'text') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_type_text')]['selected'] = true;
 				if ($chunk['id']){
 
 					$hidden = [
