@@ -171,7 +171,7 @@ class TEXTTEMPLATE extends API {
 								'type' => 'select',
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_chunk_type'),
-									'onchange' => "document.getElementById('insertchunk').disabled = this.value == 'text';",
+									'onchange' => "document.getElementById('insertchunk').disabled = this.value == 'replacement';",
 									'required' => true
 								],
 								'content' => [
@@ -183,7 +183,7 @@ class TEXTTEMPLATE extends API {
 								'type' => 'select',
 								'attributes' => [
 									'id' => 'insertchunk',
-									'disabled' => true,
+									'disabled' => $chunk['type'] !== 'text',
 									'name' => LANG::GET('texttemplate.edit_chunk_insert_name'),
 									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
 								],
@@ -213,6 +213,7 @@ class TEXTTEMPLATE extends API {
 					]
 				];
 				if ($chunk['type'] === 'text') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_type_text')]['selected'] = true;
+				if ($chunk['type'] === 'replacement') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_type_replacement')]['selected'] = true;
 				if ($chunk['id']){
 
 					$hidden = [
@@ -516,7 +517,7 @@ class TEXTTEMPLATE extends API {
 		if ($template['name']){
 			$inputs = [];
 			// match placeholders
-			preg_match_all('/(:.+?)\W/m', strtr($template['content'], $texts), $placeholders);
+			preg_match_all('/(:.+?)(?:\W|$)/m', strtr($template['content'], $texts), $placeholders);
 			$undefined = array_unique(array_diff($placeholders[1], array_keys($replacements)));
 			foreach ($undefined as $placeholder) {
 				$inputs[] = [
