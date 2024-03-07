@@ -406,7 +406,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, composedComponent || request[1] === 'bundle');
+		api.send(method, request, successFn, null, payload, composedComponent || request[1] === "bundle");
 	},
 	message: (method, ...request) => {
 		/*
@@ -620,7 +620,7 @@ export const api = {
 				identifier: LANG.GET("menu.record_create_identifier"),
 				forms: LANG.GET("menu.record_record"),
 				records: LANG.GET("menu.record_summary"),
-				record: LANG.GET("menu.record_summary")
+				record: LANG.GET("menu.record_summary"),
 			};
 		switch (method) {
 			case "get":
@@ -732,16 +732,28 @@ export const api = {
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 					if (data.data !== undefined) texttemplateClient.data = data.data;
+					if (data.selected !== undefined && data.selected.length) {
+						compose_helper.importTextTemplate(data.selected);
+					}
 					api.preventDataloss.start();
 				};
 				break;
 			case "post":
-				payload = _.getInputs("[data-usecase=texttemplate]", true);
+				switch (request[1]) {
+					case "template":
+						successFn = function (data) {
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+						};
+						if (!(payload = compose_helper.composeNewTextTemplate())) return;
+						break;
+					default:
+						payload = _.getInputs("[data-usecase=texttemplate]", true);
+				}
 				break;
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post");
+		api.send(method, request, successFn, null, payload, method === "post" && request[1] !== 'template');
 	},
 	tool: (method, ...request) => {
 		/*

@@ -3,21 +3,15 @@ const _serviceWorker = {
 	permission: null,
 	register: async function () {
 		if ("serviceWorker" in navigator) {
-			this.worker = await navigator.serviceWorker.register(
-				"./service-worker.js"
-			);
+			this.worker = await navigator.serviceWorker.register("./service-worker.js");
 			this.permission = await window.Notification.requestPermission();
 			navigator.serviceWorker.ready.then((registration) => {
 				setInterval(() => {
-					if (registration)
-						_serviceWorker.postMessage("getnotifications");
+					if (registration) _serviceWorker.postMessage("getnotifications");
 				}, 300000);
-				navigator.serviceWorker.addEventListener(
-					"message",
-					(message) => {
-						this.onMessage(message.data);
-					}
-				);
+				navigator.serviceWorker.addEventListener("message", (message) => {
+					this.onMessage(message.data);
+				});
 			});
 		} else throw new Error("No Service Worker support!");
 	},
@@ -57,18 +51,11 @@ const _serviceWorker = {
 								":amount": data.unnotified,
 						  })
 						: LANG.GET("message.new_message");
-				this.showLocalNotification(
-					LANG.GET("menu.communication_header"),
-					body
-				);
+				this.showLocalNotification(LANG.GET("menu.communication_header"), body);
 			}
 		}
 		if ("unseen" in data) {
-			const mailnotif = document.querySelector(
-				"[data-for=userMenu" +
-					LANG.GET("menu.communication_header") +
-					"]"
-			);
+			const mailnotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header") + "]");
 			mailnotif.setAttribute("data-notification", data.unseen);
 		}
 	},
@@ -78,19 +65,13 @@ const texttemplateClient = {
 	data: null,
 	update: () => {
 		const replacements = {},
-			genii = document.getElementsByName(
-				LANG.GET("texttemplate.use_person")
-			),
+			genii = document.getElementsByName(LANG.GET("texttemplate.use_person")),
 			blocks = document.querySelectorAll("[data-usecase=useblocks]"),
-			placeholder = document.querySelectorAll(
-				"[data-usecase=undefinedplaceholder]"
-			);
+			placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
 		let selectedgenus = 0,
 			output = "",
 			blockcontent;
-		for (const [key, value] of Object.entries(
-			texttemplateClient.data.replacements
-		)) {
+		for (const [key, value] of Object.entries(texttemplateClient.data.replacements)) {
 			replacements[key] = value.split(/\r\n|\n/);
 		}
 		for (let i = 0; i < genii.length; i++) {
@@ -101,24 +82,14 @@ const texttemplateClient = {
 		}
 		for (const block of blocks) {
 			if (block.checked) {
-				blockcontent =
-					texttemplateClient.data.blocks[
-						":" + block.name.replaceAll(/\(.*?\)/g, "")
-					];
+				blockcontent = texttemplateClient.data.blocks[":" + block.name.replaceAll(/\(.*?\)/g, "")];
 				for (const input of placeholder) {
-					if (input.value)
-						blockcontent = blockcontent.replaceAll(
-							":" + input.id,
-							input.value
-						);
+					if (input.value) blockcontent = blockcontent.replaceAll(":" + input.id, input.value);
 				}
 				for (const [key, replacement] of Object.entries(replacements)) {
-					blockcontent = blockcontent.replaceAll(
-						key,
-						replacement[selectedgenus]
-					);
+					blockcontent = blockcontent.replaceAll(key, replacement[selectedgenus]);
 				}
-				output += blockcontent + "\n";
+				output += blockcontent;
 			}
 		}
 		document.getElementById("texttemplate").value = output;
@@ -165,16 +136,14 @@ const orderClient = {
 						{
 							type: "hiddeninput",
 							attributes: {
-								name:
-									LANG.GET("order.ordernumber_label") + "[]",
+								name: LANG.GET("order.ordernumber_label") + "[]",
 								value: data[2],
 							},
 						},
 						{
 							type: "hiddeninput",
 							attributes: {
-								name:
-									LANG.GET("order.productname_label") + "[]",
+								name: LANG.GET("order.productname_label") + "[]",
 								value: data[3],
 							},
 						},
@@ -221,9 +190,7 @@ const orderClient = {
 			received: document.querySelectorAll("[data-received=true]"),
 			archived: document.querySelectorAll("[data-archived=true]"),
 		};
-		let display = [
-			...document.querySelectorAll("[data-ordered=false]"),
-		].map(function (node) {
+		let display = [...document.querySelectorAll("[data-ordered=false]")].map(function (node) {
 			return node.parentNode;
 		});
 		if (type === "ordered")
@@ -237,11 +204,7 @@ const orderClient = {
 			});
 		if (type === "received")
 			display = [...filters.received].map(function (node) {
-				return [...filters.archived]
-					.map((n) => n.parentNode)
-					.includes(node.parentNode)
-					? undefined
-					: node.parentNode;
+				return [...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
 			});
 		if (type === "archived")
 			display = [...filters.archived].map(function (node) {
@@ -282,10 +245,7 @@ const applicationModule = {
 };
 
 window.addEventListener("scroll", function () {
-	const percentScrolled =
-		(window.scrollY /
-			(document.body.clientHeight - window.innerHeight + 100)) *
-		100;
+	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
 	document.querySelector("header>div").style.width = percentScrolled + "%";
 });
 window.addEventListener("pointerup", applicationModule.clearMenu);

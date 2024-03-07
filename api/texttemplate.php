@@ -24,6 +24,8 @@ class TEXTTEMPLATE extends API {
 				];
 
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
+				preg_match("/\s\W\D/m", $chunk[':name'], $matches);
+				if ($matches) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']])]]);
 
 				// put hidden attribute if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
@@ -241,12 +243,12 @@ class TEXTTEMPLATE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$template = [
-					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_name')),
+					':name' => $this->_payload->name,
 					':author' => $_SESSION['user']['name'],
-					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_content')),
-					':language' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_language')),
+					':content' => json_encode($this->_payload->content),
+					':language' => $this->_payload->language,
 					':type' => 'template',
-					':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_template_hidden')) === LANG::PROPERTY('texttemplate.edit_template_hidden_hidden')? 1 : 0,
+					':hidden' => $this->_payload->hidden ? 1 : 0,
 				];
 
 				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
@@ -318,7 +320,7 @@ class TEXTTEMPLATE extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
 				$statement->execute();
 				$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
-				$hidden = [];
+				$hidden = $chunks = [];
 				foreach($templates as $key => $row) {
 					if ($row['type'] === 'replacement') continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -329,14 +331,17 @@ class TEXTTEMPLATE extends API {
 						}
 						$alloptions[$row['name'] . ' (' . $row['language'] . ') ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
-					if ($row['type'] === 'text') $insertreplacement[$row['name'] . ' - ' . substr($row['content'], 0, 50) . (strlen($row['content']) > 50 ? '...' : '')] = ['value' => ':' . $row['name']];
+					if ($row['type'] === 'text'){
+						if (!array_key_exists(':' . $row['name'], $chunks) && !in_array($row['name'], $hidden)) {
+							$insertreplacement[$row['name'] . ' - ' . substr($row['content'], 0, 50) . (strlen($row['content']) > 50 ? '...' : '')] = ['value' => ':' . $row['name']];
+							$chunks[':' . $row['name']] = $row['content'];
+						}
+					}
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
-
+				$return['data'] = $chunks;
+				$return['selected'] = $template['content'] ? json_decode($template['content'], true): [];
 				$return['body'] = [
-					'form' => [
-						'data-usecase' => 'texttemplate',
-						'action' => "javascript:api.texttemplate('post', 'template')"],
 					'content' => [
 						[
 							[
@@ -383,36 +388,50 @@ class TEXTTEMPLATE extends API {
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_template_name'),
 									'value' => $template['name'],
+									'id' => 'TemplateName',
 									'required' => true,
+									'pattern' => '[A-Za-z0-9_]',
 									'data-loss' => 'prevent'
 								]
 							], [
 								'type' => 'select',
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_template_insert_name'),
-									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
+									'onchange' => "if (this.value.length > 1) compose_helper.composeNewTextTemplateCallback(this.value);"
 								],
 								'content' => $insertreplacement
-							], [
-								'type' => 'textarea',
-								'hint' => LANG::GET('texttemplate.edit_template_content_hint'),
-								'attributes' => [
-									'name' => LANG::GET('texttemplate.edit_template_content'),
-									'value' => $template['content'],
-									'rows' => 6,
-									'id' => 'content',
-									'required' => true,
-									'data-loss' => 'prevent'
-								]
 							], [
 								'type' => 'textinput',
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_template_language'),
 									'list' => 'languages',
 									'value' => $template['language'],
+									'id' => 'TemplateLanguage',
 									'required' => true,
 									'data-loss' => 'prevent'
 								]
+							],[
+								'type' => 'button',
+								'attributes' => [
+									'value' => LANG::GET('texttemplate.edit_template_save'),
+									'type' => 'button',
+									'onpointerup' => "new Dialog({type: 'confirm', header: '" .
+										LANG::GET("texttemplate.edit_template_save") .
+										"', options:{" .
+										"'" .
+										LANG::GET("assemble.compose_form_cancel") .
+										"': false," .
+										"'" .
+										LANG::GET("assemble.compose_form_confirm") .
+										"': {value: true, class: 'reducedCTA'}," .
+										"}}).then(confirmation => {if (confirmation) api.texttemplate('post', 'template')})",
+						
+								]
+							]
+						], [
+							[
+								'type' => 'trash',
+								'description' => LANG::GET('assemble.edit_trash')
 							]
 						]
 					]
@@ -425,7 +444,7 @@ class TEXTTEMPLATE extends API {
 						],
 						'content' => [
 							LANG::GET('texttemplate.edit_template_hidden_visible') => ['checked' => true],
-							LANG::GET('texttemplate.edit_template_hidden_hidden') => []
+							LANG::GET('texttemplate.edit_template_hidden_hidden') => ['data-hiddenradio'=>'ComponentHidden']
 						],
 						'hint' => LANG::GET('texttemplate.edit_template_hidden_hint')
 					];
@@ -515,10 +534,21 @@ class TEXTTEMPLATE extends API {
 			]
 		];
 		if ($template['name']){
-			$inputs = [];
-			// match placeholders
-			preg_match_all('/(:.+?)(?:\W|$)/m', strtr($template['content'], $texts), $placeholders);
-			$undefined = array_unique(array_diff($placeholders[1], array_keys($replacements)));
+			$inputs = $undefined = [];
+
+			// match and replace placeholders and add parapgraph linebreaks
+			$content = '';
+			foreach(json_decode($template['content']) as $paragraph){
+				foreach($paragraph as $chunk){
+					$add = $texts[$chunk];
+					preg_match_all('/(:.+?)(?:\W|$)/m', $add, $placeholders);
+					array_push($undefined, ...$placeholders[1]);
+					$content .= $add;
+				}
+				$content .= "\n";
+				$texts[$paragraph[count($paragraph)-1]] .= "\n";
+			}
+			// add input fileds for undefined placeholders
 			foreach ($undefined as $placeholder) {
 				$inputs[] = [
 					'type' => 'textinput',
@@ -544,10 +574,9 @@ class TEXTTEMPLATE extends API {
 				'content' => $usegenus
 			];
 
-			foreach (preg_split('/\n+/', $template['content']) as $block){
+			foreach (json_decode($template['content']) as $block){
 				$useblocks = [];
-				preg_match_all('/:[\w\d]+/', $block, $blocktexts);
-				foreach($blocktexts[0] as $key => $value){
+				foreach($block as $key => $value){
 					$useblocks[preg_replace('/\W/', '', $value)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
 				}
 				if (count($useblocks)) $inputs[] = [
@@ -573,7 +602,7 @@ class TEXTTEMPLATE extends API {
 					'attributes' => [
 						'id' => 'texttemplate',
 						'name' => LANG::GET('texttemplate.use_template'),
-						'value' => strtr($template['content'], $texts),
+						'value' => $content,
 						'rows' => 13,
 						'readonly' => true,
 						'onpointerup' => 'orderClient.toClipboard(this)'

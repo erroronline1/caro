@@ -10,6 +10,7 @@ const cloneItems =
 export const compose_helper = {
 	newFormComponents: {},
 	newFormElements: new Set(),
+	newTextElements: {},
 	getNextElementID: getNextElementID,
 	composeNewElementCallback: function (parent) {
 		let sibling = parent.childNodes[0].nextSibling,
@@ -37,34 +38,21 @@ export const compose_helper = {
 			value = sibling.value;
 			if (["links", "radio", "select", "checkbox"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_multilist_name")) {
-					setTo = Object.keys(setName).find((key) =>
-						setName[key].includes(element.type)
-					);
+					setTo = Object.keys(setName).find((key) => setName[key].includes(element.type));
 					if (value && setTo === "name") element.attributes.name = value;
-					else if (value && setTo === "description")
-						element.description = value;
+					else if (value && setTo === "description") element.description = value;
 					else return;
 				}
-				if (
-					elementName === LANG.GET("assemble.compose_multilist_add_item") &&
-					value
-				) {
+				if (elementName === LANG.GET("assemble.compose_multilist_add_item") && value) {
 					if (element.content === undefined) element.content = {};
 					element.content[value] = {};
 				}
-			} else if (
-				["file", "photo", "scanner", "signature", "identify"].includes(
-					element.type
-				)
-			) {
+			} else if (["file", "photo", "scanner", "signature", "identify"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_simple_element")) {
 					if (value) element.attributes.name = value;
 					else return;
 				}
-				if (
-					elementName === LANG.GET("assemble.compose_context_identify") &&
-					sibling.checked
-				) {
+				if (elementName === LANG.GET("assemble.compose_context_identify") && sibling.checked) {
 					element.attributes.required = true;
 					element.attributes.multiple = false;
 					element.type = "identify";
@@ -74,18 +62,11 @@ export const compose_helper = {
 					if (value) element.description = value;
 					else return;
 				}
-				if (
-					elementName === LANG.GET("assemble.compose_text_content") &&
-					value
-				) {
+				if (elementName === LANG.GET("assemble.compose_text_content") && value) {
 					element.content = value;
 				}
 			} else if (["image"].includes(element.type)) {
-				if (
-					elementName === LANG.GET("assemble.compose_image_description") &&
-					value
-				)
-					element.description = value;
+				if (elementName === LANG.GET("assemble.compose_image_description") && value) element.description = value;
 				if (elementName === LANG.GET("assemble.compose_image") && value) {
 					element.attributes = {
 						name: value,
@@ -96,9 +77,7 @@ export const compose_helper = {
 					input.type = "file";
 					input.name = "composedComponent_files[]";
 					input.files = sibling.files;
-					document
-						.querySelector("[data-usecase=component_editor_form]")
-						.append(input);
+					document.querySelector("[data-usecase=component_editor_form]").append(input);
 				}
 			} else {
 				// ...input
@@ -107,33 +86,35 @@ export const compose_helper = {
 					else return;
 				}
 			}
-			if (elementName === LANG.GET("assemble.compose_field_hint") && value)
-				element.hint = value;
-			if (
-				elementName === LANG.GET("assemble.compose_required") &&
-				sibling.checked &&
-				!("required" in element.attributes)
-			)
+			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
+			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
 				element.attributes.required = true;
-			if (
-				elementName === LANG.GET("assemble.compose_multiple") &&
-				sibling.checked &&
-				!("multiple" in element.attributes)
-			)
+			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes))
 				element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
 				draggable: true,
-				composer: "component",
 				content: [
 					[structuredClone(element)], // element receives attributes from currentElement otherwise
 				],
 			});
-			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] =
-				element;
+			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] = element;
 		}
+	},
+	composeNewTextTemplateCallback: function (key) {
+		const chunk = new Compose({
+			draggable: true,
+			content: [[
+				{
+					type: "text",
+					description: key,
+					content: texttemplateClient.data[key],
+				},
+			]],
+		});
+		compose_helper.newTextElements[chunk.generatedElementIDs[0]] = key;
 	},
 
 	addComponentMultipartFormToMain: function () {
@@ -154,9 +135,7 @@ export const compose_helper = {
 		input.type = "hidden";
 		input.name = "composedComponent";
 		input.value = JSON.stringify(composedComponent);
-		document
-			.querySelector("[data-usecase=component_editor_form]")
-			.append(input);
+		document.querySelector("[data-usecase=component_editor_form]").append(input);
 	},
 
 	composeNewComponent: function () {
@@ -164,9 +143,7 @@ export const compose_helper = {
 		let isForm = false,
 			componentContent = [],
 			name = document.getElementById("ComponentName").value,
-			hidden = document.querySelector("[data-hiddenradio]")
-				? document.querySelector("[data-hiddenradio]").checked
-				: false;
+			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 
 		function nodechildren(parent) {
 			let content = [],
@@ -175,25 +152,14 @@ export const compose_helper = {
 				if (node.draggable) {
 					container = node.children[1];
 					if (container.localName === "article") {
-						if (container.firstChild.localName === "section")
-							content.push(nodechildren(container.firstChild));
+						if (container.firstChild.localName === "section") content.push(nodechildren(container.firstChild));
 						else content.push(nodechildren(container));
 					} else {
 						if (node.id in compose_helper.newFormComponents) {
-							if (
-								compose_helper.newFormComponents[node.id].attributes !=
-								undefined
-							)
-								delete compose_helper.newFormComponents[node.id].attributes[
-									"placeholder"
-								];
+							if (compose_helper.newFormComponents[node.id].attributes != undefined)
+								delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
 							content.push(compose_helper.newFormComponents[node.id]);
-							if (
-								!["text", "links", "image"].includes(
-									compose_helper.newFormComponents[node.id].type
-								)
-							)
-								isForm = true;
+							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
 						}
 					}
 				}
@@ -217,13 +183,10 @@ export const compose_helper = {
 			name = document.getElementById("ComponentName").value,
 			alias = document.getElementById("ComponentAlias").value,
 			context = document.getElementById("ComponentContext").value,
-			hidden = document.querySelector("[data-hiddenradio]")
-				? document.querySelector("[data-hiddenradio]").checked
-				: false;
+			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
-			if (nodes[i].dataset && nodes[i].dataset.name)
-				content.push(nodes[i].dataset.name);
+			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
 		if (name && context && content.length)
 			return {
@@ -236,12 +199,44 @@ export const compose_helper = {
 		api.toast(LANG.GET("assemble.edit_form_not_saved_missing"));
 		return null;
 	},
+	composeNewTextTemplate: function () {
+		// set dragged/dropped order of elements
+		const name = document.getElementById("TemplateName").value,
+			language = document.getElementById("TemplateLanguage").value,
+			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
+		function nodechildren(parent) {
+			let content = [];
+			[...parent.childNodes].forEach((node) => {
+				if (parent.localName === "main") {
+					[...node.childNodes].forEach((div) =>{
+					if (div && div.draggable && div.children[1] && div.children[1].localName === "article") {
+						content.push(nodechildren(div.children[1]));
+					}
+				});
+				} else {
+					if (node.id in compose_helper.newTextElements) {
+						content.push(compose_helper.newTextElements[node.id]);
+					}
+				}
+			});
+			return content;
+		}
+		const templateContent = nodechildren(document.querySelector("main"));
+		if (name && language && templateContent.length)
+			return {
+				name: name,
+				language: language,
+				content: templateContent,
+				hidden: hidden,
+			};
+		api.toast(LANG.GET("texttemplate.edit_template_not_saved_missing"));
+		return null;
+	},
 
 	importComponent: function (form) {
 		compose_helper.newFormComponents = {};
 		const newElements = new Compose({
 			draggable: true,
-			composer: "component",
 			content: structuredClone(form.content),
 		});
 		// recursive function to assign created ids to form content elements in order of appearance
@@ -267,6 +262,27 @@ export const compose_helper = {
 			compose_helper.newFormElements.add(component.name);
 		}
 	},
+	importTextTemplate: function (chunks) {
+		compose_helper.newTextElements = {};
+		for (const paragraph of chunks) {
+			let texts = { content: [], keys: [] };
+			for (const key of paragraph) {
+				texts.content.push({
+					type: "text",
+					description: key,
+					content: texttemplateClient.data[key],
+				});
+				texts.keys.push(key);
+			}
+			let chunk = new Compose({
+				draggable: true,
+				content: [structuredClone(texts.content)],
+			});
+			for (let i = 0; i < texts.keys.length; i++) {
+				compose_helper.newTextElements[chunk.generatedElementIDs[i]] = texts.keys[i];
+			}
+		}
+	},
 
 	dragNdrop: {
 		stopParentDropEvent: false,
@@ -281,18 +297,11 @@ export const compose_helper = {
 			evnt.preventDefault();
 			if (!evnt.dataTransfer.getData("text")) return;
 
-			const draggedElement = document.getElementById(
-					evnt.dataTransfer.getData("text")
-				),
+			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
 				draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
 				originParent = draggedElement.parentNode;
 			//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
-			if (
-				!draggedElement ||
-				this.stopParentDropEvent ||
-				draggedElement.id === droppedUpon.id
-			)
-				return;
+			if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
 
 			// dragging single element
 			if (draggedElement.classList.contains("draggableFormElement")) {
@@ -307,14 +316,8 @@ export const compose_helper = {
 						insertionArea = document.createElement("hr");
 					container = compose_helper.create_draggable(container, false);
 					article.append(draggedElementClone);
-					insertionArea.setAttribute(
-						"ondragover",
-						"this.classList.add('insertionAreaHover')"
-					);
-					insertionArea.setAttribute(
-						"ondragleave",
-						"this.classList.remove('insertionAreaHover')"
-					);
+					insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
+					insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
 					insertionArea.classList.add("insertionArea");
 					container.append(insertionArea, article);
 					droppedUpon.parentNode.insertBefore(container, droppedUpon);
@@ -345,10 +348,7 @@ export const compose_helper = {
 					//                                                                                        section    article    container
 					document
 						.getElementById("main")
-						.insertBefore(
-							originParent.children[0].cloneNode(true),
-							originParent.parentNode.parentNode
-						); // adapt to changes in section creation!
+						.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -376,45 +376,27 @@ export const compose_helper = {
 				article.append(section);
 				container.append(article);
 
-				insertionArea.setAttribute(
-					"ondragover",
-					"this.classList.add('insertionAreaHover')"
-				);
-				insertionArea.setAttribute(
-					"ondragleave",
-					"this.classList.remove('insertionAreaHover')"
-				);
+				insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
+				insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
 				insertionArea.classList.add("insertionArea");
 				container.insertBefore(insertionArea, container.firstChild);
-				previousSibling.parentNode.insertBefore(
-					container,
-					previousSibling.nextSibling
-				);
+				previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
 				draggedElement.remove(); // do not remove earlier! inserBefore might reference to this object by chance
 				return;
 			}
 		},
 		drop_delete: function (evnt) {
-			const draggedElement = document.getElementById(
-					evnt.dataTransfer.getData("text")
-				),
+			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
 				originParent = draggedElement.parentNode;
 			// sanitize article on lack of elements
-			if (
-				originParent.parentNode != document.getElementById("main") &&
-				originParent.children.length < 2
-			) {
+			if (originParent.parentNode != document.getElementById("main") && originParent.children.length < 2) {
 				originParent.parentNode.remove(); // adapt to changes in section creation!
 			}
 			draggedElement.remove();
 		},
 	},
 
-	create_draggable: function (
-		element,
-		insertionArea = true,
-		allowSections = true
-	) {
+	create_draggable: function (element, insertionArea = true, allowSections = true) {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
@@ -422,10 +404,7 @@ export const compose_helper = {
 			"ondragover",
 			"compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')"
 		);
-		element.setAttribute(
-			"ondragleave",
-			"this.classList.remove('draggableFormElementHover')"
-		);
+		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
 		element.setAttribute(
 			"ondrop",
 			"compose_helper.dragNdrop.drop_insert(event, this, " +
@@ -434,14 +413,8 @@ export const compose_helper = {
 		);
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
-			insertionArea.setAttribute(
-				"ondragover",
-				"this.classList.add('insertionAreaHover')"
-			);
-			insertionArea.setAttribute(
-				"ondragleave",
-				"this.classList.remove('insertionAreaHover')"
-			);
+			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
+			insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
 			insertionArea.classList.add("insertionArea");
 			element.insertBefore(insertionArea, element.firstChild);
 		}
@@ -449,14 +422,8 @@ export const compose_helper = {
 	},
 	composer_add_trash: function (element) {
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute(
-			"ondragover",
-			"compose_helper.dragNdrop.allowDrop(event)"
-		);
-		element.setAttribute(
-			"ondrop",
-			"compose_helper.dragNdrop.drop_delete(event)"
-		);
+		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
+		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_delete(event)");
 	},
 };
 
@@ -464,7 +431,6 @@ export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
 		this.createDraggable = setup.draggable;
-		this.composer = setup.composer;
 		this.generatedElementIDs = [];
 		this.initializeSection();
 		this.returnID();
@@ -541,12 +507,7 @@ export class Compose extends Assemble {
 				}
 			});
 			if (elements[0].constructor.name === "Array")
-				content = content.concat(
-					section,
-					this.createDraggable
-						? []
-						: this.slider(section.id, section.childNodes.length)
-				);
+				content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements
@@ -578,12 +539,7 @@ export class Compose extends Assemble {
 
 			let frame = false;
 			for (let n = 0; n < nodes.length; n++) {
-				if (
-					!(
-						["DATALIST", "HR", "BUTTON"].includes(nodes[n].nodeName) ||
-						nodes[n].hidden
-					)
-				) {
+				if (!(["DATALIST", "HR", "BUTTON"].includes(nodes[n].nodeName) || nodes[n].hidden)) {
 					frame = true;
 					break;
 				}
@@ -829,14 +785,11 @@ export class Compose extends Assemble {
 			};
 		}
 		if (type.type === "scanner") {
-			this.currentElement.content[
-				LANG.GET("assemble.compose_context_identify")
-			] = {
+			this.currentElement.content[LANG.GET("assemble.compose_context_identify")] = {
 				name: LANG.GET("assemble.compose_context_identify"),
 			};
 		}
-		if (Object.keys(this.currentElement.content).length)
-			result = result.concat(this.br(), ...this.checkbox());
+		if (Object.keys(this.currentElement.content).length) result = result.concat(this.br(), ...this.checkbox());
 
 		this.currentElement = {
 			attributes: {
@@ -1002,10 +955,8 @@ export class MetaCompose extends Assemble {
 	constructor(setup) {
 		delete setup.form;
 		super(setup);
-
 		this.initializeSection();
-		if (setup.draggable)
-			compose_helper.create_draggable(this.section, true, false);
+		if (setup.draggable) compose_helper.create_draggable(this.section, true, false);
 		this.section.setAttribute("data-name", setup.name);
 	}
 }
