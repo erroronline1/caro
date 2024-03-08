@@ -493,7 +493,7 @@ class TEXTTEMPLATE extends API {
 			if ($row['type'] !== 'template' && !in_array($row['name'], $hidden)) {
 				// prepare in case of template request
 				// set up array for strtr on content
-				if ($row['type']==='text' && !array_key_exists(':' . $row['name'], $texts)) $texts[':' . $row['name']] = $row['content'];
+				if ($row['type']==='text' && !array_key_exists(':' . $row['name'], $texts)) $texts[':' . $row['name']] = $row['content'] . ' ';
 				// set up array with valid replacements
 				if ($row['type']==='replacement' && !array_key_exists(':' . $row['name'], $replacements)) $replacements[':' . $row['name']] = $row['content'];
 				// skip for datalist and options 
@@ -536,31 +536,6 @@ class TEXTTEMPLATE extends API {
 		if ($template['name']){
 			$inputs = $undefined = [];
 
-			// match and replace placeholders and add parapgraph linebreaks
-			$content = '';
-			foreach(json_decode($template['content']) as $paragraph){
-				foreach($paragraph as $chunk){
-					$add = $texts[$chunk];
-					preg_match_all('/(:.+?)(?:\W|$)/m', $add, $placeholders);
-					array_push($undefined, ...$placeholders[1]);
-					$content .= $add;
-				}
-				$content .= "\n";
-				$texts[$paragraph[count($paragraph)-1]] .= "\n";
-			}
-			// add input fileds for undefined placeholders
-			foreach ($undefined as $placeholder) {
-				$inputs[] = [
-					'type' => 'textinput',
-					'attributes' => [
-						'name' => LANG::GET('texttemplate.use_fill_placeholder') . ' ' . $placeholder,
-						'id' => preg_replace('/\W/', '', $placeholder),
-						'data-usecase' => 'undefinedplaceholder',
-						'data-loss' => 'prevent'
-					]
-				];
-			}
-
 			$usegenus = [];
 			foreach(LANGUAGEFILE['texttemplate']['use_genus'] as $key => $genus){
 				$usegenus[$genus] = ['value' => $key, 'data-loss' => 'prevent'];
@@ -573,6 +548,34 @@ class TEXTTEMPLATE extends API {
 				],
 				'content' => $usegenus
 			];
+
+			// match and replace placeholders and add paragraph linebreaks
+			$content = '';
+			foreach(json_decode($template['content']) as $paragraph){
+				foreach($paragraph as $chunk){
+					$add = $texts[$chunk];
+					preg_match_all('/(:.+?)(?:\W|$)/m', $add, $placeholders);
+					foreach($placeholders[1] as $ph){
+						//var_dump($replacements, $ph);
+						if (!array_key_exists($ph, $replacements)) array_push($undefined, $ph);
+					}
+					$content .= $add;
+				}
+				$content .= "\n\n";
+				$texts[$paragraph[count($paragraph)-1]] .= "\n\n";
+			}
+			// add input fields for undefined placeholders
+			foreach ($undefined as $placeholder) {
+				$inputs[] = [
+					'type' => 'textinput',
+					'attributes' => [
+						'name' => LANG::GET('texttemplate.use_fill_placeholder') . ' ' . $placeholder,
+						'id' => preg_replace('/\W/', '', $placeholder),
+						'data-usecase' => 'undefinedplaceholder',
+						'data-loss' => 'prevent'
+					]
+				];
+			}
 
 			foreach (json_decode($template['content']) as $block){
 				$useblocks = [];
