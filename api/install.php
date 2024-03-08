@@ -47,6 +47,7 @@ $queries = [
 				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` timestamp NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author_id` int NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -187,6 +188,7 @@ $queries = [
 				"	identifier varchar(MAX) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
+				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				");"
 				,

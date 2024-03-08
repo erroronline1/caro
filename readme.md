@@ -105,10 +105,9 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 # open tasks
 
-* records by unit? (add unit/user units) select by permissions
 * filter by context
 * export append all files that are not embedded (aka !images)
-* add prevent data loss to form fields within records
+* empty form pdf export for occasional printing
 
 * input type email (multiple), phone
 
@@ -117,7 +116,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * vendor mailto (certificates)
 
 * settings? force desktop mode for small window? themes?
-* pdf export
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
 * caro audit

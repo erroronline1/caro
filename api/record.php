@@ -350,6 +350,7 @@ class record extends API {
 					':form_id' => $form_id,
 					':identifier' => $identifier,
 					':author' => $_SESSION['user']['name'],
+					':author_id' => $_SESSION['user']['id'],
 					':content' => json_encode($this->_payload)
 				])) $this->response([
 					'status' => [
@@ -451,47 +452,68 @@ class record extends API {
 
 	public function records(){
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$return = ['body' => ['content' => []]];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
 		$statement->execute();
 		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		if (!$data) {
+			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
+			$this->response($result);		
+		}
+
 		$recorddatalist = [];
-		$return = ['body' => ['content' => []]];
-		if ($data) {
-			$identifiers = [];
-			foreach($data as $row) {
-				$recorddatalist[] = $row['identifier'];
-				$identifiers[$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-			}
-			$content=[
+		$identifiers = ['units' => [], 'other' => [], 'unassigned' => []];
+
+		// sort records to user units, others and these that can not be assigned due to deleted user ids
+		$unassigned = [];
+		foreach($data as $row){
+			if (!in_array($row['identifier'], $recorddatalist)) $recorddatalist[] = $row['identifier'];
+			if ($row['units']){
+				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 'units';
+				else $target = 'other';
+			} else $target = 'unassigned';
+			$identifiers[$target][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+		}
+		// tidy up unassigned due to multiple returned identifiers from left join without units
+		foreach($identifiers['unassigned'] as $identifier => $value){
+			if (array_key_exists($identifier, $identifiers['units']) || array_key_exists($identifier, $identifiers['other'])) unset($identifiers['unassigned'][$identifier]);
+		}
+
+		$content = [
+			[
 				[
-					[
-						'type' => 'datalist',
-						'content' => $recorddatalist,
-						'attributes' => [
-							'id' => 'records'
-						]
-					], [
-						'type' => 'scanner',
-						'destination' => 'recordfilter',
-						'description' => LANG::GET('record.record_scan')
-					], [
-						'type' => 'filterinput',
-						'attributes' => [
-							'id' => 'recordfilter',
-							'name' => LANG::GET('record.form_filter'),
-							'list' => 'records',
-							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'recordfilter', this.value); return false;}",
-							'onblur' => "api.record('get', 'recordfilter', this.value); return false;",
-							]
+					'type' => 'datalist',
+					'content' => $recorddatalist,
+					'attributes' => [
+						'id' => 'records'
 					]
 				], [
-					'type' => 'links',
-					'description' => LANG::GET('record.record_all'),
-					'content' => $identifiers
+					'type' => 'scanner',
+					'destination' => 'recordfilter',
+					'description' => LANG::GET('record.record_scan')
+				], [
+					'type' => 'filterinput',
+					'attributes' => [
+						'id' => 'recordfilter',
+						'name' => LANG::GET('record.record_filter'),
+						'list' => 'records',
+						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'recordfilter', this.value); return false;}",
+						'onblur' => "api.record('get', 'recordfilter', this.value); return false;",
+						]
 				]
-			];
+			],
+			[ ] // leave this here!
+		];
+		foreach($identifiers as $target => $list){
+			array_push($content[1],[
+				[
+					'type' => 'links',
+					'description' => LANG::GET('record.record_list.' . $target),
+					'content' => $list
+				]
+			]);
 		}
-		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
+
 		$result['body']['content'] = $content;
 		$this->response($result);		
 	}
