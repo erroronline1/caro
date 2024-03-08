@@ -203,6 +203,7 @@ export const compose_helper = {
 		// set dragged/dropped order of elements
 		const name = document.getElementById("TemplateName").value,
 			language = document.getElementById("TemplateLanguage").value,
+			unit = document.getElementById("TemplateUnit").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 		function nodechildren(parent) {
 			let content = [];
@@ -225,6 +226,7 @@ export const compose_helper = {
 		if (name && language && templateContent.length)
 			return {
 				name: name,
+				unit: unit,
 				language: language,
 				content: templateContent,
 				hidden: hidden,

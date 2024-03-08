@@ -16,6 +16,7 @@ class TEXTTEMPLATE extends API {
 			case 'POST':
 				$chunk = [
 					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_name')),
+					':unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_unit')) ? : array_key_first(LANGUAGEFILE['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_content')),
 					':language' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('texttemplate.edit_chunk_language')),
@@ -37,7 +38,8 @@ class TEXTTEMPLATE extends API {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-put'));
 					if ($statement->execute([
 						':hidden' => $chunk[':hidden'],
-						':id' => $exists['id']
+						':id' => $exists['id'],
+						':unit' => $chunk[':unit']
 						])) $this->response([
 							'status' => [
 								'name' => $chunk[':name'],
@@ -80,6 +82,7 @@ class TEXTTEMPLATE extends API {
 				if (!$chunk = $statement->fetch(PDO::FETCH_ASSOC)) $chunk = [
 					'id' => '',
 					'name' => '',
+					'unit' => '',
 					'content' => '',
 					'language' => '',
 					'type' => ''
@@ -100,14 +103,21 @@ class TEXTTEMPLATE extends API {
 						}
 					}
 					if (!in_array($row['type'], ['replacement', 'text'])) continue;
+					$display = LANG::GET('units.' . $row['unit']) . ' ' . LANG::GET('texttemplate.edit_chunk_types.' . $row['type']) . ' ' . $row['name'] . ' (' . $row['language'] . ')';
 
-					if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
+					if (!array_key_exists($display, $options) && !in_array($row['name'], $hidden)) {
 						$chunkdatalist[] = $row['name'];
-						$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-						if ($row['type'] === 'replacement') $insertreplacement[$row['name']] = ['value' => ':' . $row['name']];
+						$options[$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						if ($row['type'] === 'replacement') $insertreplacement[LANG::GET('units.' . $row['unit']) . ' '. $row['name'] . ' (' . $row['language'] . ')'] = ['value' => ':' . $row['name']];
 					}
-					$alloptions[$row['name'] . ' (' . $row['language'] . ') ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					$alloptions[$display . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
+				}
+
+				$units = [];
+				foreach (LANGUAGEFILE['units'] as $unit => $translation){
+					$units[$translation] = ['value' => $unit];
+					if ($chunk['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
 
 				$return['body'] = [
@@ -174,8 +184,8 @@ class TEXTTEMPLATE extends API {
 								],
 								'content' => [
 									'...' . LANG::GET('texttemplate.edit_template_insert_default') => ['value' => '0'],
-									LANG::GET('texttemplate.edit_chunk_type_replacement') => ['value' => 'replacement'],
-									LANG::GET('texttemplate.edit_chunk_type_text') => ['value' => 'text'],
+									LANG::GET('texttemplate.edit_chunk_types.replacement') => ['value' => 'replacement'],
+									LANG::GET('texttemplate.edit_chunk_types.text') => ['value' => 'text'],
 								]
 							], [
 								'type' => 'select',
@@ -206,12 +216,18 @@ class TEXTTEMPLATE extends API {
 									'required' => true,
 									'data-loss' => 'prevent'
 								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_unit')
+								],
+								'content' => $units
 							]
 						]
 					]
 				];
-				if ($chunk['type'] === 'text') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_type_text')]['selected'] = true;
-				if ($chunk['type'] === 'replacement') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_type_replacement')]['selected'] = true;
+				if ($chunk['type'] === 'text') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_types.text')]['selected'] = true;
+				if ($chunk['type'] === 'replacement') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_types.replacement')]['selected'] = true;
 				if ($chunk['id']){
 
 					$hidden = [
@@ -240,6 +256,7 @@ class TEXTTEMPLATE extends API {
 			case 'POST':
 				$template = [
 					':name' => $this->_payload->name,
+					':unit' => UTILITY::propertySet($this->_payload, 'unit') ? : array_key_first(LANGUAGEFILE['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($this->_payload->content),
 					':language' => $this->_payload->language,
@@ -259,7 +276,8 @@ class TEXTTEMPLATE extends API {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-put'));
 					if ($statement->execute([
 						':hidden' => $template[':hidden'],
-						':id' => $exists['id']
+						':id' => $exists['id'],
+						'unit' => $template[':unit']
 						])) $this->response([
 							'status' => [
 								'name' => $template[':name'],
@@ -306,6 +324,7 @@ class TEXTTEMPLATE extends API {
 				if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
 					'id' => '',
 					'name' => '',
+					'unit' => '',
 					'content' => '',
 					'language' => '',
 					'type' => ''
@@ -321,20 +340,29 @@ class TEXTTEMPLATE extends API {
 					if ($row['type'] === 'replacement') continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if ($row['type'] === 'template'){
-						if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
+						$display = LANG::GET('units.' . $row['unit']) . ' ' . $row['name'] . ' (' . $row['language'] . ')';
+
+						if (!array_key_exists($display, $options) && !in_array($row['name'], $hidden)) {
 							$templatedatalist[] = $row['name'];
-							$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+							$options[$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$alloptions[$row['name'] . ' (' . $row['language'] . ') ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$alloptions[$display . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					if ($row['type'] === 'text'){
 						if (!array_key_exists(':' . $row['name'], $chunks) && !in_array($row['name'], $hidden)) {
-							$insertreplacement[$row['name'] . ' - ' . substr($row['content'], 0, 50) . (strlen($row['content']) > 50 ? '...' : '')] = ['value' => ':' . $row['name']];
+							$insertreplacement[LANG::GET('units.' . $row['unit']) . ' ' . $row['name'] . ' - ' . substr($row['content'], 0, 50) . (strlen($row['content']) > 50 ? '...' : '')] = ['value' => ':' . $row['name']];
 							$chunks[':' . $row['name']] = $row['content'];
 						}
 					}
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
+
+				$units = [];
+				foreach (LANGUAGEFILE['units'] as $unit => $translation){
+					$units[$translation] = ['value' => $unit];
+					if ($template['unit'] == $unit) $units[$translation]['selected'] = true;
+				}
+
 				$return['data'] = $chunks;
 				$return['selected'] = $template['content'] ? json_decode($template['content'], true): [];
 				$return['body'] = [
@@ -406,7 +434,14 @@ class TEXTTEMPLATE extends API {
 									'required' => true,
 									'data-loss' => 'prevent'
 								]
-							],[
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('texttemplate.edit_chunk_unit'),
+									'id' => 'TemplateUnit'
+								],
+								'content' => $units
+							], [
 								'type' => 'button',
 								'attributes' => [
 									'value' => LANG::GET('texttemplate.edit_template_save'),
@@ -455,9 +490,7 @@ class TEXTTEMPLATE extends API {
 
 	public function text(){
 		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);
-		$templatedatalist = [];
-		$options = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-		$return = [];
+		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
 
 		// get selected template
 		//if (intval($this->_requestedID)){
@@ -481,9 +514,6 @@ class TEXTTEMPLATE extends API {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
 		$statement->execute();
 		$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$hidden = [];
-		$texts = [];
-		$replacements = [];
 		foreach($templates as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if ($row['type'] !== 'template' && !in_array($row['name'], $hidden)) {
@@ -496,13 +526,30 @@ class TEXTTEMPLATE extends API {
 				continue;
 			}
 			if ($row['type'] !== 'template') continue;
-			if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options) && !in_array($row['name'], $hidden)) {
-				$templatedatalist[] = $row['name'];
-				$options[$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			if (!in_array($row['name'], $hidden)) {
+				if (!in_array($row['unit'], $options)) $options[$row['unit']] = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options[$row['unit']])){
+					$templatedatalist[] = $row['name'];
+					$options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				}
 			}
 		}
+		$return['body'] = ['content' => [[]]];
 
-		$return['body'] = [
+		foreach ($options as $unit => $templates) {
+			$return['body']['content'][0][] = [
+				[
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('texttemplate.use_text_select', [':unit' => LANGUAGEFILE['units'][$unit]]),
+						'onchange' => "api.texttemplate('get', 'text', this.value)"
+					],
+					'content' => $templates
+				]
+			];
+		}
+		
+		/*$return['body'] = [
 			'content' => [
 				[
 					[
@@ -524,11 +571,11 @@ class TEXTTEMPLATE extends API {
 							'name' => LANG::GET('texttemplate.use_text'),
 							'list' => 'templates',
 							'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'text', this.value); return false;}"
-						]*/
+						]
 					]
 				]
 			]
-		];
+		];*/
 		if ($template['name']){
 			$inputs = $undefined = [];
 

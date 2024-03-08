@@ -125,6 +125,7 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_texttemplates` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` timestamp NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -264,6 +265,7 @@ $queries = [
 				"CREATE TABLE caro_text_templates (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
+				"	unit varchar(MAX) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .

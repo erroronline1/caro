@@ -130,12 +130,12 @@ class SQLQUERY {
 		],
 
 		'texttemplate-post' => [
-			'mysql' => "INSERT INTO caro_texttemplates (id, name, date, author, content, language, type, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_texttemplates (name, date, author, content, language, type, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"
+			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, language, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, language, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"
 		],
 		'texttemplate-put' => [
-			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_texttemplates SET hidden = :hidden WHERE id = :id"
+			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id"
 		],
 		'texttemplate-datalist' => [
 			'mysql' => "SELECT * FROM caro_texttemplates ORDER BY name ASC, date DESC",
