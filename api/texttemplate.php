@@ -650,7 +650,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $content,
 						'rows' => 13,
 						'readonly' => true,
-						'onpointerup' => 'orderClient.toClipboard(this)'
+						'onpointerup' => 'orderClient.toClipboard(this.value)'
 						]
 				]
 			];
