@@ -15,11 +15,12 @@ class Lang {
 		request = request.split(".");
 		if (
 			!(request[0] in LANGUAGEFILE) ||
-			!(request[1] in LANGUAGEFILE[request[0]])
+			!(request[1] in LANGUAGEFILE[request[0]]) ||
+			(2 in request && !(request[2] in LANGUAGEFILE[request[0]][request[1]]))
 		) {
 			return "undefined language";
 		}
-		let result = LANGUAGEFILE[request[0]][request[1]];
+		let result = (2 in request) ? LANGUAGEFILE[request[0]][request[1]][request[2]] : LANGUAGEFILE[request[0]][request[1]];
 		for (const [pattern, replacement] of Object.entries(replace)) {
 			result = result.replaceAll(pattern, replacement);
 		}

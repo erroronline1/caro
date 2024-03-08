@@ -10,7 +10,9 @@ class LANG {
 
 	public static function GET($request, $replace=[]){
 		$request=explode('.', $request);
-		if (!array_key_exists($request[0], LANGUAGEFILE) || !array_key_exists($request[1], LANGUAGEFILE[$request[0]])){
+		if (!array_key_exists($request[0], LANGUAGEFILE) ||
+			!array_key_exists($request[1], LANGUAGEFILE[$request[0]]) ||
+			(array_key_exists(2, $request) && !array_key_exists($request[2], LANGUAGEFILE[$request[0]][$request[1]]))){
 			return 'undefined language';
 		}
 		$patterns = [];
@@ -19,6 +21,7 @@ class LANG {
 			$patterns[] = '/' . $pattern . '/';
 			$replacements[] = $replacement;
 		}
+		if (array_key_exists(2, $request)) return preg_replace($patterns, $replacements, LANGUAGEFILE[$request[0]][$request[1]][$request[2]]);
 		return preg_replace($patterns, $replacements, LANGUAGEFILE[$request[0]][$request[1]]);
 	}
 
