@@ -113,8 +113,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_messages WHERE id = :id and user_id = :user"
 		],
 		'message_get_inbox' => [
-			'mysql' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC",
-			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC"
+			'mysql' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC",
+			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as from_user, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.from_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.to_user = :user ORDER BY caro_messages.timestamp DESC"
 		],
 		'message_put_notified' => [
 			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
@@ -125,8 +125,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user"
 		],		
 		'message_get_sent' => [
-			'mysql' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC",
-			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user on caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC"
+			'mysql' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC",
+			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as to_user, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.to_user=caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.from_user = :user ORDER BY caro_messages.timestamp DESC"
 		],
 
 		'texttemplate-post' => [
@@ -209,12 +209,12 @@ class SQLQUERY {
 		],
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, form, identifier, date, author, content) VALUES (NULL, :context, :form, :identifier, CURRENT_TIMESTAMP, :author, :content)",
-			'sqlsrv' => "INSERT INTO caro_records (context, form, identifier, date, author, content) VALUES (:context, :form, :identifier, CURRENT_TIMESTAMP, :author, :content)"
+			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :content)",
+			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, content) VALUES (:context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :content)"
 		],
 		'records_import' => [
-			'mysql' => "SELECT * FROM caro_records WHERE identifier = :identifier ORDER BY id ASC",
-			'sqlsrv' => "SELECT * FROM caro_records WHERE identifier = :identifier ORDER BY id ASC"
+			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
+			'sqlsrv' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
 		'records_identifiers' => [
 			'mysql' => "SELECT id, identifier FROM caro_records GROUP BY identifier ORDER BY id desc",

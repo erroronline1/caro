@@ -248,8 +248,14 @@ class record extends API {
 			], [
 				'type' => 'hiddeninput',
 				'attributes' => [
-					'name' => 'form',
+					'name' => 'form_name',
 					'value' => $form['name']
+				]
+			], [
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'name' => 'form_id',
+					'value' => $form['id']
 				]
 			]
 		];
@@ -278,7 +284,7 @@ class record extends API {
 		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$considered = [];
 		foreach($data as $row){
-			$considered[] = $row['form'];
+			$considered[] = $row['form_name'];
 		}
 		foreach(array_diff($necessaryforms, $considered) as $needed){
 			$forms[$needed] = ['href' => "javascript:api.record('get', 'form', '" . $needed . "', '" . $this->_passedIdentify . "')"];
@@ -304,10 +310,11 @@ class record extends API {
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$context = $form = $identifier = null;
+				$context = $form_name = $form_id = $identifier = null;
 				$grouped_checkboxes = [];
 				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
-				if ($form = UTILITY::propertySet($this->_payload, 'form')) unset($this->_payload->form);
+				if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
+				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
@@ -339,7 +346,8 @@ class record extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
 				if ($statement->execute([
 					':context' => $context,
-					':form' => $form,
+					':form_name' => $form_name,
+					':form_id' => $form_id,
 					':identifier' => $identifier,
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($this->_payload)
@@ -357,19 +365,26 @@ class record extends API {
 				$body = [];
 				// summarize content
 				$content = $this->summarizeRecord();
-				$body[] = [
+				$body[] = [[
 					'type' => 'text',
 					'description' => LANG::GET('record.create_identifier'),
 					'content' => $this->_requestedID
-				];
-				foreach ($content['content'] as $key => $value) {
-					$body[] = [
+				]];
+				foreach($content['content'] as $form => $entries){
+					$body[]=[[
 						'type' => 'text',
-						'description' => $key,
-						'content' => $value
-					];
-				}
-				$return['body']['content'] = [$body];
+						'description' => $form
+					]];
+					foreach($entries as $key => $value){
+					array_push($body[count($body) -1],
+						[
+							'type' => 'text',
+							'description' => $key,
+							'content' => $value
+						]); 
+				}}
+		
+				$return['body']['content'] = $body;
 
 				$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
 				// match against bundles
@@ -516,23 +531,28 @@ class record extends API {
 		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
+			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => $row['form_date']]);
+			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
+
 			$content = json_decode($row['content'], true);
 			foreach($content as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent)) $accumulatedcontent[$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])]];
-				else $accumulatedcontent[$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])];
+				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])]];
+				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])];
 			}
 		}
-		foreach($accumulatedcontent as $key => $entries){
-			$summary['content'][$key] = '';
+		foreach($accumulatedcontent as $form => $entries){
+			$summary['content'][$form] = [];
+			foreach($entries as $key => $data){
+			$summary['content'][$form][$key] = '';
 			$value = '';
-			foreach($entries as $entry){
+			foreach($data as $entry){
 				if ($entry['value'] !== $value){
-					$summary['content'][$key] .= $entry['value'] . ' (' . $entry['author'] . ")\n";
+					$summary['content'][$form][$key] .= $entry['value'] . ' (' . $entry['author'] . ")\n";
 					$value = $entry['value'];
 				}
 			}
-		}
+		}}
 		return $summary;
 	}
 
@@ -619,11 +639,16 @@ class record extends API {
 		$pdf->SetFillColor(255, 255, 255);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		foreach ($content['content'] as $key => $value) {
-			$pdf->SetFont('helvetica', 'B', 10); // font size
-			$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-			$pdf->SetFont('helvetica', '', 10); // font size
-			$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+		
+		foreach($content['content'] as $form => $entries){
+			$pdf->SetFont('helvetica', '', 12); // font size
+			$pdf->MultiCell(150, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			foreach($entries as $key => $value){
+				$pdf->SetFont('helvetica', 'B', 10); // font size
+				$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+				$pdf->SetFont('helvetica', '', 10); // font size
+				$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			}
 		}
 
 		// move pointer to last page
