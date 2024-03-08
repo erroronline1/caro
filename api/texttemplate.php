@@ -24,7 +24,7 @@ class TEXTTEMPLATE extends API {
 				];
 
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
-				preg_match("/\s\W\D/m", $chunk[':name'], $matches);
+				preg_match("/[^\w\d]/m", $chunk[':name'], $matches);
 				if ($matches) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']])]]);
 
 				// put hidden attribute if anything else remains the same
@@ -43,10 +43,6 @@ class TEXTTEMPLATE extends API {
 								'name' => $chunk[':name'],
 								'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']])
 							]]);	
-				}
-
-				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']])]]);
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-post'));
