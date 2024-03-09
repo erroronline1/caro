@@ -104,9 +104,9 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* cron e.g. deleting tmp
 
 * filter by context
-* empty form pdf export for occasional printing
 
 * input type email (multiple), phone
 

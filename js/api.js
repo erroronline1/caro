@@ -678,6 +678,7 @@ export const api = {
 						payload = { IDENTIFY_BY_: request[2] };
 						break;
 					case "export":
+					case "exportform":
 					case "matchbundles":
 						//prevent default successFn
 						break;

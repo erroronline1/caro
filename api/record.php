@@ -7,11 +7,13 @@ class RECORDTCPDF extends TCPDF {
 	// custom pdf header and footer
 	public $qrcodesize = null;
 	public $qrcodecontent = null;
+	public $header = null;
 
-	public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false, $qrcodesize=20, $qrcodecontent=''){
+	public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false, $qrcodesize=20, $qrcodecontent='', $header=['title' => '', 'date' => '']){
 		parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache, $pdfa);
 		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
+		$this->header = $header;
 	}
 
     //Page header
@@ -19,21 +21,23 @@ class RECORDTCPDF extends TCPDF {
         // Title
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->SetFont('helvetica', 'B', 20); // font size
-		$this->MultiCell(110, 0, LANG::GET('menu.record_summary'), 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+		$this->MultiCell(110, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
 		$this->SetFont('helvetica', '', 10); // font size
-		$this->MultiCell(110, 0, date('y-m-d H:i'), 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
+		$this->MultiCell(110, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
 
-		$style = array(
-			'border' => 0,
-			'vpadding' => 'auto',
-			'hpadding' => 'auto',
-			'fgcolor' => array(0,0,0),
-			'bgcolor' => false, //array(255,255,255)
-			'module_width' => 1, // width of a single module in points
-			'module_height' => 1 // height of a single module in points
-		);
-		$this->write2DBarcode($this->qrcodecontent, 'QRCODE,H', 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
-		$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
+		if ($this->qrcodecontent){
+			$style = array(
+				'border' => 0,
+				'vpadding' => 'auto',
+				'hpadding' => 'auto',
+				'fgcolor' => array(0,0,0),
+				'bgcolor' => false, //array(255,255,255)
+				'module_width' => 1, // width of a single module in points
+				'module_height' => 1 // height of a single module in points
+			);
+			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,H', 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
+			$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
+		}
 	}
 
     // Page footer
@@ -259,6 +263,19 @@ class record extends API {
 				]
 			]
 		];
+		if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions'])){
+			$return['body']['content'][]= [
+				[
+					'type' => 'button',
+					'hint' => LANG::GET('record.form_export_hint'),
+					'attributes' => [
+						'type' => 'button',
+						'value' => LANG::GET('record.form_export'),
+						'onpointerup' => "api.record('get', 'exportform', " . $form['id'] . ")"
+					]
+				]
+			];
+		}
 		if (array_key_exists('type', $return['body']['content'][0][0])) array_push($return['body']['content'][0], ...$context);
 		else array_push($return['body']['content'][0][0], ...$context);
 		$this->response($return);
@@ -553,7 +570,6 @@ class record extends API {
 			'href' => $this->recordsPDF($content)
 		];
 
-		// todo: append all (but images?) 
 		$body = [];
 		array_push($body, 
 			[
@@ -564,6 +580,79 @@ class record extends API {
 		);
 		$this->response([
 			'body' => $body,
+		]);
+	}
+
+	public function exportform(){
+		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+		$statement->execute([
+			':id' => $this->_requestedID
+		]);
+		$form = $statement->fetch(PDO::FETCH_ASSOC);
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
+			'identifier' => LANG::GET('record.form_export_identifier'),
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => $form['date']]),
+			'date' => LANG::GET('record.form_export_printed', [':date' => date('y-m-d H:i')])
+		];
+
+		function printable($element){
+			// todo: enumerate names
+			$content = [];
+			foreach($element as $subs){
+				if (!array_key_exists('type', $subs)){
+					$content = array_merge($content, printable($subs));
+				}
+				else {
+					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links'])) continue;
+					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
+						if ($subs['type'] ==='checkbox') $name = $subs['description'];
+						else $name = $subs['attributes']['name'];
+						$content[$name] = '';
+						foreach($subs['content'] as $key => $v){
+							$content[$name] .= "(  ) " . $key . "\n";
+						}
+					}
+					elseif ($subs['type']==='text'){
+						$content[$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
+					}
+					elseif ($subs['type']==='textarea'){
+						$content[$subs['attributes']['name']] = str_repeat("\n", 5);
+					}
+					else {
+						$content[$subs['attributes']['name']] = str_repeat("\n", 2);
+					}
+				}
+			}
+			return $content;
+		};
+		$componentscontent = [];
+		foreach(explode(',', $form['content']) as $usedcomponent) {
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+			$statement->execute([
+				':name' => $usedcomponent
+			]);
+			$component = $statement->fetch(PDO::FETCH_ASSOC);
+			$component['content'] = json_decode($component['content'], true);
+
+			$summary['content'] = array_merge($summary['content'], printable($component['content']['content']));
+		}
+		$summary['content'] = [' ' => $summary['content']];
+		$downloadfiles[LANG::GET('record.form_export')] = [
+			'href' => $this->recordsPDF($summary)
+		];
+		$this->response([
+			'body' => [
+				[
+					'type' => 'links',
+					'description' =>  LANG::GET('record.form_export_proceed'),
+					'content' => $downloadfiles
+				]
+			],
 		]);
 	}
 
@@ -578,7 +667,9 @@ class record extends API {
 			'identifier' => $this->_requestedID,
 			'content' => [],
 			'files' => [],
-			'images' => []
+			'images' => [],
+			'title' => LANG::GET('menu.record_summary'),
+			'date' => date('y-m-d H:i')
 		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
@@ -681,12 +772,13 @@ class record extends API {
 	private function recordsPDF($content){
 		// create a pdf for a record summary
 		// create new PDF document
-		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false, 20, $content['identifier']);
+		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
+		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
 		$pdf->SetCreator(INI['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
-		$pdf->SetTitle(LANG::GET('menu.record_summary'));
+		$pdf->SetTitle($content['title']);
 
 		// set margins
 		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
@@ -725,7 +817,7 @@ class record extends API {
 					$pdf->Ln(INI['pdf']['exportimage']['maxheight']);
 				}
 			}
-	}
+		}
 
 		// move pointer to last page
 		$pdf->lastPage();
@@ -735,7 +827,6 @@ class record extends API {
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
-
 }
 
 $api = new record();
