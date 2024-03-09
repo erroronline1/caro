@@ -263,7 +263,8 @@ class record extends API {
 				]
 			]
 		];
-		if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions'])){
+		$exportpermissions = ['admin', 'supervisor'];
+		if (array_intersect($exportpermissions, $_SESSION['user']['permissions'])){
 			$return['body']['content'][]= [
 				[
 					'type' => 'button',
@@ -273,6 +274,14 @@ class record extends API {
 						'value' => LANG::GET('record.form_export'),
 						'onpointerup' => "api.record('get', 'exportform', " . $form['id'] . ")"
 					]
+				]
+			];
+		}
+		else {
+			$return['body']['content'][]= [
+				[
+					'type' => 'text',
+					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], $exportpermissions))])
 				]
 			];
 		}
