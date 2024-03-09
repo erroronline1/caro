@@ -343,7 +343,13 @@ export class Assemble {
 		this.names = {};
 		this.composer = setup.composer;
 	}
-
+	/**
+	 *
+	 * @param {*domNode} nextSibling inserts before node, used by utility.js order_client
+	 * @param {*domNode} formerSibling inserts after node, used on multiple photo or scanner type
+	 * @param {*any} returnNodes return nodes, used by Dialog
+	 * @returns none, immidiate construction of elements
+	 */
 	initializeSection(nextSibling = null, formerSibling = null, returnNodes = null) {
 		if (typeof nextSibling === "string") nextSibling = document.querySelector(nextSibling);
 		if (this.form && !nextSibling && !returnNodes) {
