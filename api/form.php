@@ -238,6 +238,14 @@ class FORMS extends API {
 						'description' => LANG::GET('assemble.compose_dateinput')
 					]], [[
 						'form' => true,
+						'type' => 'compose_telinput',
+						'description' => LANG::GET('assemble.compose_telinput')
+					]], [[
+						'form' => true,
+						'type' => 'compose_emailinput',
+						'description' => LANG::GET('assemble.compose_emailinput')
+						]], [[
+						'form' => true,
 						'type' => 'compose_links',
 						'description' => LANG::GET('assemble.compose_links')
 					]], [[

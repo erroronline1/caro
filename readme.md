@@ -104,8 +104,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* input type email (multiple), phone
-
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)

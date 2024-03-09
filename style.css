@@ -415,6 +415,8 @@ input[type="search"],
 input[type="password"],
 input[type="date"],
 input[type="time"],
+input[type="tel"],
+input[type="email"],
 textarea,
 select {
 	border: 1px solid var(--foreground);
@@ -883,6 +885,17 @@ dialog a:not([data-type])::before {
 	background-image: url("./media/clock.svg");
 }
 
+[data-type="telinput"]::before {
+	background-image: url("./media/phone.svg");
+}
+[data-type="emailinput"]::before {
+	background-image: url("./media/at.svg");
+}
+
+[data-type="filterinput"]::before {
+	background-image: url("./media/filter.svg");
+}
+
 [data-type="file"]::before {
 	background-image: url("./media/upload.svg");
 }
@@ -1027,8 +1040,4 @@ button[data-type="submitbutton"]::before {
 
 [data-type="message"]::before {
 	background-image: url("./media/comment.svg");
-}
-
-[data-type="filterinput"]::before {
-	background-image: url("./media/filter.svg");
 }

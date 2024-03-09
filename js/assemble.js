@@ -772,6 +772,7 @@ export class Assemble {
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		input = this.apply_attributes(this.currentElement.attributes, input);
+		if (type == "email") input.multiple = true;
 		if (this.currentElement.attributes.hidden !== undefined) return input;
 		return [...this.icon(), input, label, ...this.hint()];
 	}
@@ -792,6 +793,12 @@ export class Assemble {
 	}
 	filterinput() {
 		return this.input("search");
+	}
+	telinput() {
+		return this.input("tel");
+	}
+	emailinput() {
+		return this.input("email");
 	}
 	button() {
 		/*{
@@ -1028,14 +1035,15 @@ export class Assemble {
 		label.classList.add("input-label");
 		select.addEventListener("pointerdown", (e) => {
 			e.preventDefault();
-			if (!e.target.disabled) new Dialog({
-				type: "select",
-				header: select.title,
-				options: selectModal,
-			}).then((response) => {
-				e.target.value = response;
-				e.target.dispatchEvent(new Event("change"));
-			});
+			if (!e.target.disabled)
+				new Dialog({
+					type: "select",
+					header: select.title,
+					options: selectModal,
+				}).then((response) => {
+					e.target.value = response;
+					e.target.dispatchEvent(new Event("change"));
+				});
 		});
 		return [...this.icon(), select, label, ...this.hint()];
 	}

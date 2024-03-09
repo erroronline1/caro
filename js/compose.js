@@ -87,10 +87,8 @@ export const compose_helper = {
 				}
 			}
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
-			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
-				element.attributes.required = true;
-			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes))
-				element.attributes.multiple = true;
+			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
+			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
@@ -106,13 +104,15 @@ export const compose_helper = {
 	composeNewTextTemplateCallback: function (key) {
 		const chunk = new Compose({
 			draggable: true,
-			content: [[
-				{
-					type: "text",
-					description: key,
-					content: texttemplateClient.data[key],
-				},
-			]],
+			content: [
+				[
+					{
+						type: "text",
+						description: key,
+						content: texttemplateClient.data[key],
+					},
+				],
+			],
 		});
 		compose_helper.newTextElements[chunk.generatedElementIDs[0]] = key;
 	},
@@ -156,8 +156,7 @@ export const compose_helper = {
 						else content.push(nodechildren(container));
 					} else {
 						if (node.id in compose_helper.newFormComponents) {
-							if (compose_helper.newFormComponents[node.id].attributes != undefined)
-								delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
+							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
 							content.push(compose_helper.newFormComponents[node.id]);
 							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
 						}
@@ -209,11 +208,11 @@ export const compose_helper = {
 			let content = [];
 			[...parent.childNodes].forEach((node) => {
 				if (parent.localName === "main") {
-					[...node.childNodes].forEach((div) =>{
-					if (div && div.draggable && div.children[1] && div.children[1].localName === "article") {
-						content.push(nodechildren(div.children[1]));
-					}
-				});
+					[...node.childNodes].forEach((div) => {
+						if (div && div.draggable && div.children[1] && div.children[1].localName === "article") {
+							content.push(nodechildren(div.children[1]));
+						}
+					});
 				} else {
 					if (node.id in compose_helper.newTextElements) {
 						content.push(compose_helper.newTextElements[node.id]);
@@ -348,9 +347,7 @@ export const compose_helper = {
 				// sanitize section on lack of articles
 				if (originParent.children.length < 2) {
 					//                                                                                        section    article    container
-					document
-						.getElementById("main")
-						.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
+					document.getElementById("main").insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -360,10 +357,7 @@ export const compose_helper = {
 				allowSections &&
 				droppedUpon.parentNode.localName === "main" &&
 				draggedElement.parentNode.localName === "main" &&
-				!(
-					droppedUpon.children.item(1).firstChild.localName === "section" ||
-					draggedElement.children.item(1).firstChild.localName === "section"
-				)
+				!(droppedUpon.children.item(1).firstChild.localName === "section" || draggedElement.children.item(1).firstChild.localName === "section")
 			) {
 				// avoid recursive multiples
 				// create a multiple article tile if dropped on a tile
@@ -402,17 +396,9 @@ export const compose_helper = {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute(
-			"ondragover",
-			"compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')"
-		);
+		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
 		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
-		element.setAttribute(
-			"ondrop",
-			"compose_helper.dragNdrop.drop_insert(event, this, " +
-				allowSections +
-				"), this.classList.remove('draggableFormElementHover')"
-		);
+		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -508,8 +494,7 @@ export class Compose extends Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === "Array")
-				content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === "Array") content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements
@@ -663,6 +648,18 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "dateinput",
 			description: LANG.GET("assemble.compose_dateinput"),
+		});
+	}
+	compose_telinput() {
+		return this.compose_input({
+			type: "telinput",
+			description: LANG.GET("assemble.compose_telinput"),
+		});
+	}
+	compose_emailinput() {
+		return this.compose_input({
+			type: "emailinput",
+			description: LANG.GET("assemble.compose_emailinput"),
 		});
 	}
 	compose_textarea() {
