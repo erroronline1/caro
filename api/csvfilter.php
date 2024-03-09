@@ -229,17 +229,8 @@ class CSVFILTER extends API {
 				]);
 
 				// clear up tmp folder
-				if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
-				$files = UTILITY::listFiles(UTILITY::directory('tmp'), 'asc');
-				$display = [];
-				if ($files){
-					foreach ($files as $file){
-						$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
-						if ((time() - filemtime($file['path'])) / 3600 > INI['lifespan']['tmp']) {
-							UTILITY::delete($file['path']);
-						}
-					}
-				}
+				UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+
 				//create and write to file
 				$downloadfiles=[];
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){

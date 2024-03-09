@@ -104,10 +104,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* cron e.g. deleting tmp
-
-* filter by context
-
 * input type email (multiple), phone
 
 * vendor address, email, phone, customer id
@@ -128,3 +124,4 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * view other forms (e.g. instructions, modal? prevent filling out)
 * import texttemplates
 * user manual
+* filter by context?

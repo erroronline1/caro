@@ -763,7 +763,7 @@ class record extends API {
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
+		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
 		$filename = preg_replace('/[^\w\d]/', '', $content) . '.pdf';
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
@@ -823,7 +823,7 @@ class record extends API {
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		if (!file_exists(UTILITY::directory('tmp'))) mkdir(UTILITY::directory('tmp'), 0777, true);
+		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}

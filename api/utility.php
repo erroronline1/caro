@@ -412,5 +412,30 @@ class UTILITY {
 		}
 		return '../' . preg_replace($patterns, $replacements, INI['fileserver'][$request]);
 	}
+
+	/**
+	 * prepares a folder according to setup.ini and deleted files if lifespan is set
+	 * 
+	 * @param string $dir one of the fileserver keys
+	 * @param int $lifespan in hours
+	 * 
+	 * @return bool if 
+	 */
+	public static function tidydir($dir= '', $lifespan = null){
+		if (!$dir) return false;
+		$success = !file_exists(self::directory($dir)) ? mkdir(self::directory($dir), 0777, true) : true;
+		if ($lifespan && file_exists(self::directory($dir))){
+			$files = self::listFiles(self::directory($dir), 'asc');
+			if ($files){
+				foreach ($files as $file){
+					$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
+					if ((time() - filemtime($file['path'])) / 3600 > $lifespan) {
+						UTILITY::delete($file['path']);
+					}
+				}
+			}
+		}
+		return $success;
+	}
 }
 ?>
