@@ -106,7 +106,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 # open tasks
 
 * filter by context
-* export append all files that are not embedded (aka !images)
 * empty form pdf export for occasional printing
 
 * input type email (multiple), phone

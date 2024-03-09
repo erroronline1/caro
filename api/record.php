@@ -372,10 +372,12 @@ class record extends API {
 					'content' => $this->_requestedID
 				]];
 				foreach($content['content'] as $form => $entries){
-					$body[]=[[
-						'type' => 'text',
-						'description' => $form
-					]];
+					$body[] = [
+						[
+							'type' => 'text',
+							'description' => $form
+						]
+					];
 					foreach($entries as $key => $value){
 					array_push($body[count($body) -1],
 						[
@@ -383,7 +385,31 @@ class record extends API {
 							'description' => $key,
 							'content' => $value
 						]); 
-				}}
+					}
+					if (array_key_exists($form, $content['images'])){
+						foreach ($content['images'][$form] as $image){
+							$imagedata = pathinfo($image);
+							array_push($body[count($body) -1],
+							[
+								'type' => 'image',
+								'description' => $imagedata['basename'],
+								'attributes' => [
+									'name' => $imagedata['basename'],
+									'url' => $image
+								]
+							]); 
+						}
+					}
+					if (array_key_exists($form, $content['files'])){
+						array_push($body[count($body) -1],
+						[
+							'type' => 'links',
+							'description' => LANG::GET('record.record_file_attachments'),
+							'content' => $content['files'][$form]
+						]); 
+					}
+				}
+				
 		
 				$return['body']['content'] = $body;
 
@@ -400,6 +426,7 @@ class record extends API {
 						$bundles[$row['name']] = ['value' => $row['name']];
 					}
 				}
+
 				$return['body']['content'][] = [
 					[
 						[
@@ -549,7 +576,9 @@ class record extends API {
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . date('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
-			'content' => []
+			'content' => [],
+			'files' => [],
+			'images' => []
 		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
@@ -570,7 +599,21 @@ class record extends API {
 			$value = '';
 			foreach($data as $entry){
 				if ($entry['value'] !== $value){
-					$summary['content'][$form][$key] .= $entry['value'] . ' (' . $entry['author'] . ")\n";
+					$displayvalue = $entry['value'];
+					// guess file url; special regex delimiter
+					if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
+						$file = pathinfo($entry['value']);
+						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+							if (!array_key_exists($form, $summary['images'])) $summary['images'][$form] = [];
+							$summary['images'][$form][] = $entry['value'];
+						}
+						else {
+							if (!array_key_exists($form, $summary['files'])) $summary['files'][$form] = [];
+							$summary['files'][$form][$file['basename']] = ['href' => $entry['value']];
+						}
+						$displayvalue = $file['basename'];
+					}
+					$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
 					$value = $entry['value'];
 				}
 			}
@@ -661,6 +704,7 @@ class record extends API {
 		$pdf->SetFillColor(255, 255, 255);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		
 		foreach($content['content'] as $form => $entries){
 			$pdf->SetFont('helvetica', '', 12); // font size
@@ -671,7 +715,17 @@ class record extends API {
 				$pdf->SetFont('helvetica', '', 10); // font size
 				$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			}
-		}
+			if (array_key_exists($form, $content['images'])){
+				$ln = 0;
+				foreach ($content['images'][$form] as $image){
+					$imagedata = pathinfo($image);
+					$pdf->SetFont('helvetica', 'B', 10); // font size
+					$pdf->MultiCell(50, INI['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+					$pdf->Image('.' . $image, null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+					$pdf->Ln(INI['pdf']['exportimage']['maxheight']);
+				}
+			}
+	}
 
 		// move pointer to last page
 		$pdf->lastPage();
