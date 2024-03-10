@@ -336,7 +336,8 @@ class record extends API {
 		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$context = $form_name = $form_id = $identifier = null;
+				$context = $form_name = $form_id = null;
+				$identifier = '';
 				$grouped_checkboxes = [];
 				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
 				if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
@@ -370,7 +371,7 @@ class record extends API {
 					$this->_payload->$input = implode(', ', $files);
 				}
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
-				if ($statement->execute([
+				if (boolval((array) $this->_payload) && $statement->execute([
 					':context' => $context,
 					':form_name' => $form_name,
 					':form_id' => $form_id,
@@ -513,9 +514,7 @@ class record extends API {
 			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
 			$this->response($result);		
 		}
-
-		$recorddatalist = [];
-		$identifiers = ['units' => [], 'other' => [], 'unassigned' => []];
+		$recorddatalist = $contexts = [];
 
 		// sort records to user units, others and these that can not be assigned due to deleted user ids
 		$unassigned = [];
@@ -525,11 +524,8 @@ class record extends API {
 				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 'units';
 				else $target = 'other';
 			} else $target = 'unassigned';
-			$identifiers[$target][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-		}
-		// tidy up unassigned due to multiple returned identifiers from left join without units
-		foreach($identifiers['unassigned'] as $identifier => $value){
-			if (array_key_exists($identifier, $identifiers['units']) || array_key_exists($identifier, $identifiers['other'])) unset($identifiers['unassigned'][$identifier]);
+			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
+			$contexts[$row['context']][$target][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
 		}
 
 		$content = [
@@ -554,18 +550,24 @@ class record extends API {
 						'onblur' => "api.record('get', 'recordfilter', this.value); return false;",
 						]
 				]
-			],
-			[ ] // leave this here!
+			]
 		];
-		foreach($identifiers as $target => $list){
-			array_push($content[1],[
-				[
-					'type' => 'links',
-					'description' => LANG::GET('record.record_list.' . $target),
-					'content' => $list
-				]
-			]);
+		$contextrows = [];
+		foreach($contexts as $context => $targets){
+			$contextcolumns = [];
+			if ($targets) foreach($targets as $target => $identifiers){
+				if ($identifiers) {
+					$contextcolumns[] = 
+					[[
+						'type' => 'links',
+						'description' => LANG::GET('record.record_list.' . $target, [':context' => LANG::GET('formcontext.' . $context)]),
+						'content' => $identifiers
+					]];
+				}
+			}
+			if ($contextcolumns) $contextrows[] = $contextcolumns;
 		}
+		array_push($content, ...$contextrows);
 
 		$result['body']['content'] = $content;
 		$this->response($result);		
@@ -593,7 +595,7 @@ class record extends API {
 	}
 
 	public function exportform(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 		$statement->execute([
 			':id' => $this->_requestedID
