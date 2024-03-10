@@ -104,6 +104,11 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* view other forms (e.g. instructions, modal? prevent filling out)
+* import texttemplates
+* user manual
+* group by context: filter duplicate identifiers, limit displayed number of entries
+
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
@@ -116,10 +121,3 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * ...material tracing within documentation
 * calendar and alerts
 * md mermaid flowcharts
-
-## form contexts ##
-### treatment ###
-* view other forms (e.g. instructions, modal? prevent filling out)
-* import texttemplates
-* user manual
-* filter by context?
