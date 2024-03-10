@@ -505,11 +505,7 @@ class FORMS extends API {
 					$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
 					if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
 				}
-				//contexts that need an identifier
-				$contexts=[
-					'casedocumentation'
-				];
-				if (in_array($this->_payload->context, $contexts) && !$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
+				if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
