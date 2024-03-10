@@ -104,6 +104,7 @@ export const compose_helper = {
 	composeNewTextTemplateCallback: function (key) {
 		const chunk = new Compose({
 			draggable: true,
+			allowSections: false,
 			content: [
 				[
 					{
@@ -207,10 +208,10 @@ export const compose_helper = {
 		function nodechildren(parent) {
 			let content = [];
 			[...parent.childNodes].forEach((node) => {
-				if (parent.localName === "main") {
-					[...node.childNodes].forEach((div) => {
-						if (div && div.draggable && div.children[1] && div.children[1].localName === "article") {
-							content.push(nodechildren(div.children[1]));
+				if (node.draggable && node.children.item(1) && node.children.item(1).localName === "article") {
+					[...node.childNodes].forEach((element) => {
+						if (element.localName === "article") {
+							content.push(nodechildren(element));
 						}
 					});
 				} else {
@@ -277,6 +278,7 @@ export const compose_helper = {
 			}
 			let chunk = new Compose({
 				draggable: true,
+				allowSections: false,
 				content: [structuredClone(texts.content)],
 			});
 			for (let i = 0; i < texts.keys.length; i++) {
@@ -338,16 +340,18 @@ export const compose_helper = {
 
 			// dragging articles
 			// dropping on hr for reordering
-			if (evnt.target.localName === "hr" || !allowSections) {
-				// handle only if dropped within the reorder area
+			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
+				// no section insertion
+				// handle only if dropped within the reorder area				console.log('hello');
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
 				droppedUpon.firstChild.classList.remove("insertionAreaHover");
 				this.stopParentDropEvent = true;
 				draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
 				// sanitize section on lack of articles
 				if (originParent.children.length < 2) {
-					//                                                                                        section    article    container
-					document.getElementById("main").insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
+					if (originParent.children.length > 0)
+						//    section  article    draggable div                                                                  section    article    container
+						originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -355,9 +359,11 @@ export const compose_helper = {
 			// dropping on article to create a slider
 			if (
 				allowSections &&
-				droppedUpon.parentNode.localName === "main" &&
-				draggedElement.parentNode.localName === "main" &&
-				!(droppedUpon.children.item(1).firstChild.localName === "section" || draggedElement.children.item(1).firstChild.localName === "section")
+				!(draggedElement.children.item(1).firstChild && draggedElement.children.item(1).firstChild.localName === "section") &&
+				!(droppedUpon.children.item(1).firstChild && droppedUpon.children.item(1).firstChild.localName === "section") &&
+				!(droppedUpon.parentNode.localName === "section") &&
+				!draggedElement.classList.contains("draggableFormElement") &&
+				!droppedUpon.classList.contains("draggableFormElement")
 			) {
 				// avoid recursive multiples
 				// create a multiple article tile if dropped on a tile
@@ -365,18 +371,19 @@ export const compose_helper = {
 					article = document.createElement("article"),
 					section = document.createElement("section"),
 					insertionArea = document.createElement("hr"),
-					previousSibling = droppedUpon.previousElementSibling;
-				container = compose_helper.create_draggable(container, false);
+					insertbefore = droppedUpon.nextElementSibling;
+				container = compose_helper.create_draggable(container, false, false);
 
 				section.append(draggedElementClone, droppedUpon);
 				article.append(section);
 				container.append(article);
-
 				insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
 				insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
 				insertionArea.classList.add("insertionArea");
 				container.insertBefore(insertionArea, container.firstChild);
-				previousSibling.parentNode.insertBefore(container, previousSibling.nextSibling);
+
+				if (insertbefore) insertbefore.parentNode.insertBefore(container, insertbefore);
+				else draggedElement.parentNode.insertAdjacentElement("beforeend", container);
 				draggedElement.remove(); // do not remove earlier! inserBefore might reference to this object by chance
 				return;
 			}
@@ -418,7 +425,8 @@ export const compose_helper = {
 export class Compose extends Assemble {
 	constructor(setup) {
 		super(setup);
-		this.createDraggable = setup.draggable;
+		this.composer = this.createDraggable = setup.draggable;
+		this.allowSections = "allowSections" in setup ? setup.allowSections : undefined;
 		this.generatedElementIDs = [];
 		this.initializeSection();
 		this.returnID();
@@ -458,7 +466,7 @@ export class Compose extends Assemble {
 				if (elements[0].constructor.name === "Array") {
 					// article
 					const article = document.createElement("article");
-					// creation form for adding elements
+					// composer creation form for adding elements
 					if (element[0].form) {
 						const form = document.createElement("form");
 						form.onsubmit = () => {
@@ -470,20 +478,20 @@ export class Compose extends Assemble {
 						}
 						article.append(form);
 					}
-					// element created
+					// imported component element
 					else {
 						for (const e of widget) {
 							if (e) article.append(e);
 						}
 					}
-					// creation form for adding elements
+					// composer creation form for adding elements
 					if (!this.createDraggable) {
 						section.append(article);
 					}
-					// element created
+					// imported component element
 					else {
 						let div = document.createElement("div");
-						div = compose_helper.create_draggable(div);
+						div = compose_helper.create_draggable(div, undefined, this.allowSections);
 						div.append(article);
 						section.append(div);
 					}
@@ -501,12 +509,12 @@ export class Compose extends Assemble {
 			if (!this.createDraggable) {
 				content = content.concat(this[this.currentElement.type]());
 			}
-			// element created
+			// actual element created
 			else {
 				let frame = document.createElement("div");
 				frame.classList.add("draggableFormElement");
 				frame.append(...this[this.currentElement.type]());
-				frame = compose_helper.create_draggable(frame, false);
+				frame = compose_helper.create_draggable(frame, false, this.allowSections);
 				this.generatedElementIDs.push(frame.id);
 				content.push(frame);
 			}
@@ -536,7 +544,7 @@ export class Compose extends Assemble {
 				article.append(...nodes);
 				if (this.createDraggable) {
 					let container = document.createElement("div");
-					container = compose_helper.create_draggable(container);
+					container = compose_helper.create_draggable(container, undefined, this.allowSections);
 					container.append(article);
 					assembledPanels.add(container);
 				} else assembledPanels.add(article);
