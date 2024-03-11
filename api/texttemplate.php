@@ -514,6 +514,11 @@ class TEXTTEMPLATE extends API {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
 		$statement->execute();
 		$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
+		if (!$templates) {
+			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
+			$this->response($result);		
+		}
+
 		foreach($templates as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if ($row['type'] !== 'template' && !in_array($row['name'], $hidden)) {
@@ -549,33 +554,6 @@ class TEXTTEMPLATE extends API {
 			];
 		}
 		
-		/*$return['body'] = [
-			'content' => [
-				[
-					[
-						'type' => 'datalist',
-						'content' => $templatedatalist,
-						'attributes' => [
-							'id' => 'templates'
-						]
-					], [
-						'type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('texttemplate.use_text_select'),
-							'onchange' => "api.texttemplate('get', 'text', this.value)"
-						],
-						'content' => $options
-					/*], [
-						'type' => 'searchinput',
-						'attributes' => [
-							'name' => LANG::GET('texttemplate.use_text'),
-							'list' => 'templates',
-							'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'text', this.value); return false;}"
-						]
-					]
-				]
-			]
-		];*/
 		if ($template['name']){
 			$inputs = $undefined = [];
 
