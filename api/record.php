@@ -613,29 +613,38 @@ class record extends API {
 
 		function printable($element){
 			// todo: enumerate names
-			$content = [];
+			$content = ['content' => [], 'images' => []];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
-					$content = array_merge($content, printable($subs));
+					$subcontent = printable($subs);
+					$content['content'] = array_merge($content['content'], $subcontent['content']);
+					$content['images'] = array_merge($content['images'], $subcontent['images']);
 				}
 				else {
 					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links'])) continue;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						if ($subs['type'] ==='checkbox') $name = $subs['description'];
 						else $name = $subs['attributes']['name'];
-						$content[$name] = '';
+						$content['content'][$name] = '';
 						foreach($subs['content'] as $key => $v){
-							$content[$name] .= "(  ) " . $key . "\n";
+							$content['content'][$name] .= "(  ) " . $key . "\n";
 						}
 					}
 					elseif ($subs['type']==='text'){
-						$content[$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
+						$content['content'][$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
 					}
 					elseif ($subs['type']==='textarea'){
-						$content[$subs['attributes']['name']] = str_repeat("\n", 5);
+						$content['content'][$subs['attributes']['name']] = str_repeat("\n", 5);
+					}
+					elseif ($subs['type']==='image'){
+						$content['content'][$subs['description']] = $subs['attributes']['url'];
+						$file = pathinfo($subs['attributes']['url']);
+						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+							$content['images'][] = $subs['attributes']['url'];
+						}
 					}
 					else {
-						$content[$subs['attributes']['name']] = str_repeat("\n", 2);
+						$content['content'][$subs['attributes']['name']] = str_repeat("\n", 2);
 					}
 				}
 			}
@@ -650,9 +659,12 @@ class record extends API {
 			$component = $statement->fetch(PDO::FETCH_ASSOC);
 			$component['content'] = json_decode($component['content'], true);
 
-			$summary['content'] = array_merge($summary['content'], printable($component['content']['content']));
+			$printablecontent = printable($component['content']['content']);
+			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
+			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
 		}
 		$summary['content'] = [' ' => $summary['content']];
+		$summary['images'] = [' ' => $summary['images']];
 		$downloadfiles[LANG::GET('record.form_export')] = [
 			'href' => $this->recordsPDF($summary)
 		];
