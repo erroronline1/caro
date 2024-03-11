@@ -264,7 +264,7 @@ $queries = [
 				");"
 				,
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
-				"CREATE TABLE caro_text_templates (" .
+				"CREATE TABLE caro_texttemplates (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
 				"	unit varchar(MAX) NOT NULL," .
