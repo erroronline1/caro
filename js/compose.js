@@ -11,6 +11,7 @@ export const compose_helper = {
 	newFormComponents: {},
 	newFormElements: new Set(),
 	newTextElements: {},
+	componentIdentify: 0,
 	getNextElementID: getNextElementID,
 	composeNewElementCallback: function (parent) {
 		let sibling = parent.childNodes[0].nextSibling,
@@ -263,11 +264,22 @@ export const compose_helper = {
 		assignIDs(form.content);
 	},
 	importForm: function (components) {
+		function lookupIdentify(element) {
+			for (const container of element) {
+				if (container.constructor.name === "Array") {
+					lookupIdentify(container);
+				} else {
+					if (container.type === "identify") compose_helper.componentIdentify++;
+				}
+			}
+		}
 		for (const component of components) {
 			component.draggable = true;
-			new MetaCompose(component);
+			let current = new MetaCompose(component);
 			compose_helper.newFormElements.add(component.name);
+			lookupIdentify(current.content);
 		}
+		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"));
 	},
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};
@@ -418,7 +430,10 @@ export const compose_helper = {
 						if (node.firstChild.localName === "section") nodechildren(node.firstChild);
 						else nodechildren(node);
 					} else {
-						if (node.name && node.name.match(/IDENTIFY_BY_/g)) document.getElementById("setIdentify").disabled = false;
+						if (node.name && node.name.match(/IDENTIFY_BY_/g)) {
+							if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
+							compose_helper.componentIdentify--;
+						}
 					}
 				});
 			}

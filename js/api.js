@@ -343,6 +343,7 @@ export const api = {
 						};
 						break;
 					case "component_editor":
+						compose_helper.componentIdentify = 0;
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
@@ -367,6 +368,7 @@ export const api = {
 						};
 						break;
 					case "form_editor":
+						compose_helper.componentIdentify = 0;
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
@@ -754,7 +756,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" && request[1] !== 'template');
+		api.send(method, request, successFn, null, payload, method === "post" && request[1] !== "template");
 	},
 	tool: (method, ...request) => {
 		/*
