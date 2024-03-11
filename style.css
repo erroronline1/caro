@@ -486,6 +486,10 @@ input:checked + .radio {
 	opacity: 0.5;
 	margin: 0 0 0 2.8em;
 }
+input[type="checkbox"]:disabled + label,
+input[type="radio"]:disabled + label {
+	color: var(--darkshadow);
+}
 
 input:not(:placeholder-shown) + .input-label,
 input:focus + .input-label,

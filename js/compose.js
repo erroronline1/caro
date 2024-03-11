@@ -56,6 +56,8 @@ export const compose_helper = {
 					element.attributes.required = true;
 					element.attributes.multiple = false;
 					element.type = "identify";
+					document.getElementById("setIdentify").disabled = true;
+					document.getElementById("setIdentify").checked = false;
 				}
 			} else if (["text"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_text_description")) {
@@ -87,8 +89,10 @@ export const compose_helper = {
 				}
 			}
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
-			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
-			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
+			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
+				element.attributes.required = true;
+			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes))
+				element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
@@ -157,7 +161,8 @@ export const compose_helper = {
 						else content.push(nodechildren(container));
 					} else {
 						if (node.id in compose_helper.newFormComponents) {
-							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
+							if (compose_helper.newFormComponents[node.id].attributes != undefined)
+								delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
 							content.push(compose_helper.newFormComponents[node.id]);
 							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
 						}
@@ -340,7 +345,14 @@ export const compose_helper = {
 
 			// dragging articles
 			// dropping on hr for reordering
-			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
+			if (
+				evnt.target.localName === "hr" &&
+				!(
+					evnt.target.parentNode.parentNode.localName === "section" &&
+					draggedElement.children.item(1) &&
+					draggedElement.children.item(1).firstChild.localName === "section"
+				)
+			) {
 				// no section insertion
 				// handle only if dropped within the reorder area				console.log('hello');
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
@@ -351,7 +363,10 @@ export const compose_helper = {
 				if (originParent.children.length < 2) {
 					if (originParent.children.length > 0)
 						//    section  article    draggable div                                                                  section    article    container
-						originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
+						originParent.parentNode.parentNode.parentNode.insertBefore(
+							originParent.children[0].cloneNode(true),
+							originParent.parentNode.parentNode
+						); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -395,6 +410,19 @@ export const compose_helper = {
 			if (originParent.parentNode != document.getElementById("main") && originParent.children.length < 2) {
 				originParent.parentNode.remove(); // adapt to changes in section creation!
 			}
+			// enable identifier if previously constructed had been deleted
+			function nodechildren(parent) {
+				let container;
+				[...parent.childNodes].forEach((node) => {
+					if (["article", "div"].includes(node.localName)) {
+						if (node.firstChild.localName === "section") nodechildren(node.firstChild);
+						else nodechildren(node);
+					} else {
+						if (node.name && node.name.match(/IDENTIFY_BY_/g)) document.getElementById("setIdentify").disabled = false;
+					}
+				});
+			}
+			nodechildren(draggedElement);
 			draggedElement.remove();
 		},
 	},
@@ -403,9 +431,17 @@ export const compose_helper = {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
+		element.setAttribute(
+			"ondragover",
+			"compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')"
+		);
 		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
-		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
+		element.setAttribute(
+			"ondrop",
+			"compose_helper.dragNdrop.drop_insert(event, this, " +
+				allowSections +
+				"), this.classList.remove('draggableFormElementHover')"
+		);
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -502,7 +538,8 @@ export class Compose extends Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === "Array") content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === "Array")
+				content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements
@@ -794,6 +831,7 @@ export class Compose extends Assemble {
 		if (type.type === "scanner") {
 			this.currentElement.content[LANG.GET("assemble.compose_context_identify")] = {
 				name: LANG.GET("assemble.compose_context_identify"),
+				id: "setIdentify",
 			};
 		}
 		if (Object.keys(this.currentElement.content).length) result = result.concat(this.br(), ...this.checkbox());
