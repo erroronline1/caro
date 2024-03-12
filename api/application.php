@@ -6,11 +6,18 @@ class APPLICATION extends API {
     private $_requestedToken = null;
     private $_requestedManual = null;
 
+	/**
+	 * init parent class and set private requests
+	 */
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedToken = $this->_requestedManual = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 * log in user or destroy session
+	 * without current user respond with login form
+	 */
 	public function login(){
 		// select single user based on token
 		if (!boolval($this->_requestedToken) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
@@ -52,6 +59,9 @@ class APPLICATION extends API {
 		]);
 	}
 
+	/**
+	 * respond with menu taking user permissions into account
+	 */
 	public function menu(){
 		// get permission based menu items
 		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
@@ -111,10 +121,16 @@ class APPLICATION extends API {
 		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
 	}
 
+	/**
+	 * respond with LANGUAGEFILE as tarnsfer to js frontend
+	 */
     public function language(){
 		$this->response(['body' => LANG::GETALL()]);
 	}
 
+	/**
+	 * respond with manual
+	 */
 	public function start(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result = ['user' => $_SESSION['user']['name'], 'body' => ['content' => []]];
@@ -134,6 +150,12 @@ class APPLICATION extends API {
 		$this->response($result);
 	}
 
+	
+	/**
+	 * manual edting
+	 * POST, PUT and DELETE manual entries or
+	 * respond with form to add or edit manual entries 
+	 */
 	public function manual(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result = [

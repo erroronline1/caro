@@ -8,6 +8,12 @@ class LANG {
 	chunks can be accessed by context.chunk with the period as separator (like nifty javascript objects)
 	*/
 
+	/**
+	 * returns a language specific chunk
+	 * @param str $request dot separated keys of LANGUAGEFILE
+	 * @param array $replace replacement key=>value pairs to replace :placeholders
+	 * @return str textchunk with replacements
+	 */
 	public static function GET($request, $replace=[]){
 		$request=explode('.', $request);
 		if (!array_key_exists($request[0], LANGUAGEFILE) ||
@@ -25,10 +31,20 @@ class LANG {
 		return preg_replace($patterns, $replacements, LANGUAGEFILE[$request[0]][$request[1]]);
 	}
 
+	/**
+	 * returns a language specific chunk with whitespaces replaced with underscore as in request parameters
+	 * @param str $request dot separated keys of LANGUAGEFILE
+	 * @param array $replace replacement key=>value pairs to replace :placeholders
+	 * @return str textchunk with replacements with whitespaces replaced with underscore as in request parameters
+	 */
 	public static function PROPERTY($request, $replace=[]){
 		return str_replace(' ', '_', self::GET($request, $replace));
 	}
 
+	/**
+	 * returns languagefile as transfer for js frontend
+	 * @return array LANGUAGEFILE
+	 */
 	public static function GETALL(){
 		return LANGUAGEFILE;
 	}

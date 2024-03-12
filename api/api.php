@@ -12,12 +12,25 @@ include_once('utility.php'); // general unities
 
 
 class API {
-
+	/**
+	 * preset all passed parameters
+	 */
 	public $_payload = [];
+
+	/**
+	 * preset database connection
+	 */
 	public $_pdo;
 	
+	/**
+	 * preset standard response code
+	 */
 	private $_httpResponse = 200;
 	
+	/**
+	 * constructor prepares payload and database connection
+	 * no parameters, no response
+	 */
 	public function __construct(){
 		//$payload = new PAYLOAD;
 		$this->_payload = UTILITY::parsePayload();//(object) $payload->_payload;
@@ -27,7 +40,13 @@ class API {
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 		$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true); // reuse tokens in prepared statements
 	}
-		
+	
+	/**
+	 * api response
+	 * @param array|string $data what should be responded
+	 * @param int $status optional override for error cases
+	 * no return, end of api processing
+	 */
 	public function response($data, $status = 200){
 		if(is_array($data)) {
 			$data = json_encode($data);
@@ -42,6 +61,9 @@ class API {
 		exit;
 	}
 	
+	/**
+	 * @return str readable http status message based on $this->_httpResponse
+	 */
 	private function get_status_message(){
 		$status = array(
 					100 => 'Continue',  
@@ -88,11 +110,19 @@ class API {
 		return ($status[$this->_httpResponse])?$status[$this->_httpResponse]:$status[500];
 	}
 
+	/**
+	 * sets document headers in advance of output stream
+	 * no return
+	 */
 	private function set_headers(){
 		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
 		header("Content-Type:application/json");
 	}
 
+	/**
+	 * executes the called api method
+	 * no return
+	 */
 	public function processApi(){
 		$func = strtolower($this->_requestedMethod);
 		if(method_exists($this, $func))
@@ -101,6 +131,13 @@ class API {
 			$this->response([], 404); // If the method not exist with in this class, response would be "Page not found".
 	}
 
+	/**
+	 * posts a system message to a user group
+	 * @param str $group name of the user group
+	 * @param str $message actual message content
+	 * @param str $permission_or_unit defines user group based on set 'permission' or 'unit'
+	 * no return
+	 */
 	public function alertUserGroup($group, $message, $permission_or_unit){
 		if ($permission_or_unit == 'permission') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
 		if ($permission_or_unit == 'unit') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
@@ -119,6 +156,11 @@ class API {
 		}
 	}
 
+	/**
+	 * returns a default content for lack of database entries
+	 * @param str $type type of requested but mission content
+	 * @return array assemble object
+	 */
 	public function noContentAvailable($type){
 		return [[
 			['type' => 'nocontent',
