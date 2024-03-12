@@ -146,7 +146,8 @@ class record extends API {
 			if (($percent >= INI['likeliness']['records_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
 		}
 		$this->response(['status' => [
-			'data' => $matches
+			'data' => $matches,
+			'filter' => !$this->_requestedID ? 'all': 'some'
 		]]);
 	}
 
@@ -527,10 +528,24 @@ class record extends API {
 			} else $target = 2;
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+			if (count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+				$contexts[$row['context']][$targets[$target]][$row['identifier']]['style'] = 'display:none';
+				$contexts[$row['context']][$targets[$target]][$row['identifier']]['data-filtered_max'] = $row['id'];
+			}
 		}
+		// delete double entries, reset filted_max state
 		foreach($contexts as &$context){
+			$previouslydeleted = null;
 			foreach ($context['unassigned'] as $identifier => $attributes){
-				if (array_key_exists($identifier, $context['units']) || array_key_exists($identifier, $context['other'])) unset ($context['unassigned'][$identifier]);
+				if ($previouslydeleted) {
+					unset($context['unassigned'][$identifier]['data-filtered_max']);
+					unset($context['unassigned'][$identifier]['style']);
+				}
+				if (array_key_exists($identifier, $context['units']) || array_key_exists($identifier, $context['other'])) {
+					unset ($context['unassigned'][$identifier]);
+					$previouslydeleted = true;
+				}
+				else $previouslydeleted = null;
 			}
 		}
 		unset($context); // error otherwise
@@ -549,6 +564,7 @@ class record extends API {
 					'description' => LANG::GET('record.record_scan')
 				], [
 					'type' => 'filterinput',
+					'hint' => LANG::GET('record.record_filter_hint', [':max' => INI['limits']['max_records']]),
 					'attributes' => [
 						'id' => 'recordfilter',
 						'name' => LANG::GET('record.record_filter'),

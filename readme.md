@@ -107,7 +107,6 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * view other forms (e.g. instructions, modal? prevent filling out)
 * import texttemplates
 * user manual
-* group by context: filter duplicate identifiers, limit displayed number of entries
 
 * vendor address, email, phone, customer id
 * vendor list

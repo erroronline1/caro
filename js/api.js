@@ -632,10 +632,11 @@ export const api = {
 						api.preventDataloss.monitor = false;
 						successFn = function (data) {
 							if (data.status) {
-								const all = document.querySelectorAll("[data-filtered]");
+								const all = document.querySelectorAll("[data-filtered]"),
+								exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									console.log(element, data.status.data.includes(element.dataset.filtered));
-									element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									if (data.status.filter === undefined ||  data.status.filter=='some') element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									else element.style.display = (data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)) ? "block" : "none";
 								}
 							}
 						};
