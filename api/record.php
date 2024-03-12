@@ -518,15 +518,22 @@ class record extends API {
 
 		// sort records to user units, others and these that can not be assigned due to deleted user ids
 		$unassigned = [];
+		$targets = array_keys(LANGUAGEFILE['record']['record_list']); // ['units', 'other', 'unassigned']
 		foreach($data as $row){
 			if (!in_array($row['identifier'], $recorddatalist)) $recorddatalist[] = $row['identifier'];
 			if ($row['units']){
-				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 'units';
-				else $target = 'other';
-			} else $target = 'unassigned';
+				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 0;
+				else $target = 1;
+			} else $target = 2;
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
-			$contexts[$row['context']][$target][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
 		}
+		foreach($contexts as &$context){
+			foreach ($context['unassigned'] as $identifier => $attributes){
+				if (array_key_exists($identifier, $context['units']) || array_key_exists($identifier, $context['other'])) unset ($context['unassigned'][$identifier]);
+			}
+		}
+		unset($context); // error otherwise
 
 		$content = [
 			[
