@@ -40,6 +40,8 @@ tested devices:
 
 ### system limitations
 * notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support
+* the application caches requests. get requests return the latest version, which might not always be the recent system state but better than nothing. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. this might lead to a delay but is better than nothing. however note that this only is reliable if the browser does not delete session content on closing. this is not a matter of the app but your system environment. you may have to contact your it department
+* changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). adding columns to the end appears to be easier instad of insertions between.
 
 ### useage notes and caveats
 * dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. reordered images will disappear but don't worry.
