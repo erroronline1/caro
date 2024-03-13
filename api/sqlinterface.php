@@ -238,12 +238,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 		'consumables_post-product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good)"
 		],
 		'consumables_put-product' => [
-			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected WHERE id = :id LIMIT 1",
-			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good WHERE id = :id LIMIT 1",
+			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good WHERE id = :id"
 		],
 		'consumables_put-product-protected' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean WHERE id = :id LIMIT 1",

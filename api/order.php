@@ -200,7 +200,7 @@ class ORDER extends API {
 
 				foreach($search as $key => $row) {
 					foreach($row as $key => $value){
-						$row[$key] = str_replace("\n", ' ', $row[$key]);
+						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 					}
 					$article = intval(count($matches) - 1);
 					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){

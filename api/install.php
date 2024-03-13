@@ -86,6 +86,8 @@ $queries = [
 				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`active` tinyint NOT NULL," .
 				"	`protected` tinyint NOT NULL," .
+				"	`trading_good` tinyint NOT NULL," .
+				"	`checked` timestamp," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -227,7 +229,9 @@ $queries = [
 				"	article_unit varchar(MAX) NOT NULL," .
 				"	article_ean varchar(MAX) NOT NULL," .
 				"	active tinyint NOT NULL," .
-				"	protected tinyint NOT NULL" .
+				"	protected tinyint NOT NULL," .
+				"	trading_good tinyint NOT NULL," .
+				"	checked smalldatetime" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
