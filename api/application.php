@@ -34,7 +34,8 @@ class APPLICATION extends API {
 				'permissions' => explode(',', $result['permissions']),
 				'units' => explode(',', $result['units']),
 				'image' => './' . $result['image'],
-				'id' => $result['id']
+				'id' => $result['id'],
+				'app_settings' => json_decode($result['app_settings'], true)
 			];
 			$this->response(['body' => $_SESSION['user']]);
 		}

@@ -130,6 +130,20 @@ export const api = {
 						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
 						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
 					}
+					if (data.body.app_settings)
+						for (const [key, value] of Object.entries(data.body.app_settings)) {
+							switch (key) {
+								case "forceDesktop":
+									if (value) {
+										let stylesheet = document.styleSheets[0].cssRules;
+										for (let i = 0; i < stylesheet.length; i++){
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)")
+											stylesheet[i].media.mediaText= "only screen and (min-width: 4em)";
+										}
+									}
+									break;
+							}
+						}
 					api.application("get", "start");
 				};
 				break;
@@ -633,10 +647,15 @@ export const api = {
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll("[data-filtered]"),
-								exceeding = document.querySelectorAll("[data-filtered_max]");
+									exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									if (data.status.filter === undefined ||  data.status.filter=='some') element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
-									else element.style.display = (data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)) ? "block" : "none";
+									if (data.status.filter === undefined || data.status.filter == "some")
+										element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									else
+										element.style.display =
+											data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)
+												? "block"
+												: "none";
 								}
 							}
 						};

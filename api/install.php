@@ -24,6 +24,7 @@ $queries = [
 				"	`token` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`orderauth` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`image` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`app_settings` json NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -164,7 +165,8 @@ $queries = [
 				"	units varchar(MAX) NOT NULL," .
 				"	token varchar(MAX) NOT NULL," .
 				"	orderauth varchar(MAX) NOT NULL," .
-				"	image varchar(MAX) NOT NULL" .
+				"	image varchar(MAX) NOT NULL," .
+				"	app_settings varchar(MAX) NOT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .

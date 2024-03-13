@@ -30,6 +30,10 @@ class USER extends API {
 					UTILITY::resizeImage($user['image'], 256, UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
+				// process settings
+				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
+				
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
 				if ($statement->execute([
 					':id' => $user['id'],
@@ -38,7 +42,8 @@ class USER extends API {
 					':units' => $user['units'],
 					':token' => $user['token'],
 					':orderauth' => $user['orderauth'],
-					':image' => $user['image']
+					':image' => $user['image'],
+					':app_settings' => json_encode($user['app_settings'])
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],
@@ -100,6 +105,19 @@ class USER extends API {
 					$result['body']['content'][1]
 				];
 
+				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+				$result['body']['content'][] = [
+					[
+						'type' => 'checkbox',
+						'description' => LANG::GET('user.settings'),
+						'hint' => LANG::GET('user.settings_hint'),
+						'content' => [
+							LANG::GET('user.settings_force_desktop') => []
+						]
+					]
+				];
+				if (array_key_exists ('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
+
 				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 				$userfiles = [];
 				foreach ($storedfiles as $file){
@@ -134,7 +152,8 @@ class USER extends API {
 					'units' => '',
 					'token' => '',
 					'orderauth' => '',
-					'image' => ''
+					'image' => '',
+					'app_settings' => ''
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
@@ -202,7 +221,8 @@ class USER extends API {
 					':units' => $user['units'],
 					':token' => $user['token'],
 					':orderauth' => $user['orderauth'],
-					':image' => $user['image']
+					':image' => $user['image'],
+					':app_settings' => $user['app_settings']
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
@@ -300,7 +320,8 @@ class USER extends API {
 					':units' => $user['units'],
 					':token' => $user['token'],
 					':orderauth' => $user['orderauth'],
-					':image' => $user['image']
+					':image' => $user['image'],
+					':app_settings' => $user['app_settings']
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],

@@ -114,7 +114,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 * vendor list
 * vendor mailto (certificates)
 
-* settings? force desktop mode for small window? themes?
+* user selectable color themes?
 * monitoring measuring equipment, rental parts, machinery, crutches
 * sample check MDR §14
 * caro audit
