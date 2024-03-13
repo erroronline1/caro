@@ -42,7 +42,7 @@ class CONSUMABLES extends API {
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
-		if (count($pricelist->_list)){
+		if (count($pricelist->_list[1])){
 			// purge all unprotected products for a fresh data set
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
 			$statement->execute([
@@ -59,7 +59,7 @@ class CONSUMABLES extends API {
 				$remainder[$row['id']]=$row['article_no'];
 			}
 
-			foreach ($pricelist->_list as $i => $row){
+			foreach ($pricelist->_list[1] as $i => $row){
 				$update = array_search($row['article_no'], $remainder);
 				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
@@ -67,6 +67,7 @@ class CONSUMABLES extends API {
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
+					':trading_good' => "'0'",
 				]) . '; ';
 				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
@@ -77,7 +78,8 @@ class CONSUMABLES extends API {
 						':article_unit' => "'" . $row['article_unit'] . "'",
 						':article_ean' => "'" . $row['article_ean'] . "'",
 						':active' => 1,
-						':protected' => 0
+						':protected' => 0,
+						':trading_good' => 0
 					]) . '; ';
 
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
@@ -89,6 +91,42 @@ class CONSUMABLES extends API {
 			return $date;
 		}
 		return '';
+	}
+
+	private function update_trading_goods($filter, $vendorID){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
+		$statement->execute([
+			':search' => $vendorID
+		]);
+		$vendorProducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$assignedArticles = [];
+		foreach($vendorProducts as $key => $row) {
+			$assignedArticles[$row['id']]=$row['article_no'];
+		}
+
+		$filter = json_decode($filter, true);
+		$filter['filesetting']['source'] = $vendorProducts;
+		$pricelist = new Listprocessor($filter);
+		$sqlchunks = [];
+		if (count($pricelist->_list[1])){
+			foreach ($pricelist->_list[1] as $i => $row){
+				$update = array_search($row['article_no'], $assignedArticles);
+				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
+				[
+					':id' => $update,
+					':article_name' => "'" . $row['article_name'] . "'",
+					':article_unit' => "'" . $row['article_unit'] . "'",
+					':article_ean' => "'" . $row['article_ean'] . "'",
+					':trading_good' => "1"
+				]) . '; ';
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
+			}
+			foreach ($sqlchunks as $chunk){
+				$statement = $this->_pdo->prepare($chunk);
+				$statement->execute();
+			}
+		}
+		return;
 	}
 
 	public function vendor(){
@@ -127,6 +165,9 @@ class CONSUMABLES extends API {
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
+				}
+				if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
+					$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-vendor'));
@@ -186,6 +227,10 @@ class CONSUMABLES extends API {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
 				}
+				if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
+					$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
+				}
+
 
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
@@ -365,7 +410,7 @@ class CONSUMABLES extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter'),
-									'value' => array_key_exists('trading_goods', $vendor['pricelist']) && $vendor['pricelist']['trading_goods'] ? : '',
+									'value' => array_key_exists('trading_goods', $vendor['pricelist']) && $vendor['pricelist']['trading_goods'] ? $vendor['pricelist']['trading_goods'] : '',
 									/*'placeholder' => json_encode(json_decode($this->filtersample, true)),*/
 									'rows' => 8
 								]
