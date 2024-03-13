@@ -14,6 +14,7 @@ class FILE extends API {
 
 	public function filter(){
 		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
+		if ($this->_requestedFolder && $this->_requestedFolder == 'users') $files = UTILITY::listFiles(UTILITY::directory('users') ,'asc');
 		else {
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			$files = [];
