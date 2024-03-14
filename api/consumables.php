@@ -193,11 +193,11 @@ class CONSUMABLES extends API {
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
+					if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
+						$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
+					}	
 				}
-				if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
-					$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
-				}
-		
+	
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-vendor'));
 				if ($statement->execute([
 					':name' => $vendor['name'],
@@ -254,11 +254,10 @@ class CONSUMABLES extends API {
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
+					if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
+						$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
+					}
 				}
-				if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
-					$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
-				}
-
 
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
