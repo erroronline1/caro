@@ -204,9 +204,9 @@ export class Dialog {
 							let content = document.querySelector("dialog>form>article");
 							if (!content) content = document.querySelector("dialog>form"); //scanner
 							content.childNodes.forEach((input) => {
-								//console.log(input);
-								if (["input", "textarea"].includes(input.localName)) {
-									result[input.name] = input.value;
+								if (["input", "textarea"].includes(input.localName) && input.value) {
+									if (["checkbox", "radio"].includes(input.type) && input.checked===true) result[input.name] = input.value;
+									else if (!(["checkbox", "radio"].includes(input.type))) result[input.name] = input.value;
 								}
 							});
 							return result;
@@ -258,7 +258,7 @@ export class Dialog {
 				content: this.body,
 			}).initializeSection(null, null, "iCanHasNodes"),
 		];
-		if (!Object.keys(this.options)) result = result.concat(this.confirm());
+		if (Object.keys(this.options)) result = result.concat(this.confirm());
 		else result = result.concat(this.alert());
 		return result;
 	}

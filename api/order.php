@@ -1064,15 +1064,34 @@ class ORDER extends API {
 					}
 
 					// request MDR §14 sample check
-					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && $tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no')))
-						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')])
-						$content[] = [
-							'type' => 'button',
-							'attributes' => [
-								'value' => LANG::GET('order.sample_check'),
-								'onpointerup' => 'alert("hello ' . $sampleCheck[$tocheck]['id']. '")'
-							]
-						];
+					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && $tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no'))){
+						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
+							$content[] = [
+								'type' => 'button',
+								'attributes' => [
+									'value' => LANG::GET('order.sample_check'),
+									'type' => 'button',
+									'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.sample_check') . "', body: JSON.parse('" . 
+										json_encode([[
+											[
+												'type' => 'text',
+												'description' => implode(' ', [
+													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
+													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''])
+											],
+											...json_decode(LANG::GET('defaultcomponent.mdrsamplecheck'), true)
+										]]). 
+										"'), options:{".
+											"'" . LANG::GET('order.sample_check_cancel') . "': false, ".
+											"'" . LANG::GET('order.sample_check_submit') . "': {value: true, class: 'reducedCTA'}}})".
+									".then(response => {if (response) {
+										orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id'].")}".
+									"})"
+								]
+							];
+						}
+					}
 					
 					// delete order button if permitted
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) {
