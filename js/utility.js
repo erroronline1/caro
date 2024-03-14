@@ -218,7 +218,7 @@ const orderClient = {
 		const check = [];
 		for (const [key, value] of Object.entries(formdata)) {
 			if (value && value !== "on") check.push(key + ": " + value);
-			else check.push(key);
+			else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
 		}
 		const result = check.join("\n");
 		formdata = new FormData();

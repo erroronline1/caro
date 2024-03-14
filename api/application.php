@@ -113,6 +113,7 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
+			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
 		}
 		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];

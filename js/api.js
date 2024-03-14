@@ -195,6 +195,39 @@ export const api = {
 		}
 		await api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
+	audit: (method, ...request) => {
+		/*
+		get audit/checks/{type}
+		*/
+		request = [...request];
+		request.splice(0, 0, "audit");
+		let payload,
+			successFn = function (data) {
+				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+			},
+			title = {
+				checks: LANG.GET("menu.audit"),
+			};
+		switch (method) {
+			case "get":
+				successFn = function (data) {
+					if (data.body) {
+						api.update_header(title[request[1]]);
+						document.getElementById("main").replaceChildren();
+						new Assemble(data.body).initializeSection();
+					}
+					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				};
+				break;
+			case "post":
+				payload = _.getInputs("[data-usecase=audit]", true);
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === "post");
+
+	},
 	csvfilter: (method, ...request) => {
 		/*
 		post csvfilter/rule

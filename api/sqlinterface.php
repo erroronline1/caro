@@ -382,6 +382,14 @@ class SQLQUERY {
 			'mysql' => "INSERT INTO caro_checks (id, type, date, author, content) VALUES (NULL, :type, CURRENT_TIMESTAMP, :author, :content)",
 			'sqlsrv' => "INSERT INTO caro_checks (type, date, author, content) VALUES (:type, CURRENT_TIMESTAMP, :author, :content)"
 		],
+		'checks_get-types' => [
+			'mysql' => "SELECT type FROM caro_checks GROUP BY type",
+			'sqlsrv' => "SELECT type FROM caro_checks GROUP BY type"
+		],
+		'checks_get' => [
+			'mysql' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
+		],
 
 
 	];
