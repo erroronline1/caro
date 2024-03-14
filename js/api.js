@@ -666,7 +666,7 @@ export const api = {
 				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				if (data.body !== undefined) {
 					const options = {};
-					options[LANG.GET("general.prevent_dataloss_ok")] = false;
+					options[LANG.GET("general.ok_button")] = false;
 					new Dialog({
 						type: "input",
 						body: data.body,
