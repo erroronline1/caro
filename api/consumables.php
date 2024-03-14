@@ -129,6 +129,34 @@ class CONSUMABLES extends API {
 		return;
 	}
 
+	public function mdrsamplecheck(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+		$statement->execute([
+			':id' => $this->_requestedID
+		]);
+		$product = $statement->fetch(PDO::FETCH_ASSOC);
+		$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
+		if ($statement->execute([
+			':type' => 'mdrsamplecheck',
+			':author' => $_SESSION['user']['name'],
+			':content' => $content
+		])) {
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-check'));
+			if ($statement->execute([
+				':id' => $product['id'],
+			])) $this->response([
+				'status' => [
+					'msg' => LANG::GET('order.sample_check_success')
+				]]);
+		}
+		$this->response([
+			'status' => [
+				'msg' => LANG::GET('order.sample_check_failure')
+			]]);
+	}
+
 	public function vendor(){
 		// Y U NO DELETE? because of audit safety, that's why!
 		switch ($_SERVER['REQUEST_METHOD']){

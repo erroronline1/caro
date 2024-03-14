@@ -108,8 +108,7 @@ to detect trading goods for the MDR §14 sample check add a respective filter li
 	]
 }
 ```
-
-if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewrite rules depend on the database columns for the caro_consumables_products database-table.
+without a filter none of the vendors products will be treated as a trading good!
 
 ## ressources
 ### external libraries
@@ -139,8 +138,7 @@ if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewri
 
 * user selectable color themes?
 * monitoring measuring equipment, rental parts, machinery, crutches
-* sample check MDR §14
-* caro audit
+* caro audit (sample check MDR §14, certificate expiry dates)
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * calendar and alerts

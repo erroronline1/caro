@@ -215,14 +215,15 @@ const orderClient = {
 		});
 	},
 	performSampleCheck(formdata, productid) {
-		console.log(formdata, productid);
 		const check = [];
 		for (const [key, value] of Object.entries(formdata)) {
 			if (value && value !== "on") check.push(key + ": " + value);
 			else check.push(key);
 		}
 		const result = check.join("\n");
-		console.log(result);
+		formdata = new FormData();
+		formdata.append("content", result);
+		api.purchase("post", "mdrsamplecheck", productid, formdata);
 	},
 };
 

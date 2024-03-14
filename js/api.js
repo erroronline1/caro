@@ -522,7 +522,7 @@ export const api = {
 		get order/filtered/{filter}
 		*/
 		request = [...request];
-		if (["vendor", "product"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -577,7 +577,16 @@ export const api = {
 				}
 				break;
 			case "post":
-				payload = _.getInputs("[data-usecase=purchase]", true);
+				switch(request[1]){
+					case "mdrsamplecheck":
+						payload = request[3]; // form data object passed by utility.js
+						successFn = function (data) {
+							api.toast(data.status.msg);
+						};
+						break;
+					default:
+						payload = _.getInputs("[data-usecase=purchase]", true);
+				}
 				break;
 			case "put":
 				if (["ordered", "received", "archived", "disapproved", "addinformation"].includes(request[3])) {
