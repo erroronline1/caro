@@ -38,6 +38,12 @@ class AUDIT extends API {
 		];
 
 		if ($this->_requestedType) {
+			switch ($this->_requestedType){
+				case 'mdrsamplecheck':
+					if ($append = $this->mdrsamplecheck()) $result['body']['content'][] = $append;					
+					break;
+				default:
+			}
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
 			$statement->execute([':type' => $this->_requestedType]);
 			$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -55,12 +61,26 @@ class AUDIT extends API {
 			}
 			$result['body']['content'][] = $entries;
 		}
-
 		$this->response($result);
 	}
 	
-
-	
+	private function mdrsamplecheck(){
+		// get unchecked articles for MDR §14 sample check
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
+		$statement->execute();
+		$sampleCheck = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$unchecked = [];
+		foreach($sampleCheck as $row){
+			if (!in_array($row['vendor_name'], $unchecked)) $unchecked[] = $row['vendor_name'];
+		}
+		return $unchecked ? [
+			[
+				'type' => 'text',
+				'description' => LANG::GET('audit.mdrsamplecheck_warning_description'),
+				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
+			]
+		] : null;
+	}
 }
 
 $api = new AUDIT();
