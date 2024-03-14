@@ -47,6 +47,7 @@ tested devices:
 * dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. reordered images will disappear but don't worry.
 * orders can be deleted by administrative users and requesting unit members at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
 * the manual is intentionally editable to accomodate it to users comprehension.
+* MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#sample-check) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. this applies for all products that have not been checked within mdr14_sample_reusable timespan. 
 
 ### importing vendor pricelists
 vendor pricelists must have an easy structure to be importable. it may need additional off-app customizing available data to have input files like:
@@ -85,6 +86,28 @@ while setting up a vendor an import rule must be defined like:
 }
 ```
 *headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+
+### sample check
+to detect trading goods for the MDR §14 sample check add a respective filter like:
+```js
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unnecessary products",
+			"keep": false, //or true
+			"match": {
+				"all": {
+					"article_name": "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOOD (OR DON'T IN ACCORDANCE TO keep-FLAG)"
+				}
+			}
+		}
+	]
+}
+```
 
 if e.g. no ean is available modify>rewrite>article_ean can be set to [""]. rewrite rules depend on the database columns for the caro_consumables_products database-table.
 
