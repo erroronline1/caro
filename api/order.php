@@ -853,6 +853,11 @@ class ORDER extends API {
 					$userunits[] = LANG::GET('units.' . $unit);
 				}
 
+				// get unchecked articles for MDR §14 sample check
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
+				$statement->execute();
+				$sampleCheck = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 				// in clause doesnt work without manually preparing
 				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order-by-unit'),
 				[
@@ -981,28 +986,31 @@ class ORDER extends API {
 						$messagepayload[':' . $replace] = array_key_exists($with, $decoded_order_data) ? $decoded_order_data[$with]: '';
 					}
 					$messagepayload[':info'] = array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data) ? $decoded_order_data[LANG::PROPERTY('order.additional_info')]: '';
-					$messageorderer=UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '';
+					$messageorderer = UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '';
 
-					$content[]=[
+					$content[] = [
 						'type' => 'links',
 						'content' => [
 							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'message', 'onpointerup' => "new Dialog({type: 'message', header: '". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', body: JSON.parse('" . 
 								json_encode(
-									[[
-										['type' => 'hiddeninput',
-										'attributes' => [
-											'name' => LANG::GET('message.to'),
-											'value' => $messageorderer
-											]
-										],
-										['type' => 'textarea',
-										'attributes' => [
-											'name' => LANG::GET('message.message'),
-											'value' => LANG::GET('order.message', $messagepayload),
-											'rows' => 8
+									[
+										[
+											[
+												'type' => 'hiddeninput',
+												'attributes' => [
+													'name' => LANG::GET('message.to'),
+													'value' => $messageorderer
+												]
+											], [
+												'type' => 'textarea',
+												'attributes' => [
+													'name' => LANG::GET('message.message'),
+													'value' => LANG::GET('order.message', $messagepayload),
+													'rows' => 8
+												]
 											]
 										]
-									]]
+									]
 								 ) . "'), options:{".
 								"'".LANG::GET('order.add_information_cancel')."': false,".
 								"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
@@ -1031,11 +1039,12 @@ class ORDER extends API {
 							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', body: JSON.parse('" . 
 								json_encode(
 									[
-										['type' => 'textarea',
-										'attributes' => [
-											'name' => LANG::GET('order.additional_info')
-										],
-										'hint' => LANG::GET('order.add_information_modal_body')
+										[
+											'type' => 'textarea',
+											'attributes' => [
+												'name' => LANG::GET('order.additional_info')
+											],
+											'hint' => LANG::GET('order.add_information_modal_body')
 										]
 									]
 								 ) . "'), options:{".
@@ -1053,8 +1062,21 @@ class ORDER extends API {
 					if ($row['received'] && !$row['archived']){
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
 					}
+
+					// request MDR §14 sample check
+					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && $tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no')))
+						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')])
+						$content[] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('order.sample_check'),
+								'onpointerup' => 'alert("hello ' . $sampleCheck[$tocheck]['id']. '")'
+							]
+						];
+					
+					// delete order button if permitted
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) {
-						$content[]=[
+						$content[] = [
 							'type' => 'deletebutton',
 							'hint' => $autodelete,
 							'attributes' => [

@@ -253,6 +253,11 @@ class SQLQUERY {
 			'mysql' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id = :id AND prod.vendor_id = dist.id LIMIT 1",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) = :id AND prod.vendor_id = dist.id"
 		],
+		'consumables_get-not-checked' => [
+			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND (IFNULL(prod.checked, " . (INI['limits']['mdr14_sample'] + 1) . ") > " . INI['limits']['mdr14_sample'] . " OR DATEDIFF(day, CURRENT_TIMESTAMP, prod.checked) > " . INI['limits']['mdr14_sample'] . ") AND prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND (ISNULL(prod.checked, " . (INI['limits']['mdr14_sample'] + 1) . ") > " . INI['limits']['mdr14_sample'] . " OR DATEDIFF(day, CURRENT_TIMESTAMP, prod.checked) > " . INI['limits']['mdr14_sample'] . ") AND prod.vendor_id = dist.id"
+		],
+
 		'consumables_get-product-units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC"
