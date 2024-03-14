@@ -5,7 +5,7 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 define ('INI', parse_ini_file('setup.ini', true));
-define ('REQUEST', explode("/", substr(@$_SERVER['PATH_INFO'], 1)));
+define ('REQUEST', explode("/", substr(@utf8_encode($_SERVER['PATH_INFO']), 1)));
 include_once('sqlinterface.php');
 include_once('language.php');
 include_once('utility.php'); // general unities
