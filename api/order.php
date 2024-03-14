@@ -1064,7 +1064,7 @@ class ORDER extends API {
 					}
 
 					// request MDR §14 sample check
-					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && $tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no'))){
+					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && $tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no')) !== false){
 						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
 							$content[] = [
 								'type' => 'button',
