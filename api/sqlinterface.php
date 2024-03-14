@@ -258,14 +258,14 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) = :id AND prod.vendor_id = dist.id"
 		],
 		'consumables_get-not-checked' => [
-			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND "
-				."(IFNULL(prod.checked, " . (INI['limits']['mdr14_sample_interval'] + 1) . ") > " . INI['limits']['mdr14_sample_interval'] . " DATEDIFF(day, prod.checked, GETDATE()) > " . INI['limits']['mdr14_sample_interval'] . ") AND "
-				."prod.vendor_id = dist.id and prod.vendor_id NOT IN(SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_interval'] . ") AND ".
-				"and prod.id not in(select id from caro_consumables_products where IFNULL(checked, 0) != 0 AND DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_reusable'] . ")",
+			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
+				. "(IFNULL(prod.checked, " . (INI['limits']['mdr14_sample_interval'] + 1) . ") > " . INI['limits']['mdr14_sample_interval'] . " OR DATEDIFF(prod.checked, CURRENT_TIMESTAMP) > " . INI['limits']['mdr14_sample_interval'] . ") AND "
+				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(checked, CURRENT_TIMESTAMP) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
+				. "prod.id NOT IN (select id from caro_consumables_products where IFNULL(checked, 0) != 0 AND DATEDIFF(checked, CURRENT_TIMESTAMP) < " . INI['limits']['mdr14_sample_reusable'] . ")",
 			'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 				. "(ISNULL(prod.checked, " . (INI['limits']['mdr14_sample_interval'] + 1) . ") > " . INI['limits']['mdr14_sample_interval'] . " OR DATEDIFF(day, prod.checked, GETDATE()) > " . INI['limits']['mdr14_sample_interval'] . ") AND "
-				. "prod.vendor_id NOT IN(SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
-				. "prod.id not in(select id from caro_consumables_products where ISNULL(checked, 0) != 0 AND DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_reusable'] . ")"
+				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
+				. "prod.id NOT IN(select id from caro_consumables_products where ISNULL(checked, 0) != 0 AND DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_reusable'] . ")"
 		],
 
 		'consumables_get-product-units' => [
