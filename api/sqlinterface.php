@@ -61,7 +61,7 @@ class SQLQUERY {
 
 		'user_post' => [
 			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings)",
-			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, app_settings, image) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
+			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
 		],
 		'user_put' => [
 			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id LIMIT 1",
