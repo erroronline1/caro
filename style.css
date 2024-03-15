@@ -130,7 +130,7 @@ dialog {
 	opacity: 0;
 	transition: ease 0.3s;
 	pointer-events: none;
-	width: 30em;
+	width: 40em;
 
 	&#toast {
 		bottom: 6em;
@@ -531,6 +531,11 @@ button {
 	color: var(--article);
 	font-weight: bold;
 	font-size: 1.15em;
+
+	&.floatright {
+		float: right;
+		width: fit-content;
+	}
 }
 
 /* Large devices such as laptops (1024px and up) */
