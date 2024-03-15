@@ -8,23 +8,43 @@ class CONSUMABLES extends API {
 	private $_requestedID = null;
 	private $filtersample = <<<'END'
 	{
-		"info": "more rules may apply, see documentation if neccessary",
-		"filesettings": {
-			"columns": [
-				"ArticleNo",
-				"Name",
-				"Unit",
-				"EAN"
-			]
-		},
-		"modify": {
-			"rewrite": {
-				"article_no": ["ArticleNo"],
-				"article_name": ["Name"],
-				"article_unit": ["Unit"],
-				"article_ean": ["EAN"]
-			}
-		}
+	  "info": "more rules may apply, see documentation if neccessary",
+	  "filesettings": {
+	    "columns": [
+	      "ArticleNo",
+	      "Name",
+	      "Unit",
+	      "EAN"
+	    ]
+	  },
+	  "modify": {
+	    "rewrite": {
+	      "article_no": ["ArticleNo"],
+	      "article_name": ["Name"],
+	      "article_unit": ["Unit"],
+	      "article_ean": ["EAN"]
+	    }
+	  }
+	}
+	END;
+
+	private $tradingsample = <<<'END'
+	{
+	  "filesetting": {
+	    "columns": ["article_no", "article_name"]
+	  },
+	  "filter": [
+	    {
+	      "apply": "filter_by_expression",
+	      "comment": "delete unnecessary products",
+	      "keep": false
+	      "match": {
+	        "all": {
+	          "article_name": "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOOD (OR DON'T IN ACCORDANCE TO keep-FLAG)"
+	        }
+	      }
+	    }
+	  ]
 	}
 	END;
 
@@ -428,7 +448,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 									'value' => $vendor['pricelist']['filter'] ? : '',
-									'placeholder' => json_encode(json_decode($this->filtersample, true)),
+									'placeholder' => $this->filtersample,
 									'rows' => 8
 								]
 							]
@@ -438,7 +458,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter'),
 									'value' => array_key_exists('trading_goods', $vendor['pricelist']) && $vendor['pricelist']['trading_goods'] ? $vendor['pricelist']['trading_goods'] : '',
-									/*'placeholder' => json_encode(json_decode($this->filtersample, true)),*/
+									'placeholder' => $this->tradingsample,
 									'rows' => 8
 								]
 							]
