@@ -124,9 +124,13 @@ export class Dialog {
 		this.body = options.body || null;
 		this.options = options.options || {};
 		this.scannerElements = {};
+		let modal = "modal";
 
-		const dialog = document.getElementById("modal");
+		let dialog = document.getElementById("modal");
 		if (this.type) {
+			if (this.type === "input") modal = "inputmodal";
+			dialog = document.getElementById(modal);
+
 			const form = document.createElement("form");
 			if (this.type === "message") {
 				form.dataset.usecase = "message";
@@ -137,7 +141,9 @@ export class Dialog {
 			img.classList.add("close");
 			img.src = "./media/times.svg";
 			img.onpointerdown = new Function(
-				"const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.querySelector('dialog').close()"
+				"const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" +
+					modal +
+					"').close()"
 			);
 			form.append(img);
 			if (this.header || this.body || this.icon) {
@@ -205,8 +211,8 @@ export class Dialog {
 							if (!content) content = document.querySelector("dialog>form"); //scanner
 							content.childNodes.forEach((input) => {
 								if (["input", "textarea"].includes(input.localName) && input.value) {
-									if (["checkbox", "radio"].includes(input.type) && input.checked===true) result[input.name] = input.value;
-									else if (!(["checkbox", "radio"].includes(input.type))) result[input.name] = input.value;
+									if (["checkbox", "radio"].includes(input.type) && input.checked === true) result[input.name] = input.value;
+									else if (!["checkbox", "radio"].includes(input.type)) result[input.name] = input.value;
 								}
 							});
 							return result;
