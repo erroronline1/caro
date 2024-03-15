@@ -894,6 +894,7 @@ export class Compose extends Assemble {
 		std = {
 			name: LANG.GET("assemble.compose_component_name"),
 			description: LANG.GET("assemble.compose_component"),
+			list: 'components',
 			action:
 				"new Dialog({type: 'confirm', header: '" +
 				LANG.GET("assemble.compose_component") +
@@ -924,6 +925,7 @@ export class Compose extends Assemble {
 				value: this.currentElement.value || "",
 				name: std.name,
 				required: true,
+				list : std.list,
 			},
 		};
 		result = result.concat(...this.textinput());
@@ -992,6 +994,7 @@ export class Compose extends Assemble {
 		return this.compose_component({
 			name: LANG.GET("assemble.compose_form_label"),
 			description: LANG.GET("assemble.compose_form"),
+			list: "forms",
 			action:
 				"new Dialog({type: 'confirm', header: '" +
 				LANG.GET("assemble.compose_form") +

@@ -673,6 +673,7 @@ class FORMS extends API {
 								'attributes' => [
 									'name' => LANG::GET('assemble.edit_bundle_name'),
 									'value' => $bundle['name'],
+									'list' => 'templates',
 									'required' => true,
 									'data-loss' => 'prevent'
 								]
