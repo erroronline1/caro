@@ -60,10 +60,9 @@ body {
 }
 
 body::before {
-	background: url("./media/favicon/logo.svg");
+	background: url("./media/favicon/logo.svg") no-repeat;
 	/*1086x570*/
 	background-size: 100%;
-	background-repeat: no-repeat;
 	transform: rotate(-90deg) translate(-25vh, -21vh);
 	content: "";
 	position: fixed;
@@ -728,6 +727,13 @@ section > div > article {
 	box-shadow: none;
 	border: none;
 	background: none;
+}
+
+article > article {
+	width: calc(33% - 1em);
+	margin: 0.5em;
+	height: max-content;
+	vertical-align: top;
 }
 
 .sectionindicator {

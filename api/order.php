@@ -205,23 +205,40 @@ class ORDER extends API {
 					$article = intval(count($matches) - 1);
 					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
 						$matches[$article][] = [
-							['type' => 'links',
+							['type' => 'text',
 							'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
-							'content' => []
 							]
 						];
 					}
 					$slide = intval(count($matches[$article]) - 1);
 					if ($this->_borrowedModule == 'editconsumables') // consumables.php can make good use of this method!
-						$matches[$article][$slide][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")", 'data-filtered' => 'breakline'];
+						$matches[$article][$slide][] = [
+							'type' => 'tile',
+							'attributes' => [
+								'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
+							],
+							'content' => [
+								['type' => 'text',
+								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
+							]
+						];
 					else
-						$matches[$article][$slide][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']] = ['href' => 'javascript:void(0);', 'data-filtered' => 'breakline', 'data-type' => 'cart', 'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;"];
+						$matches[$article][$slide][] = [
+						'type' => 'tile',
+						'attributes' => [
+							'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+						],
+						'content' => [
+							['type' => 'text',
+							'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
+						]
+					];
 
 				}
 				if (!$matches[0]) $matches[0][] = [
-					['type' => 'links',
+					['type' => 'text',
 					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
-					'content' => []
+					//'content' => []
 					]
 				];
 
