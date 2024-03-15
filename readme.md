@@ -128,9 +128,20 @@ without a filter none of the vendors products will be treated as a trading good!
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* assemble.js dialog make type input handle complex forms
 * view other forms (e.g. instructions, modal? prevent filling out)
 * import texttemplates
 * user manual
+
+* incorporate product
+    * modal on order like sample check
+    * checklist -> manage products as well
+    * adding documents
+    * special flag incorporated before
+    * adding photo (scaled down) ? (display on order selection)
+    * protected = 1
+    * add to db like sample check with db-id in content to navigate to product manager
+    * display incorporation state in order selection
 
 * vendor address, email, phone, customer id
 * vendor list
