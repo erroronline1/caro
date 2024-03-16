@@ -1090,22 +1090,9 @@ class ORDER extends API {
 							$content[] = [
 								'type' => 'button',
 								'attributes' => [
-									'value' => LANG::GET('order.incorporate'),
+									'value' => LANG::GET('order.incorporation'),
 									'type' => 'button',
-									'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.incorporate') . "', body: JSON.parse('" . 
-										json_encode([
-											[
-												'type' => 'text',
-												'description' => implode(' ', [
-													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
-													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
-													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''])
-												], ...json_decode(LANG::GET('defaultcomponent.incorporate'), true)
-										]). 
-										"'), options:{".
-											"'" . LANG::GET('order.incorporate_cancel') . "': false, ".
-											"'" . LANG::GET('order.incorporate_submit') . "': {value: true, class: 'reducedCTA'}}})".
-									".then(response => {if (response) { orderClient.performIncorporation(response, ".$unincorporated[$tocheck]['id'].")} })"
+									'onpointerup' => "api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . "); this.disabled = true;"
 								]
 							];
 						}
@@ -1133,7 +1120,7 @@ class ORDER extends API {
 										"'), options:{".
 											"'" . LANG::GET('order.sample_check_cancel') . "': false, ".
 											"'" . LANG::GET('order.sample_check_submit') . "': {value: true, class: 'reducedCTA'}}})".
-									".then(response => {if (response) { orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id'].")} })"
+									".then(response => {if (response) { orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id'].")} }); ; this.disabled = true;"
 								]
 							];
 						}

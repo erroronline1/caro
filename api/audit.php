@@ -27,6 +27,7 @@ class AUDIT extends API {
 		$types = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($types as $type){
 			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
+			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 		}
 		$result['body']['content'][] = [
 			[
@@ -87,8 +88,33 @@ class AUDIT extends API {
 	}
 
 	private function incorporation(){
-		// can be used for any warning 
-		return null;
+		// get unincorporated articles from approved orders
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-incorporated'));
+		$statement->execute();
+		$unincorporated = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
+		$statement->execute([
+			':substr' => LANG::PROPERTY('order.ordernumber_label')
+		]);
+		$approvedorders = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$orderedunincorporated = [];
+		foreach ($approvedorders as $row){
+			$decoded_order_data = json_decode($row['order_data'], true);
+			if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($unincorporated, 'article_no'))) !== false){
+				if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
+					$article = $decoded_order_data[LANG::PROPERTY('order.ordernumber_label')] . $decoded_order_data[LANG::PROPERTY('order.vendor_label')];
+					if (!in_array($article, $orderedunincorporated)) $orderedunincorporated[] = $article;
+				}
+			}
+		}
+		return $orderedunincorporated ? [
+			[
+				'type' => 'text',
+				'description' => LANG::GET('audit.incorporation_warning_description'),
+				'content' => LANG::GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
+			]
+		] : null;
 	}
 
 	public function export(){

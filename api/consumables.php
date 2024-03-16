@@ -153,71 +153,150 @@ class CONSUMABLES extends API {
 	}
 
 	public function mdrsamplecheck(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-		$statement->execute([
-			':id' => $this->_requestedID
-		]);
-		$product = $statement->fetch(PDO::FETCH_ASSOC);
-		$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+		if (!(array_intersect(['user', 'admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+			$statement->execute([
+				':id' => $this->_requestedID
+			]);
+			$product = $statement->fetch(PDO::FETCH_ASSOC);
+			$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
-		if ($statement->execute([
-			':type' => 'mdrsamplecheck',
-			':author' => $_SESSION['user']['name'],
-			':content' => $content
-		])) {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-check'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
 			if ($statement->execute([
-				':id' => $product['id'],
-			])) $this->response([
+				':type' => 'mdrsamplecheck',
+				':author' => $_SESSION['user']['name'],
+				':content' => $content
+			])) {
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-check'));
+				if ($statement->execute([
+					':id' => $product['id'],
+				])) $this->response([
+					'status' => [
+						'msg' => LANG::GET('order.sample_check_success')
+					]]);
+			}
+			$this->response([
 				'status' => [
-					'msg' => LANG::GET('order.sample_check_success')
+					'msg' => LANG::GET('order.sample_check_failure')
 				]]);
+			break;
 		}
-		$this->response([
-			'status' => [
-				'msg' => LANG::GET('order.sample_check_failure')
-			]]);
 	}
 
 	public function incorporation(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-		$statement->execute([
-			':id' => $this->_requestedID
-		]);
-		$product = $statement->fetch(PDO::FETCH_ASSOC);
-		$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+		if (!(array_intersect(['user', 'admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				$product = $statement->fetch(PDO::FETCH_ASSOC);
+				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
+				if ($statement->execute([
+					':type' => 'incorporation',
+					':author' => $_SESSION['user']['name'],
+					':content' => $content
+				])) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-incorporation'));
+					if ($statement->execute([
+						':id' => $product['id'],
+						':incorporated' => 1
+					])) $this->response([
+						'status' => [
+							'msg' => LANG::GET('order.incorporation_success')
+						]]);
+				}
+				$this->response([
+					'status' => [
+						'msg' => LANG::GET('order.incorporation_failure')
+					]]);
+				break;
+			case 'GET':
+				$result = [];
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+		
+				$result['body'] = [
+					'content' => [
+						[
+							'type' => 'text',
+							'description' => implode(' ', [
+								$product['article_no'] ? : '',
+								$product['article_name'] ? : '',
+								$product['vendor_name'] ? : ''])
+						], ...json_decode(LANG::GET('defaultcomponent.incorporation'), true)
+					],
+					'options' => [
+							LANG::GET('order.incorporation_cancel') => false,
+							LANG::GET('order.incorporation_submit') => [ 'value' => true, 'class'=> 'reducedCTA']
+					],
+					'productid' => $product['id']
+				];
 
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
+				$statement->execute([':type' => 'incorporation']);
+				$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+				$productsPerSlide = 0;
+				$matches = [[]];
 
-		$this->response([
-			'status' => [
-				'msg' => LANG::GET('order.incorporate_failure')
-			]]);
+				foreach($checks as $row){
+					$row['content'] = explode("\n", $row['content']);
+					$probability = [ 'article_no' => [], 'vendor_name' => []];
+					foreach ($row['content'] as $information){
+						similar_text($information, $product['article_no'], $article_no_percent);
+						if ($article_no_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['article_no'][] = $row['id'];
+						similar_text($information, $product['vendor_name'], $vendor_name_percent);
+						if ($vendor_name_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['vendor_name'][] = $row['id'];
+					}
+					if (array_intersect($probability['article_no'], $probability['vendor_name'])){
+						$article = intval(count($matches) - 1);
+						if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
+							$matches[$article][] = [
+								['type' => 'text',
+								'description' => LANG::GET('order.incorporation_matching_previous'),
+								]
+							];
+						}
+						$slide = intval(count($matches[$article]) - 1);
+						$matches[$article][$slide][] = [
+							'type' => 'tile',
+							'attributes' => [
+								'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name'] . "'",
+							],
+							'content' => [
+								[
+									'type' => 'text',
+									'content' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']
+								]
+							]
+						];
 
-
-
-
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
-		if ($statement->execute([
-			':type' => 'incorporation',
-			':author' => $_SESSION['user']['name'],
-			':content' => $content
-		])) {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-incorporation'));
-			if ($statement->execute([
-				':id' => $product['id'],
-				':incorporation' => 1
-			])) $this->response([
-				'status' => [
-					'msg' => LANG::GET('order.incorporate_success')
-				]]);
+					}
+				}
+				if ($matches[0]){
+					array_push($result['body']['content'], ...$matches);
+					$result['body']['content'][] = [
+						[
+							'type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('order.incorporation_matching_previous'),
+								'id' => 'incorporationmatchingprevious'
+							]
+						]
+					];
+				}
+				$this->response($result);
+				break;
 		}
-		$this->response([
-			'status' => [
-				'msg' => LANG::GET('order.incorporate_failure')
-			]]);
 	}
 
 	public function vendor(){
@@ -620,7 +699,7 @@ class CONSUMABLES extends API {
 				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 				$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
 				$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
-				
+
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([

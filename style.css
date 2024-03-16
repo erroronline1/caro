@@ -200,6 +200,10 @@ dialog {
 			header {
 				display: block;
 			}
+			section{
+				margin:0 .25em 0 1.75em;
+				article{padding:1em;article{margin:.5em}};
+			}
 		}
 	}
 }

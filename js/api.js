@@ -200,27 +200,42 @@ export const api = {
 	audit: (method, ...request) => {
 		/*
 		get audit/checks/{type}
+		get audit/export/{type}
 		*/
 		request = [...request];
 		request.splice(0, 0, "audit");
 		let payload,
 			successFn = function (data) {
 				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.body !== undefined) {
+					const options = {};
+					options[LANG.GET("general.ok_button")] = false;
+					new Dialog({
+						type: "input",
+						body: data.body,
+						options: options,
+					});
+				}
 			},
 			title = {
 				checks: LANG.GET("menu.audit"),
 			};
 		switch (method) {
 			case "get":
-				successFn = function (data) {
-					if (data.body) {
-						api.update_header(title[request[1]]);
-						const body = new Assemble(data.body);
-						document.getElementById("main").replaceChildren(body.initializeSection());
-						body.processAfterInsertion();
-					}
-					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
-				};
+				switch (request[1]) {
+					case "export":
+						break;
+					default:
+						successFn = function (data) {
+							if (data.body) {
+								api.update_header(title[request[1]]);
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+						};
+				}
 				break;
 			case "post":
 				payload = _.getInputs("[data-usecase=audit]", true);
@@ -549,6 +564,10 @@ export const api = {
 		put consumables/product/{id}
 		delete consumables/product/{id}
 
+		post consumables/mdrsamplecheck
+		post consumables/incorporation
+		get consumables/incorporation
+
 		get order/prepared
 		get order/productsearch/{id|name}
 		get order/order/{id}
@@ -563,7 +582,7 @@ export const api = {
 		get order/filtered/{filter}
 		*/
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -604,6 +623,18 @@ export const api = {
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
+					case "incorporation":
+						successFn = function (data) {
+							if (data.body) {
+								new Dialog({ type: "input", header: LANG.GET("order.incorporation"), body: data.body.content, options: data.body.options }).then((response) => {
+									if (response) {
+										orderClient.performIncorporation(response, data.body.productid);
+									}
+								});
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+						};
+						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {
@@ -620,8 +651,10 @@ export const api = {
 				break;
 			case "post":
 				switch (request[1]) {
+					case "incorporation":
 					case "mdrsamplecheck":
 						payload = request[3]; // form data object passed by utility.js
+						delete request[3];
 						successFn = function (data) {
 							api.toast(data.status.msg);
 						};
