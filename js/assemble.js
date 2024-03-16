@@ -220,14 +220,6 @@ export class Dialog {
 					default:
 						if (response.target.returnValue === "true") {
 							result = getValues(document.querySelector("dialog>form"));
-							/*let content = document.querySelector("dialog>form>article");
-							if (!content) content = document.querySelector("dialog>form"); //scanner
-							content.childNodes.forEach((input) => {
-								if (["input", "textarea"].includes(input.localName) && input.value) {
-									if (["checkbox", "radio"].includes(input.type) && input.checked === true) result[input.name] = input.value;
-									else if (!["checkbox", "radio"].includes(input.type)) result[input.name] = input.value;
-								}
-							});*/
 							return result;
 						}
 						return false;
