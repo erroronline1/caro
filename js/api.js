@@ -607,7 +607,9 @@ export const api = {
 							let list = document.querySelector("article>article");
 							if (list) list.parentNode.parentNode.parentNode.remove();
 							if (data.body.content) {
-								new Assemble(data.body).initializeSection("hr");
+								const body = new Assemble(data.body);
+								body.initializeSection("hr");
+								body.processAfterInsertion();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
