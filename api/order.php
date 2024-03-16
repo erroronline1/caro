@@ -870,6 +870,11 @@ class ORDER extends API {
 					$userunits[] = LANG::GET('units.' . $unit);
 				}
 
+				// get unincorporated
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-incorporated'));
+				$statement->execute();
+				$unincorporated = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 				// get unchecked articles for MDR §14 sample check
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
 				$statement->execute();
@@ -1079,9 +1084,35 @@ class ORDER extends API {
 					if ($row['received'] && !$row['archived']){
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
 					}
-
+					// request incorporation
+					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($unincorporated, 'article_no'))) !== false){
+						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
+							$content[] = [
+								'type' => 'button',
+								'attributes' => [
+									'value' => LANG::GET('order.incorporate'),
+									'type' => 'button',
+									'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.incorporate') . "', body: JSON.parse('" . 
+										json_encode([
+											[
+												'type' => 'text',
+												'description' => implode(' ', [
+													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
+													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''])
+												], ...json_decode(LANG::GET('defaultcomponent.incorporate'), true)
+										]). 
+										"'), options:{".
+											"'" . LANG::GET('order.incorporate_cancel') . "': false, ".
+											"'" . LANG::GET('order.incorporate_submit') . "': {value: true, class: 'reducedCTA'}}})".
+									".then(response => {if (response) { orderClient.performIncorporation(response, ".$unincorporated[$tocheck]['id'].")} })"
+								]
+							];
+						}
+					}
+					
 					// request MDR §14 sample check
-					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && $tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no')) !== false){
+					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no'))) !== false){
 						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
 							$content[] = [
 								'type' => 'button',

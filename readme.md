@@ -133,11 +133,9 @@ without a filter none of the vendors products will be treated as a trading good!
 * user manual
 
 * incorporate product
-    * modal on order like sample check
-    * checklist -> manage products as well
+    * select previous incorporations for similar products within form
     * adding documents
-    * special flag incorporated before
-    * adding photo (scaled down) ? (display on order selection)
+    * adding photo (scaled down) ? (display on order selection) (->consumables as well)
     * protected = 1
     * add to db like sample check with db-id in content to navigate to product manager
     * display incorporation state in order selection

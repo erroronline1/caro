@@ -88,6 +88,7 @@ class CONSUMABLES extends API {
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
 					':trading_good' => "'0'",
+					':incorporated' => "'" . $row['incorporated'] . "'",
 				]) . '; ';
 				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
@@ -99,7 +100,8 @@ class CONSUMABLES extends API {
 						':article_ean' => "'" . $row['article_ean'] . "'",
 						':active' => 1,
 						':protected' => 0,
-						':trading_good' => 0
+						':trading_good' => 0,
+						':incorporated' => null
 					]) . '; ';
 
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
@@ -137,7 +139,8 @@ class CONSUMABLES extends API {
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
-					':trading_good' => "1"
+					':trading_good' => "1",
+					':incorporated' => "'" . $row['incorporated'] . "'",
 				]) . '; ';
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
 			}
@@ -174,6 +177,46 @@ class CONSUMABLES extends API {
 		$this->response([
 			'status' => [
 				'msg' => LANG::GET('order.sample_check_failure')
+			]]);
+	}
+
+	public function incorporation(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+		$statement->execute([
+			':id' => $this->_requestedID
+		]);
+		$product = $statement->fetch(PDO::FETCH_ASSOC);
+		$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+
+
+
+
+		$this->response([
+			'status' => [
+				'msg' => LANG::GET('order.incorporate_failure')
+			]]);
+
+
+
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
+		if ($statement->execute([
+			':type' => 'incorporation',
+			':author' => $_SESSION['user']['name'],
+			':content' => $content
+		])) {
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-incorporation'));
+			if ($statement->execute([
+				':id' => $product['id'],
+				':incorporation' => 1
+			])) $this->response([
+				'status' => [
+					'msg' => LANG::GET('order.incorporate_success')
+				]]);
+		}
+		$this->response([
+			'status' => [
+				'msg' => LANG::GET('order.incorporate_failure')
 			]]);
 	}
 
@@ -507,12 +550,10 @@ class CONSUMABLES extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
-				
 				$product = [
 					'id' => null,
 					'vendor_id' => null,
 					'vendor_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor')),
-					'vendor_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor')),
 					'article_no' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no')),
 					'article_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name')),
 					'article_alias' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')),
@@ -547,7 +588,7 @@ class CONSUMABLES extends API {
 					':article_ean' => $product['article_ean'],
 					':active' => $product['active'],
 					':protected' => $product['protected'],
-					':trading_good' => $product['trading_good']
+					':trading_good' => $product['trading_good'],
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
@@ -578,7 +619,8 @@ class CONSUMABLES extends API {
 				$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
 				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 				$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
-
+				$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
+				
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
@@ -604,7 +646,8 @@ class CONSUMABLES extends API {
 					':article_ean' => $product['article_ean'],
 					':active' => $product['active'],
 					':protected' => $product['protected'],
-					':trading_good' => $product['trading_good']
+					':trading_good' => $product['trading_good'],
+					':incorporated' => $product['incorporated'],
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
@@ -642,7 +685,8 @@ class CONSUMABLES extends API {
 					'article_ean' => '',
 					'active' => 1,
 					'protected' => 0,
-					'trading_good' => 0
+					'trading_good' => 0,
+					'incorporated' => null,
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
 
@@ -686,7 +730,7 @@ class CONSUMABLES extends API {
 				}
 
 				// display form for adding or editing a product
-				$result['body']=['content' => [
+				$result['body'] = ['content' => [
 					[
 						[
 							'type' => 'datalist',
@@ -823,6 +867,24 @@ class CONSUMABLES extends API {
 					$result['body']['content'][3]
 				];
 				if ($product['trading_good']) $result['body']['content'][2][count($result['body']['content'][2]) -1]['content'][LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
+				if ($product['incorporated'] !== null) {
+					array_push($result['body']['content'][2] ,
+						[
+							'type' => 'text',
+							'description' => $product['incorporated'] ? LANG::GET('consumables.edit_product_incorporated_accepted') : LANG::GET('consumables.edit_product_incorporated_rejected')
+						], [
+							'type' => 'checkbox',
+							'content' => [
+								[LANG::GET('consumables.edit_product_incorporated_revoke')] => []
+							]
+						]);
+				}
+				else {
+					$result['body']['content'][2][] = [
+						'type' => 'text',
+						'description' => LANG::GET('consumables.edit_product_incorporated_not')
+					];
+				}
 				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
 					[
 						[

@@ -225,6 +225,20 @@ const orderClient = {
 		formdata.append("content", result);
 		api.purchase("post", "mdrsamplecheck", productid, formdata);
 	},
+	performIncorporation(formdata, productid) {
+		const check = [];
+		for (const [key, value] of Object.entries(formdata)) {
+			if (value && value !== "on") check.push(key + ": " + value);
+			else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
+		}
+		if (check.length) {
+			const result = check.join("\n");
+			formdata = new FormData();
+			formdata.append("content", result);
+			api.purchase("post", "incorporation", productid, formdata);
+		}
+		else new Toast(LANG.GET('order.incorporate_failure'));
+	},
 };
 
 const toolModule = {
