@@ -434,7 +434,9 @@ input[type="number"] {
 input[type="radio"],
 input[type="checkbox"] {
 	appearance: none;
-	display: none;
+	display: inline;
+	width:0;
+	height:0
 }
 
 .radio,
