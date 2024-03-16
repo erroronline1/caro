@@ -1,4 +1,4 @@
-import { assemble_helper, Toast } from "./assemble.js";
+import { assemble_helper, Dialog, Toast } from "./assemble.js";
 import { compose_helper } from "./compose.js";
 
 export const api = {
@@ -112,10 +112,11 @@ export const api = {
 					request.push(logintoken.value ? logintoken.value : null);
 				}
 				successFn = async function (data) {
-					document.getElementById("main").replaceChildren();
 					await api.application("get", "menu");
 					if (data.body.form) {
-						new Assemble(data.body).initializeSection();
+						const body = new Assemble(data.body);
+						document.getElementById("main").replaceChildren(body.initializeSection());
+						body.processAfterInsertion();
 						let signin = LANG.GET("menu.application_signin"),
 							greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 						api.update_header(
@@ -161,8 +162,9 @@ export const api = {
 							":user": greeting,
 						})
 					);
-					document.getElementById("main").replaceChildren();
-					new Assemble(data.body).initializeSection();
+					const body = new Assemble(data.body);
+					document.getElementById("main").replaceChildren(body.initializeSection());
+					body.processAfterInsertion();
 				};
 				break;
 			case "manual":
@@ -170,8 +172,9 @@ export const api = {
 					case "get":
 						successFn = function (data) {
 							api.update_header(LANG.GET("menu.application_manual_manager"));
-							document.getElementById("main").replaceChildren();
-							new Assemble(data.body).initializeSection();
+							const body = new Assemble(data.body);
+							document.getElementById("main").replaceChildren(body.initializeSection());
+							body.processAfterInsertion();
 						};
 						break;
 					case "delete":
@@ -212,8 +215,9 @@ export const api = {
 				successFn = function (data) {
 					if (data.body) {
 						api.update_header(title[request[1]]);
-						document.getElementById("main").replaceChildren();
-						new Assemble(data.body).initializeSection();
+						const body = new Assemble(data.body);
+						document.getElementById("main").replaceChildren(body.initializeSection());
+						body.processAfterInsertion();
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};
@@ -259,8 +263,9 @@ export const api = {
 				successFn = function (data) {
 					if (data.body) {
 						api.update_header(title[request[1]]);
-						document.getElementById("main").replaceChildren();
-						new Assemble(data.body).initializeSection();
+						const body = new Assemble(data.body);
+						document.getElementById("main").replaceChildren(body.initializeSection());
+						body.processAfterInsertion();
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};
@@ -296,8 +301,9 @@ export const api = {
 		let successFn = function (data) {
 				if (data.body) {
 					api.update_header(title[request[1]]);
-					document.getElementById("main").replaceChildren();
-					new Assemble(data.body).initializeSection();
+					const body = new Assemble(data.body);
+					document.getElementById("main").replaceChildren(body.initializeSection());
+					body.processAfterInsertion();
 				}
 				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				if (data.status !== undefined && data.status.redirect !== undefined) api.file("get", ...data.status.redirect);
@@ -392,8 +398,9 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById("main").replaceChildren();
-								new Compose(data.body);
+								const body = new Compose(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
 								if (data.body.component) compose_helper.importComponent(data.body.component);
 								// create multipart form for file uploads
 								compose_helper.addComponentMultipartFormToMain();
@@ -406,8 +413,9 @@ export const api = {
 					case "form":
 						successFn = function (data) {
 							if (data.body) {
-								document.getElementById("main").replaceChildren();
-								new Assemble(data.body).initializeSection();
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
@@ -417,8 +425,9 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById("main").replaceChildren();
-								new Compose(data.body);
+								const body = new Compose(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
 								if (data.body.components) compose_helper.importForm(data.body.components);
 								api.preventDataloss.start();
 							}
@@ -503,8 +512,9 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById("main").replaceChildren();
-								new Assemble(data.body).initializeSection();
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
 								api.preventDataloss.start();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
@@ -598,8 +608,9 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
-								document.getElementById("main").replaceChildren();
-								new Assemble(data.body).initializeSection();
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
 								if (request[1] === "approved") orderClient.filter();
 								api.preventDataloss.start();
 							}
@@ -740,8 +751,9 @@ export const api = {
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]] || data.title);
-								document.getElementById("main").replaceChildren();
-								new Assemble(data.body).initializeSection();
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
 								api.preventDataloss.start();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
@@ -764,7 +776,8 @@ export const api = {
 		post texttemplate/template
 		get texttemplate/template
 
-		get texttemplate/text
+		get texttemplate/text opens form properly from menu
+		get texttemplate/text/modal opens form within modal
 		*/
 		request = [...request];
 		request.splice(0, 0, "texttemplate");
@@ -779,19 +792,35 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
-				successFn = function (data) {
-					if (data.body) {
-						api.update_header(title[request[1]]);
-						document.getElementById("main").replaceChildren();
-						new Assemble(data.body).initializeSection();
-					}
-					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
-					if (data.data !== undefined) texttemplateClient.data = data.data;
-					if (data.selected !== undefined && data.selected.length) {
-						compose_helper.importTextTemplate(data.selected);
-					}
-					api.preventDataloss.start();
-				};
+				switch (request[3]) {
+					case "modal":
+						successFn = function (data) {
+							if (data.body) {
+								new Dialog({ type: "input", header: LANG.GET("menu.texttemplate_texts"), body: data.body });
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.data !== undefined) texttemplateClient.data = data.data;
+							if (data.selected !== undefined && data.selected.length) {
+								compose_helper.importTextTemplate(data.selected);
+							}
+						};
+						break;
+					default:
+						successFn = function (data) {
+							if (data.body) {
+								api.update_header(title[request[1]]);
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.data !== undefined) texttemplateClient.data = data.data;
+							if (data.selected !== undefined && data.selected.length) {
+								compose_helper.importTextTemplate(data.selected);
+							}
+							api.preventDataloss.start();
+						};
+				}
 				break;
 			case "post":
 				switch (request[1]) {
@@ -832,8 +861,9 @@ export const api = {
 				successFn = function (data) {
 					if (data.body) {
 						api.update_header(title[request[1]]);
-						document.getElementById("main").replaceChildren();
-						new Assemble(data.body).initializeSection();
+						const body = new Assemble(data.body);
+						document.getElementById("main").replaceChildren(body.initializeSection());
+						body.processAfterInsertion();
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};
@@ -873,8 +903,9 @@ export const api = {
 				successFn = function (data) {
 					if (data.body) {
 						api.update_header(title[request[1]]);
-						document.getElementById("main").replaceChildren();
-						new Assemble(data.body).initializeSection();
+						const body = new Assemble(data.body);
+						document.getElementById("main").replaceChildren(body.initializeSection());
+						body.processAfterInsertion();
 					}
 					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 				};

@@ -130,7 +130,6 @@ without a filter none of the vendors products will be treated as a trading good!
 # open tasks
 * assemble.js dialog make type input handle complex forms
 * view other forms (e.g. instructions, modal? prevent filling out)
-* import texttemplates
 * user manual
 
 * incorporate product

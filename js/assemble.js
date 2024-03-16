@@ -108,7 +108,6 @@ export class Dialog {
 	 *
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
-	 * scanner and select will NOT work for using this modal as well overriding its content and losing their response target
 	 * multiple articles and sections are NOT supported due to simplified query selector
 	 * THIS IS FOR SIMPLE INPUTS ONLY
 	 *
@@ -124,11 +123,16 @@ export class Dialog {
 		this.body = options.body || null;
 		this.options = options.options || {};
 		this.scannerElements = {};
+		this.assemble = null;
 		let modal = "modal";
 
 		let dialog = document.getElementById("modal");
 		if (this.type) {
-			if (this.type === "input") modal = "inputmodal";
+			if (this.type === "input") {
+				modal = "inputmodal";
+				if (!('content' in this.body)) this.body={content:this.body};
+				this.assemble = new Assemble(this.body);
+			}
 			dialog = document.getElementById(modal);
 
 			const form = document.createElement("form");
@@ -187,11 +191,24 @@ export class Dialog {
 				}
 				scanner.scanner.render(scanSuccess);
 			}
+			if (this.assemble) this.assemble.processAfterInsertion();
 			return new Promise((resolve, reject) => {
 				dialog.showModal();
 				dialog.onclose = resolve;
 			}).then((response) => {
 				let result;
+
+				function getValues(parent) {
+					let result = {};
+					parent.childNodes.forEach((node) => {
+						if (["input", "textarea"].includes(node.localName) && node.value) {
+							if (["checkbox", "radio"].includes(node.type) && node.checked === true) result[node.name] = node.value;
+							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
+						} else result = { ...result, ...getValues(node) };
+					});
+					return result;
+				}
+
 				switch (this.type) {
 					case "select":
 						return response.target.returnValue;
@@ -202,15 +219,15 @@ export class Dialog {
 						return result;
 					default:
 						if (response.target.returnValue === "true") {
-							result = {};
-							let content = document.querySelector("dialog>form>article");
+							result = getValues(document.querySelector("dialog>form"));
+							/*let content = document.querySelector("dialog>form>article");
 							if (!content) content = document.querySelector("dialog>form"); //scanner
 							content.childNodes.forEach((input) => {
 								if (["input", "textarea"].includes(input.localName) && input.value) {
 									if (["checkbox", "radio"].includes(input.type) && input.checked === true) result[input.name] = input.value;
 									else if (!["checkbox", "radio"].includes(input.type)) result[input.name] = input.value;
 								}
-							});
+							});*/
 							return result;
 						}
 						return false;
@@ -255,12 +272,8 @@ export class Dialog {
 		return [buttons];
 	}
 	input() {
-		let result = [
-			...new Assemble({
-				content: this.body,
-			}).initializeSection(null, null, "iCanHasNodes"),
-		];
-		if (Object.keys(this.options)) result = result.concat(this.confirm());
+		let result = [...this.assemble.initializeSection(null, null, "iCanHasNodes")];
+		if (Object.keys(this.options).length) result = result.concat(this.confirm());
 		else result = result.concat(this.alert());
 		return result;
 	}
@@ -351,12 +364,12 @@ export class Assemble {
 	 *
 	 * @param {*domNode} nextSibling inserts before node, used by utility.js order_client
 	 * @param {*domNode} formerSibling inserts after node, used on multiple photo or scanner type
-	 * @param {*any} returnNodes return nodes, used by Dialog
-	 * @returns none, immidiate construction of elements
+	 * @param {*any} returnOnlyNodes return nodes without container, used by Dialog
+	 * @returns container or nodes
 	 */
-	initializeSection(nextSibling = null, formerSibling = null, returnNodes = null) {
+	initializeSection(nextSibling = null, formerSibling = null, returnOnlyNodes = null) {
 		if (typeof nextSibling === "string") nextSibling = document.querySelector(nextSibling);
-		if (this.form && !nextSibling && !returnNodes) {
+		if (this.form && !nextSibling && !returnOnlyNodes) {
 			this.section = document.createElement("form");
 			this.section.method = "post";
 			this.section.enctype = "multipart/form-data";
@@ -370,15 +383,14 @@ export class Assemble {
 					},
 				},
 			]);
-		} else if (!this.composer && !returnNodes) this.section = document.createElement("div");
-		else if (this.composer == "photoOrScanner") this.section = formerSibling.parentNode;
-		else if (this.composer) this.section = document.getElementById("main"); // from composer.js
+		} else if (this.composer === "photoOrScanner") this.section = formerSibling.parentNode;
+		else if (!this.composer) this.section = document.createElement("div");
 
 		this.assembledPanels = this.processContent();
 
-		if (!nextSibling && !formerSibling && !returnNodes) {
+		if (!(nextSibling ||formerSibling ||returnOnlyNodes||this.composer)  || this.composer === "photoOrScanner") {
 			this.section.append(...this.assembledPanels);
-			if (!this.composer) document.getElementById("main").insertAdjacentElement("beforeend", this.section);
+			return this.section;
 		} else if (nextSibling) {
 			const tiles = Array.from(this.assembledPanels);
 			for (let i = 0; i < tiles.length; i++) {
@@ -394,11 +406,13 @@ export class Assemble {
 					formerSibling = article[j];
 				}
 			}
-		} else if (returnNodes) {
+		} else {
 			return this.assembledPanels;
 		}
+	}
 
-		let scrollables = document.querySelectorAll("section");
+	processAfterInsertion() {
+		const scrollables = document.querySelectorAll("section");
 		for (const section of scrollables) {
 			if (section.childNodes.length > 1) section.addEventListener("scroll", this.sectionScroller);
 			section.dispatchEvent(new Event("scroll"));
@@ -1062,6 +1076,7 @@ export class Assemble {
 		/*{
 			type: 'textarea',
 			hint: 'enter a lot of text',
+			texttemplates: true or undefined to add a button opening text templates within a modal
 			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				name:'somename'
@@ -1083,6 +1098,12 @@ export class Assemble {
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
+			const preservedHint = this.hint();
+			this.currentElement.attributes = { value: LANG.GET("menu.texttemplate_texts"), onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')", class: "floatright" };
+			delete this.currentElement.hint;
+			return [...this.icon(), label, textarea, ...preservedHint, ...this.button(), this.br()];
+		}
 		return [...this.icon(), label, textarea, ...this.hint()];
 	}
 

@@ -89,6 +89,7 @@ export const compose_helper = {
 					else return;
 				}
 			}
+			if (elementName === LANG.GET("assemble.compose_texttemplate") && value) element.texttemplates = true;
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
 			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
 				element.attributes.required = true;
@@ -103,6 +104,8 @@ export const compose_helper = {
 					[structuredClone(element)], // element receives attributes from currentElement otherwise
 				],
 			});
+			document.getElementById("main").append(...newElement.initializeSection());
+			newElement.processAfterInsertion();
 			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] = element;
 		}
 	},
@@ -120,6 +123,8 @@ export const compose_helper = {
 				],
 			],
 		});
+		document.getElementById("main").append( ...chunk.initializeSection());
+		chunk.processAfterInsertion();
 		compose_helper.newTextElements[chunk.generatedElementIDs[0]] = key;
 	},
 
@@ -247,6 +252,8 @@ export const compose_helper = {
 			draggable: true,
 			content: structuredClone(form.content),
 		});
+		document.getElementById("main").append(...newElements.initializeSection());
+		newElements.processAfterInsertion();
 		// recursive function to assign created ids to form content elements in order of appearance
 		const elementIDs = newElements.generatedElementIDs;
 		let i = 0;
@@ -276,6 +283,8 @@ export const compose_helper = {
 		for (const component of components) {
 			component.draggable = true;
 			let current = new MetaCompose(component);
+			document.getElementById("main").append(current.initializeSection());
+			current.processAfterInsertion2();
 			compose_helper.newFormElements.add(component.name);
 			lookupIdentify(current.content);
 		}
@@ -298,6 +307,8 @@ export const compose_helper = {
 				allowSections: false,
 				content: [structuredClone(texts.content)],
 			});
+			document.getElementById("main").append(...chunk.initializeSection());
+			chunk.processAfterInsertion();
 			for (let i = 0; i < texts.keys.length; i++) {
 				compose_helper.newTextElements[chunk.generatedElementIDs[i]] = texts.keys[i];
 			}
@@ -479,13 +490,6 @@ export class Compose extends Assemble {
 		this.composer = this.createDraggable = setup.draggable;
 		this.allowSections = "allowSections" in setup ? setup.allowSections : undefined;
 		this.generatedElementIDs = [];
-		this.initializeSection();
-		this.returnID();
-	}
-	returnID() {
-		// a constructor must not return anything
-		// idk why, but the passed object is always the whole class, no use trying to pass any individual properties...
-		return this;
 	}
 
 	processPanel(elements) {
@@ -681,6 +685,9 @@ export class Compose extends Assemble {
 		};
 		this.currentElement.content[LANG.GET("assemble.compose_required")] = {
 			name: LANG.GET("assemble.compose_required"),
+		};
+		if (type.type==='textarea') this.currentElement.content[LANG.GET("assemble.compose_texttemplate")] = {
+			name: LANG.GET("assemble.compose_texttemplate"),
 		};
 		result = result.concat(this.br(), ...this.checkbox());
 		this.currentElement = {
@@ -1018,8 +1025,11 @@ export class MetaCompose extends Assemble {
 	constructor(setup) {
 		delete setup.form;
 		super(setup);
-		this.initializeSection();
-		if (setup.draggable) compose_helper.create_draggable(this.section, true, false);
-		this.section.setAttribute("data-name", setup.name);
+		this.setup = setup;
+	}
+	processAfterInsertion2(){
+		this.processAfterInsertion();
+		if (this.setup.draggable) compose_helper.create_draggable(this.section, true, false);
+		this.section.setAttribute("data-name", this.setup.name);
 	}
 }

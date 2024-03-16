@@ -1096,15 +1096,13 @@ class ORDER extends API {
 													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
 													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
 													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''])
-											],
-											...json_decode(LANG::GET('defaultcomponent.mdrsamplecheck'), true)
-										]]). 
+											]
+										],
+											json_decode(LANG::GET('defaultcomponent.mdrsamplecheck'), true)]). 
 										"'), options:{".
 											"'" . LANG::GET('order.sample_check_cancel') . "': false, ".
 											"'" . LANG::GET('order.sample_check_submit') . "': {value: true, class: 'reducedCTA'}}})".
-									".then(response => {if (response) {
-										orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id'].")}".
-									"})"
+									".then(response => {if (response) { orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id'].")} })"
 								]
 							];
 						}

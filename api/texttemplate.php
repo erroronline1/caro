@@ -4,10 +4,12 @@ class TEXTTEMPLATE extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
     private $_requestedID = null;
+	private $_modal = null;
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedID = $this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_modal = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
 	public function chunk(){
@@ -493,17 +495,10 @@ class TEXTTEMPLATE extends API {
 		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
 
 		// get selected template
-		//if (intval($this->_requestedID)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
-			$statement->execute([
-				':id' => $this->_requestedID
-			]);
-		/*} else {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
-			$statement->execute([
-				':name' => $this->_requestedID
-			]);
-		}*/
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
+		$statement->execute([
+			':id' => $this->_requestedID
+		]);
 		if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
 			'name' => '',
 		];
@@ -547,7 +542,7 @@ class TEXTTEMPLATE extends API {
 					'type' => 'select',
 					'attributes' => [
 						'name' => LANG::GET('texttemplate.use_text_select', [':unit' => LANGUAGEFILE['units'][$unit]]),
-						'onchange' => "api.texttemplate('get', 'text', this.value)"
+						'onchange' => "api.texttemplate('get', 'text', this.value" . ($this->_modal ? ", 'modal')" : ")")
 					],
 					'content' => $templates
 				]
