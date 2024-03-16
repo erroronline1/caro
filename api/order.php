@@ -175,6 +175,7 @@ class ORDER extends API {
 	}
 
 	public function productsearch(){
+		// order to be taken into account in utility.js orderClient.addProduct() method and this->order() method as well!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
@@ -184,7 +185,7 @@ class ORDER extends API {
 					break;
 				}
 				// because in clause doesn't work
-				$query= strtr(SQLQUERY::PREPARE('order_get-product-search'),
+				$query= strtr($this->_borrowedModule == 'editconsumables' ? SQLQUERY::PREPARE('consumables_get-product-search') : SQLQUERY::PREPARE('order_get-product-search'),
 					[
 						':vendors' => "'" . implode("','", explode('_', $this->_requestedID)) . "'",
 						':search' => "'" . $this->_subMethod . "'"
@@ -230,6 +231,7 @@ class ORDER extends API {
 						],
 						'content' => [
 							['type' => 'text',
+							'description' => $row['incorporated'] ? '': LANG::GET('order.incorporation_neccessary'),
 							'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 						]
 					];
@@ -1092,7 +1094,7 @@ class ORDER extends API {
 								'attributes' => [
 									'value' => LANG::GET('order.incorporation'),
 									'type' => 'button',
-									'onpointerup' => "api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . "); this.disabled = true;"
+									'onpointerup' => "api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . ");"
 								]
 							];
 						}
@@ -1120,7 +1122,7 @@ class ORDER extends API {
 										"'), options:{".
 											"'" . LANG::GET('order.sample_check_cancel') . "': false, ".
 											"'" . LANG::GET('order.sample_check_submit') . "': {value: true, class: 'reducedCTA'}}})".
-									".then(response => {if (response) { orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id'].")} }); ; this.disabled = true;"
+									".then(response => {if (response) { orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id']."); this.disabled = true;} })"
 								]
 							];
 						}
