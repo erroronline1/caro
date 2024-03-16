@@ -698,7 +698,7 @@ class CONSUMABLES extends API {
 				$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
 				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 				$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
-				$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::GET('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
+				$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
 
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
@@ -947,14 +947,14 @@ class CONSUMABLES extends API {
 				];
 				if ($product['trading_good']) $result['body']['content'][2][count($result['body']['content'][2]) -1]['content'][LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
 				if ($product['incorporated'] !== null) {
-					array_push($result['body']['content'][2] ,
+					array_push($result['body']['content'][2],
 						[
 							'type' => 'text',
 							'description' => $product['incorporated'] ? LANG::GET('consumables.edit_product_incorporated_accepted') : LANG::GET('consumables.edit_product_incorporated_rejected')
 						], [
 							'type' => 'checkbox',
 							'content' => [
-								[LANG::GET('consumables.edit_product_incorporated_revoke')] => []
+								LANG::GET('consumables.edit_product_incorporated_revoke') => []
 							]
 						]);
 				}
