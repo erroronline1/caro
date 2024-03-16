@@ -1,5 +1,7 @@
 <?php
-// diverse tools
+// audit overview and export
+require_once('./pdf.php');
+
 class AUDIT extends API {
 	/**
 	 * in case you want to create a code from any values in any form add 
@@ -38,12 +40,14 @@ class AUDIT extends API {
 		];
 
 		if ($this->_requestedType) {
-			switch ($this->_requestedType){
-				case 'mdrsamplecheck':
-					if ($append = $this->mdrsamplecheck()) $result['body']['content'][] = $append;					
-					break;
-				default:
-			}
+			$result['body']['content'][] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('record.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			];
+			if ($append = $this->{$this->_requestedType}()) $result['body']['content'][] = $append;					
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
 			$statement->execute([':type' => $this->_requestedType]);
 			$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -52,7 +56,7 @@ class AUDIT extends API {
 				$entries[] = [
 					'type' => 'text',
 					'description' => LANG::GET('audit.check_description', [
-						':check' =>LANG::GET('audit.checks_type.' . $this->_requestedType),
+						':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
 						':date' => $row['date'],
 						':author' => $row['author']
 					]),
@@ -80,6 +84,52 @@ class AUDIT extends API {
 				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
 			]
 		] : null;
+	}
+
+	private function incorporation(){
+		// can be used for any warning 
+		return null;
+	}
+
+	public function export(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
+		$statement->execute([':type' => $this->_requestedType]);
+		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+			'date' => date('y-m-d H:i')
+		];
+
+		foreach($checks as $row){
+			$summary['content'][LANG::GET('audit.check_description', [
+				':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+				':date' => $row['date'],
+				':author' => $row['author']
+			])] = $row['content'];
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]
+		);
+		$this->response([
+			'body' => $body,
+		]);
 	}
 }
 

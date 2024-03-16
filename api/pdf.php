@@ -63,7 +63,7 @@ class PDF{
         // create a pdf for a record summary
         // create new PDF document
         $pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
-        20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
+        20, null, ['title' => $content['title'], 'date' => $content['date']]);
 
         // set document information
         $pdf->SetCreator(INI['system']['caroapp']);
@@ -108,7 +108,50 @@ class PDF{
                 }
             }
         }
+        // move pointer to last page
+        $pdf->lastPage();
 
+        //Close and output PDF document
+        UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+        $pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+        return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+    }
+
+    public static function auditPDF($content){
+        // create a pdf for a record summary
+        // create new PDF document
+        $pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
+        20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
+
+        // set document information
+        $pdf->SetCreator(INI['system']['caroapp']);
+        $pdf->SetAuthor($_SESSION['user']['name']);
+        $pdf->SetTitle($content['title']);
+
+        // set margins
+        $pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+        $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        // set auto page breaks
+        $pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
+        // add a page
+        $pdf->AddPage();
+        // set cell padding
+        $pdf->setCellPaddings(5, 5, 5, 5);
+        // set cell margins
+        $pdf->setCellMargins(0, 0, 0, 0);
+        // set color for background
+        $pdf->SetFillColor(255, 255, 255);
+
+        // MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+        // Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+        
+        foreach($content['content']  as $key => $value){
+            $pdf->SetFont('helvetica', 'B', 10); // font size
+            $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+            $pdf->SetFont('helvetica', '', 10); // font size
+            $pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+        }
         // move pointer to last page
         $pdf->lastPage();
 
