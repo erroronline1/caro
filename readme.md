@@ -128,17 +128,14 @@ without a filter none of the vendors products will be treated as a trading good!
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
-* assemble.js dialog make type input handle complex forms
 * view other forms (e.g. instructions, modal? prevent filling out)
 * user manual
 
+* incorporation and sample check custom forms (not languagafile)
+
 * incorporate product
-    * select previous incorporations for similar products within form
     * adding documents
     * adding photo (scaled down) ? (display on order selection) (->consumables as well)
-    * protected = 1
-    * add to db like sample check with db-id in content to navigate to product manager
-    * display incorporation state in order selection
 
 * vendor address, email, phone, customer id
 * vendor list
@@ -146,7 +143,7 @@ without a filter none of the vendors products will be treated as a trading good!
 
 * user selectable color themes?
 * monitoring measuring equipment, rental parts, machinery, crutches
-* caro audit (sample check MDR §14, certificate expiry dates)
+* caro audit (vendors, certificate expiry dates, user certificates)
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * calendar and alerts
