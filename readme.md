@@ -40,7 +40,8 @@ tested devices:
 
 ### system limitations
 * notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support
-* the application caches requests. get requests return the latest version, which might not always be the recent system state but better than nothing. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. this might lead to a delay but is better than nothing. however note that this only is reliable if the browser does not delete session content on closing. this is not a matter of the app but your system environment. you may have to contact your it department
+* the application caches requests. get requests return the latest version, which might not always be the recent system state but better than nothing. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. this might lead to a delay but is better than nothing. however note that this only is reliable if the browser does not delete session content on closing. this is not a matter of the app but your system environment. you may have to contact your it department.
+* cached post requests may insert the user name and entry date on processing. that is the logged in user on, and time of processing on the server side.
 * changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). adding columns to the end appears to be easier instad of insertions between.
 
 ### useage notes and caveats
@@ -136,6 +137,8 @@ without a filter none of the vendors products will be treated as a trading good!
 * incorporate product
     * adding documents
     * adding photo (scaled down) ? (display on order selection) (->consumables as well)
+
+* form_editor: mark hidden components?
 
 * vendor address, email, phone, customer id
 * vendor list

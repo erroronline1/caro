@@ -3,43 +3,52 @@
 * [order](#order)
 * [users](#users)
 * [text recommendations](#text-recommendations)
+* [forms](#forms)
 * [records](#records)
 
 ### vendor and product management
 
 ```mermaid
 graph TD;
-    manage_vendors((Manage vendors))-->edit_vendor[Edit existing vendor];
-    manage_vendors-->new_vendor[New vendor];
-    edit_vendor-->add_vinfo["Add documents,
+    manage_vendors((manage vendors))-->edit_vendor[edit existing vendor];
+    manage_vendors-->new_vendor[new vendor];
+    edit_vendor-->add_vinfo["add documents,
     update info,
-    set pricelist filter"];
+    set pricelist filter,
+    trade goods filter"];
     new_vendor-->add_vinfo;
-    add_vinfo-->import_pricelist[Import pricelist];
+    add_vinfo-->import_pricelist[import pricelist];
     import_pricelist-->delete_all_products[delete all products];
-    delete_all_products-->has_docs2{"vendor
-    has documents"};
+    delete_all_products-->has_docs2{"product
+    has documents,
+    been incorporated,
+    had samplecheck
+    (protected)"};
     has_docs2-->|yes|update[update based on ordernumber];
     has_docs2-->|no|delete[delete];
-    delete-->|reinserted from pricelist|orderable(orderable);
+    delete-->|reinserted from pricelist|apply_trade[apply trade good filter];
+    apply_trade-->orderable(orderable);
     delete-->|not in pricelist|inorderable(not available in orders)
-    update-->orderable;
+    update-->apply_trade;
 
-    manage_products((Manage products))-->edit_product[Edit existing product];
-    manage_products-->add_product[Add new product];
+    manage_products((manage products))-->edit_product[edit existing product];
+    manage_products-->add_product[add new product];
     add_product-->select_vendor[(select vendor)];
     select_vendor-->add_pinfo["Add documents,
     update info"];
     add_pinfo-->known_vendor;
 
-    edit_product-->add_pinfo["Add documents,
+    edit_product-->add_pinfo["add documents,
     update info"];
-    known_vendor{Vendor in database}-->|yes|add_pinfo;
+    known_vendor{vendor in database}-->|yes|add_pinfo;
     known_vendor-->|no|new_vendor
-    edit_product-->delete_product(Delete Product);
+    edit_product-->delete_product(delete product);
     delete_product-->has_docs{"product
-    has documents"};
-    has_docs-->|no|product_deleted["Product
+    has documents,
+    been incorporated,
+    had samplecheck
+    (protected)"};
+    has_docs-->|no|product_deleted["product
     deleted"];
     has_docs-->|yes|product_inactive["deactivate
     product"]
@@ -79,7 +88,20 @@ graph TD;
     disapprove-->append_message[append message];
     append_message-->message_unit[message all unit members];
     disapprove-->message_unit;
-    message_unit-->prepared_orders
+    message_unit-->prepared_orders;
+
+    process_order-->|not incorporated|incorporate;
+    incorporate-->incorporate_similar{"similar
+    products"};
+    incorporate_similar-->|yes|select_similar["select similar,
+    append data"];
+    select_similar-->productdb[(product database)]
+    incorporate_similar-->|no|insert_data[insert data];
+    insert_data-->productdb[(product database)]
+
+    process_order-->|sample check required|sample_check[sample check];
+    sample_check-->productdb[(product database)]
+
     process_order-->mark[mark];
     mark-->|processed|auto_delete[auto delete after X days];
     mark-->|retrieved|auto_delete;
@@ -117,7 +139,7 @@ graph TD;
     manage_users-->edit_user[edit user];
     new_user-->user_settings["set name, authorization,
     unit, photo, order auth pin,
-    login token"];
+    login token, user documents"];
     edit_user-->user_settings;
     user_settings-->export_token[export token];
     export_token-->user(((user)));
@@ -175,6 +197,41 @@ graph TD;
 ```
 [content](#content)
 
+### forms ###
+
+```mermaid
+graph TD;
+    manage_components(("manage
+    components"))-->|new component|edit_component["edit content,
+    add widgets,
+    reorder"];
+    manage_components(("manage
+    components"))-->|existing component|edit_component;
+    edit_component-->|save|new_forms_database[("append new dataset to
+    forms database")];
+
+    manage_forms(("manage
+    forms"))-->|new form|edit_form["edit form,
+    reorder components"];
+    manage_forms-->|existing form|edit_form;
+    edit_form-->add_component[add component];
+    add_component-->forms_database[(forms database)];
+    forms_database-->|latest unhidden component|edit_form;
+    edit_form-->|save|new_forms_database;
+
+    manage_bundles(("manage
+    bundles"))-->|new bundle|edit_bundle["edit bundle"];
+    manage_bundles-->|existing bundle|edit_bundle;
+    edit_bundle-->add_form[add form];
+    add_form-->forms_database2[(forms database)];
+    forms_database2-->|latest unhidden form|edit_bundle;
+    edit_bundle-->|save|new_forms_database
+
+    new_forms_database-->returns("returns only latest dataset on request
+    if named item is not hidden")
+```
+[content](#content)
+
 ### records ###
 
 ```mermaid
@@ -212,3 +269,5 @@ graph TD;
     appenddata-->forms;
     missing-->|no|nonemissing(status message);
 ```
+[content](#content)
+
