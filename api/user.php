@@ -415,16 +415,18 @@ class USER extends API {
 						],
 						'hint' => LANG::GET('user.edit_take_photo_hint')],
 					],[
-						['type' => 'file',
-						'attributes' => [
-							'name' => LANG::GET('user.edit_add_document')
-						],
-						'hint' => LANG::GET('user.edit_add_document_hint')
+						[
+							'type' => 'file',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_document')
+							],
+							'hint' => LANG::GET('user.edit_add_document_hint')
 						], [
 							'type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('user.edit_add_document_rename')
-							]
+							],
+							'hint' => LANG::GET('user.edit_add_document_rename_hint')
 						]
 					],[
 						['type' => 'radio',

@@ -22,6 +22,8 @@ class AUDIT extends API {
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result['body'] = ['content' => []];
 		$selecttypes = [];
+		
+		// checks
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get-types'));
 		$statement->execute();
 		$types = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -29,6 +31,10 @@ class AUDIT extends API {
 			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
 			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 		}
+		// user certificates
+		//$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
+		//if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
+
 		$result['body']['content'][] = [
 			[
 				'type' => 'select',
@@ -41,6 +47,7 @@ class AUDIT extends API {
 		];
 
 		if ($this->_requestedType) {
+
 			$result['body']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
