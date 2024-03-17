@@ -200,9 +200,14 @@ dialog {
 			header {
 				display: block;
 			}
-			section{
-				margin:0 .25em 0 1.75em;
-				article{padding:1em;article{margin:.5em}};
+			section {
+				margin: 0 0.25em 0 1.75em;
+				article {
+					padding: 1em;
+					article {
+						margin: 0.5em;
+					}
+				}
 			}
 		}
 	}
@@ -435,8 +440,8 @@ input[type="radio"],
 input[type="checkbox"] {
 	appearance: none;
 	display: inline;
-	width:0;
-	height:0
+	width: 0;
+	height: 0;
 }
 
 .radio,
@@ -616,7 +621,8 @@ button:active {
 input:invalid.input_required_alert,
 input:invalid + button.input_required_alert,
 input:invalid + label.input_required_alert,
-#signaturecanvas.input_required_alert {
+#signaturecanvas.input_required_alert,
+.hiddencomponent {
 	border: 2px solid var(--red) !important;
 }
 

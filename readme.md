@@ -138,8 +138,6 @@ without a filter none of the vendors products will be treated as a trading good!
     * adding documents
     * adding photo (scaled down) ? (display on order selection) (->consumables as well)
 
-* form_editor: mark hidden components?
-
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)

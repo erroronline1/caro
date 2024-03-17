@@ -1031,5 +1031,6 @@ export class MetaCompose extends Assemble {
 		this.processAfterInsertion();
 		if (this.setup.draggable) compose_helper.create_draggable(this.section, true, false);
 		this.section.setAttribute("data-name", this.setup.name);
+		if (this.setup.hidden) this.section.classList.add('hiddencomponent');
 	}
 }

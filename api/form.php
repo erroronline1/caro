@@ -450,6 +450,7 @@ class FORMS extends API {
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
 				$component['content'] = json_decode($component['content'], true);
 				$component['content']['name'] = $usedcomponent;
+				$component['content']['hidden'] = $component['hidden'];
 				$return['body']['components'][] = $component['content'];
 			}
 		}
