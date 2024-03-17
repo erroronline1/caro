@@ -289,7 +289,8 @@ class CONSUMABLES extends API {
 							'type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('order.incorporation_matching_previous'),
-								'id' => 'incorporationmatchingprevious'
+								'id' => 'incorporationmatchingprevious',
+								'readonly' => true
 							]
 						]
 					];
