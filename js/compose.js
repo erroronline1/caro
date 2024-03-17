@@ -91,10 +91,8 @@ export const compose_helper = {
 			}
 			if (elementName === LANG.GET("assemble.compose_texttemplate") && value) element.texttemplates = true;
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
-			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
-				element.attributes.required = true;
-			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes))
-				element.attributes.multiple = true;
+			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
+			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
@@ -123,7 +121,7 @@ export const compose_helper = {
 				],
 			],
 		});
-		document.getElementById("main").append( ...chunk.initializeSection());
+		document.getElementById("main").append(...chunk.initializeSection());
 		chunk.processAfterInsertion();
 		compose_helper.newTextElements[chunk.generatedElementIDs[0]] = key;
 	},
@@ -167,8 +165,7 @@ export const compose_helper = {
 						else content.push(nodechildren(container));
 					} else {
 						if (node.id in compose_helper.newFormComponents) {
-							if (compose_helper.newFormComponents[node.id].attributes != undefined)
-								delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
+							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
 							content.push(compose_helper.newFormComponents[node.id]);
 							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
 						}
@@ -368,14 +365,7 @@ export const compose_helper = {
 
 			// dragging articles
 			// dropping on hr for reordering
-			if (
-				evnt.target.localName === "hr" &&
-				!(
-					evnt.target.parentNode.parentNode.localName === "section" &&
-					draggedElement.children.item(1) &&
-					draggedElement.children.item(1).firstChild.localName === "section"
-				)
-			) {
+			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
 				// no section insertion
 				// handle only if dropped within the reorder area				console.log('hello');
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
@@ -386,10 +376,7 @@ export const compose_helper = {
 				if (originParent.children.length < 2) {
 					if (originParent.children.length > 0)
 						//    section  article    draggable div                                                                  section    article    container
-						originParent.parentNode.parentNode.parentNode.insertBefore(
-							originParent.children[0].cloneNode(true),
-							originParent.parentNode.parentNode
-						); // adapt to changes in section creation!
+						originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -457,17 +444,9 @@ export const compose_helper = {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute(
-			"ondragover",
-			"compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')"
-		);
+		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
 		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
-		element.setAttribute(
-			"ondrop",
-			"compose_helper.dragNdrop.drop_insert(event, this, " +
-				allowSections +
-				"), this.classList.remove('draggableFormElementHover')"
-		);
+		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -557,8 +536,7 @@ export class Compose extends Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === "Array")
-				content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === "Array") content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements
@@ -686,9 +664,10 @@ export class Compose extends Assemble {
 		this.currentElement.content[LANG.GET("assemble.compose_required")] = {
 			name: LANG.GET("assemble.compose_required"),
 		};
-		if (type.type==='textarea') this.currentElement.content[LANG.GET("assemble.compose_texttemplate")] = {
-			name: LANG.GET("assemble.compose_texttemplate"),
-		};
+		if (type.type === "textarea")
+			this.currentElement.content[LANG.GET("assemble.compose_texttemplate")] = {
+				name: LANG.GET("assemble.compose_texttemplate"),
+			};
 		result = result.concat(this.br(), ...this.checkbox());
 		this.currentElement = {
 			attributes: {
@@ -901,7 +880,7 @@ export class Compose extends Assemble {
 		std = {
 			name: LANG.GET("assemble.compose_component_name"),
 			description: LANG.GET("assemble.compose_component"),
-			list: 'components',
+			list: "components",
 			action:
 				"new Dialog({type: 'confirm', header: '" +
 				LANG.GET("assemble.compose_component") +
@@ -932,7 +911,7 @@ export class Compose extends Assemble {
 				value: this.currentElement.value || "",
 				name: std.name,
 				required: true,
-				list : std.list,
+				list: std.list,
 			},
 		};
 		result = result.concat(...this.textinput());
@@ -1027,10 +1006,10 @@ export class MetaCompose extends Assemble {
 		super(setup);
 		this.setup = setup;
 	}
-	processAfterInsertion2(){
+	processAfterInsertion2() {
 		this.processAfterInsertion();
 		if (this.setup.draggable) compose_helper.create_draggable(this.section, true, false);
 		this.section.setAttribute("data-name", this.setup.name);
-		if (this.setup.hidden) this.section.classList.add('hiddencomponent');
+		if (this.setup.hidden) this.section.classList.add("hiddencomponent");
 	}
 }
