@@ -254,8 +254,16 @@ class record extends API {
 		$statement->execute([
 			':name' => $this->_requestedID
 		]);
-		$bundle = $statement->fetch(PDO::FETCH_ASSOC);
+		if(!($bundle = $statement->fetch(PDO::FETCH_ASSOC))) $bundle=['content' => []];
 		$necessaryforms = explode(',', $bundle['content']);
+
+		// unset hidden forms from bundle presets
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement->execute();
+		$allforms = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($allforms as $row){
+			if ($row['hidden'] && ($key = array_search($row['name'], $necessaryforms)) !== false) unset($necessaryforms[$key]);
+		}
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
 		$statement->execute([
@@ -410,20 +418,18 @@ class record extends API {
 
 				$return['body']['content'][] = [
 					[
-						[
-							'type' => 'select',
-							'attributes' => [
-								'name' => LANG::GET('record.record_match_bundles'),
-								'onchange' => "if (this.value != '0') api.record('get', 'matchbundles', this.value, '" . $this->_requestedID . "')"
-							],
-							'hint' => LANG::GET('record.record_match_bundles_hint'),
-							'content' => $bundles
-						], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => LANG::GET('record.record_export'),
-								'onpointerup' => "api.record('get', 'export', '" . $this->_requestedID . "')"
-							]
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('record.record_match_bundles'),
+							'onchange' => "if (this.value != '0') api.record('get', 'matchbundles', this.value, '" . $this->_requestedID . "')"
+						],
+						'hint' => LANG::GET('record.record_match_bundles_hint'),
+						'content' => $bundles
+					], [
+						'type' => 'button',
+						'attributes' => [
+							'value' => LANG::GET('record.record_export'),
+							'onpointerup' => "api.record('get', 'export', '" . $this->_requestedID . "')"
 						]
 					]
 				];

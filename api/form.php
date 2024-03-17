@@ -427,7 +427,8 @@ class FORMS extends API {
 						'context' => [
 							'name' => LANG::GET('assemble.edit_form_context'),
 							'content' => $contextoptions
-						]
+						],
+						'hidden' => $result['name'] ? $result['hidden'] : 1
 					]
 				], [
 					[
@@ -466,12 +467,12 @@ class FORMS extends API {
 					':name' => $this->_payload->name
 				]);
 				$exists = $statement->fetch(PDO::FETCH_ASSOC);
-				if ($exists && json_decode($exists['content'], true) == $this->_payload->content) {
+				if ($exists && $exists['content'] == implode(',', $this->_payload->content)) {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
-						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): '',
+						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : '',
 						':context' => $this->_payload->context,
-						':hidden' => $this->_payload->hidden,
+						':hidden' => intval($this->_payload->hidden),
 						':id' => $exists['id']
 						])) $this->response([
 							'status' => [
