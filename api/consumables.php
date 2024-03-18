@@ -88,7 +88,7 @@ class CONSUMABLES extends API {
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
 					':trading_good' => "'0'",
-					':incorporated' => "'" . $row['incorporated'] . "'",
+					':incorporated' => $row['incorporated'] === null ? 'NULL' : $row['incorporated'], //without quotes
 				]) . '; ';
 				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
@@ -715,7 +715,11 @@ class CONSUMABLES extends API {
 					$product['protected'] = 1;
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-product'));
+				// sql server has a problem with actual updating null value
+				$query = strtr(SQLQUERY::PREPARE('consumables_put-product'),[
+					':incorporated' => $product['incorporated'] === null ? 'NULL' : $product['incorporated'], // without quotes
+				]);
+				$statement = $this->_pdo->prepare($query);
 				if ($statement->execute([
 					':id' => $this->_requestedID,
 					':vendor_id' => $product['vendor_id'],
@@ -727,7 +731,6 @@ class CONSUMABLES extends API {
 					':active' => $product['active'],
 					':protected' => $product['protected'],
 					':trading_good' => $product['trading_good'],
-					':incorporated' => $product['incorporated'],
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
