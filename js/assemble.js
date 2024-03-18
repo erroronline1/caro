@@ -1092,7 +1092,7 @@ export class Assemble {
 
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			const preservedHint = this.hint();
-			this.currentElement.attributes = { value: LANG.GET("menu.texttemplate_texts"), onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')", class: "floatright" };
+			this.currentElement.attributes = { value: LANG.GET("menu.texttemplate_texts"), type: 'button', onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')", class: "floatright" };
 			delete this.currentElement.hint;
 			return [...this.icon(), label, textarea, ...preservedHint, ...this.button(), this.br()];
 		}

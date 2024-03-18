@@ -497,7 +497,7 @@ class TEXTTEMPLATE extends API {
 		// get selected template
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
 		$statement->execute([
-			':id' => $this->_requestedID
+			':id' => intval($this->_requestedID)
 		]);
 		if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
 			'name' => '',
