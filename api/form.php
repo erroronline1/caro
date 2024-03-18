@@ -280,7 +280,7 @@ class FORMS extends API {
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']]) . '<br>' : '') .
 						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
-					'hidden' => $component['name'] ? $component['hidden'] : 1
+					'hidden' => $component['name'] ? intval($component['hidden']) : 1
 				]],
 				[[
 					'type' => 'trash',
@@ -428,7 +428,7 @@ class FORMS extends API {
 							'name' => LANG::GET('assemble.edit_form_context'),
 							'content' => $contextoptions
 						],
-						'hidden' => $result['name'] ? $result['hidden'] : 1
+						'hidden' => $result['name'] ? intval($result['hidden']) : 1
 					]
 				], [
 					[
@@ -450,7 +450,7 @@ class FORMS extends API {
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
 				$component['content'] = json_decode($component['content'], true);
 				$component['content']['name'] = $usedcomponent;
-				$component['content']['hidden'] = $component['hidden'];
+				$component['content']['hidden'] = boolval(intval($component['hidden']));
 				$return['body']['components'][] = $component['content'];
 			}
 		}
@@ -462,6 +462,7 @@ class FORMS extends API {
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
+				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing")]]);
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
 				$statement->execute([
@@ -628,7 +629,7 @@ class FORMS extends API {
 						}
 						$alloptions[$row['name'] . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
-					if (!in_array($row['context'] , ['bundle', 'template'])) $insertform[$row['name']] = ['value' => $row['name'] . "\n"];
+					if (!in_array($row['context'] , ['bundle', 'template']) && !in_array($row['name'], $hidden)) $insertform[$row['name']] = ['value' => $row['name'] . "\n"];
 				}
 
 				$return['body'] = [
