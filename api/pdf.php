@@ -63,7 +63,7 @@ class PDF{
         // create a pdf for a record summary
         // create new PDF document
         $pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
-        20, null, ['title' => $content['title'], 'date' => $content['date']]);
+        20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
 
         // set document information
         $pdf->SetCreator(INI['system']['caroapp']);
@@ -121,7 +121,7 @@ class PDF{
         // create a pdf for a record summary
         // create new PDF document
         $pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
-        20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
+        20, null, ['title' => $content['title'], 'date' => $content['date']]);
 
         // set document information
         $pdf->SetCreator(INI['system']['caroapp']);
