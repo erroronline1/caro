@@ -223,7 +223,7 @@ export class Dialog {
 						return result;
 					default:
 						if (response.target.returnValue === "true") {
-							result = getValues(document.querySelector("dialog>form"));
+							result = getValues(dialog);
 							return result;
 						}
 						return false;
