@@ -590,7 +590,7 @@ class record extends API {
 			'files' => [],
 			'images' => [],
 			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => $form['date']]),
-			'date' => LANG::GET('record.form_export_printed', [':date' => date('y-m-d H:i')])
+			'date' => LANG::GET('record.form_export_exported', [':date' => date('y-m-d H:i')])
 		];
 
 		function printable($element){
@@ -607,16 +607,16 @@ class record extends API {
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						if ($subs['type'] ==='checkbox') $name = $subs['description'];
 						else $name = $subs['attributes']['name'];
-						$content['content'][$name] = '';
+						$content['content'][$name] = [];
 						foreach($subs['content'] as $key => $v){
-							$content['content'][$name] .= "(  ) " . $key . "\n";
+							$content['content'][$name][] = $key;
 						}
 					}
 					elseif ($subs['type']==='text'){
 						$content['content'][$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
 					}
 					elseif ($subs['type']==='textarea'){
-						$content['content'][$subs['attributes']['name']] = str_repeat("\n", 5);
+						$content['content'][$subs['attributes']['name']] = str_repeat(" \n", 2);
 					}
 					elseif ($subs['type']==='image'){
 						$content['content'][$subs['description']] = $subs['attributes']['url'];
@@ -626,7 +626,7 @@ class record extends API {
 						}
 					}
 					else {
-						$content['content'][$subs['attributes']['name']] = str_repeat("\n", 2);
+						$content['content'][$subs['attributes']['name']] = " ";
 					}
 				}
 			}
@@ -648,7 +648,7 @@ class record extends API {
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
 		$downloadfiles[LANG::GET('record.form_export')] = [
-			'href' => PDF::recordsPDF($summary)
+			'href' => PDF::formsPDF($summary)
 		];
 		$this->response([
 			'body' => [
@@ -691,33 +691,32 @@ class record extends API {
 		foreach($accumulatedcontent as $form => $entries){
 			$summary['content'][$form] = [];
 			foreach($entries as $key => $data){
-			$summary['content'][$form][$key] = '';
-			$value = '';
-			foreach($data as $entry){
-				if ($entry['value'] !== $value){
-					$displayvalue = $entry['value'];
-					// guess file url; special regex delimiter
-					if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
-						$file = pathinfo($entry['value']);
-						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-							if (!array_key_exists($form, $summary['images'])) $summary['images'][$form] = [];
-							$summary['images'][$form][] = $entry['value'];
+				$summary['content'][$form][$key] = '';
+				$value = '';
+				foreach($data as $entry){
+					if ($entry['value'] !== $value){
+						$displayvalue = $entry['value'];
+						// guess file url; special regex delimiter
+						if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
+							$file = pathinfo($entry['value']);
+							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+								if (!array_key_exists($form, $summary['images'])) $summary['images'][$form] = [];
+								$summary['images'][$form][] = $entry['value'];
+							}
+							else {
+								if (!array_key_exists($form, $summary['files'])) $summary['files'][$form] = [];
+								$summary['files'][$form][$file['basename']] = ['href' => $entry['value']];
+							}
+							$displayvalue = $file['basename'];
 						}
-						else {
-							if (!array_key_exists($form, $summary['files'])) $summary['files'][$form] = [];
-							$summary['files'][$form][$file['basename']] = ['href' => $entry['value']];
-						}
-						$displayvalue = $file['basename'];
+						$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
+						$value = $entry['value'];
 					}
-					$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
-					$value = $entry['value'];
 				}
 			}
-		}}
+		}
 		return $summary;
 	}
-
-
 }
 
 $api = new record();
