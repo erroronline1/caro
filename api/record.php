@@ -164,7 +164,8 @@ class record extends API {
 		$return = ['title'=> $form['name'], 'body' => [
 			'form' => [
 				'data-usecase' => 'record',
-				'action' => "javascript:api.record('post', 'record')"],
+				'action' => "javascript:api.record('post', 'record')",
+				'data-confirm' => true],
 			'content' => []
 			]];
 
@@ -398,7 +399,6 @@ class record extends API {
 						]); 
 					}
 				}
-				
 		
 				$return['body']['content'] = $body;
 

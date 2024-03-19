@@ -590,7 +590,8 @@ class CONSUMABLES extends API {
 				],
 				'form' => [
 					'data-usecase' => 'purchase',
-					'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')"
+					'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
+					'data-confirm' => true
 				]];
 
 				if ($certificates) array_splice($result['body']['content'][2], 0, 0,
@@ -936,8 +937,9 @@ class CONSUMABLES extends API {
 				],
 				'form' => [
 					'data-usecase' => 'purchase',
-					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')"
-				]];
+					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
+					'data-confirm' => true
+					]];
 
 				if ($documents) $result['body']['content'][3]=[
 					[
