@@ -410,6 +410,7 @@ export const api = {
 						break;
 					case "component_editor":
 						compose_helper.componentIdentify = 0;
+						compose_helper.componentSignature = 0;
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);
@@ -437,6 +438,7 @@ export const api = {
 						break;
 					case "form_editor":
 						compose_helper.componentIdentify = 0;
+						compose_helper.componentSignature = 0;
 						successFn = function (data) {
 							if (data.body) {
 								api.update_header(title[request[1]]);

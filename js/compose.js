@@ -12,6 +12,7 @@ export const compose_helper = {
 	newFormElements: new Set(),
 	newTextElements: {},
 	componentIdentify: 0,
+	componentSignature: 0,
 	getNextElementID: getNextElementID,
 	composeNewElementCallback: function (parent) {
 		let sibling = parent.childNodes[0].nextSibling,
@@ -60,6 +61,17 @@ export const compose_helper = {
 					document.getElementById("setIdentify").disabled = true;
 					document.getElementById("setIdentify").checked = false;
 				}
+				if (element.type === "signature") {
+					const signatureform = document.querySelector("form>span[data-type=signature").parentNode;
+					for (const node of signatureform) {
+						console.log(node);
+						if (node.dataset.type === "addblock") {
+							console.log(node);
+							node.disabled = true;
+							compose_helper.componentSignature++;
+						}
+					}
+				}
 			} else if (["text"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_text_description")) {
 					if (value) element.description = value;
@@ -91,8 +103,10 @@ export const compose_helper = {
 			}
 			if (elementName === LANG.GET("assemble.compose_texttemplate") && value) element.texttemplates = true;
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
-			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
-			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
+			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
+				element.attributes.required = true;
+			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes))
+				element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
@@ -165,7 +179,8 @@ export const compose_helper = {
 						else content.push(nodechildren(container));
 					} else {
 						if (node.id in compose_helper.newFormComponents) {
-							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
+							if (compose_helper.newFormComponents[node.id].attributes != undefined)
+								delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
 							content.push(compose_helper.newFormComponents[node.id]);
 							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
 						}
@@ -196,7 +211,7 @@ export const compose_helper = {
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
-		if (name && context && context !== '0' && content.length)
+		if (name && context && context !== "0" && content.length)
 			return {
 				name: name,
 				alias: alias,
@@ -274,6 +289,7 @@ export const compose_helper = {
 					lookupIdentify(container);
 				} else {
 					if (container.type === "identify") compose_helper.componentIdentify++;
+					if (container.type === "signature") compose_helper.componentSignature++;
 				}
 			}
 		}
@@ -286,6 +302,7 @@ export const compose_helper = {
 			lookupIdentify(current.content);
 		}
 		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"));
+		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_form_multiple_signature"));
 	},
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};
@@ -365,7 +382,14 @@ export const compose_helper = {
 
 			// dragging articles
 			// dropping on hr for reordering
-			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
+			if (
+				evnt.target.localName === "hr" &&
+				!(
+					evnt.target.parentNode.parentNode.localName === "section" &&
+					draggedElement.children.item(1) &&
+					draggedElement.children.item(1).firstChild.localName === "section"
+				)
+			) {
 				// no section insertion
 				// handle only if dropped within the reorder area				console.log('hello');
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
@@ -376,7 +400,10 @@ export const compose_helper = {
 				if (originParent.children.length < 2) {
 					if (originParent.children.length > 0)
 						//    section  article    draggable div                                                                  section    article    container
-						originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
+						originParent.parentNode.parentNode.parentNode.insertBefore(
+							originParent.children[0].cloneNode(true),
+							originParent.parentNode.parentNode
+						); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -432,6 +459,14 @@ export const compose_helper = {
 							if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
 							compose_helper.componentIdentify--;
 						}
+						if (node.id && node.id === "signaturecanvas") {
+							const signatureformsibling = document.querySelector("form>span[data-type=signature");
+							if (signatureformsibling)
+								for (const node of signatureformsibling.parentNode) {
+									if (node.dataset.type === "addblock") node.disabled = false;
+								}
+							compose_helper.componentSignature--;
+						}
 					}
 				});
 			}
@@ -444,9 +479,17 @@ export const compose_helper = {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
+		element.setAttribute(
+			"ondragover",
+			"compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')"
+		);
 		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
-		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
+		element.setAttribute(
+			"ondrop",
+			"compose_helper.dragNdrop.drop_insert(event, this, " +
+				allowSections +
+				"), this.classList.remove('draggableFormElementHover')"
+		);
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -536,7 +579,8 @@ export class Compose extends Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === "Array") content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === "Array")
+				content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements
