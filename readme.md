@@ -33,7 +33,25 @@ tested devices:
 * set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
 * run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
 
-## limitations and intended usecases
+## intended usecases and limitations
+
+### audit safety
+
+#### forms
+* form components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. each entry will have a timestamp and the saving user name. within the respective managers the standard selection will access the most recent version. the advanced selection will access any existing version.
+* images for form components will not be deleted. assigned a second-timestamp to the filename these files are likely to be unique and always accessible on accessing a former version.
+
+#### records
+* records will append to the database. each entry will have a timestamp and the saving user name. summaries gather all distinct entries and display them in order of submission.
+* images and files for records will not be deleted. they are assigned the identifier and timestamp of submission to the filename.
+* records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.
+
+#### audit
+* MDR sample checks and article incorporation will append to the database. each entry will have a timestamp and the saving user name.
+* records can be exported at any time if you want to have another audit safe storage solution or have to share it with your certification body.
+
+#### other
+* MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#sample-check) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. this applies for all products that have not been checked within mdr14_sample_reusable timespan.
 
 ### setup
 * setting the package size for the sql environment to a higher value than default is useful beside the packagesize within setup.ini. batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit
@@ -46,9 +64,8 @@ tested devices:
 
 ### useage notes and caveats
 * dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. reordered images will disappear but don't worry.
-* orders can be deleted by administrative users and requesting unit members at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp
+* orders can be deleted by administrative users and requesting unit members at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp!
 * the manual is intentionally editable to accomodate it to users comprehension.
-* MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#sample-check) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. this applies for all products that have not been checked within mdr14_sample_reusable timespan. 
 
 ### importing vendor pricelists
 vendor pricelists must have an easy structure to be importable. it may need additional off-app customizing available data to have input files like:
@@ -132,7 +149,6 @@ without a filter none of the vendors products will be treated as a trading good!
 * import data from other cases, warn about identifier!
 * view other forms (e.g. instructions, modal? prevent filling out)
 * user manual
-* export form pdf with fillable form fields
 
 * incorporation and sample check custom forms (not languagefile)
 
