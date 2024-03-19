@@ -155,8 +155,8 @@ class PDF{
 				$pdf->SetFont('helvetica', 'B', 10); // font size
 				$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
 				$pdf->SetFont('helvetica', '', 10); // font size
+				$originalFontSize = $pdf->getFontSizePt();
 				if (gettype($value) === 'string'){
-					$originalFontSize = $pdf->getFontSizePt();
 					preg_match('/[\n\r]/m', $value, $lines);
 					if (count($lines)<1) {
 						if (trim($value))
@@ -165,26 +165,28 @@ class PDF{
 								$pdf->Image('.' . $value, null, $pdf->GetY() + 4, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
 								$pdf->Ln(INI['pdf']['exportimage']['maxheight'] + 4);
 							} else { // text type
-								$pdf->MultiCell(50, 4, $value, 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+								$pdf->MultiCell(133, 4, $value, 0, '', 0, 1, 63, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							}
 						else { // textinput, numberinput, etc
 							$height = 5;
 							$pdf->SetFontSize(0); // variable font size
-							$pdf->TextField($key, 130, $height, [], [], 60, $pdf->GetY() + 4);
+							$pdf->TextField($key, 133, $height, [], [], 63, $pdf->GetY() + 4);
 							$pdf->Ln($height + 5);
 						}
 					} else { // textarea
 						$height = 31;
 						$pdf->SetFontSize(0); // variable font size
-						$pdf->TextField($key, 130, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], [], 60, $pdf->GetY() + 4);
+						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], [], 63, $pdf->GetY() + 4);
 						$pdf->Ln($height + 5);
 					}
 					$pdf->SetFontSize($originalFontSize);
 				}
 				if (gettype($value) === 'array'){
 					foreach($value as $option){
-						$pdf->CheckBox($option, 5, false, [], [], 'OK', 60, $pdf->GetY() + 5);
-						$pdf->MultiCell(50, 4, $option, 0, '', 0, 1, 63, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						$pdf->SetFontSize(14);
+						$pdf->CheckBox($option, 5, false, [], [], 'OK', 63, $pdf->GetY() + 4);
+						$pdf->SetFontSize($originalFontSize);
+						$pdf->MultiCell(50, 4, $option, 0, '', 0, 1, 65, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 						$pdf->Ln(-7);
 					}
 				}
