@@ -32,8 +32,8 @@ class AUDIT extends API {
 			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 		}
 		// user certificates
-		//$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
-		//if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
+		$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
+		if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
 
 		$result['body']['content'][] = [
 			[
@@ -47,54 +47,58 @@ class AUDIT extends API {
 		];
 
 		if ($this->_requestedType) {
-
-			$result['body']['content'][] = [
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('record.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-				]
-			];
-			if ($append = $this->{$this->_requestedType}()) $result['body']['content'][] = $append;					
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
-			$statement->execute([':type' => $this->_requestedType]);
-			$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
-			$entries = [];
-			foreach($checks as $row){
-				$entries[] = [
-					'type' => 'text',
-					'description' => LANG::GET('audit.check_description', [
-						':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
-						':date' => $row['date'],
-						':author' => $row['author']
-					]),
-					'content' => $row['content']
-				];
-			}
-			$result['body']['content'][] = $entries;
+			if ($append = $this->{$this->_requestedType}()) array_push($result['body']['content'] , ...$append);
 		}
 		$this->response($result);
 	}
 	
 	private function mdrsamplecheck(){
+		$content = $unchecked = $entries = [];
 		// get unchecked articles for MDR §14 sample check
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
 		$statement->execute();
 		$sampleCheck = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$unchecked = [];
 		foreach($sampleCheck as $row){
 			if (!in_array($row['vendor_name'], $unchecked)) $unchecked[] = $row['vendor_name'];
 		}
-		return $unchecked ? [
+		if ($unchecked) $content[] = [
 			[
 				'type' => 'text',
 				'description' => LANG::GET('audit.mdrsamplecheck_warning_description'),
 				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
 			]
-		] : null;
+		];
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('record.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		// add checks
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
+		$statement->execute([':type' => $this->_requestedType]);
+		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($checks as $row){
+			$entries[] = [
+				'type' => 'text',
+				'description' => LANG::GET('audit.check_description', [
+					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+					':date' => $row['date'],
+					':author' => $row['author']
+				]),
+				'content' => $row['content']
+			];
+		}
+		if ($entries) $content[] = $entries;
+		return $content;
 	}
 
 	private function incorporation(){
+		$content = $orderedunincorporated = $entries = [];
 		// get unincorporated articles from approved orders
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-incorporated'));
 		$statement->execute();
@@ -105,7 +109,6 @@ class AUDIT extends API {
 			':substr' => LANG::PROPERTY('order.ordernumber_label')
 		]);
 		$approvedorders = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$orderedunincorporated = [];
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
 			if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($unincorporated, 'article_no'))) !== false){
@@ -115,13 +118,66 @@ class AUDIT extends API {
 				}
 			}
 		}
-		return $orderedunincorporated ? [
+		if ($orderedunincorporated) $content[] = [
 			[
 				'type' => 'text',
 				'description' => LANG::GET('audit.incorporation_warning_description'),
 				'content' => LANG::GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
 			]
-		] : null;
+		];
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('record.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		// add checks
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
+		$statement->execute([':type' => $this->_requestedType]);
+		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($checks as $row){
+			$entries[] = [
+				'type' => 'text',
+				'description' => LANG::GET('audit.check_description', [
+					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+					':date' => $row['date'],
+					':author' => $row['author']
+				]),
+				'content' => $row['content']
+			];
+		}
+		if ($entries) $content[] = $entries;
+		return $content;
+	}
+
+	private function userfiles(){
+		$content = [];
+		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+		$statement->execute();
+		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($users as $user){
+			$userfiles = [];
+			foreach ($storedfiles as $file){
+				if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+					$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
+				}
+			}
+			if ($userfiles) {
+				$content [] = [
+					[
+						'type' => 'links',
+						'description' => $user['name'],
+						'content' => $userfiles
+					]
+				];
+			}
+		}
+		return $content;
 	}
 
 	public function export(){

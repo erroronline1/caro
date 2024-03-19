@@ -133,7 +133,7 @@ without a filter none of the vendors products will be treated as a trading good!
 * view other forms (e.g. instructions, modal? prevent filling out)
 * user manual
 
-* incorporation and sample check custom forms (not languagafile)
+* incorporation and sample check custom forms (not languagefile)
 
 * incorporate product
     * adding documents
@@ -145,7 +145,7 @@ without a filter none of the vendors products will be treated as a trading good!
 
 * user selectable color themes?
 * monitoring measuring equipment, rental parts, machinery, crutches
-* caro audit (vendors, certificate expiry dates, user certificates)
+* caro audit (vendors, certificate expiry dates)
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * calendar and alerts
