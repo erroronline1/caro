@@ -348,12 +348,25 @@ class FORMS extends API {
 				$componentoptions[$row['name']] = ['value' => $row['id']];
 			}
 		}
+
+		// check for bundle dependencies
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+		$statement->execute();
+		$cd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
+		$dependedbundles = [];
+		foreach($cd as $key => $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $hidden) && 
+			in_array($result['name'], explode(',', $row['content'])) && 
+			!in_array($result['name'], $dependedbundles)) $dependedbundles[] = $result['name']; 
+		}
 		
 		// prepare existing context list
 		foreach(LANGUAGEFILE['formcontext'] as $context => $display){
 			$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 		}
-
+		
 		$return['body'] = [
 			'content' => [
 				[
@@ -428,6 +441,8 @@ class FORMS extends API {
 							'name' => LANG::GET('assemble.edit_form_context'),
 							'content' => $contextoptions
 						],
+						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br>' : '') .
+						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) : ''),
 						'hidden' => $result['name'] ? intval($result['hidden']) : 1
 					]
 				], [
@@ -679,7 +694,8 @@ class FORMS extends API {
 									'list' => 'templates',
 									'required' => true,
 									'data-loss' => 'prevent'
-								]
+								],
+								'hint' => ($bundle['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']]) . '<br>' : '')
 							], [
 								'type' => 'select',
 								'attributes' => [
