@@ -69,8 +69,8 @@ class FORMS extends API {
 										$sub['attributes']['name'] = $filename;
 										$sub['attributes']['url'] = $filearray[$filename];
 									}
-									$result[] = $sub;
 								}
+								$result[] = $sub;
 							}
 						}
 						return $result;
