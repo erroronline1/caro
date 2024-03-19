@@ -171,7 +171,7 @@ without a filter none of the vendors products will be treated as a trading good!
 
 * user selectable color themes?
 * monitoring measuring equipment, rental parts, machinery, crutches
-* caro audit (vendors, certificate expiry dates)
+* caro audit (vendors, certificate expiry dates, regulatory contexts)
 * purchase: batch identifier (product and delivery note number) for...
 * ...material tracing within documentation
 * calendar and alerts
