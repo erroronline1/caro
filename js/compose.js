@@ -196,7 +196,7 @@ export const compose_helper = {
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
-		if (name && context && content.length)
+		if (name && context && context !== '0' && content.length)
 			return {
 				name: name,
 				alias: alias,
