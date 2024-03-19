@@ -646,10 +646,11 @@ export class Assemble {
 			} else element.nextElementSibling.classList.remove("input_required_alert");
 		}
 		if (!missing_required) {
-			const options = {};
+			/*const options = {};
 			options[LANG.GET("assemble.compose_form_cancel")] = false;
 			options[LANG.GET("assemble.compose_form_confirm")] = {value: true, class: 'reducedCTA'};
 			new Dialog({type: 'confirm', header: LANG.GET("assemble.compose_form") , options:options}).then(confirmation => { if (confirmation) event.target.form.submit();});
+			*/event.target.form.submit();
 		}
 		else new Toast(LANG.GET("general.missing_form_data"));
 	}
