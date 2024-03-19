@@ -132,6 +132,7 @@ without a filter none of the vendors products will be treated as a trading good!
 * import data from other cases, warn about identifier!
 * view other forms (e.g. instructions, modal? prevent filling out)
 * user manual
+* export form pdf with fillable form fields
 
 * incorporation and sample check custom forms (not languagefile)
 
