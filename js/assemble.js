@@ -130,7 +130,7 @@ export class Dialog {
 		if (this.type) {
 			if (this.type === "input") {
 				modal = "inputmodal";
-				if (!('content' in this.body)) this.body={content:this.body};
+				if (!("content" in this.body)) this.body = { content: this.body };
 				this.assemble = new Assemble(this.body);
 			}
 			dialog = document.getElementById(modal);
@@ -144,7 +144,11 @@ export class Dialog {
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
-			img.onpointerdown = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" + modal + "').close()");
+			img.onpointerdown = new Function(
+				"const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" +
+					modal +
+					"').close()"
+			);
 			form.append(img);
 			if (this.header || this.body || this.icon) {
 				const header = document.createElement("header");
@@ -380,7 +384,7 @@ export class Assemble {
 
 		this.assembledPanels = this.processContent();
 
-		if (!(nextSibling ||formerSibling ||returnOnlyNodes||this.composer)  || this.composer === "photoOrScanner") {
+		if (!(nextSibling || formerSibling || returnOnlyNodes || this.composer) || this.composer === "photoOrScanner") {
 			this.section.append(...this.assembledPanels);
 			return this.section;
 		} else if (nextSibling) {
@@ -506,7 +510,8 @@ export class Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === "Array") content = content.concat(section, this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === "Array")
+				content = content.concat(section, this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			content = content.concat(this[elements.type]());
@@ -591,7 +596,8 @@ export class Assemble {
 			let indicator = document.getElementById(e.target.attributes.id.value + "indicator");
 			for (let panel = 0; panel < e.target.children.length + 1; panel++) {
 				try {
-					if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth) + 1) indicator.children[panel].firstChild.classList.add("articleactive");
+					if (panel == Math.round(e.target.scrollLeft / e.target.clientWidth) + 1)
+						indicator.children[panel].firstChild.classList.add("articleactive");
 					else indicator.children[panel].firstChild.classList.remove("articleactive");
 				} catch (err) {
 					continue;
@@ -626,7 +632,8 @@ export class Assemble {
 		}
 		for (const element of required) {
 			if (element.validity.valueMissing && element.form === event.target.form) {
-				if (["file", "checkbox", "radio"].includes(element.type)) element.nextElementSibling.classList.add("input_required_alert");
+				if (["file", "checkbox", "radio"].includes(element.type))
+					element.nextElementSibling.classList.add("input_required_alert");
 				else element.classList.add("input_required_alert");
 				if (!missing_required) {
 					element.scrollIntoView({
@@ -638,7 +645,12 @@ export class Assemble {
 				missing_required = true;
 			} else element.nextElementSibling.classList.remove("input_required_alert");
 		}
-		if (!missing_required) event.target.form.submit();
+		if (!missing_required) {
+			const options = {};
+			options[LANG.GET("assemble.compose_form_cancel")] = false;
+			options[LANG.GET("assemble.compose_form_confirm")] = {value: true, class: 'reducedCTA'};
+			new Dialog({type: 'confirm', header: LANG.GET("assemble.compose_form") , options:options}).then(confirmation => { if (confirmation) event.target.form.submit();});
+		}
 		else new Toast(LANG.GET("general.missing_form_data"));
 	}
 
@@ -778,15 +790,23 @@ export class Assemble {
 			label;
 		input.type = type;
 		if (type === "password") this.currentElement.type = "password";
-		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
-		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
+		input.id =
+			this.currentElement.attributes && this.currentElement.attributes.id
+				? this.currentElement.attributes.id
+				: getNextElementID();
+		input.autocomplete =
+			(this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
 		label = document.createElement("label");
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label");
 
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.name !== undefined)
+			this.currentElement.attributes.name = this.names_numerator(
+				this.currentElement.attributes.name,
+				this.currentElement.numeration
+			);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (type == "email") input.multiple = true;
 		if (this.currentElement.attributes.hidden !== undefined) return input;
@@ -860,7 +880,11 @@ export class Assemble {
 		input.type = "hidden";
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.name !== undefined)
+			this.currentElement.attributes.name = this.names_numerator(
+				this.currentElement.attributes.name,
+				this.currentElement.numeration
+			);
 		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
 		return input;
 	}
@@ -868,7 +892,8 @@ export class Assemble {
 		let datalist = document.createElement("datalist");
 		let option;
 		datalist.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
+		if (this.currentElement.attributes !== undefined)
+			datalist = this.apply_attributes(this.currentElement.attributes, datalist);
 		this.currentElement.content.forEach((key) => {
 			option = document.createElement("option");
 			option.value = key;
@@ -921,9 +946,17 @@ export class Assemble {
 		label.type = "button";
 		label.setAttribute("data-type", "file");
 		label.classList.add("inlinebutton");
-		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
+		label.appendChild(
+			document.createTextNode(
+				this.currentElement.attributes.multiple !== undefined
+					? LANG.GET("assemble.files_choose")
+					: LANG.GET("assemble.file_choose")
+			)
+		);
 
-		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		button.onpointerup = new Function(
+			"let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));"
+		);
 		button.appendChild(document.createTextNode("Reset"));
 		button.type = "button";
 		button.setAttribute("data-type", "reset");
@@ -981,7 +1014,9 @@ export class Assemble {
 
 		img.classList.add("photoupload");
 
-		resetbutton.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		resetbutton.onpointerup = new Function(
+			"let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));"
+		);
 		resetbutton.appendChild(document.createTextNode(LANG.GET("assemble.reset")));
 		resetbutton.setAttribute("data-type", "reset");
 		resetbutton.classList.add("inlinebutton");
@@ -1024,7 +1059,11 @@ export class Assemble {
 		let select = document.createElement("select"),
 			label,
 			selectModal = {};
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.name !== undefined)
+			this.currentElement.attributes.name = this.names_numerator(
+				this.currentElement.attributes.name,
+				this.currentElement.numeration
+			);
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		select.id = getNextElementID();
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
@@ -1081,18 +1120,28 @@ export class Assemble {
 		textarea.id = getNextElementID();
 		textarea.autocomplete = "off";
 		if (this.currentElement.attributes.name !== undefined) {
-			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+			this.currentElement.attributes.name = this.names_numerator(
+				this.currentElement.attributes.name,
+				this.currentElement.numeration
+			);
 			label = document.createElement("label");
 			label.htmlFor = textarea.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
 			label.classList.add("textarea-label");
 		}
-		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
-		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
+		if (this.currentElement.attributes !== undefined)
+			textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		if (this.currentElement.attributes.value !== undefined)
+			textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			const preservedHint = this.hint();
-			this.currentElement.attributes = { value: LANG.GET("menu.texttemplate_texts"), type: 'button', onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')", class: "floatright" };
+			this.currentElement.attributes = {
+				value: LANG.GET("menu.texttemplate_texts"),
+				type: "button",
+				onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')",
+				class: "floatright",
+			};
 			delete this.currentElement.hint;
 			return [...this.icon(), label, textarea, ...preservedHint, ...this.button(), this.br()];
 		}
@@ -1115,7 +1164,10 @@ export class Assemble {
 			hint: 'this selection is for...'
 		}*/
 		const result = [...this.header()],
-			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
+			radioname =
+				this.currentElement.attributes && this.currentElement.attributes.name
+					? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration)
+					: null; // keep same name for current article
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement("label"),
 				input = document.createElement("input");
@@ -1219,7 +1271,9 @@ export class Assemble {
 			multiple = true;
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
-			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + LANG.GET("assemble.scan_multiple") : LANG.GET("assemble.scan_multiple");
+			this.currentElement.hint = this.currentElement.hint
+				? this.currentElement.hint + " " + LANG.GET("assemble.scan_multiple")
+				: LANG.GET("assemble.scan_multiple");
 		}
 
 		if (this.currentElement.destination !== undefined) {
@@ -1246,7 +1300,11 @@ export class Assemble {
 		const scannerElementClone = structuredClone(this.currentElement);
 
 		let button = document.createElement("button");
-		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.scan_button")));
+		button.appendChild(
+			document.createTextNode(
+				this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.scan_button")
+			)
+		);
 		button.type = "button";
 		button.setAttribute("data-type", "scanner");
 
@@ -1269,7 +1327,11 @@ export class Assemble {
 
 		if (originaltype === "identify") {
 			let button = document.createElement("button");
-			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.compose_merge")));
+			button.appendChild(
+				document.createTextNode(
+					this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.compose_merge")
+				)
+			);
 			button.type = "button";
 			button.setAttribute("data-type", "merge");
 			button.onpointerup = function () {
