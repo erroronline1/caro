@@ -34,6 +34,9 @@ class AUDIT extends API {
 		// user certificates
 		$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
 		if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
+		// forms
+		$selecttypes[LANG::GET('audit.checks_type.forms')] = ['value' => 'forms'];
+		if ($this->_requestedType==='forms') $selecttypes[LANG::GET('audit.checks_type.forms')]['selected'] = true;
 
 		$result['body']['content'][] = [
 			[
@@ -74,7 +77,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('record.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'exportchecks', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -131,7 +134,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('record.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'exportchecks', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -154,33 +157,7 @@ class AUDIT extends API {
 		return $content;
 	}
 
-	private function userfiles(){
-		$content = [];
-		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-		$statement->execute();
-		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($users as $user){
-			$userfiles = [];
-			foreach ($storedfiles as $file){
-				if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
-					$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
-				}
-			}
-			if ($userfiles) {
-				$content [] = [
-					[
-						'type' => 'links',
-						'description' => $user['name'],
-						'content' => $userfiles
-					]
-				];
-			}
-		}
-		return $content;
-	}
-
-	public function export(){
+	public function exportchecks(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
@@ -220,6 +197,148 @@ class AUDIT extends API {
 			'body' => $body,
 		]);
 	}
+
+	private function userfiles(){
+		$content = [];
+		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+		$statement->execute();
+		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($users as $user){
+			$userfiles = [];
+			foreach ($storedfiles as $file){
+				if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+					$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
+				}
+			}
+			if ($userfiles) {
+				$content [] = [
+					[
+						'type' => 'links',
+						'description' => $user['name'],
+						'content' => $userfiles
+					]
+				];
+			}
+		}
+		return $content;
+	}
+
+	private function forms(){
+		$content = [];
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement->execute();
+		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = $currentforms = [];
+				foreach($forms as $form){
+			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
+		}
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+		$statement->execute();
+		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = $currentbundles = [];
+		foreach($bundles as &$bundle){
+			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
+		}
+
+		$formscontent = [
+			[
+				'type' => 'text',
+				'description' => LANG::GET('audit.documents_in_use_documents'),
+				'content' => ''
+			]
+		];
+		foreach($currentforms as $form){
+			$components = explode(',', $form['content']);
+			$componentlist = [];
+			foreach($components as $component){
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement->execute([':name' => $component]);
+				$cmpnnt = $statement->fetch(PDO::FETCH_ASSOC);
+				$componentlist[] = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]);
+			}
+			$formscontent[] = [
+				'type' => 'text',
+				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
+				'content' => implode("\n", $componentlist)
+			];
+		}
+
+		$bundlescontent = [
+			[
+				'type' => 'text',
+				'description' => LANG::GET('audit.documents_in_use_bundles'),
+				'content' => ''
+			]
+		];
+		foreach($currentbundles as $bundle){
+			$formslist = explode(',', $bundle['content']);
+			natsort($formslist);
+			$bundlescontent[] = [
+				'type' => 'text',
+				'description' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']]),
+				'content' => implode("\n", $formslist)
+			];
+		}
+
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('record.record_export'),
+					'onpointerup' => "api.audit('get', 'exportforms', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		
+		$content[] = $formscontent;
+		$content[] = $bundlescontent;
+		return $content;
+	}
+
+	public function exportforms(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+			'date' => date('y-m-d H:i')
+		];
+
+		$forms = $this->forms();
+
+		for($i = 1; $i<count($forms); $i++){
+			foreach($forms[$i] as $item){
+				$summary['content'][$item['description']] = $item['content'];	
+			}
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'body' => $body,
+		]);
+	}
+
 }
 
 $api = new AUDIT();
