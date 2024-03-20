@@ -153,7 +153,7 @@ without a filter none of the vendors products will be treated as a trading good!
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
 * [webworker caching](https://developer.chrome.com/docs/workbox/caching-strategies-overview)
 * [indexedDB](https://github.com/jakearchibald/idb)
-* [custom md pdf](https://marketplace.visualstudio.com/items?itemName=Deadpoulpe.custom-md-pdf)
+* [custom md pdf](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf)
 
 # open tasks
 
