@@ -320,7 +320,7 @@ class record extends API {
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $fileinput)], null, false)){
+					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . date('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
 								if (array_key_exists($fileinput, $attachments)) $attachments[$fileinput][]= substr($uploaded[$i], 1);

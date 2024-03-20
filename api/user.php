@@ -211,7 +211,7 @@ class USER extends API {
 
 				// add user documents
 				if (array_key_exists(LANG::PROPERTY('user.edit_add_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_document')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name'] . '_' . date('YmdHis')], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_post'));
@@ -309,7 +309,7 @@ class USER extends API {
 
 				// add user documents
 				if (array_key_exists(LANG::PROPERTY('user.edit_add_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_document')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name'] . '_' . date('YmdHis')], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
 				}
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
