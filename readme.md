@@ -39,7 +39,7 @@ tested devices:
 
 #### forms
 * form components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. each entry will have a timestamp and the saving user name. within the respective managers the standard selection will access the most recent version. the advanced selection will access any existing version.
-* images for form components will not be deleted. assigned a second-timestamp to the filename these files are likely to be unique and always accessible on accessing a former version.
+* images for form components will not be deleted. they are assigned the components name and timestamp of submission to the filename. they always accessible on accessing a former version.
 
 #### records
 * records will append to the database. each entry will have a timestamp and the saving user name. summaries gather all distinct entries and display them in order of submission.
@@ -155,6 +155,12 @@ without a filter none of the vendors products will be treated as a trading good!
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+* authorize components and forms
+    * signature from qm, ceo, supervisor by unit
+    * released only if all signatures are provided
+    * request via message (qm, ceo, supervisor by unit)
+    * add to permissions (qm, ceo)
+* update component and form editor for correct selection list (having ids)
 * import data from other cases, warn about identifier!
 * view other forms (e.g. instructions, modal? prevent filling out)
 * user manual
