@@ -607,8 +607,8 @@ export const api = {
 					case "productsearch":
 						api.preventDataloss.monitor = false;
 						successFn = function (data) {
-							let list = document.querySelector("article>article");
-							if (list) list.parentNode.parentNode.parentNode.remove();
+							let list = document.querySelector("hr").previousElementSibling;
+							if (list.previousElementSibling) list.remove();
 							if (data.body.content) {
 								const body = new Assemble(data.body);
 								body.initializeSection("hr");
