@@ -155,6 +155,14 @@ without a filter none of the vendors products will be treated as a trading good!
 * [indexedDB](https://github.com/jakearchibald/idb)
 
 # open tasks
+
+#### assemble
+* multiple signature pads
+
+#### compose
+* reimport component to edit
+
+#### forms
 * authorize components and forms
     * signature from qm, ceo, supervisor by unit
     * released only if all signatures are provided
@@ -162,23 +170,42 @@ without a filter none of the vendors products will be treated as a trading good!
     * add to permissions (qm, ceo)
 * update component and form editor for correct selection list (having ids)
 * import data from other cases, warn about identifier!
-* view other forms (e.g. instructions, modal? prevent filling out)
-* user manual
+* view other forms as modal (e.g. instructions)
+* suggest next form? (load with identify)
+* regulatory context for forms
+* incorporation and sample check custom forms (not languagefile), context
 
-* incorporation and sample check custom forms (not languagefile)
-
+#### purchase
 * incorporate product
     * adding documents
-    * adding photo (scaled down) ? (display on order selection) (->consumables as well)
-
+    * adding photo (scaled down) ? (display on order selection) (-> consumables as well)
+* incorporation denied state
+* batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
+* vendor evaluation
 
-* user selectable color themes?
-* monitoring measuring equipment, rental parts, machinery, crutches
-* caro audit (vendors, certificate expiry dates, regulatory contexts)
+#### records
+* monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
-* ...material tracing within documentation
+* material tracing within documentation
+* mark as finished to hide in overwiew
+
+#### audit
+* display form authorization
+* vendors, certificates and expiry date
+* checklist regulatory issues
+
+#### misc
+* user selectable color themes?
 * calendar and alerts
 * md mermaid flowcharts
+* application manual
+    * general manual
+    * iso 13485 checklist and how the application handles these
+    * csvprocessor
+* improved landing page
+* message ordering and categorizing, displaying left and right
+* risk management?
+* database export
