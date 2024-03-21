@@ -77,17 +77,13 @@ class ORDER extends API {
 				$statement->execute();
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
 				// display all orders assigned to organizational unit
-				if (array_intersect(['admin'], $_SESSION['user']['permissions'])) $units = LANGUAGEFILE['units']; // see all orders
-				else { // see only orders for own units
-					$units = [];
-					foreach($_SESSION['user']['units'] as $unit){
-						$units[] = LANG::GET('units.' . $unit);
-					}
-				}
+				if (array_intersect(['admin'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				else $units = $_SESSION['user']['units']; // see only orders for own units
+
 				$organizational_orders=[];
 				foreach($orders as $key => $row) {
 					$order_data=json_decode($row['order_data'], true);
-					if (array_intersect([$order_data[LANG::PROPERTY('order.unit')]], $units)) {
+					if (array_intersect([$order_data['organizational_unit']], $units)) {
 						array_push($organizational_orders, $row);
 					}
 				}
@@ -99,17 +95,19 @@ class ORDER extends API {
 						foreach ($processedOrderData as $key => $value){ // data
 							if (is_array($value)){
 								foreach($value as $item){
-								$items .= LANG::GET('order.prepared_order_item', [
-									':quantity' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.quantity_label')) ? : '',
-									':unit' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.unit_label')) ? : '',
-									':number' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.ordernumber_label')) ? : '',
-									':name' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.productname_label')) ? : '',
-									':vendor' => UTILITY::propertySet((object) $item, LANG::PROPERTY('order.vendor_label')) ? : ''
-								])."\n";
+									$items .= LANG::GET('order.prepared_order_item', [
+										':quantity' => UTILITY::propertySet((object) $item, 'quantity_label') ? : '',
+										':unit' => UTILITY::propertySet((object) $item, 'unit_label') ? : '',
+										':number' => UTILITY::propertySet((object) $item, 'ordernumber_label') ? : '',
+										':name' => UTILITY::propertySet((object) $item, 'productname_label') ? : '',
+										':vendor' => UTILITY::propertySet((object) $item, 'vendor_label') ? : ''
+									])."\n";
 								}
 							} else {
-								if ($key=='attachments') continue;
-								$info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";
+								if ($key==='attachments') continue;
+								if ($key==='organizational_unit') $value = LANG::GET('units.' . $value);
+
+								$info .= LANG::GET('order.' . $key) . ': ' . $value . "\n";
 							}
 						}
 						array_push($result['body']['content'], [
@@ -251,17 +249,13 @@ class ORDER extends API {
 	}
 
 	public function filter(){
-		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $displayunits = LANGUAGEFILE['units']; // see all orders
-		else { // display only orders for own units
-			$displayunits = [];
-			foreach($_SESSION['user']['units'] as $unit){
-				$displayunits[] = LANG::GET('units.' . $unit);
-			}
-		}
+		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+		else $units = $_SESSION['user']['units']; // display only orders for own units
+
 		// in clause doesnt work without manually preparing
 		$query = strtr(SQLQUERY::PREPARE('order_get_filter'),
 		[
-			':organizational_unit' => "'".implode("','", $displayunits)."'",
+			':organizational_unit' => "'" . implode("','", $units) . "'",
 			':orderfilter' => "'" . $this->_requestedID . "'"
 		]);
 		$statement = $this->_pdo->prepare($query);
@@ -324,8 +318,17 @@ class ORDER extends API {
 			unset ($this->_payload->existingattachments);
 		}
 
+		//convert organizations unit from value to key according to language file
+		$this->_payload->{LANG::PROPERTY('order.organizational_unit')} = array_search(UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.organizational_unit')), LANGUAGEFILE['units']);
+
+		// translate payload-names to languagefile keys
+		$language = [];
+		foreach(array_keys(LANGUAGEFILE['order']) as $key){
+			$language[$key] = LANG::PROPERTY('order.' . $key);
+		}
 		// set data
 		foreach ($this->_payload as $key => $value){
+			$key = array_search($key, $language);
 			if (is_array($value)){
 				foreach($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
@@ -337,8 +340,7 @@ class ORDER extends API {
 				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
 			}
 		}
-		$order_data[LANG::GET('order.orderer')]=$_SESSION['user']['name'];
-
+		$order_data['orderer'] = $_SESSION['user']['name'];
 		if(!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
 	}
@@ -350,12 +352,12 @@ class ORDER extends API {
 		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
-				if (!in_array($key, ['items',LANG::PROPERTY('order.unit')])) $order_data2[$key] = $processedOrderData['order_data'][$key];
+				if (!in_array($key, ['items', 'organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
 			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 			[
 				':order_data' => "'" . json_encode($order_data2, JSON_UNESCAPED_SLASHES) . "'",
-				':organizational_unit' => "'" . $processedOrderData['order_data'][LANG::PROPERTY('order.unit')] . "'",
+				':organizational_unit' => "'" . $processedOrderData['order_data']['organizational_unit'] . "'",
 				':approval' => "'" . $processedOrderData['approval'] . "'",
 			]) . '; ';
 		}
@@ -453,19 +455,21 @@ class ORDER extends API {
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				if (!$order = $statement->fetch(PDO::FETCH_ASSOC)){$order = [
-					LANG::PROPERTY('order.additional_info') => '',
-					LANG::PROPERTY('order.unit') => '',
-					LANG::PROPERTY('order.commission') => '',
-					LANG::PROPERTY('order.delivery_date') => '',
-					'items' => false
-				];} else {
+				if (!$order = $statement->fetch(PDO::FETCH_ASSOC)){
+					$order = [
+						LANG::PROPERTY('order.additional_info') => '',
+						LANG::PROPERTY('order.organizational_unit') => '',
+						LANG::PROPERTY('order.commission') => '',
+						LANG::PROPERTY('order.delivery_date') => '',
+						'items' => false
+					];
+				} else {
 					$order = json_decode($order['order_data'], true);
 				}
 				$organizational_units=[];
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					$organizational_units[$description] = ['name' => LANG::PROPERTY('order.unit'), 'required' => true];
-					if (array_key_exists(LANG::PROPERTY('order.unit'), $order) && in_array($description, explode(',', $order[LANG::PROPERTY('order.unit')]))) $organizational_units[$description]['checked'] = true;
+					$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'required' => true];
+					if (array_key_exists('organizational_unit', $order) && in_array($unit, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
 				}
 
 				$result['body'] = ['form'=>[
@@ -536,7 +540,7 @@ class ORDER extends API {
 									"'".LANG::GET('order.add_manually_confirm')."': true,".
 									"'".LANG::GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
 								"}}).then(response => {if (Object.keys(response).length) {".
-									"orderClient.addProduct(response[LANG.GET('order.quantity_label')] || '', response[LANG.GET('order.unit_label')] || '', response[LANG.GET('order.ordernumber_label')] || '', response[LANG.GET('order.productname_label')] || '', response[LANG.GET('order.barcode')] || '', response[LANG.GET('order.vendor_label')] || '');".
+									"orderClient.addProduct(response[LANG.GET('order.quantity_label')] || '', response[LANG.GET('order.unit_label')] || '', response[LANG.GET('order.ordernumber_label')] || '', response[LANG.GET('order.productname_label')] || '', response[LANG.GET('order.barcode_label')] || '', response[LANG.GET('order.vendor_label')] || '');".
 									"api.preventDataloss.monitor = true;}".
 									"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
 						]]
@@ -545,7 +549,7 @@ class ORDER extends API {
 					],[
 						['type' => 'radio',
 						'attributes' => [
-							'name' => LANG::GET('order.unit')
+							'name' => LANG::GET('order.organizational_unit')
 						],
 						'content' => $organizational_units
 						],
@@ -557,19 +561,19 @@ class ORDER extends API {
 						'attributes' => [
 							'required' => true,
 							'name' => LANG::GET('order.commission'),
-							'value' => array_key_exists(LANG::PROPERTY('order.commission'), $order) ? $order[LANG::PROPERTY('order.commission')] : '',
+							'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
 							'data-loss' => 'prevent',
 							'id' => 'commission'
 						]],
 						['type' => 'dateinput',
 						'attributes' => [
 							'name' => LANG::GET('order.delivery_date'),
-							'value' => array_key_exists(LANG::PROPERTY('order.delivery_date'), $order) ? $order[LANG::PROPERTY('order.delivery_date')] : ''
+							'value' => array_key_exists('delivery_date', $order) ? $order['delivery_date'] : ''
 						]],
 						['type' => 'textarea',
 						'attributes' => [
 							'name' => LANG::GET('order.additional_info'),
-							'value' => array_key_exists(LANG::PROPERTY('order.additional_info'), $order) ? $order[LANG::PROPERTY('order.additional_info')] : '',
+							'value' => array_key_exists('additional_info', $order) ? $order['additional_info'] : '',
 							'data-loss' => 'prevent'
 						]]
 					],[
@@ -632,7 +636,7 @@ class ORDER extends API {
 								'type' => 'numberinput',
 								'attributes' => [
 									'name' => LANG::GET('order.quantity_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i],LANG::PROPERTY('order.quantity_label')) ? : ' ',
+									'value' => UTILITY::propertySet((object) $order['items'][$i], 'quantity_label') ? : ' ',
 									'min' => '1',
 									'max' => '99999',
 									'required' => true,
@@ -642,45 +646,45 @@ class ORDER extends API {
 							[
 								'type' => 'text',
 								'description' => LANG::GET('order.added_product', [
-									':unit' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.unit_label')) ? : '',
-									':number' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.ordernumber_label')) ? : '',
-									':name' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.productname_label')) ? : '',
-									':vendor' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.vendor_label')) ? : ''
+									':unit' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : '',
+									':number' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : '',
+									':name' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : '',
+									':vendor' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ''
 								])
 							],
 							[
 								'type' => 'hiddeninput',
 								'attributes' => [
 									'name' => LANG::GET('order.unit_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.unit_label')) ? : ' '
+									'value' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hiddeninput',
 								'attributes' => [
 									'name' => LANG::GET('order.ordernumber_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.ordernumber_label')) ? : ' '
+									'value' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hiddeninput',
 								'attributes' => [
 									'name' => LANG::GET('order.productname_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.productname_label')) ? : ' '
+									'value' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hiddeninput',
 								'attributes' => [
-									'name' => LANG::GET('order.barcode') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.barcode')) ?  : ' '
+									'name' => LANG::GET('order.barcode_label') . '[]',
+									'value' => UTILITY::propertySet((object) $order['items'][$i], 'barcode_label') ?  : ' '
 								]
 							],
 							[
 								'type' => 'hiddeninput',
 								'attributes' => [
 									'name' => LANG::GET('order.vendor_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], LANG::PROPERTY('order.vendor_label')) ? : ' '
+									'value' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ' '
 								]
 							],
 							[
@@ -745,26 +749,26 @@ class ORDER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				if (!array_intersect(['admin', 'purchase', 'user'], $_SESSION['user']['permissions'])) $this->response([], 401);
-				if ($this->_subMethod == 'ordered') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
-				if ($this->_subMethod == 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
-				if ($this->_subMethod == 'archived') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
-				if ($this->_subMethod == 'disapproved') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
-				if ($this->_subMethod == 'addinformation') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
+				if ($this->_subMethod === 'ordered') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
+				if ($this->_subMethod === 'received') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
+				if ($this->_subMethod === 'archived') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
+				if ($this->_subMethod === 'disapproved') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
+				if ($this->_subMethod === 'addinformation') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
 				$statement->execute([
 					':id' => $this->_requestedID
 					]);
-				if ($this->_subMethod == 'disapproved'){
+				if ($this->_subMethod === 'disapproved'){
 					$order = $statement->fetch(PDO::FETCH_ASSOC);
 					$decoded_order_data = json_decode($order['order_data'], true);
 
 					// prepare possible keys
 					$prepared = [
 						'items' => [[]],
-						LANG::PROPERTY('order.additional_info') => null,
-						LANG::PROPERTY('order.unit') => $order['organizational_unit'],
-						LANG::PROPERTY('order.commission') => null,
-						LANG::PROPERTY('order.orderer') => null,
-						LANG::PROPERTY('order.delivery_date') => null,
+						'additional_info' => null,
+						'organizational_unit' => $order['organizational_unit'],
+						'commission' => null,
+						'orderer' => null,
+						'delivery_date' => null,
 						'attachments' => null
 					];
 					// fill possible keys
@@ -773,7 +777,7 @@ class ORDER extends API {
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
-					$prepared[LANG::PROPERTY('order.additional_info')] .= ($prepared[LANG::PROPERTY('order.additional_info')] ? "\n": '') . LANG::GET('order.approved_on') . ': ' . $order['approved'];
+					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 					// clear unused keys
 					foreach ($prepared as $key => $value) {
 						if (!$value) unset($prepared[$key]);
@@ -790,28 +794,28 @@ class ORDER extends API {
 					]);
 					// inform user group
 					$messagepayload=[];
-					foreach (['quantity'=> LANG::PROPERTY('order.quantity_label'),
-						'unit' => LANG::PROPERTY('order.unit_label'),
-						'number' => LANG::PROPERTY('order.ordernumber_label'),
-						'name' => LANG::PROPERTY('order.productname_label'),
-						'vendor' => LANG::PROPERTY('order.vendor_label'),
-						'commission' => LANG::PROPERTY('order.commission')] as $key => $value){
+					foreach (['quantity'=> 'quantity_label',
+						'unit' => 'unit_label',
+						'number' => 'ordernumber_label',
+						'name' => 'productname_label',
+						'vendor' => 'vendor_label',
+						'commission' => 'commission'] as $key => $value){
 						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
 					}
-					$messagepayload[':info'] = array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data) ? $decoded_order_data[LANG::PROPERTY('order.additional_info')] : '';
-					$this->alertUserGroup(array_search($prepared[LANG::PROPERTY('order.unit')], LANGUAGEFILE['units']), str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order',[
+					$messagepayload[':info'] = array_key_exists('additional_info', $decoded_order_data) ? $decoded_order_data['additional_info'] : '';
+					$this->alertUserGroup($prepared['organizational_unit'], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order',[
 						':order' => LANG::GET('order.message', $messagepayload),
-						':unit' => $prepared[LANG::PROPERTY('order.unit')],
+						':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
 						':user' => $_SESSION['user']['name']
 					])) . "\n \n" . $this->_message, 'unit');
 				}
 				if ($this->_subMethod == 'addinformation'){
 					$order = $statement->fetch(PDO::FETCH_ASSOC);
 					$decoded_order_data = json_decode($order['order_data'], true);
-					if (array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data)){
-						$decoded_order_data[LANG::PROPERTY('order.additional_info')] .= "\n".$this->_message;
+					if (array_key_exists('additional_info', $decoded_order_data)){
+						$decoded_order_data['additional_info'] .= "\n".$this->_message;
 					}
-					else $decoded_order_data[LANG::PROPERTY('order.additional_info')]=$this->_message;
+					else $decoded_order_data['additional_info']=$this->_message;
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-addinformation'));
 					$statement->execute([
 						':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
@@ -859,19 +863,9 @@ class ORDER extends API {
 						['type' => 'filter']
 					]
 				]]];
-				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $displayunits = LANGUAGEFILE['units']; // see all orders
-				else { // display only orders for own units
-					$displayunits = [];
-					foreach($_SESSION['user']['units'] as $unit){
-						$displayunits[] = LANG::GET('units.' . $unit);
-					}
-				}
-				// translate user-units for permission to delete
-				$userunits = [];
-				foreach($_SESSION['user']['units'] as $unit){
-					$userunits[] = LANG::GET('units.' . $unit);
-				}
-
+				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				else $units = $_SESSION['user']['units']; // display only orders for own units
+					
 				// get unincorporated
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-incorporated'));
 				$statement->execute();
@@ -885,7 +879,7 @@ class ORDER extends API {
 				// in clause doesnt work without manually preparing
 				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order-by-unit'),
 				[
-					':organizational_unit' => "'".implode("','", $displayunits)."'"
+					':organizational_unit' => "'".implode("','", $units)."'"
 				]);
 				$statement = $this->_pdo->prepare($query);
 				$statement->execute();
@@ -894,10 +888,10 @@ class ORDER extends API {
 					$content = [];
 					$text = "\n";
 					$decoded_order_data = json_decode($row['order_data'], true);
-					if (array_key_exists(LANG::PROPERTY('order.barcode'), $decoded_order_data) && strlen($decoded_order_data[LANG::PROPERTY('order.barcode')])) $content[]=[
+					if (array_key_exists('barcode_label', $decoded_order_data) && strlen($decoded_order_data['barcode_label'])) $content[] = [
 						'type' => 'image',
 						'attributes' => [
-							'barcode' => ['value' => $decoded_order_data[LANG::PROPERTY('order.barcode')]],
+							'barcode' => ['value' => $decoded_order_data['barcode_label']],
 							'imageonly' => ['width' => '15em', 'height' => '6em']
 							]
 					];
@@ -908,16 +902,16 @@ class ORDER extends API {
 						'attributes' => ['data-filtered' => $row['id']]];
 
 					$text .= LANG::GET('order.prepared_order_item', [
-						':quantity' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.quantity_label')) ? : '',
-						':unit' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.unit_label')) ? : '',
-						':number' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
-						':name' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
-						':vendor' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''
+						':quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
+						':unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
+						':number' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
+						':name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
+						':vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''
 					])."\n";
 
-					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.additional_info')))
+					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info'))
 						$text .= LANG::GET('order.additional_info') . ': ' . $additional_information . "\n \n";
-					$text .= LANG::GET('order.unit') . ': ' . $row['organizational_unit'] . "\n";
+					$text .= LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']) . "\n";
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . "\n";
 
@@ -925,7 +919,7 @@ class ORDER extends API {
 						[
 							'type' => 'textinput',
 							'attributes' => [
-								'value' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
+								'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
 								'name' => LANG::GET('order.ordernumber_label'),
 								'readonly' => true,
 								'onpointerup' => 'orderClient.toClipboard(this)'
@@ -934,7 +928,7 @@ class ORDER extends API {
 						[
 							'type' => 'textinput',
 							'attributes' => [
-								'value' => UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.commission')) ? : '',
+								'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
 								'name' => LANG::GET('order.commission'),
 								'readonly' => true,
 								'onpointerup' => 'orderClient.toClipboard(this)'
@@ -951,7 +945,7 @@ class ORDER extends API {
 						}
 						else {
 							if (
-								(in_array($s, ['received', 'archived']) && (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)))
+								(in_array($s, ['received', 'archived']) && (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)))
 								|| (in_array($s, ['ordered']) && (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])))
 							) $status[LANG::GET('order.' . $s)] = [
 								'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.setAttribute('data-".$s."', 'true');",
@@ -972,7 +966,7 @@ class ORDER extends API {
 									'attributes' => [
 										'name' => LANG::GET('message.message')
 									],
-									'hint' => LANG::GET('order.disapprove_message', [':unit' => $row['organizational_unit']])
+									'hint' => LANG::GET('order.disapprove_message', [':unit' => LANG::GET('units.' . $row['organizational_unit'])])
 									]
 								]
 							 ) . "'), " .
@@ -996,28 +990,23 @@ class ORDER extends API {
 						];
 					}
 
-					$fields=[
-						'name' => LANG::PROPERTY('order.productname_label'),
-						'unit' => LANG::PROPERTY('order.unit_label'),
-						'number' => LANG::PROPERTY('order.ordernumber_label'),
-						'quantity' => LANG::PROPERTY('order.quantity_label'),
-						'vendor' => LANG::PROPERTY('order.vendor_label'),
-						'commission' => LANG::PROPERTY('order.commission'),
-					];
-
 					$messagepayload=[];
-					foreach ($fields as $replace => $with){
-						$messagepayload[':' . $replace] = array_key_exists($with, $decoded_order_data) ? $decoded_order_data[$with]: '';
+					foreach (['quantity'=> 'quantity_label',
+						'unit' => 'unit_label',
+						'number' => 'ordernumber_label',
+						'name' => 'productname_label',
+						'vendor' => 'vendor_label',
+						'commission' => 'commission'] as $key => $value){
+						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
 					}
-					$messagepayload[':info'] = array_key_exists(LANG::PROPERTY('order.additional_info'), $decoded_order_data) ? $decoded_order_data[LANG::PROPERTY('order.additional_info')]: '';
-					$messageorderer = UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.orderer')) ? : '';
+					$messagepayload[':info'] = array_key_exists('.additional_info', $decoded_order_data) ? $decoded_order_data['additional_info']: '';
+					$messageorderer = UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '';
 
 					$content[] = [
 						'type' => 'links',
 						'content' => [
-							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'message', 'onpointerup' => "new Dialog({type: 'message', header: '". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', body: JSON.parse('" . 
+							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'input', 'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', body: JSON.parse('" . 
 								json_encode(
-									[
 										[
 											[
 												'type' => 'hiddeninput',
@@ -1034,11 +1023,14 @@ class ORDER extends API {
 												]
 											]
 										]
-									]
 								 ) . "'), options:{".
 								"'".LANG::GET('order.add_information_cancel')."': false,".
 								"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(response => {if (response[LANG.GET('message.message')]) api.message('post', 'message')})"]
+								"}}).then(response => {if (response[LANG.GET('message.message')]) {".
+									"const formdata = new FormData();".
+									"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
+									"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
+									"api.message('post', 'message', formdata)}})"]
 						]
 					];
 					$content[] = $copy;
@@ -1055,7 +1047,7 @@ class ORDER extends API {
 						];
 					}
 
-					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) $content[]=[
+					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)) $content[]=[
 						'type' => 'button',
 						'attributes' => [
 							'value' => LANG::GET('order.add_information'),
@@ -1129,7 +1121,7 @@ class ORDER extends API {
 					}
 					
 					// delete order button if permitted
-					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $userunits)) {
+					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)) {
 						$content[] = [
 							'type' => 'deletebutton',
 							'hint' => $autodelete,
