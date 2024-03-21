@@ -457,10 +457,10 @@ class ORDER extends API {
 				]);
 				if (!$order = $statement->fetch(PDO::FETCH_ASSOC)){
 					$order = [
-						LANG::PROPERTY('order.additional_info') => '',
-						LANG::PROPERTY('order.organizational_unit') => '',
-						LANG::PROPERTY('order.commission') => '',
-						LANG::PROPERTY('order.delivery_date') => '',
+						'additional_info' => '',
+						'organizational_unit' => '',
+						'commission' => '',
+						'delivery_date' => '',
 						'items' => false
 					];
 				} else {
@@ -1079,8 +1079,8 @@ class ORDER extends API {
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
 					}
 					// request incorporation
-					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($unincorporated, 'article_no'))) !== false){
-						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
+					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
+						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
 								'type' => 'button',
 								'attributes' => [
@@ -1093,8 +1093,8 @@ class ORDER extends API {
 					}
 					
 					// request MDR §14 sample check
-					if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($sampleCheck, 'article_no'))) !== false){
-						if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
+					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
+						if (array_key_exists('vendor_label', $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
 								'type' => 'button',
 								'attributes' => [
@@ -1105,9 +1105,9 @@ class ORDER extends API {
 											[
 												'type' => 'text',
 												'description' => implode(' ', [
-													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.ordernumber_label')) ? : '',
-													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.productname_label')) ? : '',
-													UTILITY::propertySet((object) $decoded_order_data, LANG::PROPERTY('order.vendor_label')) ? : ''])
+													UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
+													UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
+													UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''])
 											]
 										],
 											json_decode(LANG::GET('defaultcomponent.mdrsamplecheck'), true)]). 
