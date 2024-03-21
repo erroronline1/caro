@@ -363,8 +363,10 @@ class FORMS extends API {
 		}
 		
 		// prepare existing context list
-		foreach(LANGUAGEFILE['formcontext'] as $context => $display){
-			$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
+		foreach(LANGUAGEFILE['formcontext'] as $type => $contexts){
+			foreach($contexts as $context => $display){
+				$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
+			}
 		}
 		
 		$return['body'] = [
@@ -478,6 +480,37 @@ class FORMS extends API {
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing")]]);
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
+				}
+
+				// recursively check for identifier
+				function check4identifier($element){
+					$hasindentifier = false;
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							$hasindentifier = check4identifier($sub);
+						} else {
+								if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasindentifier = true;
+						}
+					}
+					return $hasindentifier;
+				}
+				// check for identifier if context makes it mandatory
+				// do this in advance of updating in case of selecting such a context
+				if (in_array($this->_payload->context, array_keys(LANGUAGEFILE['formcontext']['identify']))){
+					$hasindentifier = false;
+					foreach($this->_payload->content as $component){
+						$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+						$statement->execute([
+							':name' => $component
+						]);
+						$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
+						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
+					}
+					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
+				}
+
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
 				$statement->execute([
@@ -498,32 +531,6 @@ class FORMS extends API {
 							]]);	
 				}
 
-				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
-				}
-
-				// recursively check for identifier
-				function check4identifier($element){
-					$hasindentifier=false;
-					foreach($element as $sub){
-						if (array_is_list($sub)){
-							$hasindentifier = check4identifier($sub);
-						} else {
-								if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasindentifier = true;
-						}
-					}
-					return $hasindentifier;
-				}
-				$hasindentifier = false;
-				foreach($this->_payload->content as $component){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
-					$statement->execute([
-						':name' => $component
-					]);
-					$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
-					if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
-				}
-				if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
