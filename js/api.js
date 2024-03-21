@@ -650,6 +650,23 @@ export const api = {
 							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
 						};
 						break;
+					case "mdrsamplecheck":
+						successFn = function (data) {
+							if (data.body) {
+								new Dialog({
+									type: "input",
+									header: LANG.GET("order.sample_check"),
+									body: data.body.content,
+									options: data.body.options,
+								}).then((response) => {
+									if (response) {
+										orderClient.performSampleCheck(response, data.body.productid);
+									}
+								});
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+						};
+						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {

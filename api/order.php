@@ -841,7 +841,7 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				$result=['body'=>['content'=>[
+				$result = ['body' => ['content' => [
 					[
 						['type' => 'radio',
 						'attributes' => [
@@ -1078,6 +1078,7 @@ class ORDER extends API {
 					if ($row['received'] && !$row['archived']){
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
 					}
+					
 					// request incorporation
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
@@ -1100,21 +1101,7 @@ class ORDER extends API {
 								'attributes' => [
 									'value' => LANG::GET('order.sample_check'),
 									'type' => 'button',
-									'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.sample_check') . "', body: JSON.parse('" . 
-										json_encode([[
-											[
-												'type' => 'text',
-												'description' => implode(' ', [
-													UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
-													UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
-													UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''])
-											]
-										],
-											json_decode(LANG::GET('defaultcomponent.mdrsamplecheck'), true)]). 
-										"'), options:{".
-											"'" . LANG::GET('order.sample_check_cancel') . "': false, ".
-											"'" . LANG::GET('order.sample_check_submit') . "': {value: true, class: 'reducedCTA'}}})".
-									".then(response => {if (response) { orderClient.performSampleCheck(response, ".$sampleCheck[$tocheck]['id']."); this.disabled = true;} })"
+									'onpointerup' => "api.purchase('get', 'mdrsamplecheck', " . $sampleCheck[$tocheck]['id'] . ");"
 								]
 							];
 						}

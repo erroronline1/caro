@@ -152,36 +152,81 @@ class CONSUMABLES extends API {
 		return;
 	}
 
+	private function components($forContext){
+		$formBody = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-context'));
+		$statement->execute([':context' => $forContext]);
+		if ($form = $statement->fetch(PDO::FETCH_ASSOC))
+			foreach(explode(',', $form['content']) as $usedcomponent) {
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement->execute([
+					':name' => $usedcomponent
+				]);
+				$component = $statement->fetch(PDO::FETCH_ASSOC);
+				$component['content'] = json_decode($component['content'], true);
+				array_push($formBody, ...$component['content']['content']);
+			}
+		return $formBody;
+	}
+
 	public function mdrsamplecheck(){
 		if (!(array_intersect(['user', 'admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-			$statement->execute([
-				':id' => $this->_requestedID
-			]);
-			if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
-			$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
+				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
-			if ($statement->execute([
-				':type' => 'mdrsamplecheck',
-				':author' => $_SESSION['user']['name'],
-				':content' => $content
-			])) {
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-check'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
 				if ($statement->execute([
-					':id' => $product['id'],
-				])) $this->response([
+					':type' => 'mdrsamplecheck',
+					':author' => $_SESSION['user']['name'],
+					':content' => $content
+				])) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-check'));
+					if ($statement->execute([
+						':id' => $product['id'],
+					])) $this->response([
+						'status' => [
+							'msg' => LANG::GET('order.sample_check_success')
+						]]);
+				}
+				$this->response([
 					'status' => [
-						'msg' => LANG::GET('order.sample_check_success')
+						'msg' => LANG::GET('order.sample_check_failure')
 					]]);
-			}
-			$this->response([
-				'status' => [
-					'msg' => LANG::GET('order.sample_check_failure')
-				]]);
-			break;
+				break;
+			case 'GET':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+
+				$result = ['body' => [
+					'content' => [
+						[
+							[
+								'type' => 'text',
+								'description' => implode(' ', [
+									$product['article_no'],
+									$product['article_name'],
+									$product['vendor_name']])
+							]
+						],
+						...$this->components('mdr_sample_check_form')
+					],
+					'options' => [
+						LANG::GET('order.sample_check_cancel') => false,
+						LANG::GET('order.sample_check_submit') => ['value' => true, 'class' => 'reducedCTA']
+					],
+					'productid' => $product['id']
+				]];
+				$this->response($result);
+				break;
 		}
 	}
 
@@ -232,7 +277,7 @@ class CONSUMABLES extends API {
 								$product['article_no'] ? : '',
 								$product['article_name'] ? : '',
 								$product['vendor_name'] ? : ''])
-						], ...json_decode(LANG::GET('defaultcomponent.incorporation'), true)
+						], ...$this->components('product_incorporation_form')
 					],
 					'options' => [
 							LANG::GET('order.incorporation_cancel') => false,

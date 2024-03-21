@@ -195,6 +195,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context != 'component' AND context != 'bundle' ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context != 'component' AND context != 'bundle' ORDER BY id DESC"
 		],
+		'form_form-get-latest-by-context' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE context= :context ORDER BY id DESC"
+		],
 		'form_component-get-latest-by-name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' ORDER BY id DESC"

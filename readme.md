@@ -177,7 +177,6 @@ refactor languagefile, e.g. mutable and immutable language chunks (order compone
 * view other forms as modal (e.g. instructions)
 * suggest next form? (load with identify)
 * regulatory context for forms
-* incorporation and sample check custom forms (not languagefile), context
 
 #### purchase
 * incorporate product
