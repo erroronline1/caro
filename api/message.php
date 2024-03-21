@@ -34,7 +34,7 @@ class MESSAGE extends API {
 				if ($statement->execute($message)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_success'),
-						'redirect' => 'sent'
+						'redirect' => $this->_redirect
 					]]);
 				else $this->response([
 					'status' => [
@@ -86,9 +86,8 @@ class MESSAGE extends API {
 					],
 					'form' => [
 						'data-usecase' => 'message',
-						'action' => "javascript:api.message('post', 'message')"
+						'action' => "javascript:api.message('post', 'message', '_', 'sent')"
 					]];
-
 				break;
 			case 'DELETE':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_delete_message'));
