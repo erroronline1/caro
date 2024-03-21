@@ -52,10 +52,11 @@ class FORMS extends API {
 					$files=[];
 					foreach($uploads as $path){
 						UTILITY::resizeImage($path, 2048, UTILITY_IMAGE_REPLACE);
-						preg_match_all('/[\w\s\d\.]+/m', $path, $filename);
-						$files[substr(stristr($filename[0][count($filename[0]) - 1], '_'), 1)] = substr($path, 1);
+						// retrieve actual filename with prefix dropped to compare to upload filename
+						// boundary is underscore, actual underscores within uploaded file name will be reinserted
+						$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
+						$files[$filename] = substr($path, 1);
 					}
-
 					function replace_images($element, $filearray){
 						$result = [];
 						foreach($element as $sub){
@@ -77,7 +78,6 @@ class FORMS extends API {
 					}
 					$component['content'] = replace_images($component['content'], $files);
 				}
-
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
 					':name' => $component_name,
