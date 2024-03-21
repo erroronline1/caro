@@ -643,7 +643,7 @@ export class Assemble {
 					});
 				}
 				missing_required = true;
-			} else element.nextElementSibling.classList.remove("input_required_alert");
+			} else if (element.nextElementSibling) element.nextElementSibling.classList.remove("input_required_alert");
 		}
 		if (!missing_required) {
 			if (!event.target.form.dataset.confirm) {
