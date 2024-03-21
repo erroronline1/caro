@@ -157,6 +157,9 @@ without a filter none of the vendors products will be treated as a trading good!
 
 # open tasks
 
+#### application
+refactor languagefile, e.g. mutable and immutable language chunks (order components vs generic language)
+
 #### assemble
 * multiple signature pads
 
@@ -165,8 +168,8 @@ without a filter none of the vendors products will be treated as a trading good!
 
 #### forms
 * authorize components and forms
-    * signature from qm, ceo, supervisor by unit
-    * released only if all signatures are provided
+    * authorize checkbox from qm, ceo, supervisor by unit 
+    * released only if all authorizations are provided
     * request via message (qm, ceo, supervisor by unit)
     * add to permissions (qm, ceo)
 * update component and form editor for correct selection list (having ids)
