@@ -75,7 +75,7 @@ class TOOL extends API {
 				'code' =>
 					"BEGIN:VEVENT\n" .
 					"SUMMARY:" . UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_occasion'))) . "\n" .
-					"LOCATION:" . LANG::GET('company.location') . "\n" .
+					"LOCATION:" . LANG::GET('company.address') . "\n" .
 					"DESCRIPTION:" . (UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_reminder'))) ? : UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_occasion')))) . "\n" .
 					"DTSTART:" . str_replace('-', '', UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_date')))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_time')))) . "00\n" .
 					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_date'))) . ' ' . UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_time')))) + intval(UTILITY::propertySet($this->_payload, preg_replace('/\W/', '_', LANG::GET('tool.qrcode_appointment_duration'))))*3600) . "\n" .

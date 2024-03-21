@@ -150,7 +150,7 @@ const orderClient = {
 						{
 							type: "hiddeninput",
 							attributes: {
-								name: LANG.GET("order.barcode") + "[]",
+								name: LANG.GET("order.barcode_label") + "[]",
 								value: data[4] ? data[4] : " ",
 							},
 						},
