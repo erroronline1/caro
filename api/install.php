@@ -161,8 +161,6 @@ $queries = [
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
-				'component' => "INSERT INTO `caro_form` (`id`, `name`, `alias`, `context`, `date`, `author`, `content`, `hidden`) VALUES " .
-					"(NULL, 'template', '', 'component', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
 				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
 			]
 		]
@@ -314,10 +312,6 @@ $queries = [
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
-				'component' => "INSERT INTO `caro_form` (`id`, `name`, `alias`, `context`, `date`, `author`, `content`, `hidden`) VALUES " .
-					"('template', '', 'component', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
-				'component' => "INSERT INTO caro_form_components (name, date, alias, context, author, content, hidden) VALUES " .
-					"('template', '', 'component', CURRENT_TIMESTAMP, '" . INI['system']['caroapp'] . "', ':content', 0);",
 				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
 			]
 		]
@@ -338,10 +332,6 @@ catch (Exception $e){
 	if (!$devupdate) {
 		// add default user
 		$processing[] = $queries['install'][$driver]['insertions']['user'];
-		// add component template
-		$processing[] = strtr($queries['install'][$driver]['insertions']['component'], [':content' => LANG::GET('defaultcomponent.template')]);
-		// add form template
-		$processing[] = $queries['install'][$driver]['insertions']['form'];
 		// add default manual entries according to set up language
 		foreach(LANGUAGEFILE['defaultmanual'] as $entry){
 			$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
