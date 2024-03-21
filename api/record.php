@@ -115,7 +115,7 @@ class record extends API {
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = [];
 		foreach($fd as $key => $row) {
-			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
 				$formdatalist[] = $row['name'];
 				$forms[$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
@@ -485,6 +485,9 @@ class record extends API {
 				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 0;
 				else $target = 1;
 			} else $target = 2;
+			foreach(LANGUAGEFILE['formcontext'] as $key => $subkeys){
+				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
+			}
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
 			if (count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
