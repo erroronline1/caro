@@ -160,7 +160,7 @@ class CONSUMABLES extends API {
 			$statement->execute([
 				':id' => $this->_requestedID
 			]);
-			$product = $statement->fetch(PDO::FETCH_ASSOC);
+			if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
 			$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
@@ -193,7 +193,7 @@ class CONSUMABLES extends API {
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				$product = $statement->fetch(PDO::FETCH_ASSOC);
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
 				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));

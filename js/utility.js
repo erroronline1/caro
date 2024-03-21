@@ -220,10 +220,12 @@ const orderClient = {
 			if (value && value !== "on") check.push(key + ": " + value);
 			else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
 		}
-		const result = check.join("\n");
-		formdata = new FormData();
-		formdata.append("content", result);
-		api.purchase("post", "mdrsamplecheck", productid, formdata);
+		if (check.length) {
+			const result = check.join("\n");
+			formdata = new FormData();
+			formdata.append("content", result);
+			api.purchase("post", "mdrsamplecheck", productid, formdata);
+		} else new Toast(LANG.GET("order.sample_check_failure"));
 	},
 	performIncorporation(formdata, productid) {
 		const check = [];
@@ -236,8 +238,7 @@ const orderClient = {
 			formdata = new FormData();
 			formdata.append("content", result);
 			api.purchase("post", "incorporation", productid, formdata);
-		}
-		else new Toast(LANG.GET('order.incorporate_failure'));
+		} else new Toast(LANG.GET("order.incorporation_failure"));
 	},
 };
 
