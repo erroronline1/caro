@@ -467,7 +467,6 @@ export const api = {
 							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
 						};
 						payload = _.getInputs("[data-usecase=approval]", true);
-						console.log(payload);
 						break;
 				}
 				break;
@@ -571,7 +570,6 @@ export const api = {
 				}
 				break;
 			case "post":
-				console.log(request);
 				if (2 in request && request[2] && typeof request[2] === "object") {
 					//passed formdata
 					payload = request[2];
