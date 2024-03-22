@@ -227,7 +227,7 @@ class AUDIT extends API {
 	private function forms(){
 		$content = [];
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
 		$statement->execute();
 		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = $currentforms = [];
@@ -256,15 +256,46 @@ class AUDIT extends API {
 			$components = explode(',', $form['content']);
 			$componentlist = [];
 			foreach($components as $component){
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
 				$statement->execute([':name' => $component]);
 				$cmpnnt = $statement->fetch(PDO::FETCH_ASSOC);
-				$componentlist[] = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]);
+				if ($cmpnnt)
+					$componentlist[] = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n" .
+						LANG::GET('audit.documents_in_use_approved', [
+							':permission' => LANG::GET('permissions.supervisor'),
+							':name' => json_decode($cmpnnt['supervisor_approval'], true)['name'],
+							':date' => json_decode($cmpnnt['supervisor_approval'], true)['date'],
+						]) . "\n" .
+						LANG::GET('audit.documents_in_use_approved', [
+							':permission' => LANG::GET('permissions.qmo'),
+							':name' => json_decode($cmpnnt['qmo_approval'], true)['name'],
+							':date' => json_decode($cmpnnt['qmo_approval'], true)['date'],
+						]) . "\n" .
+						LANG::GET('audit.documents_in_use_approved', [
+							':permission' => LANG::GET('permissions.ceo'),
+							':name' => json_decode($cmpnnt['ceo_approval'], true)['name'],
+							':date' => json_decode($cmpnnt['ceo_approval'], true)['date'],
+						]);
 			}
 			$formscontent[] = [
 				'type' => 'text',
-				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
-				'content' => implode("\n", $componentlist)
+				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]) . " - " .
+					LANG::GET('audit.documents_in_use_approved', [
+						':permission' => LANG::GET('permissions.supervisor'),
+						':name' => json_decode($form['supervisor_approval'], true)['name'],
+						':date' => json_decode($form['supervisor_approval'], true)['date'],
+					]) . " - " .
+					LANG::GET('audit.documents_in_use_approved', [
+						':permission' => LANG::GET('permissions.qmo'),
+						':name' => json_decode($form['qmo_approval'], true)['name'],
+						':date' => json_decode($form['qmo_approval'], true)['date'],
+					]) . " - " .
+					LANG::GET('audit.documents_in_use_approved', [
+						':permission' => LANG::GET('permissions.ceo'),
+						':name' => json_decode($form['ceo_approval'], true)['name'],
+						':date' => json_decode($form['ceo_approval'], true)['date'],
+					]),
+				'content' => implode("\n \n", $componentlist)
 			];
 		}
 

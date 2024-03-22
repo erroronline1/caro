@@ -158,13 +158,15 @@ class CONSUMABLES extends API {
 		$statement->execute([':context' => $forContext]);
 		if ($form = $statement->fetch(PDO::FETCH_ASSOC))
 			foreach(explode(',', $form['content']) as $usedcomponent) {
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
 				$statement->execute([
 					':name' => $usedcomponent
 				]);
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
-				$component['content'] = json_decode($component['content'], true);
-				array_push($formBody, ...$component['content']['content']);
+				if ($component){
+					$component['content'] = json_decode($component['content'], true);
+					array_push($formBody, ...$component['content']['content']);
+				}
 			}
 		return $formBody;
 	}

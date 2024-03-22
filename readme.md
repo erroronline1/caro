@@ -39,8 +39,8 @@ tested devices:
 
 #### forms
 * form components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. each entry will have a timestamp and the saving user name. within the respective managers the standard selection will access the most recent version. the advanced selection will access any existing version. components and forms can not be deleted after being approved. unapproved components and forms are not accessible for use.
-* images for form components will not be deleted. they are assigned the components name and timestamp of submission to the filename. they always accessible on accessing a former version. they can not be reused and are part of the component.
-* form components and forms need to be approved by a unit supervisor, quality management officer and ceo. respective user groups will be alerted by system message on saving of a new element. all supervisors can approve though, assuming they know what they're doing. any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units.
+* images for form components will not be deleted after component approvement. they are assigned the components name and timestamp of submission to the filename. they are always accessible on accessing a former version. they can not be reused and are part of the component.
+* form components and forms need to be approved by a unit supervisor, quality management officer and ceo. respective user groups will be alerted by system message on saving of a new element. all supervisors can approve though, assuming they know what they're doing. any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. unapproved components do not show up even if the form is approved.
 
 #### records
 * records will append to the database. each entry will have a timestamp and the saving user name. summaries gather all distinct entries and display them in order of submission.
@@ -168,12 +168,6 @@ refactor languagefile, e.g. mutable and immutable language chunks (order compone
 * reimport component to edit
 
 #### forms
-* authorize components and forms
-    * authorize checkbox from qm, ceo, supervisor by unit 
-    * released only if all authorizations are provided
-    * request via message (qm, ceo, supervisor by unit)
-    * add to permissions (qm, ceo)
-* update component and form editor for correct selection list (having ids)
 * import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)
 * suggest next form? (load with identify)
@@ -197,7 +191,6 @@ refactor languagefile, e.g. mutable and immutable language chunks (order compone
 * mark as finished to hide in overwiew
 
 #### audit
-* display form authorization
 * vendors, certificates and expiry date
 * checklist regulatory issues
 

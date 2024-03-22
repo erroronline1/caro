@@ -111,7 +111,7 @@ class record extends API {
 		$return = [];
 
 		// prepare existing forms lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = [];
@@ -190,13 +190,15 @@ class record extends API {
 		};
 
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
 			$statement->execute([
 				':name' => $usedcomponent
 			]);
 			$component = $statement->fetch(PDO::FETCH_ASSOC);
-			$component['content'] = json_decode($component['content'], true);
-			array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify));
+			if ($component){
+				$component['content'] = json_decode($component['content'], true);
+				array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify));
+			}
 		}
 		$context = [
 			[
@@ -260,7 +262,7 @@ class record extends API {
 		$necessaryforms = explode(',', $bundle['content']);
 
 		// unset hidden forms from bundle presets
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
 		$statement->execute();
 		$allforms = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($allforms as $row){
@@ -642,7 +644,7 @@ class record extends API {
 		};
 		$componentscontent = [];
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
 			$statement->execute([
 				':name' => $usedcomponent
 			]);
