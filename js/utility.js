@@ -225,7 +225,7 @@ const orderClient = {
 			formdata = new FormData();
 			formdata.append("content", result);
 			api.purchase("post", "mdrsamplecheck", productid, formdata);
-		} else new Toast(LANG.GET("order.sample_check_failure"));
+		} else new Toast(LANG.GET("order.sample_check_failure"), 'error');
 	},
 	performIncorporation(formdata, productid) {
 		const check = [];
@@ -238,7 +238,7 @@ const orderClient = {
 			formdata = new FormData();
 			formdata.append("content", result);
 			api.purchase("post", "incorporation", productid, formdata);
-		} else new Toast(LANG.GET("order.incorporation_failure"));
+		} else new Toast(LANG.GET("order.incorporation_failure"), 'error');
 	},
 };
 

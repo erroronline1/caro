@@ -38,7 +38,8 @@ class record extends API {
 					]);
 				}
 				else $this->response(['status' => [
-					'msg' => LANG::GET('record.create_identifier_error')
+					'msg' => LANG::GET('record.create_identifier_error'),
+					'type' => 'error'
 				]]);
 				break;
 			case 'GET':
@@ -159,7 +160,7 @@ class record extends API {
 		$statement->execute([
 			':name' => $this->_requestedID
 		]);
-		if (!$form = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID])]]);
+		if (!$form = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $form['name'], 'body' => [
 			'form' => [
@@ -344,11 +345,13 @@ class record extends API {
 					':content' => json_encode($this->_payload)
 				])) $this->response([
 					'status' => [
-						'msg' => LANG::GET('record.record_saved')
+						'msg' => LANG::GET('record.record_saved'),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
-						'msg' => LANG::GET('record.record_error')
+						'msg' => LANG::GET('record.record_error'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -454,12 +457,14 @@ class record extends API {
 			$this->response([
 			'status' => [
 				'msg' => LANG::GET('record.record_import_success'),
-				'data' => $result
+				'data' => $result,
+				'type' => 'success'
 			]]);
 		}
 		else $this->response([
 			'status' => [
-				'msg' => LANG::GET('record.record_import_error')
+				'msg' => LANG::GET('record.record_import_error'),
+				'type' => 'error'
 			]]);
 
 	}

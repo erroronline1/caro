@@ -174,7 +174,7 @@ class APPLICATION extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']])]]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -193,12 +193,14 @@ class APPLICATION extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']])
+						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('application.edit_manual_not_saved')
+						'name' => LANG::GET('application.edit_manual_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'PUT':
@@ -210,7 +212,7 @@ class APPLICATION extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']])]]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -230,12 +232,14 @@ class APPLICATION extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedManual,
-						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']])
+						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('application.edit_manual_not_saved')
+						'name' => LANG::GET('application.edit_manual_not_saved'),
+						'type' => 'error'
 					]]);
 
 				break;
@@ -312,12 +316,14 @@ class APPLICATION extends API {
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('application.edit_manual_deleted'),
-						'id' => false
+						'id' => false,
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'msg' => LANG::GET('application.edit_manual_error'),
-						'id' => $this->_requestedManual
+						'id' => $this->_requestedManual,
+						'type' => 'error'
 					]]);
 				break;
 		}

@@ -197,7 +197,7 @@ export const compose_helper = {
 		};
 		if (isForm) answer.form = {};
 		if (name && componentContent) return answer;
-		api.toast(LANG.GET("assemble.edit_component_not_saved_missing"));
+		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), 'error');
 		return null;
 	},
 	composeNewForm: function () {
@@ -219,7 +219,7 @@ export const compose_helper = {
 				content: content,
 				hidden: hidden,
 			};
-		api.toast(LANG.GET("assemble.edit_form_not_saved_missing"));
+		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), 'error');
 		return null;
 	},
 	composeNewTextTemplate: function () {
@@ -254,7 +254,7 @@ export const compose_helper = {
 				content: templateContent,
 				hidden: hidden,
 			};
-		api.toast(LANG.GET("texttemplate.edit_template_not_saved_missing"));
+		new Toast(LANG.GET("assemble.edit_template_not_saved_missing"), 'error');
 		return null;
 	},
 
@@ -301,8 +301,8 @@ export const compose_helper = {
 			compose_helper.newFormElements.add(component.name);
 			lookupIdentify(current.content);
 		}
-		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"));
-		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_form_multiple_signature"));
+		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"), 'error');
+		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_form_multiple_signature"), 'error');
 	},
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};

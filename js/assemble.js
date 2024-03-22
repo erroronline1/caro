@@ -298,13 +298,15 @@ export class Toast {
 	/**
 	 *
 	 * @param str message
+	 * @param str type success|error|info
+	 * @param int duration in milliseconds
 	 *
-	 * new Toast('message')
+	 * new Toast('message', 'success')
 	 *
 	 * duration is a bit fuzzy, idk why
 	 *
 	 */
-	constructor(message = "", duration = 4000) {
+	constructor(message = "", type = "", duration = 4000) {
 		this.message = message || undefined;
 		this.duration = duration;
 		this.toast = document.getElementById("toast");
@@ -656,7 +658,7 @@ export class Assemble {
 			new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_form"), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
-		} else new Toast(LANG.GET("general.missing_form_data"));
+		} else new Toast(LANG.GET("general.missing_form_data"), 'error');
 	}
 
 	initialize_SignaturePad() {

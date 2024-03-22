@@ -47,12 +47,14 @@ class USER extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],
-						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']])
+						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => $user['id'],
-						'name' => LANG::GET('user.edit_user_not_saved')
+						'msg' => LANG::GET('user.edit_user_not_saved'),
+						'type' => 'error'
 					]]);
 
 				break;
@@ -157,7 +159,7 @@ class USER extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -226,12 +228,14 @@ class USER extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']])
+						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('user.edit_user_not_saved')
+						'msg' => LANG::GET('user.edit_user_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 
@@ -250,7 +254,7 @@ class USER extends API {
 				$user['name'] = UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 				
 				// chain checked permission levels
@@ -325,12 +329,14 @@ class USER extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],
-						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']])
+						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => $user['id'],
-						'name' => LANG::GET('user.edit_user_not_saved')
+						'msg' => LANG::GET('user.edit_user_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 
@@ -362,7 +368,7 @@ class USER extends API {
 					'orderauth' => '',
 					'image' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// display form for adding a new user with ini related permissions
 				$permissions = [];
@@ -529,12 +535,14 @@ class USER extends API {
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('user.edit_user_deleted', [':name' => $user['name']]),
-						'id' => false
+						'id' => false,
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'msg' => LANG::GET('user.edit_user_not_deleted', [':name' => $user['name']]),
-						'id' => $user['id']
+						'id' => $user['id'],
+						'type' => 'error'
 					]]);
 				break;
 		}

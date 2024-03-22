@@ -191,12 +191,14 @@ class CONSUMABLES extends API {
 						':id' => $product['id'],
 					])) $this->response([
 						'status' => [
-							'msg' => LANG::GET('order.sample_check_success')
+							'msg' => LANG::GET('order.sample_check_success'),
+							'type' => 'success'
 						]]);
 				}
 				$this->response([
 					'status' => [
-						'msg' => LANG::GET('order.sample_check_failure')
+						'msg' => LANG::GET('order.sample_check_failure'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -204,7 +206,7 @@ class CONSUMABLES extends API {
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$result = ['body' => [
 					'content' => [
@@ -253,12 +255,14 @@ class CONSUMABLES extends API {
 						':incorporated' => 1
 					])) $this->response([
 						'status' => [
-							'msg' => LANG::GET('order.incorporation_success')
+							'msg' => LANG::GET('order.incorporation_success'),
+							'type' => 'success'
 						]]);
 				}
 				$this->response([
 					'status' => [
-						'msg' => LANG::GET('order.incorporation_failure')
+						'msg' => LANG::GET('order.incorporation_failure'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -267,7 +271,7 @@ class CONSUMABLES extends API {
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				$result['body'] = [
 					'content' => [
@@ -365,7 +369,7 @@ class CONSUMABLES extends API {
 				];
 				
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
 
 				// save certificate
@@ -397,12 +401,14 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError,
+						'type' => 'info'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('consumables.edit_vendor_not_saved')
+						'name' => LANG::GET('consumables.edit_vendor_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 
@@ -426,7 +432,7 @@ class CONSUMABLES extends API {
 				$vendor['pricelist']['trading_goods'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_trading_filter'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']])]]);
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
 
 				// save certificate
@@ -467,12 +473,14 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $vendor['id'],
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError,
+						'type' => 'info'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => $vendor['id'],
-						'name' => LANG::GET('consumables.edit_vendor_not_saved')
+						'name' => LANG::GET('consumables.edit_vendor_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 
@@ -496,7 +504,7 @@ class CONSUMABLES extends API {
 					'pricelist' => '{"validity":"", "filter": "", "trading_goods": ""}'
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
-					$result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID])];
+					$result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
@@ -695,7 +703,7 @@ class CONSUMABLES extends API {
 				$statement->execute([
 					':id' => $product['vendor_name']
 				]);
-				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']])]]);
+				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 
 				// save documents
@@ -718,12 +726,14 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']])
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'name' => LANG::GET('consumables.edit_product_not_saved')
+						'name' => LANG::GET('consumables.edit_product_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 
@@ -735,7 +745,7 @@ class CONSUMABLES extends API {
 					':id' => $this->_requestedID
 				]);
 				// prepare product-array to update, return error if not found
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
 				$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
@@ -752,7 +762,7 @@ class CONSUMABLES extends API {
 				$statement->execute([
 					':id' => $product['vendor_name']
 				]);
-				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']])]]);
+				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
@@ -780,12 +790,14 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']])
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]),
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'name' => LANG::GET('consumables.edit_product_not_saved')
+						'name' => LANG::GET('consumables.edit_product_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 
@@ -817,7 +829,7 @@ class CONSUMABLES extends API {
 					'trading_good' => 0,
 					'incorporated' => null,
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID])];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$isactive = $product['active'] ? ['checked' => true] : [];
 				$isinactive = !$product['active'] ? ['checked' => true] : [];
@@ -1047,12 +1059,14 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('consumables.edit_product_deleted', [':name' => $product['article_name']]),
-						'id' => false
+						'id' => false,
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'msg' => LANG::GET('consumables.edit_product_not_deleted', [':name' => $product['article_name']]),
-						'id' => $product['id']
+						'id' => $product['id'],
+						'type' => 'error'
 					]]);
 			break;
 		}

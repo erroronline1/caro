@@ -39,12 +39,13 @@ class FORMS extends API {
 						])) $this->response([
 							'status' => [
 								'name' => $component_name,
-								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name])
+								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
+								'type' => 'success'
 							]]);	
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name])]]);
+					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 				}
 				// recursively replace images with actual $_FILES content according to content nesting
 				if (array_key_exists('composedComponent_files', $_FILES)){
@@ -88,12 +89,14 @@ class FORMS extends API {
 					])) $this->response([
 						'status' => [
 							'name' => $component_name,
-							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name])
+							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
+							'type' => 'success'
 						]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('assemble.edit_component_not_saved')
+						'msg' => LANG::GET('assemble.edit_component_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -112,7 +115,7 @@ class FORMS extends API {
 					$component['content'] = json_decode($component['content']);
 					$this->response(['body' => $component, 'name' => $component['name']]);
 				}
-				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID])]]);
+				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 				break;
 		}
 	}
@@ -137,7 +140,7 @@ class FORMS extends API {
 			]);
 		}
 		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['id' => '', 'name' =>''];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID])];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
@@ -320,7 +323,7 @@ class FORMS extends API {
 			'alias' => '',
 			'context' => ''
 		];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID])];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing forms lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
@@ -479,9 +482,9 @@ class FORMS extends API {
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
-				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing")]]);
+				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name])]]);
+					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 				}
 
 				// recursively check for identifier
@@ -508,7 +511,7 @@ class FORMS extends API {
 						$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
 						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
 					}
-					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier')]]);
+					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
 				}
 
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
@@ -527,7 +530,8 @@ class FORMS extends API {
 						])) $this->response([
 							'status' => [
 								'name' => $this->_payload->name,
-								'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name])
+								'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+								'type' => 'success'
 							]]);	
 				}
 
@@ -542,12 +546,14 @@ class FORMS extends API {
 					])) $this->response([
 						'status' => [
 							'name' => $this->_payload->name,
-							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name])
+							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+							'type' => 'success'
 						]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('assemble.edit_form_not_saved')
+						'msg' => LANG::GET('assemble.edit_form_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 		}
@@ -585,24 +591,27 @@ class FORMS extends API {
 						])) $this->response([
 							'status' => [
 								'name' => $bundle[':name'],
-								'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']])
+								'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']]),
+								'type' => 'success'
 							]]);	
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']])]]);
+					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute($bundle)) $this->response([
 						'status' => [
 							'name' => $bundle[':name'],
-							'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']])
+							'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']]),
+							'type' => 'success'
 						]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('assemble.edit_bundle_not_saved')
+						'msg' => LANG::GET('assemble.edit_bundle_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -634,7 +643,7 @@ class FORMS extends API {
 					'content' => '',
 					'hidden' => 0
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist-edit'));

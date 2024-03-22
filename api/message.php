@@ -21,8 +21,8 @@ class MESSAGE extends API {
 				$statement->execute([
 					':id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))
 				]);
-				if (!$recipient = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))])]], 400);
-				if ($recipient['id'] < 2) $this->response(['status' => ['msg' => LANG::GET('message.forbidden')]], 403);
+				if (!$recipient = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]), 'type' => 'error']], 400);
+				if ($recipient['id'] < 2) $this->response(['status' => ['msg' => LANG::GET('message.forbidden'), 'type' => 'error']], 403);
 				
 				$message = [
 					'from_user' => $_SESSION['user']['id'],
@@ -34,12 +34,14 @@ class MESSAGE extends API {
 				if ($statement->execute($message)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_success'),
-						'redirect' => $this->_redirect
+						'redirect' => $this->_redirect,
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
-						'name' => LANG::GET('message.send_failure'),
-						'redirect' => false
+						'msg' => LANG::GET('message.send_failure'),
+						'redirect' => false,
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -97,12 +99,14 @@ class MESSAGE extends API {
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.delete_success'),
-						'redirect' => $this->_redirect ? : 'inbox'
+						'redirect' => $this->_redirect ? : 'inbox',
+						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
-						'name' => LANG::GET('message.delete_failure'),
-						'redirect' => false
+						'msg' => LANG::GET('message.delete_failure'),
+						'redirect' => false,
+						'type' => 'error'
 					]]);
 				break;
 		}
@@ -110,7 +114,7 @@ class MESSAGE extends API {
 	}
 	
 	public function notification(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header')]], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id']

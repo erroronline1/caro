@@ -28,7 +28,7 @@ class TEXTTEMPLATE extends API {
 
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 				preg_match("/[^\w\d]/m", $chunk[':name'], $matches);
-				if ($matches) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']])]]);
+				if ($matches) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
@@ -45,7 +45,8 @@ class TEXTTEMPLATE extends API {
 						])) $this->response([
 							'status' => [
 								'name' => $chunk[':name'],
-								'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']])
+								'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
+								'type' => 'success'
 							]]);	
 				}
 
@@ -53,12 +54,14 @@ class TEXTTEMPLATE extends API {
 				if ($statement->execute($chunk)) $this->response([
 						'status' => [
 							'name' => $chunk[':name'],
-							'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']])
+							'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
+							'type' => 'success'
 						]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('texttemplate.edit_chunk_not_saved')
+						'msg' => LANG::GET('texttemplate.edit_chunk_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -89,7 +92,7 @@ class TEXTTEMPLATE extends API {
 					'language' => '',
 					'type' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_chunk_not_found', [':name' => $this->_requestedID])];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing chunks lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
@@ -283,24 +286,27 @@ class TEXTTEMPLATE extends API {
 						])) $this->response([
 							'status' => [
 								'name' => $template[':name'],
-								'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']])
+								'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
+								'type' => 'success'
 							]]);	
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $template[':name']])]]);
+					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]), 'type' => 'error']]);
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-post'));
 				if ($statement->execute($template)) $this->response([
 						'status' => [
 							'name' => $template[':name'],
-							'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']])
+							'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
+							'type' => 'success'
 						]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('texttemplate.edit_template_not_saved')
+						'msg' => LANG::GET('texttemplate.edit_template_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -331,7 +337,7 @@ class TEXTTEMPLATE extends API {
 					'language' => '',
 					'type' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
@@ -503,7 +509,7 @@ class TEXTTEMPLATE extends API {
 			'name' => '',
 		];
 
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID])];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing templates lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));

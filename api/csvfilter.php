@@ -40,24 +40,27 @@ class CSVFILTER extends API {
 						])) $this->response([
 							'status' => [
 								'name' => $filter[':name'],
-								'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']])
+								'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
+								'type' => 'success'
 							]]);	
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']])]]);
+					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 				}
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-post'));
 				if ($statement->execute($filter)) $this->response([
 						'status' => [
 							'name' => $filter[':name'],
-							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']])
+							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
+							'type' => 'success'
 						]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('csvfilter.edit_filter_not_saved')
+						'msg' => LANG::GET('csvfilter.edit_filter_not_saved'),
+						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
@@ -83,7 +86,7 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID])];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-datalist'));
@@ -195,7 +198,8 @@ class CSVFILTER extends API {
 				if (!$filter) $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('csvfilter.error_filter_not_found')
+						'msg' => LANG::GET('csvfilter.error_filter_not_found'),
+						'type' => 'error'
 					]]);
 				$content = json_decode($filter['content'], true);
 
@@ -203,7 +207,8 @@ class CSVFILTER extends API {
 				if (!$inputfile) $this->response([
 					'status' => [
 						'name' => false,
-						'msg' => LANG::GET('csvfilter.use_filter_no_input_file')
+						'msg' => LANG::GET('csvfilter.use_filter_no_input_file'),
+						'type' => 'error'
 					]]);
 				$content['filesetting']['source'] = $inputfile;
 				if (!array_key_exists('dialect', $content['filesetting'])) $content['filesetting']['dialect'] = INI['csv']['dialect'];
@@ -216,7 +221,8 @@ class CSVFILTER extends API {
 						if (!$comparefile) $this->response([
 							'status' => [
 								'name' => false,
-								'msg' => LANG::GET('csvfilter.use_filter_no_compare_file', [':name' => $filtertype['filesetting']['source']])
+								'msg' => LANG::GET('csvfilter.use_filter_no_compare_file', [':name' => $filtertype['filesetting']['source']]),
+								'type' => 'error'
 							]]);
 						$filtertype['filesetting']['source'] = $comparefile;
 						$comparefileindex++;
@@ -304,7 +310,7 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_template_not_found', [':name' => $this->_requestedID])];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-datalist'));

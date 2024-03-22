@@ -64,7 +64,7 @@ class ORDER extends API {
 				if(!count($order_data['items'])) $this->response([], 406);
 				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 
-				if ($result['status']['msg']==LANG::GET('order.saved')){
+				if ($result['status']['msg'] === LANG::GET('order.saved')){
 					$query=strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . implode("','", $approvedIDs) . "'"]);
 					$statement = $this->_pdo->prepare($query);
 					$statement->execute();
@@ -366,7 +366,8 @@ class ORDER extends API {
 			$result=[
 			'status' => [
 				'id' => false,
-				'msg' => LANG::GET('order.saved')
+				'msg' => LANG::GET('order.saved'),
+				'type' => 'success'
 			]];
 			$statement->closeCursor();
 			$this->alertUserGroup('purchase', LANG::GET('order.alert_purchase'), 'permission');		
@@ -374,7 +375,8 @@ class ORDER extends API {
 		else $result=[
 			'status' => [
 				'id' => false,
-				'msg' => LANG::GET('order.failed_save')
+				'msg' => LANG::GET('order.failed_save'),
+				'type' => 'error'
 			]];
 		return $result;
 	}
@@ -393,7 +395,8 @@ class ORDER extends API {
 					$result = [
 						'status' => [
 							'id' => $this->_pdo->lastInsertId(),
-							'msg' => LANG::GET('order.saved_to_prepared')
+							'msg' => LANG::GET('order.saved_to_prepared'),
+							'type' => 'info'
 						]];
 					break;
 				}
@@ -413,14 +416,15 @@ class ORDER extends API {
 					$result = [
 						'status' => [
 							'id' => $this->_requestedID,
-							'msg' => LANG::GET('order.saved_to_prepared')
+							'msg' => LANG::GET('order.saved_to_prepared'),
+							'type' => 'info'
 						]];
 					break;
 				}
 				
 				$result = $this->postApprovedOrder($processedOrderData);
 
-				if ($result['status']['msg'] == LANG::GET('order.saved')){
+				if ($result['status']['msg'] === LANG::GET('order.saved')){
 					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
 					$statement = $this->_pdo->prepare($query);
 					$statement->execute();
@@ -733,13 +737,15 @@ class ORDER extends API {
 					$result=[
 					'status' => [
 						'id' => false,
-						'msg' => LANG::GET('order.deleted')
+						'msg' => LANG::GET('order.deleted'),
+						'type' => 'success'
 					]];
 				}
 				else $result=[
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('order.failed_delete')
+						'msg' => LANG::GET('order.failed_delete'),
+						'type' => 'error'
 					]];
 				break;
 			}
@@ -825,7 +831,8 @@ class ORDER extends API {
 				}
 				$result=[
 					'status' => [
-						'msg' => LANG::GET('order.' . $this->_subMethod)
+						'msg' => LANG::GET('order.' . $this->_subMethod),
+						'type' => 'info'
 					]];
 				break;
 			case 'GET':
@@ -1142,13 +1149,15 @@ class ORDER extends API {
 					$result = [
 					'status' => [
 						'id' => false,
-						'msg' => LANG::GET('order.deleted')
+						'msg' => LANG::GET('order.deleted'),
+						'type' => 'success'
 					]];
 				}
 				else $result = [
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('order.failed_delete')
+						'msg' => LANG::GET('order.failed_delete'),
+						'type' => 'error'
 					]];
 				break;
 			}

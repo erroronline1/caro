@@ -103,13 +103,14 @@ class FILE extends API {
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, LANG::PROPERTY('file.manager_new_folder')));
 				if ($new_folder){
 					foreach(INI['forbidden']['names'] as $pattern){
-						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['status' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder])]]);
+						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['status' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 					}
 					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
 					UTILITY::storeUploadedFiles([], $new_folder);
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_folder_created', [':name' => $new_folder]),
-						'redirect' => ['filemanager']
+						'redirect' => ['filemanager'],
+						'type' => 'success'
 						]]);
 				}
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
@@ -117,11 +118,13 @@ class FILE extends API {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('files_documents', [':category' => $destination]));
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
-						'redirect' => ['filemanager', $destination]
+						'redirect' => ['filemanager', $destination],
+						'type' => 'success'
 					]]);
 				}
 				$this->response(['status' => [
-					'msg' => LANG::GET('file.manager_error')
+					'msg' => LANG::GET('file.manager_error'),
+					'type' => 'error'
 				]]);
 		break;
 			case 'GET':
@@ -239,10 +242,12 @@ class FILE extends API {
 				else $success = UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
 				if ($success) $this->response(['status' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
-					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null]
+					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null],
+					'type' => 'success'
 				]]);
 				else $this->response(['status' => [
-					'msg' => LANG::GET('file.manager_error')
+					'msg' => LANG::GET('file.manager_error'),
+					'type' => 'error'
 				]]);
 				break;
 		}
@@ -307,12 +312,14 @@ class FILE extends API {
 					])) $this->response([
 						'status' => [
 							'name' => $name,
-							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name])
+							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name]),
+							'type' => 'success'
 						]]);
 					else $this->response([
 						'status' => [
 							'name' => false,
-							'name' => LANG::GET('file.edit_bundle_not_saved')
+							'msg' => LANG::GET('file.edit_bundle_not_saved'),
+							'type' => 'error'
 						]]);
 				break;
 			case 'GET':
@@ -334,7 +341,7 @@ class FILE extends API {
 					':name' => $this->_requestedFolder
 				]);
 				if (!$bundle = $statement->fetch(PDO::FETCH_ASSOC)) $bundle = ['name' => '', 'content' => '', 'active' => null];
-				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['status'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder])];
+				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['status'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
 		
 				$return['body'] = [
 					'form' => [
@@ -425,11 +432,13 @@ class FILE extends API {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.sharepoint_upload_header')], UTILITY::directory('sharepoint'), [$_SESSION['user']['name']]);
 					$this->response(['status' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
-						'redirect' => ['sharepoint']
+						'redirect' => ['sharepoint'],
+						'type' => 'success'
 					]]);
 				}
 				$this->response(['status' => [
-					'msg' => LANG::GET('file.manager_error')
+					'msg' => LANG::GET('file.manager_error'),
+					'type' => 'error'
 				]]);
 		break;
 			case 'GET':

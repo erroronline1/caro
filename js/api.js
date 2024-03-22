@@ -80,8 +80,8 @@ export const api = {
 		}, 300);
 	},
 	loadindicatorTimeout: [],
-	toast: function (msg) {
-		new Toast(msg);
+	toast: function (msg, type) {
+		new Toast(msg, type);
 	},
 	update_header: function (string = "") {
 		document.querySelector("header>h1").innerHTML = string;
