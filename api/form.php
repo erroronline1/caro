@@ -220,7 +220,6 @@ class FORMS extends API {
 				$component_approve = $component['approve'];
 				unset($component['approve']);
 
-
 				// put hidden attribute if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
 				$statement->execute([
@@ -242,8 +241,7 @@ class FORMS extends API {
 							]]);	
 				}
 
-				if (!in_array($component_approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
-				$component_approve = array_search($component_approve, LANGUAGEFILE['units']);
+				if (!($component_approve = array_search($component_approve, LANGUAGEFILE['units']))) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
@@ -287,13 +285,18 @@ class FORMS extends API {
 					':context' => 'component',
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($component)
-					])) $this->response([
+					])) {
+						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => $component_name]);
+						$this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
+						$this->alertUserGroup(['permission' => ['ceo', 'qmo']], $message);
+						$this->response([
 						'status' => [
 							'name' => $component_name,
 							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
 							'reload' => 'component_editor',
 							'type' => 'success'
 						]]);
+				}
 				else $this->response([
 					'status' => [
 						'name' => false,
@@ -620,13 +623,18 @@ class FORMS extends API {
 					':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
 					':author' => $_SESSION['user']['name'],
 					':content' => implode(',', $this->_payload->content)
-					])) $this->response([
+					])) {
+						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => $this->_payload->name]);
+						$this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
+						$this->alertUserGroup(['permission' => ['ceo', 'qmo']], $message);
+						$this->response([
 						'status' => [
 							'name' => $this->_payload->name,
 							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
 							'reload' => 'form_editor',
 							'type' => 'success'
 						]]);
+				}
 				else $this->response([
 					'status' => [
 						'name' => false,
