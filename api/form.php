@@ -11,120 +11,6 @@ class FORMS extends API {
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
-	public function component(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				$component = json_decode($this->_payload->composedComponent, true);
-				$component_name = $component['name'];
-				unset($component['name']);
-				$component_hidden = intval($component['hidden']);
-				unset($component['hidden']);
-				$component_approve = $component['approve'];
-				unset($component['approve']);
-
-
-				// put hidden attribute if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
-				$statement->execute([
-					':name' => $component_name
-				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
-				if ($exists && json_decode($exists['content'], true) == $component) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
-					if ($statement->execute([
-						':alias' => '',
-						':context' => 'component',
-						':hidden' => $component_hidden,
-						':id' => $exists['id']
-						])) $this->response([
-							'status' => [
-								'name' => $component_name,
-								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
-								'type' => 'success'
-							]]);	
-				}
-
-				if (!in_array($component_approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
-				$component_approve = array_search($component_approve, LANGUAGEFILE['units']);
-
-				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
-				}
-				// recursively replace images with actual $_FILES content according to content nesting
-				if (array_key_exists('composedComponent_files', $_FILES)){
-					$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . date('YmdHis')]);
-					$files=[];
-					foreach($uploads as $path){
-						UTILITY::resizeImage($path, 2048, UTILITY_IMAGE_REPLACE);
-						// retrieve actual filename with prefix dropped to compare to upload filename
-						// boundary is underscore, actual underscores within uploaded file name will be reinserted
-						$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
-						$files[$filename] = substr($path, 1);
-					}
-					function replace_images($element, $filearray){
-						$result = [];
-						foreach($element as $sub){
-							if (array_is_list($sub)){
-								$result[] = replace_images($sub, $filearray);
-							} else {
-								if ($sub['type'] === 'image'){
-									preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
-									$filename = $fakefilename[0][count($fakefilename[0])-1];
-									if ($filename && array_key_exists($filename, $filearray)){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
-										$sub['attributes']['name'] = $filename;
-										$sub['attributes']['url'] = $filearray[$filename];
-									}
-								}
-								$result[] = $sub;
-							}
-						}
-						return $result;
-					}
-					$component['content'] = replace_images($component['content'], $files);
-				}
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
-				if ($statement->execute([
-					':name' => $component_name,
-					':alias' => '',
-					':context' => 'component',
-					':author' => $_SESSION['user']['name'],
-					':content' => json_encode($component)
-					])) $this->response([
-						'status' => [
-							'name' => $component_name,
-							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
-							'type' => 'success'
-						]]);
-				else $this->response([
-					'status' => [
-						'name' => false,
-						'msg' => LANG::GET('assemble.edit_component_not_saved'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'GET':
-				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
-					$statement->execute([
-						':id' => $this->_requestedID
-					]);
-				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
-					$statement->execute([
-						':name' => $this->_requestedID
-					]);
-				}
-				if ($component = $statement->fetch(PDO::FETCH_ASSOC)){
-					$component['content'] = json_decode($component['content']);
-					$this->response(['body' => $component, 'name' => $component['name']]);
-				}
-				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
-				break;
-		}
-	}
-
 	public function component_editor(){
 		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$componentdatalist = [];
@@ -307,10 +193,121 @@ class FORMS extends API {
 				]]
 			]
 		];
-
 		if (array_key_exists('content', $component)) $return['body']['component'] = json_decode($component['content']);
-
 		$this->response($return);
+	}
+
+	public function component(){
+		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$component = json_decode($this->_payload->composedComponent, true);
+				$component_name = $component['name'];
+				unset($component['name']);
+				$component_hidden = intval($component['hidden']);
+				unset($component['hidden']);
+				$component_approve = $component['approve'];
+				unset($component['approve']);
+
+
+				// put hidden attribute if anything else remains the same
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+				$statement->execute([
+					':name' => $component_name
+				]);
+				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($exists && json_decode($exists['content'], true) == $component) {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
+					if ($statement->execute([
+						':alias' => '',
+						':context' => 'component',
+						':hidden' => $component_hidden,
+						':id' => $exists['id']
+						])) $this->response([
+							'status' => [
+								'name' => $component_name,
+								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
+								'type' => 'success'
+							]]);	
+				}
+
+				if (!in_array($component_approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
+				$component_approve = array_search($component_approve, LANGUAGEFILE['units']);
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
+				}
+				// recursively replace images with actual $_FILES content according to content nesting
+				if (array_key_exists('composedComponent_files', $_FILES)){
+					$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . date('YmdHis')]);
+					$files=[];
+					foreach($uploads as $path){
+						UTILITY::resizeImage($path, 2048, UTILITY_IMAGE_REPLACE);
+						// retrieve actual filename with prefix dropped to compare to upload filename
+						// boundary is underscore, actual underscores within uploaded file name will be reinserted
+						$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
+						$files[$filename] = substr($path, 1);
+					}
+					function replace_images($element, $filearray){
+						$result = [];
+						foreach($element as $sub){
+							if (array_is_list($sub)){
+								$result[] = replace_images($sub, $filearray);
+							} else {
+								if ($sub['type'] === 'image'){
+									preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
+									$filename = $fakefilename[0][count($fakefilename[0])-1];
+									if ($filename && array_key_exists($filename, $filearray)){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
+										$sub['attributes']['name'] = $filename;
+										$sub['attributes']['url'] = $filearray[$filename];
+									}
+								}
+								$result[] = $sub;
+							}
+						}
+						return $result;
+					}
+					$component['content'] = replace_images($component['content'], $files);
+				}
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
+				if ($statement->execute([
+					':name' => $component_name,
+					':alias' => '',
+					':context' => 'component',
+					':author' => $_SESSION['user']['name'],
+					':content' => json_encode($component)
+					])) $this->response([
+						'status' => [
+							'name' => $component_name,
+							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
+							'type' => 'success'
+						]]);
+				else $this->response([
+					'status' => [
+						'name' => false,
+						'msg' => LANG::GET('assemble.edit_component_not_saved'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				if (intval($this->_requestedID)){
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+					$statement->execute([
+						':id' => $this->_requestedID
+					]);
+				} else {
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+					$statement->execute([
+						':name' => $this->_requestedID
+					]);
+				}
+				if ($component = $statement->fetch(PDO::FETCH_ASSOC)){
+					$component['content'] = json_decode($component['content']);
+					$this->response(['body' => $component, 'name' => $component['name']]);
+				}
+				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+				break;
+		}
 	}
 
 	public function form_editor(){
@@ -524,7 +521,7 @@ class FORMS extends API {
 						if (array_is_list($sub)){
 							$hasindentifier = check4identifier($sub);
 						} else {
-								if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasindentifier = true;
+							if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasindentifier = true;
 						}
 					}
 					return $hasindentifier;
@@ -584,6 +581,180 @@ class FORMS extends API {
 						'msg' => LANG::GET('assemble.edit_form_not_saved'),
 						'type' => 'error'
 					]]);
+				break;
+		}
+	}
+
+	public function approval(){
+		if (!(array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'PUT':
+				$approveas = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.approve_as_select'));
+				if (!$approveas) $this->response([
+					'status' => [
+						'msg' => LANG::GET('assemble.approve_not_saved'),
+						'type' => 'error'
+					]]);
+				$approveas = explode(', ', $approveas);
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+				$statement->execute([':id' => $this->_requestedID]);
+				$approve = $statement->fetch(PDO::FETCH_ASSOC);
+				$approval = json_encode(
+					[
+						'name' => $_SESSION['user']['name'],
+						'date' => date('Y-m-d H:i:s')
+					]
+				);
+				if (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.ceo'), $approveas)){
+					$approve['ceo_approval'] = $approval;
+				}
+				if (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.qmo'), $approveas)){
+					$approve['qmo_approval'] = $approval;
+				}
+				if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.supervisor'), $approveas)){
+					$approve['supervisor_approval'] = $approval;
+				}
+
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put-approve'));
+				if ($statement->execute([
+					':id' => $approve['id'],
+					':ceo_approval' => $approve['ceo_approval'] ? : '',
+					':qmo_approval' =>$approve['qmo_approval'] ? : '',
+					':supervisor_approval' => $approve['supervisor_approval'] ? : ''
+				])) $this->response([
+						'status' => [
+							'msg' => LANG::GET('assemble.approve_saved') . "<br />". ($approve['ceo_approval'] && $approve['qmo_approval'] && $approve['supervisor_approval'] ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
+							'type' => 'success'
+						]]);
+				else $this->response([
+					'status' => [
+						'msg' => LANG::GET('assemble.approve_not_saved'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				$componentselection = $formselection = $approvalposition = [];
+
+				// prepare all unapproved elements
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
+				$statement->execute();
+				$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+				$statement->execute();
+				$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$unapproved = ['forms' => [], 'components' => []];
+				$hidden = [];
+				foreach(array_merge($components, $forms) as $element){
+					if ($element['context'] === 'bundle') continue;
+					if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
+					if (!in_array($element['context'] . $element['name'], $hidden) && (!$element['ceo_approval'] || !$element['qmo_approval'] || !$element['supervisor_approval'])) {
+						switch ($element['context']){
+							case 'component':
+								$sort = ['unapproved' => 'components', 'selection' => 'componentselection'];
+								break;
+							default:
+							$sort = ['unapproved' => 'forms', 'selection' => 'formselection'];
+						}						
+						if (!in_array($element['name'], array_keys($unapproved[$sort['unapproved']]))){
+							$unapproved[$sort['unapproved']][$element['name']] = $element['content'];
+							if (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval']){
+								${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
+							}
+							if (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval']){
+								${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
+							}
+							if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval']){
+								${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
+							}
+						}
+					}
+					$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
+				}
+				$return = ['body'=> ['content' => [
+					[
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('assemble.approve_component_select'),
+								'onchange' => "api.form('get', 'approval', this.value)"
+							],
+							'content' => $componentselection
+						], [
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('assemble.approve_form_select'),
+								'onchange' => "api.form('get', 'approval', this.value)"
+							],
+							'content' => $formselection
+						]
+					], [
+						[
+							'type' => 'hr'
+						]
+					]
+				]]];
+				if ($this->_requestedID){
+					// recursively delete required attributes
+					function unrequire($element){
+						$result = [];
+						foreach($element as $sub){
+							if (array_is_list($sub)){
+								array_push($result, ...unrequire($sub));
+							} else {
+								if (array_key_exists('attributes', $sub)){
+									unset ($sub['attributes']['required']);
+									unset ($sub['attributes']['data-required']);
+								}
+								if ($sub) $result[] = $sub;
+							}
+						}
+						return [$result];
+					}
+
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+					$statement->execute([':id' => $this->_requestedID]);
+					$approve = $statement->fetch(PDO::FETCH_ASSOC);
+					if (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$approve['ceo_approval']){
+						$approvalposition[LANG::GET('permissions.ceo')] = [];
+					}
+					if (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && !$approve['qmo_approval']){
+						$approvalposition[LANG::GET('permissions.qmo')] = [];
+					}
+					if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && !$approve['supervisor_approval']){
+						$approvalposition[LANG::GET('permissions.supervisor')] = [];
+					}
+					if ($approve['context'] === 'component'){
+						array_push($return['body']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
+					}
+					else {
+						foreach(explode(',', $approve['content']) as $component){
+							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
+							$statement->execute([':name' => $component]);
+							$cmpnnt = $statement->fetch(PDO::FETCH_ASSOC);
+							array_push($return['body']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
+						}
+					}
+					array_push($return['body']['content'], 
+						[
+							[
+								'type' => 'hr'
+							]
+						],[
+							[
+								'type' => 'checkbox',
+								'content' => $approvalposition,
+								'description' => LANG::GET('assemble.approve_as_select')
+							]
+						]
+					);
+					$return['body']['form'] = [
+						'data-usecase' => 'approval',
+						'action' => "javascript: api.form('put', 'approval', " . $this->_requestedID . ")",
+						'data-confirm' => true
+					];
+				}
+				$this->response($return);
 				break;
 		}
 	}

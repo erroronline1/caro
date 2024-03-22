@@ -81,7 +81,7 @@ export const api = {
 	},
 	loadindicatorTimeout: [],
 	update_header: function (string = "") {
-		document.querySelector("header>h1").innerHTML = string;
+		if (string) document.querySelector("header>h1").innerHTML = string;
 		window.scrollTo({
 			top: 0,
 			behavior: "smooth",
@@ -376,11 +376,14 @@ export const api = {
 		get form elements from database.
 		notice only the first requested form will appear. later duplicates will be ignored.
 
-		get form/component_editor/{name}
-		get form/form_editor/{name}
+		get form/component_editor/{name|id}
+		get form/form_editor/{name|id}
 
 		get form/component/{name}
 		post form/component
+
+		get form/approval/{id}
+		put form/approval/{id}
 
 		get form/form/{name}
 		post form/form
@@ -392,9 +395,9 @@ export const api = {
 			title = {
 				component_editor: LANG.GET("menu.forms_manage_components"),
 				form_editor: LANG.GET("menu.forms_manage_forms"),
+				approval: LANG.GET("menu.forms_manage_approval"),
 			},
 			composedComponent;
-
 		switch (method) {
 			case "get":
 				switch (request[1]) {
@@ -424,8 +427,10 @@ export const api = {
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
+					case "approval":
 					case "bundle":
 					case "form":
+						api.update_header(title[request[1]]);
 						successFn = function (data) {
 							if (data.body) {
 								const body = new Assemble(data.body);
@@ -449,6 +454,22 @@ export const api = {
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
+						break;
+				}
+				break;
+			case "put":
+				switch (request[1]) {
+					case "approval":
+						successFn = function (data) {
+							if (data.body) {
+								const body = new Assemble(data.body);
+								document.getElementById("main").replaceChildren(body.initializeSection());
+								body.processAfterInsertion();
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+						};
+						payload = _.getInputs("[data-usecase=approval]", true);
+						console.log(payload);
 						break;
 				}
 				break;
@@ -478,7 +499,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, composedComponent || request[1] === "bundle");
+		api.send(method, request, successFn, null, payload, composedComponent || request[1] === "bundle" || method === "put");
 	},
 	message: (method, ...request) => {
 		/*

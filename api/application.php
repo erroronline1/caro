@@ -119,6 +119,9 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['onpointerup' => "api.purchase('get', 'product')"];
 		}
+		if (array_intersect(['admin', 'supervisor', 'qmo', 'ceo'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
+		}
 
 		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
 	}

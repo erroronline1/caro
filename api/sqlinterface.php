@@ -175,6 +175,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id"
 		],
+		'form_put-approve' => [
+			'mysql' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id"
+		],
 		'form_form-datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' AND context != 'bundle' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' AND context != 'bundle' ORDER BY name ASC, date DESC"
