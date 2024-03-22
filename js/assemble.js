@@ -317,7 +317,6 @@ export class Toast {
 				msg = document.createElement("span"),
 				div = document.createElement("div");
 			if (type) this.toast.classList.add(type);
-			console.log(this.toast.classList);
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
 			closeimg.onpointerdown = new Function("document.getElementById('toast').close();");
