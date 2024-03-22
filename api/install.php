@@ -37,6 +37,9 @@ $queries = [
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hidden` tinyint NOT NULL," .
+				"	`ceo_approval` json NULL DEFAULT NULL," .
+				"	`qmo_approval` json NULL DEFAULT NULL," .
+				"	`supervisor_approval` json NULL DEFAULT NULL" .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -71,8 +74,8 @@ $queries = [
 				"	`to_user` int NOT NULL," .
 				"	`message` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`timestamp` timestamp NOT NULL," .
-				"	`notified` tinyint DEFAULT NULL," .
-				"	`seen` tinyint DEFAULT NULL," .
+				"	`notified` tinyint NULL DEFAULT NULL," .
+				"	`seen` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -84,11 +87,11 @@ $queries = [
 				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`active` tinyint NOT NULL," .
-				"	`protected` tinyint NOT NULL," .
-				"	`trading_good` tinyint NOT NULL," .
-				"	`checked` timestamp," .
-				"	`incorporated` tinyint NULL," .
+				"	`active` tinyint NULL DEFAULT NULL," .
+				"	`protected` tinyint NULL DEFAULT NULL," .
+				"	`trading_good` tinyint NULL DEFAULT NULL," .
+				"	`checked` timestamp NULL DEFAULT NULLE," .
+				"	`incorporated` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -188,7 +191,10 @@ $queries = [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL" .
+				"	hidden tinyint NOT NULL," .
+				"	ceo_approval varchar(MAX) NULL DEFAULT NULL," .
+				"	qmo_approval varchar(MAX) NULL DEFAULT NULL," .
+				"	supervisor_approval varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
@@ -223,8 +229,8 @@ $queries = [
 				"	to_user int NOT NULL," .
 				"	message varchar(MAX) NOT NULL," .
 				"	timestamp smalldatetime NOT NULL," .
-				"	notified tinyint DEFAULT NULL," .
-				"	seen tinyint DEFAULT NULL," .
+				"	notified tinyint NULL DEFAULT NULL," .
+				"	seen tinyint NULL DEFAULT NULL," .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_products', N'U') IS NULL " .
@@ -236,11 +242,11 @@ $queries = [
 				"	article_alias varchar(MAX) NOT NULL," .
 				"	article_unit varchar(MAX) NOT NULL," .
 				"	article_ean varchar(MAX) NOT NULL," .
-				"	active tinyint NOT NULL," .
-				"	protected tinyint NOT NULL," .
-				"	trading_good tinyint NOT NULL," .
-				"	checked smalldatetime," .
-				"	incorporated tinyint NULL" .
+				"	active tinyint NULL DEFAULT NULL," .
+				"	protected tinyint NULL DEFAULT NULL," .
+				"	trading_good tinyint NULL DEFAULT NULL," .
+				"	checked smalldatetime NULL DEFAULT NULL," .
+				"	incorporated tinyint NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .

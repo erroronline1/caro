@@ -1,6 +1,5 @@
 <?php
 // add and edit form components and forms
-// Y U NO DELETE? because of audit safety, that's why!
 
 class FORMS extends API {
    // processed parameters for readability
@@ -18,10 +17,13 @@ class FORMS extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$component = json_decode($this->_payload->composedComponent, true);
-				$component_name = $component['name'];			
+				$component_name = $component['name'];
 				unset($component['name']);
-				$component_hidden = intval($component['hidden']);			
+				$component_hidden = intval($component['hidden']);
 				unset($component['hidden']);
+				$component_approve = $component['approve'];
+				unset($component['approve']);
+
 
 				// put hidden attribute if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
@@ -43,6 +45,9 @@ class FORMS extends API {
 								'type' => 'success'
 							]]);	
 				}
+
+				if (!in_array($component_approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
+				$component_approve = array_search($component_approve, LANGUAGEFILE['units']);
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
@@ -171,6 +176,16 @@ class FORMS extends API {
 			}
 		}
 
+		// prepare unit list for approval
+		$approve = [
+			'hint' => LANG::GET('assemble.compose_component_approve_hint'),
+			'name' => LANG::GET('assemble.compose_component_approve'),
+			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
+		];
+		foreach(LANGUAGEFILE['units'] as $key => $value){
+			$approve['content'][$value] = [];
+		}
+
 		$return['body'] = [
 			'content' => [
 				[
@@ -283,7 +298,8 @@ class FORMS extends API {
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => $component['date']]) . '<br>' : '') .
 						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
-					'hidden' => $component['name'] ? intval($component['hidden']) : 1
+					'hidden' => $component['name'] ? intval($component['hidden']) : 1,
+					'approve' => $approve
 				]],
 				[[
 					'type' => 'trash',
@@ -371,6 +387,16 @@ class FORMS extends API {
 				$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 			}
 		}
+
+		// prepare unit list for approval
+		$approve = [
+			'hint' => LANG::GET('assemble.compose_component_approve_hint'),
+			'name' => LANG::GET('assemble.compose_component_approve'),
+			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
+		];
+		foreach(LANGUAGEFILE['units'] as $key => $value){
+			$approve['content'][$value] = [];
+		}
 		
 		$return['body'] = [
 			'content' => [
@@ -448,7 +474,8 @@ class FORMS extends API {
 						],
 						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br>' : '') .
 						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) : ''),
-						'hidden' => $result['name'] ? intval($result['hidden']) : 1
+						'hidden' => $result['name'] ? intval($result['hidden']) : 1,
+						'approve' => $approve
 					]
 				], [
 					[
@@ -481,6 +508,9 @@ class FORMS extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
+				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
 
 				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
 				foreach(INI['forbidden']['names'] as $pattern){
@@ -534,7 +564,6 @@ class FORMS extends API {
 								'type' => 'success'
 							]]);	
 				}
-
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([

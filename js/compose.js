@@ -166,6 +166,7 @@ export const compose_helper = {
 		let isForm = false,
 			componentContent = [],
 			name = document.getElementById("ComponentName").value,
+			approve = document.getElementById("ComponentApprove").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 
 		function nodechildren(parent) {
@@ -194,9 +195,10 @@ export const compose_helper = {
 			name: name,
 			content: componentContent,
 			hidden: hidden,
+			approve: approve
 		};
 		if (isForm) answer.form = {};
-		if (name && componentContent) return answer;
+		if (name && componentContent && approve && approve !== "0" ) return answer;
 		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), 'error');
 		return null;
 	},
@@ -206,18 +208,20 @@ export const compose_helper = {
 			name = document.getElementById("ComponentName").value,
 			alias = document.getElementById("ComponentAlias").value,
 			context = document.getElementById("ComponentContext").value,
+			approve = document.getElementById("ComponentApprove").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
-		if (name && context && context !== "0" && content.length)
+		if (name && context && context !== "0" && approve && approve !== "0" && content.length)
 			return {
 				name: name,
 				alias: alias,
 				context: context,
 				content: content,
 				hidden: hidden,
+				approve: approve
 			};
 		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), 'error');
 		return null;
@@ -939,14 +943,15 @@ export class Compose extends Assemble {
 			hidden: {
 				name: LANG.GET("assemble.edit_component_hidden"),
 				hint: LANG.GET("assemble.edit_component_hidden_hint"),
-			},
+			}
 		}
 	) {
 		let result = [],
 			alias = this.currentElement.alias,
 			context = this.currentElement.context,
 			prefilled = Boolean(this.currentElement.value),
-			hidden = Boolean(this.currentElement.hidden);
+			hidden = Boolean(this.currentElement.hidden),
+			approve = this.currentElement.approve;
 		this.currentElement = {
 			type: "textinput",
 			hint: this.currentElement.hint,
@@ -984,6 +989,20 @@ export class Compose extends Assemble {
 				content: context.content,
 			};
 			result = result.concat(...this.select());
+		}
+		if (approve){
+			this.currentElement = {
+				type: "select",
+				hint: approve.hint || null,
+				attributes: {
+					id: "ComponentApprove",
+					name: approve.name,
+					required: true,
+				},
+				content: approve.content,
+			};
+			result = result.concat(...this.select());
+
 		}
 		if (prefilled) {
 			const options = {};

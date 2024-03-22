@@ -68,8 +68,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
 		],
 		'user_get-datalist' => [
-			'mysql' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name, orderauth FROM caro_user ORDER BY name ASC"
+			'mysql' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
@@ -168,8 +168,8 @@ class SQLQUERY {
 		],
 
 		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0)"
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL)"
 		],
 		'form_put' => [
 			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id",
