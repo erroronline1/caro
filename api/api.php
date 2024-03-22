@@ -133,22 +133,39 @@ class API {
 
 	/**
 	 * posts a system message to a user group
-	 * @param str $group name of the user group
+	 * @param array $group 'permission'=>[] ||&& 'unit'=>[] reach out for permission holders or unit member or permission holders within units
 	 * @param str $message actual message content
-	 * @param str $permission_or_unit defines user group based on set 'permission' or 'unit'
 	 * no return
+	 * 
+	 * if permission and unit are both set only permission holders within units get the message! 
 	 */
-	public function alertUserGroup($group, $message, $permission_or_unit){
-		if ($permission_or_unit == 'permission') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
-		if ($permission_or_unit == 'unit') $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
-		$statement->execute([
-			':group' => $group
-		]);
-		$purchase = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($purchase as $row) {
+	public function alertUserGroup($group = [], $message = ''){
+		$permission = $unit = $recipients = [];
+		if (array_key_exists('permission', $group)){
+			foreach($group['permission'] as $prmssn){
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
+				$statement->execute([
+					':group' => $prmssn
+				]);
+				array_push($permission, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
+			}
+		}
+		if (array_key_exists('unit', $group)){
+			foreach($group['unit'] as $unt){
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
+				$statement->execute([
+					':group' => $unt
+				]);
+				array_push($unit, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
+			}
+		}
+		if ($permission) $recipients = $permission;
+		if ($unit) $recipients = $unit;
+		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
+		foreach($recipients as $rcpnt_id) {
 			$postmessage = [
 				'from_user' => 1,
-				'to_user' => $row['id'],
+				'to_user' => $rcpnt_id,
 				'message' => $message
 			];
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));

@@ -370,7 +370,7 @@ class ORDER extends API {
 				'type' => 'success'
 			]];
 			$statement->closeCursor();
-			$this->alertUserGroup('purchase', LANG::GET('order.alert_purchase'), 'permission');		
+			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
 		}
 		else $result=[
 			'status' => [
@@ -809,11 +809,11 @@ class ORDER extends API {
 						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
 					}
 					$messagepayload[':info'] = array_key_exists('additional_info', $decoded_order_data) ? $decoded_order_data['additional_info'] : '';
-					$this->alertUserGroup($prepared['organizational_unit'], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order',[
+					$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order',[
 						':order' => LANG::GET('order.message', $messagepayload),
 						':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
 						':user' => $_SESSION['user']['name']
-					])) . "\n \n" . $this->_message, 'unit');
+					])) . "\n \n" . $this->_message);
 				}
 				if ($this->_subMethod == 'addinformation'){
 					$order = $statement->fetch(PDO::FETCH_ASSOC);
