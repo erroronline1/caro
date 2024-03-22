@@ -381,12 +381,14 @@ export const api = {
 
 		get form/component/{name}
 		post form/component
+		delete form/component/{id}
 
 		get form/approval/{id}
 		put form/approval/{id}
 
 		get form/form/{name}
 		post form/form
+		delete form/form/{id}
 		*/
 		request = [...request];
 		request.splice(0, 0, "form");
@@ -461,12 +463,8 @@ export const api = {
 				switch (request[1]) {
 					case "approval":
 						successFn = function (data) {
-							if (data.body) {
-								const body = new Assemble(data.body);
-								document.getElementById("main").replaceChildren(body.initializeSection());
-								body.processAfterInsertion();
-							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
 						};
 						payload = _.getInputs("[data-usecase=approval]", true);
 						console.log(payload);
@@ -478,6 +476,7 @@ export const api = {
 					case "component":
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
 						};
 						composedComponent = compose_helper.composeNewComponent();
 						if (!composedComponent) return;
@@ -487,6 +486,7 @@ export const api = {
 					case "form":
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
 						};
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
@@ -497,6 +497,12 @@ export const api = {
 						payload = _.getInputs("[data-usecase=bundle]", true);
 						break;
 				}
+				break;
+			case "delete":
+				successFn = function (data) {
+					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+					if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
+				};
 				break;
 		}
 		api.send(method, request, successFn, null, payload, composedComponent || request[1] === "bundle" || method === "put");

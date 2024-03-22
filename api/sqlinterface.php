@@ -215,6 +215,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
+		'form_delete' => [
+			'mysql' => "DELETE FROM caro_form WHERE id = :id ",
+			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id"
+		],
 
 		'records_post' => [
 			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)",

@@ -193,6 +193,17 @@ class FORMS extends API {
 				]]
 			]
 		];
+		if ($component['name'] && (!$component['ceo_approval'] || !$component['qmo_approval'] || !$component['supervisor_approval']))
+			$return['body']['content'][count($return['body']['content']) - 2][] = [
+				[
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => LANG::GET('assemble.edit_delete'),
+						'onpointerup' => "api.form('delete', 'component', " . $component['id'] . ")" 
+					]
+				]
+			];
+
 		if (array_key_exists('content', $component)) $return['body']['component'] = json_decode($component['content']);
 		$this->response($return);
 	}
@@ -280,6 +291,7 @@ class FORMS extends API {
 						'status' => [
 							'name' => $component_name,
 							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
+							'reload' => 'component_editor',
 							'type' => 'success'
 						]]);
 				else $this->response([
@@ -306,6 +318,35 @@ class FORMS extends API {
 					$this->response(['body' => $component, 'name' => $component['name']]);
 				}
 				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+				break;
+			case 'DELETE':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				$component = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($component['ceo_approval'] && $component['qmo_approval'] && $component['supervisor_approval']) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
+				
+				// recursively check for identifier
+				function deleteImages($element){
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							deleteImages($sub);
+						} else {
+							if (array_key_exists('type', $sub) && $sub['type'] === 'image')
+								UTILITY::delete('.' . $sub['attributes']['url']);
+						}
+					}
+				}
+				deleteImages(json_decode($component['content'], true)['content']);
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_delete'));
+				if ($statement->execute([
+					':id' => $this->_requestedID
+				])) $this->response(['status' => [
+					'msg' => LANG::GET('assemble.edit_component_delete_success'),
+					'type' => 'success',
+					'reload' => 'component_editor'
+					]]);
 				break;
 		}
 	}
@@ -482,6 +523,16 @@ class FORMS extends API {
 				]
 			]
 		];
+		if ($result['name'] && (!$result['ceo_approval'] || !$result['qmo_approval'] || !$result['supervisor_approval']))
+			$return['body']['content'][count($return['body']['content']) - 2][] = [
+				[
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => LANG::GET('assemble.edit_delete'),
+						'onpointerup' => "api.form('delete', 'form', " . $result['id'] . ")" 
+					]
+				]
+			];
 
 		// add used components to response
 		if (array_key_exists('content', $result)) {
@@ -573,6 +624,7 @@ class FORMS extends API {
 						'status' => [
 							'name' => $this->_payload->name,
 							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+							'reload' => 'form_editor',
 							'type' => 'success'
 						]]);
 				else $this->response([
@@ -580,6 +632,23 @@ class FORMS extends API {
 						'name' => false,
 						'msg' => LANG::GET('assemble.edit_form_not_saved'),
 						'type' => 'error'
+					]]);
+				break;
+			case 'DELETE':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
+				$statement->execute([
+					':id' => $this->_requestedID
+				]);
+				$component = $statement->fetch(PDO::FETCH_ASSOC);
+				if ($component['ceo_approval'] && $component['qmo_approval'] && $component['supervisor_approval']) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_delete_failure'), 'type' => 'error']]);
+				
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_delete'));
+				if ($statement->execute([
+					':id' => $this->_requestedID
+				])) $this->response(['status' => [
+					'msg' => LANG::GET('assemble.edit_form_delete_success'),
+					'type' => 'success',
+					'reload' => 'form_editor',
 					]]);
 				break;
 		}
@@ -625,8 +694,9 @@ class FORMS extends API {
 				])) $this->response([
 						'status' => [
 							'msg' => LANG::GET('assemble.approve_saved') . "<br />". ($approve['ceo_approval'] && $approve['qmo_approval'] && $approve['supervisor_approval'] ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
-							'type' => 'success'
-						]]);
+							'type' => 'success',
+							'reload' => 'approval',
+							]]);
 				else $this->response([
 					'status' => [
 						'msg' => LANG::GET('assemble.approve_not_saved'),
@@ -644,6 +714,7 @@ class FORMS extends API {
 				$statement->execute();
 				$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$unapproved = ['forms' => [], 'components' => []];
+				$return = ['body'=> ['content' => [[]]]]; // default first nesting
 				$hidden = [];
 				foreach(array_merge($components, $forms) as $element){
 					if ($element['context'] === 'bundle') continue;
@@ -671,29 +742,31 @@ class FORMS extends API {
 					}
 					$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 				}
-				$return = ['body'=> ['content' => [
+
+				if ($componentselection) $return['body']['content'][0][] = [
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('assemble.approve_component_select'),
+						'onchange' => "api.form('get', 'approval', this.value)"
+					],
+					'content' => $componentselection
+				];
+				if ($formselection) $return['body']['content'][0][] =
+				[
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('assemble.approve_form_select'),
+						'onchange' => "api.form('get', 'approval', this.value)"
+					],
+					'content' => $formselection
+				];
+				if ($componentselection || $formselection) $return['body']['content'][] = [
 					[
-						[
-							'type' => 'select',
-							'attributes' => [
-								'name' => LANG::GET('assemble.approve_component_select'),
-								'onchange' => "api.form('get', 'approval', this.value)"
-							],
-							'content' => $componentselection
-						], [
-							'type' => 'select',
-							'attributes' => [
-								'name' => LANG::GET('assemble.approve_form_select'),
-								'onchange' => "api.form('get', 'approval', this.value)"
-							],
-							'content' => $formselection
-						]
-					], [
-						[
-							'type' => 'hr'
-						]
+						'type' => 'hr'
 					]
-				]]];
+				];
+				else $this->response(['body' => ['content' => $this->noContentAvailable(LANG::GET('assemble.approve_no_approvals'))]]);
+
 				if ($this->_requestedID){
 					// recursively delete required attributes
 					function unrequire($element){
@@ -740,7 +813,7 @@ class FORMS extends API {
 							[
 								'type' => 'hr'
 							]
-						],[
+						], [
 							[
 								'type' => 'checkbox',
 								'content' => $approvalposition,
