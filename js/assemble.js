@@ -310,11 +310,14 @@ export class Toast {
 		this.message = message || undefined;
 		this.duration = duration;
 		this.toast = document.getElementById("toast");
+		this.toast.removeAttribute("class");
 		if (typeof this.message !== "undefined") {
 			const closeimg = document.createElement("img"),
 				pauseimg = document.createElement("img"),
 				msg = document.createElement("span"),
 				div = document.createElement("div");
+			if (type) this.toast.classList.add(type);
+			console.log(this.toast.classList);
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
 			closeimg.onpointerdown = new Function("document.getElementById('toast').close();");
@@ -658,7 +661,7 @@ export class Assemble {
 			new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_form"), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
-		} else new Toast(LANG.GET("general.missing_form_data"), 'error');
+		} else new Toast(LANG.GET("general.missing_form_data"), "error");
 	}
 
 	initialize_SignaturePad() {

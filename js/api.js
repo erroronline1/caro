@@ -47,7 +47,7 @@ export const api = {
 			.then(async (data) => {
 				if (data.status === 203) api.toast(LANG.GET("general.service_worker_get_cache_fallback"));
 				if (data.status === 207) {
-					api.toast(LANG.GET("general.service_worker_post_cache_fallback"));
+					new Toast(LANG.GET("general.service_worker_post_cache_fallback"), "info");
 					_serviceWorker.onPostCache();
 					return;
 				}
@@ -56,7 +56,7 @@ export const api = {
 			.catch((error) => {
 				console.trace(error);
 				if (errorFn != null) errorFn(error);
-				else api.toast(error);
+				new Toast(error, "error");
 			});
 		api.loadindicator(false);
 	},
@@ -80,9 +80,6 @@ export const api = {
 		}, 300);
 	},
 	loadindicatorTimeout: [],
-	toast: function (msg, type) {
-		new Toast(msg, type);
-	},
 	update_header: function (string = "") {
 		document.querySelector("header>h1").innerHTML = string;
 		window.scrollTo({
@@ -180,13 +177,13 @@ export const api = {
 						break;
 					case "delete":
 						successFn = function (data) {
-							api.toast(data.status.msg);
+							new Toast(data.status.msg, data.status.type);
 							api.application("get", request[1], data.status.id);
 						};
 						break;
 					default:
 						successFn = function (data) {
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 							api.application("get", request[1], data.status.id);
 						};
 						payload = _.getInputs("[data-usecase=manual]", true);
@@ -207,7 +204,7 @@ export const api = {
 		request.splice(0, 0, "audit");
 		let payload,
 			successFn = function (data) {
-				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				if (data.body !== undefined) {
 					const options = {};
 					options[LANG.GET("general.ok_button")] = false;
@@ -235,7 +232,7 @@ export const api = {
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 				}
 				break;
@@ -259,7 +256,7 @@ export const api = {
 		request.splice(0, 0, "csvfilter");
 		let payload,
 			successFn = function (data) {
-				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				if (data.log !== undefined) {
 					const dialog = {
 						type: "input",
@@ -284,7 +281,7 @@ export const api = {
 						document.getElementById("main").replaceChildren(body.initializeSection());
 						body.processAfterInsertion();
 					}
-					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				};
 				break;
 			case "post":
@@ -322,7 +319,7 @@ export const api = {
 					document.getElementById("main").replaceChildren(body.initializeSection());
 					body.processAfterInsertion();
 				}
-				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				if (data.status !== undefined && data.status.redirect !== undefined) api.file("get", ...data.status.redirect);
 			},
 			payload,
@@ -347,7 +344,7 @@ export const api = {
 									} else file.style.display = data.status.data.includes(file.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "bundlefilter":
@@ -359,14 +356,14 @@ export const api = {
 									list.parentNode.style.display = data.status.data.includes(list.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 				}
 				break;
 			case "post":
 				successFn = function (data) {
-					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 					if (data.status !== undefined && data.status.redirect !== undefined) api.file("get", ...data.status.redirect);
 				};
 				payload = _.getInputs("[data-usecase=file]", true);
@@ -407,7 +404,7 @@ export const api = {
 								data.body.content.name = data.name;
 								if (data.body.content) compose_helper.importForm([data.body.content]);
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "component_editor":
@@ -424,7 +421,7 @@ export const api = {
 								compose_helper.addComponentMultipartFormToMain();
 								api.preventDataloss.start();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "bundle":
@@ -435,7 +432,7 @@ export const api = {
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "form_editor":
@@ -450,7 +447,7 @@ export const api = {
 								if (data.body.components) compose_helper.importForm(data.body.components);
 								api.preventDataloss.start();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 				}
@@ -459,7 +456,7 @@ export const api = {
 				switch (request[1]) {
 					case "component":
 						successFn = function (data) {
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						composedComponent = compose_helper.composeNewComponent();
 						if (!composedComponent) return;
@@ -468,13 +465,13 @@ export const api = {
 						break;
 					case "form":
 						successFn = function (data) {
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
 					case "bundle":
 						successFn = function (data) {
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						payload = _.getInputs("[data-usecase=bundle]", true);
 						break;
@@ -504,7 +501,7 @@ export const api = {
 		request.splice(0, 0, "message");
 		let payload,
 			successFn = function (data) {
-				api.toast(data.status.msg);
+				new Toast(data.status.msg, data.status.type);
 				if (data.status !== undefined && data.status.redirect) api.message("get", data.status.redirect);
 			},
 			title = {
@@ -524,7 +521,7 @@ export const api = {
 									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					default:
@@ -536,7 +533,7 @@ export const api = {
 								body.processAfterInsertion();
 								api.preventDataloss.start();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 							if (request[1] === "inbox" && _serviceWorker.worker)
 								_serviceWorker.onMessage({
 									unseen: 0,
@@ -548,7 +545,8 @@ export const api = {
 				break;
 			case "post":
 				console.log(request);
-				if (2 in request && request[2] && typeof request[2] === "object") { //passed formdata
+				if (2 in request && request[2] && typeof request[2] === "object") {
+					//passed formdata
 					payload = request[2];
 					delete request[2];
 				} else payload = _.getInputs("[data-usecase=message]", true);
@@ -595,7 +593,7 @@ export const api = {
 
 		let payload,
 			successFn = function (data) {
-				api.toast(data.status.msg);
+				new Toast(data.status.msg, data.status.type);
 				api.purchase("get", request[1], data.status.id);
 			},
 			title = {
@@ -619,7 +617,7 @@ export const api = {
 								body.initializeSection("hr");
 								body.processAfterInsertion();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "filter":
@@ -630,7 +628,7 @@ export const api = {
 									order.parentNode.style.display = data.status.data.includes(order.dataset.filtered) ? "block" : "none";
 								}
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "incorporation":
@@ -647,7 +645,7 @@ export const api = {
 									}
 								});
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					case "mdrsamplecheck":
@@ -664,7 +662,7 @@ export const api = {
 									}
 								});
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					default:
@@ -677,7 +675,7 @@ export const api = {
 								if (request[1] === "approved") orderClient.filter();
 								api.preventDataloss.start();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 				}
 				break;
@@ -688,7 +686,7 @@ export const api = {
 						payload = request[3]; // form data object passed by utility.js
 						delete request[3];
 						successFn = function (data) {
-							api.toast(data.status.msg);
+							new Toast(data.status.msg, data.status.type);
 						};
 						break;
 					default:
@@ -698,12 +696,12 @@ export const api = {
 			case "put":
 				if (["ordered", "received", "archived", "disapproved", "addinformation"].includes(request[3])) {
 					successFn = function (data) {
-						api.toast(data.status.msg);
+						new Toast(data.status.msg, data.status.type);
 					};
 				}
 				if (request[1] == "prepared") {
 					successFn = function (data) {
-						api.toast(data.status.msg);
+						new Toast(data.status.msg, data.status.type);
 						api.purchase("get", "prepared");
 					};
 				}
@@ -737,7 +735,7 @@ export const api = {
 		request.splice(0, 0, "record");
 		let payload,
 			successFn = function (data) {
-				if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				if (data.body !== undefined) {
 					const options = {};
 					options[LANG.GET("general.ok_button")] = false;
@@ -779,7 +777,7 @@ export const api = {
 					case "import":
 						successFn = function (data) {
 							if (data.status !== undefined) {
-								if (data.status.msg !== undefined) api.toast(data.status.msg);
+								if (data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 								if (data.status.data !== undefined) {
 									let inputs = document.querySelectorAll("input, textarea, select");
 									let inputname, groupname, files, a;
@@ -829,7 +827,7 @@ export const api = {
 								body.processAfterInsertion();
 								api.preventDataloss.start();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 				}
 				break;
@@ -856,7 +854,7 @@ export const api = {
 		request.splice(0, 0, "texttemplate");
 		let payload,
 			successFn = function (data) {
-				api.toast(data.status.msg);
+				new Toast(data.status.msg, data.status.type);
 			},
 			title = {
 				chunk: LANG.GET("menu.texttemplate_chunks"),
@@ -871,7 +869,7 @@ export const api = {
 							if (data.body) {
 								new Dialog({ type: "input", header: LANG.GET("menu.texttemplate_texts"), body: data.body });
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 							if (data.data !== undefined) texttemplateClient.data = data.data;
 							if (data.selected !== undefined && data.selected.length) {
 								compose_helper.importTextTemplate(data.selected);
@@ -886,7 +884,7 @@ export const api = {
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();
 							}
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 							if (data.data !== undefined) texttemplateClient.data = data.data;
 							if (data.selected !== undefined && data.selected.length) {
 								compose_helper.importTextTemplate(data.selected);
@@ -899,7 +897,7 @@ export const api = {
 				switch (request[1]) {
 					case "template":
 						successFn = function (data) {
-							if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						};
 						if (!(payload = compose_helper.composeNewTextTemplate())) return;
 						break;
@@ -921,7 +919,7 @@ export const api = {
 		request.splice(0, 0, "tool");
 		let payload,
 			successFn = function (data) {
-				api.toast(data.status.msg);
+				new Toast(data.status.msg, data.status.type);
 				api.user("get", request[1], data.status.id);
 			},
 			title = {
@@ -938,7 +936,7 @@ export const api = {
 						document.getElementById("main").replaceChildren(body.initializeSection());
 						body.processAfterInsertion();
 					}
-					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				};
 				if (request[3] === "display") {
 					payload = _.getInputs("[data-usecase=tool_create_code]");
@@ -964,7 +962,7 @@ export const api = {
 		request.splice(0, 0, "user");
 		let payload,
 			successFn = function (data) {
-				api.toast(data.status.msg);
+				new Toast(data.status.msg, data.status.type);
 				api.user("get", request[1], data.status.id);
 			},
 			title = {
@@ -980,7 +978,7 @@ export const api = {
 						document.getElementById("main").replaceChildren(body.initializeSection());
 						body.processAfterInsertion();
 					}
-					if (data.status !== undefined && data.status.msg !== undefined) api.toast(data.status.msg);
+					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 				};
 				break;
 			case "post":

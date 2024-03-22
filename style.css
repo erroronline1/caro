@@ -134,7 +134,7 @@ dialog {
 
 	&#toast {
 		bottom: 6em;
-
+		border: 3px solid transparent !important;
 		span {
 			display: block;
 			margin-bottom: 1em;
@@ -146,6 +146,15 @@ dialog {
 			position: fixed;
 			background: var(--yellow);
 		}
+	}
+	&#toast.success {
+		border: 3px solid var(--green) !important;
+	}
+	&#toast.error {
+		border: 3px solid var(--red) !important;
+	}
+	&#toast.info {
+		border: 3px solid var(--cta) !important;
 	}
 
 	.confirmButton {
