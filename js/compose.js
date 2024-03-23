@@ -103,10 +103,8 @@ export const compose_helper = {
 			}
 			if (elementName === LANG.GET("assemble.compose_texttemplate") && value) element.texttemplates = true;
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
-			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes))
-				element.attributes.required = true;
-			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes))
-				element.attributes.multiple = true;
+			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
+			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
@@ -180,8 +178,7 @@ export const compose_helper = {
 						else content.push(nodechildren(container));
 					} else {
 						if (node.id in compose_helper.newFormComponents) {
-							if (compose_helper.newFormComponents[node.id].attributes != undefined)
-								delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
+							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
 							content.push(compose_helper.newFormComponents[node.id]);
 							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
 						}
@@ -195,11 +192,11 @@ export const compose_helper = {
 			name: name,
 			content: componentContent,
 			hidden: hidden,
-			approve: approve
+			approve: approve,
 		};
 		if (isForm) answer.form = {};
-		if (name && componentContent && approve && approve !== "0" ) return answer;
-		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), 'error');
+		if (name && componentContent && approve && approve !== "0") return answer;
+		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), "error");
 		return null;
 	},
 	composeNewForm: function () {
@@ -209,21 +206,23 @@ export const compose_helper = {
 			alias = document.getElementById("ComponentAlias").value,
 			context = document.getElementById("ComponentContext").value,
 			approve = document.getElementById("ComponentApprove").value,
+			regulatory_context = document.getElementById('ComponentRegulatoryContext').value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
-		if (name && context && context !== "0" && approve && approve !== "0" && content.length)
+		if (name && context && context !== "0" && content.length)
 			return {
 				name: name,
 				alias: alias,
 				context: context,
 				content: content,
 				hidden: hidden,
-				approve: approve
+				approve: approve,
+				regulatory_context: regulatory_context
 			};
-		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), 'error');
+		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), "error");
 		return null;
 	},
 	composeNewTextTemplate: function () {
@@ -258,7 +257,7 @@ export const compose_helper = {
 				content: templateContent,
 				hidden: hidden,
 			};
-		new Toast(LANG.GET("assemble.edit_template_not_saved_missing"), 'error');
+		new Toast(LANG.GET("assemble.edit_template_not_saved_missing"), "error");
 		return null;
 	},
 
@@ -305,8 +304,8 @@ export const compose_helper = {
 			compose_helper.newFormElements.add(component.name);
 			lookupIdentify(current.content);
 		}
-		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"), 'error');
-		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_form_multiple_signature"), 'error');
+		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"), "error");
+		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_form_multiple_signature"), "error");
 	},
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};
@@ -386,14 +385,7 @@ export const compose_helper = {
 
 			// dragging articles
 			// dropping on hr for reordering
-			if (
-				evnt.target.localName === "hr" &&
-				!(
-					evnt.target.parentNode.parentNode.localName === "section" &&
-					draggedElement.children.item(1) &&
-					draggedElement.children.item(1).firstChild.localName === "section"
-				)
-			) {
+			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
 				// no section insertion
 				// handle only if dropped within the reorder area				console.log('hello');
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
@@ -404,10 +396,7 @@ export const compose_helper = {
 				if (originParent.children.length < 2) {
 					if (originParent.children.length > 0)
 						//    section  article    draggable div                                                                  section    article    container
-						originParent.parentNode.parentNode.parentNode.insertBefore(
-							originParent.children[0].cloneNode(true),
-							originParent.parentNode.parentNode
-						); // adapt to changes in section creation!
+						originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
 					originParent.parentNode.parentNode.remove();
 				}
 				return;
@@ -483,17 +472,9 @@ export const compose_helper = {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute(
-			"ondragover",
-			"compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')"
-		);
+		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
 		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
-		element.setAttribute(
-			"ondrop",
-			"compose_helper.dragNdrop.drop_insert(event, this, " +
-				allowSections +
-				"), this.classList.remove('draggableFormElementHover')"
-		);
+		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -583,8 +564,7 @@ export class Compose extends Assemble {
 					}
 				}
 			});
-			if (elements[0].constructor.name === "Array")
-				content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
+			if (elements[0].constructor.name === "Array") content = content.concat(section, this.createDraggable ? [] : this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
 			// creation form for adding elements
@@ -943,7 +923,7 @@ export class Compose extends Assemble {
 			hidden: {
 				name: LANG.GET("assemble.edit_component_hidden"),
 				hint: LANG.GET("assemble.edit_component_hidden_hint"),
-			}
+			},
 		}
 	) {
 		let result = [],
@@ -951,7 +931,8 @@ export class Compose extends Assemble {
 			context = this.currentElement.context,
 			prefilled = Boolean(this.currentElement.value),
 			hidden = Boolean(this.currentElement.hidden),
-			approve = this.currentElement.approve;
+			approve = this.currentElement.approve,
+			regulatory_context = this.currentElement.regulatory_context;
 		this.currentElement = {
 			type: "textinput",
 			hint: this.currentElement.hint,
@@ -990,7 +971,45 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.select());
 		}
-		if (approve){
+		if (regulatory_context) {
+			const options = {};
+			for (const [key,value] of Object.entries(LANGUAGEFILE.regulatory)) {
+				options[value] = {};
+				if (regulatory_context.includes(value)) options[value].checked = true;
+			}
+			const dialog = [
+				[
+					{
+						type: "checkbox",
+						content: options,
+					},
+				],
+			];
+			this.currentElement = {
+				type: "checkbox",
+				attributes: {
+					id: "ComponentRegulatoryContext",
+					name: LANG.GET("assemble.compose_form_regulatory_context"),
+					value: typeof regulatory_context === 'string' ? regulatory_context.trim() : regulatory_context.join(', '),
+					onpointerdown:
+						"new Dialog({type: 'input', header: '" +
+						LANG.GET("assemble.compose_form_regulatory_context") +
+						"', body:" +
+						JSON.stringify(dialog) +
+						", " +
+						"options:{" +
+						"'" +
+						LANG.GET("assemble.compose_form_cancel") +
+						"': false," +
+						"'" +
+						LANG.GET("assemble.compose_form_confirm") +
+						"': {value: true, class: 'reducedCTA'}," +
+						"}}).then(response => { const e = document.getElementById('ComponentRegulatoryContext'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}})",
+				},
+			};
+			result = result.concat(...this.textinput());
+		}
+		if (approve) {
 			this.currentElement = {
 				type: "select",
 				hint: approve.hint || null,
@@ -1002,7 +1021,6 @@ export class Compose extends Assemble {
 				content: approve.content,
 			};
 			result = result.concat(...this.select());
-
 		}
 		if (prefilled) {
 			const options = {};

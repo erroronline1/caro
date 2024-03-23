@@ -277,25 +277,30 @@ class AUDIT extends API {
 							':date' => json_decode($cmpnnt['ceo_approval'], true)['date'],
 						]);
 			}
+			$regulatory_context = [];
+			if ($form['regulatory_context']){
+				foreach(explode(',', $form['regulatory_context']) as $context){
+					$regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
+				}
+			}
 			$formscontent[] = [
 				'type' => 'text',
-				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]) . " - " .
-					LANG::GET('audit.documents_in_use_approved', [
-						':permission' => LANG::GET('permissions.supervisor'),
-						':name' => json_decode($form['supervisor_approval'], true)['name'],
-						':date' => json_decode($form['supervisor_approval'], true)['date'],
-					]) . " - " .
-					LANG::GET('audit.documents_in_use_approved', [
-						':permission' => LANG::GET('permissions.qmo'),
-						':name' => json_decode($form['qmo_approval'], true)['name'],
-						':date' => json_decode($form['qmo_approval'], true)['date'],
-					]) . " - " .
-					LANG::GET('audit.documents_in_use_approved', [
-						':permission' => LANG::GET('permissions.ceo'),
-						':name' => json_decode($form['ceo_approval'], true)['name'],
-						':date' => json_decode($form['ceo_approval'], true)['date'],
-					]),
-				'content' => implode("\n \n", $componentlist)
+				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
+				'content' => LANG::GET('audit.documents_in_use_approved', [
+					':permission' => LANG::GET('permissions.supervisor'),
+					':name' => json_decode($form['supervisor_approval'], true)['name'],
+					':date' => json_decode($form['supervisor_approval'], true)['date'],
+				]) . "\n" .
+				LANG::GET('audit.documents_in_use_approved', [
+					':permission' => LANG::GET('permissions.qmo'),
+					':name' => json_decode($form['qmo_approval'], true)['name'],
+					':date' => json_decode($form['qmo_approval'], true)['date'],
+				]) . "\n" .
+				LANG::GET('audit.documents_in_use_approved', [
+					':permission' => LANG::GET('permissions.ceo'),
+					':name' => json_decode($form['ceo_approval'], true)['name'],
+					':date' => json_decode($form['ceo_approval'], true)['date'],
+				]) . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
 			];
 		}
 

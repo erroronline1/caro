@@ -168,12 +168,12 @@ class SQLQUERY {
 		],
 
 		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)"
 		],
 		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden WHERE id = :id"
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id"
 		],
 		'form_put-approve' => [
 			'mysql' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id",

@@ -40,6 +40,7 @@ $queries = [
 				"	`ceo_approval` json NULL DEFAULT NULL," .
 				"	`qmo_approval` json NULL DEFAULT NULL," .
 				"	`supervisor_approval` json NULL DEFAULT NULL" .
+				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -194,7 +195,8 @@ $queries = [
 				"	hidden tinyint NOT NULL," .
 				"	ceo_approval varchar(MAX) NULL DEFAULT NULL," .
 				"	qmo_approval varchar(MAX) NULL DEFAULT NULL," .
-				"	supervisor_approval varchar(MAX) NULL DEFAULT NULL" .
+				"	supervisor_approval varchar(MAX) NULL DEFAULT NULL," .
+				"	regulatory_context varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .

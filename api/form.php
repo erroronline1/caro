@@ -379,7 +379,8 @@ class FORMS extends API {
 		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = [
 			'name' => '',
 			'alias' => '',
-			'context' => ''
+			'context' => '',
+			'regulatory_context' => ''
 		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -441,7 +442,12 @@ class FORMS extends API {
 		foreach(LANGUAGEFILE['units'] as $key => $value){
 			$approve['content'][$value] = [];
 		}
-		
+		$regulatory_context = [];
+		if ($result['regulatory_context']){
+			foreach(explode(',', $result['regulatory_context']) as $context){
+				$regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
+			}
+		}
 		$return['body'] = [
 			'content' => [
 				[
@@ -519,7 +525,8 @@ class FORMS extends API {
 						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br>' : '') .
 						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) : ''),
 						'hidden' => $result['name'] ? intval($result['hidden']) : 1,
-						'approve' => $approve
+						'approve' => $approve,
+						'regulatory_context' => $regulatory_context ? : ' '
 					]
 				], [
 					[
@@ -565,9 +572,6 @@ class FORMS extends API {
 			case 'POST':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
-				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
-				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
-
 				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
@@ -599,7 +603,13 @@ class FORMS extends API {
 					}
 					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
 				}
-
+				// convert values to keys for regulatory_context
+				$rc = preg_split('/, /m', $this->_payload->regulatory_context);
+				$regulatory_context = [];
+				foreach($rc as $context){
+					$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
+				}
+				
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
 				$statement->execute([
@@ -612,6 +622,7 @@ class FORMS extends API {
 						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : '',
 						':context' => $this->_payload->context,
 						':hidden' => intval($this->_payload->hidden),
+						':regulatory_context' => implode(',', $regulatory_context),
 						':id' => $exists['id']
 						])) $this->response([
 							'status' => [
@@ -621,13 +632,18 @@ class FORMS extends API {
 							]]);	
 				}
 
+				// if not updated check if approve is set, not earlier
+				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
+				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
+
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_post'));
 				if ($statement->execute([
 					':name' => $this->_payload->name,
 					':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): '',
 					':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
 					':author' => $_SESSION['user']['name'],
-					':content' => implode(',', $this->_payload->content)
+					':content' => implode(',', $this->_payload->content),
+					':regulatory_context' => implode(',', $regulatory_context)
 					])) {
 						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => $this->_payload->name]);
 						$this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
