@@ -233,6 +233,7 @@ class FORMS extends API {
 						':alias' => '',
 						':context' => 'component',
 						':hidden' => $component_hidden,
+						':regulatory_context' => '',
 						':id' => $exists['id']
 						])) $this->response([
 							'status' => [
@@ -285,7 +286,8 @@ class FORMS extends API {
 					':alias' => '',
 					':context' => 'component',
 					':author' => $_SESSION['user']['name'],
-					':content' => json_encode($component)
+					':content' => json_encode($component),
+					':regulatory_context' => ''
 					])) {
 						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => $component_name]);
 						$this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
