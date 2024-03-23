@@ -159,7 +159,7 @@ without a filter none of the vendors products will be treated as a trading good!
 # open tasks
 
 #### application
-refactor languagefile, e.g. mutable and immutable language chunks (order components vs generic language)
+* refactor languagefile
 
 #### assemble
 * multiple signature pads
@@ -171,7 +171,6 @@ refactor languagefile, e.g. mutable and immutable language chunks (order compone
 * import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)
 * suggest next form? (load with identify)
-* regulatory context for forms
 
 #### purchase
 * incorporate product
