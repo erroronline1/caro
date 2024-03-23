@@ -431,6 +431,7 @@ class FORMS extends API {
 		// prepare existing context list
 		foreach(LANGUAGEFILE['formcontext'] as $type => $contexts){
 			foreach($contexts as $context => $display){
+				if ($type === 'identify') $display .= ' *';
 				$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 			}
 		}
@@ -522,7 +523,8 @@ class FORMS extends API {
 						],
 						'context' => [
 							'name' => LANG::GET('assemble.edit_form_context'),
-							'content' => $contextoptions
+							'content' => $contextoptions,
+							'hint' => LANG::GET('assemble.edit_form_context_hint')
 						],
 						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br>' : '') .
 						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) : ''),
@@ -593,6 +595,7 @@ class FORMS extends API {
 				}
 				// check for identifier if context makes it mandatory
 				// do this in advance of updating in case of selecting such a context
+				$this->_payload->context = substr($this->_payload->context, -2) === ' *' ? substr($this->_payload->context, 0, -2) : $this->_payload->context; // unset marking
 				if (in_array($this->_payload->context, array_keys(LANGUAGEFILE['formcontext']['identify']))){
 					$hasindentifier = false;
 					foreach($this->_payload->content as $component){
