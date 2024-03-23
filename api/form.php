@@ -609,10 +609,12 @@ class FORMS extends API {
 					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
 				}
 				// convert values to keys for regulatory_context
-				$rc = preg_split('/, /m', $this->_payload->regulatory_context);
 				$regulatory_context = [];
-				foreach($rc as $context){
-					$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
+				if ($this->_payload->regulatory_context) {
+					$rc = preg_split('/, /m', $this->_payload->regulatory_context);
+					foreach($rc as $context){
+						$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
+					}
 				}
 				
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same

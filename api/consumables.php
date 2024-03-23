@@ -243,7 +243,12 @@ class CONSUMABLES extends API {
 					':id' => $this->_requestedID
 				]);
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
-				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n";
+				
+				// check denial
+				preg_match("/" . LANG::GET('order.incorporation_denied') . ".*/m", $this->_payload->content, $denied);
+				if ($denied) $content .= $denied[0];
+				else $content .= $this->_payload->content;
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
 				if ($statement->execute([
@@ -254,7 +259,7 @@ class CONSUMABLES extends API {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-incorporation'));
 					if ($statement->execute([
 						':id' => $product['id'],
-						':incorporated' => 1
+						':incorporated' => intval(!boolval($denied))
 					])) $this->response([
 						'status' => [
 							'msg' => LANG::GET('order.incorporation_success'),
@@ -298,46 +303,50 @@ class CONSUMABLES extends API {
 
 				$productsPerSlide = 0;
 				$matches = [[]];
-
-				foreach($checks as $row){
-					$row['content'] = explode("\n", $row['content']);
+				$hideduplicates = [];
+				foreach($checks as $check){
+					$check['content'] = explode("\n", $check['content']);
 					$probability = [ 'article_no' => [], 'vendor_name' => []];
-					foreach ($row['content'] as $information){
-						similar_text($information, $product['article_no'], $article_no_percent);
-						if ($article_no_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['article_no'][] = $row['id'];
-						similar_text($information, $product['vendor_name'], $vendor_name_percent);
-						if ($vendor_name_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['vendor_name'][] = $row['id'];
-					}
-					if (array_intersect($probability['article_no'], $probability['vendor_name'])){
-						$article = intval(count($matches) - 1);
-						if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
-							$matches[$article][] = [
-								['type' => 'text',
-								'description' => LANG::GET('order.incorporation_matching_previous'),
+					$identifyproduct = implode(' ', array_slice($check['content'], 0, 3));
+					if (!in_array($identifyproduct, $hideduplicates)){
+						foreach ($check['content'] as $information){
+							similar_text($information, $product['article_no'], $article_no_percent);
+							if ($article_no_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['article_no'][] = $check['id'];
+							similar_text($information, $product['vendor_name'], $vendor_name_percent);
+							if ($vendor_name_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['vendor_name'][] = $check['id'];
+						}
+						if (array_intersect($probability['article_no'], $probability['vendor_name'])){
+							$article = intval(count($matches) - 1);
+							if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
+								$matches[$article][] = [
+									['type' => 'text',
+									'description' => LANG::GET('order.incorporation_matching_previous'),
+									]
+								];
+							}
+							$slide = intval(count($matches[$article]) - 1);
+							$matches[$article][$slide][] = [
+								'type' => 'tile',
+								'attributes' => [
+									'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . $identifyproduct . "'",
+								],
+								'content' => [
+									[
+										'type' => 'text',
+										'content' => implode("\n", $check['content'])
+									]
 								]
 							];
 						}
-						$slide = intval(count($matches[$article]) - 1);
-						$matches[$article][$slide][] = [
-							'type' => 'tile',
-							'attributes' => [
-								'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name'] . "'",
-							],
-							'content' => [
-								[
-									'type' => 'text',
-									'content' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']
-								]
-							]
-						];
-
 					}
+					$hideduplicates[] = $identifyproduct;
 				}
 				if ($matches[0]){
 					array_push($result['body']['content'], ...$matches);
 					$result['body']['content'][] = [
 						[
 							'type' => 'textinput',
+							'hint' => LANG::GET('order.incorporation_matching_previous_hint'),
 							'attributes' => [
 								'name' => LANG::GET('order.incorporation_matching_previous'),
 								'id' => 'incorporationmatchingprevious',
@@ -346,6 +355,15 @@ class CONSUMABLES extends API {
 						]
 					];
 				}
+				$result['body']['content'][] = [
+					[
+						'type' => 'textarea',
+						'hint' => LANG::GET('order.incorporation_denied_hint'),
+						'attributes' => [
+							'name' => LANG::GET('order.incorporation_denied'),
+						]
+					]
+				];
 				$this->response($result);
 				break;
 		}
@@ -777,6 +795,17 @@ class CONSUMABLES extends API {
 				$query = strtr(SQLQUERY::PREPARE('consumables_put-product'),[
 					':incorporated' => $product['incorporated'] === null ? 'NULL' : $product['incorporated'], // without quotes
 				]);
+				if ($product['incorporated'] === null){
+					// record revoked state
+					$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . LANG::GET('order.incorporation_revoked');
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
+					$statement->execute([
+						':type' => 'incorporation',
+						':author' => $_SESSION['user']['name'],
+						':content' => $content
+					]);
+				}
+
 				$statement = $this->_pdo->prepare($query);
 				if ($statement->execute([
 					':id' => $this->_requestedID,
@@ -1015,7 +1044,7 @@ class CONSUMABLES extends API {
 					array_push($result['body']['content'][2],
 						[
 							'type' => 'text',
-							'description' => $product['incorporated'] ? LANG::GET('consumables.edit_product_incorporated_accepted') : LANG::GET('consumables.edit_product_incorporated_rejected')
+							'description' => ($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
 						], [
 							'type' => 'checkbox',
 							'content' => [

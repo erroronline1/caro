@@ -229,7 +229,7 @@ class ORDER extends API {
 						],
 						'content' => [
 							['type' => 'text',
-							'description' => $row['incorporated'] ? '': LANG::GET('order.incorporation_neccessary'),
+							'description' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? '' : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied')),
 							'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 						]
 					];
@@ -238,10 +238,8 @@ class ORDER extends API {
 				if (!$matches[0]) $matches[0][] = [
 					['type' => 'text',
 					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
-					//'content' => []
 					]
 				];
-
 				$result['body']['content'] = $matches;
 				break;
 			}
@@ -751,6 +749,7 @@ class ORDER extends API {
 			}
 		$this->response($result);
 	}
+
 	public function approved(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
