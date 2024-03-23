@@ -595,7 +595,7 @@ class record extends API {
 		$form = $statement->fetch(PDO::FETCH_ASSOC);
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
-			'identifier' => LANG::GET('record.form_export_identifier'),
+			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
