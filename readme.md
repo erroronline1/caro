@@ -164,9 +164,6 @@ without a filter none of the vendors products will be treated as a trading good!
 #### assemble
 * multiple signature pads
 
-#### compose
-* reimport component to edit
-
 #### forms
 * import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)

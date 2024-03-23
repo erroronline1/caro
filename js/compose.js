@@ -3,11 +3,35 @@ this module helps to compose and edit forms according to the passed simplified o
 */
 import { getNextElementID, Assemble } from "./assemble.js";
 
-//chain as much previousElementSibling as iterations. every odd will be deep copied including nodes (aka labels)
-const cloneItems =
-	"for (let i = 0; i < 4; i++){let clone = this.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.cloneNode(i % 2); clone.value = ''; clone.id = compose_helper.getNextElementID(); this.parentNode.insertBefore(clone, this);}";
-
 export const compose_helper = {
+	cloneMultipleItems: function (startNode, offset = -4, numberOfElements = 4) {
+		// positive offset for nodes after fromNode, negative for previous nodes
+		// ids and htmlfor are only assigned within first layer !!!
+
+		//set pointer
+		for (let i = 0 || offset; i < (offset < 0 ? 0 : offset); i++) {
+			if (offset < 0) startNode = startNode.previousElementSibling;
+			if (offset > 0) startNode = startNode.nextElementSibling;
+		}
+
+		const elements = [],
+			clonedIds = {};
+		for (let i = 0; i < numberOfElements; i++) {
+			let clone = startNode.cloneNode(true);
+			if ("value" in clone) clone.value = "";
+			if ("id" in clone && clone.id) {
+				clonedIds[clone.id] = compose_helper.getNextElementID();
+				clone.id = clonedIds[clone.id];
+			}
+			if ("htmlFor" in clone && Object.keys(clonedIds).includes(clone.htmlFor)) {
+				// does work only if label comes after input
+				clone.htmlFor = clonedIds[clone.htmlFor];
+			}
+			elements.push(clone);
+			startNode = startNode.nextElementSibling;
+		}
+		return elements;
+	},
 	newFormComponents: {},
 	newFormElements: new Set(),
 	newTextElements: {},
@@ -206,7 +230,7 @@ export const compose_helper = {
 			alias = document.getElementById("ComponentAlias").value,
 			context = document.getElementById("ComponentContext").value,
 			approve = document.getElementById("ComponentApprove").value,
-			regulatory_context = document.getElementById('ComponentRegulatoryContext').value,
+			regulatory_context = document.getElementById("ComponentRegulatoryContext").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
@@ -220,7 +244,7 @@ export const compose_helper = {
 				content: content,
 				hidden: hidden,
 				approve: approve,
-				regulatory_context: regulatory_context
+				regulatory_context: regulatory_context,
 			};
 		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), "error");
 		return null;
@@ -442,7 +466,6 @@ export const compose_helper = {
 			}
 			// enable identifier if previously constructed had been deleted
 			function nodechildren(parent) {
-				let container;
 				[...parent.childNodes].forEach((node) => {
 					if (["article", "div"].includes(node.localName)) {
 						if (node.firstChild.localName === "section") nodechildren(node.firstChild);
@@ -466,6 +489,89 @@ export const compose_helper = {
 			nodechildren(draggedElement);
 			draggedElement.remove();
 		},
+		drop_reimport: function (evnt) {
+			// this doesn't make sense for some types but idc. actually impossible for image type, so this is a exit case
+			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
+			let targetform = evnt.target;
+			if (targetform.constructor.name !== "HTMLFormElement") targetform = targetform.parentNode;
+			const targettype = targetform.children[1].dataset.type;
+			if (Object.keys(compose_helper.newFormComponents).includes(draggedElement.id)) {
+				const importable = compose_helper.newFormComponents[draggedElement.id];
+
+				if (["image"].includes(importable.type)) return;
+
+				if (importable.type === targettype || (importable.type === "identify" && targettype === "scanner")) {
+					// actual inverse compose_helper.composeNewElementCallback
+
+					let sibling = targetform.childNodes[0].nextSibling,
+						setTo,
+						elementName,
+						value;
+					const setName = {
+						name: ["select", "scanner", "radio", "photo", "file", "signature"],
+						description: ["links", "checkbox"],
+					};
+					do {
+						if (!["input", "textarea"].includes(sibling.localName)) {
+							sibling = sibling.nextSibling;
+							continue;
+						}
+						elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
+						if (elementName === LANG.GET("assemble.compose_texttemplate") && importable.texttemplates) sibling.checked = true;
+						if (elementName === LANG.GET("assemble.compose_field_hint") && importable.hint) sibling.value = importable.hint;
+						if (elementName === LANG.GET("assemble.compose_required") && "required" in importable.attributes && importable.attributes.required) sibling.checked = true;
+						if (elementName === LANG.GET("assemble.compose_multiple") && "multiple" in importable.attributes && importable.attributes.multiple) sibling.checked = true;
+						if (elementName === LANG.GET("assemble.compose_context_identify") && importable.type === "identify") sibling.checked = true;
+
+						if (["links", "radio", "select", "checkbox"].includes(importable.type)) {
+							if (elementName === LANG.GET("assemble.compose_multilist_name")) {
+								setTo = Object.keys(setName).find((key) => setName[key].includes(importable.type));
+								if (setTo === "name") sibling.value = importable.attributes.name;
+								else if (setTo === "description") sibling.value = importable.description;
+							}
+							if (elementName === LANG.GET("assemble.compose_multilist_add_item")) {
+								let deletesibling = sibling.nextSibling;
+								while (deletesibling.nextElementSibling.constructor.name !== "HTMLButtonElement") {
+									deletesibling.nextElementSibling.remove();
+								}
+								const options = Object.keys(importable.content);
+								sibling.value = options[0];
+								let next = [],
+									all = [];
+								for (let i = 1; i < options.length; i++) {
+									next = compose_helper.cloneMultipleItems(sibling, -2, 4);
+									for (const e of next) {
+										if ("value" in e) e.value = options[i];
+									}
+									all = all.concat(next);
+								}
+								sibling.nextSibling.after(...all);
+								// set pointer to avoid overflow
+								for (let i = 0; i < all.length + 1; i++) sibling = sibling.nextSibling;
+								continue;
+							}
+						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
+							if (elementName === LANG.GET("assemble.compose_simple_element")) {
+								sibling.value = importable.attributes.name;
+							}
+						} else if (["text"].includes(importable.type)) {
+							if (elementName === LANG.GET("assemble.compose_text_description")) {
+								sibling.value = importable.description;
+							}
+							if (elementName === LANG.GET("assemble.compose_text_content")) {
+								if (importable.content) sibling.value = importable.content;
+							}
+						} else {
+							// ...input
+							if (elementName === LANG.GET("assemble.compose_field_name")) {
+								sibling.value = importable.attributes.name;
+							}
+						}
+						sibling = sibling.nextSibling;
+					} while (sibling);
+				}
+			}
+		},
 	},
 
 	create_draggable: function (element, insertionArea = true, allowSections = true) {
@@ -488,6 +594,11 @@ export const compose_helper = {
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
 		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
 		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_delete(event)");
+	},
+	composer_component_form_reimportable: function (element) {
+		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
+		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
+		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_reimport(event)");
 	},
 };
 
@@ -531,6 +642,7 @@ export class Compose extends Assemble {
 					// composer creation form for adding elements
 					if (element[0].form) {
 						const form = document.createElement("form");
+						compose_helper.composer_component_form_reimportable(form);
 						form.onsubmit = () => {
 							compose_helper.composeNewElementCallback(form);
 						};
@@ -772,7 +884,7 @@ export class Compose extends Assemble {
 				value: LANG.GET("assemble.compose_multilist_add_item_button"),
 				"data-type": "additem",
 				type: "button",
-				onpointerup: cloneItems,
+				onpointerup: "for (const e of compose_helper.cloneMultipleItems(this, -4, 4)) this.parentNode.insertBefore(e, this);",
 			},
 		};
 		result = result.concat(...this.button());
@@ -973,7 +1085,7 @@ export class Compose extends Assemble {
 		}
 		if (regulatory_context) {
 			const options = {};
-			for (const [key,value] of Object.entries(LANGUAGEFILE.regulatory)) {
+			for (const [key, value] of Object.entries(LANGUAGEFILE.regulatory)) {
 				options[value] = {};
 				if (regulatory_context.includes(value)) options[value].checked = true;
 			}
@@ -990,7 +1102,7 @@ export class Compose extends Assemble {
 				attributes: {
 					id: "ComponentRegulatoryContext",
 					name: LANG.GET("assemble.compose_form_regulatory_context"),
-					value: typeof regulatory_context === 'string' ? regulatory_context.trim() : regulatory_context.join(', '),
+					value: typeof regulatory_context === "string" ? regulatory_context.trim() : regulatory_context.join(", "),
 					onpointerdown:
 						"new Dialog({type: 'input', header: '" +
 						LANG.GET("assemble.compose_form_regulatory_context") +
