@@ -254,8 +254,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id"
 		],
 		'consumables_get-vendor-datalist' => [
-			'mysql' => "SELECT id, name FROM caro_consumables_vendors ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name FROM caro_consumables_vendors ORDER BY name ASC"
+			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
+			'sqlsrv' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC"
 		],
 		'consumables_get-vendor' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id LIMIT 1",

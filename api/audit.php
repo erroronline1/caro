@@ -31,12 +31,15 @@ class AUDIT extends API {
 			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
 			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 		}
-		// user certificates
-		$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
-		if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
 		// forms
 		$selecttypes[LANG::GET('audit.checks_type.forms')] = ['value' => 'forms'];
 		if ($this->_requestedType==='forms') $selecttypes[LANG::GET('audit.checks_type.forms')]['selected'] = true;
+		// user certificates
+		$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
+		if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
+		// vendor list
+		$selecttypes[LANG::GET('audit.checks_type.vendors')] = ['value' => 'vendors'];
+		if ($this->_requestedType==='vendors') $selecttypes[LANG::GET('audit.checks_type.vendors')]['selected'] = true;
 
 		$result['body']['content'][] = [
 			[
@@ -362,6 +365,90 @@ class AUDIT extends API {
 			'href' => PDF::auditPDF($summary)
 		];
 
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'body' => $body,
+		]);
+	}
+
+	private function vendors(){
+		$vendorlist = $hidden = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
+		$statement->execute();
+		$vendors = $statement->fetchAll(PDO::FETCH_ASSOC);
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('record.record_export'),
+					'onpointerup' => "api.audit('get', 'exportvendors')"
+				]
+			]
+		];
+		foreach($vendors as $vendor){
+			$info = '';
+			if ($vendor['active']) {
+				if ($vendor['info']) $info .= LANG::GET('consumables.edit_vendor_info') . ': ' . $vendor['info'] . "\n";
+				$pricelist = json_decode($vendor['pricelist'], true);
+				if ($pricelist['validity']) $info .= LANG::GET('consumables.edit_vendor_pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
+				$certificate = json_decode($vendor['certificate'], true);
+				if ($certificate['validity']) $info .= LANG::GET('consumables.edit_vendor_certificate_validity') . ' ' . $certificate['validity'] . "\n";
+				$vendorlist[] = [
+					'type' => 'text',
+					'description' => $vendor['name'],
+					'content' => $info
+				];
+				
+				$certificates = [];
+				$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
+				foreach($certfiles as $path){
+					$certificates[substr($path, 1)] = ['target' => '_blank'];
+				}
+				if ($certificates) $vendorlist[] = [
+					'type' => 'links',
+					'description' => LANG::GET('consumables.edit_vendor_documents_download'),
+					'content' => $certificates
+				];
+			}
+		}
+		$content[] = $vendorlist;
+		return $content;
+	}
+	public function exportvendors(){
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.vendors') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.vendors'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$vendors = $this->vendors();
+		$previous = ''; // given there's a text followed by links
+		foreach($vendors[1] as $item){
+			if ($item['type'] === 'text') {
+				$summary['content'][$item['description']] = $item['content'];
+				$previous = $item['description'];
+			}
+			if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
+		}
+
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
 		$body = [];
 		array_push($body, 
 			[[
