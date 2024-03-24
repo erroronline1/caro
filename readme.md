@@ -167,9 +167,6 @@ without a filter none of the vendors products will be treated as a trading good!
 * suggest next form? (load with identify)
 
 #### purchase
-* incorporate product
-    * adding documents
-    * adding photo (scaled down) ? (display on order selection) (-> consumables as well)
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
