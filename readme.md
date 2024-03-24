@@ -161,9 +161,6 @@ without a filter none of the vendors products will be treated as a trading good!
 #### application
 * refactor languagefile
 
-#### assemble
-* multiple signature pads
-
 #### forms
 * import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)
@@ -173,7 +170,6 @@ without a filter none of the vendors products will be treated as a trading good!
 * incorporate product
     * adding documents
     * adding photo (scaled down) ? (display on order selection) (-> consumables as well)
-* incorporation denied state
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
