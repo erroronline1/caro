@@ -11,7 +11,7 @@ class USER extends API {
 	}
 
 	public function profile(){
-		if (!$_SESSION['user']['id']) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
@@ -65,21 +65,21 @@ class USER extends API {
 				]);
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
-				$permissions = '';
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					$permissions .= in_array($level, explode(',', $user['permissions'])) ? ', ' . $description : '';
+				$permissions = [];
+				foreach(explode(',', $user['permissions']) as $level){
+					$permissions[] = LANG::GET('permissions.' . $level);
 				}
-				$units = '';
-				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					$units .= in_array($unit, explode(',', $user['units'])) ? ', ' . $description : '';
+				$units = [];
+				foreach(explode(',', $user['units']) as $unit){
+					$units[] = LANG::GET('units.' . $unit);
 				}
 				$result['body']=['content' => [
 						[
 							['type' => 'text',
 							'description' => LANG::GET('user.display_user'),
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
-								LANG::GET('user.display_permissions') . ': ' . substr($permissions, 2) . "\n" .
-								LANG::GET('user.edit_units') . ': ' . substr($units, 2) . "\n" .
+								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
+								LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" .
 								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '')]
 						],[
 							['type' => 'photo',
@@ -142,7 +142,7 @@ class USER extends API {
 	}
 
 	public function user(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -164,7 +164,7 @@ class USER extends API {
 		
 				// chain checked permission levels
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
+					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('permissions.' . $level))) {
 						$permissions[] = $level;
 					}
 				}
@@ -172,7 +172,7 @@ class USER extends API {
 
 				// chain checked organizational units
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
+					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('permissions.' . $unit))) {
 						$units[] = $unit;
 					}
 				}
@@ -259,7 +259,7 @@ class USER extends API {
 				
 				// chain checked permission levels
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload,  str_replace(' ', '_', $description))) {
+					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('permissions.' . $level))) {
 						$permissions[] = $level;
 					}
 				}
@@ -267,7 +267,7 @@ class USER extends API {
 
 				// chain checked organizational units
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload,  str_replace(' ', '_', $description))) {
+					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('units.' . $unit))) {
 						$units[] = $unit;
 					}
 				}

@@ -17,7 +17,7 @@ class record extends API {
 	}
 
 	public function identifier(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content=UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'))) $content .= ' ' . date('Y-m-d H:i');
@@ -70,6 +70,7 @@ class record extends API {
 	}
 
 	public function formfilter(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -91,6 +92,7 @@ class record extends API {
 	}
 
 	public function recordfilter(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
 		$statement->execute();
 		$records = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -106,7 +108,7 @@ class record extends API {
 	}
 
 	public function forms(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$formdatalist = $forms = [];
 		$return = [];
 
@@ -153,7 +155,7 @@ class record extends API {
 	}
 
 	public function form(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 
 		// prepare existing forms lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
@@ -221,7 +223,7 @@ class record extends API {
 				]
 			]
 		];
-		$exportpermissions = ['admin', 'supervisor'];
+		$exportpermissions = ['admin', 'supervisor', 'ceo', 'qmo'];
 		if (array_intersect($exportpermissions, $_SESSION['user']['permissions'])){
 			$return['body']['content'][]= [
 				[
@@ -249,7 +251,7 @@ class record extends API {
 	}
 
 	public function matchbundles(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$forms = [];
 		$return = [];
 
@@ -299,7 +301,7 @@ class record extends API {
 	}
 
 	public function record(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$context = $form_name = $form_id = null;
@@ -446,7 +448,7 @@ class record extends API {
 	}
 
 	public function import(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
 		$statement->execute([
 			':identifier' => $this->_payload->IDENTIFY_BY_
@@ -472,7 +474,7 @@ class record extends API {
 	}
 
 	public function records(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$return = ['body' => ['content' => []]];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
 		$statement->execute();
@@ -566,7 +568,7 @@ class record extends API {
 	}
 
 	public function export(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$content = $this->summarizeRecord();
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
@@ -587,7 +589,7 @@ class record extends API {
 	}
 
 	public function exportform(){
-		if (!(array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'supervisor', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 		$statement->execute([
 			':id' => $this->_requestedID

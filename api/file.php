@@ -13,6 +13,7 @@ class FILE extends API {
 	}
 
 	public function filter(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
 		if ($this->_requestedFolder && $this->_requestedFolder == 'users') $files = UTILITY::listFiles(UTILITY::directory('users') ,'asc');
 		else {
@@ -33,6 +34,7 @@ class FILE extends API {
 	}
 
 	public function bundlefilter(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
 		$statement->execute();
 		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -47,7 +49,7 @@ class FILE extends API {
 	}
 
 	public function files(){
-		if (!(array_intersect(['admin', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body'] = [
 		'content' => [
 				[
@@ -97,7 +99,7 @@ class FILE extends API {
 		 * no put method for windows server permissions are a pita
 		 * thus directories can not be renamed
 		 */
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo', 'office'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, LANG::PROPERTY('file.manager_new_folder')));
@@ -254,7 +256,7 @@ class FILE extends API {
 	}
 
 	public function bundle(){
-		if (!(array_intersect(['admin', 'user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body'] = [
 			'content' => [
 				[
@@ -290,7 +292,7 @@ class FILE extends API {
 	}
 
 	public function bundlemanager(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$unset = LANG::PROPERTY('file.edit_existing_bundle_select');
@@ -425,7 +427,7 @@ class FILE extends API {
 	}
 
 	public function sharepoint(){
-		if (!$_SESSION['user']) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (array_key_exists(LANG::PROPERTY('file.sharepoint_upload_header'), $_FILES) && $_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
@@ -491,7 +493,6 @@ class FILE extends API {
 				break;
 		}
 	}
-
 }
 
 

@@ -19,7 +19,7 @@ class AUDIT extends API {
 	}
 
 	public function checks(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result['body'] = ['content' => []];
 		$selecttypes = [];
 		
@@ -158,7 +158,7 @@ class AUDIT extends API {
 	}
 
 	public function exportchecks(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
 		$statement->execute([':type' => $this->_requestedType]);
@@ -338,7 +338,7 @@ class AUDIT extends API {
 	}
 
 	public function exportforms(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
@@ -374,7 +374,6 @@ class AUDIT extends API {
 			'body' => $body,
 		]);
 	}
-
 }
 
 $api = new AUDIT();

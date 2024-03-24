@@ -14,7 +14,7 @@ class CSVFILTER extends API {
 	}
 
 	public function rule(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$filter = [
@@ -186,7 +186,7 @@ class CSVFILTER extends API {
 	}
 
 	public function filter(){
-		if (!(array_intersect(['user'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-filter'));

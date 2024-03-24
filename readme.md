@@ -38,9 +38,11 @@ tested devices:
 ### audit safety
 
 #### forms
+* adding and editing form components, forms, form bundles, text chunks and text templates is permitted to admin, ceo and quality management officers only
 * form components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. each entry will have a timestamp and the saving user name. within the respective managers the standard selection will access the most recent version. the advanced selection will access any existing version. components and forms can not be deleted after being approved. unapproved components and forms are not accessible for use.
 * images for form components will not be deleted after component approvement. they are assigned the components name and timestamp of submission to the filename. they are always accessible on accessing a former version. they can not be reused and are part of the component.
 * form components and forms need to be approved by a unit supervisor, quality management officer and ceo. respective user groups will be alerted by system message on saving of a new element. all supervisors can approve though, assuming they know what they're doing. any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. unapproved components do not show up even if the form is approved.
+* forms can be exported blank by elevated users including supervisors
 
 #### records
 * records will append to the database. each entry will have a timestamp and the saving user name. summaries gather all distinct entries and display them in order of submission.
@@ -48,6 +50,7 @@ tested devices:
 * records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.
 
 #### audit
+* audit is accessable for elevated users only
 * MDR sample checks and article incorporation will append to the database. each entry will have a timestamp and the saving user name.
 * records can be exported at any time if you want to have another audit safe storage solution or have to share it with your certification body.
 
@@ -58,9 +61,12 @@ tested devices:
     * a sample check has been made
     * any document to the product has been provided
 * product documents will not be deleted. they are assigned the vendors name, a timestamp of submission and the products article number.
+* vendor and product editing is permitted by elevated users including purchase only
+* products are supposed to be incorporated. incorporation can be granted, denied and - through product management - revoked. all inputs will result in an entry to the respective audit check list. incorporation information is to be enriched through a dedicated form with the respective context.
 
 #### other
 * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#sample-check) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. this applies for all products that have not been checked within mdr14_sample_reusable timespan.
+* sample check information is to be enriched through a dedicated form with the respective context.
 
 ### setup
 * setting the package size for the sql environment to a higher value than default is useful beside the packagesize within setup.ini. batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit

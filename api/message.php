@@ -135,6 +135,7 @@ class MESSAGE extends API {
 	}
 
 	public function filter(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_filter'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id'],

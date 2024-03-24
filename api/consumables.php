@@ -172,7 +172,7 @@ class CONSUMABLES extends API {
 	}
 
 	public function mdrsamplecheck(){
-		if (!(array_intersect(['user', 'admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
@@ -235,7 +235,7 @@ class CONSUMABLES extends API {
 	}
 
 	public function incorporation(){
-		if (!(array_intersect(['user', 'admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
@@ -370,10 +370,10 @@ class CONSUMABLES extends API {
 	}
 
 	public function vendor(){
+		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		// Y U NO DELETE? because of audit safety, that's why!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				
 				/**
 				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
@@ -433,7 +433,6 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
@@ -505,7 +504,6 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'GET':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
 				$options = ['...' . LANG::GET('consumables.edit_existing_vendors_new') => (!$this->_requestedID) ? ['selected' => true] : []];
 				$result = [];
@@ -701,9 +699,9 @@ class CONSUMABLES extends API {
 	}
 
 	public function product(){
+		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$product = [
 					'id' => null,
 					'vendor_id' => null,
@@ -758,7 +756,6 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'PUT':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
 				$statement->execute([
@@ -833,7 +830,6 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'GET':
-				if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				$datalist = [];
 				$options = [LANG::GET('consumables.edit_product_vendor_select_default') => []];
 				$datalist_unit = [];
@@ -1076,7 +1072,6 @@ class CONSUMABLES extends API {
 				$this->response($result);
 				break;
 		case 'DELETE':
-			if (!(array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions']))) $this->response([], 401);
 				// prefetch to return proper name after deletion
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
 				$statement->execute([
