@@ -448,7 +448,7 @@ class FORMS extends API {
 		$regulatory_context = [];
 		if ($result['regulatory_context']){
 			foreach(explode(',', $result['regulatory_context']) as $context){
-				$regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
+				if (in_array($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
 			}
 		}
 		$return['body'] = [
