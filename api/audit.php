@@ -410,7 +410,7 @@ class AUDIT extends API {
 				$certificates = [];
 				$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
 				foreach($certfiles as $path){
-					$certificates[substr($path, 1)] = ['target' => '_blank'];
+					$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => substr($path, 1)];
 				}
 				if ($certificates) $vendorlist[] = [
 					'type' => 'links',
