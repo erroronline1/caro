@@ -75,20 +75,20 @@ class CONSUMABLES extends API {
 				':search' => $vendorID
 			]);
 			$remained = $statement->fetchAll(PDO::FETCH_ASSOC);
-			foreach($remained as $key => $row) {
-				$remainder[$row['id']]=$row['article_no'];
+			foreach($remained as $row) {
+				$remainder[] = ['id' => $row['id'], 'article' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
 			}
 
-			foreach ($pricelist->_list[1] as $i => $row){
-				$update = array_search($row['article_no'], $remainder);
+			foreach ($pricelist->_list[1] as $row){
+				$update = array_search($row['article_no'], array_column($remainder, 'article'));
 				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
-					':id' => $update,
+					':id' => $remainder[$update]['id'],
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
 					':trading_good' => "'0'",
-					':incorporated' => $row['incorporated'] === null ? 'NULL' : $row['incorporated'], //without quotes
+					':incorporated' => $remainder[$update]['incorporated'], //without quotes
 				]) . '; ';
 				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
@@ -122,25 +122,24 @@ class CONSUMABLES extends API {
 		]);
 		$vendorProducts = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$assignedArticles = [];
-		foreach($vendorProducts as $key => $row) {
-			$assignedArticles[$row['id']]=$row['article_no'];
+		foreach($vendorProducts as $row) {
+			$assignedArticles[] = ['id' => $row['id'], 'article' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
 		}
-
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $vendorProducts;
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		if (count($pricelist->_list[1])){
-			foreach ($pricelist->_list[1] as $i => $row){
-				$update = array_search($row['article_no'], $assignedArticles);
+			foreach ($pricelist->_list[1] as $row){
+				$update = array_search($row['article_no'], array_column($assignedArticles, 'article'));
 				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
-					':id' => $update,
+					':id' => $assignedArticles[$update]['id'],
 					':article_name' => "'" . $row['article_name'] . "'",
 					':article_unit' => "'" . $row['article_unit'] . "'",
 					':article_ean' => "'" . $row['article_ean'] . "'",
-					':trading_good' => "1",
-					':incorporated' => "'" . $row['incorporated'] . "'",
+					':trading_good' => 1,
+					':incorporated' => $assignedArticles[$update]['incorporated'], //without quotes
 				]) . '; ';
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
 			}
