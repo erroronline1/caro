@@ -63,10 +63,7 @@ class AUDIT extends API {
 		// get unchecked articles for MDR §14 sample check
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
 		$statement->execute();
-		$sampleCheck = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($sampleCheck as $row){
-			if (!in_array($row['vendor_name'], $unchecked)) $unchecked[] = $row['vendor_name'];
-		}
+		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], $statement->fetchAll(PDO::FETCH_ASSOC)));
 		if ($unchecked) $content[] = [
 			[
 				'type' => 'text',
@@ -112,14 +109,14 @@ class AUDIT extends API {
 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
 		$statement->execute([
-			':substr' => LANG::PROPERTY('order.ordernumber_label')
+			':substr' => 'ordernumber_label'
 		]);
 		$approvedorders = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
-			if (array_key_exists(LANG::PROPERTY('order.ordernumber_label'), $decoded_order_data) && ($tocheck = array_search($decoded_order_data[LANG::PROPERTY('order.ordernumber_label')], array_column($unincorporated, 'article_no'))) !== false){
-				if (array_key_exists(LANG::PROPERTY('order.vendor_label'), $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data[LANG::PROPERTY('order.vendor_label')]){
-					$article = $decoded_order_data[LANG::PROPERTY('order.ordernumber_label')] . $decoded_order_data[LANG::PROPERTY('order.vendor_label')];
+			if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
+				if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+					$article = $decoded_order_data['ordernumber_label'] . $decoded_order_data['vendor_label'];
 					if (!in_array($article, $orderedunincorporated)) $orderedunincorporated[] = $article;
 				}
 			}
@@ -383,6 +380,10 @@ class AUDIT extends API {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
 		$statement->execute();
 		$vendors = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-last_checked'));
+		$statement->execute();
+		$lastchecks = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 		// add export button
 		$content[] = [
 			[
@@ -399,6 +400,7 @@ class AUDIT extends API {
 				if ($vendor['info']) $info .= LANG::GET('consumables.edit_vendor_info') . ': ' . $vendor['info'] . "\n";
 				$pricelist = json_decode($vendor['pricelist'], true);
 				if ($pricelist['validity']) $info .= LANG::GET('consumables.edit_vendor_pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
+				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= LANG::GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
 				$certificate = json_decode($vendor['certificate'], true);
 				if ($certificate['validity']) $info .= LANG::GET('consumables.edit_vendor_certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				$vendorlist[] = [
