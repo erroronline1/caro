@@ -4,6 +4,8 @@
 ## Content
 * [Aims](#Aims)
     * [Intended ISO 13485 goals](#intended-iso-13485-goals)
+    * [Necessary infrastructure](#necessary-infrastructure)
+    * [What it is not](#what-it-is-not)
 * [Application flow for current modules](#application-flow-for-current-modules)
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
@@ -12,11 +14,12 @@
     * [Forms](#forms)
     * [Records](#records)
 * [Prerequisites](#prerequisites)
-* [Installation](#installation)
+    * [Installation](#installation)
+    * [Useage notes and caveats](#useage-notes-and-caveats)
+    * [Customisation](#customisation)
+    * [Importing vendor pricelists](#importing-vendor-pricelists)
+    * [Sample check](#sample-check)
 * [Ressources](#ressources)
-
-
-
 
 
 # open tasks
@@ -120,10 +123,21 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * user files (e.g. certificates)
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
 
-### Limitations
+[Content](#Content)
+
+### Necessary infrastructure 
+You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
+
+Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well.
+
+For technical details see [prerequisites](#prerequisites). 
+
+### What it is not
 Beside a few architectural decisions the app is not a preset quality management system. Define your processes and documents on your own. The application is supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues.
 
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision for overwhelming product databases that are not maintainable in reality. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis. 
+The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis. 
+
+[Content](#Content)
 
 ## Application flow for current modules
 
@@ -177,8 +191,8 @@ graph TD;
     product_inactive-->inorderable;
     edit_product-->product_inactive;
 ```
-[Content](#Content)
 
+[Content](#Content)
 
 ### Order
 
@@ -245,8 +259,8 @@ graph TD;
     mark_bulk-->|no|prepared_orders;
     prepared_orders-->add_product;
 ```
-[Content](#Content)
 
+[Content](#Content)
 
 ### Users
 
@@ -283,8 +297,8 @@ graph TD;
     user-->|units|units(("see content based
     on units"))
 ```
-[Content](#Content)
 
+[Content](#Content)
 
 ### Text recommendations
 
@@ -319,8 +333,8 @@ graph TD;
     chunks3 -->edittemplate[edit template];
     edittemplate -->|add template|chunks3;
 ```
-[Content](#Content)
 
+[Content](#Content)
 
 ### Forms
 
@@ -355,8 +369,8 @@ graph TD;
     new_forms_database-->returns("returns only latest dataset on request
     if named item is not hidden")
 ```
-[Content](#Content)
 
+[Content](#Content)
 
 ### Records
 
@@ -395,28 +409,29 @@ graph TD;
     appenddata-->forms;
     missing-->|no|nonemissing(status message);
 ```
+
 [Content](#Content)
 
 ## Prerequisites
-* php >= 8
-* mysql or sql server (or some other database, but queries may have to be adjusted. as i chose pdo as database connectivity i hope this is possible)
-* ssl (camera access for qr-scanner and serviceworkers don't work otherwise)
-* vendor pricelists as csv-files [see details](#importing-vendor-pricelists)
+* PHP >= 8
+* MySQL or SQL Server (or some other database, but queries may have to be adjusted. As I chose pdo as database connectivity I assume this is possible)
+* SSQL (camera access for qr-scanner and serviceworkers don't work otherwise)
+* Vendor pricelists as CSV-files [see details](#importing-vendor-pricelists)
 
-tested server environments:
-* apache [uniform server zero XV](https://uniformserver.com) with php 8.2, mysql 8.0.31
-* microsoft iis with sql express (sql server 22)
+Tested server environments:
+* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31
+* Microsoft IIS with SQL Express (SQL Server 22)
 
-tested devices:
-* desktop pc win10 edge-browser
-* notebook win11 firefox-browser
-* smartphone android12 firefox-browser
+Tested devices:
+* Desktop PC Win10 Edge-browser
+* Notebook Win11 Firefox-browser
+* Smartphone Android12 Firefox-browser
 
 [Content](#Content)
 
-## Installation
-* php.ini memory_limit ~2048M for processing of large csv-files, disable open_basedir at least for local iis for file handlers
-* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for iis according to your expected filesize for e.g. sharepoint- and csv-files ~128MB
+### Installation
+* php.ini memory_limit ~2048M for processing of large csv-files, disable open_basedir at least for local IIS for file handlers
+* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~128MB
 * php.ini max_execution_time / fastCGI timeout (iis) ~ 300 for csv processing may take a while depending on your data amount
 * php.ini enable extensions:
     * gd
@@ -427,31 +442,34 @@ tested devices:
     * zip
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
-* manually set mime type for site-webmanifest as application/manifest+json for iis servers
+* manually set mime type for site-webmanifest as application/manifest+json for IIS servers
 * set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
 * run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
 
+#### Useage notes and caveats
+* Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
+* Notifications on new messages are as reliable as the timespan of a service-woker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
+* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
+* Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue. 
+* Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
+* Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose. It is not supposed to replace your erp!
+* Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
+
+#### Customisation
+* The manual is intentionally editable to accomodate it to users comprehension.
+* Some parts of the setup.ini can be changes during runtime, others will mess up your system. Respective parts are marked
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+    * [units]
+    * [formcontext][anonymous]
+    * [regulatory]
+
+If you ever fiddle around with the sourcecode:
+* Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between.
+
 [Content](#Content)
 
-## System usecases and limitations
-
-### setup
-* setting the package size for the sql environment to a higher value than default is useful beside the packagesize within setup.ini. batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit
-
-### system limitations
-* notifications on new messages are as reliable as the timespan of a service-woker. which is short. therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. there will be no implementation of push api to avoid third party usage and for lack of safari support
-* the application caches requests. get requests return the latest version, which might not always be the recent system state but better than nothing. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. this might lead to a delay but is better than nothing. however note that this only is reliable if the browser does not delete session content on closing. this is not a matter of the app but your system environment. you may have to contact your it department.
-* cached post requests may insert the user name and entry date on processing. that is the logged in user on, and time of processing on the server side.
-* changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). adding columns to the end appears to be easier instad of insertions between.
-
-### useage notes and caveats
-* dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. reordered images will disappear but don't worry.
-* orders can be deleted by administrative users and requesting unit members at any time. this module is for operational communication only, not for persistent documentation purpose. it is not supposed to replace your erp!
-* the manual is intentionally editable to accomodate it to users comprehension.
-* product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). it is possible to have documents displayed that do not really match the product. 
-
-### importing vendor pricelists
-vendor pricelists must have an easy structure to be importable. it may need additional off-app customizing available data to have input files like:
+### Importing vendor pricelists
+Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
 
 | Article Number | Article Name | EAN         | Sales Unit |
 | :------------- | :----------- | :---------- | :--------- |
@@ -488,8 +506,10 @@ while setting up a vendor an import rule must be defined like:
 ```
 *headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
 
-### sample check
-to detect trading goods for the MDR §14 sample check add a respective filter like:
+[Content](#Content)
+
+### Sample check
+To detect trading goods for the MDR §14 sample check add a respective filter like:
 ```js
 {
 	"filesetting": {
@@ -509,7 +529,7 @@ to detect trading goods for the MDR §14 sample check add a respective filter li
 	]
 }
 ```
-without a filter none of the vendors products will be treated as a trading good!
+Without a filter none of the vendors products will be treated as a trading good!
 
 [Content](#Content)
 
@@ -533,4 +553,3 @@ without a filter none of the vendors products will be treated as a trading good!
 * [mermaid charts](https://mermaid.js.org/)
 
 [Content](#Content)
-
