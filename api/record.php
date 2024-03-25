@@ -260,8 +260,8 @@ class record extends API {
 		$statement->execute([
 			':name' => $this->_requestedID
 		]);
-		if(!($bundle = $statement->fetch(PDO::FETCH_ASSOC))) $bundle=['content' => []];
-		$necessaryforms = explode(',', $bundle['content']);
+		if(!($bundle = $statement->fetch(PDO::FETCH_ASSOC))) $bundle = ['content' => []];
+		$necessaryforms = $bundle['content'] ? explode(',', $bundle['content']) : [];
 
 		// unset hidden forms from bundle presets
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
