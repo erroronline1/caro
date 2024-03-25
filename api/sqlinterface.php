@@ -228,8 +228,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
 		'form_delete' => [
-			'mysql' => "DELETE FROM caro_form WHERE id = :id ",
-			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id"
+			'mysql' => "DELETE FROM caro_form WHERE id = :id AND (ceo_approval IS NULL OR qmo_approval IS NULL OR supervisor_approval IS NULL)",
+			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND (ceo_approval IS NULL OR qmo_approval IS NULL OR supervisor_approval IS NULL)"
 		],
 
 		'records_post' => [
