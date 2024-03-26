@@ -13,11 +13,19 @@ class AUDIT extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
 
+	/**
+	 * init parent class and set private requests
+	 */
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 * main entry point for module
+	 * displays a selection of available options
+	 * calls $this->_requestedType method if set
+	 */
 	public function checks(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result['body'] = ['content' => []];
@@ -58,12 +66,17 @@ class AUDIT extends API {
 		$this->response($result);
 	}
 	
+	/**
+	 * returns all sample checks from the caro_checks database in descending chronological order
+	 * displays a warning if a vendor is overdue for sample check
+	 */
 	private function mdrsamplecheck(){
 		$content = $unchecked = $entries = [];
 		// get unchecked articles for MDR §14 sample check
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
 		$statement->execute();
 		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], $statement->fetchAll(PDO::FETCH_ASSOC)));
+		// display warning
 		if ($unchecked) $content[] = [
 			[
 				'type' => 'text',
@@ -81,7 +94,7 @@ class AUDIT extends API {
 				]
 			]
 		];
-		// add checks
+		// add check records
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
 		$statement->execute([':type' => $this->_requestedType]);
 		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -100,6 +113,10 @@ class AUDIT extends API {
 		return $content;
 	}
 
+	/**
+	 * returns all incorporation records from the caro_checks database in descending chronological order
+	 * displays a warning if products within approved orders require an incorporation
+	 */
 	private function incorporation(){
 		$content = $orderedunincorporated = $entries = [];
 		// get unincorporated articles from approved orders
@@ -121,6 +138,7 @@ class AUDIT extends API {
 				}
 			}
 		}
+		// display warning
 		if ($orderedunincorporated) $content[] = [
 			[
 				'type' => 'text',
@@ -138,7 +156,7 @@ class AUDIT extends API {
 				]
 			]
 		];
-		// add checks
+		// add check records
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
 		$statement->execute([':type' => $this->_requestedType]);
 		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -157,6 +175,10 @@ class AUDIT extends API {
 		return $content;
 	}
 
+	/**
+	 * creates and returns a download link to the export file for requested check
+	 * if check type within caro_checks database
+	 */
 	public function exportchecks(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
@@ -172,7 +194,7 @@ class AUDIT extends API {
 			'title' => LANG::GET('audit.checks_type.' . $this->_requestedType),
 			'date' => date('y-m-d H:i')
 		];
-
+		// stringify check records
 		foreach($checks as $row){
 			$summary['content'][LANG::GET('audit.check_description', [
 				':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
@@ -198,6 +220,9 @@ class AUDIT extends API {
 		]);
 	}
 
+	/**
+	 * returns all users with file attachments to review e.g. certificates
+	 */
 	private function userfiles(){
 		$content = [];
 		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
@@ -224,18 +249,24 @@ class AUDIT extends API {
 		return $content;
 	}
 
+	/**
+	 * returns all current approved forms with their respective components and approvement notes in alphabetical order
+	 * also form bundles
+	 */
 	private function forms(){
 		$content = [];
 
+		// get all current approved forms
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
 		$statement->execute();
 		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = $currentforms = [];
-				foreach($forms as $form){
+		foreach($forms as $form){
 			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
 		}
 
+		// get all current bundles
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
 		$statement->execute();
 		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -252,6 +283,8 @@ class AUDIT extends API {
 				'content' => ''
 			]
 		];
+
+		// iterate over forms an their respective components
 		foreach($currentforms as $form){
 			$components = explode(',', $form['content']);
 			$componentlist = [];
@@ -337,6 +370,10 @@ class AUDIT extends API {
 		return $content;
 	}
 
+	/**
+	 * creates and returns a download link to the export file for forms and form bundles
+	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 */
 	public function exportforms(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 
@@ -375,6 +412,9 @@ class AUDIT extends API {
 		]);
 	}
 
+	/**
+	 * returns all current active vendors with stored info, most recent pricelist import, MDR sample check and certificate details in alphabetical order
+	 */
 	private function vendors(){
 		$vendorlist = $hidden = [];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
@@ -424,6 +464,11 @@ class AUDIT extends API {
 		$content[] = $vendorlist;
 		return $content;
 	}
+
+	/**
+	 * creates and returns a download link to the export file for the vendor list
+	 * processes the result of $this->vendors() and translates the body object into more simple strings
+	 */
 	public function exportvendors(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 

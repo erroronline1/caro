@@ -48,11 +48,21 @@ class CONSUMABLES extends API {
 	}
 	END;
 
+	/**
+	 * init parent class and set private requests
+	 */
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 * imports pricelist according to set filter and populates product database
+	 * deletes all unprotected entries
+	 * updates all protected entries based on vendor name and order number
+	 * 
+	 * chunkifies requests to avoid overflow
+	 */
 	private function update_pricelist($file, $filter, $vendorID){
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
@@ -115,6 +125,11 @@ class CONSUMABLES extends API {
 		return '';
 	}
 
+	/**
+	 * updates product database according to filter setting trading good flag
+	 * 
+	 * chunkifies requests to avoid overflow
+	 */
 	private function update_trading_goods($filter, $vendorID){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
 		$statement->execute([
@@ -151,6 +166,12 @@ class CONSUMABLES extends API {
 		return;
 	}
 
+	/**
+	 * retrieves most recent approved form for
+	 * sample check or
+	 * incorporation
+	 * and returns the components as body response for modal
+	 */
 	private function components($forContext){
 		$formBody = [];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-context'));
@@ -170,6 +191,12 @@ class CONSUMABLES extends API {
 		return $formBody;
 	}
 
+	/**
+	 * returns the mdr sample check body response for modal
+	 * processes contents of the sample check and writes to the caro_checks database
+	 * 
+	 * $this->_payload->content is a string passed by utility.js orderClient.performSampleCheck()
+	 */
 	public function mdrsamplecheck(){
 		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -233,6 +260,15 @@ class CONSUMABLES extends API {
 		}
 	}
 
+	/**
+	 * returns the incorporation body response for modal
+	 * creates a list of possible identical products to refer to
+	 * 
+	 * processes contents of the incorporation and writes to the caro_checks database
+	 * 
+	 * $this->_payload->content is a string passed by utility.js orderClient.performIncorporation()
+	 * incorporation denial is detected by pattern matching LANG::GET('order.incorporation_denied')
+	 */
 	public function incorporation(){
 		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -368,12 +404,21 @@ class CONSUMABLES extends API {
 		}
 	}
 
-	public function vendor(){
+	/**
+	 * vendor management
+	 * posts new vendors
+	 * updates (put) existing vendors
+	 * dispays form to choose and edit vendors
+	 * 
+	 * on disabling vendor all unprotected products will be deleted
+	 * 
+	 * $this->_payload as genuine form data
+	 */
+	 public function vendor(){
 		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		// Y U NO DELETE? because of audit safety, that's why!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				
 				/**
 				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
 				 * thus directories can not be renamed on name changes of vendors
@@ -697,6 +742,20 @@ class CONSUMABLES extends API {
 		}
 	}
 
+	/**
+	 * product management
+	 * posts new products
+	 * updates (put) existing products
+	 * displays form to choose and edit products
+	 * 
+	 * only unprotected products can be deleted, otherwise only hidden
+	 * 
+	 * adding documents sets protected flag
+	 * 
+	 * revoking incorporation state results in a caro_check entry
+	 * 
+	 * $this->_payload as genuine form data
+	 */
 	public function product(){
 		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
