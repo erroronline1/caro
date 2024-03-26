@@ -116,7 +116,7 @@ class API {
 	 */
 	private function set_headers(){
 		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
-		header("Content-Type:application/json");
+		header("Content-Type:application/json; charset=utf-8");
 	}
 
 	/**
