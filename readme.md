@@ -13,6 +13,7 @@
     * [Text recommendations](#text-recommendations)
     * [Forms](#forms)
     * [Records](#records)
+* [CSV processor](#csv-processor)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Useage notes and caveats](#useage-notes-and-caveats)
@@ -73,7 +74,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Case documentation form require a case identifier to ensure respective data is allocated correctly.
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
-    * Only the most recent approved components and forms are accessible for use.
+    * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#useage-notes-and-caveats).
     * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, ceo and quality management officers only.
     * Form components and forms need to be approved by a unit supervisor, quality management officer and ceo. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New Components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
@@ -135,7 +136,9 @@ For technical details see [prerequisites](#prerequisites).
 ### What it is not
 Beside a few architectural decisions the app is not a preset quality management system. Define your processes and documents on your own. The application is supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues.
 
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis. 
+The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
+
+Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose.
 
 [Content](#Content)
 
@@ -412,10 +415,273 @@ graph TD;
 
 [Content](#Content)
 
+## CSV processor
+
+The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
+
+Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
+
+	"postProcessing": Optional string as hint what to do with the result file
+    "filesetting":
+		"source": File to process, SELF or a named array (the other filesettings don't matter then)
+	    "headerrowindex": Offset for title row
+	    "dialect": Settings according to php fgetcsv
+	    "columns": list/array of column names to process and export to destination
+        "encoding": Comma separated string of possible character encoding of sourcefile
+
+    "filter": List/array of objects/dicts
+        "apply": "filter_by_expression"
+		"comment": Description, will be displayed
+        "keep": Boolean if matches are kept or omitted
+        "match":
+            "all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
+            "any": At least one expression has to be matched, it's either "all" or "any"
+
+        "apply": "filter_by_monthdiff"
+        "comment": Description, will be displayed
+        "keep": Boolean if matches are kept or omitted
+        "date": Filter by identifier and date diff in months
+            "identifier": Column name with recurring values, e.g. customer id
+            "column": Column name with date to process,
+            "format": List/array of date format order e.g. ["d", "m", "y"],
+            "threshold": Integer for months,
+            "bias": < less than, > greater than threshold
+
+        "apply": "filter_by_duplicates",
+        "comment": Description, will be displayed
+        "keep": Boolean if matches are kept or omitted
+        "duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+            "orderby": List/array of column names whose values concatenate for comparison
+            "descending": Boolean,
+            "column": Column name with recurring values, e.g. customer id of which duplicates are allowed
+            "amount": Integer > 0
+
+        "apply": "filter_by_comparison_file",
+        "comment": Description, will be displayed
+        "keep": Boolean if matches are kept or omitted
+        "compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
+            "filesetting": Same structure as base. if source == "SELF" the origin file will be processed
+            "filter": Same structure as base
+            "modify": Same structure as base
+            "match":
+                "all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
+                "any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
+        "transfer": Add a new column with comparison value
+
+        "apply": "filter_by_monthinterval",
+        "comment": Description, will be displayed
+        "keep": Boolean if matches are kept or omitted
+        "interval": Discard by not matching interval in months, optional offset from initial column value
+            "column": Column name with date to process,
+            "format": List/array of date format order e.g. ["d", "m", "y"],
+            "interval": Integer for months,
+            "offset": Optional offset in months
+
+        "apply": "filter_by_rand",
+        "comment": Description, will be displayed
+        "keep": boolean if matches are kept or omitted
+        "data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
+            "columns": Object/dict of COLUMN-REGEX-pairs to select from,
+            "amount": Integer > 0
+
+    "modify": Modifies the result
+        "add": Adds a column with the set value. if the name is already in use this will be replaced!
+               If property is an array with number values and arithmetic operators it will try to calculate
+               Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
+        "replace": Replaces regex matches with the given value either at a specified field or in all
+                   according to index 0 being a column name or none/null
+        "remove": Remove columns from result, may have been used solely for filtering
+        "rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
+                   Original columns will be omitted, nested within a list to make sure to order as given
+        "translate": Column values to be translated according to specified translation object
+
+    "split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+
+    "evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+
+    "translations" : Can replace e.g. numerical values with legible translations.
+                     This is an object/dict whose keys can be refered to from the modifier. 
+                     The dict keys are processed as regex for a possible broader use.
+
+```javascript
+{
+    "postProcessing": "some message, e.g. do not forget to check and archive",
+    "filesetting": {
+        "source": "Export.+?\\.csv",
+        "headerrowindex": 0,
+        "columns": [
+            "ORIGININDEX",
+            "SOMEDATE",
+            "CUSTOMERID",
+            "NAME",
+            "DEATH",
+            "AID",
+            "PRICE",
+            "DELIVERED",
+            "DEPARTMENT",
+            "SOMEFILTERCOLUMN"
+        ]
+    },
+    "filter": [
+        {
+            "apply": "filter_by_expression",
+            "comment": "keep if all general patterns match",
+            "keep": true,
+            "match": {
+                "all": {
+                    "DELIEVERED": "delivered",
+                    "NAME": ".+?"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if any general exclusions match",
+            "keep": false,
+            "match": {
+                "any": {
+                    "DEATH": ".+?",
+                    "NAME": "company|special someone",
+                    "AID": "repair|cancelling|special.*?names"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if value is below 400 unless pattern matches",
+            "keep": false,
+            "match": {
+                "all": {
+                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
+                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_monthdiff",
+            "comment": "discard by date diff in months, do not contact if last event within x months",
+            "keep": false,
+            "date": {
+                "column": "SOMEDATE",
+                "format": ["d", "m", "y"],
+                "threshold": 6,
+                "bias": "<"
+            }
+        },
+        {
+            "apply": "filter_by_duplicates",
+            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
+            "keep": true,
+            "duplicates": {
+                "orderby": ["ORIGININDEX"],
+                "descending": false,
+                "column": "CUSTOMERID",
+                "amount": 1
+            }
+        },
+        {
+            "apply": "filter_by_comparison_file",
+            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
+            "keep": false,
+            "filesetting": {
+                "source": "excemptions.*?.csv",
+                "headerrowindex": 0,
+                "columns": [
+                    "VORGANG"
+                ]
+            },
+            "filter": [],
+            "match": {
+                "all":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                },
+                "any":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                }
+            },
+            "transfer":{
+                "NEWPARENTCOLUMN": "COMPARECOLUMN"
+            }
+        },
+        {
+            "apply": "filter_by_monthinterval",
+            "comment": "discard by not matching interval in months, optional offset from initial column value",
+            "keep": false,
+            "interval": {
+                "column": "SOMEDATE",
+                "format": ["d", "m", "y"],
+                "interval": 6,
+                "offset": 0
+            }
+        },
+        {
+            "apply": "filter_by_rand",
+            "comment": "keep some random rows",
+            "keep": true,
+            "data": {
+                "columns": {
+                    "SOMEFILTERCOLUMN", "hasvalue"
+                },
+                "amount": 10
+            }
+        }
+    ],
+    "modify":{
+        "add":{
+            "NEWCOLUMNNAME": "string",
+            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
+        },
+        "replace":[
+            ["NAME", "regex", "replacement"],
+            [null, ";", ","]
+        ],
+        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
+        "rewrite":[
+            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
+        ],
+        "translate":{
+            "DEPARTMENT": "departments"
+        }
+    },
+    "split":{
+        "DEPARTMENT": "(.*)",
+        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
+    },
+    "format":{
+        "sheet": {
+            "width": 125,
+            "orientation": "landscape",
+            "row-height":32
+        },
+        "columns":{
+            "ORIGININDEX":5,
+            "SOMEDATE":5,
+            "CUSTOMERID":5,
+            "NAME":10,
+            "AID":15,
+            "PRICE": null
+        }
+    },
+    "evaluate": {
+        "EMAIL": "^((?!@).)*$"
+    }
+	"translations":{
+		"departments":{
+			"1": "Central",
+			"2": "Department 1",
+			"3": "Department 2",
+			"4": "Office"
+		}
+	}
+}
+```
+
+[Content](#Content)
+
 ## Prerequisites
 * PHP >= 8
 * MySQL or SQL Server (or some other database, but queries may have to be adjusted. As I chose pdo as database connectivity I assume this is possible)
-* SSQL (camera access for qr-scanner and serviceworkers don't work otherwise)
+* SSL (camera access for qr-scanner and serviceworkers don't work otherwise)
 * Vendor pricelists as CSV-files [see details](#importing-vendor-pricelists)
 
 Tested server environments:
@@ -430,9 +696,9 @@ Tested devices:
 [Content](#Content)
 
 ### Installation
-* php.ini memory_limit ~2048M for processing of large csv-files, disable open_basedir at least for local IIS for file handlers
+* php.ini memory_limit ~2048M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~128MB
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 for csv processing may take a while depending on your data amount
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 for [CSV processing](#csv-processor) may take a while depending on your data amount
 * php.ini enable extensions:
     * gd
     * gettext
@@ -442,17 +708,20 @@ Tested devices:
     * zip
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
-* manually set mime type for site-webmanifest as application/manifest+json for IIS servers
-* set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
-* run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen
+* Manually set mime type for site-webmanifest as application/manifest+json for IIS servers
+* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
+* Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
 
 #### Useage notes and caveats
+
+##### Network connection handling
+* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
+* Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue.
+
+##### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
 * Notifications on new messages are as reliable as the timespan of a service-woker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
-* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue. 
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
-* Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose. It is not supposed to replace your erp!
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 
 #### Customisation
@@ -462,6 +731,7 @@ Tested devices:
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
+* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 
 If you ever fiddle around with the sourcecode:
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between.
