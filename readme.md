@@ -7,6 +7,8 @@
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
     * [Data integrity](#data-integrity)
+    * [User management](#user-management)
+* [Modules](#modules)
 * [Application flow for current modules](#application-flow-for-current-modules)
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
@@ -86,7 +88,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
     * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, ceo and quality management officers only.
-    * Form components and forms need to be approved by a unit supervisor, quality management officer and ceo. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
+    * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and ceo. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New Components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
@@ -96,7 +98,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.
     * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
 * ISO 13485 5.5.1 Responsibility and authority
-    * Users are assigned special permissions that limit access and unclutter menu items
+    * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items
     * Users can be assigned a pin to approve orders
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in messenger. This messenger is being made use of internal modules to ensure decent data distribution e.g.
@@ -156,6 +158,61 @@ As records intend to save the submitting users name, group accounts are unreason
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
 [Content](#Content)
+
+### User management
+The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions:
+* User
+    * has access to all non writeable content
+    * can access forms and add records
+    * can contribute to open sharepoint
+    * can place orders
+    * can only see orders for own assigned organizational unit
+    * can incorporate and sample check articles
+* Group
+    * has access to all non writeable content
+    * can not add records due to limited identification data
+    * can contribute to open sharepoint
+    * can place orders, will be prompted to identify themself
+    * can only see orders for own assigned organizational unit
+    * can not incorporate and sample check due to limited identification data
+* Supervisor
+    * can approve form components and forms
+* Office
+    * can contribute to file manager 
+* Purchase
+    * has full access to vendor and product management
+    * can see all orders
+* Purchase assistant
+    * has limited access to product management, can modify alias
+* Quality management officer
+    * can approve form components and forms
+    * can add CSV filters
+    * can manage users
+* CEO
+    * can approve components and forms
+    * can add CSV filters
+    * can manage users
+* Application admin
+    * full access
+    * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
+
+Permissions of QMO and CEO do hardly differ, but are neccessary being assigned to have a reliable alert on submission of a new form
+
+Users can have multiple assigned organizational units.
+
+On registering a new user a default profile picture is generated. Custom set pictures can not be deleted.
+
+Adding files is granted to elevated users only, to make sure certificates are acknowledged.
+
+[Content](#Content)
+
+## Modules
+### Users
+Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to elevated users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
+
+Users can see their information in the profile section for transparency reasons. They can modify theit profile picture and set individual application settings
+
+
 
 ## Application flow for current modules
 
