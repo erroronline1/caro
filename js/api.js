@@ -1040,6 +1040,15 @@ export const api = {
 		api.send(method, request, successFn, null, payload, method === "post" && request[1] !== "template");
 	},
 
+	/**
+	 * displays 2d code form and result passed by get query
+	 * displays a generic 2d scanner
+	 * displays stl viewer for files managed by filemanager and open sharepoint
+	 * 
+	 * @param {string} method get
+	 * @param  {array} request api method, occasionally passed values for 2d codes
+	 * @returns request
+	 */
 	tool: (method, ...request) => {
 		/*
 		get tool/code
@@ -1083,6 +1092,14 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
+
+	/**
+	 * user manager and display of profile
+	 * 
+	 * @param {string} method get|post|put|delete 
+	 * @param  {array} request api method, name|id
+	 * @returns request
+	 */
 	user: (method, ...request) => {
 		/*
 		get user/profile
