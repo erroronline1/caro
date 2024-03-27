@@ -2,6 +2,9 @@ import { assemble_helper, Dialog, Toast } from "./assemble.js";
 import { compose_helper } from "./compose.js";
 
 export const api = {
+	/**
+	 * tracks GET queries and alerts if a chenged form is about to get left
+	 */
 	preventDataloss: {
 		// explicitly start this on any eligible successFn
 		// on appending queries (e.g. searches) set api.preventDataloss.monitor = false within query routing
@@ -39,6 +42,16 @@ export const api = {
 			return true;
 		},
 	},
+	/**
+	 * handles prepared requests
+	 * @param {string} method get|put|post|delete 
+	 * @param {array} request url parameters to pass to api 
+	 * @param {function} successFn handle result 
+	 * @param {function} errorFn handle error 
+	 * @param {object} payload FormData object|object 
+	 * @param {boolean} form_data tell _.api how to handle payload 
+	 * @returns none / results of successFn
+	 */
 	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
@@ -60,6 +73,11 @@ export const api = {
 			});
 		api.loadindicator(false);
 	},
+	/**
+	 * ui feedback on accuring requests that are expected to take longer
+	 * @param {any} toggle initiates inidicator, undefined|null|false disables all
+	 * @returns none
+	 */
 	loadindicator: (toggle) => {
 		if (toggle) {
 			api.loadindicatorTimeout.push(
@@ -80,6 +98,10 @@ export const api = {
 		}, 300);
 	},
 	loadindicatorTimeout: [],
+	/**
+	 * sets the documents header and is supposed to scroll to top
+	 * @param {string} string content 
+	 */
 	update_header: function (string = "") {
 		if (string) document.querySelector("header>h1").innerHTML = string;
 		window.scrollTo({
@@ -87,6 +109,18 @@ export const api = {
 			behavior: "smooth",
 		});
 	},
+
+	/**
+	 * imports serverside defined languagefile
+	 * handles user login/logout
+	 * loads application menu
+	 * loads application landing page
+	 * manages manual
+	 * 
+	 * @param {string} method get|post|put|delete 
+	 * @param {array} request api method, logintoken|manual id
+	 * @returns request
+	 */
 	application: async (method, ...request) => {
 		/*
 		get application/language
@@ -195,6 +229,14 @@ export const api = {
 		}
 		await api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
+
+	/**
+	 * displays audit contents
+	 * 
+	 * @param {string} method get|post|put|delete 
+	 * @param {array} request api method
+	 * @returns request
+	 */
 	audit: (method, ...request) => {
 		/*
 		get audit/checks/{type}
@@ -245,6 +287,14 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
+
+	/**
+	 * loads, executes and manages csv filters
+	 * 
+	 * @param {string} method get|post
+	 * @param {array} request api method
+	 * @returns request
+	 */
 	csvfilter: (method, ...request) => {
 		/*
 		post csvfilter/rule
@@ -293,6 +343,14 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
+
+	/**
+	 * displays and manages provided files, either administrative managed or open sharepoint
+	 * 
+	 * @param {string} method get|post|delete 
+	 * @param  {array} request api method, search term / bundle name | requested directory name, requested filename
+	 * @returns request
+	 */
 	file: async (method, ...request) => {
 		/*
 		get file/filter/{directory}
@@ -372,6 +430,14 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
+
+	/**
+	 * form component and form management with creation, editing and approval
+	 * 
+	 * @param {string} method get|post|put|delete 
+	 * @param  {array} request api method, name|id
+	 * @returns request
+	 */
 	form: (method, ...request) => {
 		/*
 		get form elements from database.
@@ -507,6 +573,15 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, composedComponent || request[1] === "bundle" || method === "put");
 	},
+
+	/**
+	 * handles internal messenger
+	 * notification indicator of unread messages
+	 * 
+	 * @param {string} method get|post|delete 
+	 * @param  {array} request api method, filter term / message id / message form data, occasionally query selector
+	 * @returns request
+	 */
 	message: (method, ...request) => {
 		/*
 		get message/inbox
@@ -517,9 +592,10 @@ export const api = {
 		post message/message/{formdata}
 		delete message/message/{id}/(inbox|sent)
 
-		// to initiate a new message with (hidden or visible inputs having both the same unique queryselector) prepared recipient and message using _.getinputs(queryselector)
+		to initiate a new message with (hidden or visible inputs having both the same unique queryselector) prepared recipient and message using _.getinputs(queryselector)
 		call by api.message('get', 'message', '{queryselector}') 
 		results in get message/message?to=recipient&message=messagetext
+		alternatively prepare third parameter as formdata
 
 		get notification // (returns number of unnotified/unread messages, only used within service-worker)
 
@@ -584,6 +660,15 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
+
+	/**
+	 * handles vendor and product management
+	 * handles orders
+	 * 
+	 * @param {string} method get|post|put|delete 
+	 * @param  {array} request api method, id / name / filter term, occasionally subrequest, occasionally message
+	 * @returns request
+	 */
 	purchase: (method, ...request) => {
 		/*
 		get consumables/vendor/{id|name}
@@ -740,6 +825,15 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
+
+	/**
+	 * handles records, displays record lists
+	 * imports data from other records
+	 * 
+	 * @param {string} method get|post
+	 * @param  {array} request api method, occasional identifier to import from
+	 * @returns request
+	 */
 	record: (method, ...request) => {
 		/*
 		post record/identifier
@@ -865,6 +959,15 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},
+
+	/**
+	 * manages text templates
+	 * displays text template frontend either as body or within a modal
+	 * 
+	 * @param {string} method get|post
+	 * @param  {array} request api method, occasional modal destination
+	 * @returns request
+	 */
 	texttemplate: (method, ...request) => {
 		/*
 		post texttemplate/chunk
@@ -936,10 +1039,15 @@ export const api = {
 		}
 		api.send(method, request, successFn, null, payload, method === "post" && request[1] !== "template");
 	},
+
 	tool: (method, ...request) => {
 		/*
 		get tool/code
 		get tool/code/display?key=value
+
+		get tool/scanner
+		
+		get tool/stlviewer
 		*/
 		request = [...request];
 		request.splice(0, 0, "tool");
@@ -969,7 +1077,6 @@ export const api = {
 				}
 				break;
 			case "post":
-				//payload = _.getInputs('[data-usecase=user]', true);
 				break;
 			default:
 				return;
