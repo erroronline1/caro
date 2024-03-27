@@ -729,6 +729,7 @@ export const api = {
 								body.processAfterInsertion();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+							api.preventDataloss.monitor = true;
 						};
 						break;
 					case "filter":
