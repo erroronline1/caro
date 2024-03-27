@@ -407,7 +407,8 @@ class USER extends API {
 						]],
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_permissions'),
-						'content' => $permissions
+						'content' => $permissions,
+						'hint' => LANG::GET('user.edit_permissions_hint')
 						],
 						['type' => 'checkbox',
 						'description' => LANG::GET('user.edit_units'),

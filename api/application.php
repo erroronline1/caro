@@ -117,6 +117,8 @@ class APPLICATION extends API {
 		}
 		if (array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
+		}
+		if (array_intersect(['admin', 'purchase_assistant', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['onpointerup' => "api.purchase('get', 'product')"];
 		}
 		if (array_intersect(['admin', 'office', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){

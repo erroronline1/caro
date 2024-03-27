@@ -770,7 +770,7 @@ class CONSUMABLES extends API {
 					'article_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')),
 					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')),
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
-					'protected' => 0,
+					'protected' => intval(boolval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')))),
 					'trading_good' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0
 				];
 
@@ -822,7 +822,7 @@ class CONSUMABLES extends API {
 				// prepare product-array to update, return error if not found
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
+				$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) && UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
 				$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
 				$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
@@ -831,7 +831,8 @@ class CONSUMABLES extends API {
 				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 				$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
 				$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
-
+				$product['protected'] = intval(boolval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')))) ? : $product['protected'];
+				
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
@@ -985,7 +986,7 @@ class CONSUMABLES extends API {
 							'content' => $vendors,
 							'attributes' => [
 								'id' => 'productsearchvendor',
-								'name' => LANG::GET('consumables.edit_product_vendor_select')
+								'name' => LANG::GET('consumables.edit_product_filter_vendors')
 								]
 						], [
 							'type' => 'searchinput',
@@ -1010,21 +1011,21 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_product_vendor'),
 								'list' => 'vendors',
-								'value' => $product['vendor_name']
+								'value' => $product['vendor_name'],
 							]
 						], [
 							'type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_product_article_no'),
 								'required' => true,
-								'value' => $product['article_no']
+								'value' => $product['article_no'],
 							]
 						], [
 							'type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_product_article_name'),
 								'required' => true,
-								'value' => $product['article_name']
+								'value' => $product['article_name'],
 							]
 						], [
 							'type' => 'textinput',
@@ -1038,13 +1039,13 @@ class CONSUMABLES extends API {
 								'name' => LANG::GET('consumables.edit_product_article_unit'),
 								'list' => 'units',
 								'required' => true,
-								'value' => $product['article_unit']
+								'value' => $product['article_unit'],
 							]
 						], [
 							'type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_product_article_ean'),
-								'value' => $product['article_ean']
+								'value' => $product['article_ean'],
 							]
 						], [
 							'type' => 'br'
@@ -1052,7 +1053,7 @@ class CONSUMABLES extends API {
 						[
 							'type' => 'checkbox',
 							'content' => [
-								LANG::GET('consumables.edit_product_article_trading_good') => []
+								LANG::GET('consumables.edit_product_article_trading_good') => [],
 							]
 						]
 					], [
@@ -1060,7 +1061,7 @@ class CONSUMABLES extends API {
 							'type' => 'file',
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_product_documents_update'),
-								'multiple' => true
+								'multiple' => true,
 							],
 							'hint' => LANG::GET('consumables.edit_product_documents_update_hint')
 						]
@@ -1082,6 +1083,17 @@ class CONSUMABLES extends API {
 					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
 					'data-confirm' => true
 					]];
+				
+				if (array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])){
+					$result['body']['content'][0][2]['attributes']['disabled'] =
+					$result['body']['content'][2][0]['attributes']['disabled'] =
+					$result['body']['content'][2][1]['attributes']['readonly'] =
+					$result['body']['content'][2][2]['attributes']['readonly'] =
+					$result['body']['content'][2][3]['attributes']['readonly'] =
+					$result['body']['content'][2][5]['attributes']['readonly'] =
+					$result['body']['content'][2][6]['attributes']['readonly'] =
+					$result['body']['content'][3][0]['attributes']['readonly'] = true;
+				}
 
 				if ($documents) $result['body']['content'][3]=[
 					[

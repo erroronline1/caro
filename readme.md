@@ -30,8 +30,6 @@
 * ux tabs?
 * refactor languagefile
 
-#### todo user
-* product editing permission
 
 #### todo forms
 * import data from other cases, warn about identifier!
@@ -39,8 +37,6 @@
 * suggest next form? (load with identify)
 
 #### todo purchase
-* product editing permission alias only, rest readonly
-* alias editing protects product
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
