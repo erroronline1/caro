@@ -6,6 +6,7 @@
     * [Intended ISO 13485 goals](#intended-iso-13485-goals)
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
+    * [Data integrity](#data-integrity)
 * [Application flow for current modules](#application-flow-for-current-modules)
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
@@ -134,11 +135,16 @@ Main goal is a distribution of mobile devices to the whole staff or at least key
 For technical details see [prerequisites](#prerequisites). 
 
 ### What it is not
-Beside a few architectural decisions the app is not a preset quality management system. Define your processes and documents on your own. The application is supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues.
+Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes and documents for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues.
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
 Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose.
+
+### Data integrity
+As records intend to save the submitting users name, group accounts are unreasonable. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+
+Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
 [Content](#Content)
 
