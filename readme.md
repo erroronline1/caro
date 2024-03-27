@@ -75,7 +75,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Case documentation form require a case identifier to ensure respective data is allocated correctly.
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
-    * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#useage-notes-and-caveats).
+    * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
     * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, ceo and quality management officers only.
     * Form components and forms need to be approved by a unit supervisor, quality management officer and ceo. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New Components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
@@ -427,6 +427,8 @@ The CSV Processor is implemented within the CSV filter module as well as importi
 
 Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
 
+Description of options:
+
 	"postProcessing": Optional string as hint what to do with the result file
     "filesetting":
 		"source": File to process, SELF or a named array (the other filesettings don't matter then)
@@ -508,6 +510,8 @@ Filters and modifications are processed in order of appearance. Modifications ta
     "translations" : Can replace e.g. numerical values with legible translations.
                      This is an object/dict whose keys can be refered to from the modifier. 
                      The dict keys are processed as regex for a possible broader use.
+
+A generic sample:
 
 ```javascript
 {
