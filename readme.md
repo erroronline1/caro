@@ -31,7 +31,6 @@
 * refactor languagefile
 
 #### todo user
-* group account permission (no record input)
 * product editing permission
 
 #### todo forms
@@ -40,8 +39,6 @@
 * suggest next form? (load with identify)
 
 #### todo purchase
-* order prevent dataloss
-* order dynamic field ordering user on group account
 * product editing permission alias only, rest readonly
 * alias editing protects product
 * batch identifier (product and delivery note number) for ordered items
@@ -49,7 +46,6 @@
 * vendor list
 * vendor mailto (certificates)
 * vendor evaluation
-
 
 #### todo planning
 * weekly schedule planning

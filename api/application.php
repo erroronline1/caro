@@ -81,7 +81,6 @@ class APPLICATION extends API {
 			],
 			LANG::GET('menu.record_header') => [
 				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
-				LANG::GET('menu.record_record') => ['onpointerup' => "api.record('get', 'forms')"],
 				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
 			LANG::GET('menu.files_header') => [
@@ -100,6 +99,9 @@ class APPLICATION extends API {
 				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"]
 			],
 		];
+		if (array_intersect(['user'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
+		}
 		if (array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];

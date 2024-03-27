@@ -409,37 +409,40 @@ class record extends API {
 		
 				$return['body']['content'] = $body;
 
-				$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
-				// match against bundles
-				// prepare existing bundle lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
-				$statement->execute();
-				$bd = $statement->fetchAll(PDO::FETCH_ASSOC);
-				$hidden = [];
-				foreach($bd as $key => $row) {
-					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!in_array($row['name'], $bundles) && !in_array($row['name'], $hidden)) {
-						$bundles[$row['name']] = ['value' => $row['name']];
+				if (array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+					// simple groups are not allowed to append to form
+					$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
+					// match against bundles
+					// prepare existing bundle lists
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
+					$statement->execute();
+					$bd = $statement->fetchAll(PDO::FETCH_ASSOC);
+					$hidden = [];
+					foreach($bd as $key => $row) {
+						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+						if (!in_array($row['name'], $bundles) && !in_array($row['name'], $hidden)) {
+							$bundles[$row['name']] = ['value' => $row['name']];
+						}
 					}
-				}
 
-				$return['body']['content'][] = [
-					[
-						'type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('record.record_match_bundles'),
-							'onchange' => "if (this.value != '0') api.record('get', 'matchbundles', this.value, '" . $this->_requestedID . "')"
-						],
-						'hint' => LANG::GET('record.record_match_bundles_hint'),
-						'content' => $bundles
-					], [
-						'type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('record.record_export'),
-							'onpointerup' => "api.record('get', 'export', '" . $this->_requestedID . "')"
+					$return['body']['content'][] = [
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('record.record_match_bundles'),
+								'onchange' => "if (this.value != '0') api.record('get', 'matchbundles', this.value, '" . $this->_requestedID . "')"
+							],
+							'hint' => LANG::GET('record.record_match_bundles_hint'),
+							'content' => $bundles
+						], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('record.record_export'),
+								'onpointerup' => "api.record('get', 'export', '" . $this->_requestedID . "')"
+							]
 						]
-					]
-				];
+					];
+				}
 				$this->response($return);
 				break;
 			default:

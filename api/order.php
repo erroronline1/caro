@@ -315,7 +315,7 @@ class ORDER extends API {
 			unset ($this->_payload->existingattachments);
 		}
 
-		//convert organizations unit from value to key according to language file
+		// convert organizations unit from value to key according to language file
 		$this->_payload->{LANG::PROPERTY('order.organizational_unit')} = array_search(UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.organizational_unit')), LANGUAGEFILE['units']);
 
 		// translate payload-names to languagefile keys
@@ -552,9 +552,6 @@ class ORDER extends API {
 						],
 						'content' => $organizational_units
 						],
-						['type' => 'scanner',
-						'destination' => 'commission'
-						],
 						['type' => 'textinput',
 						'hint' => LANG::GET('order.commission_hint'),
 						'attributes' => [
@@ -564,6 +561,9 @@ class ORDER extends API {
 							'data-loss' => 'prevent',
 							'id' => 'commission'
 						]],
+						['type' => 'scanner',
+						'destination' => 'commission'
+						],
 						['type' => 'dateinput',
 						'attributes' => [
 							'name' => LANG::GET('order.delivery_date'),
@@ -606,6 +606,19 @@ class ORDER extends API {
 						]
 					],
 				]];
+				if (!array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+					array_splice($result['body']['content'][2], 1, 0, [[
+							'type' => 'textinput',
+							'hint' => LANG::GET('order.orderer_group_hint'),
+							'attributes' => [
+								'name' => LANG::GET('order.orderer_group_identify'),
+								'required' => true,
+								'value' => array_key_exists('orderer_group_identify', $order) ? $order['orderer_group_identify'] : '',
+							]
+						]]
+					);
+				
+				}
 				if (array_key_exists('attachments', $order)){
 					$files = [];
 					foreach(explode(',', $order['attachments']) as $file){
@@ -911,6 +924,8 @@ class ORDER extends API {
 					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info'))
 						$text .= LANG::GET('order.additional_info') . ': ' . $additional_information . "\n \n";
 					$text .= LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']) . "\n";
+					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify'))
+						$text .= LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify . "\n";
 					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . "\n";
 
@@ -1081,31 +1096,47 @@ class ORDER extends API {
 					// request incorporation
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							$content[] = [
-								'type' => 'button',
-								'attributes' => [
-									'value' => LANG::GET('order.incorporation'),
+							if (array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+								$content[] = [
 									'type' => 'button',
-									'onpointerup' => "api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . ");"
-								]
-							];
+									'attributes' => [
+										'value' => LANG::GET('order.incorporation'),
+										'type' => 'button',
+										'onpointerup' => "api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . ");"
+									]
+								];
+							} else {
+								// simple groups are not allowed to make records
+								$content[] = [
+									'type' => 'text',
+									'description' => LANG::GET('order.incorporation_neccessary_by_user')
+								];
+							}
 						}
 					}
 					
 					// request MDR §14 sample check
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							$content[] = [
-								'type' => 'button',
-								'attributes' => [
-									'value' => LANG::GET('order.sample_check'),
+							if (array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+									$content[] = [
 									'type' => 'button',
-									'onpointerup' => "api.purchase('get', 'mdrsamplecheck', " . $sampleCheck[$tocheck]['id'] . ");"
-								]
-							];
+									'attributes' => [
+										'value' => LANG::GET('order.sample_check'),
+										'type' => 'button',
+										'onpointerup' => "api.purchase('get', 'mdrsamplecheck', " . $sampleCheck[$tocheck]['id'] . ");"
+									]
+								];
+							} else {
+								// simple groups are not allowed to make records
+								$content[] = [
+									'type' => 'text',
+									'description' => LANG::GET('order.sample_check_by_user')
+								];
+							}
 						}
 					}
-					
+
 					// delete order button if permitted
 					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)) {
 						$content[] = [
