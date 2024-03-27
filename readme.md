@@ -27,7 +27,12 @@
 # open tasks
 
 #### todo application
+* ux tabs?
 * refactor languagefile
+
+#### todo user
+* group account permission (no record input)
+* product editing permission
 
 #### todo forms
 * import data from other cases, warn about identifier!
@@ -35,13 +40,25 @@
 * suggest next form? (load with identify)
 
 #### todo purchase
+* order prevent dataloss
+* order dynamic field ordering user on group account
+* product editing permission alias only, rest readonly
+* alias editing protects product
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
 * vendor evaluation
 
+
+#### todo planning
+* weekly schedule planning
+* list / reminder for unfinished cases, current state
+
 #### todo records
+* export option for most recent data only for insurance companies w/o author and date
+* export option for distinct form
+* linked files on separate external path
 * monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
