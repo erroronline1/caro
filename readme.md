@@ -15,9 +15,11 @@
     * [Records](#records)
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
+    * [Tools](#tools)
 * [CSV processor](#csv-processor)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
+    * [Runtime variables](#runtime-variables)
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
@@ -30,7 +32,10 @@
 #### todo application
 * ux tabs?
 * refactor languagefile
+* hash sum check for data completeness?
 
+#### csv processor
+* PFP0XYYZ ossur feet x=cat yy=size z=side pattern matching and prefilling by array
 
 #### todo forms
 * import data from other cases, warn about identifier!
@@ -38,6 +43,9 @@
 * suggest next form? (load with identify)
 
 #### todo purchase
+
+* order only assigned units selecteable?
+
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
@@ -83,6 +91,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
     * Case documentation form require a case identifier to ensure respective data is allocated correctly.
+    * also see [records](#records)
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
@@ -91,40 +100,49 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * New Components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
+    * also see [forms](#forms)
 * ISO 13485 4.2.5 Record control
     * All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.
     * Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.
     * Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.
     * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
+    * also see [user management](#user-management), [records](#records)
 * ISO 13485 5.5.1 Responsibility and authority
     * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items
     * Users can be assigned a pin to approve orders
+    * also see [user management](#user-management)
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in messenger. This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
         * alerting user groups about disapproved orders
         * messaging inquiries to ordering users
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
+    * also see [order](#order)
 * ISO 13485 6.2 Human resources
-    * Users can be attached documents. Intended usecase is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
+    * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
+    * also see [users](#users), [tools](#tools)
 * ISO 13485 7.4.1 Procurement process
     * Procurement is guided through the application. Vendors and products can be added into the database.
-        * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
-        * Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.
-        * Products are supposed to be incorporated. Incorporation can be granted, denied and - through product management - revoked. All inputs will result in an entry to the respective audit check list. Incorporation information is to be enriched through a dedicated form with the respective context.
-        * Products are deleted by default on update of the pricelist unless
-            * an incorporation has been made
-            * a sample check has been made
-            * any document to the product has been provided
-        * Vendor and product editing is permitted by elevated users including purchase only.
+    * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
+    * Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.
+    * Products are supposed to be incorporated. Incorporation can be granted, denied and - through product management - revoked. All inputs will result in an entry to the respective audit check list. Incorporation information is to be enriched through a dedicated form with the respective context.
+    * Products are deleted by default on update of the pricelist unless
+        * an incorporation has been made
+        * a sample check has been made
+        * any document to the product has been provided
+    * Vendor and product editing is permitted by elevated users including purchase only.
+    * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#sample-check) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
     * Sample check information is to be enriched through a dedicated form with the respective context.
+    * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.5.1 Control of production and service
     * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
     * Form contexts allow the definition as process or work instructions.
+    * also see [forms](#forms), [records](#records)
 * ISO 13485 7.5.8 Product indentification
     * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky Identifier labels can be used to mark any components of a product during production.
+    * also see [records](#records)
 * ISO 13485 7.6 Surveillance and measuring equipment control
     * --- yet to be implemented ---
 * ISO 13485 8.2.4 Internal audit
@@ -134,6 +152,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * a list of current documents in use (forms and their components)
         * user files (e.g. certificates)
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
+    * also see [tools](#tools)
 
 [Content](#Content)
 
@@ -155,6 +174,8 @@ Orders can be deleted by administrative users and requesting unit members at any
 As records intend to save the submitting users name, group accounts are unreasonable. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
+
+Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable for your processes enough.
 
 [Content](#Content)
 
@@ -267,7 +288,7 @@ On creating a text you can make use of predefined replacements that may contain 
 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
-Output wil be copied to clipboad on clicking ot tapping the output field.
+Output wil be copied to clipboad on clicking or tapping the output field.
 
 ```mermaid
 graph TD;
@@ -304,6 +325,15 @@ graph TD;
 [Content](#Content)
 
 ### Forms
+To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check, if all neccessary forms have been taken into account for defined use cases.
+
+An approvement request is delivered by the applications messenger to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit.
+
+Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally neccessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
+
+The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
+
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to elevated users to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
 
 ```mermaid
 graph TD;
@@ -340,6 +370,11 @@ graph TD;
 [Content](#Content)
 
 ### Records
+Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries contain all inputs in chronological order and can be exported.
+
+The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
+
+Checking for completeness of form bundles can be applied on display of a record summary.
 
 ```mermaid
 graph TD;
@@ -357,7 +392,7 @@ graph TD;
     displayform-->inputdata[add data];
     inputdata-->|input new dataset with form name|recorddb[(record database)];
     displayform-->idimport[import by identifier];
-    idimport-->recorddb2[(record database)];;
+    idimport-->recorddb2[(record database)];
     recorddb2-->selectbyid[retrieve all with identifier];
     selectbyid-->|render last appended data|inputdata;
 
@@ -380,10 +415,20 @@ graph TD;
 [Content](#Content)
 
 ### Files
+Admin, CEO, QMO and office can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
+
+Both cloud storages equip the [tools STL-Viewer](#tools) with sources to display.
+
+This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
 
 [Content](#Content)
 
 ### Vendor and product management
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase can manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
+
+Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
+
+The special permission of *purchase assistant* can edit the alias definition of products to disburden purchase and enhance identification of products with company customs. 
 
 ```mermaid
 graph TD;
@@ -437,6 +482,12 @@ graph TD;
 [Content](#Content)
 
 ### Order
+The order module helps all parties. Purchase is supposed to get structured and complete data for placed orders and ordering units get information about the order state.
+Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up.
+
+Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin or elevated users including supervisors.
+
+Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
 
 ```mermaid
 graph TD;
@@ -475,10 +526,11 @@ graph TD;
     append data"];
     select_similar-->productdb[(product database)]
     incorporate_similar-->|no|insert_data[insert data];
-    insert_data-->productdb[(product database)]
+    insert_data-->productdb[(product database)];
+    productdb[(product database)]-->checksdb[(checks database)];
 
     process_order-->|sample check required|sample_check[sample check];
-    sample_check-->productdb[(product database)]
+    sample_check-->productdb[(product database)];
 
     process_order-->mark[mark];
     mark-->|processed|auto_delete[auto delete after X days];
@@ -502,11 +554,16 @@ graph TD;
     prepared_orders-->add_product;
 ```
 
-
-
 [Content](#Content)
 
+### Tools
+Some generic tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
 
+Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by admin, ceo, qmo and office.
+
+The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements.
+
+[Content](#Content)
 
 ## CSV processor
 
@@ -808,6 +865,57 @@ Tested devices:
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
 * Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
+
+### Runtime variables
+Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
+
+```
+language = "en" ; en, de, etc. according to available language.xx.ini files
+
+[lifespan]
+sharepoint =  48 ; HOURS, after these files will be deleted
+tmp =  24 ; HOURS, after these files will be deleted
+order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+
+[splitresults]
+bundle_files_per_slide = 12
+products_per_slide = 6
+
+[limits]
+max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
+mdr14_sample_interval = 365 ; days until a new sample check is required
+mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
+
+; forbidden names as regex-patterns
+[forbidden]
+names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whitespace, decimals, special characters 
+names[] = "^.{0,3}$" ; less than 4 characters
+
+; immutable hardcoded reserved keywords
+names[] = "IDENTIFY_BY_" ; special substrings |-separated
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
+
+; probability factor for similarity of texts in percent
+[likeliness]
+consumables_article_no_similarity = 70 ; percent
+file_search_similarity = 50 ; percent
+records_search_similarity = 20 ; percent
+csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
+
+; page settings for pdf
+[pdf]
+labelsheet[format] = 'A4'
+labelsheet[rows] = 11
+labelsheet[columns] = 5
+labelsheet[margintop] = 0 ; in mm
+labelsheet[marginbottom] = 10 ; in mm
+record[format] = 'A4'
+record[margintop] = 35 ; in mm
+record[marginright] = 15 ; in mm
+record[marginbottom] = 15 ; in mm
+record[marginleft] = 20 ; in mm
+exportimage[maxheight] = 75 ; try what fits you typical aspect ratio for landscape
+```
 
 #### Useage notes and caveats
 
