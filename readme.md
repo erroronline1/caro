@@ -9,13 +9,12 @@
     * [Data integrity](#data-integrity)
     * [User management](#user-management)
 * [Modules](#modules)
-* [Application flow for current modules](#application-flow-for-current-modules)
-    * [Vendor and product management](#vendor-and-product-management)
-    * [Order](#order)
     * [Users](#users)
     * [Text recommendations](#text-recommendations)
     * [Forms](#forms)
     * [Records](#records)
+    * [Vendor and product management](#vendor-and-product-management)
+    * [Order](#order)
 * [CSV processor](#csv-processor)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -207,14 +206,182 @@ Adding files is granted to elevated users only, to make sure certificates are ac
 [Content](#Content)
 
 ## Modules
+
 ### Users
 Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to elevated users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
 
-Users can see their information in the profile section for transparency reasons. They can modify theit profile picture and set individual application settings
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings
 
+```mermaid
+graph TD;
+    application((application))-->login[login];
+    login-->scan_code;
+    scan_code{scan code}-->user_db[(user database)];
+    user_db-->|found|logged_in[logged in];
+    user_db-->|not found|login;
+    logged_in-->manage_users((manage users));
+    manage_users-->new_user[new user];
+    manage_users-->edit_user[edit user];
+    new_user-->user_settings["set name, authorization,
+    unit, photo, order auth pin,
+    login token, user documents"];
+    edit_user-->user_settings;
+    user_settings-->export_token[export token];
+    export_token-->user(((user)));
+    user-->login;
+    user_settings-->user;
 
+    logged_in-->own_profile((profile));
+    own_profile-->profile["view information,
+    renew photo"];
+    profile-->user;
 
-## Application flow for current modules
+    edit_user-->delete_user[delete user];
+    delete_user-->user;
+
+    user-->|has pin|orders((approve orders))
+    user-->|authorized|authorized(("see content based
+    on authorization"))
+    user-->|units|units(("see content based
+    on units"))
+```
+
+[Content](#Content)
+
+### Text recommendations
+To avoid unneccesary or repetitive poetry and support a unique linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
+* Child female - the girl
+* Child male - the boy
+* Child genderless - the child
+* Adult female - the woman
+* Adult male - the man
+* Adult genderless - the person
+* Informal you - "buddy"
+* Formal you - "your honor" (this is the german model part where there is more than just "you")
+such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+
+On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
+*"Today we inform you about *
+
+*"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNomative can make use of the aid."*
+
+Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
+
+Output wil be copied to clipboad on clicking ot tapping the output field.
+
+```mermaid
+graph TD;
+    textrecommendation(("text
+    recommendation")) -->select[select template];
+    select -->chunks[(chunks)];
+    chunks-->|get recent by name|display["display template
+    and inputs"];
+    display -->|input|render(rendered text);
+
+    managechunks(("manage
+    text chunks")) -->select2["select recent
+    by name or new"];
+    managechunks(("manage
+    text chunks")) -->select3["select any or new"];
+    select2-->chunks2[(chunks)];
+    select3-->chunks2;
+    chunks2 -->editchunk[edit chunk];
+    editchunk -->type{type};
+    type -->|replacement|chunks2;
+    type -->|text|chunks2;
+    
+    managetemplates(("manage
+    text templates")) -->select4["select recent
+    by name or new"];
+    managetemplates(("manage
+    text chunks")) -->select5["select any or new"];
+    select4-->chunks3[(chunks)];
+    select5-->chunks3;
+    chunks3 -->edittemplate[edit template];
+    edittemplate -->|add template|chunks3;
+```
+
+[Content](#Content)
+
+### Forms
+
+```mermaid
+graph TD;
+    manage_components(("manage
+    components"))-->|new component|edit_component["edit content,
+    add widgets,
+    reorder"];
+    manage_components(("manage
+    components"))-->|existing component|edit_component;
+    edit_component-->|save|new_forms_database[("append new dataset to
+    forms database")];
+
+    manage_forms(("manage
+    forms"))-->|new form|edit_form["edit form,
+    reorder components"];
+    manage_forms-->|existing form|edit_form;
+    edit_form-->add_component[add component];
+    add_component-->forms_database[(forms database)];
+    forms_database-->|latest unhidden component|edit_form;
+    edit_form-->|save|new_forms_database;
+
+    manage_bundles(("manage
+    bundles"))-->|new bundle|edit_bundle["edit bundle"];
+    manage_bundles-->|existing bundle|edit_bundle;
+    edit_bundle-->add_form[add form];
+    add_form-->forms_database2[(forms database)];
+    forms_database2-->|latest unhidden form|edit_bundle;
+    edit_bundle-->|save|new_forms_database
+
+    new_forms_database-->returns("returns only latest dataset on request
+    if named item is not hidden")
+```
+
+[Content](#Content)
+
+### Records
+
+```mermaid
+graph TD;
+    records((records))-->identifiersheet(("create
+    identifier
+    sheet"));
+    identifiersheet-->input[input data];
+    input-->|generate|print("print sheet,
+    handout to workmates");
+
+    records-->fillform((fill out form));
+    fillform-->selectform[select form];
+    selectform-->forms[(forms)];
+    forms-->|get recent by name|displayform[display form];
+    displayform-->inputdata[add data];
+    inputdata-->|input new dataset with form name|recorddb[(record database)];
+    displayform-->idimport[import by identifier];
+    idimport-->recorddb2[(record database)];;
+    recorddb2-->selectbyid[retrieve all with identifier];
+    selectbyid-->|render last appended data|inputdata;
+
+    print-.->idimport;
+
+    records-->summaries((record summary));
+    summaries-->recorddb3[(record database)]
+    recorddb3-->displayids[display identifier];
+    displayids-->|select|summary[display summary];
+    summary-->export[export];
+    export-->pdf("summary as pdf,
+    attached files");
+    summary-->matchbundles[match with form bundles];
+    matchbundles-->missing{missing form};
+    missing-->|yes|appenddata[append form];
+    appenddata-->forms;
+    missing-->|no|nonemissing(status message);
+```
+
+[Content](#Content)
+
+### Files
+
+[Content](#Content)
 
 ### Vendor and product management
 
@@ -335,157 +502,11 @@ graph TD;
     prepared_orders-->add_product;
 ```
 
-[Content](#Content)
 
-### Users
-
-```mermaid
-graph TD;
-    application((application))-->login[login];
-    login-->scan_code;
-    scan_code{scan code}-->user_db[(user database)];
-    user_db-->|found|logged_in[logged in];
-    user_db-->|not found|login;
-    logged_in-->manage_users((manage users));
-    manage_users-->new_user[new user];
-    manage_users-->edit_user[edit user];
-    new_user-->user_settings["set name, authorization,
-    unit, photo, order auth pin,
-    login token, user documents"];
-    edit_user-->user_settings;
-    user_settings-->export_token[export token];
-    export_token-->user(((user)));
-    user-->login;
-    user_settings-->user;
-
-    logged_in-->own_profile((profile));
-    own_profile-->profile["view information,
-    renew photo"];
-    profile-->user;
-
-    edit_user-->delete_user[delete user];
-    delete_user-->user;
-
-    user-->|has pin|orders((approve orders))
-    user-->|authorized|authorized(("see content based
-    on authorization"))
-    user-->|units|units(("see content based
-    on units"))
-```
 
 [Content](#Content)
 
-### Text recommendations
 
-```mermaid
-graph TD;
-    textrecommendation(("text
-    recommendation")) -->select[select template];
-    select -->chunks[(chunks)];
-    chunks-->|get recent by name|display["display template
-    and inputs"];
-    display -->|input|render(rendered text);
-
-    managechunks(("manage
-    text chunks")) -->select2["select recent
-    by name or new"];
-    managechunks(("manage
-    text chunks")) -->select3["select any or new"];
-    select2-->chunks2[(chunks)];
-    select3-->chunks2;
-    chunks2 -->editchunk[edit chunk];
-    editchunk -->type{type};
-    type -->|replacement|chunks2;
-    type -->|text|chunks2;
-    
-    managetemplates(("manage
-    text templates")) -->select4["select recent
-    by name or new"];
-    managetemplates(("manage
-    text chunks")) -->select5["select any or new"];
-    select4-->chunks3[(chunks)];
-    select5-->chunks3;
-    chunks3 -->edittemplate[edit template];
-    edittemplate -->|add template|chunks3;
-```
-
-[Content](#Content)
-
-### Forms
-
-```mermaid
-graph TD;
-    manage_components(("manage
-    components"))-->|new component|edit_component["edit content,
-    add widgets,
-    reorder"];
-    manage_components(("manage
-    components"))-->|existing component|edit_component;
-    edit_component-->|save|new_forms_database[("append new dataset to
-    forms database")];
-
-    manage_forms(("manage
-    forms"))-->|new form|edit_form["edit form,
-    reorder components"];
-    manage_forms-->|existing form|edit_form;
-    edit_form-->add_component[add component];
-    add_component-->forms_database[(forms database)];
-    forms_database-->|latest unhidden component|edit_form;
-    edit_form-->|save|new_forms_database;
-
-    manage_bundles(("manage
-    bundles"))-->|new bundle|edit_bundle["edit bundle"];
-    manage_bundles-->|existing bundle|edit_bundle;
-    edit_bundle-->add_form[add form];
-    add_form-->forms_database2[(forms database)];
-    forms_database2-->|latest unhidden form|edit_bundle;
-    edit_bundle-->|save|new_forms_database
-
-    new_forms_database-->returns("returns only latest dataset on request
-    if named item is not hidden")
-```
-
-[Content](#Content)
-
-### Records
-
-```mermaid
-graph TD;
-    records((records))-->identifiersheet(("create
-    identifier
-    sheet"));
-    identifiersheet-->input[input data];
-    input-->|generate|print("print sheet,
-    handout to workmates");
-
-    records-->fillform((fill out form));
-    fillform-->selectform[select form];
-    selectform-->forms[(forms)];
-    forms-->|get recent by name|displayform[display form];
-    displayform-->inputdata[add data];
-    inputdata-->|input new dataset with form name|recorddb[(record database)];
-    displayform-->idimport[import by identifier];
-    idimport-->recorddb2[(record database)];;
-    recorddb2-->selectbyid[retrieve all with identifier];
-    selectbyid-->|render last appended data|inputdata;
-
-    print-.->idimport;
-
-    records-->summaries((record summary));
-    summaries-->recorddb3[(record database)]
-    recorddb3-->displayids[display identifier];
-    displayids-->|select|summary[display summary];
-    summary-->export[export];
-    export-->pdf("summary as pdf,
-    attached files");
-    summary-->matchbundles[match with form bundles];
-    matchbundles-->missing{missing form};
-    missing-->|yes|appenddata[append form];
-    appenddata-->forms;
-    missing-->|no|nonemissing(status message);
-```
-
-[Content](#Content)
 
 ## CSV processor
 
