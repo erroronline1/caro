@@ -179,7 +179,7 @@ const orderClient = {
 			node.setSelectionRange(0, 99999); // For mobile devices
 			navigator.clipboard.writeText(node.value);
 		} else navigator.clipboard.writeText(node); // passed string
-		api.toast(LANG.GET("general.copied_to_clipboard"));
+		new Toast(LANG.GET("general.copied_to_clipboard"), 'info');
 	},
 	filter: (type = undefined) => {
 		document.querySelectorAll("[data-ordered]").forEach((article) => {
