@@ -900,14 +900,14 @@ csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 labelsheet[format] = 'A4'
 labelsheet[rows] = 11
 labelsheet[columns] = 5
-labelsheet[margintop] = 0 ; in mm
-labelsheet[marginbottom] = 10 ; in mm
+labelsheet[margintop] = 0 ; in points
+labelsheet[marginbottom] = 10 ; in points
 record[format] = 'A4'
-record[margintop] = 35 ; in mm
-record[marginright] = 15 ; in mm
-record[marginbottom] = 15 ; in mm
-record[marginleft] = 20 ; in mm
-exportimage[maxheight] = 75 ; try what fits you typical aspect ratio for landscape
+record[margintop] = 35 ; in points
+record[marginright] = 15 ; in points
+record[marginbottom] = 15 ; in points
+record[marginleft] = 20 ; in points
+exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
 ```
 
 #### Useage notes and caveats
