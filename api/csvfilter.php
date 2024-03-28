@@ -26,6 +26,9 @@ class CSVFILTER extends API {
 
 				if (!trim($filter[':name']) || !trim($filter[':content'])) $this->response([], 400);
 
+				// ensure valid json for filters
+				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['status' => ['msg' => LANG::GET('csvfilter.edit_filter_content_hint'), 'type' => 'error']]);
+
 				// put hidden attribute if anything else remains the same
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-latest-by-name'));
 				$statement->execute([
@@ -229,7 +232,7 @@ class CSVFILTER extends API {
 					}
 				}
 				
-				$pricelist = new Listprocessor($content, [
+				$datalist = new Listprocessor($content, [
 					'processedMonth' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.use_filter_month')),
 					'processedYear' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.use_filter_year'))
 				]);
@@ -241,25 +244,25 @@ class CSVFILTER extends API {
 				$downloadfiles=[];
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
 					case 'csv':
-						foreach($pricelist->_list as $subsetname => $subset){
+						foreach($datalist->_list as $subsetname => $subset){
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
 							$tempFile = UTILITY::directory('tmp') . '/' . time() . $subsetname . '.csv';
 							$file = fopen($tempFile, 'w');
 							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-							fputcsv($file, $pricelist->_setting['filesetting']['columns'],
-								$pricelist->_setting['filesetting']['dialect']['separator'],
-								$pricelist->_setting['filesetting']['dialect']['enclosure'],
-								$pricelist->_setting['filesetting']['dialect']['escape']);
+							fputcsv($file, $datalist->_setting['filesetting']['columns'],
+								$datalist->_setting['filesetting']['dialect']['separator'],
+								$datalist->_setting['filesetting']['dialect']['enclosure'],
+								$datalist->_setting['filesetting']['dialect']['escape']);
 							foreach($subset as $line) {
 								fputcsv($file, $line,
-								$pricelist->_setting['filesetting']['dialect']['separator'],
-								$pricelist->_setting['filesetting']['dialect']['enclosure'],
-								$pricelist->_setting['filesetting']['dialect']['escape']);
+								$datalist->_setting['filesetting']['dialect']['separator'],
+								$datalist->_setting['filesetting']['dialect']['enclosure'],
+								$datalist->_setting['filesetting']['dialect']['escape']);
 							}
 							fclose($file);
-							$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => preg_replace('/.csv$/', (count($pricelist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])])] = [
+							$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])])] = [
 								'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-								'download' => preg_replace('/.csv$/', (count($pricelist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])
+								'download' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])
 							];
 						}
 						break;
@@ -268,9 +271,9 @@ class CSVFILTER extends API {
 						$tempFile = UTILITY::directory('tmp') . '/' . time() . '.xlsx';
 						$writer = new XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
-						foreach($pricelist->_list as $subsetname => $subset){
+						foreach($datalist->_list as $subsetname => $subset){
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
-							$writer->writeSheetRow($subsetname, $pricelist->_setting['filesetting']['columns']);
+							$writer->writeSheetRow($subsetname, $datalist->_setting['filesetting']['columns']);
 							foreach ($subset as $line)
 								$writer->writeSheetRow($subsetname, $line);
 						}
@@ -284,7 +287,7 @@ class CSVFILTER extends API {
 				}
 				
 				$this->response([
-					'log' => $pricelist->_log,
+					'log' => $datalist->_log,
 					'links' => $downloadfiles
 				]);
 				break;

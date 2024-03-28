@@ -436,6 +436,10 @@ class CONSUMABLES extends API {
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
 
+				// ensure valid json for filters
+				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor['pricelist']['trading_goods'] && !json_decode($vendor['pricelist']['trading_goods'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter_json_error', ), 'type' => 'error']]);
+
 				// save certificate
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
@@ -497,6 +501,10 @@ class CONSUMABLES extends API {
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
+
+				// ensure valid json for filters
+				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor['pricelist']['trading_goods'] && !json_decode($vendor['pricelist']['trading_goods'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter_json_error', ), 'type' => 'error']]);
 
 				// save certificate
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
