@@ -34,9 +34,6 @@
 * refactor languagefile
 * hash sum check for data completeness?
 
-#### csv processor
-* PFP0XYYZ ossur feet x=cat yy=size z=side pattern matching and prefilling by array
-
 #### todo forms
 * import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)
@@ -71,15 +68,9 @@
 #### todo misc
 * user selectable color themes?
 * calendar and alerts
-* md mermaid flowcharts
-* application manual
-    * general manual
-    * iso 13485 checklist and how the application handles these
-    * csvprocessor
 * improved landing page
 * message ordering and categorizing, displaying left and right
 * risk management?
-* database export
 
 
 ## Aims
@@ -574,86 +565,88 @@ Filters and modifications are processed in order of appearance. Modifications ta
 Description of options:
 
 	"postProcessing": Optional string as hint what to do with the result file
-    "filesetting":
+	"filesetting":
 		"source": File to process, SELF or a named array (the other filesettings don't matter then)
-	    "headerrowindex": Offset for title row
-	    "dialect": Settings according to php fgetcsv
-	    "columns": list/array of column names to process and export to destination
-        "encoding": Comma separated string of possible character encoding of sourcefile
+		"headerrowindex": Offset for title row
+		"dialect": Settings according to php fgetcsv
+		"columns": list/array of column names to process and export to destination
+		"encoding": Comma separated string of possible character encoding of sourcefile
 
-    "filter": List/array of objects/dicts
-        "apply": "filter_by_expression"
+	"filter": List/array of objects/dicts
+		"apply": "filter_by_expression"
 		"comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "match":
-            "all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
-            "any": At least one expression has to be matched, it's either "all" or "any"
+		"keep": Boolean if matches are kept or omitted
+		"match":
+			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
+			"any": At least one expression has to be matched, it's either "all" or "any"
 
-        "apply": "filter_by_monthdiff"
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "date": Filter by identifier and date diff in months
-            "identifier": Column name with recurring values, e.g. customer id
-            "column": Column name with date to process,
-            "format": List/array of date format order e.g. ["d", "m", "y"],
-            "threshold": Integer for months,
-            "bias": < less than, > greater than threshold
+		"apply": "filter_by_monthdiff"
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"date": Filter by identifier and date diff in months
+			"identifier": Column name with recurring values, e.g. customer id
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"threshold": Integer for months,
+			"bias": < less than, > greater than threshold
 
-        "apply": "filter_by_duplicates",
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-            "orderby": List/array of column names whose values concatenate for comparison
-            "descending": Boolean,
-            "column": Column name with recurring values, e.g. customer id of which duplicates are allowed
-            "amount": Integer > 0
+		"apply": "filter_by_duplicates",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+			"orderby": List/array of column names whose values concatenate for comparison
+			"descending": Boolean,
+			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
+			"amount": Integer > 0
 
-        "apply": "filter_by_comparison_file",
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
-            "filesetting": Same structure as base. if source == "SELF" the origin file will be processed
-            "filter": Same structure as base
-            "modify": Same structure as base
-            "match":
-                "all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
-                "any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
-        "transfer": Add a new column with comparison value
+		"apply": "filter_by_comparison_file",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
+			"filesetting": Same structure as base. if source == "SELF" the origin file will be processed
+			"filter": Same structure as base
+			"modify": Same structure as base
+			"match":
+				"all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
+				"any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
+		"transfer": Add a new column with comparison value
 
-        "apply": "filter_by_monthinterval",
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "interval": Discard by not matching interval in months, optional offset from initial column value
-            "column": Column name with date to process,
-            "format": List/array of date format order e.g. ["d", "m", "y"],
-            "interval": Integer for months,
-            "offset": Optional offset in months
+		"apply": "filter_by_monthinterval",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"interval": Discard by not matching interval in months, optional offset from initial column value
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"interval": Integer for months,
+			"offset": Optional offset in months
 
-        "apply": "filter_by_rand",
-        "comment": Description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
-            "columns": Object/dict of COLUMN-REGEX-pairs to select from,
-            "amount": Integer > 0
+		"apply": "filter_by_rand",
+		"comment": Description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
+			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
+			"amount": Integer > 0
 
-    "modify": Modifies the result
-        "add": Adds a column with the set value. if the name is already in use this will be replaced!
-               If property is an array with number values and arithmetic operators it will try to calculate
-               Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
-        "replace": Replaces regex matches with the given value either at a specified field or in all
-                   according to index 0 being a column name or none/null
-        "remove": Remove columns from result, may have been used solely for filtering
-        "rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
-                   Original columns will be omitted, nested within a list to make sure to order as given
-        "translate": Column values to be translated according to specified translation object
+	"modify": Modifies the result
+		"add": Adds a column with the set value. if the name is already in use this will be replaced!
+			   If property is an array with number values and arithmetic operators it will try to calculate
+			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
+		"replace": Replaces regex matches with the given value either at a specified field or in all
+				   according to index 0 being a column name or none/null
+				   If more than one replacement are provided new lines with altered column values will be added to the result
+				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if neccessary), group 2, ...rest)
+		"remove": Remove columns from result, may have been used solely for filtering
+		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
+				   Original columns will be omitted, nested within a list to make sure to order as given
+		"translate": Column values to be translated according to specified translation object
 
-    "split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
-    "evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
 
-    "translations" : Can replace e.g. numerical values with legible translations.
-                     This is an object/dict whose keys can be refered to from the modifier. 
-                     The dict keys are processed as regex for a possible broader use.
+	"translations" : Can replace e.g. numerical values with legible translations.
+					 This is an object/dict whose keys can be refered to from the modifier. 
+					 The dict keys are processed as regex for a possible broader use.
 
 A generic sample:
 
@@ -980,6 +973,16 @@ while setting up a vendor an import rule must be defined like:
 }
 ```
 *headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+
+Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
+
+```js
+"replace": [
+    ["Article Number", "(product)(X)(.*?)", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ["Article Number", "(product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    ["Article Number", "(product...)(Z)", "L", "R"]
+]
+```  
 
 [Content](#Content)
 
