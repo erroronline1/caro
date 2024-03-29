@@ -54,8 +54,6 @@
 * list / reminder for unfinished cases, current state
 
 #### todo records
-* export option for most recent data only for insurance companies w/o author and date
-* export option for distinct form
 * linked files on separate external path
 * monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
@@ -361,7 +359,9 @@ graph TD;
 [Content](#Content)
 
 ### Records
-Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries contain all inputs in chronological order and can be exported.
+Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. 
+
+Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
 The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
 

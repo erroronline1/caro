@@ -934,8 +934,10 @@ export const api = {
 						};
 						payload = { IDENTIFY_BY_: request[2] };
 						break;
-					case "export":
-					case "exportform":
+					case "fullexport":
+					case "simplifiedexport":
+					case "formexport": // sorry. exports a form with records
+					case "exportform": // exports the empty form as editable pdf
 					case "matchbundles":
 						//prevent default successFn
 						break;
