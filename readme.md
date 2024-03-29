@@ -79,14 +79,14 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ### Intended ISO 13485 goals
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
-    * Case documentation form require a case identifier to ensure respective data is allocated correctly.
+    * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
     * also see [records](#records)
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
-    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, ceo and quality management officers only.
-    * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and ceo. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
-    * New Components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
+    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, CEO and quality management officers  (QMO) only.
+    * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and CEO. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
+    * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
     * also see [forms](#forms)
@@ -97,8 +97,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
     * also see [user management](#user-management), [records](#records)
 * ISO 13485 5.5.1 Responsibility and authority
-    * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items
-    * Users can be assigned a pin to approve orders
+    * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items.
+    * Users can be assigned a pin to approve orders.
     * also see [user management](#user-management)
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in messenger. This messenger is being made use of internal modules to ensure decent data distribution e.g.
@@ -106,7 +106,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * alerting user groups about disapproved orders
         * messaging inquiries to ordering users
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
-    * also see [order](#order)
+    * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
+    * also see [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
     * also see [users](#users), [tools](#tools)
@@ -119,6 +120,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * an incorporation has been made
         * a sample check has been made
         * any document to the product has been provided
+        * an alias has been modified
     * Vendor and product editing is permitted by elevated users including purchase only.
     * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.4.3 Verification of procured products
@@ -160,11 +162,11 @@ The application does not replace an ERP system. Procurement data is solely acces
 Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose.
 
 ### Data integrity
-As records intend to save the submitting users name, group accounts are unreasonable. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
 
-Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
+Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
-Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable for your processes enough.
+Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
 
 [Content](#Content)
 
@@ -175,19 +177,20 @@ The application provides some options for registered users. The whole content is
     * can access forms and add records
     * can contribute to open sharepoint
     * can place orders
-    * can only see orders for own assigned organizational unit
+    * can only see orders for own assigned organizational units
     * can incorporate and sample check articles
 * Group
     * has access to all non writeable content
     * can not add records due to limited identification data
     * can contribute to open sharepoint
     * can place orders, will be prompted to identify themself
-    * can only see orders for own assigned organizational unit
+    * can only see orders for own assigned organizational units
     * can not incorporate and sample check due to limited identification data
 * Supervisor
     * can approve form components and forms
 * Office
-    * can contribute to file manager 
+    * can contribute to file manager
+    * cann access CSV-filter
 * Purchase
     * has full access to vendor and product management
     * can see all orders
@@ -205,7 +208,7 @@ The application provides some options for registered users. The whole content is
     * full access
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
 
-Permissions of QMO and CEO do hardly differ, but are neccessary being assigned to have a reliable alert on submission of a new form
+Permissions of QMO and CEO do hardly differ, but are neccessary being assigned to have a reliable alert on submission of a new form.
 
 Users can have multiple assigned organizational units.
 
@@ -220,7 +223,7 @@ Adding files is granted to elevated users only, to make sure certificates are ac
 ### Users
 Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to elevated users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
 
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
 ```mermaid
 graph TD;
@@ -259,7 +262,7 @@ graph TD;
 [Content](#Content)
 
 ### Text recommendations
-To avoid unneccesary or repetitive poetry and support a unique linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
+To avoid unneccesary or repetitive poetry and support a consistent linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
 * Child female - the girl
 * Child male - the boy
 * Child genderless - the child
@@ -268,16 +271,15 @@ To avoid unneccesary or repetitive poetry and support a unique linguistic style 
 * Adult genderless - the person
 * Informal you - "buddy"
 * Formal you - "your honor" (this is the german model part where there is more than just "you")
-such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+Such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
-*"Today we inform you about *
 
 *"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNomative can make use of the aid."*
 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
-Output wil be copied to clipboad on clicking or tapping the output field.
+Output will be copied to clipboad on clicking or tapping the output field.
 
 ```mermaid
 graph TD;
@@ -415,7 +417,7 @@ This source can also be used to provide documents that are [unsuitable to be fil
 [Content](#Content)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase can manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -473,7 +475,7 @@ graph TD;
 [Content](#Content)
 
 ### Order
-The order module helps all parties. Purchase is supposed to get structured and complete data for placed orders and ordering units get information about the order state.
+The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up.
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin or elevated users including supervisors.
@@ -924,14 +926,14 @@ exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landsc
 
 #### Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
-* Some parts of the setup.ini can be changes during runtime, others will mess up your system. Respective parts are marked
+* Some parts of the setup.ini can be changes during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
-* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 
 If you ever fiddle around with the sourcecode:
+* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between.
 
 [Content](#Content)
@@ -1031,3 +1033,5 @@ Without a filter none of the vendors products will be treated as a trading good!
 * [mermaid charts](https://mermaid.js.org/)
 
 [Content](#Content)
+
+(c)2023-2024 error on line 1 (dev@erroronline.one)
