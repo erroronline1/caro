@@ -9,11 +9,12 @@ class record extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_passedIdentify = null;
+	private $_formExport = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_passedIdentify = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
+		$this->_passedIdentify = $this->_formExport = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
 	}
 
 	public function identifier(){
@@ -376,12 +377,12 @@ class record extends API {
 						]
 					];
 					foreach($entries as $key => $value){
-					array_push($body[count($body) -1],
-						[
-							'type' => 'text',
-							'description' => $key,
-							'content' => $value
-						]); 
+						array_push($body[count($body) -1],
+							[
+								'type' => 'text',
+								'description' => $key,
+								'content' => $value
+							]); 
 					}
 					if (array_key_exists($form, $content['images'])){
 						foreach ($content['images'][$form] as $image){
@@ -405,6 +406,13 @@ class record extends API {
 							'content' => $content['files'][$form]
 						]); 
 					}
+					array_push($body[count($body) -1],[
+						'type' => 'button',
+						'attributes' => [
+							'value' => LANG::GET('record.record_form_export'),
+							'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')"
+						]
+						]);
 				}
 		
 				$return['body']['content'] = $body;
@@ -437,8 +445,14 @@ class record extends API {
 						], [
 							'type' => 'button',
 							'attributes' => [
-								'value' => LANG::GET('record.record_export'),
-								'onpointerup' => "api.record('get', 'export', '" . $this->_requestedID . "')"
+								'value' => LANG::GET('record.record_full_export'),
+								'onpointerup' => "api.record('get', 'fullexport', '" . $this->_requestedID . "')"
+							]
+						], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('record.record_simplified_export'),
+								'onpointerup' => "api.record('get', 'simplifiedexport', '" . $this->_requestedID . "')"
 							]
 						]
 					];
@@ -570,9 +584,23 @@ class record extends API {
 		$this->response($result);		
 	}
 
-	public function export(){
+	public function fullexport(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$content = $this->summarizeRecord();
+		$this->export('full');
+	}
+
+	public function simplifiedexport(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		$this->export('simplified');
+	}
+
+	public function formexport(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		$this->export('form');
+	}
+
+	private function export($summarize = "full"){
+		$content = $this->summarizeRecord($summarize);
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
 			'href' => PDF::recordsPDF($content)
@@ -676,7 +704,7 @@ class record extends API {
 		]);
 	}
 
-	private function summarizeRecord(){
+	private function summarizeRecord($type = 'full'){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
 		$statement->execute([
 			':identifier' => $this->_requestedID
@@ -703,6 +731,10 @@ class record extends API {
 				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])];
 			}
 		}
+
+		if ($type === 'form') {
+			foreach(array_keys($accumulatedcontent) as $key) if ($key !==$this->_formExport) unset($accumulatedcontent[$key]);
+		}
 		foreach($accumulatedcontent as $form => $entries){
 			$summary['content'][$form] = [];
 			foreach($entries as $key => $data){
@@ -724,7 +756,15 @@ class record extends API {
 							}
 							$displayvalue = $file['basename'];
 						}
-						$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
+						switch ($type){
+							case 'form':
+							case 'full':
+								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
+								break;
+							case 'simplified':
+								$summary['content'][$form][$key] = $displayvalue . "\n";
+								break;
+						}
 						$value = $entry['value'];
 					}
 				}

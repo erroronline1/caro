@@ -34,9 +34,6 @@
 * refactor languagefile
 * hash sum check for data completeness?
 
-#### csv processor
-* PFP0XYYZ ossur feet x=cat yy=size z=side pattern matching and prefilling by array
-
 #### todo forms
 * import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)
@@ -57,8 +54,6 @@
 * list / reminder for unfinished cases, current state
 
 #### todo records
-* export option for most recent data only for insurance companies w/o author and date
-* export option for distinct form
 * linked files on separate external path
 * monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
@@ -71,15 +66,9 @@
 #### todo misc
 * user selectable color themes?
 * calendar and alerts
-* md mermaid flowcharts
-* application manual
-    * general manual
-    * iso 13485 checklist and how the application handles these
-    * csvprocessor
 * improved landing page
 * message ordering and categorizing, displaying left and right
 * risk management?
-* database export
 
 
 ## Aims
@@ -90,14 +79,14 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ### Intended ISO 13485 goals
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
-    * Case documentation form require a case identifier to ensure respective data is allocated correctly.
+    * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
     * also see [records](#records)
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
-    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, ceo and quality management officers only.
-    * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and ceo. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
-    * New Components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
+    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, CEO and quality management officers  (QMO) only.
+    * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and CEO. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
+    * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
     * also see [forms](#forms)
@@ -108,8 +97,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
     * also see [user management](#user-management), [records](#records)
 * ISO 13485 5.5.1 Responsibility and authority
-    * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items
-    * Users can be assigned a pin to approve orders
+    * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items.
+    * Users can be assigned a pin to approve orders.
     * also see [user management](#user-management)
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in messenger. This messenger is being made use of internal modules to ensure decent data distribution e.g.
@@ -117,7 +106,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * alerting user groups about disapproved orders
         * messaging inquiries to ordering users
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
-    * also see [order](#order)
+    * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
+    * also see [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
     * also see [users](#users), [tools](#tools)
@@ -130,6 +120,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * an incorporation has been made
         * a sample check has been made
         * any document to the product has been provided
+        * an alias has been modified
     * Vendor and product editing is permitted by elevated users including purchase only.
     * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.4.3 Verification of procured products
@@ -171,11 +162,11 @@ The application does not replace an ERP system. Procurement data is solely acces
 Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose.
 
 ### Data integrity
-As records intend to save the submitting users name, group accounts are unreasonable. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
 
-Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
+Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
-Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable for your processes enough.
+Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
 
 [Content](#Content)
 
@@ -186,19 +177,20 @@ The application provides some options for registered users. The whole content is
     * can access forms and add records
     * can contribute to open sharepoint
     * can place orders
-    * can only see orders for own assigned organizational unit
+    * can only see orders for own assigned organizational units
     * can incorporate and sample check articles
 * Group
     * has access to all non writeable content
     * can not add records due to limited identification data
     * can contribute to open sharepoint
     * can place orders, will be prompted to identify themself
-    * can only see orders for own assigned organizational unit
+    * can only see orders for own assigned organizational units
     * can not incorporate and sample check due to limited identification data
 * Supervisor
     * can approve form components and forms
 * Office
-    * can contribute to file manager 
+    * can contribute to file manager
+    * cann access CSV-filter
 * Purchase
     * has full access to vendor and product management
     * can see all orders
@@ -216,7 +208,7 @@ The application provides some options for registered users. The whole content is
     * full access
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
 
-Permissions of QMO and CEO do hardly differ, but are neccessary being assigned to have a reliable alert on submission of a new form
+Permissions of QMO and CEO do hardly differ, but are neccessary being assigned to have a reliable alert on submission of a new form.
 
 Users can have multiple assigned organizational units.
 
@@ -231,7 +223,7 @@ Adding files is granted to elevated users only, to make sure certificates are ac
 ### Users
 Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to elevated users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
 
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
 ```mermaid
 graph TD;
@@ -270,7 +262,7 @@ graph TD;
 [Content](#Content)
 
 ### Text recommendations
-To avoid unneccesary or repetitive poetry and support a unique linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
+To avoid unneccesary or repetitive poetry and support a consistent linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
 * Child female - the girl
 * Child male - the boy
 * Child genderless - the child
@@ -279,16 +271,15 @@ To avoid unneccesary or repetitive poetry and support a unique linguistic style 
 * Adult genderless - the person
 * Informal you - "buddy"
 * Formal you - "your honor" (this is the german model part where there is more than just "you")
-such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+Such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
-*"Today we inform you about *
 
 *"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNomative can make use of the aid."*
 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
-Output wil be copied to clipboad on clicking or tapping the output field.
+Output will be copied to clipboad on clicking or tapping the output field.
 
 ```mermaid
 graph TD;
@@ -370,7 +361,9 @@ graph TD;
 [Content](#Content)
 
 ### Records
-Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries contain all inputs in chronological order and can be exported.
+Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. 
+
+Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
 The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
 
@@ -424,7 +417,7 @@ This source can also be used to provide documents that are [unsuitable to be fil
 [Content](#Content)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase can manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -482,7 +475,7 @@ graph TD;
 [Content](#Content)
 
 ### Order
-The order module helps all parties. Purchase is supposed to get structured and complete data for placed orders and ordering units get information about the order state.
+The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up.
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin or elevated users including supervisors.
@@ -574,86 +567,88 @@ Filters and modifications are processed in order of appearance. Modifications ta
 Description of options:
 
 	"postProcessing": Optional string as hint what to do with the result file
-    "filesetting":
+	"filesetting":
 		"source": File to process, SELF or a named array (the other filesettings don't matter then)
-	    "headerrowindex": Offset for title row
-	    "dialect": Settings according to php fgetcsv
-	    "columns": list/array of column names to process and export to destination
-        "encoding": Comma separated string of possible character encoding of sourcefile
+		"headerrowindex": Offset for title row
+		"dialect": Settings according to php fgetcsv
+		"columns": list/array of column names to process and export to destination
+		"encoding": Comma separated string of possible character encoding of sourcefile
 
-    "filter": List/array of objects/dicts
-        "apply": "filter_by_expression"
+	"filter": List/array of objects/dicts
+		"apply": "filter_by_expression"
 		"comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "match":
-            "all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
-            "any": At least one expression has to be matched, it's either "all" or "any"
+		"keep": Boolean if matches are kept or omitted
+		"match":
+			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
+			"any": At least one expression has to be matched, it's either "all" or "any"
 
-        "apply": "filter_by_monthdiff"
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "date": Filter by identifier and date diff in months
-            "identifier": Column name with recurring values, e.g. customer id
-            "column": Column name with date to process,
-            "format": List/array of date format order e.g. ["d", "m", "y"],
-            "threshold": Integer for months,
-            "bias": < less than, > greater than threshold
+		"apply": "filter_by_monthdiff"
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"date": Filter by identifier and date diff in months
+			"identifier": Column name with recurring values, e.g. customer id
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"threshold": Integer for months,
+			"bias": < less than, > greater than threshold
 
-        "apply": "filter_by_duplicates",
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-            "orderby": List/array of column names whose values concatenate for comparison
-            "descending": Boolean,
-            "column": Column name with recurring values, e.g. customer id of which duplicates are allowed
-            "amount": Integer > 0
+		"apply": "filter_by_duplicates",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+			"orderby": List/array of column names whose values concatenate for comparison
+			"descending": Boolean,
+			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
+			"amount": Integer > 0
 
-        "apply": "filter_by_comparison_file",
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
-            "filesetting": Same structure as base. if source == "SELF" the origin file will be processed
-            "filter": Same structure as base
-            "modify": Same structure as base
-            "match":
-                "all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
-                "any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
-        "transfer": Add a new column with comparison value
+		"apply": "filter_by_comparison_file",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
+			"filesetting": Same structure as base. if source == "SELF" the origin file will be processed
+			"filter": Same structure as base
+			"modify": Same structure as base
+			"match":
+				"all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
+				"any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
+		"transfer": Add a new column with comparison value
 
-        "apply": "filter_by_monthinterval",
-        "comment": Description, will be displayed
-        "keep": Boolean if matches are kept or omitted
-        "interval": Discard by not matching interval in months, optional offset from initial column value
-            "column": Column name with date to process,
-            "format": List/array of date format order e.g. ["d", "m", "y"],
-            "interval": Integer for months,
-            "offset": Optional offset in months
+		"apply": "filter_by_monthinterval",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"interval": Discard by not matching interval in months, optional offset from initial column value
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"interval": Integer for months,
+			"offset": Optional offset in months
 
-        "apply": "filter_by_rand",
-        "comment": Description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
-            "columns": Object/dict of COLUMN-REGEX-pairs to select from,
-            "amount": Integer > 0
+		"apply": "filter_by_rand",
+		"comment": Description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
+			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
+			"amount": Integer > 0
 
-    "modify": Modifies the result
-        "add": Adds a column with the set value. if the name is already in use this will be replaced!
-               If property is an array with number values and arithmetic operators it will try to calculate
-               Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
-        "replace": Replaces regex matches with the given value either at a specified field or in all
-                   according to index 0 being a column name or none/null
-        "remove": Remove columns from result, may have been used solely for filtering
-        "rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
-                   Original columns will be omitted, nested within a list to make sure to order as given
-        "translate": Column values to be translated according to specified translation object
+	"modify": Modifies the result
+		"add": Adds a column with the set value. if the name is already in use this will be replaced!
+			   If property is an array with number values and arithmetic operators it will try to calculate
+			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
+		"replace": Replaces regex matches with the given value either at a specified field or in all
+				   according to index 0 being a column name or none/null
+				   If more than one replacement are provided new lines with altered column values will be added to the result
+				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if neccessary), group 2, ...rest)
+		"remove": Remove columns from result, may have been used solely for filtering
+		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
+				   Original columns will be omitted, nested within a list to make sure to order as given
+		"translate": Column values to be translated according to specified translation object
 
-    "split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
-    "evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
 
-    "translations" : Can replace e.g. numerical values with legible translations.
-                     This is an object/dict whose keys can be refered to from the modifier. 
-                     The dict keys are processed as regex for a possible broader use.
+	"translations" : Can replace e.g. numerical values with legible translations.
+					 This is an object/dict whose keys can be refered to from the modifier. 
+					 The dict keys are processed as regex for a possible broader use.
 
 A generic sample:
 
@@ -907,14 +902,14 @@ csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 labelsheet[format] = 'A4'
 labelsheet[rows] = 11
 labelsheet[columns] = 5
-labelsheet[margintop] = 0 ; in mm
-labelsheet[marginbottom] = 10 ; in mm
+labelsheet[margintop] = 0 ; in points
+labelsheet[marginbottom] = 10 ; in points
 record[format] = 'A4'
-record[margintop] = 35 ; in mm
-record[marginright] = 15 ; in mm
-record[marginbottom] = 15 ; in mm
-record[marginleft] = 20 ; in mm
-exportimage[maxheight] = 75 ; try what fits you typical aspect ratio for landscape
+record[margintop] = 35 ; in points
+record[marginright] = 15 ; in points
+record[marginbottom] = 15 ; in points
+record[marginleft] = 20 ; in points
+exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
 ```
 
 #### Useage notes and caveats
@@ -931,14 +926,14 @@ exportimage[maxheight] = 75 ; try what fits you typical aspect ratio for landsca
 
 #### Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
-* Some parts of the setup.ini can be changes during runtime, others will mess up your system. Respective parts are marked
+* Some parts of the setup.ini can be changes during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
-* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 
 If you ever fiddle around with the sourcecode:
+* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between.
 
 [Content](#Content)
@@ -980,6 +975,16 @@ while setting up a vendor an import rule must be defined like:
 }
 ```
 *headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+
+Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
+
+```js
+"replace": [
+    ["Article Number", "(product)(X)(.*?)", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ["Article Number", "(product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    ["Article Number", "(product...)(Z)", "L", "R"]
+]
+```  
 
 [Content](#Content)
 
@@ -1028,3 +1033,5 @@ Without a filter none of the vendors products will be treated as a trading good!
 * [mermaid charts](https://mermaid.js.org/)
 
 [Content](#Content)
+
+(c)2023-2024 error on line 1 (dev@erroronline.one)

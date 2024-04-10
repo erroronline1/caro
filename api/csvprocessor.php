@@ -1,96 +1,98 @@
 <?php
 /*
 filters and returns a named array according to setup.
-    if a filterset uses date thresholds or date intervals and month or year are not manually set,
-    the current date is processed.
+	if a filterset uses date thresholds or date intervals and month or year are not manually set,
+	the current date is processed.
 
-    setup is passed as names array.
-    filters and modifications are processed in order of appearance.
-    modifications take place with the filtered list only for performance reasons.
-    compare lists can be filtered and manipulated likewise. due to recursive implementation the origin list
-    can be used as a filter by itself.
+	setup is passed as names array.
+	filters and modifications are processed in order of appearance.
+	modifications take place with the filtered list only for performance reasons.
+	compare lists can be filtered and manipulated likewise. due to recursive implementation the origin list
+	can be used as a filter by itself.
 
 	"postProcessing": optional string as hint what to do with the result file
-    "filesetting":
+	"filesetting":
 		"source": file to process or a named array (the other filesettings don't matter then)
-	    "headerrowindex": offset for title row
-	    "dialect": settings according to php fgetcsv
-	    "columns": list/array of column names to process and export to destination
-        "encoding": comma separated string of possible character encoding of sourcefile
+		"headerrowindex": offset for title row
+		"dialect": settings according to php fgetcsv
+		"columns": list/array of column names to process and export to destination
+		"encoding": comma separated string of possible character encoding of sourcefile
 
-    "filter": list/array of objects/dicts
-        "apply": "filter_by_expression"
+	"filter": list/array of objects/dicts
+		"apply": "filter_by_expression"
 		"comment": description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "match":
-            "all": all expressions have to be matched, object/dict with column-name-key, and pattern as value
-            "any": at least one expression has to be matched, it's either "all" or "any"
+		"keep": boolean if matches are kept or omitted
+		"match":
+			"all": all expressions have to be matched, object/dict with column-name-key, and pattern as value
+			"any": at least one expression has to be matched, it's either "all" or "any"
 
-        "apply": "filter_by_monthdiff"
-        "comment": description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "date": filter by identifier and date diff in months
-            "identifier": column name with recurring values, e.g. customer id
-            "column": column name with date to process,
-            "format": list/array of date format order e.g. ["d", "m", "y"],
-            "threshold": integer for months,
-            "bias": < less than, > greater than threshold
+		"apply": "filter_by_monthdiff"
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"date": filter by identifier and date diff in months
+			"identifier": column name with recurring values, e.g. customer id
+			"column": column name with date to process,
+			"format": list/array of date format order e.g. ["d", "m", "y"],
+			"threshold": integer for months,
+			"bias": < less than, > greater than threshold
 
-        "apply": "filter_by_duplicates",
-        "comment": description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "duplicates": keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-            "orderby": list/array of column names whose values concatenate for comparison
-            "descending": boolean,
-            "column": column name with recurring values, e.g. customer id of which duplicates are allowed
-            "amount": integer > 0
+		"apply": "filter_by_duplicates",
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"duplicates": keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+			"orderby": list/array of column names whose values concatenate for comparison
+			"descending": boolean,
+			"column": column name with recurring values, e.g. customer id of which duplicates are allowed
+			"amount": integer > 0
 
-        "apply": "filter_by_comparison_file",
-        "comment": description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "compare": keep or discard explicit excemptions as stated in excemption file, based on same identifier
-            "filesetting": same structure as base. if source == "SELF" the origin file will be processed
-            "filter": same structure as base
-            "modify": same structure as base
-            "match":
-                "all": dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
-                "any": dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
-        "transfer": add a new column with comparison value
+		"apply": "filter_by_comparison_file",
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"compare": keep or discard explicit excemptions as stated in excemption file, based on same identifier
+			"filesetting": same structure as base. if source == "SELF" the origin file will be processed
+			"filter": same structure as base
+			"modify": same structure as base
+			"match":
+				"all": dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
+				"any": dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
+		"transfer": add a new column with comparison value
 
-        "apply": "filter_by_monthinterval",
-        "comment": description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "interval": discard by not matching interval in months, optional offset from initial column value
-            "column": column name with date to process,
-            "format": list/array of date format order e.g. ["d", "m", "y"],
-            "interval": integer for months,
-            "offset": optional offset in months
+		"apply": "filter_by_monthinterval",
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"interval": discard by not matching interval in months, optional offset from initial column value
+			"column": column name with date to process,
+			"format": list/array of date format order e.g. ["d", "m", "y"],
+			"interval": integer for months,
+			"offset": optional offset in months
 
-        "apply": "filter_by_rand",
-        "comment": description, will be displayed
-        "keep": boolean if matches are kept or omitted
-        "data": select amount of random rows that match given content of asserted column (if multiple, all must be found)
-            "columns": object/dict of COLUMN-REGEX-pairs to select from,
-            "amount": integer > 0
+		"apply": "filter_by_rand",
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"data": select amount of random rows that match given content of asserted column (if multiple, all must be found)
+			"columns": object/dict of COLUMN-REGEX-pairs to select from,
+			"amount": integer > 0
 
-    "modify": modifies the result
-        "add": adds a column with the set value. if the name is already in use this will be replaced!
-               if property is an array with number values and arithmetic operators it will try to calculate
-               comma will be replaced with a decimal point in the latter case. hope for a proper number format.
-        "replace": replaces regex matches with the given value either at a specified field or in all
-                   according to index 0 being a column name or none/null
-        "remove": remove columns from result, may have been used solely for filtering
-        "rewrite": adds newly named columns consisting of concatenated origin column values and separators.
-                   original columns will be omitted, nested within a list to make sure to order as given
-        "translate": column values to be translated according to specified translation object
+	"modify": modifies the result
+		"add": adds a column with the set value. if the name is already in use this will be replaced!
+			   if property is an array with number values and arithmetic operators it will try to calculate
+			   comma will be replaced with a decimal point in the latter case. hope for a proper number format.
+		"replace": replaces regex matches with the given value either at a specified field or in all
+				   according to index 0 being a column name or none/null.
+				   if more than one replacement are provided new lines with altered column values will be added to the result
+				   replacements on a peculiar position have to be match[2] (full match, group 1 (^ if neccessary), group 2, ...rest)
+		"remove": remove columns from result, may have been used solely for filtering
+		"rewrite": adds newly named columns consisting of concatenated origin column values and separators.
+				   original columns will be omitted, nested within a list to make sure to order as given
+		"translate": column values to be translated according to specified translation object
 
-    "split": split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+	"split": split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
-    "evaluate": object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+	"evaluate": object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
 
-    translations can replace e.g. numerical values with legible translations.
-    this is an object/dict whose keys can be refered to from the modifier. 
-    the dict keys are processed as regex for a possible broader use.
+	translations can replace e.g. numerical values with legible translations.
+	this is an object/dict whose keys can be refered to from the modifier. 
+	the dict keys are processed as regex for a possible broader use.
 */
 
 class Listprocessor {
@@ -332,7 +334,7 @@ class Listprocessor {
 				// create sorting key by matched patterns, mandatory translated if applicable
 				$sorting = '';
 				foreach ($this->_setting['split'] as $key => $pattern){
-					preg_match_all($pattern, $row[$key], $match);
+					preg_match_all('/' . $pattern . '/m', $row[$key], $match);
 					if (count($match)) $sorting += implode(' ', $match);
 				}
 				$sorting = trim($sorting);
@@ -698,7 +700,8 @@ class Listprocessor {
 			},
 			"replace":[
 				["NAME", "regex", "replacement"],
-				[None, ";", ","]
+				[null, ";", ","],
+				["SOMECOLUMN", "regex", "replacement", "replacementnewrow", "replacementanothernewrow"]
 			],
 			"remove": ["SOMEFILTERCOLUMN", "DEATH"],
 			"rewrite":[
@@ -728,10 +731,29 @@ class Listprocessor {
 						}
 						break;
 					case 'replace':
-						foreach ($this->_list as $i => &$row){
+						foreach ($this->_list as $i => $row){
 							foreach ($row as $column => $value) {
-								if (!$rule[0] || $rule[0] == $column)
-									$this->_list[$i][$column] = trim(preg_replace('/' . $rule[1] . '/', $rule[2], $value));
+								for ($replacement = 2; $replacement < count($rule); $replacement++){
+									if ((!$rule[0] || $rule[0] == $column) && preg_match('/'. $rule[1]. '/m', $value)){
+										$replaced_value = preg_replace_callback(
+											'/'. $rule[1]. '/m',
+											function($matches) use ($rule, $replacement){
+												// plain replacement of first match
+												if (count($matches)<2) return $rule[$replacement];
+												// replacement on peculiar position
+												// ensure a pattern where $match[2] has to be replaced. match string start (^) if neccessary
+												// ignore $match[0] for being the whole match w/o groups
+												return count($matches)>3 ? implode('', [$matches[1], $rule[$replacement], ...array_slice($matches,3)]) : $matches[1] . $rule[$replacement];	    	
+											},
+											$value);
+										if ($replacement < 3) {
+											$this->_list[$i][$column] =	$replaced_value;
+										} else {
+											$row[$column] = $replaced_value;
+											$this->_list[] = $row;
+										}
+									}
+								}
 							}
 						}
 						break;
@@ -756,7 +778,7 @@ class Listprocessor {
 						if (!array_key_exists('translations', $this->_setting)) break;
 						foreach ($this->_list as $i => &$row) {
 							foreach($modifications as $translate => $translation){
-								if (array_key_exists($row[$rule],$this->_setting['translations'][$rule])) $this->_list[$i][$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
+								if (array_key_exists($row[$rule], $this->_setting['translations'][$rule])) $this->_list[$i][$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
 							}
 						}
 						break;
