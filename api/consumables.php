@@ -72,6 +72,13 @@ class CONSUMABLES extends API {
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
+		if (!array_key_exists(1, $pricelist->_list)){
+			$this->response([
+				'status' => [
+					'msg' => implode("\n", $pricelist->_log),
+					'type' => 'error'
+				]]);
+		}
 		if (count($pricelist->_list[1])){
 			// purge all unprotected products for a fresh data set
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
@@ -448,15 +455,6 @@ class CONSUMABLES extends API {
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
-				// update pricelist
-				$pricelistImportError = '';
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
-					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
-					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
-					if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
-						$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
-					}	
-				}
 	
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-vendor'));
 				if ($statement->execute([
@@ -682,14 +680,6 @@ class CONSUMABLES extends API {
 					], [
 						[
 							[
-								'type' => 'file',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_pricelist_update'),
-									'accept' => '.csv'
-								]
-							]
-						], [
-							[
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
@@ -716,6 +706,16 @@ class CONSUMABLES extends API {
 					'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
 					'data-confirm' => true
 				]];
+				if ($vendor['id'])
+					array_splice($result['body']['content'][4], 0, 0,
+						[[[
+							'type' => 'file',
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_vendor_pricelist_update'),
+								'accept' => '.csv'
+							]
+						]]]
+					);
 
 				if ($certificates) array_splice($result['body']['content'][2], 0, 0,
 					[
