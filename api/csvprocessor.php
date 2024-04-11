@@ -248,7 +248,7 @@ class Listprocessor {
 
 		foreach ($this->_list as $row => &$values){
 			foreach($values as $column => &$columnvalue){
-				$this->_list[$row][$column]=mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
+				$this->_list[$row][$column] = @mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
 			}
 		}
 		return true;
