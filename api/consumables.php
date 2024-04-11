@@ -154,16 +154,18 @@ class CONSUMABLES extends API {
 		if (count($pricelist->_list[1])){
 			foreach ($pricelist->_list[1] as $row){
 				$update = array_search($row['article_no'], array_column($assignedArticles, 'article'));
-				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
-				[
-					':id' => $assignedArticles[$update]['id'],
-					':article_name' => "'" . $row['article_name'] . "'",
-					':article_unit' => "'" . $row['article_unit'] . "'",
-					':article_ean' => "'" . $row['article_ean'] . "'",
-					':trading_good' => 1,
-					':incorporated' => $assignedArticles[$update]['incorporated'], //without quotes
-				]) . '; ';
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
+				if ($update) {
+					$query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
+					[
+						':id' => $assignedArticles[$update]['id'],
+						':article_name' => "'" . $row['article_name'] . "'",
+						':article_unit' => "'" . $row['article_unit'] . "'",
+						':article_ean' => "'" . $row['article_ean'] . "'",
+						':trading_good' => 1,
+						':incorporated' => $assignedArticles[$update]['incorporated'], //without quotes
+					]) . '; ';
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
+				}
 			}
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
