@@ -6,6 +6,7 @@
 * [ofa](#ofa)
 * [ortho reha neuhof](#ortho-reha-neuhof)
 * [otto bock](#otto-bock)
+* [perpedes](#perpedes)
 * [taska](#taska)
 
 ### caroli
@@ -290,11 +291,11 @@ replace specialchars in header
 	"filter": [
 		{
 			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": false,
+			"comment": "keep applicable products",
+			"keep": true,
 			"match": {
 				"all": {
-					"article_name": ""
+					"article_name": "^O\\d.*"
 				}
 			}
 		}
