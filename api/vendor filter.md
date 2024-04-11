@@ -1,25 +1,29 @@
 * [caroli](#caroli)
 * [feet control](#feet-control)
+* [juzo](#juzo)
+* [neatec](#neatec)
+* [nowecor](#nowecor)
+* [ofa](#ofa)
 * [ortho reha neuhof](#ortho-reha-neuhof)
 * [otto bock](#otto-bock)
 * [taska](#taska)
 
 ### caroli
-delete first two columns
+delete first two columns and rows
 ```json
 {
-    "filesetting": {
+	"filesetting": {
 		"headerrowindex": 2,
-        "columns": ["Neue Artikel Nummer", "Bezeichnung", "GTIN"]
-    },
-    "modify": {
-        "rewrite": [{
-            "article_no": ["Neue Artikel Nummer"],
-            "article_name": ["Bezeichnung"],
-            "article_unit": [""],
-            "article_ean": ["GTIN"]
-        }]
-    }
+		"columns": ["Neue Artikel Nummer", "Bezeichnung", "GTIN"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Neue Artikel Nummer"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": [""],
+			"article_ean": ["GTIN"]
+		}]
+	}
 }
 ```
 
@@ -27,34 +31,182 @@ delete first two columns
 add header
 ```json
 {
-    "filesetting": {
-        "columns": ["artnr"]
-    },
-    "modify": {
-        "rewrite": [{
-            "article_no": ["artnr"],
-            "article_name": [""],
-            "article_unit": [""],
-            "article_ean": [""]
-        }]
-    }
+	"filesetting": {
+		"columns": ["artnr"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["artnr"],
+			"article_name": [""],
+			"article_unit": [""],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+
+### juzo
+```json
+{
+	"filesetting": {
+		"columns": ["JUZO-Artikelnr", "GTIN", "Mengeneinheit (Artikel)", "Artikelbezeichnung 1", "Artikelbezeichnung 2"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["JUZO-Artikelnr"],
+			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2"],
+			"article_unit": ["Mengeneinheit (Artikel)"],
+			"article_ean": ["GTIN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".*?"
+				}
+			}
+		}
+	]
+}
+```
+
+### neatec
+replace specialchars in header
+```json
+{
+	"filesetting": {
+		"headerrowindex": 1,
+		"columns": ["Artikel-Nr", "Artikelbezeichnung lang", "Groesse", "Farbe", "Einheit"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikel-Nr."],
+			"article_name": ["Artikelbezeichnung lang", ", ", "Groesse", ", ", "Farbe"],
+			"article_unit": ["Einheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".*?"
+				}
+			}
+		}
+	]
+}
+```
+
+### nowecor
+```json
+{
+	"filesetting": {
+		"headerrowindex": 1,
+		"columns": ["Artikel-Nr", "Artikelbezeichnung lang", "Groesse", "Farbe", "Einheit"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikel-Nr."],
+			"article_name": ["Artikelbezeichnung lang", ", ", "Groesse", ", ", "Farbe"],
+			"article_unit": ["Einheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unnecessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"article_name": ""
+				}
+			}
+		}
+	]
+}
+```
+
+### ofa
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikel", "Bez. 1", "Bez. II", "EAN", "VME"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikel"],
+			"article_name": ["Bez. 1", ", ", "Bez. II"],
+			"article_unit": ["VME"],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unnecessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"article_name": "Anti-Rutsch-Beschichtung"
+				}
+			}
+		}
+	]
 }
 ```
 
 ### ortho reha neuhof
 ```json
 {
-    "filesetting": {
-        "columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
-    },
-    "modify": {
-        "rewrite": [{
-            "article_no": ["Art.Nr."],
-            "article_name": ["Bezeichnung"],
-            "article_unit": ["ME"],
-            "article_ean": ["UDI-DI"]
-        }]
-    }
+	"filesetting": {
+		"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Art.Nr."],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["ME"],
+			"article_ean": ["UDI-DI"]
+		}]
+	}
 }
 ```
 ```json
@@ -80,17 +232,17 @@ add header
 ### otto bock
 ```json
 {
-    "filesetting": {
-        "columns": ["Material", "Materialtext", "Mengeneinheit", "EAN/UPC"]
-    },
-    "modify": {
-        "rewrite": [{
-            "article_no": ["Material"],
-            "article_name": ["Materialtext"],
-            "article_unit": ["Mengeneinheit"],
+	"filesetting": {
+		"columns": ["Material", "Materialtext", "Mengeneinheit", "EAN/UPC"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Material"],
+			"article_name": ["Materialtext"],
+			"article_unit": ["Mengeneinheit"],
 			"article_ean": ["EAN/UPC"]
-        }]
-    }
+		}]
+	}
 }
 ```
 ```json
@@ -113,25 +265,62 @@ add header
 }
 ```
 
+### perpedes
+```json
+{
+	"filesetting": {
+		"headerrowindex": 9,
+		"columns": ["Material", "Materialkurztext", "ME"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Material"],
+			"article_name": ["Materialkurztext"],
+			"article_unit": ["ME"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unnecessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"article_name": ""
+				}
+			}
+		}
+	]
+}
+```
+
 ### taska
 ```json
 {
-    "filesetting": {
-        "headerrowindex": 0,
-        "dialect": {
-            "separator": ";",
-            "enclosure": "\"",
-            "escape": ""
-        },
-        "columns": ["Part", "DE"]
-    },
-    "modify": {
-        "rewrite": [{
-            "article_no": ["Part"],
-            "article_name": ["DE"],
-            "article_unit": [""],
+	"filesetting": {
+		"headerrowindex": 0,
+		"dialect": {
+			"separator": ";",
+			"enclosure": "\"",
+			"escape": ""
+		},
+		"columns": ["Part", "DE"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Part"],
+			"article_name": ["DE"],
+			"article_unit": [""],
 			"article_ean": [""]
-        }]
-    }
+		}]
+	}
 }
 ```
