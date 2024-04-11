@@ -467,7 +467,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError,
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]),
 						'type' => 'info'
 					]]);
 				else $this->response([
@@ -706,6 +706,7 @@ class CONSUMABLES extends API {
 					'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
 					'data-confirm' => true
 				]];
+
 				if ($vendor['id'])
 					array_splice($result['body']['content'][4], 0, 0,
 						[[[
@@ -716,7 +717,6 @@ class CONSUMABLES extends API {
 							]
 						]]]
 					);
-
 				if ($certificates) array_splice($result['body']['content'][2], 0, 0,
 					[
 						[
