@@ -846,7 +846,7 @@ Tested devices:
 
 ### Installation
 * php.ini memory_limit ~2048M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers
-* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~128MB
+* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB
 * php.ini max_execution_time / fastCGI timeout (iis) ~ 300 for [CSV processing](#csv-processor) may take a while depending on your data amount
 * php.ini enable extensions:
     * gd
