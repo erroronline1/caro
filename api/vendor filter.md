@@ -1,12 +1,15 @@
 * [caroli](#caroli)
 * [feet control](#feet-control)
-* [juzo](#juzo)
+* [juzo (failing due to filesize)](#juzo)
 * [neatec](#neatec)
-* [nowecor](#nowecor)
+* [nowecor (trading goods yet to define)](#nowecor)
 * [ofa](#ofa)
 * [ortho reha neuhof](#ortho-reha-neuhof)
 * [otto bock](#otto-bock)
-* [perpedes](#perpedes)
+* [perpedes (trading goods yet to define)](#perpedes)
+* [prowalk](#prowalk)
+* [protheseus](#protheseus)
+* [russka](#russka)
 * [taska](#taska)
 
 ### caroli
@@ -291,11 +294,137 @@ replace specialchars in header
 	"filter": [
 		{
 			"apply": "filter_by_expression",
-			"comment": "keep applicable products",
+			"comment": "delete unneccessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"article_name": ""
+				}
+			}
+		}
+	]
+}
+```
+
+### prowalk
+replace specialchars in header
+
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["ArtikelNummer", "Bezeichnung 1", "Bezeichnung 2", "Farbe", "Groesse", "Menge"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["ArtikelNummer"],
+			"article_name": ["Bezeichnung 1", ", ", "Bezeichnung 2", ", ", "Farbe", ", ", "Groesse"],
+			"article_unit": ["Menge"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
 			"keep": true,
 			"match": {
 				"all": {
-					"article_name": "^O\\d.*"
+					"article_name": "Lagerungsschiene|orthese|helm|headmaster"
+				}
+			}
+		}
+	]
+}
+```
+
+### protheseus
+add header on first line
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["artno", "name", "unit"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["artno"],
+			"article_name": ["name"],
+			"article_unit": ["unit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "Compression|Weste|Peronäusschiene|Stax|liner"
+				}
+			}
+		}
+	]
+}
+```
+
+### russka
+```json
+{
+	"filesetting": {
+		"headerrowindex": 2,
+		"columns": ["Artikelnummer ", "Artikelbezeichnung", "Einheit"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"Einheit": "nicht mehr lieferbar"
+				}
+			}
+		}
+	],
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnummer "],
+			"article_name": ["Artikelbezeichnung"],
+			"article_unit": ["Einheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|stützschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"
 				}
 			}
 		}
