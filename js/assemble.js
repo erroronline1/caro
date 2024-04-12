@@ -951,7 +951,7 @@ export class Assemble {
 					  LANG.GET("assemble.file_rechoose")
 					: LANG.GET("assemble.file_choose");
 			};
-		label.onclick = new Function("document.getElementById('" + input.id + "').click();");
+		label.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
 		label.type = "button";
 		label.setAttribute("data-type", "file");
 		label.classList.add("inlinebutton");
@@ -1015,7 +1015,7 @@ export class Assemble {
 		input.capture = true;
 		input.onchange = changeEvent;
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		button.onclick = new Function("document.getElementById('" + input.id + "').click();");
+		button.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
 		button.type = "button";
 		button.setAttribute("data-type", "photo");
 		button.classList.add("inlinebutton");
