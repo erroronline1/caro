@@ -715,7 +715,7 @@ class CONSUMABLES extends API {
 					'data-confirm' => true
 				]];
 
-				if ($vendor['id'])
+				if ($vendor['id'] && $vendor['active'] == 1)
 					array_splice($result['body']['content'][4], 0, 0,
 						[[[
 							'type' => 'file',
