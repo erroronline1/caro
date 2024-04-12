@@ -101,20 +101,20 @@ class CONSUMABLES extends API {
 				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
 					':id' => $remainder[$update]['id'],
-					':article_name' => "'" . $row['article_name'] . "'",
-					':article_unit' => "'" . $row['article_unit'] . "'",
-					':article_ean' => "'" . $row['article_ean'] . "'",
+					':article_name' => $this->_pdo->quote($row['article_name']),
+					':article_unit' => $this->_pdo->quote($row['article_unit']),
+					':article_ean' => $this->_pdo->quote($row['article_ean']),
 					':trading_good' => "'0'",
 					':incorporated' => $remainder[$update]['incorporated'], //without quotes
 				]) . '; ';
 				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
 						':vendor_id' => $vendorID,
-						':article_no' => "'" . $row['article_no'] . "'",
-						':article_name' => "'" . $row['article_name'] . "'",
+						':article_no' => $this->_pdo->quote($row['article_no']),
+						':article_name' => $this->_pdo->quote($row['article_name']),
 						':article_alias' => "''",
-						':article_unit' => "'" . $row['article_unit'] . "'",
-						':article_ean' => "'" . $row['article_ean'] . "'",
+						':article_unit' => $this->_pdo->quote($row['article_unit']),
+						':article_ean' => $this->_pdo->quote($row['article_ean']),
 						':active' => 1,
 						':protected' => 0,
 						':trading_good' => 0,
@@ -125,7 +125,13 @@ class CONSUMABLES extends API {
 			}
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
-				if ($statement->execute()) $date = date("d.m.Y");
+				try {
+					if ($statement->execute()) $date = date("d.m.Y");
+				}
+				catch (Exception $e) {
+					echo $e, $chunk;
+					die();
+				}
 			}
 			return $date;
 		}
@@ -158,9 +164,9 @@ class CONSUMABLES extends API {
 					$query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 					[
 						':id' => $assignedArticles[$update]['id'],
-						':article_name' => "'" . $row['article_name'] . "'",
-						':article_unit' => "'" . $row['article_unit'] . "'",
-						':article_ean' => "'" . $row['article_ean'] . "'",
+						':article_name' => $this->_pdo->quote($row['article_name']),
+						':article_unit' => $this->_pdo->quote($row['article_unit']),
+						':article_ean' => $this->_pdo->quote($row['article_ean']),
 						':trading_good' => 1,
 						':incorporated' => $assignedArticles[$update]['incorporated'], //without quotes
 					]) . '; ';

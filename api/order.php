@@ -64,7 +64,7 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 
 				if ($result['status']['msg'] === LANG::GET('order.saved')){
-					$query=strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . implode("','", $approvedIDs) . "'"]);
+					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => $this->_pdo->quote(implode("','", $approvedIDs))]);
 					$statement = $this->_pdo->prepare($query);
 					$statement->execute();
 				}
@@ -181,10 +181,10 @@ class ORDER extends API {
 					break;
 				}
 				// because in clause doesn't work
-				$query= strtr($this->_borrowedModule == 'editconsumables' ? SQLQUERY::PREPARE('consumables_get-product-search') : SQLQUERY::PREPARE('order_get-product-search'),
+				$query = strtr($this->_borrowedModule == 'editconsumables' ? SQLQUERY::PREPARE('consumables_get-product-search') : SQLQUERY::PREPARE('order_get-product-search'),
 					[
-						':vendors' => "'" . implode("','", explode('_', $this->_requestedID)) . "'",
-						':search' => "'" . $this->_subMethod . "'"
+						':vendors' => $this->_pdo->quote(implode("','", explode('_', $this->_requestedID))),
+						':search' => $this->_pdo->quote($this->_subMethod)
 					]
 				);
 
@@ -252,8 +252,8 @@ class ORDER extends API {
 		// in clause doesnt work without manually preparing
 		$query = strtr(SQLQUERY::PREPARE('order_get_filter'),
 		[
-			':organizational_unit' => "'" . implode("','", $units) . "'",
-			':orderfilter' => "'" . $this->_requestedID . "'"
+			':organizational_unit' => $this->_pdo->quote(implode("','", $units)),
+			':orderfilter' => $this->_pdo->quote($this->_requestedID)
 		]);
 		$statement = $this->_pdo->prepare($query);
 		$statement->execute();
@@ -353,9 +353,9 @@ class ORDER extends API {
 			}
 			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
 			[
-				':order_data' => "'" . json_encode($order_data2, JSON_UNESCAPED_SLASHES) . "'",
-				':organizational_unit' => "'" . $processedOrderData['order_data']['organizational_unit'] . "'",
-				':approval' => "'" . $processedOrderData['approval'] . "'",
+				':order_data' => $this->_pdo->quote(json_encode($order_data2, JSON_UNESCAPED_SLASHES)),
+				':organizational_unit' => $this->_pdo->quote($processedOrderData['order_data']['organizational_unit']),
+				':approval' => $this->_pdo->quote($processedOrderData['approval']),
 			]) . '; ';
 		}
 		$statement = $this->_pdo->prepare($query);
@@ -421,7 +421,7 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder($processedOrderData);
 
 				if ($result['status']['msg'] === LANG::GET('order.saved')){
-					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
+					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => $this->_pdo->quote($this->_requestedID)]);
 					$statement = $this->_pdo->prepare($query);
 					$statement->execute();
 				}
@@ -737,7 +737,7 @@ class ORDER extends API {
 				}
 
 				// delete prepared order
-				$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => "'" . $this->_requestedID . "'"]);
+				$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => $this->_pdo->quote($this->_requestedID)]);
 				$statement = $this->_pdo->prepare($query);
 				if ($statement->execute()) {
 					$result=[
@@ -891,7 +891,7 @@ class ORDER extends API {
 				// in clause doesnt work without manually preparing
 				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order-by-unit'),
 				[
-					':organizational_unit' => "'".implode("','", $units)."'"
+					':organizational_unit' => $this->_pdo->quote(implode("','", $units))
 				]);
 				$statement = $this->_pdo->prepare($query);
 				$statement->execute();
