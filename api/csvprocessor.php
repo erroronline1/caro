@@ -114,7 +114,7 @@ class Listprocessor {
 	 * 
 	 * @var array
 	 */
-	public $_list = [];
+	public $_list = []; // https://www.php.net/SplFixedArray
 	public $_originallist = [];
 
 	/**
@@ -145,12 +145,14 @@ class Listprocessor {
 	 * 
 	 * @var array
 	 */
-	public $_headers=[];
+	public $_headers = [];
 
 	public function __construct($setup, $argument = [], $isChild = false){
 		$this->_setting = gettype($setup) === 'array' ? $setup : json_decode($setup, true);
 		$this->_isChild = $isChild;
 		$this->_argument = $argument;
+		$this->_list = new SplFixedArray(0);
+
 		if (!array_key_exists('processedMonth', $this->_argument)) $this->_argument['processedMonth'] = date('m');
 		if (!array_key_exists('processedYear', $this->_argument)) $this->_argument['processedMonth'] = date('Y');
 
@@ -239,17 +241,21 @@ class Listprocessor {
 					$this->_log[] = '[~] File Import Error: not all required columns were found, filter aborted...';					
 					break;
 				}
-				// kindly ignore corrupt formatted lines
-				if (count($this->_headers) == count($row)) 
-					$this->_list[] = array_combine($this->_headers, $row);
+				// kindly ignore corrupt formatted and empty lines
+				$unique = array_unique($row);
+				if (count($this->_headers) === count($row) && count($unique) > 0 && end($unique) !== null){
+					$this->_list->setSize(count($this->_list) + 1);
+					$this->_list[count($this->_list) - 1] = array_combine($this->_headers, $row);
+				}
 			}
 		}
 		fclose($csvfile);
 
-		foreach ($this->_list as $row => &$values){
+		foreach ($this->_list as $row => $values){
 			foreach($values as $column => &$columnvalue){
-				$this->_list[$row][$column] = @mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
+				$columnvalue = @mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
 			}
+			$this->_list[$row] = $values; // SplFixedArray has problems accessing nested elements, must assign array to key directly
 		}
 		return true;
 	}
@@ -286,10 +292,11 @@ class Listprocessor {
 			*/
 			$unsetcolumns=array_diff($this->_headers, $this->_setting['filesetting']['columns']);
 			$evaluate_warning=[];
-			foreach ($this->_list as $row => &$values){
+			foreach ($this->_list as $row => $values){
 				foreach($unsetcolumns as $unset){
-					unset($this->_list[$row][$unset]);
+					unset($values[$unset]);
 				}
+				$this->_list[$row] = $values;  // SplFixedArray has problems accessing nested elements, must assign array to key directly
 				if (array_key_exists('evaluate',$this->_setting)){
 					foreach ($this->_setting['evaluate'] as $column => $pattern){
 						if (boolval($values[$column]) && boolval(preg_match('/' . $pattern . '/mi', $values[$column]))){
@@ -329,7 +336,7 @@ class Listprocessor {
 	public function split() {
 		/* split list as desired or at least nest one layer */
 		$split_list = [];
-		foreach ($this->_list as $i => &$row){
+		foreach ($this->_list as $i => $row){
 			if (array_key_exists('split', $this->_setting)){
 				// create sorting key by matched patterns, mandatory translated if applicable
 				$sorting = '';
@@ -384,7 +391,7 @@ class Listprocessor {
 			}
 		},
 		*/
-		foreach ($this->_list as $i => &$row){
+		foreach ($this->_list as $i => $row){
 			$keep = true;
 			$track = [];
 			if (array_key_exists('match', $rule)){
@@ -442,7 +449,7 @@ class Listprocessor {
 		},
 		*/
 		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
-		foreach ($this->_list as $i => &$row){
+		foreach ($this->_list as $i => $row){
 			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
 			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['date']['format'])] = '01';
@@ -490,7 +497,7 @@ class Listprocessor {
 		},
 		*/
 		if (($key = array_search('y', $rule['interval']['format'])) !== false) $rule['interval']['format'][$key] = 'Y'; // make year format 4 digits
-		foreach ($this->_list as $i => &$row){
+		foreach ($this->_list as $i => $row){
 			preg_match_all('/\d+/mi', $row[$rule['interval']['column']], $entrydate);
 			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['interval']['format'])] = '01';
@@ -727,7 +734,8 @@ class Listprocessor {
 							}
 							else
 								$expression = [$modifications[$modify][$key]];
-							$this->_list[$i][$key] = $this->calculate($expression);
+							$row[$key] = $this->calculate($expression);
+							$this->_list[$i] = $row;
 						}
 						break;
 					case 'replace':
@@ -746,11 +754,12 @@ class Listprocessor {
 												return count($matches)>3 ? implode('', [$matches[1], $rule[$replacement], ...array_slice($matches,3)]) : $matches[1] . $rule[$replacement];	    	
 											},
 											$value);
+										$row[$column] = $replaced_value; // SplFixedArray has problems accessing nested elements, must assign array to key directly
 										if ($replacement < 3) {
-											$this->_list[$i][$column] =	$replaced_value;
+											$this->_list[$i] = $row;
 										} else {
-											$row[$column] = $replaced_value;
-											$this->_list[] = $row;
+											$this->_list->setSize(count($this->_list) + 1);
+											$this->_list[count($this->_list) - 1] = $row;
 										}
 									}
 								}
@@ -764,22 +773,26 @@ class Listprocessor {
 						foreach ($rule as $new_column => $combine){
 							if (!in_array($new_column, $this->_setting['filesetting']['columns']))
 								$this->_setting['filesetting']['columns'][] = $new_column;
-							foreach ($this->_list as $i => &$row) {
+							foreach ($this->_list as $i => $row) {
 								$concatenate = '';
 								foreach ($combine as $column){
 									if (array_key_exists($column, $row)) $concatenate .= $row[$column];
 									else $concatenate .= $column;
 								}
-								$this->_list[$i][$new_column] = $concatenate;
+								$row[$new_column] = $concatenate; // SplFixedArray has problems accessing nested elements, must assign array to key directly
+								$this->_list[$i] = $row;
 							}
 						}
 						break;
 					case 'translate':
 						if (!array_key_exists('translations', $this->_setting)) break;
-						foreach ($this->_list as $i => &$row) {
+						foreach ($this->_list as $i => $row) {
 							foreach($modifications as $translate => $translation){
-								if (array_key_exists($row[$rule], $this->_setting['translations'][$rule])) $this->_list[$i][$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
+								if (array_key_exists($row[$rule], $this->_setting['translations'][$rule]))
+									$row[$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
 							}
+							// SplFixedArray has problems accessing nested elements, must assign array to key directly
+							$this->_list[$i] = $row;
 						}
 						break;
 				}
