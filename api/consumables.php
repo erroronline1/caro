@@ -72,7 +72,14 @@ class CONSUMABLES extends API {
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
-		if (!array_key_exists(1, $pricelist->_list)){
+		try {
+			if (!array_key_exists(1, $pricelist->_list)) $this->response([
+				'status' => [
+					'msg' => implode("\n", $pricelist->_log),
+					'type' => 'error'
+				]]);
+		}
+		catch(Error $e){
 			$this->response([
 				'status' => [
 					'msg' => implode("\n", $pricelist->_log),
