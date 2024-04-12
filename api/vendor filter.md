@@ -1,5 +1,8 @@
+### ean/gtin may have to be formatted as number or fracture before resaving as csv to avoid being displayed as exponential function
+
 * [caroli](#caroli)
 * [feet control](#feet-control)
+* [fiorgentz](#fiorgentz)
 * [juzo (failing due to filesize)](#juzo)
 * [neatec](#neatec)
 * [nowecor (trading goods yet to define)](#nowecor)
@@ -10,6 +13,7 @@
 * [prowalk](#prowalk)
 * [protheseus](#protheseus)
 * [russka](#russka)
+* [schein](#schein)
 * [taska](#taska)
 
 ### caroli
@@ -46,6 +50,43 @@ add header
 			"article_ean": [""]
 		}]
 	}
+}
+```
+
+### fiorgentz
+add name headers where empty, delete . from headers
+```json
+{
+	"filesetting": {
+		"columns": ["Art-Nr", "Bezeichnung", "Bezeichnung 2", "ME", "EANNummer"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Art-Nr"],
+			"article_name": ["Bezeichnung", ", ", "Bezeichnung 2"],
+			"article_unit": ["ME"],
+			"article_ean": ["EANNummer"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": false,
+			"match": {
+				"all": {
+					"article_name": "^(?!.*?(schuh)).*"
+				}
+			}
+		}
+	]
 }
 ```
 
@@ -425,6 +466,43 @@ add header on first line
 			"match": {
 				"all": {
 					"article_name": "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|stützschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"
+				}
+			}
+		}
+	]
+}
+```
+
+### schein
+```json
+{
+	"filesetting": {
+		"headerrowindex": 1,
+		"columns": ["Artikelnummer", "Artikelbezeichnung", "Artikelbezeichnung 2", "Basiseinheit"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Artikelbezeichnung", ", ", "Artikelbezeichnung 2"],
+			"article_unit": ["Basiseinheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "einlage|schuh|orthese"
 				}
 			}
 		}
