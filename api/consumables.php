@@ -133,6 +133,9 @@ class CONSUMABLES extends API {
 					die();
 				}
 			}
+			//var_dump($sqlchunks);
+			//die();
+
 			return $date;
 		}
 		return '';
@@ -161,14 +164,9 @@ class CONSUMABLES extends API {
 			foreach ($pricelist->_list[1] as $row){
 				$update = array_search($row['article_no'], array_column($assignedArticles, 'article'));
 				if ($update) {
-					$query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
+					$query = strtr(SQLQUERY::PREPARE('consumables_put-trading-good'),
 					[
 						':id' => $assignedArticles[$update]['id'],
-						':article_name' => $this->_pdo->quote($row['article_name']),
-						':article_unit' => $this->_pdo->quote($row['article_unit']),
-						':article_ean' => $this->_pdo->quote($row['article_ean']),
-						':trading_good' => 1,
-						':incorporated' => $assignedArticles[$update]['incorporated'], //without quotes
 					]) . '; ';
 					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
 				}
