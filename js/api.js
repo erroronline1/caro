@@ -705,7 +705,7 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				new Toast(data.status.msg, data.status.type);
-				api.purchase("get", request[1], data.status.id);
+				if (data.status.type !== "error") api.purchase("get", request[1], data.status.id);
 			},
 			title = {
 				vendor: LANG.GET("menu.purchase_vendor"),
