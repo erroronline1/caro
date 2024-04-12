@@ -2,19 +2,29 @@
 
 * [caroli](#caroli)
 * [feet control](#feet-control)
-* [fiorgentz](#fiorgentz)
+* [fior gentz](#fior-gentz)
+* [gottinger](#gottinger)
+* [ihle (mysterious unresponsiveness)](#ihle)
 * [juzo (failing due to filesize)](#juzo)
 * [neatec](#neatec)
 * [nowecor (trading goods yet to define)](#nowecor)
-* [ofa](#ofa)
+* [ofa (failing due to timeout)](#ofa)
 * [ortho reha neuhof](#ortho-reha-neuhof)
+* [ortho systems](#ortho-systems)
 * [otto bock](#otto-bock)
 * [perpedes (trading goods yet to define)](#perpedes)
 * [prowalk](#prowalk)
 * [protheseus](#protheseus)
+* [rehaforum](#rehaforum)
 * [russka](#russka)
 * [schein](#schein)
+* [sporlastic](#sporlastic)
+* [streifeneder]
 * [taska](#taska)
+* [tigges]
+* [triconmed]
+* [uniprox]
+* [werkmeister]
 
 ### caroli
 delete first two columns and rows
@@ -53,7 +63,7 @@ add header
 }
 ```
 
-### fiorgentz
+### fior gentz
 add name headers where empty, delete . from headers
 ```json
 {
@@ -87,6 +97,63 @@ add name headers where empty, delete . from headers
 			}
 		}
 	]
+}
+```
+
+### ihle
+delete . from headers, replace specialchars
+```json
+{
+	"filesetting": {
+		"headerrowindex": 1,
+		"columns": ["Nr", "Beschreibung 1", "Beschreibung 2", "Farbe", "Groesse", "Einheiten"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Nr"],
+			"article_name": ["Beschreibung 1", ", ", "Beschreibung 2", ", ", "Farbe", ", ", "Groesse"],
+			"article_unit": ["Einheiten"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "socke|strumpf|ckchen|kniestr|shirt|body|hose"
+				}
+			}
+		}
+	]
+}
+```
+
+### gottinger
+delete whitespaces and . from headers
+```json
+{
+	"filesetting": {
+		"headerrowindex": 2,
+		"columns": ["Art Nr", "Bezeichnung", "Menge"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Art Nr"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["Menge"],
+			"article_ean": [""]
+		}]
+	}
 }
 ```
 
@@ -202,18 +269,19 @@ replace specialchars in header
 ```
 
 ### ofa
+delete . from headers
 ```json
 {
 	"filesetting": {
 		"headerrowindex": 0,
-		"columns": ["Artikel", "Bez. 1", "Bez. II", "EAN", "VME"]
+		"columns": ["Artikel", "Bez 1", "Bez II", "VME"]
 	},
 	"modify": {
 		"rewrite": [{
 			"article_no": ["Artikel"],
-			"article_name": ["Bez. 1", ", ", "Bez. II"],
+			"article_name": ["Bez 1", ", ", "Bez II"],
 			"article_unit": ["VME"],
-			"article_ean": ["EAN"]
+			"article_ean": [""]
 		}]
 	}
 }
@@ -239,14 +307,15 @@ replace specialchars in header
 ```
 
 ### ortho reha neuhof
+delete . from header
 ```json
 {
 	"filesetting": {
-		"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
+		"columns": ["ArtNr", "Bezeichnung", "ME", "UDI-DI"]
 	},
 	"modify": {
 		"rewrite": [{
-			"article_no": ["Art.Nr."],
+			"article_no": ["ArtNr"],
 			"article_name": ["Bezeichnung"],
 			"article_unit": ["ME"],
 			"article_ean": ["UDI-DI"]
@@ -271,6 +340,24 @@ replace specialchars in header
 			}
 		}
 	]
+}
+```
+
+### ortho systems
+delete . and () from header
+```json
+{
+	"filesetting": {
+		"columns": ["Artikel-Nr", "Einh", "EAN_UDI-DI-Nr", "Auflistung mit Menge und Inhalt-Pos"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikel-Nr"],
+			"article_name": ["Auflistung mit Menge und Inhalt-Pos"],
+			"article_unit": ["Einh"],
+			"article_ean": ["EAN_UDI-DI-Nr"]
+		}]
+	}
 }
 ```
 
@@ -424,6 +511,55 @@ add header on first line
 }
 ```
 
+### rehaforum
+```json
+{
+	"filesetting": {
+		"columns": ["Artikelnummer", "Bezeichnung", "EAN", "Einheit"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_duplicates",
+			"comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
+			"keep": true,
+			"duplicates": {
+				"orderby": ["Artikelnummer"],
+				"descending": false,
+				"column": "Artikelnummer",
+				"amount": 1
+			}
+		}
+	],
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["Einheit"],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".+"
+				}
+			}
+		}
+	]
+}
+```
+
 ### russka
 ```json
 {
@@ -509,7 +645,43 @@ add header on first line
 	]
 }
 ```
-
+### sporlastic
+delete . from headers, replace specialchars and whitespaces
+```json
+{
+	"filesetting": {
+		"headerrowindex": 1,
+		"columns": ["Bestell-Nr", "ArtikelBez1", "ArtikelBez2", "Seite", "Farbe", "Groesse", "ME", "EAN_CODE"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Bestell-Nr"],
+			"article_name": ["ArtikelBez1", ", ", "ArtikelBez2", ", ", "Seite", ", ", "Farbe", ", ", "Groesse"],
+			"article_unit": ["ME"],
+			"article_ean": ["EAN_CODE"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".+"
+				}
+			}
+		}
+	]
+}
+```
 ### taska
 ```json
 {
