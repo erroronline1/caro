@@ -4,27 +4,27 @@
 * [feet control](#feet-control)
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
-* [ihle (mysterious unresponsiveness)](#ihle)
+* [ihle](#ihle)
 * [juzo (failing due to filesize)](#juzo)
 * [neatec](#neatec)
-* [nowecor (trading goods yet to define)](#nowecor)
+* [nowecor](#nowecor)
 * [ofa (failing due to timeout)](#ofa)
 * [ortho reha neuhof](#ortho-reha-neuhof)
 * [ortho systems](#ortho-systems)
 * [otto bock](#otto-bock)
-* [perpedes (trading goods yet to define)](#perpedes)
+* [perpedes](#perpedes)
 * [prowalk](#prowalk)
 * [protheseus](#protheseus)
 * [rehaforum](#rehaforum)
 * [russka](#russka)
 * [schein](#schein)
 * [sporlastic](#sporlastic)
-* [streifeneder]
+* [streifeneder](#streifeneder)
 * [taska](#taska)
-* [tigges]
-* [triconmed]
-* [uniprox]
-* [werkmeister]
+* [tigges](#tigges)
+* [triconmed](#triconmed)
+* [uniprox](#uniprox)
+* [werkmeister](#werkmeister)
 
 ### caroli
 delete first two columns and rows
@@ -158,16 +158,17 @@ delete whitespaces and . from headers
 ```
 
 ### juzo
+delete unreqired columns
 ```json
 {
 	"filesetting": {
-		"columns": ["JUZO-Artikelnr", "GTIN", "Mengeneinheit (Artikel)", "Artikelbezeichnung 1", "Artikelbezeichnung 2"]
+		"columns": ["JUZO-Artikelnr", "GTIN", "Mengeneinheit", "Artikelbezeichnung 1", "Artikelbezeichnung 2"]
 	},
 	"modify": {
 		"rewrite": [{
 			"article_no": ["JUZO-Artikelnr"],
 			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2"],
-			"article_unit": ["Mengeneinheit (Artikel)"],
+			"article_unit": ["Mengeneinheit"],
 			"article_ean": ["GTIN"]
 		}]
 	}
@@ -185,7 +186,7 @@ delete whitespaces and . from headers
 			"keep": true,
 			"match": {
 				"all": {
-					"article_name": ".*?"
+					"article_name": ".+"
 				}
 			}
 		}
@@ -235,15 +236,15 @@ replace specialchars in header
 ```json
 {
 	"filesetting": {
-		"headerrowindex": 1,
-		"columns": ["Artikel-Nr", "Artikelbezeichnung lang", "Groesse", "Farbe", "Einheit"]
+		"headerrowindex": 0,
+		"columns": ["MATCHCODE", "NAME1", "EANCODE", "VK_EINHEIT"]
 	},
 	"modify": {
 		"rewrite": [{
-			"article_no": ["Artikel-Nr."],
-			"article_name": ["Artikelbezeichnung lang", ", ", "Groesse", ", ", "Farbe"],
-			"article_unit": ["Einheit"],
-			"article_ean": [""]
+			"article_no": ["MATCHCODE"],
+			"article_name": ["NAME1"],
+			"article_unit": ["VK_EINHEIT"],
+			"article_ean": ["EANCODE"]
 		}]
 	}
 }
@@ -257,10 +258,10 @@ replace specialchars in header
 		{
 			"apply": "filter_by_expression",
 			"comment": "delete unnecessary products",
-			"keep": false,
+			"keep": true,
 			"match": {
 				"all": {
-					"article_name": ""
+					"article_name": "aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|tübinger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"
 				}
 			}
 		}
@@ -362,6 +363,7 @@ delete . and () from header
 ```
 
 ### otto bock
+join tables
 ```json
 {
 	"filesetting": {
@@ -423,10 +425,10 @@ delete . and () from header
 		{
 			"apply": "filter_by_expression",
 			"comment": "delete unneccessary products",
-			"keep": false,
+			"keep": true,
 			"match": {
 				"all": {
-					"article_name": ""
+					"article_name": "^o|^ns|^av|schuh|^d\\d"
 				}
 			}
 		}
@@ -682,6 +684,45 @@ delete . from headers, replace specialchars and whitespaces
 	]
 }
 ```
+
+### streifeneder
+delete . from headers, replace specialchars and whitespaces
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikelnummer", "Bezeichnung", "Einheit", "GTIN-Code"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["Einheit"],
+			"article_ean": ["GTIN-Code"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"
+				}
+			}
+		}
+	]
+}
+```
+
 ### taska
 ```json
 {
@@ -702,5 +743,157 @@ delete . from headers, replace specialchars and whitespaces
 			"article_ean": [""]
 		}]
 	}
+}
+```
+
+### tigges
+delete . from headers, replace specialchars and whitespaces
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Bestellnr", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Bestellnr"],
+			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2", ", ", "Artikelbezeichnung 3"],
+			"article_unit": ["Verpackung1"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "WS-Bandage|Wirbelsäulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"
+				}
+			}
+		}
+	]
+}
+```
+
+### triconmed
+delete . from headers, replace specialchars and whitespaces
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikelnr", "Artikelbeschreibung"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnr"],
+			"article_name": ["Artikelbeschreibung"],
+			"article_unit": [""],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".+"
+				}
+			}
+		}
+	]
+}
+```
+
+### uniprox
+delete . from headers, replace specialchars and whitespaces
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikel-Nr", "Beschreibung", "ME", "EAN"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikel-Nr"],
+			"article_name": ["Beschreibung"],
+			"article_unit": ["ME"],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "^bob|^daho|liner|philadelphia"
+				}
+			}
+		}
+	]
+}
+```
+
+### werkmeister
+delete . from headers, replace specialchars and whitespaces
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikelnummer", "Farbe Groesse", "Artikelbez 1", "Artikelbez 2", "EAN"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnummer", " ", "Farbe Groesse"],
+			"article_name": ["Artikelbez 1", " ", "Artikelbez 2"],
+			"article_unit": [""],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "Arthrodesenkissen"
+				}
+			}
+		}
+	]
 }
 ```
