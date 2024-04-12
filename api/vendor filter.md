@@ -1,11 +1,13 @@
 ### ean/gtin may have to be formatted as number or fracture before resaving as csv to avoid being displayed as exponential function
 
+* [basko](#basko)
 * [caroli](#caroli)
 * [feet control](#feet-control)
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
 * [ihle](#ihle)
 * [juzo (failing due to filesize)](#juzo)
+* [mmib](#mmib)
 * [neatec](#neatec)
 * [nowecor](#nowecor)
 * [ofa (failing due to timeout)](#ofa)
@@ -25,6 +27,43 @@
 * [triconmed](#triconmed)
 * [uniprox](#uniprox)
 * [werkmeister](#werkmeister)
+
+### basko
+delete . from headers, replace specialchars
+```json
+{
+	"filesetting": {
+		"columns": ["Art-Nr", "Artikelname", "Groesse", "Seite", "Farbe", "EAN GTIN", "Verpackungseinheit"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Art-Nr"],
+			"article_name": ["Artikelname", ", ", "Groesse", ", ", "Seite", ", ", "Farbe"],
+			"article_unit": ["Verpackungseinheit"],
+			"article_ean": ["EAN GTIN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."
+				}
+			}
+		}
+	]
+}
+```
 
 ### caroli
 delete first two columns and rows
@@ -191,6 +230,24 @@ delete unreqired columns
 			}
 		}
 	]
+}
+```
+
+### mmib
+rewrite pricelist (concat first three columns to article number, paste as values, add name column, delete the rest)
+```json
+{
+	"filesetting": {
+		"columns": ["artnr", "name"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["artnr"],
+			"article_name": ["name"],
+			"article_unit": ["LFM"],
+			"article_ean": [""]
+		}]
+	}
 }
 ```
 
