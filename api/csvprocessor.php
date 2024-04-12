@@ -337,6 +337,8 @@ class Listprocessor {
 		/* split list as desired or at least nest one layer */
 		$split_list = [];
 		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
+
 			if (array_key_exists('split', $this->_setting)){
 				// create sorting key by matched patterns, mandatory translated if applicable
 				$sorting = '';
@@ -392,6 +394,8 @@ class Listprocessor {
 		},
 		*/
 		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
+
 			$keep = true;
 			$track = [];
 			if (array_key_exists('match', $rule)){
@@ -434,22 +438,24 @@ class Listprocessor {
 		}
 	}
 
+	/* keep or discard all entries if 'column' meets 'bias' for 'threshold' 
+	{
+		"apply": "filter_by_monthdiff",
+		"comment": "discard by date diff in months, do not contact if last event within x months",
+		"keep": False,
+		"date": {
+			"column": "SOMEDATE",
+			"format": ["d", "m", "y"],
+			"threshold": 6,
+			"bias": "<"
+		}
+	},
+	*/
 	public function filter_by_monthdiff($rule){
-		/* keep or discard all entries if 'column' meets 'bias' for 'threshold' 
-		{
-			"apply": "filter_by_monthdiff",
-			"comment": "discard by date diff in months, do not contact if last event within x months",
-			"keep": False,
-			"date": {
-				"column": "SOMEDATE",
-				"format": ["d", "m", "y"],
-				"threshold": 6,
-				"bias": "<"
-			}
-		},
-		*/
 		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
+
 			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
 			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['date']['format'])] = '01';
@@ -482,22 +488,24 @@ class Listprocessor {
 		}
 	}
 
+	/* keep or discard if 'column'-value -+ 'offset' matches 'interval' from current or argument-set date
+	{
+		"apply": "filter_by_monthinterval",
+		"comment": "discard by not matching interval in months, optional offset from initial column value",
+		"keep": False,
+		"interval": {
+			"column": "SOMEDATE",
+			"format": ["d", "m", "y"],
+			"interval": 6,
+			"offset": 0
+		}
+	},
+	*/
 	public function filter_by_monthinterval($rule){
-		/* keep or discard if 'column'-value -+ 'offset' matches 'interval' from current or argument-set date
-		{
-			"apply": "filter_by_monthinterval",
-			"comment": "discard by not matching interval in months, optional offset from initial column value",
-			"keep": False,
-			"interval": {
-				"column": "SOMEDATE",
-				"format": ["d", "m", "y"],
-				"interval": 6,
-				"offset": 0
-			}
-		},
-		*/
 		if (($key = array_search('y', $rule['interval']['format'])) !== false) $rule['interval']['format'][$key] = 'Y'; // make year format 4 digits
 		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
+
 			preg_match_all('/\d+/mi', $row[$rule['interval']['column']], $entrydate);
 			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['interval']['format'])] = '01';
@@ -531,34 +539,34 @@ class Listprocessor {
 		}
 	}
 
-	public function filter_by_comparison_file($rule){
-		/* discard or keep explicit excemptions as stated in comparison file, based on same identifier
-		comparison file is imported recursively and can be filtered and alteres the same as the parent file
-		{
-			"apply": "filter_by_comparison_file",
-			"comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
-			"keep": False,
-			"filesetting": {
-				"source": "excemptions.*?.csv",
-				"headerrowindex": 0,
-				"columns": [
-					"COMPAREFILEINDEX"
-				]
+	/* discard or keep explicit excemptions as stated in comparison file, based on same identifier
+	comparison file is imported recursively and can be filtered and alteres the same as the parent file
+	{
+		"apply": "filter_by_comparison_file",
+		"comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
+		"keep": False,
+		"filesetting": {
+			"source": "excemptions.*?.csv",
+			"headerrowindex": 0,
+			"columns": [
+				"COMPAREFILEINDEX"
+			]
+		},
+		"filter": [],
+		"match": {
+			"all":{
+				"ORIGININDEX": "COMPAREFILEINDEX"
 			},
-			"filter": [],
-			"match": {
-				"all":{
-					"ORIGININDEX": "COMPAREFILEINDEX"
-				},
-				"any":{
-					"ORIGININDEX": "COMPAREFILEINDEX"
-				}
-			},
-			"transfer": {
-				"NEWPARENTCOLUMN": "COMPARECOLUMN"
+			"any":{
+				"ORIGININDEX": "COMPAREFILEINDEX"
 			}
 		},
-		*/
+		"transfer": {
+			"NEWPARENTCOLUMN": "COMPARECOLUMN"
+		}
+	},
+	*/
+	public function filter_by_comparison_file($rule){
 		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_originallist;
 		if (array_key_exists('translations', $this->_setting)) $rule['translations'] = $this->_setting['translations'];
 		if (array_key_exists('encoding', $this->_setting['filesetting']) && !array_key_exists('encoding', $rule['filesetting'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
@@ -577,6 +585,8 @@ class Listprocessor {
 			}
 			# fill false-prepared match-items with values
 			foreach ($this->_list as $i => $self_row){
+				if (!$row) continue;
+
 				foreach ($compare_list->_list as $j => $cmp_row){
 					$corresponded = 0;
 					#iterate over matches
@@ -611,22 +621,24 @@ class Listprocessor {
 		}
 	}
 
+	/* keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+	{
+		"apply": "filter_by_duplicates",
+		"comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
+		"keep": True,
+		"duplicates": {
+			"orderby": ["ORIGININDEX"],
+			"descending": False,
+			"column": "CUSTOMERID",
+			"amount": 1
+		}
+	},
+	*/
 	public function filter_by_duplicates($rule){
-		/* keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-		{
-			"apply": "filter_by_duplicates",
-			"comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
-			"keep": True,
-			"duplicates": {
-				"orderby": ["ORIGININDEX"],
-				"descending": False,
-				"column": "CUSTOMERID",
-				"amount": 1
-			}
-		},
-		*/
 		$duplicates = [];
 		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
+
 			$identifier = $row[$rule['duplicates']['column']];
 			$orderby = [];
 			foreach($rule['duplicates']['orderby'] as $k => $column){
@@ -656,23 +668,25 @@ class Listprocessor {
 		}
 	}
 
-	public function filter_by_rand($rule){
-		/* keep or discard amount of random rows that match given column values
-		{
-			"apply": "filter_by_rand",
-			"comment": "keep some random rows",
-			"keep": True,
-			"data": {
-				"columns": {
-					"SOMEFILTERCOLUMN", "hasvalue"
-				},
-				"amount": 10
-			}
+	/* keep or discard amount of random rows that match given column values
+	{
+		"apply": "filter_by_rand",
+		"comment": "keep some random rows",
+		"keep": True,
+		"data": {
+			"columns": {
+				"SOMEFILTERCOLUMN", "hasvalue"
+			},
+			"amount": 10
 		}
-		*/
+	}
+	*/
+	public function filter_by_rand($rule){
 		$subset = [];
 		if (array_key_exists('columns', rule['data'])){
 			foreach ($this->_list as $i => $row){
+				if (!$row) continue;
+
 				$match = false;
 				$columns = array_keys($rule['data']['columns']);
 				for($c = 0; $c < count($columns); $c++){
@@ -698,27 +712,27 @@ class Listprocessor {
 		}
 	}
 
-	public function modify(){
-		/* remove, replace or add column with fixed value or formula or replace regex pattern in existing column
-		{
-			"add":{
-				"NEWCOLUMNNAME": "string",
-				"ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
-			},
-			"replace":[
-				["NAME", "regex", "replacement"],
-				[null, ";", ","],
-				["SOMECOLUMN", "regex", "replacement", "replacementnewrow", "replacementanothernewrow"]
-			],
-			"remove": ["SOMEFILTERCOLUMN", "DEATH"],
-			"rewrite":[
-				{"Customer": ["CUSTOMERID", " separator ", "NAME"]}
-			],
-			"translate":{
-				"DEPARTMENT": "departments"
-			}
+	/* remove, replace or add column with fixed value or formula or replace regex pattern in existing column
+	{
+		"add":{
+			"NEWCOLUMNNAME": "string",
+			"ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
 		},
-		*/
+		"replace":[
+			["NAME", "regex", "replacement"],
+			[null, ";", ","],
+			["SOMECOLUMN", "regex", "replacement", "replacementnewrow", "replacementanothernewrow"]
+		],
+		"remove": ["SOMEFILTERCOLUMN", "DEATH"],
+		"rewrite":[
+			{"Customer": ["CUSTOMERID", " separator ", "NAME"]}
+		],
+		"translate":{
+			"DEPARTMENT": "departments"
+		}
+	},
+	*/
+	public function modify(){
 		foreach ($this->_setting['modify'] as $modify => $modifications){
 			foreach ($modifications as $key => $rule){
 				switch ($modify){
@@ -726,6 +740,8 @@ class Listprocessor {
 						if (!in_array($rule, $this->_setting['filesetting']['columns']))
 								$this->_setting['filesetting']['columns'][] = $key;
 						foreach ($this->_list as $i => $row){
+							if (!$row) continue;
+
 							if (is_array($modifications[$modify][$key])){
 								$expression = [];
 								foreach ($modifications[$modify][$key] as $possible_col){
@@ -740,6 +756,8 @@ class Listprocessor {
 						break;
 					case 'replace':
 						foreach ($this->_list as $i => $row){
+							if (!$row) continue;
+
 							foreach ($row as $column => $value) {
 								for ($replacement = 2; $replacement < count($rule); $replacement++){
 									if ((!$rule[0] || $rule[0] == $column) && preg_match('/'. $rule[1]. '/m', $value)){
@@ -774,6 +792,8 @@ class Listprocessor {
 							if (!in_array($new_column, $this->_setting['filesetting']['columns']))
 								$this->_setting['filesetting']['columns'][] = $new_column;
 							foreach ($this->_list as $i => $row) {
+								if (!$row) continue;
+
 								$concatenate = '';
 								foreach ($combine as $column){
 									if (array_key_exists($column, $row)) $concatenate .= $row[$column];
@@ -787,6 +807,8 @@ class Listprocessor {
 					case 'translate':
 						if (!array_key_exists('translations', $this->_setting)) break;
 						foreach ($this->_list as $i => $row) {
+							if (!$row) continue;
+
 							foreach($modifications as $translate => $translation){
 								if (array_key_exists($row[$rule], $this->_setting['translations'][$rule]))
 									$row[$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
