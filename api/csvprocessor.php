@@ -602,8 +602,9 @@ class Listprocessor {
 							foreach ($transfercolumns as $transfer){
 								if (!array_key_exists($transfer, $this->setting['filesetting']['columns']))
 									$this->setting['filesetting']['columns'][] = $transfer;
-								$this->_list[$i][$transfer] = $cmp_row[$transfercolumns[$transfer]];
+								$self_row[$transfer] = $cmp_row[$transfercolumns[$transfer]];
 							}
+							$this->_list[$i] = $self_row;
 						}
 					}
 				}
@@ -745,7 +746,7 @@ class Listprocessor {
 							if (is_array($modifications[$modify][$key])){
 								$expression = [];
 								foreach ($modifications[$modify][$key] as $possible_col){
-									$expression[] = array_key_exists($possible_col, $this->_list[$i]) ? $this->_list[$i][$possible_col] : $possible_col;
+									$expression[] = array_key_exists($possible_col, $row) ? $row[$possible_col] : $possible_col;
 								}
 							}
 							else
