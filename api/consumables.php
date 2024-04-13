@@ -100,19 +100,19 @@ class CONSUMABLES extends API {
 			]);
 			$remained = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($remained as $row) {
-				$remainder[] = ['id' => $row['id'], 'article' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
+				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
 			}
 
 			foreach ($pricelist->_list[1] as $row){
-				$update = array_search($row['article_no'], array_column($remainder, 'article'));
+				$update = array_search($row['article_no'], array_column($remainder, 'article_no')); // this feels very unperformant, but i don't know better
 				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
 					':id' => $remainder[$update]['id'],
 					':article_name' => $this->_pdo->quote($row['article_name']),
 					':article_unit' => $this->_pdo->quote($row['article_unit']),
 					':article_ean' => $this->_pdo->quote($row['article_ean']),
-					':trading_good' => "'0'",
-					':incorporated' => $remainder[$update]['incorporated'], //without quotes
+					':trading_good' => 0,
+					':incorporated' => $remainder[$update]['incorporated']
 				]) . '; ';
 				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
 					[
@@ -142,7 +142,6 @@ class CONSUMABLES extends API {
 			}
 			//var_dump($sqlchunks);
 			//die();
-
 			return $date;
 		}
 		return '';
@@ -161,23 +160,23 @@ class CONSUMABLES extends API {
 		$vendorProducts = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$assignedArticles = [];
 		foreach($vendorProducts as $row) {
-			$assignedArticles[] = ['id' => $row['id'], 'article' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
+			$assignedArticles[] = ['id' => $row['id'], 'article_no' => $row['article_no'] ];
 		}
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $vendorProducts;
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		if (count($pricelist->_list[1])){
-			foreach ($pricelist->_list[1] as $row){
-				$update = array_search($row['article_no'], array_column($assignedArticles, 'article'));
-				if ($update) {
-					$query = strtr(SQLQUERY::PREPARE('consumables_put-trading-good'),
-					[
-						':id' => $assignedArticles[$update]['id'],
-					]) . '; ';
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
-				}
+			function compare_func($value1, $value2){
+				return $value1 <=> $value2;
 			}
+			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($assignedArticles, 'article_no'), 'compare_func') as $index => $row){
+				$query = strtr(SQLQUERY::PREPARE('consumables_put-trading-good'),
+					[
+						':id' => $pricelist->_list[1][$index]['id'],
+					]) . '; ';
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
+				}
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
 				$statement->execute();
