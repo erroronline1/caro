@@ -157,7 +157,7 @@ class Listprocessor {
 		if (!array_key_exists('processedYear', $this->_argument)) $this->_argument['processedMonth'] = date('Y');
 
 		if (gettype($this->_setting['filesetting']['source']) === 'string' && is_file($this->_setting['filesetting']['source'])) $this->importFile();
-		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = $this->_setting['filesetting']['source'];
+		elseif (gettype($this->_setting['filesetting']['source']) === 'array' || gettype($this->_setting['filesetting']['source']) === 'object') $this->_list = $this->_setting['filesetting']['source'];
 		$this->_originallist = $this->_list;
 		if ($this->_list) $this->filter();
 	}
@@ -177,7 +177,7 @@ class Listprocessor {
 		$dateformat = implode('-', $dateformat);
 		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
 		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
-		return round($processedmonth->diff($backthen, true)->days / (365 / 12));
+		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 2);
 	}
 
 	public function monthdelta($date = [], $dateformat = [], $delta = 0){
@@ -272,32 +272,35 @@ class Listprocessor {
 
 				if (method_exists($this, $listfilter['apply'])) {
 					$this->{$listfilter['apply']}($listfilter);
-					$this->_log[] = '[*] remaining filtered: '. count($this->_list);
+					$remaining = count(array_filter($this->_list->toArray(), fn($row) => $row ? : false));
+					$this->_log[] = '[*] remaining filtered: '. $remaining;
+					if (!$remaining) break;
 				} else $this->_log[] = '[~] ' . $listfilter['apply'] . ' does not exist and could not be applied!';
 			}
 		}
 
-		if (count($this->_list)){
+		if ($remaining){
 			/* modify the result list if applicable */
 			if (array_key_exists('modify', $this->_setting)){
 				$this->modify();
 				$this->_log[] = '[*] modifications done';
 			}
 
-			/* delete unwanted columns to reduce memory footprint and evaluate values if applicable 
+			/* delete unwanted columns and evaluate values if applicable 
 			
 			{
 				"EMAIL": "^((?!@).)*$"
 			}
 			*/
-			$unsetcolumns=array_diff($this->_headers, $this->_setting['filesetting']['columns']);
-			$evaluate_warning=[];
+			$unsetcolumns = array_diff($this->_headers, $this->_setting['filesetting']['columns']);
+			$evaluate_warning = [];
 			foreach ($this->_list as $row => $values){
+				if (!$values) continue;
 				foreach($unsetcolumns as $unset){
 					unset($values[$unset]);
 				}
 				$this->_list[$row] = $values;  // SplFixedArray has problems accessing nested elements, must assign array to key directly
-				if (array_key_exists('evaluate',$this->_setting)){
+				if (array_key_exists('evaluate', $this->_setting)){
 					foreach ($this->_setting['evaluate'] as $column => $pattern){
 						if (boolval($values[$column]) && boolval(preg_match('/' . $pattern . '/mi', $values[$column]))){
 							if (array_key_exists($column, $evaluate_warning)) $evaluate_warning[$column]++;
@@ -310,16 +313,19 @@ class Listprocessor {
 				$this->_log[] = '[!] WARNING: ' . $amount . ' values of ' . $column . ' match the evaluation pattern, please revise in the output';
 			}
 
-			$this->_log[] = '[*] result - final rows: ' . count($this->_list);
+			$this->_log[] = '[*] result - final rows: ' . count(array_filter($this->_list->toArray(), fn($row) => $row ? : false));
 
 			// split list or at least elevate to n = 1 for output
-			if (!$this->_isChild) $this->split();
+			$this->split();
 
 			/* add postprocessing message to log if applicable */
-			if (array_key_exists('postProcessing',$this->_setting)){
+			if (array_key_exists('postProcessing', $this->_setting)){
 				$this->_log[] = '[*] done! '. $this->_setting['postProcessing'];
 			}
-		} else $this->_log[] = '[!] all list entries have been filtered out :(';
+		} else {
+			$this->_list = [];
+			$this->_log[] = '[!] all list entries have been filtered out :(';
+		}
 	}
 
 	public function delete($row, $track = null){
@@ -459,7 +465,6 @@ class Listprocessor {
 			preg_match_all('/\d+/mi', $row[$rule['date']['column']], $entrydate);
 			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['date']['format'])] = '01';
-			$d = 0;
 			$thismonth = [];
 			foreach ($rule['date']['format'] as $key){
 				switch($key){
@@ -573,53 +578,57 @@ class Listprocessor {
 		if (array_key_exists('dialect', $this->_setting['filesetting']) && !array_key_exists('dialect', $rule['filesetting'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
 		$this->_log[] = '[*] comparing with '. (gettype($rule['filesetting']['source']) === 'string' ? $rule['filesetting']['source'] : 'self');
 		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']], True);
+		if (!array_key_exists(1, $compare_list->_list)) return;
 		$equals = [];
-		$transfercolumns = array_key_exists('transfer', $rule) ? $rule['transfer']: null;
+		// reduce current list to avoid key errors on unset items
+		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
 
-		foreach ($rule['match'] as $any_or_all => $any_or_allcolumns){
-			$compare_columns = $any_or_allcolumns;
-			# prepare possibly needed amount of matches
-			$correspond = [];
-			for ($i = 0; $i < count($compare_columns); $i++) {
-				$correspond[] = false;
+		// match lists
+		foreach ($rule['match'] as $any_or_all => $compare_columns){
+			$corresponds = [];
+			foreach($compare_columns as $column => $cmp_column){
+				foreach (array_uintersect(array_column($thislistwithoutempty, $column), array_column($compare_list->_list[1], $cmp_column), fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
+					if (!array_key_exists($index, $corresponds)) $corresponds[$index] = [];
+					$corresponds[$index][] = true;
+				}
+				if ($any_or_all === 'any') break;
 			}
-			# fill false-prepared match-items with values
-			foreach ($this->_list as $i => $self_row){
-				if (!$row) continue;
+			if ($any_or_all === 'any' && count($corresponds[$index]) || ($any_or_all === 'all' && count($corresponds[$index]) === count(array_keys($compare_columns)))) {
+				if (!in_array($index, $equals)) $equals[] = $index;
+			}
+		}
 
-				foreach ($compare_list->_list as $j => $cmp_row){
-					$corresponded = 0;
-					#iterate over matches
-					$columns = array_keys($compare_columns);
-					for ($c = 0; $c < count($columns); $c++){
-						$column = $columns[$c];
-						$correspond[$corresponded++] = $self_row[$column] === $cmp_row[$compare_columns[$column]];
-						if ($any_or_all === 'any') break;
-					}
-					if ($any_or_all === 'any' && in_array(true, $correspond) || ($any_or_all === 'all' && !in_array(false, $correspond))) {
-						if (!in_array($i, $equals)) $equals[]=$i;
-						if ($transfercolumns){
-							foreach ($transfercolumns as $transfer){
-								if (!array_key_exists($transfer, $this->setting['filesetting']['columns']))
-									$this->setting['filesetting']['columns'][] = $transfer;
-								$self_row[$transfer] = $cmp_row[$transfercolumns[$transfer]];
-							}
-							$this->_list[$i] = $self_row;
-						}
-					}
+		// transfer values from comparison list to main list
+		if (array_key_exists('transfer', $rule)){
+			foreach ($rule['transfer'] as $newcolumn => $from){
+				if (!array_key_exists($newcolumn, $this->setting['filesetting']['columns'])) $this->setting['filesetting']['columns'][] = $newcolumn;
+				foreach (array_uintersect(array_column($thislistwithoutempty, $column), array_column($compare_list->_list[1], $cmp_column), fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
+					$self_row = $this->_list[$index];						
+					$self_row[$newcolumn] = $cmp_row[$from];
+					$this->_list[$index] = $self_row;
 				}
 			}
 		}
-		$compare_list = null; //release ressources
-		foreach ($equals as $i){
-			if (!$rule['keep']){
+		
+		if ($rule['keep']){
+			foreach (array_udiff(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
 				$track = [
 					'filter' => 'filter_by_comparison_file',
 					'kept' => $rule['keep'],
 					'matched' => json_encode($rule['match'])];
-				$this->delete($i, $track);
-			}
+				$this->delete($index, $track);
+			}	
 		}
+		else {
+			foreach (array_uintersect(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
+				$track = [
+					'filter' => 'filter_by_comparison_file',
+					'kept' => $rule['keep'],
+					'matched' => json_encode($rule['match'])];
+				$this->delete($index, $track);
+			}	
+		}
+		$compare_list = $thislistwithoutempty = null; // release ressources
 	}
 
 	/* keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
