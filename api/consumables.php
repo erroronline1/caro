@@ -167,10 +167,7 @@ class CONSUMABLES extends API {
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		if (count($pricelist->_list[1])){
-			function compare_func($value1, $value2){
-				return $value1 <=> $value2;
-			}
-			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($assignedArticles, 'article_no'), 'compare_func') as $index => $row){
+			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($assignedArticles, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$query = strtr(SQLQUERY::PREPARE('consumables_put-trading-good'),
 					[
 						':id' => $pricelist->_list[1][$index]['id'],
