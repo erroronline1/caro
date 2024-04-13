@@ -847,7 +847,9 @@ Tested devices:
 ### Installation
 * php.ini memory_limit ~2048M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 1200 for [CSV processing](#csv-processor) may take a while depending on your data amount (pricelist import @ 660k rows currently takes about 26 min)
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 2700 (45min) for [CSV processing](#csv-processor) may take a while depending on your data amount
+    * [pricelist import](#importing-vendor-pricelists) @ 220k rows takes about 1 minute to import and process, 12 minutes in total to write to database
+    * pricelist import @ 660k rows currently takes about 28 min
 * php.ini enable extensions:
     * gd
     * gettext

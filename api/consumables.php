@@ -93,7 +93,7 @@ class CONSUMABLES extends API {
 				':id' => $vendorID
 			]);
 			// retrieve left items
-			$remainder=[];
+			$remainder = [];
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
 			$statement->execute([
 				':search' => $vendorID
@@ -103,32 +103,32 @@ class CONSUMABLES extends API {
 				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
 			}
 
-			foreach ($pricelist->_list[1] as $row){
-				$update = array_search($row['article_no'], array_column($remainder, 'article_no')); // this feels very unperformant, but i don't know better
-				if ($update) $query = strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
+			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
 				[
 					':id' => $remainder[$update]['id'],
-					':article_name' => $this->_pdo->quote($row['article_name']),
-					':article_unit' => $this->_pdo->quote($row['article_unit']),
-					':article_ean' => $this->_pdo->quote($row['article_ean']),
+					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
+					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
+					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
 					':trading_good' => 0,
 					':incorporated' => $remainder[$update]['incorporated']
-				]) . '; ';
-				else $query = strtr(SQLQUERY::PREPARE('consumables_post-product'),
-					[
-						':vendor_id' => $vendorID,
-						':article_no' => $this->_pdo->quote($row['article_no']),
-						':article_name' => $this->_pdo->quote($row['article_name']),
-						':article_alias' => "''",
-						':article_unit' => $this->_pdo->quote($row['article_unit']),
-						':article_ean' => $this->_pdo->quote($row['article_ean']),
-						':active' => 1,
-						':protected' => 0,
-						':trading_good' => 0,
-						':incorporated' => null
-					]) . '; ';
-
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
+				]) . '; ');
+			}
+			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post-product'),
+				[
+					':vendor_id' => $vendorID,
+					':article_no' => $this->_pdo->quote($pricelist->_list[1][$index]['article_no']),
+					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
+					':article_alias' => "''",
+					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
+					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
+					':active' => 1,
+					':protected' => 0,
+					':trading_good' => 0,
+					':incorporated' => null
+				]) . '; ');
 			}
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
