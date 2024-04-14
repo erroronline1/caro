@@ -111,11 +111,12 @@ class Listprocessor {
 
 	/**
 	 * define result
+	 * define original import result for lossless recursive comparison
 	 * 
 	 * @var array
 	 */
 	public $_list = []; // https://www.php.net/SplFixedArray
-	public $_originallist = [];
+	public $_originallist = []; // dito
 
 	/**
 	 * define arguments
@@ -332,12 +333,13 @@ class Listprocessor {
 	public function delete($row, $track = null){
 		/* delete row and add tracking to log if applicable */
 		if ($track && array_key_exists('track', $this->_argument)){
-			foreach($this->_argument['track'] as $column => $values){
-				$thislistrow = $this->_list[$row];
-				if (!$thislistrow) continue;
-				$tracked = array_search($thislistrow[$column], $values);
-				if ($tracked !== false)
-					$this->_log[] = "[!] tracked " . $values[$tracked] . ' in ' . $column . ': ' . json_encode($track);
+			$thislistrow = $this->_list[$row];
+			if ($thislistrow) {
+				foreach($this->_argument['track'] as $column => $values){
+					$tracked = array_search($thislistrow[$column], $values);
+					if ($tracked !== false)
+						$this->_log[] = "[!] tracked deletion " . $values[$tracked] . ' in ' . $column . ': ' . json_encode($track);
+				}
 			}
 		}
 		unset ($this->_list[$row]);
@@ -406,45 +408,39 @@ class Listprocessor {
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
-			$keep = true;
-			$track = [];
 			if (array_key_exists('match', $rule)){
+				$keep = true;
+				$track = [];
 				if (array_key_exists('any', $rule['match'])){
-					$columns = array_keys($rule['match']['any']);
-					for($c = 0; $c < count($columns); $c++){
-						$column = $columns[$c];
+					foreach($rule['match']['any'] as $column => $filter){
+						$track = [
+							'filter' => 'filter_by_expression',
+							'column' => $column,
+							'value' => $row[$column],
+							'filtered_by' => $filter];
 						$keep = !$rule['keep'];
-						if (boolval(preg_match('/' . $rule['match']['any'][$column] . '/mi', $row[$column]))){
+						if (boolval(preg_match('/' . $filter . '/mi', $row[$column]))){
 							$keep = $rule['keep'];
-							$track=[
-								'filter' => 'filter_by_expression',
-								'kept' => $rule['keep'],
-								'column' => $column,
-								'value' => $row[$column],
-								'matched' => $rule['match']['any'][$column]];
 							break;
 						}
 					}
 				}
 				elseif (array_key_exists('all', $rule['match'])){
-					$columns = array_keys($rule['match']['all']);
-					for($c = 0; $c < count($columns); $c++){
-						$column = $columns[$c];
+					foreach($rule['match']['all'] as $column => $filter){
+						$track = [
+							'filter' => 'filter_by_expression',
+							'column' => $column,
+							'value' => $row[$column],
+							'filtered_by' => $filter];
 						$keep = $rule['keep'];
-						if (!boolval(preg_match('/' . $rule['match']['all'][$column] . '/mi', $row[$column]))){
+						if (!boolval(preg_match('/' . $filter . '/mi', $row[$column]))){
 							$keep = !$rule['keep'];
-							$track = [
-								'filter' => 'filter_by_expression',
-								'kept' => $rule['keep'],
-								'column' => $column,
-								'value' => $row[$column],
-								'matched' => $rule['match']['all'][$column]];
 							break;
 						}
 					}
 				}
+				if (!$keep)	$this->delete($i, $track);
 			}
-			if (!$keep)	$this->delete($i, $track);
 		}
 	}
 
@@ -488,10 +484,9 @@ class Listprocessor {
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track = [
 					'filter' => 'filter_by_monthdiff',
-					'kept' => $rule['keep'],
 					'column' => $rule['date']['column'],
 					'value' => $row[$rule['date']['column']],
-					'matched' => $rule['date']['bias'] . $rule['date']['threshold']];
+					'filtered_by' => $rule['date']['bias'] . $rule['date']['threshold']];
 				$this->delete($i, $track);
 			}
 		}
@@ -539,10 +534,9 @@ class Listprocessor {
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track = [
 					'filter' => 'filter_by_monthinterval',
-					'kept' => $rule['keep'],
 					'column' => $rule['interval']['column'],
 					'value' => $row[$rule['interval']['column']],
-					'matched' => $rule['interval']['interval'] . ' remainder ' . $filtermatch];
+					'filtered_by' => $rule['interval']['interval'] . ' remainder ' . $filtermatch];
 				$this->delete($i);
 			}
 		}
@@ -618,8 +612,7 @@ class Listprocessor {
 			foreach (array_udiff(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
 				$track = [
 					'filter' => 'filter_by_comparison_file',
-					'kept' => $rule['keep'],
-					'matched' => json_encode($rule['match'])];
+					'filtered_by' => json_encode($rule['match'])];
 				$this->delete($index, $track);
 			}	
 		}
@@ -627,8 +620,7 @@ class Listprocessor {
 			foreach (array_uintersect(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
 				$track = [
 					'filter' => 'filter_by_comparison_file',
-					'kept' => $rule['keep'],
-					'matched' => json_encode($rule['match'])];
+					'filtered_by' => json_encode($rule['match'])];
 				$this->delete($index, $track);
 			}	
 		}
@@ -675,7 +667,7 @@ class Listprocessor {
 					$track = [
 						'filter' => 'filter_by_duplicates',
 						'value' => $k[0],
-						'matched' => $index + 1 . ' of ' . $rule['duplicates']['amount']];
+						'filtered_by' => $index + 1 . ' of ' . $rule['duplicates']['amount']];
 					$this->delete($k[1], $track);
 				}
 			}
@@ -697,10 +689,10 @@ class Listprocessor {
 	*/
 	public function filter_by_rand($rule){
 		$subset = [];
-		if (array_key_exists('columns', rule['data'])){
-			foreach ($this->_list as $i => $row){
-				if (!$row) continue;
+		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
 
+			if (array_key_exists('columns', rule['data'])){
 				$match = false;
 				$columns = array_keys($rule['data']['columns']);
 				for($c = 0; $c < count($columns); $c++){
@@ -711,7 +703,8 @@ class Listprocessor {
 				if (!$match) continue;
 				$subset[] = $i;
 			}
-		} else $subset = array_keys($this->_list);
+			else $subset[] = $i;
+		}
 		$randomset = array_rand($subset, min(count($subset), $rule['data']['amount']));
 		foreach ($subset as $i){
 			if (in_array($i, $randomset))
@@ -720,8 +713,7 @@ class Listprocessor {
 				if (!$rule['keep'])	continue;
 			$track = [
 				'filter' => 'filter_by_rand',
-				'kept' => $rule['keep'],
-				'matched' => 'randomly selected'];
+				'filtered_by' => 'randomly selected'];
 			$this->delete($i, $track);
 		}
 	}
