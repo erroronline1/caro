@@ -332,10 +332,13 @@ class Listprocessor {
 	public function delete($row, $track = null){
 		/* delete row and add tracking to log if applicable */
 		if ($track && array_key_exists('track', $this->_argument)){
-			foreach($this->_argument['track'] as $column => $values)
-				$tracked = array_search($this->_list[$row][$column], $values);
-				if ($tracked || $tracked === 0)
+			foreach($this->_argument['track'] as $column => $values){
+				$thislistrow = $this->_list[$row];
+				if (!$thislistrow) continue;
+				$tracked = array_search($thislistrow[$column], $values);
+				if ($tracked !== false)
 					$this->_log[] = "[!] tracked " . $values[$tracked] . ' in ' . $column . ': ' . json_encode($track);
+			}
 		}
 		unset ($this->_list[$row]);
 	}
