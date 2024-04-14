@@ -151,14 +151,14 @@ class Listprocessor {
 		$this->_setting = gettype($setup) === 'array' ? $setup : json_decode($setup, true);
 		$this->_isChild = $isChild;
 		$this->_argument = $argument;
-		$this->_list = new SplFixedArray(0);
 
 		if (!array_key_exists('processedMonth', $this->_argument)) $this->_argument['processedMonth'] = date('m');
 		if (!array_key_exists('processedYear', $this->_argument)) $this->_argument['processedMonth'] = date('Y');
 
 		if (gettype($this->_setting['filesetting']['source']) === 'string' && is_file($this->_setting['filesetting']['source'])) $this->importFile();
-		elseif (gettype($this->_setting['filesetting']['source']) === 'array' || gettype($this->_setting['filesetting']['source']) === 'object') $this->_list = $this->_setting['filesetting']['source'];
-		$this->_originallist = $this->_list;
+		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = SplFixedArray::fromArray($this->_setting['filesetting']['source'], true);
+		elseif (gettype($this->_setting['filesetting']['source']) === 'object') $this->_list = SplFixedArray::fromArray($this->_setting['filesetting']['source']->toArray(), true);
+		$this->_originallist = SplFixedArray::fromArray($this->_list->toArray(), true);
 		if ($this->_list) $this->filter();
 	}
 
@@ -230,6 +230,7 @@ class Listprocessor {
 			]
 		}		
 		*/
+		$this->_list = new SplFixedArray(0);
 		$i = 0;
 		$csvfile = fopen($this->_setting['filesetting']['source'], 'r');
 		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
@@ -263,7 +264,7 @@ class Listprocessor {
 	public function filter(){
 		/* iterates through filter rules according to passed setting and calls required the methods	*/
 		$this->_log[] = '[*] total rows: ' . count($this->_list);
-
+		$remaining = null;
 		/* apply filters */
 		if (array_key_exists('filter',$this->_setting)){
 			foreach ($this->_setting['filter'] as $filter => $listfilter){
@@ -531,7 +532,7 @@ class Listprocessor {
 			}
 			$offset_edate = $this->monthdelta($entrydate[0], $rule['interval']['format'], $rule['interval']['offset']);
 			$timespan = $this->monthdiff($offset_edate, $thismonth, $rule['interval']['format']);
-			$filtermatch = boolval($timespan % $rule['interval']['interval']);
+			$filtermatch = @boolval($timespan % $rule['interval']['interval']); // Implicit conversion from float XX.XX to int loses precision
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track = [
 					'filter' => 'filter_by_monthinterval',
@@ -582,7 +583,6 @@ class Listprocessor {
 		$equals = [];
 		// reduce current list to avoid key errors on unset items
 		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
-
 		// match lists
 		foreach ($rule['match'] as $any_or_all => $compare_columns){
 			$corresponds = [];
@@ -593,8 +593,10 @@ class Listprocessor {
 				}
 				if ($any_or_all === 'any') break;
 			}
-			if ($any_or_all === 'any' && count($corresponds[$index]) || ($any_or_all === 'all' && count($corresponds[$index]) === count(array_keys($compare_columns)))) {
-				if (!in_array($index, $equals)) $equals[] = $index;
+			foreach($corresponds as $index => $corresponding){
+				if ($any_or_all === 'any' && count($corresponding) || ($any_or_all === 'all' && count($corresponding) === count(array_keys($compare_columns)))) {
+					if (!in_array($index, $equals)) $equals[] = $index;
+				}	
 			}
 		}
 
@@ -609,7 +611,6 @@ class Listprocessor {
 				}
 			}
 		}
-		
 		if ($rule['keep']){
 			foreach (array_udiff(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
 				$track = [
