@@ -41,7 +41,6 @@
 
 #### todo purchase
 * split sql query for product search with or without vendor, not where vendor in (all) to possibly speed things up
-* does updating trading good=1 where id in (xxx,yyy) speed things up?
 
 * order only assigned units selecteable?
 
@@ -851,10 +850,9 @@ Tested devices:
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 1.6GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 2700 (45min) for [CSV processing](#csv-processor) may take a while depending on your data amount
-    * pricelist import @ 220k rows takes about 1 minute to import and process, 12 minutes in total to write to database (Uniform Server)
-    * pricelist import @ 660k rows currently takes about 28 min
-    * *for the 220k row file has been a timeout on sqlserver, i'll look into that*
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount
+    * pricelist import @ 220k rows takes about 1 minute to import and process (Uniform Server)
+    * pricelist import @ 660k rows currently takes about 4 min to import and process (Uniform Server)
 * php.ini enable extensions:
     * gd
     * gettext

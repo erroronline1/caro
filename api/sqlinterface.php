@@ -29,6 +29,37 @@ class SQLQUERY {
 	}
 
 	/**
+	 * creates packages of sql INSERTIONS to handle sql package size
+	 * e.g. for multiple inserts
+	 * @param string $query sql query
+	 * @param array $items named array to replace query by strtr
+	 * @return array $chunks extended packages so far
+	 * 
+	 * this does make sense to only have to define one valid (and standalone as well) reusable dummy query
+	 */
+	public static function CHUNKIFY_INSERT($query = null, $items = null){
+		$chunks = [];
+		if ($query && $items){
+			[$query, $values] = explode('VALUES', $query);
+			$chunkeditems = [];
+			foreach($items as $item){
+				$item = strtr($values, $item);
+				if (count($chunkeditems)){
+					$index = count($chunkeditems) - 1;
+					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$chunkeditems[$index]])) < INI['sql'][INI['sql']['use']]['packagesize']){
+						$chunkeditems[$index][] = $item;
+					}
+					else $chunkeditems[] = [$item];
+				} else $chunkeditems[] = [$item];
+			}
+			foreach($chunkeditems as $items){
+				$chunks[] = $query . ' VALUES ' . implode(',', $items) . ';';
+			}
+		}
+		return $chunks;
+	}
+
+	/**
 	 * creates packages of sql queries with IN clause to handle sql package size
 	 * e.g. for update where id in (huge list) clauses
 	 * @param string $query sql query
@@ -43,22 +74,14 @@ class SQLQUERY {
 			foreach($items as $item){
 				if (count($chunkeditems)){
 					$index = count($chunkeditems) - 1;
-
 					if (strlen(strtr($query, [$replace=> implode(',', [$item, ...$chunkeditems[$index]])])) < INI['sql'][INI['sql']['use']]['packagesize']){
 						$chunkeditems[$index][] = $item;
 					}
 					else $chunkeditems[] = [$item];
 				} else $chunkeditems[] = [$item];
-				$index = count($chunkeditems) - 1;
-
-				$currentquery = strtr($query, [$replace=> implode(',', $chunkeditems[$index])]);
-				if (count($chunks)){
-					if (strlen($currentquery) < INI['sql'][INI['sql']['use']]['packagesize']){
-						$chunks[count($chunks) - 1] = $currentquery;
-					}
-					else $chunks[] = $currentquery;
-				}
-				else $chunks[] = $currentquery;	
+			}
+			foreach($chunkeditems as $items){
+				$chunks[] = strtr($query, [$replace => implode(',', $items)]);
 			}
 		}
 		return $chunks;

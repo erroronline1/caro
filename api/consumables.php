@@ -115,9 +115,9 @@ class CONSUMABLES extends API {
 					':incorporated' => $remainder[$update]['incorporated']
 				]) . '; ');
 			}
+			$insertions = [];
 			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post-product'),
-				[
+				$insertions[]=[
 					':vendor_id' => $vendorID,
 					':article_no' => $this->_pdo->quote($pricelist->_list[1][$index]['article_no']),
 					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
@@ -127,9 +127,11 @@ class CONSUMABLES extends API {
 					':active' => 1,
 					':protected' => 0,
 					':trading_good' => 0,
-					':incorporated' => null
-				]) . '; ');
+					':incorporated' => 'NULL'
+				];
 			}
+			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT(SQLQUERY::PREPARE('consumables_post-product'), $insertions));
+
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
 				try {
@@ -140,8 +142,6 @@ class CONSUMABLES extends API {
 					die();
 				}
 			}
-			//var_dump($sqlchunks);
-			//die();
 			return $date;
 		}
 		return '';
@@ -174,7 +174,13 @@ class CONSUMABLES extends API {
 			$sqlchunks = SQLQUERY::CHUNKIFY_IN(SQLQUERY::PREPARE('consumables_put-trading-good'), ':ids', $ids);
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
-				$statement->execute();
+				try {
+					$statement->execute();
+				}
+				catch (Exception $e) {
+					echo $e, $chunk;
+					die();
+				}
 			}
 		}
 		return;
