@@ -7,6 +7,8 @@
 * [gottinger](#gottinger)
 * [ihle](#ihle)
 * [juzo (timeout!)](#juzo)
+* [lohmann und rauscher](#lohmann-und-rauscher)
+* [medi](#medi)
 * [mmib](#mmib)
 * [neatec](#neatec)
 * [nowecor](#nowecor)
@@ -17,6 +19,7 @@
 * [perpedes](#perpedes)
 * [protheseus](#protheseus)
 * [prowalk](#prowalk)
+* [rebotec](#rebotec)
 * [rehaforum](#rehaforum)
 * [russka](#russka)
 * [schein](#schein)
@@ -199,8 +202,6 @@ delete whitespaces and . from headers
 ### juzo
 delete unreqired columns
 
-*needs about 30 minutes*
-
 ```json
 {
 	"filesetting": {
@@ -212,6 +213,64 @@ delete unreqired columns
 			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2"],
 			"article_unit": ["Mengeneinheit"],
 			"article_ean": ["GTIN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".+"
+				}
+			}
+		}
+	]
+}
+```
+
+### lohmann und rauscher
+```json
+{
+	"filesetting": {
+		"columns": ["Material", "Bezeichnung"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Material"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": [""],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+
+### medi
+replace . and specialchars in header
+
+```json
+{
+	"filesetting": {
+		"columns": ["ArtikelNr", "Bezeichnung", "Mengeneinh", "EAN-Nummer"]
+	},
+	"modify": {
+		"replace":[
+			["EAN-Nummer", "\\.", ""]
+		],
+		"rewrite": [{
+			"article_no": ["ArtikelNr"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["Mengeneinh"],
+			"article_ean": ["EAN-Nummer"]
 		}]
 	}
 }
@@ -576,6 +635,44 @@ add header on first line
 }
 ```
 
+### rebotec
+delete last row
+```json
+{
+	"filesetting": {
+		"headerrowindex": 2,
+		"columns": ["Art-Nr", "Bezeichnung1", "Bezeichnung2", "EAN_GTIN", "ME"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Art-Nr"],
+			"article_name": ["Bezeichnung1", ", ", "Bezeichnung2"],
+			"article_unit": ["ME"],
+			"article_ean": ["EAN_GTIN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unneccessary products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": "stuhl|hilfe|wagen|rollator|stock|gehstütze|achselstütze|toiletten|gehgestell|vierfuß|fischer"
+				}
+			}
+		}
+	]
+}
+```
+
 ### rehaforum
 ```json
 {
@@ -624,7 +721,6 @@ add header on first line
 	]
 }
 ```
-
 ### russka
 ```json
 {
