@@ -6,7 +6,7 @@
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
 * [ihle](#ihle)
-* [juzo (timeout!)](#juzo)
+* [juzo](#juzo)
 * [lohmann und rauscher](#lohmann-und-rauscher)
 * [medi](#medi)
 * [mmib](#mmib)
