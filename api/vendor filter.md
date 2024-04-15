@@ -12,7 +12,7 @@
 * [mmib](#mmib)
 * [neatec](#neatec)
 * [nowecor](#nowecor)
-* [ofa (timeout!)](#ofa)
+* [ofa](#ofa)
 * [ortho systems](#ortho-systems)
 * [ortho reha neuhof](#ortho-reha-neuhof)
 * [otto bock](#otto-bock)

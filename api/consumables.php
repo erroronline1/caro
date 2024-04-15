@@ -167,13 +167,11 @@ class CONSUMABLES extends API {
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		if (count($pricelist->_list[1])){
+			$ids = [];
 			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($assignedArticles, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$query = strtr(SQLQUERY::PREPARE('consumables_put-trading-good'),
-					[
-						':id' => $pricelist->_list[1][$index]['id'],
-					]) . '; ';
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, $query);
-				}
+				$ids[] = $pricelist->_list[1][$index]['id'];
+			}
+			$sqlchunks = SQLQUERY::CHUNKIFY_IN(SQLQUERY::PREPARE('consumables_put-trading-good'), ':ids', $ids);
 			foreach ($sqlchunks as $chunk){
 				$statement = $this->_pdo->prepare($chunk);
 				$statement->execute();

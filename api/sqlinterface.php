@@ -1,12 +1,24 @@
 <?php
 class SQLQUERY {
+	/**
+	 * return query for driver
+	 * @param string $context
+	 * 
+	 * @return string sql query
+	 */
 	public static function PREPARE($context){
 		return self::QUERIES[$context][INI['sql'][INI['sql']['use']]['driver']];
 	}
 
+	/**
+	 * creates packages of sql queries to handle sql package size
+	 * @param array $chunks packages so far
+	 * @param string $query next sql query
+	 * @return array $chunks extended packages so far
+	 */
 	public static function CHUNKIFY($chunks, $query = null){
 		if ($query){
-			$chunkIndex=count($chunks)-1;
+			$chunkIndex = count($chunks) - 1;
 			if (array_key_exists($chunkIndex, $chunks)){
 				if (strlen($chunks[$chunkIndex] . $query) < INI['sql'][INI['sql']['use']]['packagesize']) $chunks[$chunkIndex] .= $query;
 				else $chunks[] = $query;
@@ -16,11 +28,49 @@ class SQLQUERY {
 		return $chunks;
 	}
 
+	/**
+	 * creates packages of sql queries with IN clause to handle sql package size
+	 * e.g. for update where id in (huge list) clauses
+	 * @param string $query sql query
+	 * @param string $replace string for strtr replacement
+	 * @param array $items for IN clause
+	 * @return array $chunks packages
+	 */
+	public static function CHUNKIFY_IN($query = null, $replace = null, $items = null){
+		$chunks = [];
+		if ($query && $replace && $items){
+			$chunkeditems = [];
+			foreach($items as $item){
+				if (count($chunkeditems)){
+					$index = count($chunkeditems) - 1;
+
+					if (strlen(strtr($query, [$replace=> implode(',', [$item, ...$chunkeditems[$index]])])) < INI['sql'][INI['sql']['use']]['packagesize']){
+						$chunkeditems[$index][] = $item;
+					}
+					else $chunkeditems[] = [$item];
+				} else $chunkeditems[] = [$item];
+				$index = count($chunkeditems) - 1;
+
+				$currentquery = strtr($query, [$replace=> implode(',', $chunkeditems[$index])]);
+				if (count($chunks)){
+					if (strlen($currentquery) < INI['sql'][INI['sql']['use']]['packagesize']){
+						$chunks[count($chunks) - 1] = $currentquery;
+					}
+					else $chunks[] = $currentquery;
+				}
+				else $chunks[] = $currentquery;	
+			}
+		}
+		return $chunks;
+	}
+
+	/**
+	 * 'context' => [
+	 *  	'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",
+	 *  	'sqlsrv' => "SELECT TOP 3 WITH TIES * FROM person ORDER BY age ASC"
+	 * ],
+	 */
 	public const QUERIES = [
-		/*'context' => [
-			'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",
-			'sqlsrv' => "SELECT TOP 3 WITH TIES * FROM person ORDER BY age ASC"
-		],*/
 		'DYNAMICDBSETUP' => [
 			'mysql' => "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));",  // intuitive group by
 			'sqlsrv' => ""
@@ -274,8 +324,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
 		],
 		'consumables_put-trading-good' => [
-			'mysql' => "UPDATE caro_consumables_products SET trading_good = 1 WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET trading_good = 1 WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET trading_good = 1 WHERE id IN (:ids)",
+			'sqlsrv' => "UPDATE caro_consumables_products SET trading_good = 1 WHERE id IN (:ids)"
 		],
 		'consumables_put-check' => [
 			'mysql' => "UPDATE caro_consumables_products SET protected = 1, checked = CURRENT_TIMESTAMP WHERE id = :id",
