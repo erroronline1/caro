@@ -391,8 +391,6 @@ replace specialchars in header
 ### ofa
 delete . from headers
 
-*needs about 15 minutes*
-
 ```json
 {
 	"filesetting": {
