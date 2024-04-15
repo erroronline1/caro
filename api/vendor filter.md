@@ -6,17 +6,17 @@
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
 * [ihle](#ihle)
-* [juzo (failing due to filesize)](#juzo)
+* [juzo (timeout!)](#juzo)
 * [mmib](#mmib)
 * [neatec](#neatec)
 * [nowecor](#nowecor)
-* [ofa (failing due to timeout)](#ofa)
-* [ortho reha neuhof](#ortho-reha-neuhof)
+* [ofa (timeout!)](#ofa)
 * [ortho systems](#ortho-systems)
+* [ortho reha neuhof](#ortho-reha-neuhof)
 * [otto bock](#otto-bock)
 * [perpedes](#perpedes)
-* [prowalk](#prowalk)
 * [protheseus](#protheseus)
+* [prowalk](#prowalk)
 * [rehaforum](#rehaforum)
 * [russka](#russka)
 * [schein](#schein)
@@ -198,6 +198,9 @@ delete whitespaces and . from headers
 
 ### juzo
 delete unreqired columns
+
+*needs about 30 minutes*
+
 ```json
 {
 	"filesetting": {
@@ -328,6 +331,9 @@ replace specialchars in header
 
 ### ofa
 delete . from headers
+
+*needs about 15 minutes*
+
 ```json
 {
 	"filesetting": {
