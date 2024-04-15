@@ -400,6 +400,11 @@ delete . from headers
 		"columns": ["Artikel", "Bez 1", "Bez II", "VME"]
 	},
 	"modify": {
+		"replace":[
+			["Artikel", "\\s{2,}", " "],
+			["Bez 1", "\\s{2,}", " "],
+			["Bez II", "\\s{2,}", " "]
+		],
 		"rewrite": [{
 			"article_no": ["Artikel"],
 			"article_name": ["Bez 1", ", ", "Bez II"],
