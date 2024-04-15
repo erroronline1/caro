@@ -265,9 +265,9 @@ class Listprocessor {
 	public function filter(){
 		/* iterates through filter rules according to passed setting and calls required the methods	*/
 		$this->_log[] = '[*] total rows: ' . count($this->_list);
-		$remaining = null;
+		$remaining = count(array_filter($this->_list->toArray(), fn($row) => $row ? : false));
 		/* apply filters */
-		if (array_key_exists('filter',$this->_setting)){
+		if (array_key_exists('filter', $this->_setting)){
 			foreach ($this->_setting['filter'] as $filter => $listfilter){
 				if (array_key_exists('comment', $listfilter)) 
 					$this->_log[] = '[*] applying filter: '. $listfilter['apply'] . ' ' . $listfilter['comment'] . '...';
