@@ -43,6 +43,13 @@
 * split sql query for product search with or without vendor, not where vendor in (all) to possibly speed things up
 
 * order only assigned units selecteable?
+* general orders select workshop storage number
+* return button for received orders containing all relevant data
+* optional view prepared orders for other units
+* cancel order (with typeable cause)
+* order state (not deliverable, extended delivery period, delivery date changed, etc.) onchange message to unit
+* overview orders by commission/justification / vendor
+
 
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
