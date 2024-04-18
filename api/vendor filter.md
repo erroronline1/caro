@@ -12,6 +12,7 @@
 * [mmib](#mmib)
 * [neatec](#neatec)
 * [nowecor](#nowecor)
+* [oessur](#oessur)
 * [ofa](#ofa)
 * [ortho systems](#ortho-systems)
 * [ortho reha neuhof](#ortho-reha-neuhof)
@@ -381,6 +382,92 @@ replace specialchars in header
 			"match": {
 				"all": {
 					"article_name": "aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|tübinger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"
+				}
+			}
+		}
+	]
+}
+```
+
+### oessur
+merge lists, delete . from headers
+modify product description for:
+* knit-rite soft socken (1SB1XXYY3,ff)
+
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["ART-NR", "BEZEICHNUNG"]
+	},
+	"filter":[
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unnecessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"ART-NR": ""
+				}
+			}
+		}
+	]
+	"modify": {
+		"replace":[
+			["ART-NR", "(I-4443|I-CL63|I-CW63|I-CL43|I-CW43|I-CL53)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40],
+			["ART-NR", "(I-4446|I-CL46|I-CL56)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36],
+			["ART-NR", "(I-SXC0|I-SXG0|I-SXV0)(XX)", 20, 22, 24, 26, 28, 30, 32, 35, 38, 41, 44, 47, 51, 55, 60, 65],
+			["ART-NR", "(I-SXL3|I-SXL6)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40, 45],
+			["ART-NR", "(I-4713|I-4723|I-3664|I-3663|I-4613)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36],
+			["ART-NR", "(I-6303|I-6306|I-6003|I-6203|I-4313|I-4223|I-4013|I-4213|I-4016|I-4216|I-5303|I-5406|I-5506|I-5006|I-5106)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40, 45],
+			["ART-NR", "(I-4913)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36],
+			["ART-NR", "(I-0124|I-2024)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 42, 45],
+			["ART-NR", "(I-1033|I-1233|I-09DC|I-09FLC)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34],
+			["ART-NR", "(M8994|M8996|MF921|M8997|M8998)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 45],
+			["ART-NR", "(MF941)(XX)", 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40],
+			["ART-NR", "(T-0103|T-0106|T-0109|T-CL03|T-CL06|T-CL09)(XX)", "15 (S)", "18 (M)", "20 (M+)", "25 (L)", "28 (L+)", "33 (XL)"],
+			["ART-NR", "(F-2011|S-2011)(XX)", 35, 41, 49, 55, 62],
+			["ART-NR", "(F-1010)(XX)",  35, 49, 62],
+			["ART-NR", "(MK0020|M00020)(X)",  "2 (S)", "3 (M)", "4 (L)"],
+			["ART-NR", "(I-8532|I-TF673|I-7532|I-7032)(XX)", 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 45, 50, 55],
+			["ART-NR", "(I-8632)(XX)", 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40],
+			["ART-NR", "(I-TF678|I-7632)(XX)", 25, 26.5, 28, 30, 32, 34, 36, 38],
+			["ART-NR", "(M8917)(XX)", 26.5, 28, 30, 32, 34, 36, 38, 40, 45, 50],
+			["ART-NR", "(M8918)(XX)", 25, 26.5, 28, 30, 32, 34, 36, 40],
+			["ART-NR", "(I-7132)(XX)", 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 42],
+			["ART-NR", "(M8955|M8957)(XX)", 27, 31, 35, 39, 43, 47, 52],
+			["ART-NR", "(M8956|M8958)(XX)", 24, 27, 31, 35, 39],
+			["ART-NR", "(I-8131)(XX)", 12, 14, 16, 18, 20, 22],
+			["ART-NR", "(I-3000)(XX)", "06", "07", "09", 11, 12, 14, 16, 17, 19, 20, 22, 24, 26],
+			["ART-NR", "(K-5311|K-5313)(XX)", 10, 13, 16, 20],
+			["ART-NR", "(1SB1|1SBS)(XX)(.+?)", "NA (SCHMAL)", "RG (NORMAL)", "WD (WEIT)", "XW (EXTRA-WEIT)"],
+			["ART-NR", "(1SB1.*?|1SBS.*?)(YY)(.+?)", "SH (KURZ)", "MD (MITTEL)", "LG (LANG)"],
+			["ART-NR", "(CTF020)(X)(.+?)", "2 (M KURZ)", "3 (M STANDARD)", "4 (L KURZ)", "5 (L STANDARD)"],
+			["ART-NR", "(CTF020.+?)(Y)", "L", "R"],
+
+],
+		"rewrite": [{
+			"article_no": ["ART-NR"],
+			"article_name": ["BEZEICHNUNG"],
+			"article_unit": [""],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete unnecessary products",
+			"keep": false,
+			"match": {
+				"all": {
+					"article_name": "Anti-Rutsch-Beschichtung"
 				}
 			}
 		}
