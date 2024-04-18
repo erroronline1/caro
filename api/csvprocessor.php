@@ -167,8 +167,8 @@ class Listprocessor {
 		/* determine approximately difference of months (not taking leap years into account) */
 		// force days and months two digit
 		$day = array_search('d', $dateformat);
-		$first[$day] = strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
-		$last[$day] = strlen($last[$day]) < 2 ? '0' . $last[$day] : $last[$day];
+		$first[$day] = '01';//strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
+		$last[$day] = '01';//strlen($last[$day]) < 2 ? '0' . $last[$day] : $last[$day];
 		$month = array_search('m', $dateformat);
 		$first[$month] = strlen($first[$month]) < 2 ? '0' . $first[$month] : $first[$month];
 		$last[$month] = strlen($last[$month]) < 2 ? '0' . $last[$month] : $last[$month];
@@ -185,7 +185,7 @@ class Listprocessor {
 		/* adds a delta to a passed date */
 		// force days and months two digit
 		$day = array_search('d', $dateformat);
-		$date[$day] = strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
+		$date[$day] = '01';//strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
 		$month = array_search('m', $dateformat);
 		$date[$month] = strlen($date[$month]) < 2 ? '0' . $date[$month] : $date[$month];
 
@@ -193,7 +193,7 @@ class Listprocessor {
 		$dateformat = implode('-', $dateformat);
 		$offset_date = new DateTime(DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
 		$day = $offset_date->format('j');
-		$offset_date->modify('first day of +1 month')->modify(($delta - 1 < 0 ? '-' . $delta - 1 : '+' . $delta - 1) . ' months');
+		$offset_date->modify('first day of ' . ($delta === 0 ? 'this' : ($delta > 1 ? '+' . $delta : '-' . $delta)) . ' month' . ($delta !==0 ? 's': ''));
 		return explode('-', $offset_date->format($dateformat));
 	}
 
@@ -580,24 +580,45 @@ class Listprocessor {
 		$equals = [];
 		// reduce current list to avoid key errors on unset items
 		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
+	
 		// match lists
-		foreach ($rule['match'] as $any_or_all => $compare_columns){
-			$corresponds = [];
-			foreach($compare_columns as $column => $cmp_column){
-				foreach (array_uintersect(array_column($thislistwithoutempty, $column), array_column($compare_list->_list[1], $cmp_column), fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
-					if (!array_key_exists($index, $corresponds)) $corresponds[$index] = [];
-					$corresponds[$index][] = true;
+		foreach($thislistwithoutempty as $index => $self_row){
+			foreach ($rule['match'] as $any_or_all => $compare_columns){
+				$corresponds = [];
+				foreach($compare_columns as $column => $cmp_column){
+					if (in_array($self_row[$column], array_column($compare_list->_list[1], $cmp_column))){
+						if (!array_key_exists($index, $corresponds)) $corresponds[$index] = [];
+						$corresponds[$index][] = true;
+					}
+					if ($any_or_all === 'any') break;
 				}
-				if ($any_or_all === 'any') break;
+				foreach($corresponds as $index => $corresponding){
+					if ($any_or_all === 'any' && count($corresponding) || ($any_or_all === 'all' && count($corresponding) === count(array_keys($compare_columns)))) {
+						$equals[] = $index;
+					}	
+				}
 			}
-			foreach($corresponds as $index => $corresponding){
-				if ($any_or_all === 'any' && count($corresponding) || ($any_or_all === 'all' && count($corresponding) === count(array_keys($compare_columns)))) {
-					if (!in_array($index, $equals)) $equals[] = $index;
-				}	
-			}
+		}
+		$equals = array_unique($equals);
+		if ($rule['keep']){
+			foreach (array_udiff(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index){
+				$track = [
+					'filter' => 'filter_by_comparison_file',
+					'filtered_by' => json_encode($rule['match'])];
+				$this->delete($index, $track);
+			}	
+		}
+		else {
+			foreach (array_uintersect(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index){
+				$track = [
+					'filter' => 'filter_by_comparison_file',
+					'filtered_by' => json_encode($rule['match'])];
+				$this->delete($index, $track);
+			}	
 		}
 
 		// transfer values from comparison list to main list
+		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
 		if (array_key_exists('transfer', $rule)){
 			foreach ($rule['transfer'] as $newcolumn => $from){
 				if (!array_key_exists($newcolumn, $this->setting['filesetting']['columns'])) $this->setting['filesetting']['columns'][] = $newcolumn;
@@ -607,22 +628,6 @@ class Listprocessor {
 					$this->_list[$index] = $self_row;
 				}
 			}
-		}
-		if ($rule['keep']){
-			foreach (array_udiff(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
-				$track = [
-					'filter' => 'filter_by_comparison_file',
-					'filtered_by' => json_encode($rule['match'])];
-				$this->delete($index, $track);
-			}	
-		}
-		else {
-			foreach (array_uintersect(array_keys($thislistwithoutempty), $equals, fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
-				$track = [
-					'filter' => 'filter_by_comparison_file',
-					'filtered_by' => json_encode($rule['match'])];
-				$this->delete($index, $track);
-			}	
 		}
 		$compare_list = $thislistwithoutempty = null; // release ressources
 	}
