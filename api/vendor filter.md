@@ -445,7 +445,7 @@ merge lists, delete . from headers
 modify product description for:
 * knit-rite soft socken (1SB1XXYY3,ff)
 
-resume on variflex
+resume on ICEROSS STABILO® JUNIOR DISTALANSCHLUSS LINER
 
 ```json
 {
@@ -500,9 +500,9 @@ resume on variflex
 
 			["ART-NR", "(FBD0|FBDU|FBP0|FBPU|JBPE|JBPU|FAPE|FAXE|FAPU)(X)(.+?)", 1, 2, 3, 4, 5],
 			["ART-NR", "(PLA0)(X)(.+?)", 1, 2, 3, 4, 5, 6],
-			["ART-NR", "(PFP0|PFPU)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7],
-			["ART-NR", "(BSP0|BSPU|BST0|BSTU|PSX01|PSXU1|PXT0|PXTU|PLT0|PLTU)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7, 8],
-			["ART-NR", "(PXC0|PXCU|PST0|PSTU|PDM0|PLP0|PLPU)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7, 8, 9],
+			["ART-NR", "(PFP0|PFPU|CXE004|CXE002)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7],
+			["ART-NR", "(BSP0|BSPU|BST0|BSTU|PSX01|PSXU1|PXT0|PXTU|PLT0|PLTU|RSPE|RSFE|RHPE|RHFE|RSXE|RHXE|RSPU|RSFU|RRP0|RRF0|RSS4400|CHP00)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7, 8],
+			["ART-NR", "(PXC0|PXCU|PST0|PSTU|PDM0|PLP0|PLPU|VFPE|VFXE|VFPU|VLPE|VLXE|SSPE|SHPE|RSXE|RHXE|RSP0|SSPU|FSX009|SLP0|CXD002|CXL004|CXL002|FSX008|FSX003|FSX006)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7, 8, 9],
 
 			["ART-NR", "(BSP0.|BSPU.|BST0.|BSTU.|FST0|JBPE.|JBPU.|FSL0|FAPU.|PSX01.|PSXU1.|PFP0.|PFPU.|PXC0.|PXCU.|PXT0.|PXTU.|PST0.|PSTU.|PDM0.|PLP0.|PLPU.|PLT0.|PLTU.)(YY)(.+?)", 22, 23, 24, 25, 26, 27, 28, 29, 30],
 			["ART-NR", "(FBD0.|FBDU.|FBP0.|FBPU.|FSM0)(YY)(.+?)", 21, 22, 23, 24, 25, 26, 27, 28],
@@ -512,8 +512,10 @@ resume on variflex
 			["ART-NR", "(PLA0.)(YY)(.+?)", 22, 23, 24, 25, 26, 27, 28],
 			["ART-NR", "(FSF0)(YY)(.+?)", 22, 23, 24, 25, 26],
 			["ART-NR", "(FST0)(YY)(.+?)", 27, 28],
+			["ART-NR", "(VFPE.|VFXE.|VFPU.|FSE0|VLPE.|VLXE.|RSPE.|RSFE.|RHPE.|RHFE.|RSXE.|RHXE.|RSPU.|RSFU.|SSPE.|SHPE.|RSXE.|RHXE.|SSPU.|SLP0.|CHP00.)(YY)(.+?)", 22, 23, 24, 25, 26, 27, 28, 29, 30],
+			["ART-NR", "(FSX008)(YY)(.+?)", "HOCH", "NIEDRIG"],
 
-			["ART-NR", "(BSP0.+|BSPU.+|BST0.+|BSTU.+|FST0.+|FBD0.+|FBDU.+|FBP0.+|FBPU.+|JBPE.+|JBPU.+|FSL0.+|FAPE.+|FAXE.+|FAPU.+|PSX01.+|PSXU1.+|FSF0S.+|FST0S.+|PFP0.+|PFPU.+|PXC0.+|PXCU.+|PXT0.+|PXTU.+|PST0.+|PSTU.+|PDM0.+|PLP0.+|PLPU.+|PLT0.+|PLTU.+|PLA0.+|FSF0.+|FST0.+)(Z)", "L", "R"],
+			["ART-NR", "(BSP0.+|BSPU.+|BST0.+|BSTU.+|FST0.+|FBD0.+|FBDU.+|FBP0.+|FBPU.+|JBPE.+|JBPU.+|FSL0.+|FAPE.+|FAXE.+|FAPU.+|PSX01.+|PSXU1.+|FSF0S.+|FST0S.+|PFP0.+|PFPU.+|PXC0.+|PXCU.+|PXT0.+|PXTU.+|PST0.+|PSTU.+|PDM0.+|PLP0.+|PLPU.+|PLT0.+|PLTU.+|PLA0.+|FSF0.+|FST0.+|FSE0.+)(Z)", "L", "R"],
 
 
 ],
