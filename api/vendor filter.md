@@ -445,6 +445,8 @@ merge lists, delete . from headers
 modify product description for:
 * knit-rite soft socken (1SB1XXYY3,ff)
 
+resume on variflex
+
 ```json
 {
 	"filesetting": {
@@ -495,6 +497,24 @@ modify product description for:
 			["ART-NR", "(1SB1.*?|1SBS.*?)(YY)(.+?)", "SH (KURZ)", "MD (MITTEL)", "LG (LANG)"],
 			["ART-NR", "(CTF020)(X)(.+?)", "2 (M KURZ)", "3 (M STANDARD)", "4 (L KURZ)", "5 (L STANDARD)"],
 			["ART-NR", "(CTF020.+?)(Y)", "L", "R"],
+
+			["ART-NR", "(FBD0|FBDU|FBP0|FBPU|JBPE|JBPU|FAPE|FAXE|FAPU)(X)(.+?)", 1, 2, 3, 4, 5],
+			["ART-NR", "(PLA0)(X)(.+?)", 1, 2, 3, 4, 5, 6],
+			["ART-NR", "(PFP0|PFPU)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7],
+			["ART-NR", "(BSP0|BSPU|BST0|BSTU|PSX01|PSXU1|PXT0|PXTU|PLT0|PLTU)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7, 8],
+			["ART-NR", "(PXC0|PXCU|PST0|PSTU|PDM0|PLP0|PLPU)(X)(.+?)", 1, 2, 3, 4, 5, 6, 7, 8, 9],
+
+			["ART-NR", "(BSP0.|BSPU.|BST0.|BSTU.|FST0|JBPE.|JBPU.|FSL0|FAPU.|PSX01.|PSXU1.|PFP0.|PFPU.|PXC0.|PXCU.|PXT0.|PXTU.|PST0.|PSTU.|PDM0.|PLP0.|PLPU.|PLT0.|PLTU.)(YY)(.+?)", 22, 23, 24, 25, 26, 27, 28, 29, 30],
+			["ART-NR", "(FBD0.|FBDU.|FBP0.|FBPU.|FSM0)(YY)(.+?)", 21, 22, 23, 24, 25, 26, 27, 28],
+			["ART-NR", "(FAPE.|FAXE.)(YY)(.+?)", 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+			["ART-NR", "(FSF0S)(YY)(.+?)", 22, 23, 24],
+			["ART-NR", "(FST0S)(YY)(.+?)", 25, 26, 27, 28, 29, 30],
+			["ART-NR", "(PLA0.)(YY)(.+?)", 22, 23, 24, 25, 26, 27, 28],
+			["ART-NR", "(FSF0)(YY)(.+?)", 22, 23, 24, 25, 26],
+			["ART-NR", "(FST0)(YY)(.+?)", 27, 28],
+
+			["ART-NR", "(BSP0.+|BSPU.+|BST0.+|BSTU.+|FST0.+|FBD0.+|FBDU.+|FBP0.+|FBPU.+|JBPE.+|JBPU.+|FSL0.+|FAPE.+|FAXE.+|FAPU.+|PSX01.+|PSXU1.+|FSF0S.+|FST0S.+|PFP0.+|PFPU.+|PXC0.+|PXCU.+|PXT0.+|PXTU.+|PST0.+|PSTU.+|PDM0.+|PLP0.+|PLPU.+|PLT0.+|PLTU.+|PLA0.+|FSF0.+|FST0.+)(Z)", "L", "R"],
+
 
 ],
 		"rewrite": [{
