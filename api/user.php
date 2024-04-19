@@ -33,6 +33,9 @@ class USER extends API {
 				// process settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
+				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
+					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
+				}
 				
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
 				if ($statement->execute([
@@ -65,14 +68,20 @@ class USER extends API {
 				]);
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+
 				$permissions = [];
 				foreach(explode(',', $user['permissions']) as $level){
 					$permissions[] = LANG::GET('permissions.' . $level);
 				}
-				$units = [];
+
+				$units = $primary_unit = [];
 				foreach(explode(',', $user['units']) as $unit){
+					$primary_unit[LANG::GET('units.' . $unit)] = ['name' => LANG::PROPERTY('user.settings_primary_unit')];
 					$units[] = LANG::GET('units.' . $unit);
 				}
+				if(array_key_exists('primaryUnit', $user['app_settings'])) $primary_unit[LANG::GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
+
 				$result['body']=['content' => [
 						[
 							['type' => 'text',
@@ -107,18 +116,23 @@ class USER extends API {
 					$result['body']['content'][1]
 				];
 
-				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$result['body']['content'][] = [
 					[
 						'type' => 'checkbox',
 						'description' => LANG::GET('user.settings'),
-						'hint' => LANG::GET('user.settings_hint'),
 						'content' => [
 							LANG::GET('user.settings_force_desktop') => []
 						]
+					], [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('user.settings_primary_unit')
+						],
+						'hint' => LANG::GET('user.settings_hint'),
+						'content' => $primary_unit
 					]
 				];
-				if (array_key_exists ('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
+				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
 
 				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 				$userfiles = [];
