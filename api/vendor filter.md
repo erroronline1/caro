@@ -443,28 +443,25 @@ add headers on line 7
 ### oessur
 merge lists, delete . from headers
 modify product description for:
-* knit-rite soft socken (1SB1XXYY3,ff)
-
-resume on ICEROSS STABILO® JUNIOR DISTALANSCHLUSS LINER
-
+* knit-rite soft socken (1SB1XXYY3, ff)
 ```json
 {
 	"filesetting": {
-		"headerrowindex": 0,
+		"headerrowindex": 4,
 		"columns": ["ART-NR", "BEZEICHNUNG"]
 	},
 	"filter":[
 		{
 			"apply": "filter_by_expression",
 			"comment": "delete unnecessary products",
-			"keep": false,
+			"keep": true,
 			"match": {
 				"all": {
-					"ART-NR": ""
+					"ART-NR": ".+"
 				}
 			}
 		}
-	]
+	],
 	"modify": {
 		"replace":[
 			["ART-NR", "(I-4443|I-CL63|I-CW63|I-CL43|I-CW43|I-CL53)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40],
@@ -476,11 +473,10 @@ resume on ICEROSS STABILO® JUNIOR DISTALANSCHLUSS LINER
 			["ART-NR", "(I-4913)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36],
 			["ART-NR", "(I-0124|I-2024)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 42, 45],
 			["ART-NR", "(I-1033|I-1233|I-09DC|I-09FLC)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34],
-			["ART-NR", "(M8994|M8996|MF921|M8997|M8998)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 45],
-			["ART-NR", "(MF941)(XX)", 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40],
+			["ART-NR", "(M8994|M8996|M8997|M8998)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 45],
 			["ART-NR", "(T-0103|T-0106|T-0109|T-CL03|T-CL06|T-CL09)(XX)", "15 (S)", "18 (M)", "20 (M+)", "25 (L)", "28 (L+)", "33 (XL)"],
 			["ART-NR", "(F-2011|S-2011)(XX)", 35, 41, 49, 55, 62],
-			["ART-NR", "(F-1010)(XX)",  35, 49, 62],
+			["ART-NR", "(F-1010)(XX)", 35, 49, 62],
 			["ART-NR", "(MK0020|M00020)(X)",  "2 (S)", "3 (M)", "4 (L)"],
 			["ART-NR", "(I-8532|I-TF673|I-7532|I-7032)(XX)", 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 45, 50, 55],
 			["ART-NR", "(I-8632)(XX)", 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40],
@@ -493,6 +489,10 @@ resume on ICEROSS STABILO® JUNIOR DISTALANSCHLUSS LINER
 			["ART-NR", "(I-8131)(XX)", 12, 14, 16, 18, 20, 22],
 			["ART-NR", "(I-3000)(XX)", "06", "07", "09", 11, 12, 14, 16, 17, 19, 20, 22, 24, 26],
 			["ART-NR", "(K-5311|K-5313)(XX)", 10, 13, 16, 20],
+			["ART-NR", "(I-PO12)(XX)", 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 42, 45],
+			["ART-NR", "(I-PO22)(XX)", 30, 32, 34, 36, 38, 40, 42, 45, 50, 55],
+			["ART-NR", "(MF921|MF941)(XX)", 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 38, 40, 42, 45],
+
 			["ART-NR", "(1SB1|1SBS)(XX)(.+?)", "NA (SCHMAL)", "RG (NORMAL)", "WD (WEIT)", "XW (EXTRA-WEIT)"],
 			["ART-NR", "(1SB1.*?|1SBS.*?)(YY)(.+?)", "SH (KURZ)", "MD (MITTEL)", "LG (LANG)"],
 			["ART-NR", "(CTF020)(X)(.+?)", "2 (M KURZ)", "3 (M STANDARD)", "4 (L KURZ)", "5 (L STANDARD)"],
@@ -515,10 +515,19 @@ resume on ICEROSS STABILO® JUNIOR DISTALANSCHLUSS LINER
 			["ART-NR", "(VFPE.|VFXE.|VFPU.|FSE0|VLPE.|VLXE.|RSPE.|RSFE.|RHPE.|RHFE.|RSXE.|RHXE.|RSPU.|RSFU.|SSPE.|SHPE.|RSXE.|RHXE.|SSPU.|SLP0.|CHP00.)(YY)(.+?)", 22, 23, 24, 25, 26, 27, 28, 29, 30],
 			["ART-NR", "(FSX008)(YY)(.+?)", "HOCH", "NIEDRIG"],
 
-			["ART-NR", "(BSP0.+|BSPU.+|BST0.+|BSTU.+|FST0.+|FBD0.+|FBDU.+|FBP0.+|FBPU.+|JBPE.+|JBPU.+|FSL0.+|FAPE.+|FAXE.+|FAPU.+|PSX01.+|PSXU1.+|FSF0S.+|FST0S.+|PFP0.+|PFPU.+|PXC0.+|PXCU.+|PXT0.+|PXTU.+|PST0.+|PSTU.+|PDM0.+|PLP0.+|PLPU.+|PLT0.+|PLTU.+|PLA0.+|FSF0.+|FST0.+|FSE0.+)(Z)", "L", "R"],
+			["ART-NR", "(I-8301|I-8302)(XX)", 12, 14, 16, 18],
 
+			["ART-NR", "(VJB0|JRP0|CJX0)(X)(.+?)", 1, 2, 3, 4],
+			["ART-NR", "(FSX007)(X)(.+?)", 1, 2, 3, 4, 5 ,6],
+			["ART-NR", "(CHX0)(Y)(.+?)", 1, 2, 3, 4],
 
-],
+			["ART-NR", "(VJB0.|JRP0.)(YY)(.+?)", 16, 17, 18, 19, 20, 21, 22, 23, 24],
+			["ART-NR", "(FJS0)(YY)(.+?)", 16, 17, 18, 19, 20, 21],
+			["ART-NR", "(FSM0)(YY)(.+?)", 22, 23, 24],
+			["ART-NR", "(FSL0)(YY)(.+?)", 18, 19, 20, 21, 22, 23, 24],
+
+			["ART-NR", "(BSP0.+|BSPU.+|BST0.+|BSTU.+|FST0.+|FBD0.+|FBDU.+|FBP0.+|FBPU.+|JBPE.+|JBPU.+|FSL0.+|FAPE.+|FAXE.+|FAPU.+|PSX01.+|PSXU1.+|FSF0S.+|FST0S.+|PFP0.+|PFPU.+|PXC0.+|PXCU.+|PXT0.+|PXTU.+|PST0.+|PSTU.+|PDM0.+|PLP0.+|PLPU.+|PLT0.+|PLTU.+|PLA0.+|FSF0.+|FST0.+|FSE0.+|VJB0.+|FJS0.+|FSM0.+|JRP0.+|FSL0.+)(Z)", "L", "R"]
+		],
 		"rewrite": [{
 			"article_no": ["ART-NR"],
 			"article_name": ["BEZEICHNUNG"],
@@ -536,11 +545,11 @@ resume on ICEROSS STABILO® JUNIOR DISTALANSCHLUSS LINER
 	"filter": [
 		{
 			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": false,
+			"comment": "select applicable products",
+			"keep": true,
 			"match": {
 				"all": {
-					"article_name": "Anti-Rutsch-Beschichtung"
+					"article_name": "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"
 				}
 			}
 		}
