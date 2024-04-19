@@ -44,12 +44,12 @@ export const api = {
 	},
 	/**
 	 * handles prepared requests
-	 * @param {string} method get|put|post|delete 
-	 * @param {array} request url parameters to pass to api 
-	 * @param {function} successFn handle result 
-	 * @param {function} errorFn handle error 
-	 * @param {object} payload FormData object|object 
-	 * @param {boolean} form_data tell _.api how to handle payload 
+	 * @param {string} method get|put|post|delete
+	 * @param {array} request url parameters to pass to api
+	 * @param {function} successFn handle result
+	 * @param {function} errorFn handle error
+	 * @param {object} payload FormData object|object
+	 * @param {boolean} form_data tell _.api how to handle payload
 	 * @returns none / results of successFn
 	 */
 	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
@@ -100,7 +100,7 @@ export const api = {
 	loadindicatorTimeout: [],
 	/**
 	 * sets the documents header and is supposed to scroll to top
-	 * @param {string} string content 
+	 * @param {string} string content
 	 */
 	update_header: function (string = "") {
 		if (string) document.querySelector("header>h1").innerHTML = string;
@@ -116,8 +116,8 @@ export const api = {
 	 * loads application menu
 	 * loads application landing page
 	 * manages manual
-	 * 
-	 * @param {string} method get|post|put|delete 
+	 *
+	 * @param {string} method get|post|put|delete
 	 * @param {array} request api method, logintoken|manual id
 	 * @returns request
 	 */
@@ -169,8 +169,7 @@ export const api = {
 									if (value) {
 										let stylesheet = document.styleSheets[0].cssRules;
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)")
-												stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
 										}
 									}
 									break;
@@ -232,8 +231,8 @@ export const api = {
 
 	/**
 	 * displays audit contents
-	 * 
-	 * @param {string} method get|post|put|delete 
+	 *
+	 * @param {string} method get|post|put|delete
 	 * @param {array} request api method
 	 * @returns request
 	 */
@@ -266,7 +265,7 @@ export const api = {
 					case "exportchecks":
 					case "exportforms":
 					case "exportvendors":
-							break;
+						break;
 					default:
 						successFn = function (data) {
 							if (data.body) {
@@ -290,7 +289,7 @@ export const api = {
 
 	/**
 	 * loads, executes and manages csv filters
-	 * 
+	 *
 	 * @param {string} method get|post
 	 * @param {array} request api method
 	 * @returns request
@@ -346,8 +345,8 @@ export const api = {
 
 	/**
 	 * displays and manages provided files, either administrative managed or open sharepoint
-	 * 
-	 * @param {string} method get|post|delete 
+	 *
+	 * @param {string} method get|post|delete
 	 * @param  {array} request api method, search term / bundle name | requested directory name, requested filename
 	 * @returns request
 	 */
@@ -433,8 +432,8 @@ export const api = {
 
 	/**
 	 * form component and form management with creation, editing and approval
-	 * 
-	 * @param {string} method get|post|put|delete 
+	 *
+	 * @param {string} method get|post|put|delete
 	 * @param  {array} request api method, name|id
 	 * @returns request
 	 */
@@ -531,7 +530,7 @@ export const api = {
 					case "approval":
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
+							if (data.status !== undefined && data.status.reload !== undefined) api.form("get", data.status.reload);
 						};
 						payload = _.getInputs("[data-usecase=approval]", true);
 						break;
@@ -542,7 +541,7 @@ export const api = {
 					case "component":
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
+							if (data.status !== undefined && data.status.reload !== undefined) api.form("get", data.status.reload);
 						};
 						composedComponent = compose_helper.composeNewComponent();
 						if (!composedComponent) return;
@@ -552,7 +551,7 @@ export const api = {
 					case "form":
 						successFn = function (data) {
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
+							if (data.status !== undefined && data.status.reload !== undefined) api.form("get", data.status.reload);
 						};
 						if (!(payload = compose_helper.composeNewForm())) return;
 						break;
@@ -567,7 +566,7 @@ export const api = {
 			case "delete":
 				successFn = function (data) {
 					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-					if (data.status !== undefined && data.status.reload !== undefined) api.form('get', data.status.reload);
+					if (data.status !== undefined && data.status.reload !== undefined) api.form("get", data.status.reload);
 				};
 				break;
 		}
@@ -577,8 +576,8 @@ export const api = {
 	/**
 	 * handles internal messenger
 	 * notification indicator of unread messages
-	 * 
-	 * @param {string} method get|post|delete 
+	 *
+	 * @param {string} method get|post|delete
 	 * @param  {array} request api method, filter term / message id / message form data, occasionally query selector
 	 * @returns request
 	 */
@@ -664,8 +663,8 @@ export const api = {
 	/**
 	 * handles vendor and product management
 	 * handles orders
-	 * 
-	 * @param {string} method get|post|put|delete 
+	 *
+	 * @param {string} method get|post|put|delete
 	 * @param  {array} request api method, id / name / filter term, occasionally subrequest, occasionally message
 	 * @returns request
 	 */
@@ -806,7 +805,7 @@ export const api = {
 				}
 				break;
 			case "put":
-				if (["ordered", "received", "archived", "disapproved", "addinformation"].includes(request[3])) {
+				if (["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
 					successFn = function (data) {
 						new Toast(data.status.msg, data.status.type);
 					};
@@ -830,7 +829,7 @@ export const api = {
 	/**
 	 * handles records, displays record lists
 	 * imports data from other records
-	 * 
+	 *
 	 * @param {string} method get|post
 	 * @param  {array} request api method, occasional identifier to import from
 	 * @returns request
@@ -884,13 +883,8 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]"),
 									exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									if (data.status.filter === undefined || data.status.filter == "some")
-										element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
-									else
-										element.style.display =
-											data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)
-												? "block"
-												: "none";
+									if (data.status.filter === undefined || data.status.filter == "some") element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									else element.style.display = data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
 								}
 							}
 						};
@@ -918,13 +912,10 @@ export const api = {
 											}
 										} else if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											input.checked =
-												Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
+											input.checked = Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
 										} else if (input.type === "checkbox") {
 											groupname = input.dataset.grouped.replaceAll(" ", "_");
-											input.checked =
-												Object.keys(data.status.data).includes(groupname) &&
-												data.status.data[groupname].split(", ").includes(input.name);
+											input.checked = Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name);
 										} else {
 											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}
@@ -966,7 +957,7 @@ export const api = {
 	/**
 	 * manages text templates
 	 * displays text template frontend either as body or within a modal
-	 * 
+	 *
 	 * @param {string} method get|post
 	 * @param  {array} request api method, occasional modal destination
 	 * @returns request
@@ -1047,7 +1038,7 @@ export const api = {
 	 * displays 2d code form and result passed by get query
 	 * displays a generic 2d scanner
 	 * displays stl viewer for files managed by filemanager and open sharepoint
-	 * 
+	 *
 	 * @param {string} method get
 	 * @param  {array} request api method, occasionally passed values for 2d codes
 	 * @returns request
@@ -1098,8 +1089,8 @@ export const api = {
 
 	/**
 	 * user manager and display of profile
-	 * 
-	 * @param {string} method get|post|put|delete 
+	 *
+	 * @param {string} method get|post|put|delete
 	 * @param  {array} request api method, name|id
 	 * @returns request
 	 */

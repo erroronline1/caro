@@ -432,8 +432,8 @@ class SQLQUERY {
 		],
 
 		'order_post-approved-order' => [
-			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received, archived) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, archived) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)",
+			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)"
 		],
 		'order_put-approved-order-ordered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = CURRENT_TIMESTAMP WHERE id = :id",
@@ -450,6 +450,10 @@ class SQLQUERY {
 		'order_put-approved-order-addinformation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id"
+		],
+		'order_put-approved-order-cancellation' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 
 		'order_get-approved-order-by-unit' => [

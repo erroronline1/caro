@@ -40,16 +40,11 @@
 * suggest next form? (load with identify)
 
 #### todo purchase
-* split sql query for product search with or without vendor, not where vendor in (all) to possibly speed things up
-
 * order only assigned units selecteable?
 * general orders select workshop storage number
-* return button for received orders containing all relevant data
 * optional view prepared orders for other units
-* cancel order (with typeable cause)
 * order state (not deliverable, extended delivery period, delivery date changed, etc.) onchange message to unit
 * overview orders by commission/justification / vendor
-
 
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
@@ -534,13 +529,22 @@ graph TD;
     sample_check-->productdb[(product database)];
 
     process_order-->mark[mark];
-    mark-->|processed|auto_delete[auto delete after X days];
+    mark-->|processed|order_type{order type};
+    order_type-->|order|auto_delete[auto delete after X days];
+    order_type-->|return|auto_delete;
+    order_type-->|cancellation|order_deleted(order deleted)
     mark-->|retrieved|auto_delete;
     mark-->|archived|delete[delete manually];
     process_order-->|delete|delete;
+    process_order-->cancel_order[cancel order];
+    cancel_order-->rewrite_cancel[rewrite order as cancellation];
+    rewrite_cancel-->approved_orders;
+    process_order-->return_order[return order];
+    return_order-->clone_order[clone order, set return type];
+    clone_order-->approved_orders
     delete-->delete_permission{"permission
     to delete"};
-    delete_permission-->|is admin|order_deleted(order deleted);
+    delete_permission-->|is admin|order_deleted;
     delete_permission-->|is unit member|order_deleted;
     delete_permission-->|purchase member, unprocessed order|order_deleted;
     delete_permission-->|purchase member, processed order|approved_orders;
@@ -872,6 +876,7 @@ Tested devices:
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
 * Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
+* Install as progressive web app (PWA) from the initial browser request
 
 ### Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
