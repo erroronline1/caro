@@ -352,6 +352,57 @@ replace specialchars in header
 }
 ```
 
+### nowecare
+add headers on line 7
+```json
+{
+	"filesetting": {
+		"headerrowindex": 6,
+		"columns": ["EAN", "NAME", "ARTNR"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete headers",
+			"keep": true,
+			"match": {
+				"all": {
+					"ARTNR": ".+"
+				}
+			}
+		}
+	],
+
+	"modify": {
+		"rewrite": [{
+			"article_no": ["ARTNR"],
+			"article_name": ["NAME"],
+			"article_unit": [""],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep all products",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_name": ".+"
+				}
+			}
+		}
+	]
+}
+```
+
 ### nowecor
 ```json
 {
