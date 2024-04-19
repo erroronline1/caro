@@ -42,7 +42,6 @@
 #### todo purchase
 * order only assigned units selecteable?
 * general orders select workshop storage number
-* optional view prepared orders for other units
 * order state (not deliverable, extended delivery period, delivery date changed, etc.) onchange message to unit
 * overview orders by commission/justification / vendor
 

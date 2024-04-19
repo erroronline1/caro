@@ -75,17 +75,35 @@ class ORDER extends API {
 				$statement->execute();
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
 				// display all orders assigned to organizational unit
-				if (array_intersect(['admin'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				if ($this->_requestedID) $units = [$this->_requestedID]; // see orders from selected unit
+				elseif (array_intersect(['admin'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // see only orders for own units
 
-				$organizational_orders=[];
+				$organizational_orders = [];
 				foreach($orders as $key => $row) {
-					$order_data=json_decode($row['order_data'], true);
+					$order_data = json_decode($row['order_data'], true);
 					if (array_intersect([$order_data['organizational_unit']], $units)) {
 						array_push($organizational_orders, $row);
 					}
 				}
-				$result=['body' => ['content' => []]];
+				$result = ['body' => ['content' => []]];
+				if ($_SESSION['user']['orderauth']){
+					$organizational_units=[];
+					foreach(LANGUAGEFILE['units'] as $unit => $description){
+						$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
+						//$organizational_units[$description]['checked'] = true;
+					}
+					if (!$this->_requestedID && array_key_exists('primaryUnit', $_SESSION['user']['app_settings'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
+					elseif($this->_requestedID) $organizational_units[LANG::GET('units.' . $this->_requestedID)]['checked'] = true;
+					$result['body']['content'][] = [
+						['type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('order.organizational_unit')
+						],
+						'content' => $organizational_units
+						]
+					];
+				}
 				if (count($organizational_orders)){
 					foreach($organizational_orders as $order){ // order
 						$items = $info = '';
@@ -164,7 +182,7 @@ class ORDER extends API {
 						$result['body']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
 					}
 				}
-				else $result['body']['content'] = $this->noContentAvailable(LANG::GET('order.no_orders'));
+				else $result['body']['content'][] = $this->noContentAvailable(LANG::GET('order.no_orders'))[0];
 				break;
 		}
 		$this->response($result);
@@ -470,6 +488,7 @@ class ORDER extends API {
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
 					$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'required' => true];
 					if (array_key_exists('organizational_unit', $order) && in_array($unit, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
+					elseif (array_key_exists('primaryUnit', $_SESSION['user']['app_settings'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
 				}
 
 				$result['body'] = ['form'=>[

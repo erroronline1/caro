@@ -684,7 +684,7 @@ export const api = {
 		post consumables/incorporation
 		get consumables/incorporation
 
-		get order/prepared
+		get order/prepared/{unit}
 		get order/productsearch/{id|name}
 		get order/order/{id}
 		post order/order
