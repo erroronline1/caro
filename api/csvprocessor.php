@@ -178,7 +178,7 @@ class Listprocessor {
 		$dateformat = implode('-', $dateformat);
 		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
 		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
-		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 2);
+		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
 	}
 
 	public function monthdelta($date = [], $dateformat = [], $delta = 0){
