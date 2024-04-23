@@ -111,6 +111,7 @@ $queries = [
 				"	`ordered` timestamp NULL DEFAULT NULL," .
 				"	`received` timestamp NULL DEFAULT NULL," .
 				"	`archived` timestamp NULL DEFAULT NULL," .
+				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -266,7 +267,8 @@ $queries = [
 				"	approved smalldatetime NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
 				"	received smalldatetime NULL DEFAULT NULL," .
-				"	archived smalldatetime NULL DEFAULT NULL" .
+				"	archived smalldatetime NULL DEFAULT NULL," .
+				"	ordertype varchar(MAX) NOT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_file_bundles', N'U') IS NULL " .
