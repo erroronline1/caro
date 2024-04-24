@@ -31,7 +31,6 @@
 
 #### todo application
 * ux tabs?
-* refactor languagefile
 * hash sum check for data completeness?
 
 #### todo forms
@@ -42,7 +41,6 @@
 #### todo purchase
 * order only assigned units selecteable?
 * general orders select workshop storage number
-* order state (not deliverable, extended delivery period, delivery date changed, etc.) onchange message to unit
 * overview orders by commission/justification / vendor
 
 * batch identifier (product and delivery note number) for ordered items
