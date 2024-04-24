@@ -9,6 +9,7 @@
 * [juzo](#juzo)
 * [lohmann und rauscher](#lohmann-und-rauscher)
 * [medi](#medi)
+* [minke](#minke)
 * [mmib](#mmib)
 * [neatec](#neatec)
 * [nowecor](#nowecor)
@@ -296,6 +297,36 @@ replace . and specialchars in header
 }
 ```
 
+### minke
+rewrite pricelist (concat sections (bit of a pita) Beschreibung to Staffel, repaste as values)
+```json
+{
+	"filesetting": {
+		"columns": ["Artikelnummer", "Einheit", "Staffel"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete headers",
+			"keep": true,
+			"match": {
+				"all": {
+					"Artikelnummer": ".+"
+				}
+			}
+		}
+	],
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Staffel"],
+			"article_unit": ["Einheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+
 ### mmib
 rewrite pricelist (concat first three columns to article number, paste as values, add name column, delete the rest)
 ```json
@@ -372,7 +403,6 @@ add headers on line 7
 			}
 		}
 	],
-
 	"modify": {
 		"rewrite": [{
 			"article_no": ["ARTNR"],
