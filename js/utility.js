@@ -58,6 +58,10 @@ const _serviceWorker = {
 			const mailnotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header") + "]");
 			mailnotif.setAttribute("data-notification", data.unseen);
 		}
+		if ("unprocessed" in data) {
+			const ordernotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header") + "]");
+			ordernotif.setAttribute("data-notification", data.unprocessed);
+		}
 	},
 };
 

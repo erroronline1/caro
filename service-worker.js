@@ -1,4 +1,4 @@
-const cacheName = "2020240107_0101"; // Change value to force update
+const cacheName = "20240425_0101"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
@@ -11,7 +11,8 @@ addEventListener("message", async (message) => {
 	//do something with message.data
 	switch (message.data) {
 		case "getnotifications":
-			let count = await fetch("api/api.php/message/notification/", {
+			const response = {};
+			let messages = await fetch("api/api.php/message/notification/", {
 				method: "GET",
 				cache: "no-cache",
 				body: null,
@@ -28,11 +29,31 @@ addEventListener("message", async (message) => {
 					return undefined;
 				}
 			);
-			if (count)
-				client.postMessage({
-					unnotified: count.body.unnotified,
-					unseen: count.body.unseen,
-				});
+			if (messages) {
+				response["unnotified"] = messages.body.unnotified;
+				response["unseen"] = messages.body.unseen;
+			}
+			let orders = await fetch("api/api.php/order/notification/", {
+				method: "GET",
+				cache: "no-cache",
+				body: null,
+			}).then(
+				async (response) => {
+					if (response.statusText === "OK")
+						return {
+							status: response.status,
+							body: await response.json(),
+						};
+					else return undefined;
+				},
+				() => {
+					return undefined;
+				}
+			);
+			if (orders) {
+				response["unprocessed"] = orders.body.unprocessed;
+			}
+			if (Object.keys(response).length !== 0) client.postMessage(response);
 			break;
 	}
 });
@@ -89,8 +110,7 @@ self.addEventListener("fetch", (event) => {
 			const clonedRequest = await event.request.clone();
 			return fetch(event.request)
 				.then(async (fetchedResponse) => {
-					if (event.request.method === "GET")
-						cache.put(event.request, fetchedResponse.clone());
+					if (event.request.method === "GET") cache.put(event.request, fetchedResponse.clone());
 					//sync-event still marked as experimental as of 01/2024 so sync has to be performed on successful fetch request
 					const cachedRequests = await database.all();
 					let successfullyRequested = [];
@@ -109,8 +129,7 @@ self.addEventListener("fetch", (event) => {
 								console.log(error);
 							});
 					}
-					if (successfullyRequested.length)
-						await database.delete(successfullyRequested);
+					if (successfullyRequested.length) await database.delete(successfullyRequested);
 					return fetchedResponse;
 				})
 				.catch(async () => {

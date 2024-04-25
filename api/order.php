@@ -15,6 +15,20 @@ class ORDER extends API {
 		$this->_borrowedModule = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
+	public function notification(){
+		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
+		$unprocessed = ['num' => 0];
+		if (array_intersect(['purchase'], $_SESSION['user']['permissions'])){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
+			$statement->execute([
+			]);
+			$unprocessed = $statement->fetch(PDO::FETCH_ASSOC);
+		}
+		$this->response([
+			'unprocessed' => $unprocessed['num']
+		]);
+	}
+
 	public function prepared(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){

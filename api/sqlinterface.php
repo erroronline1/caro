@@ -480,6 +480,10 @@ class SQLQUERY {
 			'mysql' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))",
 			'sqlsrv' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
 		],
+		'order_get_approved_unprocessed' => [
+			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE IFNULL(ordered, 100) = 100",
+			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ISNULL(ordered, 100) = 100",
+		],
 
 		'csvfilter-post' => [
 			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
