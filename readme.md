@@ -34,7 +34,6 @@
 * hash sum check for data completeness?
 
 #### todo forms
-* import data from other cases, warn about identifier!
 * view other forms as modal (e.g. instructions)
 * suggest next form? (load with identify)
 

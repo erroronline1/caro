@@ -169,7 +169,8 @@ export const api = {
 									if (value) {
 										let stylesheet = document.styleSheets[0].cssRules;
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)")
+												stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
 										}
 									}
 									break;
@@ -805,7 +806,9 @@ export const api = {
 				}
 				break;
 			case "put":
-				if (["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
+				if (
+					["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])
+				) {
 					successFn = function (data) {
 						new Toast(data.status.msg, data.status.type);
 					};
@@ -883,8 +886,13 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]"),
 									exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									if (data.status.filter === undefined || data.status.filter == "some") element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
-									else element.style.display = data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
+									if (data.status.filter === undefined || data.status.filter == "some")
+										element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									else
+										element.style.display =
+											data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)
+												? "block"
+												: "none";
 								}
 							}
 						};
@@ -892,7 +900,6 @@ export const api = {
 					case "import":
 						successFn = function (data) {
 							if (data.status !== undefined) {
-								if (data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 								if (data.status.data !== undefined) {
 									let inputs = document.querySelectorAll("input, textarea, select");
 									let inputname, groupname, files, a;
@@ -912,14 +919,34 @@ export const api = {
 											}
 										} else if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											input.checked = Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
+											input.checked =
+												Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
 										} else if (input.type === "checkbox") {
 											groupname = input.dataset.grouped.replaceAll(" ", "_");
-											input.checked = Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name);
+											input.checked =
+												Object.keys(data.status.data).includes(groupname) &&
+												data.status.data[groupname].split(", ").includes(input.name);
 										} else {
 											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}
 									}
+								}
+								if (data.status.msg !== undefined) {
+									const options = {};
+									options[LANG.GET("record.record_import_ok")] = false;
+									options[LANG.GET("record.record_import_clear_identifier")] = {
+										value: true,
+										class: "reducedCTA",
+									};
+
+									new Dialog({
+										type: "confirm",
+										header: LANG.GET("assemble.compose_merge"),
+										options: options,
+										body: data.status.msg,
+									}).then((response) => {
+										if (response) document.querySelector("input[name^=IDENTIFY_BY_]").value = "";
+									});
 								}
 							}
 						};
