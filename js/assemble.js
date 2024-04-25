@@ -162,7 +162,12 @@ export class Dialog {
 					h3.append(document.createTextNode(this.header));
 					header.append(h3);
 				}
-				if (this.body && this.body.constructor.name === "String") header.append(document.createTextNode(this.body));
+				if (this.body && this.body.constructor.name === "String") {
+					for (const line of this.body.split(/\r\n|\n/)) {
+						header.append(document.createTextNode(line));
+						header.append(document.createElement("br"));
+					}
+				}
 				form.append(header);
 			}
 			if (this.type === "select") form.style.display = "flex";
