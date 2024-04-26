@@ -362,6 +362,7 @@ class record extends API {
 			case 'GET':
 				$return = ['body' =>[]];
 				$body = [];
+				$closed = false;
 				// summarize content
 				$content = $this->summarizeRecord();
 				$body[] = [[
@@ -456,12 +457,38 @@ class record extends API {
 							]
 						]
 					];
+					if (array_intersect(['supervisor', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']) && !$content['closed']){
+						array_unshift($return['body']['content'][count($return['body']['content']) - 1], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('record.record_mark_as_closed'),
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ."', 'body': '" . LANG::GET('record.record_mark_as_closed_info') . "', 'options':{".
+									"'" . LANG::GET('general.cancel_button') . "': false,".
+									"'" . LANG::GET('record.record_mark_as_closed') . "': {value: true, class: 'reducedCTA'},".
+									"}}).then(confirmation => {if (confirmation) {this.disabled = true; console.log('hello'); api.record('put', 'close', '" . $this->_requestedID . "')}})"
+							]
+						]);
+					}
 				}
 				$this->response($return);
 				break;
 			default:
 				$this->response([], 401);
 		}
+	}
+
+	public function close(){
+		if (!array_intersect(['supervisor', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])) $this->response([], 401);
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_close'));
+		$statement->execute([
+			':identifier' => $this->_requestedID
+		]);
+		$this->response([
+			'status' => [
+				'msg' => LANG::GET('record.record_mark_as_closed_info'),
+				'type' => 'success'
+			]]);
+
 	}
 
 	public function import(){
@@ -516,7 +543,7 @@ class record extends API {
 			}
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-			if (count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+			if ($row['closed'] || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
 				$contexts[$row['context']][$targets[$target]][$row['identifier']]['style'] = 'display:none';
 				$contexts[$row['context']][$targets[$target]][$row['identifier']]['data-filtered_max'] = $row['id'];
 			}
@@ -717,10 +744,12 @@ class record extends API {
 			'files' => [],
 			'images' => [],
 			'title' => LANG::GET('menu.record_summary'),
-			'date' => date('y-m-d H:i')
+			'date' => date('y-m-d H:i'),
+			'closed' => false
 		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
+			$summary['closed'] = boolval($row['closed']);
 			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => $row['form_date']]);
 			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
 

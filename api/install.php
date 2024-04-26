@@ -54,6 +54,7 @@ $queries = [
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author_id` int NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`closed` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -211,6 +212,7 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
+				"	content tinyint NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .

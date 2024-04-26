@@ -850,6 +850,8 @@ export const api = {
 
 		post record/record
 
+		put record/close/{identifier}
+
 		get record/import
 		get record/records
 		get records/export
@@ -974,6 +976,8 @@ export const api = {
 				break;
 			case "post":
 				payload = _.getInputs("[data-usecase=record]", true);
+				break;
+			case "put":
 				break;
 			default:
 				return;

@@ -57,7 +57,6 @@
 * monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
-* mark as finished to hide in overwiew
 
 #### todo audit
 * checklist regulatory issues
@@ -1053,4 +1052,4 @@ Without a filter none of the vendors products will be treated as a trading good!
 
 [Content](#Content)
 
-(c)2023-2024 error on line 1 (dev@erroronline.one)
+(c) 2023-2024 error on line 1 (dev@erroronline.one)
