@@ -502,7 +502,9 @@ graph TD;
     approve_order-->|by pin|approved_orders;
     approve_order-->|no|prepared_orders(("prepared orders,
     only from own unit
-    unless admin"));
+    unless admin or
+    order authorized
+    and selected"));
 
     approved_orders-->process_order{process order};
     process_order-->disapprove[disapprove];
@@ -544,6 +546,10 @@ graph TD;
     delete_permission-->|is unit member|order_deleted;
     delete_permission-->|purchase member, unprocessed order|order_deleted;
     delete_permission-->|purchase member, processed order|approved_orders;
+    process_order-->update_state[update state];
+    update_state-->append_inform["append info,
+    message all unit members"];
+    append_inform-->process_order
     
     process_order-->|add info|process_order;
     process_order-->message((message user))
