@@ -787,6 +787,9 @@ export class Assemble {
 				result.push(document.createElement("br"));
 			}
 		}
+		if (this.currentElement.attributes !== undefined) {
+			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
+		}
 		result.push(document.createElement("br"));
 		return result;
 	}
