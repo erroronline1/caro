@@ -89,7 +89,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => LANG::GET('record.record_export'),
+					'value' => LANG::GET('audit.record_export'),
 					'onpointerup' => "api.audit('get', 'exportchecks', '" . $this->_requestedType . "')"
 				]
 			]
@@ -151,7 +151,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => LANG::GET('record.record_export'),
+					'value' => LANG::GET('audit.record_export'),
 					'onpointerup' => "api.audit('get', 'exportchecks', '" . $this->_requestedType . "')"
 				]
 			]
@@ -313,7 +313,7 @@ class AUDIT extends API {
 			$regulatory_context = [];
 			if ($form['regulatory_context']){
 				foreach(explode(',', $form['regulatory_context']) as $context){
-					$regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
+					if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
 				}
 			}
 			$formscontent[] = [
@@ -359,7 +359,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => LANG::GET('record.record_export'),
+					'value' => LANG::GET('audit.record_export'),
 					'onpointerup' => "api.audit('get', 'exportforms', '" . $this->_requestedType . "')"
 				]
 			]
@@ -429,7 +429,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => LANG::GET('record.record_export'),
+					'value' => LANG::GET('audit.record_export'),
 					'onpointerup' => "api.audit('get', 'exportvendors')"
 				]
 			]
