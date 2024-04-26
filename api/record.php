@@ -122,7 +122,7 @@ class record extends API {
 			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
 				$formdatalist[] = $row['name'];
-				$forms[$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
+				$forms[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
 			}
 		}
@@ -144,14 +144,23 @@ class record extends API {
 							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
 							]
 					]
-				], [
-					[
-						'type' => 'links',
-						'description' => LANG::GET('record.form_all'),
-						'content' => $forms
-					]
 				]
 			]];
+		foreach ($forms as $context => $list){
+			$contexttranslation = '';
+			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
+				if (array_key_exists($context, $contexts)){
+					$contexttranslation = $contexts[$context];
+					break;
+				}
+			}
+			$return['body']['content'][] = 					[
+				'type' => 'links',
+				'description' => $contexttranslation,
+				'content' => $list
+			];
+
+		}
 		$this->response($return);
 	}
 
