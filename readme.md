@@ -101,10 +101,11 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in messenger. This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
-        * alerting user groups about disapproved orders
+        * alerting user groups about disapproved orders and order state changes
         * messaging inquiries to ordering users
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
+    * The interface alerts on new messages and approved orders (purchase members). The landing page displays a brief summary of unfinished items.
     * also see [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
