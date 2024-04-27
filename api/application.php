@@ -147,6 +147,89 @@ class APPLICATION extends API {
 	public function start(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result = ['user' => $_SESSION['user']['name'], 'body' => ['content' => []]];
+		$tiles = [];
+
+		// messages
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
+		$statement->execute([
+			':user' => $_SESSION['user']['id']
+		]);
+		$unseen = $statement->fetch(PDO::FETCH_ASSOC);
+		if ($unseen['number']) {
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.message('get', 'inbox')",
+				],
+				'content' => [
+					[
+						'type' => 'text',
+						'content' => LANG::GET('application.overview_messages', [':number' => $unseen['number']]),
+						'description' => LANG::GET('menu.message_inbox'),
+						'attributes' => [
+							'data-type' => 'message'
+						]
+					]
+				]
+			];
+		}
+
+		// unprocessed orders
+		if (array_intersect(['purchase'], $_SESSION['user']['permissions'])){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
+			$statement->execute();
+			$unprocessed = $statement->fetch(PDO::FETCH_ASSOC);
+			if ($unprocessed['num']) {
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onpointerup' => "api.purchase('get', 'approved')",
+					],
+					'content' => [
+						[
+							'type' => 'text',
+							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed['num']]),
+							'description' => LANG::GET('menu.purchase_approved_orders'),
+							'attributes' => [
+								'data-type' => 'cart'
+							]
+						]
+					]
+				];
+			}
+		}
+
+		// unclosed case documentation for own unit
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
+		$statement->execute();
+		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$number = 0;
+//var_dump($data);
+		foreach ($data as $row){
+			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units']) && !$row['closed']) $number++;
+		}
+		if ($number){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.record('get', 'records')",
+				],
+				'content' => [
+					[
+						'type' => 'text',
+						'content' => LANG::GET('application.overview_cases', [':number' => $number]),
+						'description' => LANG::GET('menu.record_header'),
+						'attributes' => [
+							'data-type' => 'record'
+						]
+					]
+				]
+			];
+		}
+
+		if (count($tiles)) $result['body']['content'][] = $tiles;
+
+		// manual
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
 		$statement->execute();
 		$manual = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -159,7 +242,7 @@ class APPLICATION extends API {
 					'content' => $row['content']
 				]];
 		}
-		$result['body']['content'] = [$topics];
+		$result['body']['content'][] = $topics;
 		$this->response($result);
 	}
 
