@@ -391,8 +391,11 @@ graph TD;
 
     records-->summaries((record summary));
     summaries-->recorddb3[(record database)]
-    recorddb3-->displayids[display identifier];
+    recorddb3-->|not closed and within limit|displayids[display identifier];
+    recorddb3-->|matching filter|displayids;
     displayids-->|select|summary[display summary];
+    summary-->|supervisor, admin or ceo|close[close];
+    close-->recorddb3
     summary-->export[export];
     export-->pdf("summary as pdf,
     attached files");
