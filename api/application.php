@@ -83,6 +83,8 @@ class APPLICATION extends API {
 				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
 				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
+			LANG::GET('menu.calendar_header') => [
+			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
 				LANG::GET('menu.files_bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
@@ -204,7 +206,6 @@ class APPLICATION extends API {
 		$statement->execute();
 		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$number = 0;
-//var_dump($data);
 		foreach ($data as $row){
 			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units']) && !$row['closed']) $number++;
 		}
