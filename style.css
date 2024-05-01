@@ -610,7 +610,7 @@ input:read-only {
 	width: fit-content;
 	display: inline-block;
 	margin-bottom: 0;
-	margin: .25em 1em;
+	margin: 0.25em 1em;
 	padding-left: 2em;
 }
 
@@ -788,18 +788,24 @@ article > article {
 
 /*************************** calendar ******************************/
 
-.day{
-	width:calc(99% / 7 - 1em);
+.day {
+	width: calc(99% / 7 - 1em);
 	height: 4em;
-	margin:.5em;
-	padding:.5em;
-	display:inline-block;
+	margin: 0.5em;
+	padding: 0.5em;
+	display: inline-block;
 	vertical-align: top;
 }
-.displayDay{
+.displayDay {
 	background-color: var(--article);
 	box-shadow: var(--shadow);
 	color: var(--foreground);
+}
+.today {
+	border: 2px solid var(--green);
+}
+.holiday {
+	opacity: 0.4;
 }
 
 /*************************** general elements ******************************/
@@ -934,8 +940,7 @@ dialog a:not([data-type])::before {
 }
 
 [data-type="dateinput"]::before,
-[data-type="calendar"]::before
- {
+[data-type="calendar"]::before {
 	background-image: url("./media/calendar-alt.svg");
 }
 
