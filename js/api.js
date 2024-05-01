@@ -169,8 +169,7 @@ export const api = {
 									if (value) {
 										let stylesheet = document.styleSheets[0].cssRules;
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)")
-												stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
 										}
 									}
 									break;
@@ -662,6 +661,54 @@ export const api = {
 	},
 
 	/**
+	 * planning and editing calendar entries
+	 *
+	 * @param {string} method get|post|put|delete
+	 * @param  {array} request api method, name|id
+	 * @returns request
+	 */
+	planning: (method, ...request) => {
+		/*
+		get planning/calendar
+		get planning/calendar/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
+		post planning/calendar
+		put planning/calendar/{id}
+		delete planning/calendar/{id}
+		*/
+		request = [...request];
+		request.splice(0, 0, "planning");
+		let payload,
+			successFn = function (data) {
+				if (data.body) {
+					api.update_header(title[request[1]]);
+					const body = new Assemble(data.body);
+					document.getElementById("main").replaceChildren(body.initializeSection());
+					body.processAfterInsertion();
+					if (request[3] !== undefined) location.hash="#displayspecificdate";
+				}
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+			},
+			title = {
+				calendar: LANG.GET("menu.planning_calendar"),
+			};
+		switch (method) {
+			case "get":
+				break;
+			case "post":
+				payload = _.getInputs("[data-usecase=planning]", true);
+				break;
+			case "put":
+				payload = _.getInputs("[data-usecase=planning]", true);
+				break;
+			case "delete":
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+	},
+
+	/**
 	 * handles vendor and product management
 	 * handles orders
 	 *
@@ -806,9 +853,7 @@ export const api = {
 				}
 				break;
 			case "put":
-				if (
-					["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])
-				) {
+				if (["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
 					successFn = function (data) {
 						new Toast(data.status.msg, data.status.type);
 					};
@@ -888,13 +933,8 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]"),
 									exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									if (data.status.filter === undefined || data.status.filter == "some")
-										element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
-									else
-										element.style.display =
-											data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)
-												? "block"
-												: "none";
+									if (data.status.filter === undefined || data.status.filter == "some") element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									else element.style.display = data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
 								}
 							}
 						};
@@ -921,13 +961,10 @@ export const api = {
 											}
 										} else if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											input.checked =
-												Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
+											input.checked = Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
 										} else if (input.type === "checkbox") {
 											groupname = input.dataset.grouped.replaceAll(" ", "_");
-											input.checked =
-												Object.keys(data.status.data).includes(groupname) &&
-												data.status.data[groupname].split(", ").includes(input.name);
+											input.checked = Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name);
 										} else {
 											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}

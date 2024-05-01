@@ -86,6 +86,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
 			LANG::GET('menu.planning_header') => [
+				LANG::GET('menu.planning_calendar') => ['onpointerup' => "api.planning('get', 'calendar')"]
 			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
