@@ -23,6 +23,35 @@ class CALENDAR {
 	}
 
 	/**
+	 * calculates holidays for given year, this has to be set up according to your local or company customs, germany baden-württemberg by default
+	 */
+	private function holidays($year){
+		$holidays = ['-01-01', '-01-06', '-05-01', '-10-03', '-11-01', '-12-24', '-12-25', '-12-26', '-12-31'];
+		$holidays = array_map(Fn($d) => $year . $d, $holidays);
+		$easter = new DateTime();
+		$easter->setTimestamp(easter_date($year));
+		$easter->modify('+1 days');
+		$holidays[]= $easter->format('Y-m-d');
+		//good friday
+		$easter->modify('-2 days');
+		$holidays[]= $easter->format('Y-m-d');
+		//easter monday
+		$easter->modify('+3 days');
+		$holidays[]= $easter->format('Y-m-d');
+		//ascension
+		$easter->modify('+38 days');
+		$holidays[]= $easter->format('Y-m-d');
+		//pentecoste
+		$easter->modify('+11 days');
+		$holidays[]= $easter->format('Y-m-d');
+		//corpus christi
+		$easter->modify('+10 days');
+		$holidays[]= $easter->format('Y-m-d');
+
+		return $holidays;
+	}
+
+	/**
 	 * calculates a calendar view, for given date week starts on monday, month on 1st
 	 * 
 	 * @param string $type month|week
@@ -69,12 +98,15 @@ class CALENDAR {
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($type, $date);
 
+		$today = new DateTime('now');
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
-					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j')
+					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j'),
+					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
+					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y')))
 				];
 				if ($result['header']) continue;
 				if ($type === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
@@ -82,6 +114,34 @@ class CALENDAR {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * @param str $date
+	 * @param str $type
+	 * @param str $organizational_unit
+	 */
+	public function getdate($date = '', $type = '', $organizational_unit = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
+		$statement->execute([
+			':date' => $date,
+			':type' => $type,
+			':organizational_unit' => $organizational_unit
+		]);
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * @param int $id
+	 * @param str $type
+	 * @param str $organizational_unit
+	 */
+	public function get($id = 0){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get'));
+		$statement->execute([
+			':id' => $id
+		]);
+		return $statement->fetch(PDO::FETCH_ASSOC);
 	}
 
 	/**
