@@ -1,5 +1,7 @@
 <?php
 // login handler, menu and landing page methods
+require_once('calendar.php');
+
 class APPLICATION extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
@@ -83,7 +85,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
 				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
-			LANG::GET('menu.calendar_header') => [
+			LANG::GET('menu.planning_header') => [
 			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
@@ -229,6 +231,15 @@ class APPLICATION extends API {
 		}
 
 		if (count($tiles)) $result['body']['content'][] = $tiles;
+
+		// calendar
+		$calendar = new CALENDAR($this->_pdo);
+		$week = $calendar->render('week');
+		$result['body']['content'][] = [[
+			'type' => 'calendar',
+			'description' => $week['header'],
+			'content' => $week['content']
+		]];
 
 		// manual
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));

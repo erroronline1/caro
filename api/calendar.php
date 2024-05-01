@@ -1,20 +1,78 @@
 <?php
-// calendar and planning
-class CALENDAR extends API {
-	// processed parameters for readability
-	public $_requestedMethod = REQUEST[1];
-	private $_requestedType = null;
+// calendar
+class CALENDAR {
+    /**
+     * calendar handler writing to database and rendering either weeks or months for given date or now by default
+     * include to display calendar or use for planning
+     */
 
-	public function __construct(){
-		parent::__construct();
-		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+
+   	/**
+	 * preset database connection, passes from main application
+	 */
+	public $_pdo;
+
+	public function __construct($pdo){
+		$this->_pdo = $pdo;
 	}
 
-	
+	/**
+	 * calculates a calendar view, for given date week starts on monday, month on 1st
+	 * 
+	 * @param string $type month|week
+	 * @param string $date yyyy-mm-dd
+	 * 
+	 * @return array $calendar [null for display offset || DateTime object]
+	 */
+	private function days($type = '', $date = ''){
+		$result = [];
+		$date = new DateTime($date ? : 'now');
+		if ($type === 'week') {
+			$date->modify('- ' . ($date->format('N') - 1) . ' days');
+			while ($date->format('N') < 7){
+				$result[] = clone $date;
+				$date->modify('+ 1 days');
+			}
+			$result[] = $date;
+		}
+		elseif ($type === 'month') {
+			$date->modify('first day of this month');
+			if ($date->format('N') > 1){
+				for ($i = 1; $i < $date->format('N'); $i++){
+					$result[] = null;
+				}
+			}
+			while ($date->format('j') < $date->format('t')) {
+				$result[] = clone $date;
+				$date->modify('+ 1 days');
+			}
+			$result[] = $date;
+		}
+		return $result;
+	}
+
+	/**
+	 * renders a calendar view, for given date week starts on monday, month on 1st
+	 * 
+	 * @param string $type month|week
+	 * @param string $date yyyy-mm-dd
+	 * 
+	 * @return array $calendar [null for display offset || day info]
+	 */
+	public function render($type = '', $date = ''){
+		$result = ['header' => null, 'content' => []];
+        $days = $this->days($type, $date);
+
+        foreach ($days as $day){
+            if ($day === null) $result['content'][] = null;
+            else {
+                $result['content'][] = LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j');
+                if ($result['header']) continue;
+                if ($type === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
+                if ($type === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
+            }
+        }
+		return $result;
+	}
 }
-
-$api = new CALENDAR();
-$api->processApi();
-
-exit;
 ?>
