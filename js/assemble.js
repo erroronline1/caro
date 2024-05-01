@@ -1461,6 +1461,8 @@ export class Assemble {
 				daytile.onpointerup = function () {
 					api.planning('get', 'calendar', day.date, day.date);
 				};
+				if (day.today) daytile.classList.add("today");
+				if (day.holiday) daytile.classList.add("holiday");
 			}
 			cal.push(daytile);
 		}
