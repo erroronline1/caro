@@ -18,16 +18,25 @@ class CALENDAR {
 	 */
 	public $_days = [];
 
+	/**
+	 * ini settings avoiding repetitive calls
+	 */
+	private $_holidays = [];
+	private $_workdays = [];
+
 	public function __construct($pdo){
 		$this->_pdo = $pdo;
+		$this->_holidays = preg_split('/[^\d-]/', INI['calendar']['holidays']);
+		$this->_workdays = preg_split('/[^\d-]/', INI['calendar']['workdays']);
 	}
 
 	/**
 	 * calculates holidays for given year, this has to be set up according to your local or company customs, germany baden-württemberg by default
+	 * no setting up on construction for possible year overlaps on week rendering
 	 */
 	private function holidays($year){
-		$holidays = ['-01-01', '-01-06', '-05-01', '-10-03', '-11-01', '-12-24', '-12-25', '-12-26', '-12-31'];
-		$holidays = array_map(Fn($d) => $year . $d, $holidays);
+		$holidays = $this->_holidays;
+		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
 		$easter = new DateTime();
 		$easter->setTimestamp(easter_date($year));
 		$easter->modify('+1 days');
@@ -106,7 +115,7 @@ class CALENDAR {
 					'date' => $day->format('Y-m-d'),
 					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j'),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
-					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y')))
+					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
 				];
 				if ($result['header']) continue;
 				if ($type === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
