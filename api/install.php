@@ -164,6 +164,18 @@ $queries = [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`date` timestamp NOT NULL," .
+				"	`due` timestamp NOT NULL," .
+				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`completed` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
@@ -320,7 +332,17 @@ $queries = [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL" .
-				");" 
+				");"
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	date smalldatetime NOT NULL," .
+				"	due smalldatetime NOT NULL," .
+				"	type varchar(MAX) NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	organizational_unit varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	completed varchar(MAX) NOT NULL"
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",

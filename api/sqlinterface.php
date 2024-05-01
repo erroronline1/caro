@@ -523,7 +523,22 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
 		],
 
-
+		'calendar_post' => [
+			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, author, organizational_unit, content, completed) VALUES (NULL, :date, :due, :type, :author, :organizational_unit, :content, '')",
+			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, completed) VALUES (:date, :type, :due, :author, :organizational_unit, :content, '')",
+		],
+		'calendar_put' => [
+			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, type = :type, organizational_unit = :organizational_unit, content = :content, completed = :completed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET date = :date, due = :due, type = :type, organizational_unit = :organizational_unit, content = :content, completed = :completed WHERE id = :id",
+		],
+		'calendar_get-day' => [
+			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date",
+		],
+		'calendar_delete' => [
+			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
+		],
 	];
 }
 ?>

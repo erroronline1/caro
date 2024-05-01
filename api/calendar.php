@@ -1,10 +1,10 @@
 <?php
 // calendar
 class CALENDAR {
-    /**
-     * calendar handler writing to database and rendering either weeks or months for given date or now by default
-     * include to display calendar or use for planning
-     */
+	/**
+	 * calendar handler writing to database and rendering either weeks or months for given date or now by default
+	 * include to display calendar or use for planning
+	 */
 
 
    	/**
@@ -52,7 +52,7 @@ class CALENDAR {
 	}
 
 	/**
-	 * renders a calendar view, for given date week starts on monday, month on 1st
+	 * renders a calendar view, for given date week starts on monday, month on 1st, weekday offsets are empty
 	 * 
 	 * @param string $type month|week
 	 * @param string $date yyyy-mm-dd
@@ -61,18 +61,71 @@ class CALENDAR {
 	 */
 	public function render($type = '', $date = ''){
 		$result = ['header' => null, 'content' => []];
-        $days = $this->days($type, $date);
+		$days = $this->days($type, $date);
 
-        foreach ($days as $day){
-            if ($day === null) $result['content'][] = null;
-            else {
-                $result['content'][] = LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j');
-                if ($result['header']) continue;
-                if ($type === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
-                if ($type === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
-            }
-        }
+		foreach ($days as $day){
+			if ($day === null) $result['content'][] = null;
+			else {
+				$result['content'][] = LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j');
+				if ($result['header']) continue;
+				if ($type === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
+				if ($type === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
+			}
+		}
 		return $result;
+	}
+
+	/**
+	 * @param str $date
+	 * @param str $due
+	 * @param str $type
+	 * @param int $author
+	 * @param str $organizational_unit
+	 * @param str $content
+	 */
+	public function post($date = '', $due = '', $type = '', $author = 0, $organizational_unit = '', $content = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_post'));
+		return $statement->execute([
+			':date' => $date,
+			':due' => $due,
+			':type' => $type,
+			':author' => $author,
+			':organizational_unit' => $organizational_unit,
+			':content' => $content
+		]);
+	}
+
+	/**
+	 * @param int $id
+	 * @param str $date
+	 * @param str $due
+	 * @param str $type
+	 * @param str $organizational_unit
+	 * @param str $content
+	 * @param str $completed
+	 */
+	public function put($id = 0, $date = '', $due = '', $type = '', $author = 0, $organizational_unit = '', $content = '', $completed = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
+		return $statement->execute([
+			':id' => $id,
+			':date' => $date,
+			':due' => $due,
+			':type' => $type,
+			':organizational_unit' => $organizational_unit,
+			':content' => $content,
+			':completed' => $completed
+		]);
+	}
+
+	/**
+	 * @param int $id
+	 */
+	public function delete($id = 0){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_delete'));
+		return $statement->execute([
+			':id' => $id
+		]);
+
 	}
 }
 ?>
