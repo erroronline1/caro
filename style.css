@@ -786,6 +786,22 @@ article > article {
 	object-fit: contain;
 }
 
+/*************************** calendar ******************************/
+
+.day{
+	width:calc(99% / 7 - 1em);
+	height: 4em;
+	margin:.5em;
+	padding:.5em;
+	display:inline-block;
+	vertical-align: top;
+}
+.displayDay{
+	background-color: var(--article);
+	box-shadow: var(--shadow);
+	color: var(--foreground);
+}
+
 /*************************** general elements ******************************/
 
 h1 {
@@ -917,7 +933,9 @@ dialog a:not([data-type])::before {
 	background-image: url("./media/hashtag.svg");
 }
 
-[data-type="dateinput"]::before {
+[data-type="dateinput"]::before,
+[data-type="calendar"]::before
+ {
 	background-image: url("./media/calendar-alt.svg");
 }
 
