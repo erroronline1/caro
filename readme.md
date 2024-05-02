@@ -10,9 +10,12 @@
     * [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
+    * [Messages](#messages)
     * [Text recommendations](#text-recommendations)
     * [Forms](#forms)
     * [Records](#records)
+    * [Files](#files)
+    * [Planning](#planning)
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
     * [Tools](#tools)
@@ -30,6 +33,7 @@
 # open tasks
 
 #### todo application
+* assemble alert (date) field to contribute to calendar?
 * ux tabs?
 * hash sum check for data completeness?
 
@@ -99,14 +103,15 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Users can be assigned a pin to approve orders.
     * also see [user management](#user-management)
 * ISO 13485 5.5.3 Internal communication
-    * The application has a built in messenger. This messenger is being made use of internal modules to ensure decent data distribution e.g.
+    * The application has a built in [messenger](#messages). This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
         * alerting user groups about disapproved orders and order state changes
         * messaging inquiries to ordering users
+    * The application has a built in calendar. This calendar is supposed to assist in planning operations and keeping track of time critical recurring events like calibrations etc. 
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
     * The interface alerts on new messages and approved orders (purchase members). The landing page displays a brief summary of unfinished items.
-    * also see [order](#order), [files](#files), [tools](#tools)
+    * also see [messages](#messages), [planning](#planning), [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
     * also see [users](#users), [tools](#tools)
@@ -129,7 +134,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 7.5.1 Control of production and service
     * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
     * Form contexts allow the definition as process or work instructions.
-    * also see [forms](#forms), [records](#records)
+    * The inbuilt calendar assists in planning operations.
+    * also see [forms](#forms), [records](#records), [planning](#planning)
 * ISO 13485 7.5.8 Product indentification
     * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky Identifier labels can be used to mark any components of a product during production.
     * also see [records](#records)
@@ -257,6 +263,11 @@ graph TD;
     user-->|units|units(("see content based
     on units"))
 ```
+
+[Content](#Content)
+
+### Messages
+This is for internal communication and system alerts only and has no record aspect. You can message any registered user but the system user and delete any message at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 [Content](#Content)
 
@@ -415,6 +426,15 @@ Admin, CEO, QMO and office can provide files for everyone to access. Also all us
 Both cloud storages equip the [tools STL-Viewer](#tools) with sources to display.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
+
+[Content](#Content)
+
+### Planning
+Add events to the calendar. The landing page gives a brief overview of weekly and daily events at a quick glance. Planning and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
+
+Events may trigger a [message](#messages) to a defined user group.
+
+You may choose to fully use this calendar for your operations and appointments but it is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place. You're free to use Outlook and the like along.
 
 [Content](#Content)
 
@@ -948,11 +968,12 @@ exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landsc
 
 #### Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
-* Some parts of the setup.ini can be changes during runtime, others will mess up your system. Respective parts are marked.
+* Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
+* calendar.php contains the calendar-class. It computes fixed holidays as defined within setup.ini as well as moving holidays according to easter. If any of these (good friday, easter monday, acension, pentecost, corpus christi) are not a holiday for your company you will have to edit the function holidays() to not add these to the result.
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
