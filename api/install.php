@@ -167,8 +167,8 @@ $queries = [
 				,
 				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`date` timestamp NOT NULL," .
-				"	`due` timestamp NOT NULL," .
+				"	`date` date NOT NULL," .
+				"	`due` date NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
