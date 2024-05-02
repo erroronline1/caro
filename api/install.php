@@ -334,7 +334,8 @@ $queries = [
 				"	content varchar(MAX) NOT NULL" .
 				");"
 				,
-				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
+				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
+				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	date smalldatetime NOT NULL," .
 				"	due smalldatetime NOT NULL," .
@@ -342,7 +343,8 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	completed varchar(MAX) NOT NULL"
+				"	completed varchar(MAX) NOT NULL" .
+				");"
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
