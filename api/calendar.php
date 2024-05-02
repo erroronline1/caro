@@ -134,9 +134,7 @@ class CALENDAR {
 	public function getdate($date = '', $type = '', $organizational_unit = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
 		$statement->execute([
-			':date' => $date,
-			':type' => $type,
-			':organizational_unit' => $organizational_unit
+			':date' => $date
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -171,7 +169,7 @@ class CALENDAR {
 			':author' => $author,
 			':organizational_unit' => $organizational_unit,
 			':content' => $content
-		])) return $statement->lastInsertId();
+		])) return $this->_pdo->lastInsertId();
 		return false;
 	}
 
@@ -184,16 +182,14 @@ class CALENDAR {
 	 * @param str $content
 	 * @param str $completed
 	 */
-	public function put($id = 0, $date = '', $due = '', $type = '', $author = 0, $organizational_unit = '', $content = '', $completed = ''){
+	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
 		return $statement->execute([
 			':id' => $id,
 			':date' => $date,
 			':due' => $due,
-			':type' => $type,
 			':organizational_unit' => $organizational_unit,
 			':content' => $content,
-			':completed' => $completed
 		]);
 	}
 

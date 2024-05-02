@@ -528,12 +528,12 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, completed) VALUES (:date, :type, :due, :author, :organizational_unit, :content, '')",
 		],
 		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, type = :type, organizational_unit = :organizational_unit, content = :content, completed = :completed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET date = :date, due = :due, type = :type, organizational_unit = :organizational_unit, content = :content, completed = :completed WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET date = :date, due = :due, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
 		],
 		'calendar_get-date' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date AND type = :type",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date AND type = :type",
+			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date",
 		],
 		'calendar_get' => [
 			'mysql' => "SELECT * FROM caro_calendar WHERE id = :id",

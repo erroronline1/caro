@@ -100,6 +100,18 @@ const texttemplateClient = {
 	},
 };
 
+const calendarClient = {
+	createFormData: (data) => {
+		window.calendarFormData = new FormData();
+		units = [];
+		for (const [key, value] of Object.entries(data)) {
+			if (value === "on") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+			else window.calendarFormData.append(key, value);
+		}
+		window.calendarFormData.append(LANG.GET("planning.event_organizational_unit"), units.join(","));
+	},
+};
+
 const orderClient = {
 	addProduct: (...data) => {
 		// order to be taken into account in order.php "productsearch" method as well!
@@ -183,7 +195,7 @@ const orderClient = {
 			node.setSelectionRange(0, 99999); // For mobile devices
 			navigator.clipboard.writeText(node.value);
 		} else navigator.clipboard.writeText(node); // passed string
-		new Toast(LANG.GET("general.copied_to_clipboard"), 'info');
+		new Toast(LANG.GET("general.copied_to_clipboard"), "info");
 	},
 	filter: (type = undefined) => {
 		document.querySelectorAll("[data-ordered]").forEach((article) => {
@@ -229,7 +241,7 @@ const orderClient = {
 			formdata = new FormData();
 			formdata.append("content", result);
 			api.purchase("post", "mdrsamplecheck", productid, formdata);
-		} else new Toast(LANG.GET("order.sample_check_failure"), 'error');
+		} else new Toast(LANG.GET("order.sample_check_failure"), "error");
 	},
 	performIncorporation(formdata, productid) {
 		const check = [];
@@ -242,7 +254,7 @@ const orderClient = {
 			formdata = new FormData();
 			formdata.append("content", result);
 			api.purchase("post", "incorporation", productid, formdata);
-		} else new Toast(LANG.GET("order.incorporation_failure"), 'error');
+		} else new Toast(LANG.GET("order.incorporation_failure"), "error");
 	},
 };
 

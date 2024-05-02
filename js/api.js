@@ -684,7 +684,7 @@ export const api = {
 					const body = new Assemble(data.body);
 					document.getElementById("main").replaceChildren(body.initializeSection());
 					body.processAfterInsertion();
-					if (request[3] !== undefined) location.hash="#displayspecificdate";
+					if (request[3] !== undefined) location.hash = "#displayspecificdate";
 				}
 				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 			},
@@ -695,10 +695,10 @@ export const api = {
 			case "get":
 				break;
 			case "post":
-				payload = _.getInputs("[data-usecase=planning]", true);
+				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
 				break;
 			case "put":
-				payload = _.getInputs("[data-usecase=planning]", true);
+				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
 				break;
 			case "delete":
 				break;
