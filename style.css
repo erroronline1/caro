@@ -343,7 +343,7 @@ nav {
 		width: auto;
 	}
 
-	div[data-for]:first-of-type > label {
+	div[data-for=userMenuApplication] > label {
 		border-radius: 50%;
 		background-size: cover;
 		background-repeat: no-repeat;

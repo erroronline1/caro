@@ -158,7 +158,7 @@ export const api = {
 						return;
 					}
 					if (data.body.image) {
-						const firstLabel = document.querySelector("nav>div:first-child>label");
+						const firstLabel = document.querySelector("[data-for=userMenuApplication]>label");
 						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
 						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
 					}

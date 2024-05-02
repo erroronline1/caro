@@ -70,11 +70,6 @@ class APPLICATION extends API {
 		// get permission based menu items
 		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
 		$menu=[
-			LANG::GET('menu.application_header') => [
-				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('get','login', 'null')"],
-				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
-				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
-			],
 			LANG::GET('menu.communication_header') => [
 				LANG::GET('menu.message_inbox') => ['onpointerup' => "api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
 				LANG::GET('menu.message_new') => ['onpointerup' => "api.message('get', 'message')"],
@@ -87,6 +82,11 @@ class APPLICATION extends API {
 			],
 			LANG::GET('menu.planning_header') => [
 				LANG::GET('menu.planning_calendar') => ['onpointerup' => "api.planning('get', 'calendar')"]
+			],
+			LANG::GET('menu.application_header') => [
+				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('get','login', 'null')"],
+				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
+				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
 			],
 			LANG::GET('menu.files_header') => [
 				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
