@@ -115,6 +115,7 @@ class CALENDAR {
 					'date' => $day->format('Y-m-d'),
 					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j'),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
+					'selected' => $date === $day->format('Y-m-d'),
 					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
 				];
 				if ($result['header']) continue;

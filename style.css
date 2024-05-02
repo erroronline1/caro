@@ -804,6 +804,9 @@ article > article {
 .today {
 	border: 2px solid var(--green);
 }
+.selected {
+	border: 2px solid var(--yellow);
+}
 .holiday {
 	opacity: 0.4;
 }

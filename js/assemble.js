@@ -131,7 +131,7 @@ export class Dialog {
 		if (this.type) {
 			if (this.type === "input") {
 				modal = "inputmodal";
-				if (!("content" in this.body)) this.body = { content: this.body };
+				if (this.body.content === undefined) this.body = { content: this.body };
 				this.assemble = new Assemble(this.body);
 			}
 			dialog = document.getElementById(modal);
@@ -1462,6 +1462,7 @@ export class Assemble {
 					api.planning('get', 'calendar', day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
+				if (day.selected) daytile.classList.add("selected");
 				if (day.holiday) daytile.classList.add("holiday");
 			}
 			cal.push(daytile);
