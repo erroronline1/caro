@@ -224,7 +224,7 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	content tinyint NULL" .
+				"	closed tinyint NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
