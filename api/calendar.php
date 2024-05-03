@@ -119,14 +119,14 @@ class CALENDAR {
 	 * returns a dialog script to contibute to the calendar
 	 * 
 	 * @param str $date event date Y-m-d
-	 * @param str $due due date Y-m-d
 	 * @param str $type calendar/alert type
-	 * @param str $organizational_unit comma separated preselected units
 	 * @param str $content event text
+	 * @param str $due due date Y-m-d
+	 * @param str $organizational_unit comma separated preselected units
 	 * @param int $id event database id for updating
 	 * 
 	 */
-	public function dialog($date = '', $due = '', $type = '', $organizational_unit = '', $content = '', $id = 0){
+	public function dialog($date = '', $type = '', $content = '', $due = '', $organizational_unit = '', $id = 0){
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
 			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true] : [];

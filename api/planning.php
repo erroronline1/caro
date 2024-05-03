@@ -134,7 +134,7 @@ class PLANNING extends API {
 								'type' => 'button',
 								'class' => 'inlinebutton',
 								'value' => LANG::GET('planning.event_edit'),
-								'onpointerup' => $calendar->dialog($row['date'], $row['due'], $row['type'], $row['organizational_unit'], $row['content'], $row['id'])
+								'onpointerup' => $calendar->dialog($row['date'], $row['type'], $row['content'], $row['due'], $row['organizational_unit'], $row['id'])
 									]
 						];	
 						$events[] = [
@@ -150,7 +150,7 @@ class PLANNING extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => LANG::GET('planning.event_new'),
-							'onpointerup' => $calendar->dialog($this->_requestedDate)
+							'onpointerup' => $calendar->dialog($this->_requestedDate, 'planning')
 						]
 					];
 					$result['body']['content'][] = $events;
