@@ -525,11 +525,11 @@ class SQLQUERY {
 
 		'calendar_post' => [
 			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, author, organizational_unit, content, completed) VALUES (NULL, :date, :due, :type, :author, :organizational_unit, :content, '')",
-			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, completed) VALUES (:date, :type, :due, :author, :organizational_unit, :content, '')",
+			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, completed) VALUES (CAST(:date AS DATE), CAST(:due AS DATE), :type, :author, :organizational_unit, :content, '')",
 		],
 		'calendar_put' => [
 			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET date = :date, due = :due, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET date = CAST(:date AS DATE), due = CAST(:due AS DATE), organizational_unit = :organizational_unit, content = :content WHERE id = :id",
 		],
 		'calendar_get-date' => [
 			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date",
