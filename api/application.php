@@ -236,11 +236,25 @@ class APPLICATION extends API {
 		// calendar
 		$calendar = new CALENDAR($this->_pdo);
 		$week = $calendar->render('week');
-		$result['body']['content'][] = [[
-			'type' => 'calendar',
-			'description' => $week['header'],
-			'content' => $week['content']
-		]];
+		$today = new DateTime('now');
+		$events = $calendar->getdate($today->format('Y-m-d'));
+		$displayevents = '';
+		foreach ($events as $row){
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayevents .= $row['content'] . "\n";
+		}
+		if (!strlen($displayevents)) $displayevents = LANG::GET('planning.events_none');
+		$result['body']['content'][] = [
+			[
+				'type' => 'calendar',
+				'description' => $week['header'],
+				'content' => $week['content']
+			],
+			[
+				'type' => 'text',
+				'description' => LANG::GET('planning.events_assigned_units'),
+				'content' => $displayevents
+			]
+		];
 
 		// manual
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
