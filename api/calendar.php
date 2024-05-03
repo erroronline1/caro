@@ -22,16 +22,18 @@ class CALENDAR {
 	 * ini settings avoiding repetitive calls
 	 */
 	private $_holidays = [];
+	private $_easter_holidays = [];
 	private $_workdays = [];
 
 	public function __construct($pdo){
 		$this->_pdo = $pdo;
 		$this->_holidays = preg_split('/[^\d-]+/', INI['calendar']['holidays']);
+		$this->_easter_holidays = INI['calendar']['easter_holidays'];
 		$this->_workdays = preg_split('/[^\d-]+/', INI['calendar']['workdays']);
 	}
 
 	/**
-	 * calculates holidays for given year, this has to be set up according to your local or company customs, germany baden-württemberg by default
+	 * calculates holidays for given year, according to setup.ini
 	 * no setting up on construction for possible year overlaps on week rendering
 	 */
 	private function holidays($year){
@@ -41,7 +43,7 @@ class CALENDAR {
 		$easter = new DateTime();
 		$easter->setTimestamp(easter_date($year)); //suppoed to be easter sunday but isn't?
 		$easter->modify('+1 day');
-		foreach(INI['calendar']['easter_holidays'] as $day => $offset){
+		foreach($this->_easter_holidays as $day => $offset){
 			$easterholiday = clone $easter;
 			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
 			$holidays[]= $easterholiday->format('Y-m-d');
@@ -86,6 +88,7 @@ class CALENDAR {
 
 	/**
 	 * renders a calendar view, for given date week starts on monday, month on 1st, weekday offsets are empty
+	 * calculates holidays for every date for possible year overlaps in selected view-type
 	 * 
 	 * @param string $type month|week
 	 * @param string $date yyyy-mm-dd
