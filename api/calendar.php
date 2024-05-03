@@ -103,9 +103,14 @@ class CALENDAR {
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
+				$events = $this->getdate($day->format('Y-m-d'));
+				$numbers = 0;
+				foreach ($events as $row){
+					if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $numbers++;
+				}
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
-					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j'),
+					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
 					'selected' => $date === $day->format('Y-m-d'),
 					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
@@ -188,9 +193,7 @@ class CALENDAR {
 	}
 
 	/**
-	 * @param str $date
-	 * @param str $type
-	 * @param str $organizational_unit
+	 * @param str $date Y-m-d
 	 */
 	public function getdate($date = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
@@ -201,9 +204,19 @@ class CALENDAR {
 	}
 
 	/**
+	 * @param str $earlier Y-m-d | null
+	 * @param str $later Y-m-d | null
+	 */
+	public function getdaterange($earlier = '', $later = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date-range'));
+		$statement->execute([
+			':earlier' => $earlier ? : '0001-01-01',
+			':later' => $later ? : '9999-12-31'
+		]);
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+	/**
 	 * @param int $id
-	 * @param str $type
-	 * @param str $organizational_unit
 	 */
 	public function get($id = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get'));
@@ -217,11 +230,11 @@ class CALENDAR {
 	 * @param str $date
 	 * @param str $due
 	 * @param str $type
-	 * @param int $author
+	 * @param str $author
 	 * @param str $organizational_unit
 	 * @param str $content
 	 */
-	public function post($date = '', $due = '', $type = '', $author = 0, $organizational_unit = '', $content = ''){
+	public function post($date = '', $due = '', $type = '', $author = '', $organizational_unit = '', $content = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_post'));
 		if ($statement->execute([
 			':date' => $date,
@@ -249,6 +262,7 @@ class CALENDAR {
 			':id' => $id,
 			':date' => $date,
 			':due' => $due,
+			':author' => $_SESSION['user']['name'], // no need to pass, system doesn't edit
 			':organizational_unit' => $organizational_unit,
 			':content' => $content,
 		]);
