@@ -116,6 +116,75 @@ class CALENDAR {
 	}
 
 	/**
+	 * returns a dialog script to contibute to the calendar
+	 * 
+	 * @param str $date event date Y-m-d
+	 * @param str $due due date Y-m-d
+	 * @param str $type calendar/alert type
+	 * @param str $organizational_unit comma separated preselected units
+	 * @param str $content event text
+	 * @param int $id event database id for updating
+	 * 
+	 */
+	public function dialog($date = '', $due = '', $type = '', $organizational_unit = '', $content = '', $id = 0){
+		$units = [];
+		foreach(LANGUAGEFILE['units'] as $unit => $description){
+			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true] : [];
+		}
+		if (!$due){
+			$due = new DateTime($date);
+			$due->modify('+' . INI['calendar']['default_due'] . ' months');
+			$due = $due->format('Y-m-d');
+		}
+		$inputs = [
+			[
+				'type' => 'scanner',
+				'attributes' => [
+					'value' => $content,
+					'name' => LANG::GET('planning.event_content')
+				]
+			],
+			[
+				'type' => 'dateinput',
+				'attributes' => [
+					'value' => $date,
+					'name' => LANG::GET('planning.event_date')
+				]
+			],
+			[
+				'type' => 'dateinput',
+				'attributes' => [
+					'value' => $due,
+					'name' => LANG::GET('planning.event_due')
+				]
+			],
+			[
+				'type' => 'checkbox',
+				'description' => LANG::GET('planning.event_organizational_unit'),
+				'content' => $units
+			],
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'value' => 'planning',
+					'name' => LANG::GET('planning.event_type')
+
+				]
+			],
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'value' => $id,
+					'name' => 'calendarEventId'
+
+				]
+			]
+		];
+		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('planning.event_cancel') . "': false, '" . LANG::GET('planning.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
+			".then(response => {if (response) {calendarClient.createFormData(response); api.planning('" . ($content ? 'put': 'post') . "', 'calendar');}})";
+	}
+
+	/**
 	 * @param str $date
 	 * @param str $type
 	 * @param str $organizational_unit

@@ -111,63 +111,6 @@ class PLANNING extends API {
 
 				if ($this->_requestedDate){
 					$events = [];
-					function dialog($date = '', $due = '', $type = '', $organizational_unit = '', $content = '', $id = 0){
-						$units = [];
-						foreach(LANGUAGEFILE['units'] as $unit => $description){
-							$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true] : [];
-						}
-						if (!$due){
-							$due = new DateTime($date);
-							$due->modify('+' . INI['calendar']['default_due'] . ' months');
-							$due = $due->format('Y-m-d');
-						}
-						$inputs = [
-							[
-								'type' => 'scanner',
-								'attributes' => [
-									'value' => $content,
-									'name' => LANG::GET('planning.event_content')
-								]
-							],
-							[
-								'type' => 'dateinput',
-								'attributes' => [
-									'value' => $date,
-									'name' => LANG::GET('planning.event_date')
-								]
-							],
-							[
-								'type' => 'dateinput',
-								'attributes' => [
-									'value' => $due,
-									'name' => LANG::GET('planning.event_due')
-								]
-							],
-							[
-								'type' => 'checkbox',
-								'description' => LANG::GET('planning.event_organizational_unit'),
-								'content' => $units
-							],
-							[
-								'type' => 'hiddeninput',
-								'attributes' => [
-									'value' => 'planning',
-									'name' => LANG::GET('planning.event_type')
-
-								]
-							],
-							[
-								'type' => 'hiddeninput',
-								'attributes' => [
-									'value' => $id,
-									'name' => 'calendarEventId'
-
-								]
-							]
-						];
-						return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('planning.event_cancel') . "': false, '" . LANG::GET('planning.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(response => {if (response) {calendarClient.createFormData(response); api.planning('" . ($content ? 'put': 'post') . "', 'calendar');}})";
-					}
 
 					$events[] = [
 						'type' => 'text',
@@ -191,7 +134,7 @@ class PLANNING extends API {
 								'type' => 'button',
 								'class' => 'inlinebutton',
 								'value' => LANG::GET('planning.event_edit'),
-								'onpointerup' => dialog($row['date'], $row['due'], $row['type'], $row['organizational_unit'], $row['content'], $row['id'])
+								'onpointerup' => $calendar->dialog($row['date'], $row['due'], $row['type'], $row['organizational_unit'], $row['content'], $row['id'])
 									]
 						];	
 						$events[] = [
@@ -207,7 +150,7 @@ class PLANNING extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => LANG::GET('planning.event_new'),
-							'onpointerup' => dialog($this->_requestedDate)
+							'onpointerup' => $calendar->dialog($this->_requestedDate)
 						]
 					];
 					$result['body']['content'][] = $events;
