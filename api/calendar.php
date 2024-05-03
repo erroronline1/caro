@@ -215,15 +215,16 @@ class CALENDAR {
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
+
 	/**
-	 * @param int $id
+	 * @param int $content
 	 */
-	public function get($id = 0){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get'));
+	public function search($content = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_search'));
 		$statement->execute([
-			':id' => $id
+			':content' => $content
 		]);
-		return $statement->fetch(PDO::FETCH_ASSOC);
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**

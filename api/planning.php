@@ -17,6 +17,54 @@ class PLANNING extends API {
 		$this->_requestedDate = $this->_requestedComplete = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
+	private function events($dbevents, $calendar){
+		$events = [];
+		foreach($dbevents as $row){
+			$display = LANG::GET('planning.event_due') . ': ' . $row['due'] . "\n" .
+				LANG::GET('planning.event_author') . ': ' . $row['author'] . "\n";
+			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
+
+			$completed[LANG::GET('planning.event_complete')] = ['onchange' => "api.planning('put', 'complete', " . $row['id'] . ", this.checked)"];
+			if ($row['completed']) {
+				$completed[LANG::GET('planning.event_complete')]['checked'] = true;
+				$row['completed'] = json_decode($row['completed'], true);
+				$display .= "\n" . LANG::GET('planning.event_completed_state', [':user' => $row['completed']['user'], ':date' => $row['completed']['date']]);
+			}
+
+			$events[] = [
+				'type' => 'tile',
+				'content' => [
+					[
+						'type' => 'text',
+						'description' => $row['content'],
+						'content' => $display
+					],
+					[
+						'type' => 'checkbox',
+						'content' => $completed
+					],
+					[
+						'type' => 'button',
+						'attributes' => [
+							'type' => 'button',
+							'value' => LANG::GET('planning.event_edit'),
+							'onpointerup' => $calendar->dialog($row['date'], $row['type'], $row['content'], $row['due'], $row['organizational_unit'], $row['id'])
+							]
+					],
+					[
+						'type' => 'deletebutton',
+						'attributes' => [
+							'value' => LANG::GET('planning.event_delete'),
+							'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('planning.event_delete') . " " . $row['content'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('planning.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+								".then(confirmation => {if (confirmation) api.planning('delete', 'calendar', " . $row['id'] . ");});"
+						]
+					]
+				]
+			];
+		}
+		return $events;
+	}
+
 	public function calendar(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$calendar = new CALENDAR($this->_pdo);
@@ -87,6 +135,21 @@ class PLANNING extends API {
 
 				$result['body']['content'][] = [
 					[
+						'type' => 'scanner',
+						'destination' => 'recordfilter',
+						'description' => LANG::GET('assemble.scan_button')
+					], [
+						'type' => 'searchinput',
+						'attributes' => [
+							'id' => 'recordfilter',
+							'name' => LANG::GET('planning.event_search'),
+							'onkeypress' => "if (event.key === 'Enter') {api.planning('get', 'search', this.value); return false;}",
+							'onblur' => "api.planning('get', 'search', this.value); return false;",
+							]
+					]
+				];
+				$result['body']['content'][] = [
+					[
 						'type' => 'calendar',
 						'description' => $month['header'],
 						'content' => $month['content']
@@ -122,48 +185,8 @@ class PLANNING extends API {
 					];
 
 					$dbevents = $calendar->getdate($this->_requestedDate);
-					foreach($dbevents as $row){
-						$display = LANG::GET('planning.event_due') . ': ' . $row['due'] . "\n" .
-							LANG::GET('planning.event_author') . ': ' . $row['author'];
+					if ($dbevents) array_push($events, ...$this->events($dbevents, $calendar));
 
-						$completed[LANG::GET('planning.event_complete')] = ['onchange' => "api.planning('put', 'complete', " . $row['id'] . ", this.checked)"];
-						if ($row['completed']) {
-							$completed[LANG::GET('planning.event_complete')]['checked'] = true;
-							$row['completed'] = json_decode($row['completed'], true);
-							$display .= "\n" . LANG::GET('planning.event_completed_state', [':user' => $row['completed']['user'], ':date' => $row['completed']['date']]);
-						}
-
-						$events[] = [
-							'type' => 'tile',
-							'content' => [
-								[
-									'type' => 'text',
-									'description' => $row['content'],
-									'content' => $display
-								],
-								[
-									'type' => 'checkbox',
-									'content' => $completed
-								],
-								[
-									'type' => 'button',
-									'attributes' => [
-										'type' => 'button',
-										'value' => LANG::GET('planning.event_edit'),
-										'onpointerup' => $calendar->dialog($row['date'], $row['type'], $row['content'], $row['due'], $row['organizational_unit'], $row['id'])
-										]
-								],
-								[
-									'type' => 'deletebutton',
-									'attributes' => [
-										'value' => LANG::GET('planning.event_delete'),
-										'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('planning.event_delete') . " " . $row['content'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('planning.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-											".then(confirmation => {if (confirmation) api.planning('delete', 'calendar', " . $row['id'] . ");});"
-									]
-								]
-							]
-						];
-					}
 					$events[] = [
 						'type' => 'button',
 						'attributes' => [
@@ -186,6 +209,39 @@ class PLANNING extends API {
 		$this->response($result);
 	}
 	
+	public function search(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!$this->_requestedId) $this->calendar();
+		$result = ['body' => ['content' => [
+			[
+				[
+					'type' => 'scanner',
+					'destination' => 'recordfilter',
+					'description' => LANG::GET('assemble.scan_button')
+				], [
+					'type' => 'searchinput',
+					'attributes' => [
+						'id' => 'recordfilter',
+						'name' => LANG::GET('planning.event_search'),
+						'onkeypress' => "if (event.key === 'Enter') {api.planning('get', 'search', this.value); return false;}",
+						'onblur' => "api.planning('get', 'search', this.value); return false;",
+					]
+				]
+			]
+		]]];
+		$calendar = new CALENDAR($this->_pdo);
+		$dbevents = $calendar->search($this->_requestedId);
+		$events = [
+			[
+				'type' => 'text',
+				'description' => LANG::GET ('planning.events_none')
+			]
+		];
+		if ($dbevents) $events = $this->events($dbevents, $calendar);
+		$result['body']['content'][] = $events;
+		$this->response($result);
+	}
+
 	public function complete(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$calendar = new CALENDAR($this->_pdo);

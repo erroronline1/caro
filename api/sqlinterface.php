@@ -543,6 +543,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_calendar WHERE date >= :earlier and date <= :later ORDER BY due ASC",
 			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date >= CAST(:earlier AS DATE) and date <= CAST(:later AS DATE) ORDER BY due ASC",
 		],
+		'calendar_search' => [
+			'mysql' => "SELECT * FROM caro_calendar WHERE LOWER(content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY due ASC",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE LOWER(content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY due ASC",
+		],
 		'calendar_delete' => [
 			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
