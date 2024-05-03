@@ -531,6 +531,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, author = :author, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET date = CAST(:date AS DATE), due = CAST(:due AS DATE), author = :author, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
 		],
+		'calendar_complete' => [
+			'mysql' => "UPDATE caro_calendar SET completed = :completed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET completed = :completed WHERE id = :id",
+		],
 		'calendar_get-date' => [
 			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",
 			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",

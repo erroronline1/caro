@@ -698,7 +698,12 @@ export const api = {
 				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
 				break;
 			case "put":
-				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
+				switch(request[1]){
+					case 'complete':
+						break;
+					default:
+						payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
+				}
 				break;
 			case "delete":
 				break;

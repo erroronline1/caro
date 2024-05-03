@@ -251,10 +251,8 @@ class CALENDAR {
 	 * @param int $id
 	 * @param str $date
 	 * @param str $due
-	 * @param str $type
 	 * @param str $organizational_unit
 	 * @param str $content
-	 * @param str $completed
 	 */
 	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
@@ -265,6 +263,19 @@ class CALENDAR {
 			':author' => $_SESSION['user']['name'], // no need to pass, system doesn't edit
 			':organizational_unit' => $organizational_unit,
 			':content' => $content,
+		]);
+	}
+
+	/**
+	 * @param int $id
+	 * @param any $complete boolval false will clear
+	 */
+	public function complete($id = 0, $complete = null){
+		if ($complete) $complete = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_complete'));
+		return $statement->execute([
+			':id' => $id,
+			':completed' => $complete ? json_encode($complete) : '',
 		]);
 	}
 
