@@ -975,7 +975,7 @@ exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landsc
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
-* calendar.php contains the calendar-class. It computes fixed holidays as defined within setup.ini as well as moving holidays according to easter. If any of these (good friday, easter monday, acension, pentecost, corpus christi) are not a holiday for your company you will have to edit the function holidays() to not add these to the result.
+* calendar.php contains the calendar-class. It computes fixed holidays as defined within setup.ini as well as moving holidays according to easter. Comment not applicable holidays out.
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.

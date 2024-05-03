@@ -26,8 +26,8 @@ class CALENDAR {
 
 	public function __construct($pdo){
 		$this->_pdo = $pdo;
-		$this->_holidays = preg_split('/[^\d-]/', INI['calendar']['holidays']);
-		$this->_workdays = preg_split('/[^\d-]/', INI['calendar']['workdays']);
+		$this->_holidays = preg_split('/[^\d-]+/', INI['calendar']['holidays']);
+		$this->_workdays = preg_split('/[^\d-]+/', INI['calendar']['workdays']);
 	}
 
 	/**
@@ -37,26 +37,15 @@ class CALENDAR {
 	private function holidays($year){
 		$holidays = $this->_holidays;
 		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
-		$easter = new DateTime();
-		$easter->setTimestamp(easter_date($year));
-		$easter->modify('+1 days');
-		$holidays[]= $easter->format('Y-m-d');
-		//good friday
-		$easter->modify('-2 days');
-		$holidays[]= $easter->format('Y-m-d');
-		//easter monday
-		$easter->modify('+3 days');
-		$holidays[]= $easter->format('Y-m-d');
-		//ascension
-		$easter->modify('+38 days');
-		$holidays[]= $easter->format('Y-m-d');
-		//pentecoste
-		$easter->modify('+11 days');
-		$holidays[]= $easter->format('Y-m-d');
-		//corpus christi
-		$easter->modify('+10 days');
-		$holidays[]= $easter->format('Y-m-d');
 
+		$easter = new DateTime();
+		$easter->setTimestamp(easter_date($year)); //suppoed to be easter sunday but isn't?
+		$easter->modify('+1 day');
+		foreach(INI['calendar']['easter_holidays'] as $day => $offset){
+			$easterholiday = clone $easter;
+			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
+			$holidays[]= $easterholiday->format('Y-m-d');
+		}
 		return $holidays;
 	}
 
