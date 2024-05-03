@@ -61,7 +61,7 @@ class CALENDAR {
 	 */
 	private function days($type = '', $date = ''){
 		$result = [];
-		$date = new DateTime($date ? : 'now');
+		$date = new DateTime($date ? : 'now', new DateTimeZone(INI['timezone']));
 		if ($type === 'week') {
 			$date->modify('- ' . ($date->format('N') - 1) . ' days');
 			while ($date->format('N') < 7){
@@ -99,7 +99,7 @@ class CALENDAR {
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($type, $date);
 
-		$today = new DateTime('now');
+		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
@@ -142,7 +142,7 @@ class CALENDAR {
 		}
 		$alert = [LANG::GET('planning.event_alert') => $alert ? ['checked' => true] : []];
 		if (!$due){
-			$due = new DateTime($date);
+			$due = new DateTime($date, new DateTimeZone(INI['timezone']));
 			$due->modify('+' . INI['calendar']['default_due'] . ' months');
 			$due = $due->format('Y-m-d');
 		}

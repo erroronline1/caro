@@ -92,7 +92,7 @@ class PLANNING extends API {
 				];
 				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('planning.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':due']){
-					$due = new DateTime($event[':date']);
+					$due = new DateTime($event[':date'], new DateTimeZone(INI['timezone']));
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':due'] = $due->format('Y-m-d');	
 				}
@@ -120,7 +120,7 @@ class PLANNING extends API {
 				];
 				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('planning.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':due']){
-					$due = new DateTime($event[':date']);
+					$due = new DateTime($event[':date'], new DateTimeZone(INI['timezone']));
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':due'] = $due->format('Y-m-d');	
 				}

@@ -244,7 +244,7 @@ class APPLICATION extends API {
 		];
 
 		$displayevents = '';
-		$today = new DateTime('now');
+		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		$events = $calendar->getdate($today->format('Y-m-d'));
 		foreach ($events as $row){
 			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $displayevents .= "* " . $row['content'] . "\n";
