@@ -528,16 +528,16 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, completed) VALUES (CAST(:date AS DATE), CAST(:due AS DATE), :type, :author, :organizational_unit, :content, '')",
 		],
 		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET date = CAST(:date AS DATE), due = CAST(:due AS DATE), organizational_unit = :organizational_unit, content = :content WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, author = :author, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET date = CAST(:date AS DATE), due = CAST(:due AS DATE), author = :author, organizational_unit = :organizational_unit, content = :content WHERE id = :id",
 		],
 		'calendar_get-date' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date",
+			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",
 		],
-		'calendar_get' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE id = :id",
+		'calendar_get-date-range' => [
+			'mysql' => "SELECT * FROM caro_calendar WHERE date >= :earlier and date <= :later ORDER BY due ASC",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date >= CAST(:earlier AS DATE) and date <= CAST(:later AS DATE) ORDER BY due ASC",
 		],
 		'calendar_delete' => [
 			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
