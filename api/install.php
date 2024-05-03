@@ -337,8 +337,8 @@ $queries = [
 				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	date smalldatetime NOT NULL," .
-				"	due smalldatetime NOT NULL," .
+				"	date date NOT NULL," .
+				"	due date NOT NULL," .
 				"	type varchar(MAX) NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
