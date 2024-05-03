@@ -192,7 +192,7 @@ class CALENDAR {
 	 * @param str $type
 	 * @param str $organizational_unit
 	 */
-	public function getdate($date = '', $type = '', $organizational_unit = ''){
+	public function getdate($date = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
 		$statement->execute([
 			':date' => $date
