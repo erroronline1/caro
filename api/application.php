@@ -234,27 +234,40 @@ class APPLICATION extends API {
 		if (count($tiles)) $result['body']['content'][] = $tiles;
 
 		// calendar
+		$overview = [];
 		$calendar = new CALENDAR($this->_pdo);
 		$week = $calendar->render('week');
+		$overview[] = [
+			'type' => 'calendar',
+			'description' => $week['header'],
+			'content' => $week['content']
+		];
+
+		$displayevents = '';
 		$today = new DateTime('now');
 		$events = $calendar->getdate($today->format('Y-m-d'));
-		$displayevents = '';
 		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayevents .= $row['content'] . "\n";
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $displayevents .= "* " . $row['content'] . "\n";
 		}
-		if (!strlen($displayevents)) $displayevents = LANG::GET('planning.events_none');
-		$result['body']['content'][] = [
-			[
-				'type' => 'calendar',
-				'description' => $week['header'],
-				'content' => $week['content']
-			],
-			[
-				'type' => 'text',
-				'description' => LANG::GET('planning.events_assigned_units'),
-				'content' => $displayevents
-			]
+		if ($displayevents) $overview[] = [
+			'type' => 'text',
+			'description' => LANG::GET('planning.events_assigned_units'),
+			'content' => $displayevents
 		];
+
+		$today->modify('-1 day');
+		$events = $calendar->getdaterange(null, $today->format('Y-m-d'));
+		$uncompleted = [];
+		foreach ($events as $row){
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $uncompleted[$row['content'] . " (" . $row['date'] . ")"] = ['href' => "javascript:api.planning('get', 'calendar', '" . $row['date'] . "', '" . $row['date'] . "')"];
+		}
+		if ($uncompleted) $overview[] = [
+			'type' => 'links',
+			'description' => LANG::GET('planning.events_assigned_units_uncompleted'),
+			'content' => $uncompleted
+		];
+
+		$result['body']['content'][] = $overview;
 
 		// manual
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
