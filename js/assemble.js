@@ -1386,7 +1386,7 @@ export class Assemble {
 			content: [] array of any defined type
 		} */
 		let article = document.createElement("article");
-		article = this.apply_attributes(this.currentElement.attributes, article);
+		if (this.currentElement.attributes !== undefined) article = this.apply_attributes(this.currentElement.attributes, article);
 		for (const element of this.currentElement.content) {
 			this.currentElement = element;
 			article.append(...this[element.type]());
