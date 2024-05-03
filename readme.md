@@ -33,7 +33,6 @@
 # open tasks
 
 #### todo application
-* assemble alert (date) field to contribute to calendar?
 * ux tabs?
 * hash sum check for data completeness?
 
