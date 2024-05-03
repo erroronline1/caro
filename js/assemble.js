@@ -1457,7 +1457,11 @@ export class Assemble {
 			daytile.classList = "day";
 			if (day !== null) {
 				daytile.classList.add("displayDay");
-				daytile.append(document.createTextNode(day.display));
+				let display = day.display.split('\n');
+				for (const line of display){
+					daytile.append(document.createTextNode(line));
+					daytile.append(document.createElement('br'));
+				}
 				daytile.onpointerup = function () {
 					api.planning('get', 'calendar', day.date, day.date);
 				};
