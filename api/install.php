@@ -174,6 +174,7 @@ $queries = [
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`completed` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`alert` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				],
@@ -343,7 +344,8 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	completed varchar(MAX) NOT NULL" .
+				"	completed varchar(MAX) NOT NULL," .
+				"	alert tinyint NULL" .
 				");"
 				],
 			'insertions' => [

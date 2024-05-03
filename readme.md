@@ -52,7 +52,6 @@
 * vendor evaluation
 
 #### todo planning
-* weekly schedule planning
 * list / reminder for unfinished cases, current state
 
 #### todo records
@@ -66,8 +65,6 @@
 
 #### todo misc
 * user selectable color themes?
-* calendar and alerts
-* improved landing page
 * message ordering and categorizing, displaying left and right
 * risk management?
 
@@ -429,14 +426,37 @@ This source can also be used to provide documents that are [unsuitable to be fil
 [Content](#Content)
 
 ### Planning
-Add events to the calendar. The landing page gives a brief overview of weekly and daily events at a quick glance. Planning and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
+Add events to the calendar. The landing page gives a brief overview of weekly and daily events at a quick glance. Events can be added by every user, editing and deleting is permitted to elevated users including supervisors only.
 
-Events may trigger a [message](#messages) to a defined user group.
+Events may trigger a [message](#messages) to a defined user group if set.
 
 You may choose to fully use this calendar for your operations and appointments but it is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place. You're free to use Outlook and the like along. The calendar only processed dates and no times anyway.
 
-Displayed calendars do display weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then to not being overlooked.
+Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
 
+Planning and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
+
+```mermaid
+graph TD;
+    calendar((calendar))-->select_day[select day];
+    calendar-->search[search];
+    select_day-->database[(calendar db)];
+    search-->database;
+    database-->matches["display matches
+    for assigned units"];
+    matches-->permission{"admin, ceo,
+    qmo,
+    supervisor"};
+    permission-->|yes|edit[edit or delete];
+    permission-->|no|complete[mark as completed];
+    edit-->complete;
+    database-->alert["alert selected unit members once"]
+
+    landing_page((landing page))-->summary["calendar week,
+    current events,
+    uncompleted past events"];
+    summary-->select_day
+```
 [Content](#Content)
 
 ### Vendor and product management

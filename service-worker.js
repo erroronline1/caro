@@ -12,6 +12,13 @@ addEventListener("message", async (message) => {
 	switch (message.data) {
 		case "getnotifications":
 			const response = {};
+
+			await fetch("api/api.php/planning/alert/", {
+				method: "GET",
+				cache: "no-cache",
+				body: null,
+			});
+
 			let messages = await fetch("api/api.php/message/notification/", {
 				method: "GET",
 				cache: "no-cache",
@@ -53,6 +60,7 @@ addEventListener("message", async (message) => {
 			if (orders) {
 				response["unprocessed"] = orders.body.unprocessed;
 			}
+
 			if (Object.keys(response).length !== 0) client.postMessage(response);
 			break;
 	}

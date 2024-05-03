@@ -131,14 +131,16 @@ class CALENDAR {
 	 * @param str $content event text
 	 * @param str $due due date Y-m-d
 	 * @param str $organizational_unit comma separated preselected units
+	 * @param int $alert event triggers message
 	 * @param int $id event database id for updating
 	 * 
 	 */
-	public function dialog($date = '', $type = '', $content = '', $due = '', $organizational_unit = '', $id = 0){
+	public function dialog($date = '', $type = '', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
-			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true] : [];
+			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
+		$alert = [LANG::GET('planning.event_alert') => $alert ? ['checked' => true] : []];
 		if (!$due){
 			$due = new DateTime($date);
 			$due->modify('+' . INI['calendar']['default_due'] . ' months');
@@ -172,6 +174,11 @@ class CALENDAR {
 				'content' => $units
 			],
 			[
+				'type' => 'checkbox',
+				'description' => LANG::GET('planning.event_alert_description'),
+				'content' => $alert
+			],
+			[
 				'type' => 'hiddeninput',
 				'attributes' => [
 					'value' => 'planning',
@@ -199,6 +206,16 @@ class CALENDAR {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
 		$statement->execute([
 			':date' => $date
+		]);
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * @param str $date Y-m-d
+	 */
+	public function alert($date = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_alert'));
+		$statement->execute([
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -234,8 +251,9 @@ class CALENDAR {
 	 * @param str $author
 	 * @param str $organizational_unit
 	 * @param str $content
+	 * @param int $alert
 	 */
-	public function post($date = '', $due = '', $type = '', $author = '', $organizational_unit = '', $content = ''){
+	public function post($date = '', $due = '', $type = '', $author = '', $organizational_unit = '', $content = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_post'));
 		if ($statement->execute([
 			':date' => $date,
@@ -243,7 +261,8 @@ class CALENDAR {
 			':type' => $type,
 			':author' => $author,
 			':organizational_unit' => $organizational_unit,
-			':content' => $content
+			':content' => $content,
+			':alert' => $alert
 		])) return $this->_pdo->lastInsertId();
 		return false;
 	}
@@ -254,8 +273,9 @@ class CALENDAR {
 	 * @param str $due
 	 * @param str $organizational_unit
 	 * @param str $content
+	 * @param int $alert
 	 */
-	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = ''){
+	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
 		return $statement->execute([
 			':id' => $id,
@@ -264,6 +284,7 @@ class CALENDAR {
 			':author' => $_SESSION['user']['name'], // no need to pass, system doesn't edit
 			':organizational_unit' => $organizational_unit,
 			':content' => $content,
+			':alert' => $alert
 		]);
 	}
 

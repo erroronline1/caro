@@ -105,7 +105,7 @@ const calendarClient = {
 		window.calendarFormData = new FormData();
 		units = [];
 		for (const [key, value] of Object.entries(data)) {
-			if (value === "on") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+			if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 			else window.calendarFormData.append(key, value);
 		}
 		window.calendarFormData.append(LANG.GET("planning.event_organizational_unit"), units.join(","));

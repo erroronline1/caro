@@ -1111,3 +1111,7 @@ button[data-type="submitbutton"]::before {
 [data-type="record"]::before {
 	background-image: url("./media/file-signature.svg");
 }
+
+[data-type="alert"]::before {
+	background-image: url("./media/bell.svg");
+}
