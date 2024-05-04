@@ -289,6 +289,19 @@ class PLANNING extends API {
 			$this->alertUserGroup(['unit' => explode(',', $event['organizational_unit'])], LANG::GET('planning.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
 		}
 	}
+
+	public function notification (){
+		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
+		$calendar = new CALENDAR($this->_pdo);
+		$events = $calendar->getdaterange(null, date('Y-m-d'));
+		$uncompleted = 0;
+		foreach ($events as $row){
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $uncompleted++;
+		}
+		$this->response([
+			'uncompletedevents' => $uncompleted
+		]);
+	}
 }
 
 $api = new PLANNING();

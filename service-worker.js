@@ -19,6 +19,27 @@ addEventListener("message", async (message) => {
 				body: null,
 			});
 
+			let events = await fetch("api/api.php/planning/notification/", {
+				method: "GET",
+				cache: "no-cache",
+				body: null,
+			}).then(
+				async (response) => {
+					if (response.statusText === "OK")
+						return {
+							status: response.status,
+							body: await response.json(),
+						};
+					else return undefined;
+				},
+				() => {
+					return undefined;
+				}
+			);
+			if (events) {
+				response["uncompletedevents"] = events.body.uncompletedevents;
+			}
+
 			let messages = await fetch("api/api.php/message/notification/", {
 				method: "GET",
 				cache: "no-cache",
