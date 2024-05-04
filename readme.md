@@ -43,6 +43,7 @@
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
+* batch deactivate inaccessible products?
 
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
@@ -1053,7 +1054,7 @@ while setting up a vendor an import rule must be defined like:
         ]
     },
     "modify": {
-   	    "add": {
+        "add": {
             "trading_good": "0"
         },
         "replace":[
