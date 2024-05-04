@@ -42,6 +42,8 @@
 * calendar link - add event - match identifier for possibly related events
 
 #### todo purchase
+* csvprocessor: modify conditional [column1, regex, column2, value]
+
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
