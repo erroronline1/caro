@@ -265,6 +265,7 @@ export const api = {
 					case "exportchecks":
 					case "exportforms":
 					case "exportvendors":
+					case "exportregulatory":
 						break;
 					default:
 						successFn = function (data) {

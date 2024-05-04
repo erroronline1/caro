@@ -48,6 +48,9 @@ class AUDIT extends API {
 		// vendor list
 		$selecttypes[LANG::GET('audit.checks_type.vendors')] = ['value' => 'vendors'];
 		if ($this->_requestedType==='vendors') $selecttypes[LANG::GET('audit.checks_type.vendors')]['selected'] = true;
+		// regulatory issues
+		$selecttypes[LANG::GET('audit.checks_type.regulatory')] = ['value' => 'regulatory'];
+		if ($this->_requestedType==='regulatory') $selecttypes[LANG::GET('audit.checks_type.regulatory')]['selected'] = true;
 
 		$result['body']['content'][] = [
 			[
@@ -496,6 +499,90 @@ class AUDIT extends API {
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'body' => $body,
+		]);
+	}
+
+	/**
+	 * returns regulatory items according to language.xx.ini and matches current assigned forms
+	 */
+	public function regulatory(){
+		$content = $issues = [];
+		// prepare existing forms lists
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
+		$statement->execute();
+		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = $regulatory = [];
+		foreach($fd as $key => $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $hidden)) {
+				foreach(explode(',', $row['regulatory_context']) as $regulatory_context){
+					$regulatory[$regulatory_context][] = $row['name'] . ' (' . $row['date'] . ')';
+				}
+			}
+		}
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'exportregulatory')"
+				]
+			]
+		];
+		foreach(LANGUAGEFILE['regulatory'] as $key => $issue){
+			if (array_key_exists($key, $regulatory)) $issues[] = [
+				'type' => 'text',
+				'description' => $issue,
+				'content' => implode("\n", $regulatory[$key])
+			];
+			else $issues[] = [
+				'type' => 'text',
+				'description' => $issue,
+				'content' => LANG::GET('audit.regulatory_warning_content')
+			];
+		}
+		$content[] = $issues;
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for the regulatory issue result
+	 * processes the result of $this->regulatory() and translates the body object into more simple strings
+	 */
+	public function exportregulatory(){
+		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.regulatory') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.regulatory'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$issues = $this->regulatory();
+		foreach($issues[1] as $item){
+			$summary['content'][$item['description']] = $item['content'];	
+		}
+
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
 		$body = [];
 		array_push($body, 
 			[[
