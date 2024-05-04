@@ -8,43 +8,31 @@ class CONSUMABLES extends API {
 	private $_requestedID = null;
 	private $filtersample = <<<'END'
 	{
-	  "info": "more rules may apply, see documentation if neccessary",
-	  "filesettings": {
-	    "columns": [
-	      "ArticleNo",
-	      "Name",
-	      "Unit",
-	      "EAN"
-	    ]
-	  },
-	  "modify": {
-	    "rewrite": {
-	      "article_no": ["ArticleNo"],
-	      "article_name": ["Name"],
-	      "article_unit": ["Unit"],
-	      "article_ean": ["EAN"]
-	    }
-	  }
-	}
-	END;
-
-	private $tradingsample = <<<'END'
-	{
-	  "filesetting": {
-	    "columns": ["article_no", "article_name"]
-	  },
-	  "filter": [
-	    {
-	      "apply": "filter_by_expression",
-	      "comment": "delete unnecessary products",
-	      "keep": false
-	      "match": {
-	        "all": {
-	          "article_name": "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOOD (OR DON'T IN ACCORDANCE TO keep-FLAG)"
-	        }
-	      }
-	    }
-	  ]
+		"filesettings": {
+			"columns": [
+				"Article Number",
+				"Article Name",
+				"EAN",
+				"Sales Unit"
+			]
+		},
+		"modify": {
+			   "add": {
+				"trading_good": "0"
+			},
+			"replace":[
+				["EAN", "\\s+", ""]
+			],
+			"conditional": [
+				["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+			],
+			"rewrite": [{
+				"article_no": ["Article Number"],
+				"article_name": ["Article Name"],
+				"article_ean": ["EAN"],
+				"article_unit": ["Sales Unit"]
+			}]
+		}
 	}
 	END;
 
@@ -111,7 +99,7 @@ class CONSUMABLES extends API {
 					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
 					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
 					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
-					':trading_good' => 0,
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
 					':incorporated' => $remainder[$update]['incorporated']
 				]) . '; ');
 			}
@@ -126,7 +114,7 @@ class CONSUMABLES extends API {
 					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
 					':active' => 1,
 					':protected' => 0,
-					':trading_good' => 0,
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
 					':incorporated' => 'NULL'
 				];
 			}
@@ -145,45 +133,6 @@ class CONSUMABLES extends API {
 			return $date;
 		}
 		return '';
-	}
-
-	/**
-	 * updates product database according to filter setting trading good flag
-	 * 
-	 * chunkifies requests to avoid overflow
-	 */
-	private function update_trading_goods($filter, $vendorID){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
-		$statement->execute([
-			':search' => $vendorID
-		]);
-		$vendorProducts = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$assignedArticles = [];
-		foreach($vendorProducts as $row) {
-			$assignedArticles[] = ['id' => $row['id'], 'article_no' => $row['article_no'] ];
-		}
-		$filter = json_decode($filter, true);
-		$filter['filesetting']['source'] = $vendorProducts;
-		$pricelist = new Listprocessor($filter);
-		$sqlchunks = [];
-		if (count($pricelist->_list[1])){
-			$ids = [];
-			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($assignedArticles, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$ids[] = $pricelist->_list[1][$index]['id'];
-			}
-			$sqlchunks = SQLQUERY::CHUNKIFY_IN(SQLQUERY::PREPARE('consumables_put-trading-good'), ':ids', $ids);
-			foreach ($sqlchunks as $chunk){
-				$statement = $this->_pdo->prepare($chunk);
-				try {
-					$statement->execute();
-				}
-				catch (Exception $e) {
-					echo $e, $chunk;
-					die();
-				}
-			}
-		}
-		return;
 	}
 
 	/**
@@ -448,7 +397,7 @@ class CONSUMABLES extends API {
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
 					'info' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info')),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
-					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter')), 'trading_goods' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_trading_filter'))],
+					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
 					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . date('Ymd')
 				];
 				
@@ -458,7 +407,6 @@ class CONSUMABLES extends API {
 
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
-				if ($vendor['pricelist']['trading_goods'] && !json_decode($vendor['pricelist']['trading_goods'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter_json_error', ), 'type' => 'error']]);
 
 				// save certificate
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
@@ -507,7 +455,6 @@ class CONSUMABLES extends API {
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
-				$vendor['pricelist']['trading_goods'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_trading_filter'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
@@ -515,7 +462,6 @@ class CONSUMABLES extends API {
 
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
-				if ($vendor['pricelist']['trading_goods'] && !json_decode($vendor['pricelist']['trading_goods'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter_json_error', ), 'type' => 'error']]);
 
 				// save certificate
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
@@ -530,9 +476,6 @@ class CONSUMABLES extends API {
 				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
-					if (!$pricelistImportError && $vendor['pricelist']['trading_goods']){
-						$this->update_trading_goods($vendor['pricelist']['trading_goods'], $vendor['id']);
-					}
 				}
 
 				// tidy up consumable products database if inactive
@@ -582,7 +525,7 @@ class CONSUMABLES extends API {
 					'active' => 0,
 					'info' => '',
 					'certificate' => '{"validity":""}',
-					'pricelist' => '{"validity":"", "filter": "", "trading_goods": ""}'
+					'pricelist' => '{"validity":"", "filter": ""}'
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
 					$result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -698,16 +641,6 @@ class CONSUMABLES extends API {
 									'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 									'value' => $vendor['pricelist']['filter'] ? : '',
 									'placeholder' => $this->filtersample,
-									'rows' => 8
-								]
-							]
-						], [
-							[
-								'type' => 'textarea',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_pricelist_trading_filter'),
-									'value' => array_key_exists('trading_goods', $vendor['pricelist']) && $vendor['pricelist']['trading_goods'] ? $vendor['pricelist']['trading_goods'] : '',
-									'placeholder' => $this->tradingsample,
 									'rows' => 8
 								]
 							]

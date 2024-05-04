@@ -26,7 +26,6 @@
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
-    * [Sample check](#sample-check)
 * [Ressources](#ressources)
 
 
@@ -42,8 +41,6 @@
 * calendar link - add event - match identifier for possibly related events
 
 #### todo purchase
-* csvprocessor: modify conditional [column1, regex, column2, value]
-
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
@@ -124,7 +121,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Vendor and product editing is permitted by elevated users including purchase only.
     * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.4.3 Verification of procured products
-    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#sample-check) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
+    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
     * Sample check information is to be enriched through a dedicated form with the respective context.
     * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.5.1 Control of production and service
@@ -472,8 +469,7 @@ graph TD;
     manage_vendors-->new_vendor[new vendor];
     edit_vendor-->add_vinfo["add documents,
     update info,
-    set pricelist filter,
-    trade goods filter"];
+    set pricelist filter"];
     new_vendor-->add_vinfo;
     add_vinfo-->import_pricelist[import pricelist];
     import_pricelist-->delete_all_products[delete all products];
@@ -484,10 +480,9 @@ graph TD;
     (protected)"};
     has_docs2-->|yes|update[update based on ordernumber];
     has_docs2-->|no|delete[delete];
-    delete-->|reinserted from pricelist|apply_trade[apply trade good filter];
-    apply_trade-->orderable(orderable);
+    delete-->|reinserted from pricelist|orderable(orderable);
     delete-->|not in pricelist|inorderable(not available in orders)
-    update-->apply_trade;
+    update-->orderable;
 
     manage_products((manage products))-->edit_product[edit existing product];
     manage_products-->add_product[add new product];
@@ -699,6 +694,7 @@ Description of options:
 		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
 				   Original columns will be omitted, nested within a list to make sure to order as given
 		"translate": Column values to be translated according to specified translation object
+		"conditional": changes a columns value if regex matches on other columns, adds column by default with empty value
 
 	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
@@ -848,7 +844,10 @@ A generic sample:
         ],
         "translate":{
             "DEPARTMENT": "departments"
-        }
+        },
+		"conditional":[
+			["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+		]
     },
     "split":{
         "DEPARTMENT": "(.*)",
@@ -907,7 +906,8 @@ Tested devices:
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount
+* php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 2 minutes on SQL Server
     * pricelist import @ 660k rows currently takes about 4 minutes to import and process on Uniform Server, 10 minutes on SQL Server
 * php.ini enable extensions:
@@ -928,7 +928,11 @@ Tested devices:
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
 
 ```
+; application language
 language = "en" ; en, de, etc. according to available language.xx.ini files
+
+; timezone for calendar handling
+timezone = "Europe/Berlin"
 
 [lifespan]
 sharepoint =  48 ; HOURS, after these files will be deleted
@@ -943,6 +947,20 @@ products_per_slide = 6
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 mdr14_sample_interval = 365 ; days until a new sample check is required
 mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
+
+[calendar]
+holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
+; comment out if any of these holidays don't apply
+; second key is just for comprehension, value is offset to easter sunday
+; easter_holidays[maundy_thursday] = -3
+easter_holidays[good_friday] = -2
+; easter_holidays[holy_saturday] = -1
+easter_holidays[easter_monday] = 1
+easter_holidays[ascension] = 39
+easter_holidays[pentecost] = 50
+easter_holidays[corpus_christi] = 60
+workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
+default_due = 12 ; events are due in x months by default
 
 ; forbidden names as regex-patterns
 [forbidden]
@@ -973,6 +991,13 @@ record[marginright] = 15 ; in points
 record[marginbottom] = 15 ; in points
 record[marginleft] = 20 ; in points
 exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
+
+; default values for csv processing if left out of filter rules
+[csv]
+headerrowindex = 0
+dialect["separator"] = ";"
+dialect["enclosure"] = "\""
+dialect["escape"] = ""
 ```
 
 #### Useage notes and caveats
@@ -1029,12 +1054,21 @@ while setting up a vendor an import rule must be defined like:
         ]
     },
     "modify": {
-        "rewrite": {
+   	    "add": {
+            "trading_good": "0"
+        },
+        "replace":[
+            ["EAN", "\\s+", ""]
+        ],
+        "conditional": [
+            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+        ],
+        "rewrite": [{
             "article_no": ["Article Number"],
             "article_name": ["Article Name"],
             "article_ean": ["EAN"],
             "article_unit": ["Sales Unit"]
-        }
+        }]
     }
 }
 ```
@@ -1048,32 +1082,12 @@ Some vendors list products with placeholders. Some product may be listed as *pro
     ["Article Number", "(product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
     ["Article Number", "(product...)(Z)", "L", "R"]
 ]
-```  
-
-[Content](#Content)
-
-### Sample check
-To detect trading goods for the MDR §14 sample check add a respective filter like:
-```js
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": false, //or true
-			"match": {
-				"all": {
-					"article_name": "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOOD (OR DON'T IN ACCORDANCE TO keep-FLAG)"
-				}
-			}
-		}
-	]
-}
 ```
-Without a filter none of the vendors products will be treated as a trading good!
+
+#### Sample Check
+*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default.
+
+You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
 
 [Content](#Content)
 

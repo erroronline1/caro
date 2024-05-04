@@ -41,6 +41,15 @@ delete . from headers, replace specialchars
 		"columns": ["Art-Nr", "Artikelname", "Groesse", "Seite", "Farbe", "EAN GTIN", "Verpackungseinheit"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"replace":[
+			["EAN GTIN", "\\s+", ""]
+		],
+		"conditional": [
+			["trading_good", "1", ["Artikelname", "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."]]
+		],
 		"rewrite": [{
 			"article_no": ["Art-Nr"],
 			"article_name": ["Artikelname", ", ", "Groesse", ", ", "Seite", ", ", "Farbe"],
@@ -48,25 +57,6 @@ delete . from headers, replace specialchars
 			"article_ean": ["EAN GTIN"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -115,6 +105,15 @@ add name headers where empty, delete . from headers
 		"columns": ["Art-Nr", "Bezeichnung", "Bezeichnung 2", "ME", "EANNummer"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"replace":[
+			["EANNummer", "\\s+", ""]
+		],
+		"conditional": [
+			["trading_good", "1", ["Bezeichnung", ".+schuh"]]
+		],
 		"rewrite": [{
 			"article_no": ["Art-Nr"],
 			"article_name": ["Bezeichnung", ", ", "Bezeichnung 2"],
@@ -122,25 +121,6 @@ add name headers where empty, delete . from headers
 			"article_ean": ["EANNummer"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": false,
-			"match": {
-				"all": {
-					"article_name": "^(?!.*?(schuh)).*"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -153,32 +133,19 @@ delete . from headers, replace specialchars
 		"columns": ["Nr", "Beschreibung 1", "Beschreibung 2", "Farbe", "Groesse", "Einheiten"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
 		"rewrite": [{
 			"article_no": ["Nr"],
 			"article_name": ["Beschreibung 1", ", ", "Beschreibung 2", ", ", "Farbe", ", ", "Groesse"],
 			"article_unit": ["Einheiten"],
 			"article_ean": [""]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "1", ["article_name", "socke|strumpf|ckchen|kniestr|shirt|body|hose"]]
+		]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "socke|strumpf|ckchen|kniestr|shirt|body|hose"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -210,6 +177,9 @@ delete unreqired columns
 		"columns": ["JUZO-Artikelnr", "GTIN", "Mengeneinheit", "Artikelbezeichnung 1", "Artikelbezeichnung 2"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"rewrite": [{
 			"article_no": ["JUZO-Artikelnr"],
 			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2"],
@@ -217,25 +187,6 @@ delete unreqired columns
 			"article_ean": ["GTIN"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".+"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -265,6 +216,9 @@ replace . and specialchars in header
 		"columns": ["ArtikelNr", "Bezeichnung", "Mengeneinh", "EAN-Nummer"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"replace":[
 			["EAN-Nummer", "\\.", ""]
 		],
@@ -275,25 +229,6 @@ replace . and specialchars in header
 			"article_ean": ["EAN-Nummer"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".+"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -354,6 +289,9 @@ replace specialchars in header
 		"columns": ["Artikel-Nr", "Artikelbezeichnung lang", "Groesse", "Farbe", "Einheit"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"rewrite": [{
 			"article_no": ["Artikel-Nr."],
 			"article_name": ["Artikelbezeichnung lang", ", ", "Groesse", ", ", "Farbe"],
@@ -361,25 +299,6 @@ replace specialchars in header
 			"article_ean": [""]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".*?"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -404,6 +323,9 @@ add headers on line 7
 		}
 	],
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"rewrite": [{
 			"article_no": ["ARTNR"],
 			"article_name": ["NAME"],
@@ -411,25 +333,6 @@ add headers on line 7
 			"article_ean": ["EAN"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "keep all products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".+"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -441,6 +344,15 @@ add headers on line 7
 		"columns": ["MATCHCODE", "NAME1", "EANCODE", "VK_EINHEIT"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"replace":[
+			["EANCODE", "\\s+", ""]
+		],
+		"conditional": [
+			["trading_good", "1", ["NAME1", "aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|tübinger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"]]
+		],
 		"rewrite": [{
 			"article_no": ["MATCHCODE"],
 			"article_name": ["NAME1"],
@@ -448,25 +360,6 @@ add headers on line 7
 			"article_ean": ["EANCODE"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|tübinger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -493,6 +386,12 @@ modify product description for:
 		}
 	],
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["BEZEICHNUNG", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]]
+		],
 		"replace":[
 			["ART-NR", "(I-4443|I-CL63|I-CW63|I-CL43|I-CW43|I-CL53)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40],
 			["ART-NR", "(I-4446|I-CL46|I-CL56)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36],
@@ -567,25 +466,6 @@ modify product description for:
 	}
 }
 ```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "select applicable products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"
-				}
-			}
-		}
-	]
-}
-```
 
 ### ofa
 delete . from headers
@@ -597,6 +477,9 @@ delete . from headers
 		"columns": ["Artikel", "Bez 1", "Bez II", "VME"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"replace":[
 			["Artikel", "\\s{2,}", " "],
 			["Bez 1", "\\s{2,}", " "],
@@ -607,27 +490,11 @@ delete . from headers
 			"article_name": ["Bez 1", ", ", "Bez II"],
 			"article_unit": ["VME"],
 			"article_ean": [""]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "0", ["article_name", "Anti-Rutsch-Beschichtung"]]
+		]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": false,
-			"match": {
-				"all": {
-					"article_name": "Anti-Rutsch-Beschichtung"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -639,6 +506,12 @@ delete . from header
 		"columns": ["ArtNr", "Bezeichnung", "ME", "UDI-DI"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]]
+		],
 		"rewrite": [{
 			"article_no": ["ArtNr"],
 			"article_name": ["Bezeichnung"],
@@ -646,25 +519,6 @@ delete . from header
 			"article_ean": ["UDI-DI"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": false,
-			"match": {
-				"all": {
-					"article_name": "^(?!.*?(liner|kniekappe|strumpf|wilmer)).*"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -694,6 +548,12 @@ join tables
 		"columns": ["Material", "Materialtext", "Mengeneinheit", "EAN/UPC"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]]
+		],
 		"rewrite": [{
 			"article_no": ["Material"],
 			"article_name": ["Materialtext"],
@@ -701,25 +561,6 @@ join tables
 			"article_ean": ["EAN/UPC"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unnecessary products",
-			"keep": false,
-			"match": {
-				"all": {
-					"article_name": "^(?!.*?(knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine)).*"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -731,6 +572,12 @@ join tables
 		"columns": ["Material", "Materialkurztext", "ME"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["Materialkurztext", "^o|^ns|^av|schuh|^d\\d"]]
+		],
 		"rewrite": [{
 			"article_no": ["Material"],
 			"article_name": ["Materialkurztext"],
@@ -738,25 +585,6 @@ join tables
 			"article_ean": [""]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "^o|^ns|^av|schuh|^d\\d"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -770,32 +598,19 @@ replace specialchars in header
 		"columns": ["ArtikelNummer", "Bezeichnung 1", "Bezeichnung 2", "Farbe", "Groesse", "Menge"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
 		"rewrite": [{
 			"article_no": ["ArtikelNummer"],
 			"article_name": ["Bezeichnung 1", ", ", "Bezeichnung 2", ", ", "Farbe", ", ", "Groesse"],
 			"article_unit": ["Menge"],
 			"article_ean": [""]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "1", ["article_name", "Lagerungsschiene|orthese|helm|headmaster"]]
+		]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "Lagerungsschiene|orthese|helm|headmaster"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -808,6 +623,12 @@ add header on first line
 		"columns": ["artno", "name", "unit"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["name", "Compression|Weste|Peronäusschiene|Stax|liner"]]
+		],
 		"rewrite": [{
 			"article_no": ["artno"],
 			"article_name": ["name"],
@@ -815,25 +636,6 @@ add header on first line
 			"article_ean": [""]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "Compression|Weste|Peronäusschiene|Stax|liner"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -846,32 +648,19 @@ delete last row
 		"columns": ["Art-Nr", "Bezeichnung1", "Bezeichnung2", "EAN_GTIN", "ME"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
 		"rewrite": [{
 			"article_no": ["Art-Nr"],
 			"article_name": ["Bezeichnung1", ", ", "Bezeichnung2"],
 			"article_unit": ["ME"],
 			"article_ean": ["EAN_GTIN"]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehstütze|achselstütze|toiletten|gehgestell|vierfuß|fischer"]]
+		]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "stuhl|hilfe|wagen|rollator|stock|gehstütze|achselstütze|toiletten|gehgestell|vierfuß|fischer"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -895,6 +684,9 @@ delete last row
 		}
 	],
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
 			"article_name": ["Bezeichnung"],
@@ -904,25 +696,7 @@ delete last row
 	}
 }
 ```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".+"
-				}
-			}
-		}
-	]
-}
-```
+
 ### russka
 ```json
 {
@@ -943,6 +717,12 @@ delete last row
 		}
 	],
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|stützschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]
+		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer "],
 			"article_name": ["Artikelbezeichnung"],
@@ -950,25 +730,6 @@ delete last row
 			"article_ean": [""]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|stützschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -980,34 +741,22 @@ delete last row
 		"columns": ["Artikelnummer", "Artikelbezeichnung", "Artikelbezeichnung 2", "Basiseinheit"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
 			"article_name": ["Artikelbezeichnung", ", ", "Artikelbezeichnung 2"],
 			"article_unit": ["Basiseinheit"],
 			"article_ean": [""]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "1", ["article_name", "einlage|schuh|orthese"]]
+		]
 	}
 }
 ```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "einlage|schuh|orthese"
-				}
-			}
-		}
-	]
-}
-```
+
 ### sporlastic
 delete . from headers, replace specialchars and whitespaces
 ```json
@@ -1017,6 +766,9 @@ delete . from headers, replace specialchars and whitespaces
 		"columns": ["Bestell-Nr", "ArtikelBez1", "ArtikelBez2", "Seite", "Farbe", "Groesse", "ME", "EAN_CODE"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"rewrite": [{
 			"article_no": ["Bestell-Nr"],
 			"article_name": ["ArtikelBez1", ", ", "ArtikelBez2", ", ", "Seite", ", ", "Farbe", ", ", "Groesse"],
@@ -1024,25 +776,6 @@ delete . from headers, replace specialchars and whitespaces
 			"article_ean": ["EAN_CODE"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".+"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -1055,6 +788,12 @@ delete . from headers, replace specialchars and whitespaces
 		"columns": ["Artikelnummer", "Bezeichnung", "Einheit", "GTIN-Code"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]]
+		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
 			"article_name": ["Bezeichnung"],
@@ -1062,25 +801,6 @@ delete . from headers, replace specialchars and whitespaces
 			"article_ean": ["GTIN-Code"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -1116,32 +836,19 @@ delete . from headers, replace specialchars and whitespaces
 		"columns": ["Bestellnr", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
 		"rewrite": [{
 			"article_no": ["Bestellnr"],
 			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2", ", ", "Artikelbezeichnung 3"],
 			"article_unit": ["Verpackung1"],
 			"article_ean": [""]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "1", ["article_name", "WS-Bandage|Wirbelsäulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]]
+		]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "WS-Bandage|Wirbelsäulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -1154,6 +861,9 @@ delete . from headers, replace specialchars and whitespaces
 		"columns": ["Artikelnr", "Artikelbeschreibung"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
 		"rewrite": [{
 			"article_no": ["Artikelnr"],
 			"article_name": ["Artikelbeschreibung"],
@@ -1161,25 +871,6 @@ delete . from headers, replace specialchars and whitespaces
 			"article_ean": [""]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": ".+"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -1192,6 +883,12 @@ delete . from headers, replace specialchars and whitespaces
 		"columns": ["Artikel-Nr", "Beschreibung", "ME", "EAN"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional": [
+			["trading_good", "1", ["Beschreibung", "^bob|^daho|liner|philadelphia"]]
+		],
 		"rewrite": [{
 			"article_no": ["Artikel-Nr"],
 			"article_name": ["Beschreibung"],
@@ -1199,25 +896,6 @@ delete . from headers, replace specialchars and whitespaces
 			"article_ean": ["EAN"]
 		}]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "^bob|^daho|liner|philadelphia"
-				}
-			}
-		}
-	]
 }
 ```
 
@@ -1230,31 +908,18 @@ delete . from headers, replace specialchars and whitespaces
 		"columns": ["Artikelnummer", "Farbe Groesse", "Artikelbez 1", "Artikelbez 2", "EAN"]
 	},
 	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
 		"rewrite": [{
 			"article_no": ["Artikelnummer", " ", "Farbe Groesse"],
 			"article_name": ["Artikelbez 1", " ", "Artikelbez 2"],
 			"article_unit": [""],
 			"article_ean": ["EAN"]
-		}]
+		}],
+		"conditional": [
+			["trading_good", "1", ["article_name", "Arthrodesenkissen"]]
+		]
 	}
-}
-```
-```json
-{
-	"filesetting": {
-		"columns": ["article_no", "article_name"]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_expression",
-			"comment": "delete unneccessary products",
-			"keep": true,
-			"match": {
-				"all": {
-					"article_name": "Arthrodesenkissen"
-				}
-			}
-		}
-	]
 }
 ```
