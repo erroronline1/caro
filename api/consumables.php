@@ -17,7 +17,7 @@ class CONSUMABLES extends API {
 			]
 		},
 		"modify": {
-			   "add": {
+			"add": {
 				"trading_good": "0"
 			},
 			"replace":[
