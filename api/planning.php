@@ -130,12 +130,20 @@ class PLANNING extends API {
 						'msg' => LANG::GET('planning.event_success'),
 						'type' => 'success'
 					]]);
-				else $this->response([
-					'status' => [
-						'id' => false,
-						'msg' => LANG::GET('planning.event_error'),
-						'type' => 'error'
-					]]);
+				else {
+					if ($newid = $calendar->post($event[':date'], $event[':due'], UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_type')), $_SESSION['user']['name'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+						'status' => [
+							'id' => $newid,
+							'msg' => LANG::GET('planning.event_success'),
+							'type' => 'success'
+						]]);
+					else $this->response([
+						'status' => [
+							'id' => false,
+							'msg' => LANG::GET('planning.event_error'),
+							'type' => 'error'
+						]]);
+					}
 				break;
 			case 'GET':
 				$result = ['body' => ['content' => []]];
@@ -210,12 +218,17 @@ class PLANNING extends API {
 				}
 				break;
 			case 'DELETE':
-				$calendar->delete($this->_requestedId);
-				$this->response([
+				if ($calendar->delete($this->_requestedId)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('planning.event_deleted'),
 						'type' => 'success'
 					]]);
+				else $this->response([
+					'status' => [
+						'msg' => LANG::GET('planning.event_not_found'),
+						'type' => 'error'
+					]]);
+			
 				break;
 		}
 		$this->response($result);
@@ -257,11 +270,15 @@ class PLANNING extends API {
 	public function complete(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$calendar = new CALENDAR($this->_pdo);
-		$calendar->complete($this->_requestedId, $this->_requestedComplete === 'true');
-		$this->response([
+		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true')) $this->response([
 			'status' => [
 				'msg' => $this->_requestedComplete === 'true' ? LANG::GET('planning.event_completed') : LANG::GET('planning.event_incompleted'),
 				'type' => 'success'
+			]]);
+		else $this->response([
+			'status' => [
+				'msg' => LANG::GET('planning.event_not_found'),
+				'type' => 'error'
 			]]);
 	}
 

@@ -135,7 +135,7 @@ class CALENDAR {
 	 * @param int $id event database id for updating
 	 * 
 	 */
-	public function dialog($date = '', $type = '', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
+	public function dialog($date = '', $type = 'planning', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
 			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
@@ -185,7 +185,7 @@ class CALENDAR {
 			[
 				'type' => 'hiddeninput',
 				'attributes' => [
-					'value' => 'planning',
+					'value' => $type,
 					'name' => LANG::GET('planning.event_type')
 
 				]
@@ -281,7 +281,7 @@ class CALENDAR {
 	 */
 	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
-		return $statement->execute([
+		$statement->execute([
 			':id' => $id,
 			':date' => $date,
 			':due' => $due,
@@ -290,6 +290,7 @@ class CALENDAR {
 			':content' => $content,
 			':alert' => $alert
 		]);
+		return $statement->rowCount();
 	}
 
 	/**
@@ -299,10 +300,11 @@ class CALENDAR {
 	public function complete($id = 0, $complete = null){
 		if ($complete) $complete = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_complete'));
-		return $statement->execute([
+		$statement->execute([
 			':id' => $id,
 			':completed' => $complete ? json_encode($complete) : '',
 		]);
+		return $statement->rowCount();
 	}
 
 	/**
@@ -310,9 +312,10 @@ class CALENDAR {
 	 */
 	public function delete($id = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_delete'));
-		return $statement->execute([
+		$statement->execute([
 			':id' => $id
 		]);
+		return $statement->rowCount();
 	}
 }
 ?>
