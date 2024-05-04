@@ -85,6 +85,7 @@ filters and returns a named array according to setup.
 		"rewrite": adds newly named columns consisting of concatenated origin column values and separators.
 				   original columns will be omitted, nested within a list to make sure to order as given
 		"translate": column values to be translated according to specified translation object
+		"conditional": changes a columns value if regex matches on other columns, adds column by default with empty value
 
 	"split": split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
@@ -723,7 +724,9 @@ class Listprocessor {
 		}
 	}
 
-	/* remove, replace or add column with fixed value or formula or replace regex pattern in existing column
+	/*	remove, replace or add column with fixed value or formula,
+		replace regex pattern in existing column or
+		change value in a column if a regex matches in others (add column if not present with empty value b default)
 	{
 		"add":{
 			"NEWCOLUMNNAME": "string",
@@ -740,7 +743,10 @@ class Listprocessor {
 		],
 		"translate":{
 			"DEPARTMENT": "departments"
-		}
+		},
+		"conditional":[
+			["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+		]
 	},
 	*/
 	public function modify(){
@@ -753,15 +759,15 @@ class Listprocessor {
 						foreach ($this->_list as $i => $row){
 							if (!$row) continue;
 
-							if (is_array($modifications[$modify][$key])){
+							if (is_array($rule)){
 								$expression = [];
-								foreach ($modifications[$modify][$key] as $possible_col){
+								foreach ($rule as $possible_col){
 									$expression[] = array_key_exists($possible_col, $row) ? $row[$possible_col] : $possible_col;
 								}
 							}
 							else
-								$expression = [$modifications[$modify][$key]];
-							$row[$key] = $this->calculate($expression);
+								$expression = [$rule];
+							$row[$key] = strval($this->calculate($expression));
 							$this->_list[$i] = $row;
 						}
 						break;
@@ -825,6 +831,20 @@ class Listprocessor {
 									$row[$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
 							}
 							// SplFixedArray has problems accessing nested elements, must assign array to key directly
+							$this->_list[$i] = $row;
+						}
+						break;
+					case 'conditional':
+						foreach ($this->_list as $i => $row){
+							if (!$row) continue;
+							if (!in_array($rule[0], $this->_setting['filesetting']['columns']))
+								$this->_setting['filesetting']['columns'][] = $rule[0];
+							$matches = 0;
+							for ($condition = 2; $condition < count($rule); $condition++){
+								if (array_key_exists($rule[$condition][0], $row) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
+							}
+							if ($matches == (count($rule) - 2)) $row[$rule[0]] = $rule[1];
+							else $row[$rule[0]] = strlen($row[$rule[0]]) ? $row[$rule[0]] : '';
 							$this->_list[$i] = $row;
 						}
 						break;
