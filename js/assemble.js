@@ -253,6 +253,7 @@ export class Dialog {
 				button.value = value.value;
 				if (value.class) button.classList.add(value.class);
 			}
+			if (!value) button.formNoValidate = true;
 			buttons.push(button);
 		}
 		return buttons;
