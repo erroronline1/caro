@@ -196,7 +196,7 @@ class APPLICATION extends API {
 							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed['num']]),
 							'description' => LANG::GET('menu.purchase_approved_orders'),
 							'attributes' => [
-								'data-type' => 'cart'
+								'data-type' => 'purchase'
 							]
 						]
 					]

@@ -1112,6 +1112,10 @@ button[data-type="submitbutton"]::before {
 	background-image: url("./media/shopping-cart.svg");
 }
 
+[data-type="purchase"]::before {
+	background-image: url("./media/shopping-bag.svg");
+}
+
 [data-type="message"]::before {
 	background-image: url("./media/comment.svg");
 }
