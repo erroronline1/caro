@@ -872,6 +872,12 @@ export class Assemble {
 		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return this.button();
 	}
+	calendarbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "calendarbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return [this.br(), ...this.button()];
+	}
 
 	hiddeninput() {
 		/*{
@@ -1457,13 +1463,13 @@ export class Assemble {
 			daytile.classList = "day";
 			if (day !== null) {
 				daytile.classList.add("displayDay");
-				let display = day.display.split('\n');
-				for (const line of display){
+				let display = day.display.split("\n");
+				for (const line of display) {
 					daytile.append(document.createTextNode(line));
-					daytile.append(document.createElement('br'));
+					daytile.append(document.createElement("br"));
 				}
 				daytile.onpointerup = function () {
-					api.planning('get', 'calendar', day.date, day.date);
+					api.planning("get", "calendar", day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");

@@ -343,7 +343,7 @@ nav {
 		width: auto;
 	}
 
-	div[data-for=userMenuApplication] > label {
+	div[data-for="userMenuApplication"] > label {
 		border-radius: 50%;
 		background-size: cover;
 		background-repeat: no-repeat;
@@ -943,8 +943,16 @@ dialog a:not([data-type])::before {
 }
 
 [data-type="dateinput"]::before,
-[data-type="calendar"]::before {
+[data-type="calendar"]::before,
+[data-type="calendarbutton"]::before {
 	background-image: url("./media/calendar-alt.svg");
+}
+
+button[data-type="calendarbutton"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/calendar-alt.svg");
+	mask-image: url("./media/calendar-alt.svg");
 }
 
 [data-type="timeinput"]::before {

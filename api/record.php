@@ -2,6 +2,7 @@
 // add and export records
 // Y U NO DELETE? because of audit safety, that's why!
 require_once('./pdf.php');
+require_once('calendar.php');
 
 
 class record extends API {
@@ -182,15 +183,20 @@ class record extends API {
 			'content' => []
 			]];
 
-		function setidentifier($element, $identify){
+			$calendar = new CALENDAR($this->_pdo);
+			function setidentifier($element, $identify, $calendar){
 			$content = [];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
-					$content[] = setidentifier($subs, $identify);
+					$content[] = setidentifier($subs, $identify, $calendar);
 				}
 				else {
 					if ($subs['type'] === 'identify'){
 						$subs['attributes']['value'] = $identify;
+					}
+					if ($subs['type'] === 'calendarbutton'){
+						$subs['attributes']['value'] = LANG::GET('planning.event_new');
+						$subs['attributes']['onpointerup'] = $calendar->dialog();
 					}
 					if (in_array($subs['type'], ['textarea', 'textinput', 'scanner', 'textinput', 'numberinput', 'dateinput', 'timeinput'])){
 						$subs['attributes']['data-loss'] = 'prevent';
@@ -209,7 +215,7 @@ class record extends API {
 			$component = $statement->fetch(PDO::FETCH_ASSOC);
 			if ($component){
 				$component['content'] = json_decode($component['content'], true);
-				array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify));
+				array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
 			}
 		}
 		$context = [
@@ -682,7 +688,7 @@ class record extends API {
 					$content['images'] = array_merge($content['images'], $subcontent['images']);
 				}
 				else {
-					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links'])) continue;
+					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton'])) continue;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						if ($subs['type'] ==='checkbox') $name = $subs['description'];
 						else $name = $subs['attributes']['name'];

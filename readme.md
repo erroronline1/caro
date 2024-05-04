@@ -38,7 +38,6 @@
 #### todo forms
 * view other forms as modal (e.g. instructions) - select applicable form within composer 
 * suggest next form? (load with identify)
-* calendar link - add event - match identifier for possibly related events
 
 #### todo purchase
 * order only assigned units selecteable?

@@ -47,16 +47,25 @@ export const compose_helper = {
 				name: ["select", "scanner", "radio", "photo", "file", "signature"],
 				description: ["links", "checkbox"],
 			},
+			buttonValues = {
+				calendarbutton: LANG.GET("planning.event_new"),
+			},
 			element = {
 				attributes: {},
 			};
 		do {
-			if (!["span", "input", "textarea"].includes(sibling.localName)) {
+			if (!["span", "input", "textarea", "header"].includes(sibling.localName)) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
 			if (sibling.localName === "span") {
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
+				sibling = sibling.nextSibling;
+				continue;
+			}
+			if (sibling.localName === "header") {
+				if (element.type === undefined) element["type"] = sibling.dataset.type;
+				element["attributes"] = { value: buttonValues[sibling.dataset.type] };
 				sibling = sibling.nextSibling;
 				continue;
 			}
@@ -1014,6 +1023,27 @@ export class Compose extends Assemble {
 			description: LANG.GET("assemble.compose_scanner"),
 			multiple: "optional",
 		});
+	}
+
+	compose_calendarbutton() {
+		let result = [this.br()];
+		this.currentElement = {
+			type: "text",
+			attributes: {
+				"data-type": "calendarbutton",
+			},
+			description: LANG.GET("assemble.compose_calendarbutton"),
+			content: LANG.GET("assemble.compose_calendarbutton_not_working"),
+		};
+		result = result.concat(...this.text());
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET("assemble.compose_calendarbutton"),
+				"data-type": "addblock",
+			},
+		};
+		result = result.concat(...this.button());
+		return result;
 	}
 
 	compose_component(

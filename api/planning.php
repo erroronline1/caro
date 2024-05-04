@@ -200,7 +200,7 @@ class PLANNING extends API {
 					if ($dbevents) array_push($events, ...$this->events($dbevents, $calendar));
 
 					$events[] = [
-						'type' => 'button',
+						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => LANG::GET('planning.event_new'),
 							'onpointerup' => $calendar->dialog($this->_requestedDate, 'planning')

@@ -151,27 +151,31 @@ class CALENDAR {
 				'type' => 'scanner',
 				'attributes' => [
 					'value' => $content,
-					'name' => LANG::GET('planning.event_content')
+					'name' => LANG::GET('planning.event_content'),
+					'required' => true
 				]
 			],
 			[
 				'type' => 'dateinput',
 				'attributes' => [
 					'value' => $date,
-					'name' => LANG::GET('planning.event_date')
+					'name' => LANG::GET('planning.event_date'),
+					'required' => true
 				]
 			],
 			[
 				'type' => 'dateinput',
 				'attributes' => [
 					'value' => $due,
-					'name' => LANG::GET('planning.event_due')
+					'name' => LANG::GET('planning.event_due'),
+					'required' => true
 				]
 			],
 			[
 				'type' => 'checkbox',
 				'description' => LANG::GET('planning.event_organizational_unit'),
-				'content' => $units
+				'content' => $units,
+				'hint' => LANG::GET('planning.event_organizational_unit_hint')
 			],
 			[
 				'type' => 'checkbox',

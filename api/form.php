@@ -177,6 +177,10 @@ class FORMS extends API {
 						'form' => true,
 						'type' => 'compose_signature',
 						'description' => LANG::GET('assemble.compose_signature')
+					]], [[
+						'form' => true,
+						'type' => 'compose_calendarbutton',
+						'description' => LANG::GET('assemble.compose_calendarbutton')
 					]]
 				],
 				[[
