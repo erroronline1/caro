@@ -144,7 +144,7 @@ class MESSAGE extends API {
 		$filtered = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$matches = [];
 		foreach ($filtered as $row){
-			$matches[] = $row['id'];
+			$matches[] = strval($row['id']);
 		}
 		$this->response(['status' => [
 			'data' => $matches

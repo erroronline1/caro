@@ -620,8 +620,8 @@ export const api = {
 						successFn = function (data) {
 							if (data.status) {
 								const all = document.querySelectorAll("[data-filtered]");
-								for (const file of all) {
-									file.parentNode.style.display = data.status.data.includes(file.dataset.filtered) ? "block" : "none";
+								for (const message of all) {
+									message.parentNode.style.display = data.status.data.includes(message.dataset.filtered) ? "block" : "none";
 								}
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
