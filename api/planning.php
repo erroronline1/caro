@@ -203,10 +203,6 @@ class PLANNING extends API {
 							'data-type' => 'calendar'
 						]
 					];
-
-					$dbevents = $calendar->getdate($this->_requestedDate);
-					if ($dbevents) array_push($events, ...$this->events($dbevents, $calendar));
-
 					$events[] = [
 						'type' => 'calendarbutton',
 						'attributes' => [
@@ -214,7 +210,30 @@ class PLANNING extends API {
 							'onpointerup' => $calendar->dialog($this->_requestedDate, 'planning')
 						]
 					];
+					$dbevents = $calendar->getdate($this->_requestedDate);
+					if ($dbevents) array_push($events, ...$this->events($dbevents, $calendar));
 					$result['body']['content'][] = $events;
+
+					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
+					$today->modify('-1 day');
+					$dbevents = $calendar->getdaterange(null, $today->format('Y-m-d'));
+					if ($dbevents) {
+						$events = [
+							[
+								'type' => 'text',
+								'description' => LANG::GET('planning.events_assigned_units_uncompleted'),
+								'attributes' => [
+									'data-type' => 'calendar'
+								]
+							]
+						];
+						$uncompleted = [];
+						foreach ($dbevents as $id => $row){
+							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['completed']) unset($dbevents[$id]);
+						}
+						array_push($events, ...$this->events($dbevents, $calendar));
+						$result['body']['content'][] = $events;
+					}
 				}
 				break;
 			case 'DELETE':
