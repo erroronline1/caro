@@ -37,8 +37,9 @@
 * hash sum check for data completeness?
 
 #### todo forms
-* view other forms as modal (e.g. instructions)
+* view other forms as modal (e.g. instructions) - select applicable form within composer 
 * suggest next form? (load with identify)
+* calendar link - add event - match identifier for possibly related events
 
 #### todo purchase
 * order only assigned units selecteable?
@@ -59,9 +60,6 @@
 * monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
-
-#### todo audit
-* checklist regulatory issues
 
 #### todo misc
 * user selectable color themes?
