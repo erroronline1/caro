@@ -130,7 +130,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The inbuilt calendar assists in planning operations.
     * also see [forms](#forms), [records](#records), [planning](#planning)
 * ISO 13485 7.5.8 Product indentification
-    * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky Identifier labels can be used to mark any components of a product during production.
+    * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
     * also see [records](#records)
 * ISO 13485 7.6 Surveillance and measuring equipment control
     * --- yet to be implemented ---
@@ -902,12 +902,12 @@ Tested devices:
 [Content](#Content)
 
 ### Installation
-* php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers
+* php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers.
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
-* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB
-* php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though
+* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
+* php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 2 minutes on SQL Server
     * pricelist import @ 660k rows currently takes about 4 minutes to import and process on Uniform Server, 10 minutes on SQL Server
 * php.ini enable extensions:
@@ -919,10 +919,10 @@ Tested devices:
     * zip
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
-* Manually set mime type for site-webmanifest as application/manifest+json for IIS servers
-* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration
+* Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
+* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
 * Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
-* Install as progressive web app (PWA) from the initial browser request
+* Install as progressive web app (PWA) from the initial browser request.
 
 ### Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
@@ -1023,7 +1023,7 @@ dialect["escape"] = ""
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
-* Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between.
+* Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
 
 [Content](#Content)
 
