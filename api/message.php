@@ -313,7 +313,23 @@ class MESSAGE extends API {
 		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
 		$result['body']['content'] = $content;
 		$this->response($result);
-	}	
+	}
+
+	public function msglist(){
+		// list threads
+		// new message button 
+		// clear thread instead of deleting individual messages
+		// if user selected show messages left/right
+		// shorter update cycle for chatlike functionality?
+		// scroll to bottom
+		
+	}
+
+	public function usrlist(){
+		// list users with pic axcluding systemuser
+		// for new messages, initiate new message
+	}
+
 }
 
 $api = new MESSAGE();
