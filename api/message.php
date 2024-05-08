@@ -250,7 +250,7 @@ class MESSAGE extends API {
 									'user' => $conversation['conversation_user_name'],
 									'text' => (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
 									'date' => $conversation['timestamp'],
-									'unseen' => $unseen['unseen']
+									'unseen' => intval($unseen['unseen'])
 								],
 								'attributes' =>  [
 									'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
