@@ -5,11 +5,14 @@ class MESSAGE extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_redirect = null;
+	
+	private $_conversation = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_redirect = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
+
+		$this->_conversation = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	public function message(){
@@ -34,77 +37,12 @@ class MESSAGE extends API {
 				if ($statement->execute($message)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_success'),
-						'redirect' => $this->_redirect,
+						'redirect' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_failure'),
-						'redirect' => false,
-						'type' => 'error'
-					]]);
-				break;
-			case 'GET':
-				$datalist = [];
-				$result = [];
-				$prefill = [
-					'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : '',
-					'to' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.from')) ? : (UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : '')
-				];				
-				// prepare existing users lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-				$statement->execute();
-				$user = $statement->fetchAll(PDO::FETCH_ASSOC);
-				foreach($user as $key => $row) {
-					if ($row['id'] > 1)	$datalist[] = $row['name'];
-				}
-						
-				// display form for writing
-				$result['body']=['content' => [
-					[
-						['type' => 'datalist',
-						'content' => $datalist,
-						'attributes' => [
-							'id' => 'users'
-						]],
-					],[
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('message.to'),
-							'required' => true,
-							'list' => 'users',
-							'value' => $prefill['to'] ? : '',
-							'data-loss' => 'prevent'
-						]],
-						['type' => 'textarea',
-						'attributes' => [
-							'name' => LANG::GET('message.message'),
-							'required' => true,
-							'value' => $prefill['message'] ? : '',
-							'rows' => 10,
-							'data-loss' => 'prevent'
-						]]
-					]
-					],
-					'form' => [
-						'data-usecase' => 'message',
-						'action' => "javascript:api.message('post', 'message', '_', 'sent')"
-					]];
-				break;
-			case 'DELETE':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_delete_message'));
-				if ($statement->execute([
-					':id' => $this->_requestedID,
-					':user' => $_SESSION['user']['id']
-				])) $this->response([
-					'status' => [
-						'msg' => LANG::GET('message.delete_success'),
-						'redirect' => $this->_redirect ? : 'inbox',
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'status' => [
-						'msg' => LANG::GET('message.delete_failure'),
 						'redirect' => false,
 						'type' => 'error'
 					]]);
@@ -134,195 +72,172 @@ class MESSAGE extends API {
 		]);
 	}
 
-	public function filter(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_filter'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id'],
-			':msgfilter' => $this->_requestedID
-		]);
-		$filtered = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$matches = [];
-		foreach ($filtered as $row){
-			$matches[] = strval($row['id']);
-		}
-		$this->response(['status' => [
-			'data' => $matches
-		]]);
-	}
-
-	public function inbox(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$result = ['body'=>[]];
-		
-		// set messages to seen on entering inbox
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_put_seen'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-
-		// select messages
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_inbox'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		if (count($messages)){
-			$content=[[
-					['type' => 'filterinput',
-					'attributes' => [
-						'name' => LANG::GET('message.message_filter_label'),
-						'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
-						'onblur' => "api.message('get', 'filter', this.value); return false;",
-						'id' => 'productsearch'
-					]]
-			]];
-			foreach($messages as $message) {
-				$content[]= [
-					['type' => 'hiddeninput',
-					'description' => 'filter',
-					'attributes'=>['data-filtered' => $message['id']]
-				],
-					['type' => 'textinput',
-					'numeration' => 'prevent',
-					'attributes' => [
-						'readonly' => true,
-						'data-message' => $message['id'],
-						'name' => LANG::GET('message.from'),
-						'value' => $message['from_user'] ? : LANG::GET('message.deleted_user')
-					]],
-					['type' => 'textarea',
-					'numeration' => 'prevent',
-					'attributes' => [
-						'name' => LANG::GET('message.message'),
-						'data-message' => $message['id'],
-						'readonly' => true,
-						'value' => $message['message'],
-						'rows' => 7
-					]],
-					['type' => 'text',
-					'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
-					],
-					['type' => 'deletebutton',
-					'attributes' => [
-						'value' => LANG::GET('message.delete'),
-						'type' => 'button',
-						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
-							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
-							"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(confirmation => {if (confirmation) api.message('delete', 'message', " . $message['id'] . ", 'inbox')})"
-					]]
-				];
-				if ($message['from_user'] && $message['from_user'] != INI['system']['caroapp']) array_splice($content[count($content)-1], 4, 0, [
-					['type' => 'button',
-					'attributes' => [
-						'value' => LANG::GET('message.reply'),
-						'type' => 'button',
-						'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'reply')" 
-						]]
-					]);
-				if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
-					['type' => 'image',
-					'attributes' => [
-						'url' => $message['image'],
-						'imageonly' => ['width' => '3em', 'height' => '3em'] 
-						]],
-						['type' => 'br'],
-						['type' => 'br'],
-					]);
-			}
-		}
-		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
-		$result['body']['content'] = $content;
-		$this->response($result);
-	}
-
-	public function sent(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$result = ['body'=>[]];
-		
-		// select messages
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_sent'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
-		if (count($messages)){
-			$content=[[
-				['type' => 'filterinput',
-				'attributes' => [
-					'name' => LANG::GET('message.message_filter_label'),
-					'onkeypress' => "if (event.key === 'Enter') {api.message('get', 'filter', this.value); return false;}",
-					'onblur' => "api.message('get', 'filter', this.value); return false;",
-					'id' => 'productsearch'
-				]]
-			]];
-			foreach($messages as $key => $message) {
-				$content[]= [
-					['type' => 'hiddeninput',
-					'description' => 'filter',
-					'attributes'=>['data-filtered' => $message['id']]],
-					['type' => 'textinput',
-					'numeration' => 'prevent',
-					'attributes' => [
-						'name' => LANG::GET('message.to'),
-						'readonly' => true,
-						'data-message' => $message['id'],
-						'value' => $message['to_user'] ? : LANG::GET('message.deleted_user')
-					]],
-					['type' => 'textarea',
-					'numeration' => 'prevent',
-					'attributes' => [
-						'name' => LANG::GET('message.message'),
-						'data-message' => $message['id'],
-						'readonly' => true,
-						'value' => $message['message'],
-						'rows' => 7
-					]],
-					['type' => 'text',
-					'content' => '\n' . LANG::GET('message.time') . ' ' . $message['timestamp']
-					],
-					['type' => 'button',
-					'attributes' => [
-						'value' => LANG::GET('message.forward'),
-						'type' => 'button',
-						'onpointerup' => "api.message('get', 'message', '[data-message=\"" . $message['id'] . "\"]', 'sent')" 
-					]],
-					['type' => 'deletebutton',
-					'attributes' => [
-						'value' => LANG::GET('message.delete'),
-						'type' => 'button',
-						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
-							"'".LANG::GET('message.delete_confirm_cancel')."': false,".
-							"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-							"}}).then(confirmation => {if (confirmation) api.message('delete', 'message', " . $message['id'] . ", 'sent')})"
-					]]
-				];
-				if ($message['image']) array_splice($content[count($content)-1], 0, 0, [
-					['type' => 'image',
-					'attributes' => [
-						'url' => $message['image'],
-						'imageonly' => ['width' => '3em', 'height' => '3em'] 
-						]],
-					['type' => 'br'],
-					['type' => 'br'],
-					]);
-			}
-		}
-		else $content = $this->noContentAvailable(LANG::GET('message.no_messages'));
-		$result['body']['content'] = $content;
-		$this->response($result);
-	}
-
-	public function msglist(){
-		// list threads
-		// new message button 
-		// clear thread instead of deleting individual messages
-		// if user selected show messages left/right
+	public function conversation(){
 		// shorter update cycle for chatlike functionality?
 		// scroll to bottom
-		
+		// group chats
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'GET':
+				$result = ['body'=>['content'=> []]];
+
+				if ($this->_conversation){
+					// select conversation
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_conversation'));
+					$statement->execute([
+						':user' => $_SESSION['user']['id'],
+						':conversation' => $this->_conversation
+					]);
+					$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
+					$conversation_content = [];
+					foreach($messages as $conversation){
+						$conversation['message'] = str_replace("\n", ' ', $conversation['message']);
+						$conversation_content[] = [
+							'type' => 'message',
+							'content' => [
+								'img' => $conversation['image'],
+								'text' => $conversation['conversation_user_name'] . "\n" . $conversation['message'],
+								'date' => $conversation['timestamp'],
+							],
+							'attributes' =>  [
+								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'right': ''
+							]
+						];
+					}
+					$result['body']['content'][] = [
+						[
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => LANG::GET('message.delete'),
+								'type' => 'button',
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
+									"'".LANG::GET('message.delete_confirm_cancel')."': false,".
+									"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ", 'inbox')})"
+							]
+						]
+					];
+					$result['body']['content'][] = $conversation_content;
+					$result['body']['content'][] = [
+						[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => LANG::GET('message.to'),
+								'value' => $this->_conversation
+							]
+						],
+						[
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => LANG::GET('message.message'),
+								'id' => 'messageprompt'
+							]
+						]
+					];
+					$result['body']['form'] = [
+						'data-usecase' => 'message',
+						'action' => "javascript:api.message('post', 'message', '_', 'sent')"
+					];
+				}
+				else {
+					// prepare existing users lists
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+					$statement->execute();
+					$user = $statement->fetchAll(PDO::FETCH_ASSOC);
+					foreach($user as $key => $row) {
+						if ($row['id'] > 1)	$datalist[] = $row['name'];
+					}
+
+					$result['body']['content'][] = [
+						[
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('message.new'),
+								'type' => 'button',
+								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('message.new') ."', body: JSON.parse('" . 
+									json_encode(
+											[
+												[
+													'type' => 'datalist',
+													'content' => $datalist,
+													'attributes' => [
+														'id' => 'users'
+													]
+												],
+												[
+													'type' => 'textinput',
+													'attributes' => [
+														'name' => LANG::GET('message.to'),
+														'required' => true,
+														'list' => 'users',
+													]
+												],
+												[
+													'type' => 'textarea',
+													'attributes' => [
+														'name' => LANG::GET('message.message'),
+														'rows' => 8
+													]
+												]
+											]
+									 ) . "'), options:{".
+									"'".LANG::GET('order.add_information_cancel')."': false,".
+									"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
+									"}}).then(response => {if (response[LANG.GET('message.message')]) {".
+										"const formdata = new FormData();".
+										"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
+										"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
+										"api.message('post', 'message', formdata)}})"
+							]
+						]
+					];
+					// select conversations
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_conversations'));
+					$statement->execute([
+						':user' => $_SESSION['user']['id']
+					]);
+					$conversations = $statement->fetchAll(PDO::FETCH_ASSOC);
+					foreach($conversations as $conversation){
+						$conversation['message'] = str_replace("\n", ' ', $conversation['message']);
+						$result['body']['content'][] = [
+							[
+								'type' => 'message',
+								'content' => [
+									'img' => $conversation['image'],
+									'text' => $conversation['conversation_user_name'] . "\n" . (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
+									'date' => $conversation['timestamp'],
+			//						unseen: null|int
+								],
+								'attributes' =>  [
+									'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
+								]
+							]
+						];
+					}
+				}
+				break;
+			case 'DELETE':
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_delete_conversation'));
+				if ($statement->execute([
+					':conversation' => $this->_conversation,
+					':user' => $_SESSION['user']['id']
+				])) $this->response([
+					'status' => [
+						'msg' => LANG::GET('message.delete_success'),
+						'redirect' => false,
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'status' => [
+						'msg' => LANG::GET('message.delete_failure'),
+						'redirect' => false,
+						'type' => 'error'
+					]]);
+				break;
+		}
+		$this->response($result);
+
 	}
 
 	public function usrlist(){

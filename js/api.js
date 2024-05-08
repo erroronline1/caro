@@ -584,13 +584,10 @@ export const api = {
 	 */
 	message: (method, ...request) => {
 		/*
-		get message/inbox
-		get message/sent
-		get message/filter/{filter}
+		get message/conversation/{conversation_user}
+		delete message/conversation/{conversation_user}
 
-		get message/message/ // empty form
 		post message/message/{formdata}
-		delete message/message/{id}/(inbox|sent)
 
 		to initiate a new message with (hidden or visible inputs having both the same unique queryselector) prepared recipient and message using _.getinputs(queryselector)
 		call by api.message('get', 'message', '{queryselector}') 
@@ -611,40 +608,24 @@ export const api = {
 				inbox: LANG.GET("menu.message_inbox"),
 				sent: LANG.GET("menu.message_sent"),
 				message: LANG.GET("menu.message_new"),
+				conversations: LANG.GET("menu.message_conversations"),
 			};
 
 		switch (method) {
 			case "get":
-				switch (request[1]) {
-					case "filter":
-						successFn = function (data) {
-							if (data.status) {
-								const all = document.querySelectorAll("[data-filtered]");
-								for (const message of all) {
-									message.parentNode.style.display = data.status.data.includes(message.dataset.filtered) ? "block" : "none";
-								}
-							}
-							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-						};
-						break;
-					default:
-						successFn = function (data) {
-							if (data.body) {
-								api.update_header(title[request[1]]);
-								const body = new Assemble(data.body);
-								document.getElementById("main").replaceChildren(body.initializeSection());
-								body.processAfterInsertion();
-								api.preventDataloss.start();
-							}
-							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							if (request[1] === "inbox" && _serviceWorker.worker)
-								_serviceWorker.onMessage({
-									unseen: 0,
-								});
-						};
-						if (request[2]) payload = _.getInputs(request[2]);
-						break;
-				}
+					successFn = function (data) {
+						if (data.body) {
+							api.update_header(title[request[1]]);
+							const body = new Assemble(data.body);
+							document.getElementById("main").replaceChildren(body.initializeSection());
+							body.processAfterInsertion();
+						}
+						if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+						if (request[1] === "inbox" && _serviceWorker.worker)
+							_serviceWorker.onMessage({
+								unseen: 0,
+							});
+					};
 				break;
 			case "post":
 				if (2 in request && request[2] && typeof request[2] === "object") {

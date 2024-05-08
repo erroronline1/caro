@@ -71,9 +71,7 @@ class APPLICATION extends API {
 		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
 		$menu=[
 			LANG::GET('menu.communication_header') => [
-				LANG::GET('menu.message_inbox') => ['onpointerup' => "api.message('get', 'inbox')", 'data-unreadmessages' => '0'],
-				LANG::GET('menu.message_new') => ['onpointerup' => "api.message('get', 'message')"],
-				LANG::GET('menu.message_sent') => ['onpointerup' => "api.message('get', 'sent')"],
+				LANG::GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
 				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
 			LANG::GET('menu.record_header') => [
