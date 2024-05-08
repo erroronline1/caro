@@ -1480,4 +1480,51 @@ export class Assemble {
 		}
 		return [...this.header(), ...cal];
 	}
+
+	message() {
+		/*{
+			type: 'message',
+			content: {
+				img: profile-picture url,
+				text: well... text,
+				date: timestamp,
+				unseen: null|int
+			},
+			attributes:{
+				onpointerup
+				class: right, conversation, 
+			}
+		} */
+		let message, icondiv, icon, p, date, unseen;
+		message = document.createElement("div");
+
+		if (this.currentElement.content.img != undefined) {
+			icondiv=document.createElement('div');
+			icondiv.classList.add('image');
+			icon = document.createElement("img");
+			icon.src = this.currentElement.content.img;
+			icondiv.append(icon);
+			message.append(icondiv);
+		}
+		let display = this.currentElement.content.text.split("\n");
+		for (const line of display) {
+			p = document.createElement('p');
+			p.append(document.createTextNode(line));
+			message.append(p);
+		}
+		p = document.createElement('p');
+		date = document.createElement("small");
+		date.append(document.createTextNode(this.currentElement.content.date));
+		p.append(date);
+		message.append(p);
+		if (this.currentElement.content.unseen != undefined && this.currentElement.content.unseen) {
+			unseen = document.createElement("div");
+			unseen.append(document.createTextNode(this.currentElement.content.unseen));
+		}
+		if (this.currentElement.attributes !== undefined) message = this.apply_attributes(this.currentElement.attributes, message);
+		message.classList.add("message");
+		if (this.currentElement.dirright != undefined && this.currentElement.dirright) message.classList.add("right");
+
+		return [message];
+	}
 }

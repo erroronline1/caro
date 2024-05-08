@@ -811,6 +811,35 @@ article > article {
 	opacity: 0.4;
 }
 
+/*************************** messages ******************************/
+
+.message {
+	width: 100%;
+
+	div.image img {
+		margin: 0 0.5em 0.5em 0;
+		float: left;
+		width: 3em;
+		height: 3em;
+		border-radius: 50%;
+	}
+	div {
+		background-color: var(--red);
+		color: var(--background);
+	}
+}
+.message.conversation {
+	width: 80%;
+}
+.message.right{
+	text-align: right;
+	div.image img {
+		margin: 0 0em 0.5em .5em;
+		float: right;
+	}
+
+}
+
 /*************************** general elements ******************************/
 
 h1 {
