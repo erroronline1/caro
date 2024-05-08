@@ -605,10 +605,7 @@ export const api = {
 				if (data.status !== undefined && data.status.redirect) api.message("get", data.status.redirect);
 			},
 			title = {
-				inbox: LANG.GET("menu.message_inbox"),
-				sent: LANG.GET("menu.message_sent"),
-				message: LANG.GET("menu.message_new"),
-				conversations: LANG.GET("menu.message_conversations"),
+				conversation: LANG.GET("menu.message_conversations"),
 			};
 
 		switch (method) {
@@ -619,6 +616,7 @@ export const api = {
 							const body = new Assemble(data.body);
 							document.getElementById("main").replaceChildren(body.initializeSection());
 							body.processAfterInsertion();
+							if (request[2])	window.scrollTo(0, document.body.scrollHeight);
 						}
 						if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 						if (request[1] === "inbox" && _serviceWorker.worker)

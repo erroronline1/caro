@@ -164,7 +164,6 @@ class API {
 		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
 		foreach($recipients as $rcpnt_id) {
 			$postmessage = [
-				'from_user' => 1,
 				'to_user' => $rcpnt_id,
 				'message' => $message
 			];

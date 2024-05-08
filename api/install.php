@@ -72,8 +72,8 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_messages` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
-				"	`from_user` int NOT NULL," .
-				"	`to_user` int NOT NULL," .
+				"	`conversation_user` int NOT NULL," .
+				"	`sender` int NOT NULL," .
 				"	`message` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`timestamp` timestamp NOT NULL," .
 				"	`notified` tinyint NULL DEFAULT NULL," .
@@ -243,8 +243,8 @@ $queries = [
 				"CREATE TABLE caro_messages (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	user_id int NOT NULL," .
-				"	from_user int NOT NULL," .
-				"	to_user int NOT NULL," .
+				"	conversation_user int NOT NULL," .
+				"	sender int NOT NULL," .
 				"	message varchar(MAX) NOT NULL," .
 				"	timestamp smalldatetime NOT NULL," .
 				"	notified tinyint NULL DEFAULT NULL," .

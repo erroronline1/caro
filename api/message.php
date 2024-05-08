@@ -74,13 +74,19 @@ class MESSAGE extends API {
 
 	public function conversation(){
 		// shorter update cycle for chatlike functionality?
-		// scroll to bottom
 		// group chats
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				$result = ['body'=>['content'=> []]];
+				// prepare existing users lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+				$statement->execute();
+				$user = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach($user as $key => $row) {
+					if ($row['id'] > 1)	$datalist[] = $row['name'];
+				}
 
 				if ($this->_conversation){
 					// select conversation
@@ -92,16 +98,52 @@ class MESSAGE extends API {
 					$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 					$conversation_content = [];
 					foreach($messages as $conversation){
-						$conversation['message'] = str_replace("\n", ' ', $conversation['message']);
 						$conversation_content[] = [
 							'type' => 'message',
 							'content' => [
 								'img' => $conversation['image'],
-								'text' => $conversation['conversation_user_name'] . "\n" . $conversation['message'],
+								'user' => $conversation['conversation_user_name'],
+								'text' => $conversation['message'],
 								'date' => $conversation['timestamp'],
 							],
 							'attributes' =>  [
-								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'right': ''
+								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
+								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('message.forward') ."', body: JSON.parse('" . 
+									json_encode(
+											[
+												[
+													'type' => 'datalist',
+													'content' => $datalist,
+													'attributes' => [
+														'id' => 'users'
+													]
+												],
+												[
+													'type' => 'textinput',
+													'attributes' => [
+														'name' => LANG::GET('message.to'),
+														'required' => true,
+														'list' => 'users',
+													]
+												],
+												[
+													'type' => 'textarea',
+													'attributes' => [
+														'name' => LANG::GET('message.message'),
+														'value' => preg_replace(["/\r/","/\n/"], ["\\r", "\\n"], LANG::GET('message.forward_message', [':message' => $conversation['message'], ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])),
+														'rows' => 8
+													]
+												]
+											]
+									 ) . "'), options:{".
+									"'".LANG::GET('order.add_information_cancel')."': false,".
+									"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
+									"}}).then(response => {if (response[LANG.GET('message.message')]) {".
+										"const formdata = new FormData();".
+										"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
+										"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
+										"api.message('post', 'message', formdata)}})"
+
 							]
 						];
 					}
@@ -137,18 +179,10 @@ class MESSAGE extends API {
 					];
 					$result['body']['form'] = [
 						'data-usecase' => 'message',
-						'action' => "javascript:api.message('post', 'message', '_', 'sent')"
+						'action' => "javascript:api.message('post', 'message', '_')"
 					];
 				}
 				else {
-					// prepare existing users lists
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-					$statement->execute();
-					$user = $statement->fetchAll(PDO::FETCH_ASSOC);
-					foreach($user as $key => $row) {
-						if ($row['id'] > 1)	$datalist[] = $row['name'];
-					}
-
 					$result['body']['content'][] = [
 						[
 							'type' => 'button',
@@ -199,15 +233,25 @@ class MESSAGE extends API {
 					]);
 					$conversations = $statement->fetchAll(PDO::FETCH_ASSOC);
 					foreach($conversations as $conversation){
-						$conversation['message'] = str_replace("\n", ' ', $conversation['message']);
+
+					// select unseen per conversation
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen_conversations'));
+					$statement->execute([
+						':user' => $_SESSION['user']['id'],
+						':conversation' => $conversation['conversation_user']
+					]);
+					$unseen = $statement->fetch(PDO::FETCH_ASSOC);
+
+						$conversation['message'] = preg_replace('/\n|\r/', ' ', $conversation['message']);
 						$result['body']['content'][] = [
 							[
 								'type' => 'message',
 								'content' => [
 									'img' => $conversation['image'],
-									'text' => $conversation['conversation_user_name'] . "\n" . (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
+									'user' => $conversation['conversation_user_name'],
+									'text' => (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
 									'date' => $conversation['timestamp'],
-			//						unseen: null|int
+									'unseen' => $unseen['unseen']
 								],
 								'attributes' =>  [
 									'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
@@ -237,14 +281,7 @@ class MESSAGE extends API {
 				break;
 		}
 		$this->response($result);
-
 	}
-
-	public function usrlist(){
-		// list users with pic axcluding systemuser
-		// for new messages, initiate new message
-	}
-
 }
 
 $api = new MESSAGE();
