@@ -97,6 +97,11 @@ class MESSAGE extends API {
 					]);
 					$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 					$conversation_content = [];
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
+					$statement->execute([
+						':id' => $this->_conversation
+					]);
+					$conversation_user = $statement->fetch(PDO::FETCH_ASSOC);
 					foreach($messages as $conversation){
 						$conversation_content[] = [
 							'type' => 'message',
@@ -161,26 +166,27 @@ class MESSAGE extends API {
 						]
 					];
 					$result['body']['content'][] = $conversation_content;
-					$result['body']['content'][] = [
-						[
-							'type' => 'hiddeninput',
-							'attributes' => [
-								'name' => LANG::GET('message.to'),
-								'value' => $this->_conversation
+					if ($conversation['conversation_user'] !== 1) {
+						$result['body']['content'][] = [
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => LANG::GET('message.to'),
+									'value' => $this->_conversation
+								]
+							],
+							[
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => LANG::GET('message.message_to', [':user' => $conversation_user['name']]),
+								]
 							]
-						],
-						[
-							'type' => 'textarea',
-							'attributes' => [
-								'name' => LANG::GET('message.message'),
-								'id' => 'messageprompt'
-							]
-						]
-					];
-					$result['body']['form'] = [
-						'data-usecase' => 'message',
-						'action' => "javascript:api.message('post', 'message', '_')"
-					];
+						];
+						$result['body']['form'] = [
+							'data-usecase' => 'message',
+							'action' => "javascript:api.message('post', 'message', '_')"
+						];
+					}
 				}
 				else {
 					$result['body']['content'][] = [
