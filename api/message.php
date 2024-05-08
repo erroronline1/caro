@@ -3,15 +3,10 @@
 class MESSAGE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
-	private $_requestedID = null;
-	private $_redirect = null;
-	
 	private $_conversation = null;
 
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-
 		$this->_conversation = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
@@ -73,8 +68,6 @@ class MESSAGE extends API {
 	}
 
 	public function conversation(){
-		// shorter update cycle for chatlike functionality?
-		// group chats
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){

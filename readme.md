@@ -62,7 +62,6 @@
 
 #### todo misc
 * user selectable color themes?
-* message ordering and categorizing, displaying left and right
 * risk management?
 
 
