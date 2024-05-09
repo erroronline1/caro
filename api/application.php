@@ -162,13 +162,13 @@ class APPLICATION extends API {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.message('get', 'inbox')",
+					'onpointerup' => "api.message('get', 'conversation')",
 				],
 				'content' => [
 					[
 						'type' => 'text',
 						'content' => LANG::GET('application.overview_messages', [':number' => $unseen['number']]),
-						'description' => LANG::GET('menu.message_inbox'),
+						'description' => LANG::GET('menu.message_conversations'),
 						'attributes' => [
 							'data-type' => 'message'
 						]
