@@ -524,7 +524,7 @@ class AUDIT extends API {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
-					$regulatory[$regulatory_context][] = $row['name'] . ' (' . $row['date'] . ')';
+					$regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')"];
 				}
 			}
 		}
@@ -540,9 +540,9 @@ class AUDIT extends API {
 		];
 		foreach(LANGUAGEFILE['regulatory'] as $key => $issue){
 			if (array_key_exists($key, $regulatory)) $issues[] = [
-				'type' => 'text',
+				'type' => 'links',
 				'description' => $issue,
-				'content' => implode("\n", $regulatory[$key])
+				'content' => $regulatory[$key]
 			];
 			else $issues[] = [
 				'type' => 'text',
