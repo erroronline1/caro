@@ -105,6 +105,10 @@ class APPLICATION extends API {
 		if (array_intersect(['user'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
 		}
+		if (array_intersect(['admin', 'office', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
+			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
+		}
 		if (array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
@@ -114,9 +118,6 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
-		}
-		if (array_intersect(['admin', 'office', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
 		}
 		if (array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
@@ -138,14 +139,14 @@ class APPLICATION extends API {
 	}
 
 	/**
-	 * respond with LANGUAGEFILE as tarnsfer to js frontend
+	 * respond with LANGUAGEFILE as transfer to js frontend
 	 */
     public function language(){
 		$this->response(['body' => LANG::GETALL()]);
 	}
 
 	/**
-	 * respond with manual
+	 * respond with landing page
 	 */
 	public function start(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);

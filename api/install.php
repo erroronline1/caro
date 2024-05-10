@@ -125,6 +125,14 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
+				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`retired` timestamp NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
 				"CREATE TABLE IF NOT EXISTS `caro_manual` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`title` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -293,6 +301,14 @@ $queries = [
 				"	date smalldatetime NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	active tinyint NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
+				"CREATE TABLE caro_file_external_documents (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	path varchar(MAX) NOT NULL," .
+				"	user varchar(MAX) NOT NULL," .
+				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .

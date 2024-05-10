@@ -36,10 +36,6 @@
 * hash sum check for data completeness?
 * external documents routing (13485 4.2.4)
 
-#### todo forms
-* view other forms as modal (e.g. instructions) - select applicable form within composer 
-* suggest next form? (load with identify)
-
 #### todo purchase
 * order only assigned units selecteable?
 * general orders select workshop storage number
@@ -84,7 +80,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
-    * also see [forms](#forms)
+    * External documents are routed.
+    * also see [forms](#forms), [files](#files)
 * ISO 13485 4.2.5 Record control
     * All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.
     * Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.
@@ -423,6 +420,8 @@ Admin, CEO, QMO and office can provide files for everyone to access. Also all us
 Both cloud storages equip the [tools STL-Viewer](#tools) with sources to display.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
+
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, retirement and the username for the last decision.
 
 [Content](#Content)
 

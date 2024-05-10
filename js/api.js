@@ -361,6 +361,10 @@ export const api = {
 		get file/filemanager/{directory}
 		delete file/filemanager/{directory}/{file}
 
+		post file/externalfilemanager
+		put file/externalfilemanager/{id}/{int accessible}
+		get file/externalfilemanager
+
 		get file/bundle/{bundle}
 
 		post file/bundlemanager

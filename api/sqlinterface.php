@@ -232,6 +232,27 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
 			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
 		],
+		'file_external_documents-get' => [
+			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"
+		],
+		'file_external_documents-get-active' => [
+			'mysql' => "SELECT * FROM caro_file_external_documents WHERE IFNULL(retired, 'null') = 'null' ORDER BY path ASC",
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, 'null') = 'null' ORDER BY path ASC"
+		],
+		'file_external_documents-retire' => [
+			'mysql' => "UPDATE caro_file_external_documents SET user = :user, retired = CURRENT_TIMESTAMP() WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET user = :user, retired = CURRENT_TIMESTAMP() WHERE id = :id"
+		],
+		'file_external_documents-unretire' => [
+			'mysql' => "UPDATE caro_file_external_documents SET user = :user, retired = NULL WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET user = :user, retired = NULL WHERE id = :id"
+		],
+		'file_external_documents-post' => [
+			'mysql' => "INSERT INTO caro_file_external_documents (id, path, user, retired) VALUES (NULL, :path, :user, NULL)",
+			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, user, retired) VALUES (:path, :user, NULL)"
+		],
+		
 
 		'form_post' => [
 			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)",
