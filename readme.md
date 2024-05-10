@@ -10,7 +10,7 @@
     * [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
-    * [Messages](#messages)
+    * [Conversations](#conversations)
     * [Text recommendations](#text-recommendations)
     * [Forms](#forms)
     * [Records](#records)
@@ -95,7 +95,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Users can be assigned a pin to approve orders.
     * also see [user management](#user-management)
 * ISO 13485 5.5.3 Internal communication
-    * The application has a built in [messenger](#messages). This messenger is being made use of internal modules to ensure decent data distribution e.g.
+    * The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
         * alerting user groups about disapproved orders and order state changes
         * messaging inquiries to ordering users
@@ -103,7 +103,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
     * The interface alerts on new messages and approved orders (purchase members). The landing page displays a brief summary of unfinished items.
-    * also see [messages](#messages), [planning](#planning), [order](#order), [files](#files), [tools](#tools)
+    * also see [conversations](#conversations), [planning](#planning), [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
     * also see [users](#users), [tools](#tools)
@@ -258,8 +258,8 @@ graph TD;
 
 [Content](#Content)
 
-### Messages
-This is for internal communication and system alerts only and has no record aspect. You can message any registered user but the system user and delete any message at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
+### Conversations
+This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 [Content](#Content)
 
@@ -320,7 +320,7 @@ graph TD;
 ### Forms
 To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check, if all neccessary forms have been taken into account for defined use cases.
 
-An approvement request is delivered by the applications messenger to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit.
+An approvement request is delivered by the applications [messenger](#conversations) to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit.
 
 Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally neccessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
 
@@ -424,7 +424,7 @@ This source can also be used to provide documents that are [unsuitable to be fil
 ### Planning
 Add events to the calendar. The landing page gives a brief overview of weekly and daily events at a quick glance. Events can be added by every user, editing and deleting is permitted to elevated users including supervisors only.
 
-Events may trigger a [message](#messages) to a defined user group if set.
+Events may trigger a [message](#conversations) to a defined user group if set.
 
 You may choose to fully use this calendar for your operations and appointments but it is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place. You're free to use Outlook and the like along. The calendar only processed dates and no times anyway.
 
@@ -1007,7 +1007,7 @@ dialect["escape"] = ""
 
 ##### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-woker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
+* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 
