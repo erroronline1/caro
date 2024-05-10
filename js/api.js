@@ -392,6 +392,7 @@ export const api = {
 				sharepoint: LANG.GET("menu.files_sharepoint"),
 				filemanager: LANG.GET("menu.files_file_manager"),
 				bundlemanager: LANG.GET("menu.files_bundle_manager"),
+				externalfilemanager: LANG.GET("menu.files_external_file_manager"),
 			};
 
 		switch (method) {
