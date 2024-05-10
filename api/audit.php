@@ -254,7 +254,7 @@ class AUDIT extends API {
 
 	/**
 	 * returns all current approved forms with their respective components and approvement notes in alphabetical order
-	 * also form bundles
+	 * also form bundles and available external documents
 	 */
 	private function forms(){
 		$content = [];
@@ -338,6 +338,25 @@ class AUDIT extends API {
 			];
 		}
 
+		$externalcontent = [
+			[
+				'type' => 'text',
+				'description' => LANG::GET('audit.documents_in_use_external'),
+				'content' => ''
+			]
+		];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_external_documents-get-active'));
+		$statement->execute();
+		if ($files = $statement->fetchAll(PDO::FETCH_ASSOC)) {
+			foreach ($files as $file){
+				$externalcontent[] = [
+					'type' => 'text',
+					'description' => $file['path'],
+					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['user'], ':date' => date('Y-m-d H:i', filemtime($file['path']))])
+				];
+			}
+		}
+
 		$bundlescontent = [
 			[
 				'type' => 'text',
@@ -367,6 +386,7 @@ class AUDIT extends API {
 		];
 		
 		$content[] = $formscontent;
+		$content[] = $externalcontent;
 		$content[] = $bundlescontent;
 		return $content;
 	}
