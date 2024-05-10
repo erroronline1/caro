@@ -34,7 +34,6 @@
 #### todo application
 * ux tabs?
 * hash sum check for data completeness?
-* external documents routing (13485 4.2.4)
 
 #### todo purchase
 * order only assigned units selecteable?
@@ -80,7 +79,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
-    * External documents are routed.
+    * External documents are routed with recording implementation, retirement and most recent user interacting.
     * also see [forms](#forms), [files](#files)
 * ISO 13485 4.2.5 Record control
     * All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.
