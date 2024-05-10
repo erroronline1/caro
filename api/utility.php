@@ -414,7 +414,7 @@ class UTILITY {
 	}
 
 	/**
-	 * prepares a folder according to setup.ini and deleted files if lifespan is set
+	 * prepares a folder according to setup.ini and deletes files if lifespan is set
 	 * 
 	 * @param string $dir one of the fileserver keys
 	 * @param int $lifespan in hours
