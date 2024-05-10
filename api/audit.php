@@ -289,7 +289,7 @@ class AUDIT extends API {
 
 		// iterate over forms an their respective components
 		foreach($currentforms as $form){
-			$components = explode(',', $form['content']);
+			$components = explode(',', $form['content'] ? : '');
 			$componentlist = [];
 			foreach($components as $component){
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
@@ -314,10 +314,8 @@ class AUDIT extends API {
 						]);
 			}
 			$regulatory_context = [];
-			if ($form['regulatory_context']){
-				foreach(explode(',', $form['regulatory_context']) as $context){
-					if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
-				}
+			foreach(explode(',', $form['regulatory_context'] ? : '') as $context){
+				if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
 			}
 			$formscontent[] = [
 				'type' => 'text',
@@ -348,7 +346,7 @@ class AUDIT extends API {
 			]
 		];
 		foreach($currentbundles as $bundle){
-			$formslist = explode(',', $bundle['content']);
+			$formslist = explode(',', $bundle['content'] ? : '');
 			natsort($formslist);
 			$bundlescontent[] = [
 				'type' => 'text',
@@ -525,7 +523,7 @@ class AUDIT extends API {
 		foreach($fd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
-				foreach(explode(',', $row['regulatory_context']) as $regulatory_context){
+				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
 					$regulatory[$regulatory_context][] = $row['name'] . ' (' . $row['date'] . ')';
 				}
 			}
