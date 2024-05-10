@@ -102,7 +102,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The application has a built in calendar. This calendar is supposed to assist in planning operations and keeping track of time critical recurring events like calibrations etc. 
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
-    * The interface alerts on new messages and approved orders (purchase members). The landing page displays a brief summary of unfinished items.
+    * The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.
     * also see [conversations](#conversations), [planning](#planning), [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
@@ -140,6 +140,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * a list of current documents in use (forms and their components)
         * user files (e.g. certificates)
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
+        * fulfilment of regulatory issues considered by forms
     * also see [tools](#tools)
 
 [Content](#Content)
@@ -156,7 +157,7 @@ Beside a few architectural decisions the app is not a preset quality management 
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
-Orders can be deleted by administrative users and requesting unit members at any time. This module is for operational communication only, not for persistent documentation purpose.
+Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan. This module is for operational communication only, not for persistent documentation purpose.
 
 ### Data integrity
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
@@ -178,11 +179,11 @@ The application provides some options for registered users. The whole content is
     * can incorporate and sample check articles
 * Group
     * has access to all non writeable content
-    * can not add records due to limited identification data
+    * can **not** add records due to limited identification data
     * can contribute to open sharepoint
     * can place orders, will be prompted to identify themself
     * can only see orders for own assigned organizational units
-    * can not incorporate and sample check due to limited identification data
+    * can **not** incorporate and sample check due to limited identification data
 * Supervisor
     * can approve form components and forms
 * Office
@@ -209,7 +210,7 @@ Permissions of QMO and CEO do hardly differ, but are neccessary being assigned t
 
 Users can have multiple assigned organizational units.
 
-On registering a new user a default profile picture is generated. Custom set pictures can not be deleted.
+On registering a new user a default profile picture is generated. Custom set pictures can not be deleted, only overwritten.
 
 Adding files is granted to elevated users only, to make sure certificates are acknowledged.
 
@@ -273,6 +274,7 @@ To avoid unneccesary or repetitive poetry and support a consistent linguistic st
 * Adult genderless - the person
 * Informal you - "buddy"
 * Formal you - "your honor" (this is the german model part where there is more than just "you")
+
 Such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
@@ -370,6 +372,8 @@ Paperless might not be suitable in humid environments. Thus single documents can
 The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
 
 Checking for completeness of form bundles can be applied on display of a record summary.
+
+Records can be marked as closed to disappear from the records overwiew and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword, name or identifier. On contributing the closed state is revoked by default.
 
 ```mermaid
 graph TD;
