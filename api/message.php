@@ -248,7 +248,7 @@ class MESSAGE extends API {
 									'content' => [
 										'img' => $conversation['image'],
 										'user' => $conversation['conversation_user_name'],
-										'text' => (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
+										'text' => (strlen($conversation['message'])>128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $conversation['timestamp'],
 										'unseen' => intval($unseen['unseen'])
 									],
