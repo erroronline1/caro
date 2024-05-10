@@ -231,33 +231,34 @@ class MESSAGE extends API {
 						':user' => $_SESSION['user']['id']
 					]);
 					$conversations = $statement->fetchAll(PDO::FETCH_ASSOC);
-					foreach($conversations as $conversation){
+					if ($conversations) {
+						foreach($conversations as $conversation){
+							// select unseen per conversation
+							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen_conversations'));
+							$statement->execute([
+								':user' => $_SESSION['user']['id'],
+								':conversation' => $conversation['conversation_user']
+							]);
+							$unseen = $statement->fetch(PDO::FETCH_ASSOC);
 
-					// select unseen per conversation
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen_conversations'));
-					$statement->execute([
-						':user' => $_SESSION['user']['id'],
-						':conversation' => $conversation['conversation_user']
-					]);
-					$unseen = $statement->fetch(PDO::FETCH_ASSOC);
-
-						$conversation['message'] = preg_replace('/\n|\r/', ' ', $conversation['message']);
-						$result['body']['content'][] = [
-							[
-								'type' => 'message',
-								'content' => [
-									'img' => $conversation['image'],
-									'user' => $conversation['conversation_user_name'],
-									'text' => (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
-									'date' => $conversation['timestamp'],
-									'unseen' => intval($unseen['unseen'])
-								],
-								'attributes' =>  [
-									'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
+							$conversation['message'] = preg_replace('/\n|\r/', ' ', $conversation['message']);
+							$result['body']['content'][] = [
+								[
+									'type' => 'message',
+									'content' => [
+										'img' => $conversation['image'],
+										'user' => $conversation['conversation_user_name'],
+										'text' => (strlen($conversation['message'])>100 ? substr($conversation['message'], 0, 100) . '...': $conversation['message']),
+										'date' => $conversation['timestamp'],
+										'unseen' => intval($unseen['unseen'])
+									],
+									'attributes' =>  [
+										'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
+									]
 								]
-							]
-						];
-					}
+							];
+						}
+					} else $result['body']['content'][] = $this->noContentAvailable(LANG::GET('message.no_messages'))[0];
 				}
 				break;
 			case 'DELETE':
