@@ -32,7 +32,7 @@ class FILE extends API {
 			foreach ($folders as $folder) {
 				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 			}
-			$files = array_merge($files, $this->activeexternalfiles());
+			$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
 		}
 		$matches = [];
 		foreach ($files as $file){
@@ -388,7 +388,8 @@ class FILE extends API {
 									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['user'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':date2' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['user'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
 									'content' => [
 										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
-									]
+									],
+									'data-filtered' => $file['path']
 								],
 								[
 									'type' => 'button',
@@ -403,7 +404,9 @@ class FILE extends API {
 								[
 									'type' => 'checkbox',
 									'content' => [
-										LANG::GET('file.external_file_available') => ($file['retired'] ? ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)"] : ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)"])
+										LANG::GET('file.external_file_available') => ($file['retired']
+										? ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
+										: ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
 									],
 								]
 							);

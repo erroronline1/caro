@@ -726,6 +726,7 @@ export class Assemble {
 		let header = document.createElement("header");
 		header.appendChild(document.createTextNode(this.currentElement.description));
 		header.setAttribute("data-type", this.currentElement.type);
+		if (this.currentElement['data-filtered']) header.dataset.filtered = this.currentElement['data-filtered'];
 		return [header];
 	}
 
@@ -1178,6 +1179,7 @@ export class Assemble {
 			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
 			input = this.apply_attributes(attributes, input);
 			label.htmlFor = input.id;
+			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
 			result.push(input);
 			result.push(label);
 		}
@@ -1201,6 +1203,7 @@ export class Assemble {
 				}
 			},
 			hint: 'these links serve the purpose of...'
+			data-filtered: any
 		}*/
 		let result = [...this.header()];
 		if (this.currentElement.attributes !== undefined) result.push(this.hiddeninput());
