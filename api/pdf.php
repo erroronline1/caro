@@ -234,6 +234,9 @@ class PDF{
 			$pdf->SetFont('helvetica', 'B', 10); // font size
 			$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 			$pdf->SetFont('helvetica', '', 10); // font size
+			if (gettype($value) === 'array') {
+				$value = implode("\n", array_keys($value));
+			}
 			$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 		}
 		// move pointer to last page
