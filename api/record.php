@@ -480,7 +480,7 @@ class record extends API {
 								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ."', 'body': '" . LANG::GET('record.record_mark_as_closed_info') . "', 'options':{".
 									"'" . LANG::GET('general.cancel_button') . "': false,".
 									"'" . LANG::GET('record.record_mark_as_closed') . "': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) {this.disabled = true; console.log('hello'); api.record('put', 'close', '" . $this->_requestedID . "')}})"
+									"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "')}})"
 							]
 						]);
 					}
