@@ -34,6 +34,7 @@
 #### todo application
 * ux tabs?
 * hash sum check for data completeness?
+* external documents routing (13485 4.2.4)
 
 #### todo forms
 * view other forms as modal (e.g. instructions) - select applicable form within composer 
@@ -320,9 +321,9 @@ graph TD;
 [Content](#Content)
 
 ### Forms
-To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check, if all neccessary forms have been taken into account for defined use cases.
+To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all neccessary forms have been taken into account for defined use cases.
 
-An approvement request is delivered by the applications [messenger](#conversations) to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit.
+An approvement request is delivered by the applications [messenger](#conversations) to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in in the respective assigned role/permission. 
 
 Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally neccessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
 

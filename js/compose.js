@@ -54,7 +54,7 @@ export const compose_helper = {
 				attributes: {},
 			};
 		do {
-			if (!["span", "input", "textarea", "header"].includes(sibling.localName)) {
+			if (!["span", "input", "textarea", "header", "select"].includes(sibling.localName)) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
@@ -65,7 +65,7 @@ export const compose_helper = {
 			}
 			if (sibling.localName === "header") {
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
-				element["attributes"] = { value: buttonValues[sibling.dataset.type] };
+				if (!element.attributes) element["attributes"] = { value: buttonValues[sibling.dataset.type] };
 				sibling = sibling.nextSibling;
 				continue;
 			}
@@ -113,6 +113,11 @@ export const compose_helper = {
 				if (elementName === LANG.GET("assemble.compose_text_content") && value) {
 					element.content = value;
 				}
+			} else if (["formbutton"].includes(element.type)) {
+				if (elementName === LANG.GET("assemble.compose_link_form_select")) {
+					if (value) element.attributes.value = value;
+					else return;
+				}
 			} else if (["image"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_image_description") && value) element.description = value;
 				if (elementName === LANG.GET("assemble.compose_image") && value) {
@@ -138,6 +143,14 @@ export const compose_helper = {
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
 			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
+			if (elementName === LANG.GET("assemble.compose_link_form_choice") && value === LANG.GET("assemble.compose_link_form_display") && sibling.checked) {
+				element.attributes.onpointerup = "api.record('get','displayonly', '" + element.attributes.value + "')";
+				element.attributes.value = LANG.GET("assemble.compose_link_form_display_button", { ":form": element.attributes.value });
+			}
+			if (elementName === LANG.GET("assemble.compose_link_form_choice") && value === LANG.GET("assemble.compose_link_form_continue") && sibling.checked) {
+				element.attributes.onpointerup = "api.record('get','form', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
+				element.attributes.value = LANG.GET("assemble.compose_link_form_continue_button", { ":form": element.attributes.value });
+			}
 			sibling = sibling.nextSibling;
 		} while (sibling);
 		if (Object.keys(element).length > 1) {
@@ -1039,6 +1052,52 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_calendarbutton"),
+				"data-type": "addblock",
+			},
+		};
+		result = result.concat(...this.button());
+		return result;
+	}
+
+	compose_formbutton() {
+		let result = [this.br()],
+			forms = this.currentElement.content,
+			options = {};
+
+		this.currentElement = {
+			type: "text",
+			attributes: {
+				"data-type": "formbutton",
+			},
+			description: LANG.GET("assemble.compose_link_form"),
+		};
+		result = result.concat(...this.text());
+
+		this.currentElement = {
+			type: "select",
+			attributes: {
+				name: LANG.GET("assemble.compose_link_form_select"),
+			},
+			content: forms,
+		};
+		result = result.concat(...this.select());
+
+		this.currentElement = {
+			type: "radio",
+			attributes: { name: LANG.GET("assemble.compose_link_form_choice") },
+			content: {},
+		};
+		this.currentElement.content[LANG.GET("assemble.compose_link_form_display")] = {
+			required: true,
+		};
+		this.currentElement.content[LANG.GET("assemble.compose_link_form_continue")] = {
+			required: true,
+		};
+		result = result.concat(this.br(), ...this.radio());
+
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET("assemble.compose_link_form"),
 				"data-type": "addblock",
 			},
 		};

@@ -834,16 +834,15 @@ article > article {
 	}
 }
 .message.conversation {
-	padding: 0 5em 0 0 ;
+	padding: 0 5em 0 0;
 }
-.message.right{
+.message.right {
 	text-align: right;
-	padding: 0 0 0 5em ;
+	padding: 0 0 0 5em;
 	div.image img {
-		margin: 0 0em 0.5em .5em;
+		margin: 0 0em 0.5em 0.5em;
 		float: right;
 	}
-
 }
 
 /*************************** general elements ******************************/
@@ -1155,8 +1154,15 @@ button[data-type="submitbutton"]::before {
 	background-image: url("./media/comment.svg");
 }
 
-[data-type="record"]::before {
+[data-type="record"]::before,
+[data-type="formbutton"]::before {
 	background-image: url("./media/file-signature.svg");
+}
+button[data-type="formbutton"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/file-signature.svg");
+	mask-image: url("./media/file-signature.svg");
 }
 
 [data-type="alert"]::before {

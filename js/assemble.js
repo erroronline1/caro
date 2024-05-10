@@ -145,7 +145,7 @@ export class Dialog {
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
-			img.onpointerdown = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" + modal + "').close()");
+			img.onpointerup = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" + modal + "').close()");
 			form.append(img);
 			if (this.header || this.body || this.icon) {
 				const header = document.createElement("header");
@@ -520,7 +520,7 @@ export class Assemble {
 			if (elements[0].constructor.name === "Array") content = content.concat(section, this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
-			content = content.concat(this[elements.type]());
+			if (elements.type) content = content.concat(this[elements.type]());
 		}
 		return content;
 	}
@@ -876,6 +876,12 @@ export class Assemble {
 	calendarbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "calendarbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return [this.br(), ...this.button()];
+	}
+	formbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "formbutton";
 		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return [this.br(), ...this.button()];
 	}
@@ -1500,18 +1506,18 @@ export class Assemble {
 		message = document.createElement("div");
 
 		if (this.currentElement.content.img != undefined) {
-			icondiv=document.createElement('div');
-			icondiv.classList.add('image');
+			icondiv = document.createElement("div");
+			icondiv.classList.add("image");
 			icon = document.createElement("img");
 			icon.src = this.currentElement.content.img;
 			icondiv.append(icon);
 			message.append(icondiv);
 		}
-		p = document.createElement('p');
+		p = document.createElement("p");
 		p.append(document.createTextNode(this.currentElement.content.user));
 		message.append(p);
 
-		p = document.createElement('p');
+		p = document.createElement("p");
 		date = document.createElement("small");
 		date.append(document.createTextNode(this.currentElement.content.date));
 		p.append(date);
@@ -1519,7 +1525,7 @@ export class Assemble {
 
 		let display = this.currentElement.content.text.split(/\r|\n/);
 		for (const line of display) {
-			p = document.createElement('p');
+			p = document.createElement("p");
 			p.append(document.createTextNode(line));
 			message.append(p);
 		}

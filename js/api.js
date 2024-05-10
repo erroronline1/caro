@@ -610,20 +610,20 @@ export const api = {
 
 		switch (method) {
 			case "get":
-					successFn = function (data) {
-						if (data.body) {
-							api.update_header(title[request[1]]);
-							const body = new Assemble(data.body);
-							document.getElementById("main").replaceChildren(body.initializeSection());
-							body.processAfterInsertion();
-							if (request[2])	window.scrollTo(0, document.body.scrollHeight);
-						}
-						if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-						if (request[1] === "inbox" && _serviceWorker.worker)
-							_serviceWorker.onMessage({
-								unseen: 0,
-							});
-					};
+				successFn = function (data) {
+					if (data.body) {
+						api.update_header(title[request[1]]);
+						const body = new Assemble(data.body);
+						document.getElementById("main").replaceChildren(body.initializeSection());
+						body.processAfterInsertion();
+						if (request[2]) window.scrollTo(0, document.body.scrollHeight);
+					}
+					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+					if (request[1] === "inbox" && _serviceWorker.worker)
+						_serviceWorker.onMessage({
+							unseen: 0,
+						});
+				};
 				break;
 			case "post":
 				if (2 in request && request[2] && typeof request[2] === "object") {
@@ -678,8 +678,8 @@ export const api = {
 				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
 				break;
 			case "put":
-				switch(request[1]){
-					case 'complete':
+				switch (request[1]) {
+					case "complete":
 						break;
 					default:
 						payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
@@ -975,6 +975,18 @@ export const api = {
 							}
 						};
 						payload = { IDENTIFY_BY_: request[2] };
+						break;
+					case "displayonly":
+						// for linked forms within forms
+						successFn = function (data) {
+							if (data.body) {
+								const options = {};
+								options[LANG.GET("general.ok_button")] = false;
+								new Dialog({ type: "input", header: data.title, body: data.body, options: options });
+							}
+							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+						};
+						request[1] = "form";
 						break;
 					case "fullexport":
 					case "simplifiedexport":

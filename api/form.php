@@ -48,18 +48,19 @@ class FORMS extends API {
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']]) . ' - ' . $approved] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
+		// load approved forms for accasional linking
 		// check for dependencies in forms
+		$approvedforms = [];
 		$dependedforms = [];
-		if (array_key_exists('content', $component)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-			$statement->execute();
-			$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
-			$hidden = [];
-			foreach($fd as $row) {
-				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-				if (!in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
-					$dependedforms[] = $row['name'];
-				}
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement->execute();
+		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$hidden = [];
+		foreach($fd as $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $hidden)) $approvedforms[$row['name']] = []; // prepare for selection
+			if (array_key_exists('content', $component) && !in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+				$dependedforms[] = $row['name'];
 			}
 		}
 
@@ -181,6 +182,11 @@ class FORMS extends API {
 						'form' => true,
 						'type' => 'compose_calendarbutton',
 						'description' => LANG::GET('assemble.compose_calendarbutton')
+					]], [[
+						'form' => true,
+						'type' => 'compose_formbutton',
+						'description' => LANG::GET('assemble.compose_link_form'),
+						'content' => $approvedforms
 					]]
 				],
 				[[
