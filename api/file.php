@@ -14,6 +14,10 @@ class FILE extends API {
 		$this->_requestedFile = $this->_accessible = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
+	/**
+	 * returns paths to documents that are available according to database
+	 * @return array filepaths
+	 */
 	private function activeexternalfiles(){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_external_documents-get-active'));
 		$statement->execute();
@@ -22,6 +26,10 @@ class FILE extends API {
 		return [];
 	}
 
+	/**
+	 * filters files according to request string and passed folder if applicable
+	 * responds with paths matching request
+	 */
 	public function filter(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
@@ -37,13 +45,17 @@ class FILE extends API {
 		$matches = [];
 		foreach ($files as $file){
 			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
-			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file,1);
+			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
 		}
 		$this->response(['status' => [
 			'data' => $matches
 		]]);
 	}
 
+	/**
+	 * filters file bundles according to request string
+	 * responds with bundle ids matching request
+	 */
 	public function bundlefilter(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
@@ -59,6 +71,9 @@ class FILE extends API {
 		]]);
 	}
 
+	/**
+	 * responds with content of available files for restricted uploads and external documents
+	 */
 	public function files(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body'] = [
@@ -109,11 +124,15 @@ class FILE extends API {
 		$this->response($result);
 	}
 
+	/**
+	 * get responds with content of available folders or files for restricted uploads
+	 * post responds with success state of upload
+	 * delete responds with success state of deletion
+	 * 
+	 * no put method for windows server permissions are a pita
+	 * thus directories can not be renamed
+	 */
 	public function filemanager(){
-		/**
-		 * no put method for windows server permissions are a pita
-		 * thus directories can not be renamed
-		 */
 		if (!(array_intersect(['admin', 'ceo', 'qmo', 'office'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -305,6 +324,13 @@ class FILE extends API {
 		}
 	}
 
+	/**
+	 * get responds with content of available files for external documents
+	 * post responds with success state of upload
+	 * put responds with success state of either setting availability or regulatory context
+	 * 
+	 * no delete for audit safety
+	 */
 	public function externalfilemanager(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo', 'office'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -474,6 +500,9 @@ class FILE extends API {
 		}
 	}
 
+	/**
+	 * responds with content of available file bundles
+	 */
 	public function bundle(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body'] = [
@@ -515,6 +544,12 @@ class FILE extends API {
 		$this->response($result);
 	}
 
+	/**
+	 * get responds with form to select and save file bundles
+	 * post responds with success state of saving
+	 * 
+	 * no delete nor put for audit safety
+	 */
 	public function bundlemanager(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -664,6 +699,12 @@ class FILE extends API {
 		}
 	}
 
+	/**
+	 * get responds with content of available files, clears overdue files according to defined lifespan
+	 * post responds with success state of saving
+	 * 
+	 * no delete for being automated
+	 */
 	public function sharepoint(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -695,8 +736,8 @@ class FILE extends API {
 				$display=[];
 				if ($files){
 					foreach ($files as $file){
-						$file=['path' => $file, 'name' => pathinfo($file)['basename']];
-						$filetime=filemtime($file['path']);
+						$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
+						$filetime = filemtime($file['path']);
 						if ((time()-$filetime)/3600 > INI['lifespan']['sharepoint']) {
 							UTILITY::delete($file['path']);
 						}

@@ -13,6 +13,10 @@ class CSVFILTER extends API {
 		$this->_requestedID = $this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 * gets and posts filter rules
+	 * no putting though for audit safety
+	 */
 	public function rule(){
 		if (!(array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -188,6 +192,10 @@ class CSVFILTER extends API {
 		}					
 	}
 
+	/**
+	 * get responds with form to select and apply filter
+	 * post responds with a download link to the result file after processing
+	 */
 	public function filter(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){

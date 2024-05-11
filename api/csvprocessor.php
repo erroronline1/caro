@@ -80,7 +80,7 @@ filters and returns a named array according to setup.
 		"replace": replaces regex matches with the given value either at a specified field or in all
 				   according to index 0 being a column name or none/null.
 				   if more than one replacement are provided new lines with altered column values will be added to the result
-				   replacements on a peculiar position have to be match[2] (full match, group 1 (^ if neccessary), group 2, ...rest)
+				   replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
 		"remove": remove columns from result, may have been used solely for filtering
 		"rewrite": adds newly named columns consisting of concatenated origin column values and separators.
 				   original columns will be omitted, nested within a list to make sure to order as given
@@ -164,8 +164,14 @@ class Listprocessor {
 		if ($this->_list) $this->filter();
 	}
 
+	/**
+	 * determine approximately difference of months (not taking leap years into account)
+	 * @param array $first [Y, m, d]
+	 * @param array $last [Y, m, d]
+	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
+	 * @return float difference
+	 */
 	public function monthdiff($first = [], $last = [], $dateformat = []){
-		/* determine approximately difference of months (not taking leap years into account) */
 		// force days and months two digit
 		$day = array_search('d', $dateformat);
 		$first[$day] = '01';//strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
@@ -182,8 +188,14 @@ class Listprocessor {
 		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
 	}
 
+	/**
+	 * adds a month delta to a passed date
+	 * @param array $date [Y, m, d]
+	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
+	 * @param int $delta number of months 
+	 * @return array new date
+	 */
 	public function monthdelta($date = [], $dateformat = [], $delta = 0){
-		/* adds a delta to a passed date */
 		// force days and months two digit
 		$day = array_search('d', $dateformat);
 		$date[$day] = '01';//strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
@@ -198,8 +210,12 @@ class Listprocessor {
 		return explode('-', $offset_date->format($dateformat));
 	}
 
+	/**
+	 * tries to calculate an expression, returns rounded number, otherwise string
+	 * @param array $expression of several strings, occasionally including numbers and arithmetic operators
+	 * @return string|float|int result of arithmetic operation or imploded string
+	 */
 	public function calculate($expression = []){
-		/* tries to calculate an expression, returns rounded number, otherwise string */
 		$expression = str_replace(',', '.', implode('', $expression));
 		if (preg_match('/^[0-9\+\-\*\/\(\)\.]+$/', $expression)) {
 			return round(eval('return ' . $expression . ';'));
@@ -784,7 +800,7 @@ class Listprocessor {
 												// plain replacement of first match
 												if (count($matches)<2) return $rule[$replacement];
 												// replacement on peculiar position
-												// ensure a pattern where $match[2] has to be replaced. match string start (^) if neccessary
+												// ensure a pattern where $match[2] has to be replaced. match string start (^) if necessary
 												// ignore $match[0] for being the whole match w/o groups
 												return count($matches)>3 ? implode('', [$matches[1], $rule[$replacement], ...array_slice($matches,3)]) : $matches[1] . $rule[$replacement];	    	
 											},

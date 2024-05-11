@@ -8,7 +8,7 @@ class CALENDAR {
 
 
    	/**
-	 * preset database connection, passes from main application
+	 * preset database connection, passed from main application
 	 */
 	private $_pdo = null;
 
@@ -35,6 +35,8 @@ class CALENDAR {
 	/**
 	 * calculates holidays for given year, according to setup.ini
 	 * no setting up on construction for possible year overlaps on week rendering
+	 * @param int $year Y
+	 * @return array containing holiday dates for a given year
 	 */
 	private function holidays($year){
 		$holidays = $this->_holidays;
@@ -46,7 +48,7 @@ class CALENDAR {
 		foreach($this->_easter_holidays as $day => $offset){
 			$easterholiday = clone $easter;
 			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
-			$holidays[]= $easterholiday->format('Y-m-d');
+			$holidays[] = $easterholiday->format('Y-m-d');
 		}
 		return $holidays;
 	}
@@ -56,8 +58,6 @@ class CALENDAR {
 	 * 
 	 * @param string $type month|week
 	 * @param string $date yyyy-mm-dd
-	 * 
-	 * @return array $calendar [null for display offset || DateTime object]
 	 */
 	private function days($type = '', $date = ''){
 		$result = [];
@@ -93,7 +93,7 @@ class CALENDAR {
 	 * @param string $type month|week
 	 * @param string $date yyyy-mm-dd
 	 * 
-	 * @return array $calendar [null for display offset || day info]
+	 * @return array assemble.js calendar type
 	 */
 	public function render($type = '', $date = ''){
 		$result = ['header' => null, 'content' => []];
@@ -126,13 +126,14 @@ class CALENDAR {
 	/**
 	 * returns a dialog script to contibute to the calendar
 	 * 
-	 * @param str $date event date Y-m-d
-	 * @param str $type calendar/alert type
-	 * @param str $content event text
-	 * @param str $due due date Y-m-d
-	 * @param str $organizational_unit comma separated preselected units
+	 * @param string $date event date Y-m-d
+	 * @param string $type calendar/alert type
+	 * @param string $content event text
+	 * @param string $due due date Y-m-d
+	 * @param string $organizational_unit comma separated preselected units
 	 * @param int $alert event triggers message
 	 * @param int $id event database id for updating
+	 * @return string dialog js script
 	 * 
 	 */
 	public function dialog($date = '', $type = 'planning', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
@@ -204,7 +205,8 @@ class CALENDAR {
 	}
 
 	/**
-	 * @param str $date Y-m-d
+	 * @param string $date Y-m-d
+	 * @return array sql result
 	 */
 	public function getdate($date = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
@@ -215,7 +217,8 @@ class CALENDAR {
 	}
 
 	/**
-	 * @param str $date Y-m-d
+	 * @param string $date Y-m-d
+	 * @return array sql result
 	 */
 	public function alert($date = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_alert'));
@@ -225,8 +228,9 @@ class CALENDAR {
 	}
 
 	/**
-	 * @param str $earlier Y-m-d | null
-	 * @param str $later Y-m-d | null
+	 * @param string $earlier Y-m-d | null
+	 * @param string $later Y-m-d | null
+	 * @return array sql result
 	 */
 	public function getdaterange($earlier = '', $later = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date-range'));
@@ -239,6 +243,7 @@ class CALENDAR {
 
 	/**
 	 * @param int $content
+	 * @return array sql result
 	 */
 	public function search($content = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_search'));
@@ -249,13 +254,14 @@ class CALENDAR {
 	}
 
 	/**
-	 * @param str $date
-	 * @param str $due
-	 * @param str $type
-	 * @param str $author
-	 * @param str $organizational_unit
-	 * @param str $content
+	 * @param string $date
+	 * @param string $due
+	 * @param string $type
+	 * @param string $author
+	 * @param string $organizational_unit
+	 * @param string $content
 	 * @param int $alert
+	 * @return int|bool insert id
 	 */
 	public function post($date = '', $due = '', $type = '', $author = '', $organizational_unit = '', $content = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_post'));
@@ -273,11 +279,12 @@ class CALENDAR {
 
 	/**
 	 * @param int $id
-	 * @param str $date
-	 * @param str $due
-	 * @param str $organizational_unit
-	 * @param str $content
+	 * @param string $date
+	 * @param string $due
+	 * @param string $organizational_unit
+	 * @param string $content
 	 * @param int $alert
+	 * @return int affected rows
 	 */
 	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
@@ -296,6 +303,7 @@ class CALENDAR {
 	/**
 	 * @param int $id
 	 * @param any $complete boolval false will clear
+	 * @return int affected rows
 	 */
 	public function complete($id = 0, $complete = null){
 		if ($complete) $complete = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
@@ -309,6 +317,7 @@ class CALENDAR {
 
 	/**
 	 * @param int $id
+	 * @return int affected rows
 	 */
 	public function delete($id = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_delete'));
