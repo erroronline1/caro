@@ -128,7 +128,7 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`user` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`retired` timestamp NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -308,7 +308,7 @@ $queries = [
 				"CREATE TABLE caro_file_external_documents (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	path varchar(MAX) NOT NULL," .
-				"	user varchar(MAX) NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
 				"	regulatory_context varchar(MAX) NOT NULL," .
 				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"

@@ -340,7 +340,7 @@ class FILE extends API {
 					$insertions = [];
 					foreach($files as $file){
 						$insertions[] = [
-							':user' => $this->_pdo->quote($_SESSION['user']['name']),
+							':author' => $this->_pdo->quote($_SESSION['user']['name']),
 							':path' => $this->_pdo->quote($file)
 						];
 					}
@@ -373,7 +373,7 @@ class FILE extends API {
 					case '0':
 						$prepare = 'file_external_documents-retire';
 						$tokens = [
-							':user' => $_SESSION['user']['name'],
+							':author' => $_SESSION['user']['name'],
 							':id' => $this->_requestedId
 						];
 						$response = LANG::GET('file.external_file_retired_success');
@@ -381,7 +381,7 @@ class FILE extends API {
 					case '1':
 						$prepare = 'file_external_documents-unretire';
 						$tokens = [
-							':user' => $_SESSION['user']['name'],
+							':author' => $_SESSION['user']['name'],
 							':id' => $this->_requestedId
 						];
 						$response = LANG::GET('file.external_file_available_success');
@@ -446,7 +446,7 @@ class FILE extends API {
 							array_push($result['body']['content'][1],
 								[
 									'type' => 'links',
-									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['user'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':date2' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['user'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
+									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':date2' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
 									'content' => [
 										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 									],

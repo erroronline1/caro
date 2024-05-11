@@ -241,20 +241,20 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, 'null') = 'null' ORDER BY path ASC"
 		],
 		'file_external_documents-retire' => [
-			'mysql' => "UPDATE caro_file_external_documents SET user = :user, retired = CURRENT_TIMESTAMP() WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET user = :user, retired = CURRENT_TIMESTAMP() WHERE id = :id"
+			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id"
 		],
 		'file_external_documents-unretire' => [
-			'mysql' => "UPDATE caro_file_external_documents SET user = :user, retired = NULL WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET user = :user, retired = NULL WHERE id = :id"
+			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id"
 		],
 		'file_external_documents-context' => [
 			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id"
 		],
 		'file_external_documents-post' => [
-			'mysql' => "INSERT INTO caro_file_external_documents (id, path, user, regulatory_context, retired) VALUES (NULL, :path, :user, :regulatory_context, NULL)",
-			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, user, regulatory_context, retired) VALUES (:path, :user, :regulatory_context, NULL)"
+			'mysql' => "INSERT INTO caro_file_external_documents (id, path, author, regulatory_context, retired) VALUES (NULL, :path, :author, '', NULL)",
+			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, author, regulatory_context, retired) VALUES (:path, :author, '', NULL)"
 		],
 		
 
