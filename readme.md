@@ -7,6 +7,7 @@
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
     * [Data integrity](#data-integrity)
+* [Regulatory fulfillment suggestions](#regulatory-fulfillment-suggestions)
 * [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
@@ -52,7 +53,6 @@
 
 #### todo records
 * linked files on separate external path
-* monitoring measuring equipment, rental parts, machinery, crutches, software validation
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 
@@ -79,7 +79,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
-    * External documents are routed with recording implementation, retirement and most recent user interacting.
+    * External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting.
     * also see [forms](#forms), [files](#files)
 * ISO 13485 4.2.5 Record control
     * All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.
@@ -129,7 +129,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
     * also see [records](#records)
 * ISO 13485 7.6 Surveillance and measuring equipment control
-    * --- yet to be implemented ---
+    * Dedicated forms make use of an identifier like production forms. Measuring equipment may each have assigned their distinct identifier.
+    * Adding a form component to adress planning helps with future events that will show up and alert user groups where reasonable.
 * ISO 13485 8.2.4 Internal audit
     * The audit module aquires data from the application and is partially able to export
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
@@ -162,6 +163,37 @@ As records intend to save the submitting users name, group accounts are unrecomm
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
 Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
+
+[Content](#Content)
+
+### Regulatory fulfillment suggestions
+Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#tools).
+* Create forms describing required documentation of processes and assign a *Process or work instruction*-form-context and the fitting regulatory context.
+    * ISO 13485 all chapters should be adressed
+    * You may refer to this documentation regarding the chapters stated in the [aims above](#aims).
+* Create forms that can be exported for a written form and assign a *General company record*-form-context and the fitting regulatory context.
+    * ISO 13485 4.1.5
+* Create forms and assign a *General company record*-form-context and the fitting regulatory context.
+    * any generic records, especially but not neccessarily limited to:
+    * ISO 13485 6.2
+    * ISO 13485 6.3
+    * ISO 13485 8.2, 8.2.3, 8.2.4
+    * educational regulations
+* Create forms and assign a *Case documentation*-form-context and the fitting regulatory context.
+    * ISO 13485 7.2, 7.2.1
+    * ISO 13485 7.3, 7.3.3, 7.3.4, 7.3.5, 7.3.6, 7.3.7, 7.3.8, 7.3.9, 7.3.10
+    * ISO 13483 7.5, 7.5.1, 7.5.3, 7.5.4, 7.5.6
+    * privacy statements
+    * SGB 5 §33
+    * MDR annex 1
+    * MDR annex 6
+    * MDR annex 7
+    * MDR annex 13
+* Create forms and assign a *MDR §14 Sample Check*- and/or *Product incorporation*-form-context and the fitting regulatory context.
+    * ISO 13485 7.4, 7.4.3
+* Create forms and assign a *Equipment surveillance*-form-context and the fitting regulatory context.
+    * ISO 13485 7.6
+    * MPBetreibV
 
 [Content](#Content)
 
@@ -420,7 +452,7 @@ Both cloud storages equip the [tools STL-Viewer](#tools) with sources to display
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
 [Content](#Content)
 
@@ -609,7 +641,12 @@ Some general tools are available to read and create 2D-barcodes, view STL-files 
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by admin, ceo, qmo and office.
 
-The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements.
+The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
+* incoporated articles
+* current documents in use including external documents
+* user certificates
+* vendor list
+* regulatory issues
 
 [Content](#Content)
 
@@ -937,8 +974,8 @@ language = "en" ; en, de, etc. according to available language.xx.ini files
 timezone = "Europe/Berlin"
 
 [lifespan]
-sharepoint =  48 ; HOURS, after these files will be deleted
-tmp =  24 ; HOURS, after these files will be deleted
+sharepoint = 48 ; HOURS, after these files will be deleted
+tmp = 24 ; HOURS, after these files will be deleted
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
 
 [splitresults]
