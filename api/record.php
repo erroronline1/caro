@@ -173,7 +173,8 @@ class record extends API {
 		$statement->execute([
 			':name' => $this->_requestedID
 		]);
-		if (!$form = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		$form = $statement->fetch(PDO::FETCH_ASSOC);
+		if (!$form || $form['hidden']) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $form['name'], 'body' => [
 			'form' => [
