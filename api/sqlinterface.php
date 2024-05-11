@@ -238,15 +238,15 @@ class SQLQUERY {
 		],
 		'file_external_documents-get-active' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents WHERE IFNULL(retired, 'null') = 'null' ORDER BY path ASC",
-			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, 'null') = 'null' ORDER BY path ASC"
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, CAST('1900-01-01 00:00:00' AS SMALLDATETIME) ) = '1900-01-01 00:00:00' OR retired = '1900-01-01 00:00:00' ORDER BY path ASC"
 		],
 		'file_external_documents-retire' => [
 			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'file_external_documents-unretire' => [
 			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CAST('1900-01-01 00:00:00' AS SMALLDATETIME) WHERE id = :id"
 		],
 		'file_external_documents-context' => [
 			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
