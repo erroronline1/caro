@@ -1174,10 +1174,11 @@ export class Compose extends Assemble {
 		}
 		if (regulatory_context) {
 			this.currentElement = {
-				content:regulatory_context,
-				attributes:{
-					name: LANG.GET("assemble.compose_form_regulatory_context")
-				}
+				content: regulatory_context,
+				attributes: {
+					name: LANG.GET("assemble.compose_form_regulatory_context"),
+					id: "ComponentRegulatoryContext",
+				},
 			};
 			result = result.concat(...this.checkboxinput());
 		}
