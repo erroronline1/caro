@@ -726,7 +726,7 @@ export class Assemble {
 		let header = document.createElement("header");
 		header.appendChild(document.createTextNode(this.currentElement.description));
 		header.setAttribute("data-type", this.currentElement.type);
-		if (this.currentElement['data-filtered']) header.dataset.filtered = this.currentElement['data-filtered'];
+		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		return [header];
 	}
 
@@ -816,7 +816,40 @@ export class Assemble {
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		if (type == "email") input.multiple = true;
+		if (type === "email") input.multiple = true;
+
+		if (type === "checkboxinput") {
+			input.type ="text";
+			const inputvalue = [];
+			for (const [key, value] of Object.entries(this.currentElement.content)) {
+				if (value.checked != undefined && value.checked) inputvalue.push(key);
+			}
+			input.value = inputvalue.join(", ");
+			input.onpointerup = new Function(
+				"new Dialog({type: 'input', header: '" +
+				this.currentElement.attributes.name.replace(/\[\]/g, "") +
+				"', body:" +
+				JSON.stringify([
+					[
+						{
+							type: "checkbox",
+							content: this.currentElement.content,
+						},
+					],
+				]) +
+				", " +
+				"options:{" +
+				"'" +
+				LANG.GET("assemble.compose_form_cancel") +
+				"': false," +
+				"'" +
+				LANG.GET("assemble.compose_form_confirm") +
+				"': {value: true, class: 'reducedCTA'}," +
+				"}}).then(response => { const e = document.getElementById('" +
+				input.id +
+				"'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}; e.dispatchEvent(new Event('change'));})");
+		}
+
 		if (this.currentElement.attributes.hidden !== undefined) return input;
 		return [...this.icon(), input, label, ...this.hint()];
 	}
@@ -844,6 +877,13 @@ export class Assemble {
 	emailinput() {
 		return this.input("email");
 	}
+	checkboxinput() {
+		// returns a text typed input with onpointerup modal with checkbox selection
+		// requires additional options property on this.currentElement containing an options object
+		// {'name':{value:str|int, checked: bool}}
+		return this.input("checkboxinput");
+	}
+
 	button() {
 		/*{
 			type: 'button',

@@ -1026,7 +1026,8 @@ button[data-type="photo"]::before {
 	mask-image: url("./media/camera.svg");
 }
 
-[data-type="select"]::before {
+[data-type="select"]::before,
+[data-type="checkboxinput"]::before {
 	background-image: url("./media/list.svg");
 }
 
