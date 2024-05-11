@@ -205,7 +205,8 @@ class FILE extends API {
 							'attributes' => [
 								'name' => LANG::GET('file.manager_new_folder'),
 								'required' => true
-							]
+							],
+							'hint' => LANG::GET('file.manager_no_external_files')
 						]
 					];
 				}
@@ -280,8 +281,10 @@ class FILE extends API {
 							'attributes' => [
 								'name' => LANG::GET('file.manager_new_file'),
 								'multiple' => true,
-								'required' => true]
-							]
+								'required' => true
+							],
+								'hint' => LANG::GET('file.manager_no_external_files')
+						]
 					];
 				}
 				$this->response($result);
