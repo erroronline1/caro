@@ -456,10 +456,10 @@ class FORMS extends API {
 			$approve['content'][$value] = [];
 		}
 		$regulatory_context = [];
-		if ($result['regulatory_context']){
-			foreach(explode(',', $result['regulatory_context']) as $context){
-				if (in_array($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
-			}
+		$result['regulatory_context'] = explode(',', $result['regulatory_context']);
+		foreach(LANGUAGEFILE['regulatory'] as $key => $value){
+			$regulatory_context[$value] = ['value' => $key];
+			if (in_array($key, $result['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 		}
 		$return['body'] = [
 			'content' => [
@@ -621,7 +621,7 @@ class FORMS extends API {
 				// convert values to keys for regulatory_context
 				$regulatory_context = [];
 				if ($this->_payload->regulatory_context) {
-					$rc = preg_split('/, /m', $this->_payload->regulatory_context);
+					$rc = explode(', ', $this->_payload->regulatory_context);
 					foreach($rc as $context){
 						$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
 					}

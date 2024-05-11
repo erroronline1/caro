@@ -1173,42 +1173,13 @@ export class Compose extends Assemble {
 			result = result.concat(...this.select());
 		}
 		if (regulatory_context) {
-			const options = {};
-			for (const [key, value] of Object.entries(LANGUAGEFILE.regulatory)) {
-				options[value] = {};
-				if (regulatory_context.includes(value)) options[value].checked = true;
-			}
-			const dialog = [
-				[
-					{
-						type: "checkbox",
-						content: options,
-					},
-				],
-			];
 			this.currentElement = {
-				type: "checkbox",
-				attributes: {
-					id: "ComponentRegulatoryContext",
-					name: LANG.GET("assemble.compose_form_regulatory_context"),
-					value: typeof regulatory_context === "string" ? regulatory_context.trim() : regulatory_context.join(", "),
-					onpointerdown:
-						"new Dialog({type: 'input', header: '" +
-						LANG.GET("assemble.compose_form_regulatory_context") +
-						"', body:" +
-						JSON.stringify(dialog) +
-						", " +
-						"options:{" +
-						"'" +
-						LANG.GET("assemble.compose_form_cancel") +
-						"': false," +
-						"'" +
-						LANG.GET("assemble.compose_form_confirm") +
-						"': {value: true, class: 'reducedCTA'}," +
-						"}}).then(response => { const e = document.getElementById('ComponentRegulatoryContext'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}})",
-				},
+				content:regulatory_context,
+				attributes:{
+					name: LANG.GET("assemble.compose_form_regulatory_context")
+				}
 			};
-			result = result.concat(...this.textinput());
+			result = result.concat(...this.checkboxinput());
 		}
 		if (approve) {
 			this.currentElement = {
