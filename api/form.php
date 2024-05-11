@@ -437,7 +437,24 @@ class FORMS extends API {
 			in_array($result['name'], explode(',', $row['content'])) && 
 			!in_array($result['name'], $dependedbundles)) $dependedbundles[] = $result['name']; 
 		}
-		
+
+		// check for dependencies in components (linked forms)
+		$dependedcomponents = [];
+		if ($result['name']){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist-approved'));
+			$statement->execute();
+			$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+			$hidden = [];
+			foreach($fd as $row) {
+				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+				if (!in_array($row['name'], $dependedcomponents) && !in_array($row['name'], $hidden)) {
+					// don't bother disassembling content, just look for an expression
+					if (stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_display_button', [':form' => $result['name']]) . '"')
+						|| stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_continue_button', [':form' => $result['name']]) . '"')) $dependedcomponents[] = $row['name'];
+				}
+			}
+		}		
+
 		// prepare existing context list
 		foreach(LANGUAGEFILE['formcontext'] as $type => $contexts){
 			foreach($contexts as $context => $display){
@@ -536,8 +553,10 @@ class FORMS extends API {
 							'content' => $contextoptions,
 							'hint' => LANG::GET('assemble.edit_form_context_hint')
 						],
-						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br>' : '') .
-						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) : ''),
+						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br />' : '') .
+						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '<br />' : '') .
+						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '<br />' : '')
+						,
 						'hidden' => $result['name'] ? intval($result['hidden']) : 1,
 						'approve' => $approve,
 						'regulatory_context' => $regulatory_context ? : ' '
