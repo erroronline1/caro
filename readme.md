@@ -272,7 +272,7 @@ To avoid unneccesary or repetitive poetry and support a consistent linguistic st
 * Informal you - "buddy"
 * Formal you - "your honor" (this is the german model part where there is more than just "you")
 
-Such a replacement may be named addressee. If a generic text chunk contains :adresseee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+Such a replacement may be named addressee. If a generic text chunk contains :adressee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
 
@@ -847,9 +847,9 @@ A generic sample:
         "translate":{
             "DEPARTMENT": "departments"
         },
-		"conditional":[
-			["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
-		]
+        "conditional":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ]
     },
     "split":{
         "DEPARTMENT": "(.*)",
@@ -890,11 +890,11 @@ A generic sample:
 * PHP >= 8
 * MySQL or SQL Server (or some other database, but queries may have to be adjusted. As I chose pdo as database connectivity I assume this is possible)
 * SSL (camera access for qr-scanner and serviceworkers don't work otherwise)
-* Vendor pricelists as CSV-files [see details](#importing-vendor-pricelists)
+* Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31
-* Microsoft IIS with SQL Express (SQL Server 22)
+* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
 
 Tested devices:
 * Desktop PC Win10 Edge-browser
