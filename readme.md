@@ -30,35 +30,36 @@
 * [Ressources](#ressources)
 
 
-# open tasks
+# development considerations
 
-#### todo application
-* ux tabs?
-* hash sum check for data completeness?
-
-#### todo purchase
+#### purchase
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
 * batch deactivate inaccessible products?
-
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
 * vendor mailto (certificates)
 * vendor evaluation
 
-#### todo planning
-* list / reminder for unfinished cases, current state
+#### application
+* ux tabs?
+* hash sum check for data completeness?
+* user selectable color themes?
+* risk management?
 
-#### todo records
+#### user
+* time tracking
+* holiday, sickness overview (special permissions?)
+
+#### planning
+* list / reminder for unfinished cases, current state?
+
+#### records
 * linked files on separate external path
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
-
-#### todo misc
-* user selectable color themes?
-* risk management?
 
 
 ## Aims
@@ -100,6 +101,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
     * The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.
+    * Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.
     * also see [conversations](#conversations), [planning](#planning), [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
@@ -174,7 +176,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Create forms that can be exported for a written form and assign a *General company record*-form-context and the fitting regulatory context.
     * ISO 13485 4.1.5
 * Create forms and assign a *General company record*-form-context and the fitting regulatory context.
-    * any generic records, especially but not neccessarily limited to:
+    * any generic records, especially but not necessarily limited to:
     * ISO 13485 6.2
     * ISO 13485 6.3
     * ISO 13485 8.2, 8.2.3, 8.2.4
@@ -235,7 +237,7 @@ The application provides some options for registered users. The whole content is
     * full access
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
 
-Permissions of QMO and CEO do hardly differ, but are neccessary being assigned to have a reliable alert on submission of a new form.
+Permissions of QMO and CEO do hardly differ, but are necessary being assigned to have a reliable alert on submission of a new form.
 
 Users can have multiple assigned organizational units.
 
@@ -349,11 +351,11 @@ graph TD;
 [Content](#Content)
 
 ### Forms
-To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all neccessary forms have been taken into account for defined use cases.
+To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
 An approvement request is delivered by the applications [messenger](#conversations) to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in in the respective assigned role/permission. 
 
-Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally neccessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
+Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
@@ -728,7 +730,7 @@ Description of options:
 		"replace": Replaces regex matches with the given value either at a specified field or in all
 				   according to index 0 being a column name or none/null
 				   If more than one replacement are provided new lines with altered column values will be added to the result
-				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if neccessary), group 2, ...rest)
+				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
 		"remove": Remove columns from result, may have been used solely for filtering
 		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
 				   Original columns will be omitted, nested within a list to make sure to order as given
