@@ -343,12 +343,38 @@ class FILE extends API {
 				}
 				break;
 			case 'PUT':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($this->_accessible ? 'file_external_documents-unretire' : 'file_external_documents-retire'));
-				if ($statement->execute([
-					':user' => $_SESSION['user']['name'],
-					':id' => $this->_requestedId
-				])) $this->response(['status' => [
-						'msg' => $this->_accessible ? LANG::GET('file.external_file_available_success') : LANG::GET('file.external_file_retired_success'),
+				 switch ($this->_accessible){
+					case '0':
+						$prepare = 'file_external_documents-retire';
+						$tokens = [
+							':user' => $_SESSION['user']['name'],
+							':id' => $this->_requestedId
+						];
+						$response = LANG::GET('file.external_file_retired_success');
+						break;
+					case '1':
+						$prepare = 'file_external_documents-unretire';
+						$tokens = [
+							':user' => $_SESSION['user']['name'],
+							':id' => $this->_requestedId
+						];
+						$response = LANG::GET('file.external_file_available_success');
+						break;
+					default:
+						$regulatory_context = [];
+						foreach(explode(', ', $this->_accessible) as $context){
+							$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
+						}
+						$prepare = 'file_external_documents-context';
+						$tokens = [
+							':regulatory_context' => implode(',', $regulatory_context),
+							':id' => $this->_requestedId
+						];
+						$response = LANG::GET('file.external_file_regulatory_context');
+				}
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($prepare));
+				if ($statement->execute($tokens)) $this->response(['status' => [
+						'msg' => $response,
 						'type' => 'success'
 					]]);
 				else $this->response(['status' => [
@@ -385,6 +411,12 @@ class FILE extends API {
 						if ($file) {
 							$file['name'] = pathinfo($file['path'])['basename'];
 							$file['path'] = substr($file['path'], 1);
+							$regulatory_context = [];
+							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
+							foreach(LANGUAGEFILE['regulatory'] as $key => $value){
+								$regulatory_context[$value] = ['value' => $key];
+								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
+							}
 							array_push($result['body']['content'][1],
 								[
 									'type' => 'links',
@@ -410,6 +442,15 @@ class FILE extends API {
 										LANG::GET('file.external_file_available') => ($file['retired']
 										? ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
 										: ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
+									],
+								],
+								[
+									'type' => 'checkboxinput',
+									'content' => $regulatory_context,
+									'attributes' => [
+										'name' => LANG::GET('assemble.compose_form_regulatory_context'),
+										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
+										'data-filtered' => $file['path']
 									],
 								]
 							);

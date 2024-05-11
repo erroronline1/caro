@@ -129,6 +129,7 @@ $queries = [
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`user` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`retired` timestamp NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -308,6 +309,7 @@ $queries = [
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	path varchar(MAX) NOT NULL," .
 				"	user varchar(MAX) NOT NULL," .
+				"	regulatory_context varchar(MAX) NOT NULL," .
 				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"
 				,

@@ -248,9 +248,13 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_file_external_documents SET user = :user, retired = NULL WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET user = :user, retired = NULL WHERE id = :id"
 		],
+		'file_external_documents-context' => [
+			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id"
+		],
 		'file_external_documents-post' => [
-			'mysql' => "INSERT INTO caro_file_external_documents (id, path, user, retired) VALUES (NULL, :path, :user, NULL)",
-			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, user, retired) VALUES (:path, :user, NULL)"
+			'mysql' => "INSERT INTO caro_file_external_documents (id, path, user, regulatory_context, retired) VALUES (NULL, :path, :user, :regulatory_context, NULL)",
+			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, user, regulatory_context, retired) VALUES (:path, :user, :regulatory_context, NULL)"
 		],
 		
 

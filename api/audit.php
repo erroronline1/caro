@@ -548,6 +548,17 @@ class AUDIT extends API {
 				}
 			}
 		}
+		// get active external documents
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_external_documents-get-active'));
+		$statement->execute();
+		if ($files = $statement->fetchAll(PDO::FETCH_ASSOC)) {
+			foreach ($files as $file){
+				foreach(explode(',', $file['regulatory_context']) as $context){
+					$regulatory[$context][$file['path'] . ' (' . date('Y-m-d H:i', filemtime($file['path'])) . ')'] = ['href' => substr($file['path'], 1)];
+				}
+			}
+		}
+
 		// add export button
 		$content[] = [
 			[
