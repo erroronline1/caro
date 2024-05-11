@@ -7,7 +7,7 @@
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
     * [Data integrity](#data-integrity)
-    * [User management](#user-management)
+* [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
     * [Conversations](#conversations)
@@ -420,7 +420,7 @@ Both cloud storages equip the [tools STL-Viewer](#tools) with sources to display
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, retirement and the username for the last decision.
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
 [Content](#Content)
 
@@ -605,7 +605,7 @@ graph TD;
 [Content](#Content)
 
 ### Tools
-Some generic tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
+Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by admin, ceo, qmo and office.
 

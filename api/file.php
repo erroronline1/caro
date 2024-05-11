@@ -82,11 +82,11 @@ class FILE extends API {
 			$files[$folder] = UTILITY::listFiles($folder ,'asc');
 		}
 		else {
+			if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			foreach ($folders as $folder) {
 				$files[$folder] = UTILITY::listFiles($folder ,'asc');
 			}
-			if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
 		}
 		if ($files){
 			foreach ($files as $folder => $content){
@@ -421,7 +421,8 @@ class FILE extends API {
 							'name' => LANG::GET('file.manager_new_file'),
 							'multiple' => true,
 							'required' => true
-						]
+						],
+						'hint' => LANG::GET('file.external_file_hint')
 					]
 				];
 				$this->response($result);
