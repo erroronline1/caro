@@ -352,7 +352,7 @@ class AUDIT extends API {
 				$externalcontent[] = [
 					'type' => 'text',
 					'description' => $file['path'],
-					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['user'], ':date' => date('Y-m-d H:i', filemtime($file['path']))])
+					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime($file['path']))])
 				];
 			}
 		}
