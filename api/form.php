@@ -917,7 +917,8 @@ class FORMS extends API {
 					':alias' => '',
 					':context' => 'bundle',
 					':author' => $_SESSION['user']['name'],
-					':content' => $content
+					':content' => $content,
+					':regulatory_context' => ''
 				];
 
 				if (!trim($bundle[':name']) || !trim($bundle[':content'])) $this->response([], 400);
