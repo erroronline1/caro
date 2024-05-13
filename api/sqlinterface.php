@@ -286,10 +286,6 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
 		],
-		'form_bundle-datalist-edit' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context != 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context != 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
-		],
 		'form_bundle-datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"

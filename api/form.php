@@ -935,7 +935,8 @@ class FORMS extends API {
 						':alias' => $exists['alias'],
 						':context' => $exists['context'],
 						':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_hidden')) === LANG::PROPERTY('assemble.edit_bundle_hidden_hidden')? 1 : 0,
-						':id' => $exists['id']
+						':id' => $exists['id'],
+						':regulatory_context' => ''
 						])) $this->response([
 							'status' => [
 								'name' => $bundle[':name'],
@@ -993,22 +994,30 @@ class FORMS extends API {
 				];
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
-				// prepare existing templates lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist-edit'));
+				// prepare existing bundle lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
 				$statement->execute();
 				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$hidden = [];
 				foreach($bundles as $key => $row) {
-					if ($row['context'] === 'component') continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if ($row['context'] === 'bundle'){
 						if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
 							$bundledatalist[] = $row['name'];
 							$options[$row['name']] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
 						$alloptions[$row['name'] . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				}
+
+				// prepare available forms lists
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
+				$statement->execute();
+				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$hidden = [];
+				foreach($bundles as $key => $row) {
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!in_array($row['name'], $hidden)) {
+							$insertform[$row['name']] = ['value' => $row['name'] . "\n"];
 					}
-					if (!in_array($row['context'] , ['bundle']) && !in_array($row['name'], $hidden)) $insertform[$row['name']] = ['value' => $row['name'] . "\n"];
 				}
 
 				$return['body'] = [
