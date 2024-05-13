@@ -27,7 +27,7 @@ class CALENDAR extends API {
 				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
 
-			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.schedule('put', 'complete', " . $row['id'] . ", this.checked)"];
+			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked)"];
 			$completed_hint = '';
 			if ($row['completed']) {
 				$completed[LANG::GET('calendar.event_complete')]['checked'] = true;
@@ -69,7 +69,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'value' => LANG::GET('calendar.event_delete'),
 						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('calendar.event_delete') . " " . $row['content'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('calendar.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.schedule('delete', 'calendar', " . $row['id'] . ");});"
+							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . ");});"
 					]
 				];
 			}

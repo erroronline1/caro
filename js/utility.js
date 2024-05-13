@@ -112,7 +112,7 @@ const calendarClient = {
 			if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 			else window.calendarFormData.append(key, value);
 		}
-		window.calendarFormData.append(LANG.GET("schedule.event_organizational_unit"), units.join(","));
+		window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));
 	},
 };
 
