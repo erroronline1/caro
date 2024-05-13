@@ -20,9 +20,11 @@ class SCHEDULE extends API {
 	private function events($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
+			$date = new DateTime($row['date'], new DateTimeZone(INI['timezone']));
+			$due = new DateTime($row['due'], new DateTimeZone(INI['timezone']));
 			if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) continue;
-			$display = LANG::GET('schedule.event_date') . ': ' . $row['date'] . "\n" .
-				LANG::GET('schedule.event_due') . ': ' . $row['due'] . "\n";
+			$display = LANG::GET('schedule.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
+				LANG::GET('schedule.event_due') . ': ' . $due->format('Y-m-d') . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
 
 			$completed[LANG::GET('schedule.event_complete')] = ['onchange' => "api.schedule('put', 'complete', " . $row['id'] . ", this.checked)"];
@@ -58,7 +60,7 @@ class SCHEDULE extends API {
 					'attributes' => [
 						'type' => 'button',
 						'value' => LANG::GET('schedule.event_edit'),
-						'onpointerup' => $calendar->dialog($row['date'], $row['type'], $row['content'], $row['due'], $row['organizational_unit'], $row['alert'], $row['id'])
+						'onpointerup' => $calendar->dialog($date->format('Y-m-d'), $row['type'], $row['content'], $due->format('Y-m-d'), $row['organizational_unit'], $row['alert'], $row['id'])
 					],
 					'hint' => LANG::GET('schedule.event_author') . ': ' . $row['author']
 				];

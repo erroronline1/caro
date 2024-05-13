@@ -33,7 +33,7 @@ $queries = [
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
+				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hidden` tinyint NOT NULL," .
@@ -50,7 +50,7 @@ $queries = [
 				"	`form_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`form_id` int NOT NULL," .
 				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
+				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author_id` int NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -75,7 +75,7 @@ $queries = [
 				"	`conversation_user` int NOT NULL," .
 				"	`sender` int NOT NULL," .
 				"	`message` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`timestamp` timestamp NOT NULL," .
+				"	`timestamp` datetime NOT NULL," .
 				"	`notified` tinyint NULL DEFAULT NULL," .
 				"	`seen` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -92,7 +92,7 @@ $queries = [
 				"	`active` tinyint NULL DEFAULT NULL," .
 				"	`protected` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
-				"	`checked` timestamp NULL DEFAULT NULLE," .
+				"	`checked` datetime NULL DEFAULT NULLE," .
 				"	`incorporated` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -108,10 +108,10 @@ $queries = [
 				"	`order_data` json NOT NULL," .
 				"	`organizational_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`approval` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`approved` timestamp NOT NULL," .
-				"	`ordered` timestamp NULL DEFAULT NULL," .
-				"	`received` timestamp NULL DEFAULT NULL," .
-				"	`archived` timestamp NULL DEFAULT NULL," .
+				"	`approved` datetime NOT NULL," .
+				"	`ordered` datetime NULL DEFAULT NULL," .
+				"	`received` datetime NULL DEFAULT NULL," .
+				"	`archived` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
@@ -119,7 +119,7 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_file_bundles` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
+				"	`date` datetime NOT NULL," .
 				"	`content` json NOT NULL," .
 				"	`active` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -130,7 +130,7 @@ $queries = [
 				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`retired` timestamp NULL DEFAULT NULL," .
+				"	`retired` datetime NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -146,7 +146,7 @@ $queries = [
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
+				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`language` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -158,7 +158,7 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_csvfilter` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
+				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not json to avoid messing up any almost comprehensible structure
 				"   `hidden` tinyint NOT NULL," .
@@ -168,7 +168,7 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_checks` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` timestamp NOT NULL," .
+				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -176,8 +176,8 @@ $queries = [
 				,
 				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`date` date NOT NULL," .
-				"	`due` date NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`due` datetime NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -242,7 +242,7 @@ $queries = [
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	active tinyint NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
-				"	info varchar(MAX)  NOT NULL," .
+				"	info varchar(MAX) NOT NULL," .
 				"	certificate varchar(MAX) NOT NULL," .
 				"	pricelist varchar(MAX) NOT NULL," .
 				"	immutable_fileserver varchar(MAX) NOT NULL" .
@@ -356,8 +356,8 @@ $queries = [
 				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	date date NOT NULL," .
-				"	due date NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	due smalldatetime NOT NULL," .
 				"	type varchar(MAX) NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
