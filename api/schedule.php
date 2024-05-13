@@ -1,8 +1,8 @@
 <?php
-// planning, contributing to calendar
+// scheduling, contributing to calendar
 require_once('calendar.php');
 
-class PLANNING extends API {
+class SCHEDULE extends API {
 
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
@@ -21,16 +21,16 @@ class PLANNING extends API {
 		$events = [];
 		foreach($dbevents as $row){
 			if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) continue;
-			$display = LANG::GET('planning.event_date') . ': ' . $row['date'] . "\n" .
-				LANG::GET('planning.event_due') . ': ' . $row['due'] . "\n";
+			$display = LANG::GET('schedule.event_date') . ': ' . $row['date'] . "\n" .
+				LANG::GET('schedule.event_due') . ': ' . $row['due'] . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
 
-			$completed[LANG::GET('planning.event_complete')] = ['onchange' => "api.planning('put', 'complete', " . $row['id'] . ", this.checked)"];
+			$completed[LANG::GET('schedule.event_complete')] = ['onchange' => "api.schedule('put', 'complete', " . $row['id'] . ", this.checked)"];
 			$completed_hint = '';
 			if ($row['completed']) {
-				$completed[LANG::GET('planning.event_complete')]['checked'] = true;
+				$completed[LANG::GET('schedule.event_complete')]['checked'] = true;
 				$row['completed'] = json_decode($row['completed'], true);
-				$completed_hint = LANG::GET('planning.event_completed_state', [':user' => $row['completed']['user'], ':date' => $row['completed']['date']]);
+				$completed_hint = LANG::GET('schedule.event_completed_state', [':user' => $row['completed']['user'], ':date' => $row['completed']['date']]);
 			}
 
 			$events[] = [
@@ -57,17 +57,17 @@ class PLANNING extends API {
 					'type' => 'button',
 					'attributes' => [
 						'type' => 'button',
-						'value' => LANG::GET('planning.event_edit'),
+						'value' => LANG::GET('schedule.event_edit'),
 						'onpointerup' => $calendar->dialog($row['date'], $row['type'], $row['content'], $row['due'], $row['organizational_unit'], $row['alert'], $row['id'])
 					],
-					'hint' => LANG::GET('planning.event_author') . ': ' . $row['author']
+					'hint' => LANG::GET('schedule.event_author') . ': ' . $row['author']
 				];
 				$events[count($events)-1]['content'][] = [
 					'type' => 'deletebutton',
 					'attributes' => [
-						'value' => LANG::GET('planning.event_delete'),
-						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('planning.event_delete') . " " . $row['content'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('planning.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.planning('delete', 'calendar', " . $row['id'] . ");});"
+						'value' => LANG::GET('schedule.event_delete'),
+						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('schedule.event_delete') . " " . $row['content'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('schedule.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+							".then(confirmation => {if (confirmation) api.schedule('delete', 'calendar', " . $row['id'] . ");});"
 					]
 				];
 			}
@@ -82,15 +82,15 @@ class PLANNING extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$event = [
-					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_date')),
-					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_due')),
-					':type' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_type')),
+					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_date')),
+					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_due')),
+					':type' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_type')),
 					':author' => $_SESSION['user']['name'],
-					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_organizational_unit')),
-					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_content')),
-					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_alert')) ? 1 : 0
+					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_organizational_unit')),
+					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_content')),
+					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_alert')) ? 1 : 0
 				];
-				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('planning.event_error_missing'), 'type' => 'error']]);
+				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('schedule.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':due']){
 					$due = new DateTime($event[':date'], new DateTimeZone(INI['timezone']));
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
@@ -99,26 +99,26 @@ class PLANNING extends API {
 				if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $event[':author'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
 					'status' => [
 						'id' => $newid,
-						'msg' => LANG::GET('planning.event_success'),
+						'msg' => LANG::GET('schedule.event_success'),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
 						'id' => false,
-						'msg' => LANG::GET('planning.event_error'),
+						'msg' => LANG::GET('schedule.event_error'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'PUT':
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
-					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_date')),
-					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_due')),
-					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_organizational_unit')),
-					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_content')),
-					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_alert')) ? 1 : 0
+					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_date')),
+					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_due')),
+					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_organizational_unit')),
+					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_content')),
+					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_alert')) ? 1 : 0
 				];
-				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('planning.event_error_missing'), 'type' => 'error']]);
+				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('schedule.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':due']){
 					$due = new DateTime($event[':date'], new DateTimeZone(INI['timezone']));
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
@@ -127,20 +127,20 @@ class PLANNING extends API {
 				if ($calendar->put($event[':id'], $event[':date'], $event[':due'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
 					'status' => [
 						'id' => $event[':id'],
-						'msg' => LANG::GET('planning.event_success'),
+						'msg' => LANG::GET('schedule.event_success'),
 						'type' => 'success'
 					]]);
 				else {
-					if ($newid = $calendar->post($event[':date'], $event[':due'], UTILITY::propertySet($this->_payload, LANG::PROPERTY('planning.event_type')), $_SESSION['user']['name'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+					if ($newid = $calendar->post($event[':date'], $event[':due'], UTILITY::propertySet($this->_payload, LANG::PROPERTY('schedule.event_type')), $_SESSION['user']['name'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
 						'status' => [
 							'id' => $newid,
-							'msg' => LANG::GET('planning.event_success'),
+							'msg' => LANG::GET('schedule.event_success'),
 							'type' => 'success'
 						]]);
 					else $this->response([
 						'status' => [
 							'id' => false,
-							'msg' => LANG::GET('planning.event_error'),
+							'msg' => LANG::GET('schedule.event_error'),
 							'type' => 'error'
 						]]);
 					}
@@ -162,9 +162,9 @@ class PLANNING extends API {
 						'type' => 'searchinput',
 						'attributes' => [
 							'id' => 'recordfilter',
-							'name' => LANG::GET('planning.event_search'),
-							'onkeypress' => "if (event.key === 'Enter') {api.planning('get', 'search', this.value); return false;}",
-							'onblur' => "api.planning('get', 'search', this.value); return false;",
+							'name' => LANG::GET('schedule.event_search'),
+							'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
+							'onblur' => "api.calendar('get', 'search', this.value); return false;",
 							]
 					]
 				];
@@ -179,7 +179,7 @@ class PLANNING extends API {
 						'attributes' => [
 							'value' => 'previous',
 							'type' => 'button',
-							'onpointerup' => "api.planning('get', 'calendar', ' " . $previousmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'calendar', ' " . $previousmonth->format('Y-m-d') . "')"
 						]
 					],
 					[
@@ -187,7 +187,7 @@ class PLANNING extends API {
 						'attributes' => [
 							'value' => 'next',
 							'type' => 'button',
-							'onpointerup' => "api.planning('get', 'calendar', ' " . $nextmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'calendar', ' " . $nextmonth->format('Y-m-d') . "')"
 						]
 					],
 				];
@@ -206,8 +206,8 @@ class PLANNING extends API {
 					$events[] = [
 						'type' => 'calendarbutton',
 						'attributes' => [
-							'value' => LANG::GET('planning.event_new'),
-							'onpointerup' => $calendar->dialog($this->_requestedDate, 'planning')
+							'value' => LANG::GET('schedule.event_new'),
+							'onpointerup' => $calendar->dialog($this->_requestedDate, 'schedule')
 						]
 					];
 					$dbevents = $calendar->getdate($this->_requestedDate);
@@ -221,7 +221,7 @@ class PLANNING extends API {
 						$events = [
 							[
 								'type' => 'text',
-								'description' => LANG::GET('planning.events_assigned_units_uncompleted'),
+								'description' => LANG::GET('schedule.events_assigned_units_uncompleted'),
 								'attributes' => [
 									'data-type' => 'calendar'
 								]
@@ -239,12 +239,12 @@ class PLANNING extends API {
 			case 'DELETE':
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'status' => [
-						'msg' => LANG::GET('planning.event_deleted'),
+						'msg' => LANG::GET('schedule.event_deleted'),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'status' => [
-						'msg' => LANG::GET('planning.event_not_found'),
+						'msg' => LANG::GET('schedule.event_not_found'),
 						'type' => 'error'
 					]]);
 			
@@ -266,9 +266,9 @@ class PLANNING extends API {
 					'type' => 'searchinput',
 					'attributes' => [
 						'id' => 'recordfilter',
-						'name' => LANG::GET('planning.event_search'),
-						'onkeypress' => "if (event.key === 'Enter') {api.planning('get', 'search', this.value); return false;}",
-						'onblur' => "api.planning('get', 'search', this.value); return false;",
+						'name' => LANG::GET('schedule.event_search'),
+						'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
+						'onblur' => "api.calendar('get', 'search', this.value); return false;",
 					]
 				]
 			]
@@ -278,7 +278,7 @@ class PLANNING extends API {
 		$events = [
 			[
 				'type' => 'text',
-				'description' => LANG::GET ('planning.events_none')
+				'description' => LANG::GET ('schedule.events_none')
 			]
 		];
 		if ($dbevents) $events = $this->events($dbevents, $calendar);
@@ -291,12 +291,12 @@ class PLANNING extends API {
 		$calendar = new CALENDAR($this->_pdo);
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true')) $this->response([
 			'status' => [
-				'msg' => $this->_requestedComplete === 'true' ? LANG::GET('planning.event_completed') : LANG::GET('planning.event_incompleted'),
+				'msg' => $this->_requestedComplete === 'true' ? LANG::GET('schedule.event_completed') : LANG::GET('schedule.event_incompleted'),
 				'type' => 'success'
 			]]);
 		else $this->response([
 			'status' => [
-				'msg' => LANG::GET('planning.event_not_found'),
+				'msg' => LANG::GET('schedule.event_not_found'),
 				'type' => 'error'
 			]]);
 	}
@@ -305,7 +305,7 @@ class PLANNING extends API {
 		$calendar = new CALENDAR($this->_pdo);
 		$alerts = $calendar->alert(date('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => explode(',', $event['organizational_unit'])], LANG::GET('planning.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
+			$this->alertUserGroup(['unit' => explode(',', $event['organizational_unit'])], LANG::GET('schedule.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
 		}
 	}
 
@@ -323,7 +323,7 @@ class PLANNING extends API {
 	}
 }
 
-$api = new PLANNING();
+$api = new SCHEDULE();
 $api->processApi();
 
 exit;

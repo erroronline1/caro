@@ -652,16 +652,17 @@ export const api = {
 	 * @param  {array} request api method, name|id
 	 * @returns request
 	 */
-	planning: (method, ...request) => {
+	calendar: (method, ...request) => {
 		/*
-		get planning/calendar
-		get planning/calendar/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
-		post planning/calendar
-		put planning/calendar/{id}
-		delete planning/calendar/{id}
+		get calendar/calendar
+		get calendar/calendar/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
+		post calendar/calendar
+		put calendar/calendar/{id}
+		delete calendar/calendar/{id}
 		*/
 		request = [...request];
-		request.splice(0, 0, "planning");
+		if (["calendar"].includes(request[0])) request.splice(0, 0, "schedule");
+		else request.splice(0, 0, "timetracking");
 		let payload,
 			successFn = function (data) {
 				if (data.body) {
@@ -674,7 +675,7 @@ export const api = {
 				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 			},
 			title = {
-				calendar: LANG.GET("menu.planning_calendar"),
+				calendar: LANG.GET("menu.calendar_scheduling"),
 			};
 		switch (method) {
 			case "get":

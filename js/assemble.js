@@ -36,7 +36,7 @@ export const assemble_helper = {
 		icons[LANG.GET("menu.application_header")] = "url('./media/bars.svg')";
 		icons[LANG.GET("menu.communication_header")] = "url('./media/comment.svg')";
 		icons[LANG.GET("menu.record_header")] = "url('./media/file-signature.svg')";
-		icons[LANG.GET("menu.planning_header")] = "url('./media/calendar-alt.svg')";
+		icons[LANG.GET("menu.calendar_header")] = "url('./media/calendar-alt.svg')";
 		icons[LANG.GET("menu.purchase_header")] = "url('./media/shopping-bag.svg')";
 		icons[LANG.GET("menu.files_header")] = "url('./media/folders.svg')";
 		icons[LANG.GET("menu.tools_header")] = "url('./media/tools.svg')";
@@ -1519,7 +1519,7 @@ export class Assemble {
 					daytile.append(document.createElement("br"));
 				}
 				daytile.onpointerup = function () {
-					api.planning("get", "calendar", day.date, day.date);
+					api.calendar("get", "calendar", day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");

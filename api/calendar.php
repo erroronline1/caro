@@ -136,12 +136,12 @@ class CALENDAR {
 	 * @return string dialog js script
 	 * 
 	 */
-	public function dialog($date = '', $type = 'planning', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
+	public function dialog($date = '', $type = 'schedule', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
 			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
-		$alert = [LANG::GET('planning.event_alert') => $alert ? ['checked' => true] : []];
+		$alert = [LANG::GET('schedule.event_alert') => $alert ? ['checked' => true] : []];
 		if (!$due){
 			$due = new DateTime($date, new DateTimeZone(INI['timezone']));
 			$due->modify('+' . INI['calendar']['default_due'] . ' months');
@@ -152,7 +152,7 @@ class CALENDAR {
 				'type' => 'scanner',
 				'attributes' => [
 					'value' => $content,
-					'name' => LANG::GET('planning.event_content'),
+					'name' => LANG::GET('schedule.event_content'),
 					'required' => true
 				]
 			],
@@ -160,7 +160,7 @@ class CALENDAR {
 				'type' => 'dateinput',
 				'attributes' => [
 					'value' => $date,
-					'name' => LANG::GET('planning.event_date'),
+					'name' => LANG::GET('schedule.event_date'),
 					'required' => true
 				]
 			],
@@ -168,26 +168,26 @@ class CALENDAR {
 				'type' => 'dateinput',
 				'attributes' => [
 					'value' => $due,
-					'name' => LANG::GET('planning.event_due'),
+					'name' => LANG::GET('schedule.event_due'),
 					'required' => true
 				]
 			],
 			[
 				'type' => 'checkbox',
-				'description' => LANG::GET('planning.event_organizational_unit'),
+				'description' => LANG::GET('schedule.event_organizational_unit'),
 				'content' => $units,
-				'hint' => LANG::GET('planning.event_organizational_unit_hint')
+				'hint' => LANG::GET('schedule.event_organizational_unit_hint')
 			],
 			[
 				'type' => 'checkbox',
-				'description' => LANG::GET('planning.event_alert_description'),
+				'description' => LANG::GET('schedule.event_alert_description'),
 				'content' => $alert
 			],
 			[
 				'type' => 'hiddeninput',
 				'attributes' => [
 					'value' => $type,
-					'name' => LANG::GET('planning.event_type')
+					'name' => LANG::GET('schedule.event_type')
 
 				]
 			],
@@ -200,8 +200,8 @@ class CALENDAR {
 				]
 			]
 		];
-		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('planning.event_cancel') . "': false, '" . LANG::GET('planning.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
-			".then(response => {if (response) {calendarClient.createFormData(response); api.planning('" . ($content ? 'put': 'post') . "', 'calendar');}})";
+		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('schedule.event_cancel') . "': false, '" . LANG::GET('schedule.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
+			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($content ? 'put': 'post') . "', 'calendar');}})";
 	}
 
 	/**

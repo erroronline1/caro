@@ -15,8 +15,8 @@
     * [Text recommendations](#text-recommendations)
     * [Forms](#forms)
     * [Records](#records)
+    * [Calendar](#calendar)
     * [Files](#files)
-    * [Planning](#planning)
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
     * [Tools](#tools)
@@ -30,9 +30,9 @@
 * [Ressources](#ressources)
 
 
-# development considerations
+# development
 
-#### purchase
+#### purchase considerations
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
@@ -43,20 +43,20 @@
 * vendor mailto (certificates)
 * vendor evaluation
 
-#### application
+#### application considerations
 * ux tabs?
 * hash sum check for data completeness?
 * user selectable color themes?
 * risk management?
 
-#### user
+#### user considerations
 * time tracking
 * holiday, sickness overview (special permissions?)
 
-#### planning
+#### planning considerations
 * list / reminder for unfinished cases, current state?
 
-#### records
+#### records considerations
 * linked files on separate external path
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
@@ -97,12 +97,12 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * alerting user groups for approving new form components and forms
         * alerting user groups about disapproved orders and order state changes
         * messaging inquiries to ordering users
-    * The application has a built in calendar. This calendar is supposed to assist in planning operations and keeping track of time critical recurring events like calibrations etc. 
+    * The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc. 
     * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
     * The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.
     * Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.
-    * also see [conversations](#conversations), [planning](#planning), [order](#order), [files](#files), [tools](#tools)
+    * also see [conversations](#conversations), [calendar](#calendar), [order](#order), [files](#files), [tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
     * also see [users](#users), [tools](#tools)
@@ -125,14 +125,14 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 7.5.1 Control of production and service
     * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
     * Form contexts allow the definition as process or work instructions.
-    * The inbuilt calendar assists in planning operations.
-    * also see [forms](#forms), [records](#records), [planning](#planning)
+    * The inbuilt calendar assists in scheduling operations.
+    * also see [forms](#forms), [records](#records), [calendar](#calendar)
 * ISO 13485 7.5.8 Product indentification
     * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
     * also see [records](#records)
 * ISO 13485 7.6 Surveillance and measuring equipment control
     * Dedicated forms make use of an identifier like production forms. Measuring equipment may each have assigned their distinct identifier.
-    * Adding a form component to adress planning helps with future events that will show up and alert user groups where reasonable.
+    * Adding a form component to adress scheduling helps with future events that will show up and alert user groups where reasonable.
 * ISO 13485 8.2.4 Internal audit
     * The audit module aquires data from the application and is partially able to export
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
@@ -458,16 +458,16 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 
 [Content](#Content)
 
-### Planning
+### Calendar
 Add events to the calendar. The landing page gives a brief overview of weekly and daily events at a quick glance. Events can be added by every user, editing and deleting is permitted to elevated users including supervisors only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
-You may choose to fully use this calendar for your operations and appointments but it is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place. You're free to use Outlook and the like along. The calendar only processed dates and no times anyway.
+You may choose to fully use this calendar for your operations and appointments but it is supposed to help you with operational scheduling (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place. You're free to use Outlook and the like along. The calendar only processed dates and no times anyway.
 
 Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
 
-Planning and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
+Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
 
 ```mermaid
 graph TD;
