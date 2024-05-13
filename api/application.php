@@ -248,7 +248,7 @@ class APPLICATION extends API {
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		$events = $calendar->getdate($today->format('Y-m-d'));
 		foreach ($events as $row){
-			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $displayevents .= "* " . $row['content'] . "\n";
+			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $displayevents .= "* " . $row['content'] . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'text',

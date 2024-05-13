@@ -29,10 +29,10 @@ class CALENDAR extends API {
 
 			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked)"];
 			$completed_hint = '';
-			if ($row['completed']) {
+			if ($row['paused']) {
 				$completed[LANG::GET('calendar.event_complete')]['checked'] = true;
-				$row['completed'] = json_decode($row['completed'], true);
-				$completed_hint = LANG::GET('calendar.event_completed_state', [':user' => $row['completed']['user'], ':date' => $row['completed']['date']]);
+				$row['paused'] = json_decode($row['paused'], true);
+				$completed_hint = LANG::GET('calendar.event_completed_state', [':user' => $row['paused']['user'], ':date' => $row['paused']['date']]);
 			}
 
 			$events[] = [
@@ -232,7 +232,7 @@ class CALENDAR extends API {
 						];
 						$uncompleted = [];
 						foreach ($dbevents as $id => $row){
-							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['completed']) unset($dbevents[$id]);
+							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['paused']) unset($dbevents[$id]);
 						}
 						array_push($events, ...$this->events($dbevents, $calendar));
 						$result['body']['content'][] = $events;
@@ -318,7 +318,7 @@ class CALENDAR extends API {
 		$events = $calendar->getdaterange(null, date('Y-m-d'));
 		$uncompleted = 0;
 		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $uncompleted++;
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $uncompleted++;
 		}
 		$this->response([
 			'uncompletedevents' => $uncompleted
@@ -441,8 +441,8 @@ class CALENDAR extends API {
 					$events[] = [
 						'type' => 'calendarbutton',
 						'attributes' => [
-							'value' => LANG::GET('calendar.event_new'),
-							'onpointerup' => $calendar->timesheet($this->_requestedDate, 'schedule')
+							'value' => LANG::GET('calendar.timesheet_new'),
+							'onpointerup' => $calendar->timesheet($this->_requestedDate, 'timesheet')
 						]
 					];
 					$dbevents = $calendar->getdate($this->_requestedDate);
@@ -464,7 +464,7 @@ class CALENDAR extends API {
 						];
 						$uncompleted = [];
 						foreach ($dbevents as $id => $row){
-							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['completed']) unset($dbevents[$id]);
+							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['paused']) unset($dbevents[$id]);
 						}
 						array_push($events, ...$this->events($dbevents, $calendar));
 						$result['body']['content'][] = $events;
