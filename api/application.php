@@ -240,7 +240,8 @@ class APPLICATION extends API {
 		$overview[] = [
 			'type' => 'calendar',
 			'description' => $week['header'],
-			'content' => $week['content']
+			'content' => $week['content'],
+			'api' => 'schedule'
 		];
 
 		$displayevents = '';

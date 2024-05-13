@@ -174,7 +174,8 @@ class CALENDAR extends API {
 					[
 						'type' => 'calendar',
 						'description' => $month['header'],
-						'content' => $month['content']
+						'content' => $month['content'],
+						'api' => 'schedule'
 					],
 					[
 						'type' => 'button',
@@ -405,7 +406,8 @@ class CALENDAR extends API {
 					[
 						'type' => 'calendar',
 						'description' => $month['header'],
-						'content' => $month['content']
+						'content' => $month['content'],
+						'api' => 'timesheet'
 					],
 					[
 						'type' => 'button',
@@ -440,7 +442,7 @@ class CALENDAR extends API {
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => LANG::GET('calendar.event_new'),
-							'onpointerup' => $calendar->schedule($this->_requestedDate, 'schedule')
+							'onpointerup' => $calendar->timesheet($this->_requestedDate, 'schedule')
 						]
 					];
 					$dbevents = $calendar->getdate($this->_requestedDate);
