@@ -107,7 +107,7 @@ class CALENDARUTILITY {
 				$events = $this->getdate($day->format('Y-m-d'));
 				$numbers = 0;
 				foreach ($events as $row){
-					if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $numbers++;
+					if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $numbers++;
 				}
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
@@ -221,7 +221,7 @@ class CALENDARUTILITY {
 	 * 
 	 * @return string dialog js script
 	 */
-	public function timesheet($date = '', $type = 'timesheet', $content = '', $due = '', $organizational_unit = '', $id = 0){
+	public function timesheet($date = '', $type = 'timesheet', $content = '', $due = '', $break = '', $organizational_unit = '', $id = 0){
 		if ($date && gettype($date) === 'string') $date = new DateTime($date, new DateTimeZone(INI['timezone']));
 		elseif (!$date) $date = new DateTime('now', new DateTimeZone(INI['timezone']));
 
@@ -231,35 +231,57 @@ class CALENDARUTILITY {
 			$due->modify('+1 hour');
 		}
 
+		$pto = [];
+		$content = explode(': ', $content);
+		foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $reason){
+			$pto[$reason] = ['value' => $reason];
+		}
+
 		$inputs = [
 			[
-				'type' => 'scanner',
+				'type' => 'timeinput',
 				'attributes' => [
-					'value' => $content,
-					'name' => LANG::GET('calendar.event_content'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'dateinput',
-				'attributes' => [
-					'value' => $date->format('H:i:s'),
+					'value' => $date->format('H:i'),
 					'name' => LANG::GET('calendar.timesheet_start'),
 					'required' => true
 				]
 			],
 			[
-				'type' => 'dateinput',
+				'type' => 'timeinput',
 				'attributes' => [
-					'value' => $due->format('H:i:s'),
+					'value' => $due->format('H:i'),
 					'name' => LANG::GET('calendar.timesheet_end'),
 					'required' => true
 				]
 			],
 			[
-				'type' => 'hidden',
-				'description' => LANG::GET('calendar.event_organizational_unit'),
-				'content' => $organizational_unit,
+				'type' => 'timeinput',
+				'attributes' => [
+					'value' => $due->format('H:i'),
+					'name' => LANG::GET('calendar.timesheet_break'),
+					'required' => true
+				]
+			],
+			[
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANG::GET('calendar.timesheet_pto_exemption'),
+				],
+				'content' => $pto
+			],
+			[
+				'type' => 'textinput',
+				'attributes' => [
+					'value' => $due->format('H:i:s'),
+					'name' => LANG::GET('calendar.timesheet_pto_note'),
+				]
+			],
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'name' => LANG::GET('calendar.event_organizational_unit'),
+					'value' => $organizational_unit
+				]
 			],
 			[
 				'type' => 'hiddeninput',
@@ -273,7 +295,6 @@ class CALENDARUTILITY {
 				'attributes' => [
 					'value' => $id,
 					'name' => 'calendarEventId'
-
 				]
 			]
 		];
