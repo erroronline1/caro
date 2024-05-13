@@ -520,7 +520,13 @@ export class Assemble {
 			if (elements[0].constructor.name === "Array") content = content.concat(section, this.slider(section.id, section.childNodes.length));
 		} else {
 			this.currentElement = elements;
-			if (elements.type) content = content.concat(this[elements.type]());
+			try {
+				if (elements.type) content = content.concat(this[elements.type]());
+			}
+			catch (e) {
+				console.trace( elements.type, e);
+				return false;
+			}
 		}
 		return content;
 	}
@@ -1504,10 +1510,12 @@ export class Assemble {
 					date: 'Y-m-d',
 					display: 'whatever text, weekday, day, number of appointments
 				}, ...
-			]
+			],
+			api: schedule|timesheet
 		} */
 		let cal = [],
-			daytile;
+			daytile,
+			apicall = this.currentElement.api;
 		for (const day of this.currentElement.content) {
 			daytile = document.createElement("div");
 			daytile.classList = "day";
@@ -1519,7 +1527,7 @@ export class Assemble {
 					daytile.append(document.createElement("br"));
 				}
 				daytile.onpointerup = function () {
-					api.calendar("get", "schedule", day.date, day.date);
+					api.calendar("get", apicall, day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");
