@@ -1,6 +1,6 @@
 <?php
 // login handler, menu and landing page methods
-require_once('calendar.php');
+require_once('calendarutility.php');
 
 class APPLICATION extends API {
     // processed parameters for readability
@@ -79,7 +79,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
 			LANG::GET('menu.calendar_header') => [
-				LANG::GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'calendar')"]
+				LANG::GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
 			],
 			LANG::GET('menu.application_header') => [
 				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('get','login', 'null')"],
@@ -104,7 +104,7 @@ class APPLICATION extends API {
 		];
 		if (array_intersect(['user'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
-			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timetracking')] = ['onpointerup' => "api.calendar('get', 'timetracking')"];
+			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
 		}
 		if (array_intersect(['admin', 'office', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
@@ -233,9 +233,9 @@ class APPLICATION extends API {
 
 		if (count($tiles)) $result['body']['content'][] = $tiles;
 
-		// calendar
+		// calendar scheduled events
 		$overview = [];
-		$calendar = new CALENDAR($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo);
 		$week = $calendar->render('week');
 		$overview[] = [
 			'type' => 'calendar',
@@ -247,11 +247,11 @@ class APPLICATION extends API {
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		$events = $calendar->getdate($today->format('Y-m-d'));
 		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $displayevents .= "* " . $row['content'] . "\n";
+			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $displayevents .= "* " . $row['content'] . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'text',
-			'description' => LANG::GET('schedule.events_assigned_units'),
+			'description' => LANG::GET('calendar.events_assigned_units'),
 			'content' => $displayevents
 		];
 
@@ -259,11 +259,11 @@ class APPLICATION extends API {
 		$events = $calendar->getdaterange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
 		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $uncompleted[$row['content'] . " (" . $row['date'] . ")"] = ['href' => "javascript:api.calendar('get', 'calendar', '" . $row['date'] . "', '" . $row['date'] . "')"];
+			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['completed']) $uncompleted[$row['content'] . " (" . $row['date'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['date'] . "', '" . $row['date'] . "')"];
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',
-			'description' => LANG::GET('schedule.events_assigned_units_uncompleted'),
+			'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
 			'content' => $uncompleted
 		];
 

@@ -463,7 +463,7 @@ Add events to the calendar. The landing page gives a brief overview of weekly an
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
-You may choose to fully use this calendar for your operations and appointments but it is supposed to help you with operational scheduling (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place. You're free to use Outlook and the like along. The calendar only processed dates and no times anyway.
+As scheduling is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place you get only to select dates. This unclutters the input form too.
 
 Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
 

@@ -1519,7 +1519,7 @@ export class Assemble {
 					daytile.append(document.createElement("br"));
 				}
 				daytile.onpointerup = function () {
-					api.calendar("get", "calendar", day.date, day.date);
+					api.calendar("get", "schedule", day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");

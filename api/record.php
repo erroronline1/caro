@@ -2,7 +2,7 @@
 // add and export records
 // Y U NO DELETE? because of audit safety, that's why!
 require_once('./pdf.php');
-require_once('calendar.php');
+require_once('calendarutility.php');
 
 
 class record extends API {
@@ -184,7 +184,7 @@ class record extends API {
 			'content' => []
 			]];
 
-			$calendar = new CALENDAR($this->_pdo);
+			$calendar = new CALENDARUTILITY($this->_pdo);
 			function setidentifier($element, $identify, $calendar){
 			$content = [];
 			foreach($element as $subs){
@@ -196,8 +196,8 @@ class record extends API {
 						$subs['attributes']['value'] = $identify;
 					}
 					if ($subs['type'] === 'calendarbutton'){
-						$subs['attributes']['value'] = LANG::GET('planning.event_new');
-						$subs['attributes']['onpointerup'] = $calendar->dialog();
+						$subs['attributes']['value'] = LANG::GET('calendar.event_new');
+						$subs['attributes']['onpointerup'] = $calendar->schedule();
 					}
 					if (in_array($subs['type'], ['textarea', 'textinput', 'scanner', 'textinput', 'numberinput', 'dateinput', 'timeinput'])){
 						$subs['attributes']['data-loss'] = 'prevent';

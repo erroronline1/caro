@@ -289,6 +289,60 @@ export const api = {
 	},
 
 	/**
+	 * planning and editing calendar entries
+	 *
+	 * @param {string} method get|post|put|delete
+	 * @param  {array} request api method, name|id
+	 * @returns request
+	 */
+	calendar: (method, ...request) => {
+		/*
+		get calendar/schedule
+		get calendar/schedule/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
+		post calendar/schedule
+		put calendar/schedule/{id}
+		delete calendar/schedule/{id}
+		*/
+		request = [...request];
+		request.splice(0, 0, "calendar");
+		let payload,
+			successFn = function (data) {
+				if (data.body) {
+					api.update_header(title[request[1]]);
+					const body = new Assemble(data.body);
+					document.getElementById("main").replaceChildren(body.initializeSection());
+					body.processAfterInsertion();
+					if (request[3] !== undefined) location.hash = "#displayspecificdate";
+				}
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
+			},
+			title = {
+				schedule: LANG.GET("menu.calendar_scheduling"),
+				timesheet: LANG.GET("menu.calendar_timesheet"),
+			};
+		switch (method) {
+			case "get":
+				break;
+			case "post":
+				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
+				break;
+			case "put":
+				switch (request[1]) {
+					case "complete":
+						break;
+					default:
+						payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
+				}
+				break;
+			case "delete":
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+	},
+
+	/**
 	 * loads, executes and manages csv filters
 	 *
 	 * @param {string} method get|post
@@ -643,60 +697,6 @@ export const api = {
 				return;
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
-	},
-
-	/**
-	 * planning and editing calendar entries
-	 *
-	 * @param {string} method get|post|put|delete
-	 * @param  {array} request api method, name|id
-	 * @returns request
-	 */
-	calendar: (method, ...request) => {
-		/*
-		get calendar/calendar
-		get calendar/calendar/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
-		post calendar/calendar
-		put calendar/calendar/{id}
-		delete calendar/calendar/{id}
-		*/
-		request = [...request];
-		if (["calendar"].includes(request[0])) request.splice(0, 0, "schedule");
-		else request.splice(0, 0, "timetracking");
-		let payload,
-			successFn = function (data) {
-				if (data.body) {
-					api.update_header(title[request[1]]);
-					const body = new Assemble(data.body);
-					document.getElementById("main").replaceChildren(body.initializeSection());
-					body.processAfterInsertion();
-					if (request[3] !== undefined) location.hash = "#displayspecificdate";
-				}
-				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-			},
-			title = {
-				calendar: LANG.GET("menu.calendar_scheduling"),
-			};
-		switch (method) {
-			case "get":
-				break;
-			case "post":
-				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
-				break;
-			case "put":
-				switch (request[1]) {
-					case "complete":
-						break;
-					default:
-						payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
-				}
-				break;
-			case "delete":
-				break;
-			default:
-				return;
-		}
-		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
 
 	/**
