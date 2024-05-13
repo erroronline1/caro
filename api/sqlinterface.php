@@ -534,16 +534,16 @@ class SQLQUERY {
 		],
 
 		'calendar_post' => [
-			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, author, organizational_unit, content, completed, alert) VALUES (NULL, :date, :due, :type, :author, :organizational_unit, :content, '', :alert)",
-			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, completed, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :author, :organizational_unit, :content, '', :alert)",
+			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, author, organizational_unit, content, paused, alert) VALUES (NULL, :date, :due, :type, :author, :organizational_unit, :content, '', :alert)",
+			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, paused, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :author, :organizational_unit, :content, '', :alert)",
 		],
 		'calendar_put' => [
 			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, author = :author, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET date = CONVERT(SMALLDATETIME, :date, 120), due = CONVERT(SMALLDATETIME, :due, 120), author = :author, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
 		],
 		'calendar_complete' => [
-			'mysql' => "UPDATE caro_calendar SET completed = :completed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET completed = :completed WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
 		],
 		'calendar_get-date' => [
 			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",
@@ -562,8 +562,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
 		],
 		'calendar_alert' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE alert = 1 AND completed = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1;",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE alert = 1 AND completed = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1;",
+			'mysql' => "SELECT * FROM caro_calendar WHERE alert = 1 AND paused = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1;",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE alert = 1 AND paused = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1;",
 		],
 
 	];
