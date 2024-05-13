@@ -124,7 +124,7 @@ class CALENDAR {
 	}
 
 	/**
-	 * returns a dialog script to contibute to the calendar
+	 * returns a dialog script to contibute scheduling events to the calendar
 	 * 
 	 * @param string $date event date Y-m-d
 	 * @param string $type calendar/alert type
@@ -133,20 +133,24 @@ class CALENDAR {
 	 * @param string $organizational_unit comma separated preselected units
 	 * @param int $alert event triggers message
 	 * @param int $id event database id for updating
-	 * @return string dialog js script
 	 * 
+	 * @return string dialog js script
 	 */
-	public function dialog($date = '', $type = 'schedule', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
+	public function schedule($date = '', $type = 'schedule', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
 			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
 		$alert = [LANG::GET('schedule.event_alert') => $alert ? ['checked' => true] : []];
-		if (!$due){
-			$due = new DateTime($date, new DateTimeZone(INI['timezone']));
+		if ($date && gettype($date) === 'string') $date = new DateTime($date, new DateTimeZone(INI['timezone']));
+		elseif (!$date) $date = new DateTime('now', new DateTimeZone(INI['timezone']));
+		
+		if ($due && gettype($due) === 'string') $due = new DateTime($due, new DateTimeZone(INI['timezone']));
+		elseif (!$due) {
+			$due = clone $date;
 			$due->modify('+' . INI['calendar']['default_due'] . ' months');
-			$due = $due->format('Y-m-d');
 		}
+
 		$inputs = [
 			[
 				'type' => 'scanner',
@@ -159,7 +163,7 @@ class CALENDAR {
 			[
 				'type' => 'dateinput',
 				'attributes' => [
-					'value' => $date,
+					'value' => $date->format('Y-m-d'),
 					'name' => LANG::GET('schedule.event_date'),
 					'required' => true
 				]
@@ -167,7 +171,7 @@ class CALENDAR {
 			[
 				'type' => 'dateinput',
 				'attributes' => [
-					'value' => $due,
+					'value' => $due->format('Y-m-d'),
 					'name' => LANG::GET('schedule.event_due'),
 					'required' => true
 				]
@@ -188,7 +192,79 @@ class CALENDAR {
 				'attributes' => [
 					'value' => $type,
 					'name' => LANG::GET('schedule.event_type')
+				]
+			],
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'value' => $id,
+					'name' => 'calendarEventId'
 
+				]
+			]
+		];
+		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('schedule.event_cancel') . "': false, '" . LANG::GET('schedule.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
+			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($content ? 'put': 'post') . "', 'calendar');}})";
+	}
+
+	/**
+	 * returns a dialog script to contibute timesheet events to the calendar
+	 * 
+	 * @param string $date event date Y-m-d H:i:s
+	 * @param string $type calendar/alert type
+	 * @param string $content event text
+	 * @param string $due due date Y-m-d H:i:s
+	 * @param string $organizational_unit comma separated preselected units
+	 * @param int $alert event triggers message
+	 * @param int $id event database id for updating
+	 * 
+	 * @return string dialog js script
+	 */
+	public function timesheet($date = '', $type = 'timesheet', $content = '', $due = '', $organizational_unit = '', $id = 0){
+		if ($date && gettype($date) === 'string') $date = new DateTime($date, new DateTimeZone(INI['timezone']));
+		elseif (!$date) $date = new DateTime('now', new DateTimeZone(INI['timezone']));
+
+		if ($due && gettype($due) === 'string') $due = new DateTime($due, new DateTimeZone(INI['timezone']));
+		elseif (!$due) {
+			$due = clone $date;
+			$due->modify('+1 hour');
+		}
+
+		$inputs = [
+			[
+				'type' => 'scanner',
+				'attributes' => [
+					'value' => $content,
+					'name' => LANG::GET('schedule.event_content'),
+					'required' => true
+				]
+			],
+			[
+				'type' => 'dateinput',
+				'attributes' => [
+					'value' => $date->format('H:i:s'),
+					'name' => LANG::GET('schedule.timesheet_start'),
+					'required' => true
+				]
+			],
+			[
+				'type' => 'dateinput',
+				'attributes' => [
+					'value' => $due->format('H:i:s'),
+					'name' => LANG::GET('schedule.timesheet_end'),
+					'required' => true
+				]
+			],
+			[
+				'type' => 'hidden',
+				'description' => LANG::GET('schedule.event_organizational_unit'),
+				'content' => $organizational_unit,
+			],
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'value' => $type,
+					'name' => LANG::GET('schedule.event_type')
 				]
 			],
 			[

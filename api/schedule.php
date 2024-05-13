@@ -60,7 +60,7 @@ class SCHEDULE extends API {
 					'attributes' => [
 						'type' => 'button',
 						'value' => LANG::GET('schedule.event_edit'),
-						'onpointerup' => $calendar->dialog($date->format('Y-m-d'), $row['type'], $row['content'], $due->format('Y-m-d'), $row['organizational_unit'], $row['alert'], $row['id'])
+						'onpointerup' => $calendar->schedule($date->format('Y-m-d'), $row['type'], $row['content'], $due->format('Y-m-d'), $row['organizational_unit'], $row['alert'], $row['id'])
 					],
 					'hint' => LANG::GET('schedule.event_author') . ': ' . $row['author']
 				];
@@ -209,7 +209,7 @@ class SCHEDULE extends API {
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => LANG::GET('schedule.event_new'),
-							'onpointerup' => $calendar->dialog($this->_requestedDate, 'schedule')
+							'onpointerup' => $calendar->schedule($this->_requestedDate, 'schedule')
 						]
 					];
 					$dbevents = $calendar->getdate($this->_requestedDate);
