@@ -207,7 +207,7 @@ export class Dialog {
 				function getValues(parent) {
 					let result = {};
 					parent.childNodes.forEach((node) => {
-						if (["input", "textarea"].includes(node.localName) && node.value) {
+						if (["input", "textarea", "select"].includes(node.localName) && node.value) {
 							if (["checkbox", "radio"].includes(node.type) && node.checked === true) result[node.name] = node.value;
 							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
 						} else result = { ...result, ...getValues(node) };
