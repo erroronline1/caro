@@ -179,7 +179,7 @@ $queries = [
 				"	`date` datetime NOT NULL," .
 				"	`due` datetime NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user_id` int NOT NULL," .
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`paused` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -359,7 +359,7 @@ $queries = [
 				"	date smalldatetime NOT NULL," .
 				"	due smalldatetime NOT NULL," .
 				"	type varchar(MAX) NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
+				"	user_id int NOT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	paused varchar(MAX) NOT NULL," .

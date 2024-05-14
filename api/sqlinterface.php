@@ -534,28 +534,28 @@ class SQLQUERY {
 		],
 
 		'calendar_post' => [
-			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, author, organizational_unit, content, paused, alert) VALUES (NULL, :date, :due, :type, :author, :organizational_unit, :content, '', :alert)",
-			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, author, organizational_unit, content, paused, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :author, :organizational_unit, :content, '', :alert)",
+			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (NULL, :date, :due, :type, :user_id, :organizational_unit, :content, '', :alert)",
+			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :user_id, :organizational_unit, :content, '', :alert)",
 		],
 		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, author = :author, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET date = CONVERT(SMALLDATETIME, :date, 120), due = CONVERT(SMALLDATETIME, :due, 120), author = :author, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, user_id = :user_id, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET date = CONVERT(SMALLDATETIME, :date, 120), due = CONVERT(SMALLDATETIME, :due, 120), user_id = :user_id, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
 		],
 		'calendar_complete' => [
 			'mysql' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
 		],
 		'calendar_get-date' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date = :date ORDER BY due ASC",
+			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date = :date ORDER BY caro_calendar.due ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date = :date ORDER BY caro_calendar.due ASC",
 		],
 		'calendar_get-date-range' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE date >= :earlier and date <= :later ORDER BY due ASC",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE date >= CONVERT(SMALLDATETIME, :earlier, 120) and date <= CONVERT(SMALLDATETIME, :later, 120) ORDER BY due ASC",
+			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date >= :earlier and caro_calendar.date <= :later ORDER BY caro_calendar.due ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date >= CONVERT(SMALLDATETIME, :earlier, 120) and caro_calendar.date <= CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.due ASC",
 		],
 		'calendar_search' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE LOWER(content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY due ASC",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE LOWER(content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY due ASC",
+			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE LOWER(caro_calendar.content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY caro_calendar.due ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE LOWER(caro_calendar.content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY caro_calendar.due ASC",
 		],
 		'calendar_delete' => [
 			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
