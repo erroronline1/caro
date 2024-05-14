@@ -231,10 +231,22 @@ class CALENDARUTILITY {
 			$due->modify('+1 hour');
 		}
 
-		$pto = [];
-		$content = $content ? explode(': ', $content) : [];
+		$display = LANG::GET('calendar.timesheet_start') . ': ' . $date->format('Y-m-d H:i') . "\n" .
+		LANG::GET('calendar.timesheet_end') . ': ' . $due->format('Y-m-d H:i') . "\n" .
+		LANG::GET('calendar.timesheet_break') . ': ' . $break . "\n";
+
+		$content = $content ? json_decode($content, true) : [];
+		$note = $pto = '';
+		if (array_key_exists('pto', $content)) {
+			$t_pto = explode(' - ', $content['pto']);
+			$pto = array_shift($t_pto);
+			$note = implode(' - ', $t_pto);
+		}
+		
+		$ptoselect = [];
 		foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $reason){
-			$pto[$reason] = ['value' => $reason];
+			$ptoselect[$reason] = ['value' => $reason];
+			if ($pto === $reason) $ptoselect[$reason]['selected'] = true;
 		}
 
 		$inputs = [
@@ -243,7 +255,7 @@ class CALENDARUTILITY {
 				'attributes' => [
 					'name' => LANG::GET('calendar.timesheet_pto_exemption'),
 				],
-				'content' => $pto
+				'content' => $ptoselect
 			],
 			[
 				'type' => 'dateinput',
@@ -280,7 +292,7 @@ class CALENDARUTILITY {
 			[
 				'type' => 'timeinput',
 				'attributes' => [
-					'value' => $due->format('H:i'),
+					'value' => $break,
 					'name' => LANG::GET('calendar.timesheet_break_time'),
 					'required' => true
 				]
@@ -288,14 +300,14 @@ class CALENDARUTILITY {
 			[
 				'type' => 'textinput',
 				'attributes' => [
-					'value' => '',
+					'value' => $note,
 					'name' => LANG::GET('calendar.timesheet_pto_note'),
 				]
 			],
 			[
 				'type' => 'numberinput',
 				'attributes' => [
-					'value' => '',
+					'value' => array_key_exists('weeklyhours', $content) ? $content['weeklyhours'] : '',
 					'step' => .1,
 					'required' => true,
 					'name' => LANG::GET('calendar.timesheet_weekly_hours'),
@@ -321,13 +333,20 @@ class CALENDARUTILITY {
 					'value' => $id,
 					'name' => 'calendarEventId'
 				]
+			],
+			[
+				'type' => 'hiddeninput',
+				'attributes' => [
+					'value' => array_key_exists('foreigncontributor', $content) ? $content['foreigncontributor'] : '',
+					'name' => LANG::GET('calendar.timesheet_foreign_contributor')
+				]
 			]
 		];
 		if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice']) array_splice($inputs, 5, 0, [
 			[
 				'type' => 'timeinput',
 				'attributes' => [
-					'value' => $due->format('H:i'),
+					'value' => array_key_exists('homeoffice', $content) ? $content['homeoffice'] : '',
 					'name' => LANG::GET('calendar.timesheet_homeoffice'),
 					'required' => true
 				]
