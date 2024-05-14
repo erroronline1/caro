@@ -17,6 +17,13 @@ class CALENDAR extends API {
 		$this->_requestedDate = $this->_requestedComplete = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
+	/**
+	 * renders events as tiles
+	 * @param array $dbevents db query results
+	 * @param object $calendar inherited CALENDARUTILITY-object
+	 * 
+	 * @return array render options for assemble.js 
+ 	*/
 	private function events($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
@@ -77,6 +84,17 @@ class CALENDAR extends API {
 		return $events;
 	}
 
+	/**
+	 * handle scheduled events
+	 * post adds event to calendar
+	 * put updates event data
+	 * get displays calendar
+	 * 		using $this->_requestedTimespan for selection of month
+	 * 			  $this->_requestedDate for events for selected date
+	 * delete removes scheduled event
+	 * 
+	 * responds with render data for assemble.js
+	 */
 	public function schedule(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
@@ -87,9 +105,10 @@ class CALENDAR extends API {
 					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
 					':type' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_type')),
-					':author' => $_SESSION['user']['name'],
+					':user_id' => $_SESSION['user']['id'],
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
+					':paused' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
 				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
@@ -98,7 +117,7 @@ class CALENDAR extends API {
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':due'] = $due->format('Y-m-d');	
 				}
-				if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $event[':author'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+				if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $event[':user_id'], $event[':organizational_unit'], $event[':content'], $event[':paused'], $event[':alert'])) $this->response([
 					'status' => [
 						'id' => $newid,
 						'msg' => LANG::GET('calendar.event_success'),
@@ -116,8 +135,10 @@ class CALENDAR extends API {
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
+					':user_id' => $_SESSION['user']['id'],
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
+					':paused' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
 				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
@@ -126,14 +147,14 @@ class CALENDAR extends API {
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':due'] = $due->format('Y-m-d');	
 				}
-				if ($calendar->put($event[':id'], $event[':date'], $event[':due'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+				if ($calendar->put($event[':id'], $event[':date'], $event[':due'], $event[':user_id'], $event[':organizational_unit'], $event[':content'], $event[':paused'],  $event[':alert'])) $this->response([
 					'status' => [
 						'id' => $event[':id'],
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
 					]]);
 				else {
-					if ($newid = $calendar->post($event[':date'], $event[':due'], UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_type')), $_SESSION['user']['name'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+					if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $event[':user_id'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
 						'status' => [
 							'id' => $newid,
 							'msg' => LANG::GET('calendar.event_success'),
@@ -221,21 +242,23 @@ class CALENDAR extends API {
 					$today->modify('-1 day');
 					$dbevents = $calendar->getdaterange(null, $today->format('Y-m-d'));
 					if ($dbevents) {
-						$events = [
-							[
-								'type' => 'text',
-								'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
-								'attributes' => [
-									'data-type' => 'calendar'
-								]
-							]
-						];
 						$uncompleted = [];
 						foreach ($dbevents as $id => $row){
 							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['paused']) unset($dbevents[$id]);
 						}
-						array_push($events, ...$this->events($dbevents, $calendar));
-						$result['body']['content'][] = $events;
+						if ($dbevents){
+							$events = [
+								[
+									'type' => 'text',
+									'description' => LANG::GET('calendar.events_assigned_units_previous_uncompleted'),
+									'attributes' => [
+										'data-type' => 'calendar'
+									]
+								]
+							];
+							array_push($events, ...$this->events($dbevents, $calendar));
+							$result['body']['content'][] = $events;	
+						}
 					}
 				}
 				break;
@@ -256,6 +279,12 @@ class CALENDAR extends API {
 		$this->response($result);
 	}
 	
+	/**
+	 * search scheduled events by $this->_requestedId (search string)
+	 * 
+	 * reroutes to calendar method without search string
+	 * responds with events or empty message
+	 */
 	public function search(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		if (!$this->_requestedId) $this->calendar();
@@ -289,6 +318,9 @@ class CALENDAR extends API {
 		$this->response($result);
 	}
 
+	/**
+	 * updates scheduled events in terms of completion
+	 */
 	public function complete(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
@@ -304,6 +336,10 @@ class CALENDAR extends API {
 			]]);
 	}
 
+	/**
+	 * alerts a user group if selected
+	 * used by service worker
+	 */
 	public function alert(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$alerts = $calendar->alert(date('Y-m-d'));
@@ -312,6 +348,10 @@ class CALENDAR extends API {
 		}
 	}
 
+	/**
+	 * checks for uncompleted scheduled tasks and does respond with number
+	 * used by service worker
+	 */
 	public function notification (){
 		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
@@ -325,27 +365,104 @@ class CALENDAR extends API {
 		]);
 	}
 
+	/**
+	 * renders timesheet entries as tiles
+	 * @param array $dbevents db query results
+	 * @param object $calendar inherited CALENDARUTILITY-object
+	 * 
+	 * @return array render options for assemble.js 
+ 	*/
+	 private function timesheetentries($dbevents, $calendar){
+		$events = [];
+		foreach($dbevents as $row){
+			$date = new DateTime($row['date'], new DateTimeZone(INI['timezone']));
+			$due = new DateTime($row['due'], new DateTimeZone(INI['timezone']));
+			if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) continue;
+			$display = LANG::GET('calendar.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
+				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
+			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
+
+			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked)"];
+			$completed_hint = '';
+
+			$events[] = [
+				'type' => 'tile',
+				'content' => [
+					[
+						'type' => 'text',
+						'attributes' => [
+							'data-type' => $row['alert'] ? 'alert' : 'text'
+						],
+						'description' => $row['content'],
+						'content' => $display
+					],
+					[
+						'type' => 'checkbox',
+						'content' => $completed,
+						'hint' => $completed_hint
+					],
+					
+				]
+			];
+			if (array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) {
+				$events[count($events)-1]['content'][] = [
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => LANG::GET('calendar.event_edit'),
+						'onpointerup' => $calendar->schedule($date->format('Y-m-d'), $row['type'], $row['content'], $due->format('Y-m-d'), $row['organizational_unit'], $row['alert'], $row['id'])
+					],
+					'hint' => LANG::GET('calendar.event_author') . ': ' . $row['author']
+				];
+				$events[count($events)-1]['content'][] = [
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => LANG::GET('calendar.event_delete'),
+						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('calendar.event_delete') . " " . $row['content'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('calendar.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . ");});"
+					]
+				];
+			}
+		}
+		return $events;
+	}
+
+	/**
+	 * handle timesheet entries
+	 * post adds entry to calendar
+	 * put updates entry data
+	 * get displays calendar
+	 * 		using $this->_requestedTimespan for selection of month
+	 * 			  $this->_requestedDate for entry for selected date
+	 * delete removes entry
+	 * 
+	 * responds with render data for assemble.js
+	 */
 	public function timesheet(){
 		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				$content = [];
+				if ($homeoffice = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_homeoffice'))){
+					$content['homeoffice'] = $homeoffice;
+				}
+				$pto = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_exemption'));
+				if ($pto !== LANG::GET('calendar.timesheet_pto.regular')){
+					$content['pto'] = implode(':', [$pto , (UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_note')) ? : '')]);
+				}
 				$event = [
-					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
-					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
+					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_start_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_start_time')) . ':00',
+					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_time')) . ':00',
 					':type' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_type')),
-					':author' => $_SESSION['user']['name'],
+					':user_id' => $_SESSION['user']['id'],
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
-					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
+					':content' => json_encode($content),
+					':paused' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_break')),
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
-				if (!($event[':date'] && $event[':organizational_unit'] && $event[':content'])) $this->response(['status' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
-				if (!$event[':due']){
-					$due = new DateTime($event[':date'], new DateTimeZone(INI['timezone']));
-					$due->modify('+' . INI['calendar']['default_due'] . ' months');
-					$event[':due'] = $due->format('Y-m-d');	
-				}
-				if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $event[':author'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+				if (!($event[':date'] && $event[':due'] && $event[':paused'])) $this->response(['status' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
+				if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $event[':user_id'], $event[':organizational_unit'], $event[':content'], $event[':paused'], $event[':alert'])) $this->response([
 					'status' => [
 						'id' => $newid,
 						'msg' => LANG::GET('calendar.event_success'),
@@ -363,6 +480,7 @@ class CALENDAR extends API {
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':due' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
+					':user_id' => $_SESSION['user']['id'],
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
@@ -373,14 +491,14 @@ class CALENDAR extends API {
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':due'] = $due->format('Y-m-d');	
 				}
-				if ($calendar->put($event[':id'], $event[':date'], $event[':due'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+				if ($calendar->put($event[':id'], $event[':date'], $event[':due'], $user[':user_id'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
 					'status' => [
 						'id' => $event[':id'],
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
 					]]);
 				else {
-					if ($newid = $calendar->post($event[':date'], $event[':due'], UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_type')), $_SESSION['user']['name'], $event[':organizational_unit'], $event[':content'], $event[':alert'])) $this->response([
+					if ($newid = $calendar->post($event[':date'], $event[':due'], $event[':type'], $_SESSION['user']['name'], $event[':organizational_unit'], $event[':content'], $event[':paused'], $event[':alert'])) $this->response([
 						'status' => [
 							'id' => $newid,
 							'msg' => LANG::GET('calendar.event_success'),
@@ -429,7 +547,8 @@ class CALENDAR extends API {
 
 				if ($this->_requestedDate){
 					$events = [];
-
+					$organizational_unit = implode(',', $_SESSION['user']['units']);
+					
 					$events[] = [
 						'type' => 'text',
 						'description' => $this->_requestedDate,
@@ -442,32 +561,34 @@ class CALENDAR extends API {
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => LANG::GET('calendar.timesheet_new'),
-							'onpointerup' => $calendar->timesheet($this->_requestedDate, 'timesheet')
+							//$date = '', $type = 'timesheet', $content = '', $due = '', $break = '', $organizational_unit = '', $id = 0
+							'onpointerup' => $calendar->timesheet($this->_requestedDate, 'timesheet', null, null, null, $organizational_unit)
 						]
 					];
 					$dbevents = $calendar->getdate($this->_requestedDate);
-					if ($dbevents) array_push($events, ...$this->events($dbevents, $calendar));
+					if ($dbevents) array_push($events, ...$this->timesheetentries($dbevents, $calendar));
 					$result['body']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
-					$today->modify('-1 day');
 					$dbevents = $calendar->getdaterange(null, $today->format('Y-m-d'));
 					if ($dbevents) {
-						$events = [
-							[
-								'type' => 'text',
-								'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
-								'attributes' => [
-									'data-type' => 'calendar'
-								]
-							]
-						];
 						$uncompleted = [];
 						foreach ($dbevents as $id => $row){
 							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['paused']) unset($dbevents[$id]);
 						}
-						array_push($events, ...$this->events($dbevents, $calendar));
-						$result['body']['content'][] = $events;
+						if ($dbevents){
+							$events = [
+								[
+									'type' => 'text',
+									'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
+									'attributes' => [
+										'data-type' => 'calendar'
+									]
+								]
+							];
+							array_push($events, ...$this->events($dbevents, $calendar));
+							$result['body']['content'][] = $events;	
+						}
 					}
 				}
 				break;
