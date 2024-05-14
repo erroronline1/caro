@@ -232,17 +232,40 @@ class CALENDARUTILITY {
 		}
 
 		$pto = [];
-		$content = explode(': ', $content);
+		$content = $content ? explode(': ', $content) : [];
 		foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $reason){
 			$pto[$reason] = ['value' => $reason];
 		}
 
 		$inputs = [
 			[
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANG::GET('calendar.timesheet_pto_exemption'),
+				],
+				'content' => $pto
+			],
+			[
+				'type' => 'dateinput',
+				'attributes' => [
+					'value' => $date->format('Y-m-d'),
+					'name' => LANG::GET('calendar.timesheet_start_date'),
+					'required' => true
+				]
+			],
+			[
 				'type' => 'timeinput',
 				'attributes' => [
 					'value' => $date->format('H:i'),
-					'name' => LANG::GET('calendar.timesheet_start'),
+					'name' => LANG::GET('calendar.timesheet_start_time'),
+					'required' => true
+				]
+			],
+			[
+				'type' => 'dateinput',
+				'attributes' => [
+					'value' => $due->format('Y-m-d'),
+					'name' => LANG::GET('calendar.timesheet_end_date'),
 					'required' => true
 				]
 			],
@@ -250,7 +273,7 @@ class CALENDARUTILITY {
 				'type' => 'timeinput',
 				'attributes' => [
 					'value' => $due->format('H:i'),
-					'name' => LANG::GET('calendar.timesheet_end'),
+					'name' => LANG::GET('calendar.timesheet_end_time'),
 					'required' => true
 				]
 			],
@@ -263,17 +286,19 @@ class CALENDARUTILITY {
 				]
 			],
 			[
-				'type' => 'select',
-				'attributes' => [
-					'name' => LANG::GET('calendar.timesheet_pto_exemption'),
-				],
-				'content' => $pto
-			],
-			[
 				'type' => 'textinput',
 				'attributes' => [
-					'value' => $due->format('H:i:s'),
+					'value' => '',
 					'name' => LANG::GET('calendar.timesheet_pto_note'),
+				]
+			],
+			[
+				'type' => 'numberinput',
+				'attributes' => [
+					'value' => '',
+					'step' => .1,
+					'required' => true,
+					'name' => LANG::GET('calendar.timesheet_weekly_hours'),
 				]
 			],
 			[
@@ -298,6 +323,16 @@ class CALENDARUTILITY {
 				]
 			]
 		];
+		if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice']) array_splice($inputs, 5, 0, [
+			[
+				'type' => 'timeinput',
+				'attributes' => [
+					'value' => $due->format('H:i'),
+					'name' => LANG::GET('calendar.timesheet_homeoffice'),
+					'required' => true
+				]
+			]
+		]);
 		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
 			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($content ? 'put': 'post') . "', 'timesheet');}})";
 	}
@@ -333,8 +368,8 @@ class CALENDARUTILITY {
 	public function getdaterange($earlier = '', $later = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date-range'));
 		$statement->execute([
-			':earlier' => $earlier ? : '0001-01-01',
-			':later' => $later ? : '9999-12-31'
+			':earlier' => $earlier ? : '0001-01-01 00:00:01',
+			':later' => $later ? : '9999-12-31 23:59:59'
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -355,21 +390,22 @@ class CALENDARUTILITY {
 	 * @param string $date
 	 * @param string $due
 	 * @param string $type
-	 * @param string $author
+	 * @param int $user_id
 	 * @param string $organizational_unit
 	 * @param string $content
 	 * @param int $alert
 	 * @return int|bool insert id
 	 */
-	public function post($date = '', $due = '', $type = '', $author = '', $organizational_unit = '', $content = '', $alert = 0){
+	public function post($date = '', $due = '', $type = '', $user_id = '', $organizational_unit = '', $content = '', $paused = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_post'));
 		if ($statement->execute([
 			':date' => $date,
 			':due' => $due,
 			':type' => $type,
-			':author' => $author,
+			':user_id' => $user_id,
 			':organizational_unit' => $organizational_unit,
 			':content' => $content,
+			':paused' => $paused,
 			':alert' => $alert
 		])) return $this->_pdo->lastInsertId();
 		return false;
@@ -379,20 +415,22 @@ class CALENDARUTILITY {
 	 * @param int $id
 	 * @param string $date
 	 * @param string $due
+	 * @param int $user_id
 	 * @param string $organizational_unit
 	 * @param string $content
 	 * @param int $alert
 	 * @return int affected rows
 	 */
-	public function put($id = 0, $date = '', $due = '', $organizational_unit = '', $content = '', $alert = 0){
+	public function put($id = 0, $date = '', $due = '', $user_id = 0, $organizational_unit = '', $content = '', $paused = '', $alert = 0){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
 		$statement->execute([
 			':id' => $id,
 			':date' => $date,
 			':due' => $due,
-			':author' => $_SESSION['user']['name'], // no need to pass, system doesn't edit
+			':user_id' => $user_id,
 			':organizational_unit' => $organizational_unit,
 			':content' => $content,
+			':paused' => $paused,
 			':alert' => $alert
 		]);
 		return $statement->rowCount();
