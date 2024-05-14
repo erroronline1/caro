@@ -534,12 +534,12 @@ class SQLQUERY {
 		],
 
 		'calendar_post' => [
-			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (NULL, :date, :due, :type, :user_id, :organizational_unit, :content, '', :alert)",
-			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :user_id, :organizational_unit, :content, '', :alert)",
+			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (NULL, :date, :due, :type, :user_id, :organizational_unit, :content, :paused, :alert)",
+			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :user_id, :organizational_unit, :content, :paused, :alert)",
 		],
 		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, user_id = :user_id, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET date = CONVERT(SMALLDATETIME, :date, 120), due = CONVERT(SMALLDATETIME, :due, 120), user_id = :user_id, organizational_unit = :organizational_unit, content = :content, alert = :alert WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, user_id = :user_id, organizational_unit = :organizational_unit, content = :content, paused = :paused, alert = :alert WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET date = CONVERT(SMALLDATETIME, :date, 120), due = CONVERT(SMALLDATETIME, :due, 120), user_id = :user_id, organizational_unit = :organizational_unit, content = :content, paused = :paused, alert = :alert WHERE id = :id",
 		],
 		'calendar_complete' => [
 			'mysql' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
