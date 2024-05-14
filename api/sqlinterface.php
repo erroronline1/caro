@@ -562,8 +562,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
 		],
 		'calendar_alert' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE alert = 1 AND paused = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1;",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE alert = 1 AND paused = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1;",
+			'mysql' => "SELECT * FROM caro_calendar WHERE alert = 1 AND paused = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND date <= CURRENT_TIMESTAMP;",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE alert = 1 AND paused = '' AND date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND date <= CURRENT_TIMESTAMP;",
 		],
 
 	];
