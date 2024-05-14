@@ -546,8 +546,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
 		],
 		'calendar_get-date' => [
-			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date = :date ORDER BY caro_calendar.due ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date = :date ORDER BY caro_calendar.due ASC",
+			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE DATE_FORMAT(caro_calendar.date, '%Y-%m-%d') = :date ORDER BY caro_calendar.due ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE FORMAT(caro_calendar.date, 'yyyy-MM-dd') = :date ORDER BY caro_calendar.due ASC",
 		],
 		'calendar_get-date-range' => [
 			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date >= :earlier and caro_calendar.date <= :later ORDER BY caro_calendar.due ASC",
