@@ -51,6 +51,12 @@
 
 #### user considerations
 * time tracking
+    * permission handling
+    * adding by human ressources and supervisor
+        * select user, read respective units
+    * export, calculate plausibility check
+    * vacation calculation
+    * import vacation and weekly hours from last entry
 * holiday, sickness overview (special permissions?)
 
 #### planning considerations
@@ -223,7 +229,7 @@ The application provides some options for registered users. The whole content is
     * can add timesheet entries for users of own assigned units
 * Office
     * can contribute to file manager
-    * cann access CSV-filter
+    * can access CSV-filter
 * Human Ressources
     * can add timesheet entries for other users
 * Purchase
