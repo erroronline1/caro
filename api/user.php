@@ -33,6 +33,7 @@ class USER extends API {
 				// process settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
+				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_homeoffice'));
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
 				}
@@ -121,7 +122,8 @@ class USER extends API {
 						'type' => 'checkbox',
 						'description' => LANG::GET('user.settings'),
 						'content' => [
-							LANG::GET('user.settings_force_desktop') => []
+							LANG::GET('user.settings_force_desktop') => [],
+							LANG::GET('user.settings_homeoffice') => [],
 						]
 					], [
 						'type' => 'radio',
@@ -133,6 +135,7 @@ class USER extends API {
 					]
 				];
 				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
+				if (array_key_exists('homeoffice', $user['app_settings']) && $user['app_settings']['homeoffice']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
 
 				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 				$userfiles = [];
