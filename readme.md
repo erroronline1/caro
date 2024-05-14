@@ -208,6 +208,7 @@ The application provides some options for registered users. The whole content is
     * can place orders
     * can only see orders for own assigned organizational units
     * can incorporate and sample check articles
+    * can contribute to schedules and timesheets
 * Group
     * has access to all non writeable content
     * can **not** add records due to limited identification data
@@ -215,11 +216,16 @@ The application provides some options for registered users. The whole content is
     * can place orders, will be prompted to identify themself
     * can only see orders for own assigned organizational units
     * can **not** incorporate and sample check due to limited identification data
+    * can contribute to schedules
+    * can **not** contribute to timesheets
 * Supervisor
     * can approve form components and forms
+    * can add timesheet entries for users of own assigned units
 * Office
     * can contribute to file manager
     * cann access CSV-filter
+* Human Ressources
+    * can add timesheet entries for other users
 * Purchase
     * has full access to vendor and product management
     * can see all orders
@@ -235,6 +241,7 @@ The application provides some options for registered users. The whole content is
     * can manage users
 * Application admin
     * full access
+    * can add and modify other users timesheet entries
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
 
 Permissions of QMO and CEO do hardly differ, but are necessary being assigned to have a reliable alert on submission of a new form.
@@ -963,7 +970,8 @@ Tested devices:
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
 * Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
-* Install as progressive web app (PWA) from the initial browser request.
+* Change system users default token immidiately and store it in a safe place!
+* Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ### Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
