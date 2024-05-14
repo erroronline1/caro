@@ -281,7 +281,7 @@ class CALENDARUTILITY {
 				'type' => 'timeinput',
 				'attributes' => [
 					'value' => $due->format('H:i'),
-					'name' => LANG::GET('calendar.timesheet_break'),
+					'name' => LANG::GET('calendar.timesheet_break_time'),
 					'required' => true
 				]
 			],
