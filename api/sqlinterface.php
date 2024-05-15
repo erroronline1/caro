@@ -534,36 +534,36 @@ class SQLQUERY {
 		],
 
 		'calendar_post' => [
-			'mysql' => "INSERT INTO caro_calendar (id, date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (NULL, :date, :due, :type, :user_id, :organizational_unit, :content, :paused, :alert)",
-			'sqlsrv' => "INSERT INTO caro_calendar (date, due, type, user_id, organizational_unit, content, paused, alert) VALUES (CAST(:date AS SMALLDATETIME), CAST(:due AS SMALLDATETIME), :type, :user_id, :organizational_unit, :content, :paused, :alert)",
+			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (NULL, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
+			'sqlsrv' => "INSERT INTO caro_calendar (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (:type, CAST(:span_start AS SMALLDATETIME), CAST(:span_end AS SMALLDATETIME), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
 		],
 		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET date = :date, due = :due, user_id = :user_id, organizational_unit = :organizational_unit, content = :content, paused = :paused, alert = :alert WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET date = CONVERT(SMALLDATETIME, :date, 120), due = CONVERT(SMALLDATETIME, :due, 120), user_id = :user_id, organizational_unit = :organizational_unit, content = :content, paused = :paused, alert = :alert WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed alert = :alert WHERE id = :id",
 		],
 		'calendar_complete' => [
-			'mysql' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET paused = :completed WHERE id = :id",
+			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 		],
-		'calendar_get-date' => [
-			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE DATE_FORMAT(caro_calendar.date, '%Y-%m-%d') = :date ORDER BY caro_calendar.due ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE FORMAT(caro_calendar.date, 'yyyy-MM-dd') = :date ORDER BY caro_calendar.due ASC",
+		'calendar_get-day' => [
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') = :span_start ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') = :span_start ORDER BY caro_calendar.span_end ASC",
 		],
-		'calendar_get-date-range' => [
-			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date >= :earlier and caro_calendar.date <= :later ORDER BY caro_calendar.due ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.date >= CONVERT(SMALLDATETIME, :earlier, 120) and caro_calendar.date <= CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.due ASC",
+		'calendar_get-within-date-range' => [
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start >= :earlier AND caro_calendar.span_start <= :later ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start >= CONVERT(SMALLDATETIME, :earlier, 120) and caro_calendar.span_start <= CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_search' => [
-			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE LOWER(caro_calendar.content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY caro_calendar.due ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE LOWER(caro_calendar.content) LIKE LOWER(CONCAT('%', :content, '%')) ORDER BY caro_calendar.due ASC",
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_delete' => [
 			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
 		],
 		'calendar_alert' => [
-			'mysql' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.alert = 1 AND caro_calendar.paused = '' AND caro_calendar.date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND date <= CURRENT_TIMESTAMP;",
-			'sqlsrv' => "SELECT caro_calendar.*, caro_user.name as author FROM caro_calendar LEFT JOIN caro_user ON caro_calendar.user_id = caro_user.id WHERE caro_calendar.alert = 1 AND caro_calendar.paused = '' AND caro_calendar.date <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND date <= CURRENT_TIMESTAMP;",
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
 		],
 
 	];

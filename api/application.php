@@ -246,9 +246,9 @@ class APPLICATION extends API {
 
 		$displayevents = '';
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
-		$events = $calendar->getdate($today->format('Y-m-d'));
+		$events = $calendar->getDay($today->format('Y-m-d'));
 		foreach ($events as $row){
-			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $displayevents .= "* " . $row['content'] . "\n";
+			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $displayevents .= "* " . $row['subject'] . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'text',
@@ -257,10 +257,10 @@ class APPLICATION extends API {
 		];
 
 		$today->modify('-1 day');
-		$events = $calendar->getdaterange(null, $today->format('Y-m-d'));
+		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
 		foreach ($events as $row){
-			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $uncompleted[$row['content'] . " (" . $row['date'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['date'] . "', '" . $row['date'] . "')"];
+			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['content'] . " (" . $row['span_start'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',

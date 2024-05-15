@@ -176,13 +176,15 @@ $queries = [
 				,
 				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`date` datetime NOT NULL," .
-				"	`due` datetime NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`user_id` int NOT NULL," .
+				"	`span_start` datetime NOT NULL," .
+				"	`span_end` datetime NOT NULL," .
+				"	`author_id` int NOT NULL," .
+				"	`affected_user_id` int NOT NULL," .
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`paused` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`misc` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`alert` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -356,13 +358,15 @@ $queries = [
 				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	date smalldatetime NOT NULL," .
-				"	due smalldatetime NOT NULL," .
 				"	type varchar(MAX) NOT NULL," .
-				"	user_id int NOT NULL," .
+				"	span_start smalldatetime NOT NULL," .
+				"	span_end smalldatetime NOT NULL," .
+				"	author_id int NOT NULL," .
+				"	affected_user_id int NOT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	paused varchar(MAX) NOT NULL," .
+				"	subject varchar(MAX) NOT NULL," .
+				"	misc varchar(MAX) NOT NULL," .
+				"	closed varchar(MAX) NOT NULL," .
 				"	alert tinyint NULL" .
 				");"
 				],

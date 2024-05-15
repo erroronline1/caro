@@ -5,8 +5,10 @@ class CALENDARUTILITY {
 	 * calendar handler writing to database and rendering either weeks or months for given date or now by default
 	 * include to display calendar or use for scheduling and timesheets
 	 * with hopefully well prepared date-handling
+	 * 
+	 * to avoid long parameter lists larger requiries will have to be passed as named arrays. this way calling scripts are supposed to be clearer.
+	 * for transparency reasons these have to be well prepared as there is no default checking, thus may end in sql errors on purpose.
 	 */
-
 
    	/**
 	 * preset database connection, passed from main application
@@ -57,13 +59,13 @@ class CALENDARUTILITY {
 	/**
 	 * calculates a calendar view, for given date week starts on monday, month on 1st
 	 * 
-	 * @param string $type month|week
+	 * @param string $format month|week
 	 * @param string $date yyyy-mm-dd
 	 */
-	private function days($type = '', $date = ''){
+	private function days($format = '', $date = ''){
 		$result = [];
 		$date = new DateTime($date ? : 'now', new DateTimeZone(INI['timezone']));
-		if ($type === 'week') {
+		if ($format === 'week') {
 			$date->modify('- ' . ($date->format('N') - 1) . ' days');
 			while ($date->format('N') < 7){
 				$result[] = clone $date;
@@ -71,7 +73,7 @@ class CALENDARUTILITY {
 			}
 			$result[] = $date;
 		}
-		elseif ($type === 'month') {
+		elseif ($format === 'month') {
 			$date->modify('first day of this month');
 			if ($date->format('N') > 1){
 				for ($i = 1; $i < $date->format('N'); $i++){
@@ -89,25 +91,25 @@ class CALENDARUTILITY {
 
 	/**
 	 * renders a calendar view, for given date week starts on monday, month on 1st, weekday offsets are empty
-	 * calculates holidays for every date for possible year overlaps in selected view-type
+	 * calculates holidays for every date for possible year overlaps in selected view-format
 	 * 
-	 * @param string $type month|week
+	 * @param string $format month|week
 	 * @param string $date yyyy-mm-dd
 	 * 
 	 * @return array assemble.js calendar type
 	 */
-	public function render($type = '', $date = ''){
+	public function render($format = '', $date = ''){
 		$result = ['header' => null, 'content' => []];
-		if (!$this->_days || $date) $this->days($type, $date);
+		if (!$this->_days || $date) $this->days($format, $date);
 
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
-				$events = $this->getdate($day->format('Y-m-d'));
+				$events = $this->getDay($day->format('Y-m-d'));
 				$numbers = 0;
 				foreach ($events as $row){
-					if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $numbers++;
+					if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $numbers++;
 				}
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
@@ -117,262 +119,250 @@ class CALENDARUTILITY {
 					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
 				];
 				if ($result['header']) continue;
-				if ($type === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
-				if ($type === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
+				if ($format === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
+				if ($format === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
 			}
 		}
 		return $result;
 	}
 
 	/**
-	 * returns a dialog script to contibute scheduling events to the calendar
+	 * returns an assemble.js dialog script to contribute to the calendar
 	 * 
-	 * @param string $date event date Y-m-d
-	 * @param string $type calendar/alert type
-	 * @param string $content event text
-	 * @param string $due due date Y-m-d
-	 * @param string $organizational_unit comma separated preselected units
-	 * @param int $alert event triggers message
-	 * @param int $id event database id for updating
-	 * 
-	 * @return string dialog js script
+	 * @param array $columns, like put-method, but :type must be provided
+	 * 	[
+	 * 	':id' => int
+	 * 	':type' => string schedule|timesheet
+	 * 	':span_start' => string Y-m-d H:i:s,
+	 * 	':span_end' => string Y-m-h H:i:s,
+	 * 	':author_id' => int,
+	 * 	':affected_user_id' => int,
+	 * 	':organizational_unit' => str,
+	 * 	':subject' => str,
+	 * 	':misc' => str (e.g. json_encoded whatnot),
+	 * 	':closed' => str (e.g. json_encoded when, by whom),
+	 * 	':alert' => int 1|0
+	 * 	]
+	 * @return string dialog script
 	 */
-	public function schedule($date = '', $type = 'schedule', $content = '', $due = '', $organizational_unit = '', $alert = 0, $id = 0){
+	public function dialog($columns = []){
+		if (!array_key_exists(':type', $columns)) return;
+		// fill up default values
+		foreach([':id', ':author_id', ':affected_user_id', ':alert'] as $int) if (!array_key_exists($int, $columns)) $columns[$int] = 0;
+		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!array_key_exists($str, $columns)) $columns[$str] = '';
+
+		// prepare lists and datetime types for modification 
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
-			$units[$description] = in_array($unit, explode(',', $organizational_unit)) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
+			$units[$description] = in_array($unit, explode(',', $columns[':organizational_unit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
-		$alert = [LANG::GET('calendar.event_alert') => $alert ? ['checked' => true] : []];
-		if ($date && gettype($date) === 'string') $date = new DateTime($date, new DateTimeZone(INI['timezone']));
-		elseif (!$date) $date = new DateTime('now', new DateTimeZone(INI['timezone']));
+
+		$alert = $span_start = $span_end = null; 
+		$alert = [LANG::GET('calendar.event_alert') => $columns[':alert'] ? ['checked' => true] : []];
 		
-		if ($due && gettype($due) === 'string') $due = new DateTime($due, new DateTimeZone(INI['timezone']));
-		elseif (!$due) {
-			$due = clone $date;
-			$due->modify('+' . INI['calendar']['default_due'] . ' months');
-		}
+		if ($columns[':span_start']) $span_start = new DateTime($columns[':span_start'], new DateTimeZone(INI['timezone']));
+		else $span_start = new DateTime('now', new DateTimeZone(INI['timezone']));
 
-		$inputs = [
-			[
-				'type' => 'scanner',
-				'attributes' => [
-					'value' => $content,
-					'name' => LANG::GET('calendar.event_content'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'dateinput',
-				'attributes' => [
-					'value' => $date->format('Y-m-d'),
-					'name' => LANG::GET('calendar.event_date'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'dateinput',
-				'attributes' => [
-					'value' => $due->format('Y-m-d'),
-					'name' => LANG::GET('calendar.event_due'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'checkbox',
-				'description' => LANG::GET('calendar.event_organizational_unit'),
-				'content' => $units,
-				'hint' => LANG::GET('calendar.event_organizational_unit_hint')
-			],
-			[
-				'type' => 'checkbox',
-				'description' => LANG::GET('calendar.event_alert_description'),
-				'content' => $alert
-			],
-			[
-				'type' => 'hiddeninput',
-				'attributes' => [
-					'value' => $type,
-					'name' => LANG::GET('calendar.event_type')
-				]
-			],
-			[
-				'type' => 'hiddeninput',
-				'attributes' => [
-					'value' => $id,
-					'name' => 'calendarEventId'
-
-				]
-			]
-		];
-		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
-			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($content ? 'put': 'post') . "', 'schedule');}})";
-	}
-
-	/**
-	 * returns a dialog script to contibute timesheet events to the calendar
-	 * 
-	 * @param string $date event date Y-m-d H:i:s
-	 * @param string $type calendar/alert type
-	 * @param string $content event text
-	 * @param string $due due date Y-m-d H:i:s
-	 * @param string $organizational_unit comma separated preselected units
-	 * @param int $alert event triggers message
-	 * @param int $id event database id for updating
-	 * 
-	 * @return string dialog js script
-	 */
-	public function timesheet($date = '', $type = 'timesheet', $content = '', $due = '', $break = '', $organizational_unit = '', $id = 0){
-		if ($date && gettype($date) === 'string') $date = new DateTime($date, new DateTimeZone(INI['timezone']));
-		elseif (!$date) $date = new DateTime('now', new DateTimeZone(INI['timezone']));
-
-		if ($due && gettype($due) === 'string') $due = new DateTime($due, new DateTimeZone(INI['timezone']));
-		elseif (!$due) {
-			$due = clone $date;
-			$due->modify('+1 hour');
-		}
-
-		$display = LANG::GET('calendar.timesheet_start') . ': ' . $date->format('Y-m-d H:i') . "\n" .
-		LANG::GET('calendar.timesheet_end') . ': ' . $due->format('Y-m-d H:i') . "\n" .
-		LANG::GET('calendar.timesheet_break') . ': ' . $break . "\n";
-
-		$content = $content ? json_decode($content, true) : [];
-		$note = $pto = '';
-		if (array_key_exists('pto', $content)) {
-			$t_pto = explode(' - ', $content['pto']);
-			$pto = array_shift($t_pto);
-			$note = implode(' - ', $t_pto);
-		}
+		switch ($columns[':type']){
+			case 'schedule':
+				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['timezone']));
+				else {
+					$span_end = clone $span_start;
+					$span_end->modify('+' . INI['calendar']['default_due'] . ' months');
+				}
+				$inputs = [
+					[
+						'type' => 'scanner',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_content'),
+							'value' => $columns[':subject'],
+							'required' => true
+						]
+					],
+					[
+						'type' => 'dateinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_date'),
+							'value' => $span_start->format('Y-m-d'),
+							'required' => true
+						]
+					],
+					[
+						'type' => 'dateinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_due'),
+							'value' => $span_end->format('Y-m-d'),
+							'required' => true
+						]
+					],
+					[
+						'type' => 'checkbox',
+						'description' => LANG::GET('calendar.event_organizational_unit'),
+						'content' => $units,
+						'hint' => LANG::GET('calendar.event_organizational_unit_hint')
+					],
+					[
+						'type' => 'checkbox',
+						'description' => LANG::GET('calendar.event_alert_description'),
+						'content' => $alert
+					],
+					[
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_type'),
+							'value' => $columns[':type']
+						]
+					],
+					[
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => 'calendarEventId',
+							'value' => $columns[':id'],		
+						]
+					]
+				];
+				break;
+			case 'timesheet':
+				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['timezone']));
+				else {
+					$span_end = clone $span_start;
+					$span_end->modify('+1 hour');
+				}
 		
-		$ptoselect = [];
-		foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $reason){
-			$ptoselect[$reason] = ['value' => $reason];
-			if ($pto === $reason) $ptoselect[$reason]['selected'] = true;
+				$misc = $columns[':misc'] ? json_decode($columns[':misc'], true) : [];
+				
+				$ptoselect = [];
+				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $reason){
+					$ptoselect[$reason] = ['value' => $reason];
+					if ($columns[':subject'] === $reason) $ptoselect[$reason]['selected'] = true;
+				}
+		
+				$inputs = [
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_pto_exemption'),
+						],
+						'content' => $ptoselect
+					],
+					[
+						'type' => 'dateinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_start_date'),
+							'value' => $span_start->format('Y-m-d'),
+							'required' => true
+						]
+					],
+					[
+						'type' => 'timeinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_start_time'),
+							'value' => $span_start->format('H:i'),
+							'required' => true
+						]
+					],
+					[
+						'type' => 'dateinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_end_date'),
+							'value' => $span_end->format('Y-m-d'),
+							'required' => true
+						]
+					],
+					[
+						'type' => 'timeinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_end_time'),
+							'value' => $span_end->format('H:i'),
+							'required' => true
+						]
+					],
+					[
+						'type' => 'timeinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_break_time'),
+							'value' => array_key_exists('break', $misc) ? $misc['break'] : '',
+							'required' => true
+						]
+					],
+					[
+						'type' => 'textinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_pto_note'),
+							'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
+						]
+					],
+					[
+						'type' => 'numberinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_weekly_hours'),
+							'value' => array_key_exists('weeklyhours', $misc) ? $misc['weeklyhours'] : '',
+							'step' => .1,
+							'required' => true,
+						]
+					],
+					[
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_organizational_unit'),
+							'value' => $columns[':organizational_unit']
+						]
+					],
+					[
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_type'),
+							'value' => $columns[':type']
+						]
+					],
+					[
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => 'calendarEventId',
+							'value' => $columns[':id']
+						]
+					],
+					[
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_foreign_contributor'),
+							'value' => $columns[':author_id']
+						]
+					]
+				];
+				if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice']) array_splice($inputs, 5, 0, [
+					[
+						'type' => 'timeinput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.timesheet_homeoffice'),
+							'value' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
+							'required' => true
+						]
+					]
+				]);
+				break;
 		}
 
-		$inputs = [
-			[
-				'type' => 'select',
-				'attributes' => [
-					'name' => LANG::GET('calendar.timesheet_pto_exemption'),
-				],
-				'content' => $ptoselect
-			],
-			[
-				'type' => 'dateinput',
-				'attributes' => [
-					'value' => $date->format('Y-m-d'),
-					'name' => LANG::GET('calendar.timesheet_start_date'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'timeinput',
-				'attributes' => [
-					'value' => $date->format('H:i'),
-					'name' => LANG::GET('calendar.timesheet_start_time'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'dateinput',
-				'attributes' => [
-					'value' => $due->format('Y-m-d'),
-					'name' => LANG::GET('calendar.timesheet_end_date'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'timeinput',
-				'attributes' => [
-					'value' => $due->format('H:i'),
-					'name' => LANG::GET('calendar.timesheet_end_time'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'timeinput',
-				'attributes' => [
-					'value' => $break,
-					'name' => LANG::GET('calendar.timesheet_break_time'),
-					'required' => true
-				]
-			],
-			[
-				'type' => 'textinput',
-				'attributes' => [
-					'value' => $note,
-					'name' => LANG::GET('calendar.timesheet_pto_note'),
-				]
-			],
-			[
-				'type' => 'numberinput',
-				'attributes' => [
-					'value' => array_key_exists('weeklyhours', $content) ? $content['weeklyhours'] : '',
-					'step' => .1,
-					'required' => true,
-					'name' => LANG::GET('calendar.timesheet_weekly_hours'),
-				]
-			],
-			[
-				'type' => 'hiddeninput',
-				'attributes' => [
-					'name' => LANG::GET('calendar.event_organizational_unit'),
-					'value' => $organizational_unit
-				]
-			],
-			[
-				'type' => 'hiddeninput',
-				'attributes' => [
-					'value' => $type,
-					'name' => LANG::GET('calendar.event_type')
-				]
-			],
-			[
-				'type' => 'hiddeninput',
-				'attributes' => [
-					'value' => $id,
-					'name' => 'calendarEventId'
-				]
-			],
-			[
-				'type' => 'hiddeninput',
-				'attributes' => [
-					'value' => array_key_exists('foreigncontributor', $content) ? $content['foreigncontributor'] : '',
-					'name' => LANG::GET('calendar.timesheet_foreign_contributor')
-				]
-			]
-		];
-		if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice']) array_splice($inputs, 5, 0, [
-			[
-				'type' => 'timeinput',
-				'attributes' => [
-					'value' => array_key_exists('homeoffice', $content) ? $content['homeoffice'] : '',
-					'name' => LANG::GET('calendar.timesheet_homeoffice'),
-					'required' => true
-				]
-			]
-		]);
 		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
-			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($content ? 'put': 'post') . "', 'timesheet');}})";
+			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
 	}
 
 	/**
 	 * @param string $date Y-m-d
 	 * @return array sql result
 	 */
-	public function getdate($date = ''){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date'));
+	public function getDay($date = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-day'));
 		$statement->execute([
-			':date' => $date
+			':span_start' => $date
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
-	 * @param string $date Y-m-d
 	 * @return array sql result
 	 */
-	public function alert($date = ''){
+	public function alert(){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_alert'));
 		$statement->execute([
 		]);
@@ -384,8 +374,8 @@ class CALENDARUTILITY {
 	 * @param string $later Y-m-d | null
 	 * @return array sql result
 	 */
-	public function getdaterange($earlier = '', $later = ''){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-date-range'));
+	public function getWithinDateRange($earlier = '', $later = ''){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-within-date-range'));
 		$statement->execute([
 			':earlier' => $earlier ? : '0001-01-01 00:00:01',
 			':later' => $later ? : '9999-12-31 23:59:59'
@@ -394,78 +384,73 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * @param int $content
+	 * @param string $search
 	 * @return array sql result
 	 */
-	public function search($content = ''){
+	public function search($search = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_search'));
 		$statement->execute([
-			':content' => $content
+			':subject' => $search
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
-	 * @param string $date
-	 * @param string $due
-	 * @param string $type
-	 * @param int $user_id
-	 * @param string $organizational_unit
-	 * @param string $content
-	 * @param int $alert
+	 * @param array $columns
+	 * 	[
+	 * 	':type' => string,
+	 * 	':span_start' => string Y-m-d H:i:s,
+	 * 	':span_end' => string Y-m-h H:i:s,
+	 * 	':author_id' => int,
+	 * 	':affected_user_id' => int,
+	 * 	':organizational_unit' => str,
+	 * 	':subject' => str,
+	 * 	':misc' => str (e.g. json_encoded whatnot),
+	 * 	':closed' => str (e.g. json_encoded when, by whom),
+	 * 	':alert' => int 1|0
+	 * 	]
 	 * @return int|bool insert id
 	 */
-	public function post($date = '', $due = '', $type = '', $user_id = '', $organizational_unit = '', $content = '', $paused = '', $alert = 0){
+	public function post($columns = []){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_post'));
-		if ($statement->execute([
-			':date' => $date,
-			':due' => $due,
-			':type' => $type,
-			':user_id' => $user_id,
-			':organizational_unit' => $organizational_unit,
-			':content' => $content,
-			':paused' => $paused,
-			':alert' => $alert
-		])) return $this->_pdo->lastInsertId();
+		if ($statement->execute($columns)) return $this->_pdo->lastInsertId();
 		return false;
 	}
 
 	/**
-	 * @param int $id
-	 * @param string $date
-	 * @param string $due
-	 * @param int $user_id
-	 * @param string $organizational_unit
-	 * @param string $content
-	 * @param int $alert
+	 * @param array $columns
+	 * 	[
+	 * 	':id' => int
+	 * 	type isn't supposed to change
+	 * 	':span_start' => string Y-m-d H:i:s,
+	 * 	':span_end' => string Y-m-h H:i:s,
+	 * 	':author_id' => int,
+	 * 	':affected_user_id' => int,
+	 * 	':organizational_unit' => str,
+	 * 	':subject' => str,
+	 * 	':misc' => str (e.g. json_encoded whatnot),
+	 * 	':closed' => str (e.g. json_encoded when, by whom),
+	 * 	':alert' => int 1|0
+	 * 	]
 	 * @return int affected rows
 	 */
-	public function put($id = 0, $date = '', $due = '', $user_id = 0, $organizational_unit = '', $content = '', $paused = '', $alert = 0){
+	public function put($columns = []){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_put'));
-		$statement->execute([
-			':id' => $id,
-			':date' => $date,
-			':due' => $due,
-			':user_id' => $user_id,
-			':organizational_unit' => $organizational_unit,
-			':content' => $content,
-			':paused' => $paused,
-			':alert' => $alert
-		]);
+		$statement->execute($columns);
 		return $statement->rowCount();
 	}
 
 	/**
 	 * @param int $id
-	 * @param any $complete boolval false will clear
+	 * @param any $close boolval false will clear
 	 * @return int affected rows
 	 */
-	public function complete($id = 0, $complete = null){
-		if ($complete) $complete = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
+	public function complete($id = 0, $close = null){
+		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_complete'));
 		$statement->execute([
 			':id' => $id,
-			':completed' => $complete ? json_encode($complete) : '',
+			':closed' => $close ? json_encode($close) : '',
 		]);
 		return $statement->rowCount();
 	}
