@@ -226,7 +226,7 @@ The application provides some options for registered users. The whole content is
     * can **not** contribute to timesheets
 * Supervisor
     * can approve form components and forms
-    * can add timesheet entries for users of own assigned units
+    * can add timesheet entries for users of own assigned units, change closure state
 * Office
     * can contribute to file manager
     * can access CSV-filter
@@ -242,13 +242,14 @@ The application provides some options for registered users. The whole content is
     * can add CSV filters
     * can manage users
 * CEO
+    * Supervisor +
     * can approve components and forms
     * can add CSV filters
     * can manage users
 * Application admin
-    * full access
-    * can add and modify other users timesheet entries
+    * **full access**
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
+    * assign only to trusted staff members, preferably administative members
 
 Permissions of QMO and CEO do hardly differ, but are necessary being assigned to have a reliable alert on submission of a new form.
 
@@ -472,7 +473,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#Content)
 
 ### Calendar
-Add events to the calendar. The landing page gives a brief overview of weekly and daily events at a quick glance. Events can be added by every user, editing and deleting is permitted to elevated users including supervisors only.
+Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events at a quick glance. Events can be added by every user, editing and deleting is permitted to elevated users including supervisors only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -482,11 +483,17 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
 
+Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries closure state can be set by supervisors and ceo only.
+
+This ensures a transparent communication, data safety and collective agreements on timetracking. It is supposed to address all known concerns of german law and staff council/union.
+
 ```mermaid
 graph TD;
-    calendar((calendar))-->select_day[select day];
-    calendar-->search[search];
+    scheduling((scheduling))-->select_day[select day];
+    scheduling-->search[search];
     select_day-->database[(calendar db)];
+    select_day-->add[add];
+    add-->database;
     search-->database;
     database-->matches["display matches
     for assigned units"];
@@ -499,9 +506,29 @@ graph TD;
     database-->alert["alert selected unit members once"]
 
     landing_page((landing page))-->summary["calendar week,
-    current events,
-    uncompleted past events"];
+    current scheduled events,
+    uncompleted past scheduled events"];
     summary-->select_day
+
+    timesheet((timesheet))-->select_day2[select day];
+    select_day2-->add2[add];
+    add2-->usertype{usertype};
+    usertype-->|any|own[own entries];
+    usertype-->|human ressources, supervisor|foreign[own and third party];
+    own-->database2;
+    foreign-->database2;
+    select_day2-->database2[(calendar db)];
+    database2-->alert;
+    database2-->entrytype{entry type};
+    entrytype-->|regular working day|usertype2{usertype};
+    usertype2-->|affected user|display_edit["display
+    edit, delete
+    if not closed"];
+    usertype2-->|supervisor, ceo, admin|display_close["display
+    close, open"];
+    entrytype-->|unavailable|usertype3{usertype};
+    usertype3-->usertype2;
+    usertype3-->|human ressources|display_only[display]
 ```
 [Content](#Content)
 
