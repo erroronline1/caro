@@ -358,7 +358,7 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * get all events where passed date is within event_start and event_end
+	 * get all events where passed date is within span_start and span_end
 	 * this results in all currently happening events
 	 * 
 	 * @param string $date Y-m-d
@@ -383,6 +383,8 @@ class CALENDARUTILITY {
 	}
 
 	/**
+	 * get all events where span_start or span_end are within passed timespan 
+	 * 
 	 * @param string $earlier Y-m-d | null
 	 * @param string $later Y-m-d | null
 	 * @return array sql result
