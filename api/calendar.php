@@ -189,7 +189,7 @@ class CALENDAR extends API {
 				break;
 			case 'GET':
 				$result = ['body' => ['content' => []]];
-				$month = $calendar->render('month', $this->_requestedTimespan);
+				$month = $calendar->render('month', 'schedule', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousmonth->modify('-1 month');
 				$nextmonth = clone $calendar->_days[6];
@@ -579,7 +579,7 @@ class CALENDAR extends API {
 				break;
 			case 'GET':
 				$result = ['body' => ['content' => []]];
-				$month = $calendar->render('month', $this->_requestedTimespan);
+				$month = $calendar->render('month', 'timesheet', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousmonth->modify('-1 month');
 				$nextmonth = clone $calendar->_days[6];

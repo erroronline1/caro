@@ -236,7 +236,7 @@ class APPLICATION extends API {
 		// calendar scheduled events
 		$overview = [];
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		$week = $calendar->render('week');
+		$week = $calendar->render('week', 'schedule');
 		$overview[] = [
 			'type' => 'calendar',
 			'description' => $week['header'],
@@ -260,7 +260,7 @@ class APPLICATION extends API {
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
 		foreach ($events as $row){
-			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['content'] . " (" . $row['span_start'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $row['span_start'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',

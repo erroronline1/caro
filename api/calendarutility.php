@@ -94,11 +94,12 @@ class CALENDARUTILITY {
 	 * calculates holidays for every date for possible year overlaps in selected view-format
 	 * 
 	 * @param string $format month|week
+	 * @param string $type schedule|timesheet
 	 * @param string $date yyyy-mm-dd
 	 * 
 	 * @return array assemble.js calendar type
 	 */
-	public function render($format = '', $date = ''){
+	public function render($format = '', $type = '', $date = '', ){
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($format, $date);
 
@@ -109,7 +110,16 @@ class CALENDARUTILITY {
 				$events = $this->getDay($day->format('Y-m-d'));
 				$numbers = 0;
 				foreach ($events as $row){
-					if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $numbers++;
+					switch ($type){
+						case 'schedule':
+							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))
+								if (!$row['closed'])
+								$numbers++;
+							break;
+						case 'timesheet':
+							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))
+							$numbers++;
+					}	
 				}
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
