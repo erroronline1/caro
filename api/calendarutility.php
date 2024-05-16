@@ -158,13 +158,28 @@ class CALENDARUTILITY {
 	public function dialog($columns = []){
 		if (!array_key_exists(':type', $columns)) return;
 		// fill up default values
-		foreach([':id', ':author_id', ':affected_user_id', ':alert'] as $int) if (!array_key_exists($int, $columns)) $columns[$int] = 0;
 		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!array_key_exists($str, $columns)) $columns[$str] = '';
+		foreach([':id', ':alert'] as $int) if (!array_key_exists($int, $columns)) $columns[$int] = 0;
+		foreach([':author_id', ':affected_user_id'] as $user) if (!array_key_exists($user, $columns)) $columns[$user] = $_SESSION['user']['id'];
 
 		// prepare lists and datetime types for modification 
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
 			$units[$description] = in_array($unit, explode(',', $columns[':organizational_unit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
+		}
+
+		$affected_users = $affected_unit_users = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+		$statement->execute();
+		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+		// unset system user
+		array_splice($users, array_search(1, array_column($users, 'id')), 1);
+		// set self to top 
+		$self = array_splice($users, array_search($_SESSION['user']['id'], array_column($users, 'id')), 1);
+		array_splice($users, 0, 0, $self);
+		foreach($users as $user){
+			$affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
+			if (array_intersect(explode(',', $user['units']), $_SESSION['user']['units'])) $affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
 		}
 
 		$alert = $span_start = $span_end = null; 
@@ -246,110 +261,134 @@ class CALENDARUTILITY {
 					$ptoselect[$reason] = ['value' => $reason];
 					if ($columns[':subject'] === $reason) $ptoselect[$reason]['selected'] = true;
 				}
-		
-				$inputs = [
+
+				$inputs = [];
+
+				if (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])){
+					$inputs[] = [
+						'type' => 'select',
+						'content' => $affected_users,
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_affected_user')
+						]
+					];
+				} elseif (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])){
+					$inputs[] = [
+						'type' => 'select',
+						'content' => $affected_unit_users,
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_affected_user')
+						]
+					];
+				} else {
+					$inputs[] = [
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_affected_user'),
+							'value' => $columns[':affected_user_id']
+						]
+					];
+				}
+
+				array_push($inputs, ...[
 					[
 						'type' => 'select',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_pto_exemption'),
 						],
 						'content' => $ptoselect
-					],
-					[
+					],[
 						'type' => 'dateinput',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_start_date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
-					],
-					[
+					],[
 						'type' => 'timeinput',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_start_time'),
 							'value' => $span_start->format('H:i'),
 							'required' => true
 						]
-					],
-					[
+					],[
 						'type' => 'dateinput',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_end_date'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
-					],
-					[
-						'type' => 'timeinput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_end_time'),
-							'value' => $span_end->format('H:i'),
-							'required' => true
+						],[
+							'type' => 'timeinput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.timesheet_end_time'),
+								'value' => $span_end->format('H:i'),
+								'required' => true
+							]
+						],
+						[
+							'type' => 'timeinput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.timesheet_break_time'),
+								'value' => array_key_exists('break', $misc) ? $misc['break'] : '',
+								'required' => true
+							]
+						],
+						[
+							'type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.timesheet_pto_note'),
+								'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
+							]
+						],
+						[
+							'type' => 'numberinput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.timesheet_weekly_hours'),
+								'value' => array_key_exists('weeklyhours', $misc) ? $misc['weeklyhours'] : '',
+								'step' => .1,
+								'required' => true,
+							]
+						],[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.event_organizational_unit'),
+								'value' => $columns[':organizational_unit']
+							]
+						],
+						[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.event_type'),
+								'value' => $columns[':type']
+							]
+						],
+						[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => 'calendarEventId',
+								'value' => $columns[':id']
+							]
+						],
+						[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.timesheet_foreign_contributor'),
+								'value' => $columns[':author_id']
+							]
 						]
-					],
-					[
-						'type' => 'timeinput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_break_time'),
-							'value' => array_key_exists('break', $misc) ? $misc['break'] : '',
-							'required' => true
+					]);
+				if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice'])
+					array_splice($inputs, 7, 0, [
+						[
+							'type' => 'timeinput',
+							'attributes' => [
+								'name' => LANG::GET('calendar.timesheet_homeoffice'),
+								'value' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
+								'required' => true
+							]
 						]
-					],
-					[
-						'type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_pto_note'),
-							'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
-						]
-					],
-					[
-						'type' => 'numberinput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_weekly_hours'),
-							'value' => array_key_exists('weeklyhours', $misc) ? $misc['weeklyhours'] : '',
-							'step' => .1,
-							'required' => true,
-						]
-					],
-					[
-						'type' => 'hiddeninput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.event_organizational_unit'),
-							'value' => $columns[':organizational_unit']
-						]
-					],
-					[
-						'type' => 'hiddeninput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.event_type'),
-							'value' => $columns[':type']
-						]
-					],
-					[
-						'type' => 'hiddeninput',
-						'attributes' => [
-							'name' => 'calendarEventId',
-							'value' => $columns[':id']
-						]
-					],
-					[
-						'type' => 'hiddeninput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_foreign_contributor'),
-							'value' => $columns[':author_id']
-						]
-					]
-				];
-				if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice']) array_splice($inputs, 5, 0, [
-					[
-						'type' => 'timeinput',
-						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_homeoffice'),
-							'value' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
-							'required' => true
-						]
-					]
-				]);
+					]);
 				break;
 		}
 
