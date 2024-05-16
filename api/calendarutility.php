@@ -178,7 +178,7 @@ class CALENDARUTILITY {
 				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['timezone']));
 				else {
 					$span_end = clone $span_start;
-					$span_end->modify('+' . INI['calendar']['default_due'] . ' months');
+					$span_end->modify('+' . INI['calendar']['default_due'] . ' days');
 				}
 				$inputs = [
 					[
@@ -358,13 +358,16 @@ class CALENDARUTILITY {
 	}
 
 	/**
+	 * get all events where passed date is within event_start and event_end
+	 * this results in all currently happening events
+	 * 
 	 * @param string $date Y-m-d
 	 * @return array sql result
 	 */
 	public function getDay($date = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-day'));
 		$statement->execute([
-			':span_start' => $date
+			':date' => $date
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}

@@ -546,8 +546,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 		],
 		'calendar_get-day' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') = :span_start ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') = :span_start ORDER BY caro_calendar.span_end ASC",
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') AND DATE_FORMAT(caro_calendar.span_end, '%Y-%m-%d') ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') AND FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_get-within-date-range' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start >= :earlier AND caro_calendar.span_start <= :later ORDER BY caro_calendar.span_end ASC",
