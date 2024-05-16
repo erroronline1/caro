@@ -54,7 +54,9 @@
     * permission handling
     * adding by human ressources and supervisor
         * select user, read respective units
+        * import user data onchange of selection?(hours) 
     * export, calculate plausibility check
+    * yearly vacation data?
     * vacation calculation
     * import vacation and weekly hours from last entry
 * holiday, sickness overview (special permissions?)
@@ -485,7 +487,7 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries closure state can be set by supervisors and ceo only.
+Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
 
 This ensures a transparent communication, data safety and collective agreements on timetracking. It is supposed to address all known concerns of german law and staff council/union.
 
