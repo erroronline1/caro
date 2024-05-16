@@ -171,8 +171,8 @@ class CALENDAR extends API {
 						'type' => 'success'
 					]]);
 				else {
-					unset($calendar[':id']);
-					$calendar[':type'] = 'schedule';
+					unset($event[':id']);
+					$event[':type'] = 'schedule';
 					if ($newid = $calendar->post($event)) $this->response([
 						'status' => [
 							'id' => $newid,
@@ -241,10 +241,17 @@ class CALENDAR extends API {
 						':span_start' => $this->_requestedDate,
 					];
 					$events = [];
+					$displayabsentmates = '';
+
+					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
+					foreach ($thisDaysEvents as $id => $row){
+						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+					}
 
 					$events[] = [
 						'type' => 'text',
 						'description' => $this->_requestedDate,
+						'content' => $displayabsentmates,
 						'attributes' => [
 							'id' => 'displayspecificdate',
 							'data-type' => 'calendar'
@@ -257,12 +264,11 @@ class CALENDAR extends API {
 							'onpointerup' => $calendar->dialog($columns)
 						]
 					];
-					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
+
 					if ($thisDaysEvents) array_push($events, ...$this->scheduledEvents($thisDaysEvents, $calendar));
 					$result['body']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
-					$today->modify('-1 day');
 					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 					if ($pastEvents) {
 						$uncompleted = [];
@@ -561,8 +567,8 @@ class CALENDAR extends API {
 						'type' => 'success'
 					]]);
 				else {
-					unset($calendar[':id']);
-					$calendar[':type'] = 'timesheet';
+					unset($event[':id']);
+					$event[':type'] = 'timesheet';
 					if ($newid = $calendar->post($event)) $this->response([
 						'status' => [
 							'id' => $newid,
@@ -617,10 +623,17 @@ class CALENDAR extends API {
 						':organizational_unit' => implode(',', $_SESSION['user']['units'])
 					];
 					$events = [];
-					
+					$displayabsentmates = '';
+
+					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
+					foreach ($thisDaysEvents as $id => $row){
+						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+					}
+
 					$events[] = [
 						'type' => 'text',
 						'description' => $this->_requestedDate,
+						'content' => $displayabsentmates,
 						'attributes' => [
 							'id' => 'displayspecificdate',
 							'data-type' => 'calendar'
@@ -633,7 +646,6 @@ class CALENDAR extends API {
 							'onpointerup' => $calendar->dialog($columns)
 						]
 					];
-					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					if ($thisDaysEvents) array_push($events, ...$this->timesheetEntries($thisDaysEvents, $calendar));
 					$result['body']['content'][] = $events;
 

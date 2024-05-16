@@ -244,16 +244,22 @@ class APPLICATION extends API {
 			'api' => 'schedule'
 		];
 
-		$displayevents = '';
+		$displayevents = $displayabsentmates = '';
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 		foreach ($thisDaysEvents as $row){
 			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $displayevents .= "* " . $row['subject'] . "\n";
+			if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'text',
 			'description' => LANG::GET('calendar.events_assigned_units'),
 			'content' => $displayevents
+		];
+		if ($displayabsentmates) $overview[] = [
+			'type' => 'text',
+			'description' => LANG::GET('calendar.timesheet_irregular'),
+			'content' => $displayabsentmates
 		];
 
 		$today->modify('-1 day');
