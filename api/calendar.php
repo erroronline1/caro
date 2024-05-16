@@ -257,29 +257,29 @@ class CALENDAR extends API {
 							'onpointerup' => $calendar->dialog($columns)
 						]
 					];
-					$dbevents = $calendar->getDay($this->_requestedDate);
-					if ($dbevents) array_push($events, ...$this->scheduledEvents($dbevents, $calendar));
+					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
+					if ($thisDaysEvents) array_push($events, ...$this->scheduledEvents($thisDaysEvents, $calendar));
 					$result['body']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
 					$today->modify('-1 day');
-					$dbevents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
-					if ($dbevents) {
+					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+					if ($pastEvents) {
 						$uncompleted = [];
-						foreach ($dbevents as $id => $row){
-							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['closed']) unset($dbevents[$id]);
+						foreach ($pastEvents as $id => $row){
+							if (in_array($row, $thisDaysEvents) || $row['type'] !== 'schedule' || !array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['closed']) unset($pastEvents[$id]);
 						}
-						if ($dbevents){
+						if ($pastEvents){
 							$events = [
 								[
 									'type' => 'text',
-									'description' => LANG::GET('calendar.events_assigned_units_previous_uncompleted'),
+									'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
 									'attributes' => [
 										'data-type' => 'calendar'
 									]
 								]
 							];
-							array_push($events, ...$this->scheduledEvents($dbevents, $calendar));
+							array_push($events, ...$this->scheduledEvents($pastEvents, $calendar));
 							$result['body']['content'][] = $events;	
 						}
 					}
@@ -633,18 +633,18 @@ class CALENDAR extends API {
 							'onpointerup' => $calendar->dialog($columns)
 						]
 					];
-					$dbevents = $calendar->getDay($this->_requestedDate);
-					if ($dbevents) array_push($events, ...$this->timesheetEntries($dbevents, $calendar));
+					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
+					if ($thisDaysEvents) array_push($events, ...$this->timesheetEntries($thisDaysEvents, $calendar));
 					$result['body']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
-					$dbevents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
-					if ($dbevents) {
+					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+					if ($pastEvents) {
 						$uncompleted = [];
-						foreach ($dbevents as $id => $row){
-							if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['closed']) unset($dbevents[$id]);
+						foreach ($pastEvents as $id => $row){
+							if ($row['type'] !== 'schedule' || !array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['closed']) unset($pastEvents[$id]);
 						}
-						if ($dbevents){
+						if ($pastEvents){
 							$events = [
 								[
 									'type' => 'text',
@@ -654,7 +654,7 @@ class CALENDAR extends API {
 									]
 								]
 							];
-							array_push($events, ...$this->scheduledEvents($dbevents, $calendar));
+							array_push($events, ...$this->scheduledEvents($pastEvents, $calendar));
 							$result['body']['content'][] = $events;	
 						}
 					}

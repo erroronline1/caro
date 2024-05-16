@@ -246,8 +246,8 @@ class APPLICATION extends API {
 
 		$displayevents = '';
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
-		$events = $calendar->getDay($today->format('Y-m-d'));
-		foreach ($events as $row){
+		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
+		foreach ($thisDaysEvents as $row){
 			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $displayevents .= "* " . $row['subject'] . "\n";
 		}
 		if ($displayevents) $overview[] = [
@@ -257,10 +257,10 @@ class APPLICATION extends API {
 		];
 
 		$today->modify('-1 day');
-		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
-		foreach ($events as $row){
-			if ($row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $row['span_start'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+		foreach ($pastEvents as $row){
+			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $row['span_start'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',
