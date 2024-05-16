@@ -10,12 +10,112 @@ class CALENDAR extends API {
 	private $_requestedId = null;
 	private $_requestedDate = null;
 	private $_requestedComplete = null;
+	private $_requestedCalendarType = null;
 
 	public function __construct(){
 		parent::__construct();
 		$this->_requestedTimespan = $this->_requestedId = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_requestedDate = $this->_requestedComplete = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
+		$this->_requestedCalendarType = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
+
+	/**
+	 * search scheduled events by $this->_requestedId (search string)
+	 * 
+	 * reroutes to calendar method without search string
+	 * responds with events or empty message
+	 */
+	public function search(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!$this->_requestedId) $this->calendar();
+		$result = ['body' => ['content' => [
+			[
+				[
+					'type' => 'scanner',
+					'destination' => 'recordfilter',
+					'description' => LANG::GET('assemble.scan_button')
+				], [
+					'type' => 'searchinput',
+					'attributes' => [
+						'id' => 'recordfilter',
+						'name' => LANG::GET('calendar.event_search'),
+						'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
+						'onblur' => "api.calendar('get', 'search', this.value); return false;",
+					]
+				]
+			]
+		]]];
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$dbevents = $calendar->search($this->_requestedId);
+		$events = [
+			[
+				'type' => 'text',
+				'description' => LANG::GET ('calendar.events_none')
+			]
+		];
+		if ($dbevents) $events = $this->scheduledEvents($dbevents, $calendar);
+		$result['body']['content'][] = $events;
+		$this->response($result);
+	}
+
+	/**
+	 * updates scheduled events in terms of completion
+	 */
+	public function complete(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		$response = [
+			'schedule' => [
+				0 => LANG::GET('calendar.event_incompleted'),
+				1 => LANG::GET('calendar.event_completed')
+			],
+			'timesheet' => [
+				0 => LANG::GET('calendar.timesheet_disapproved'),
+				1 => LANG::GET('calendar.timesheet_approved')
+			],
+		];
+
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true')) $this->response([
+			'status' => [
+				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
+				'type' => 'success'
+			]]);
+		else $this->response([
+			'status' => [
+				'msg' => LANG::GET('calendar.event_not_found'),
+				'type' => 'error'
+			]]);
+	}
+
+	/**
+	 * alerts a user group if selected
+	 * used by service worker
+	 */
+	public function alert(){
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$alerts = $calendar->alert(date('Y-m-d'));
+		foreach($alerts as $event){
+			$this->alertUserGroup(['unit' => explode(',', $event['organizational_unit'])], LANG::GET('calendar.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
+		}
+	}
+
+	/**
+	 * checks for uncompleted scheduled tasks and does respond with number
+	 * used by service worker
+	 */
+	public function notification (){
+		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
+		$uncompleted = 0;
+		foreach ($events as $row){
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $uncompleted++;
+		}
+		$this->response([
+			'uncompletedevents' => $uncompleted
+		]);
+	}
+
 
 	/**
 	 * renders scheduled events as tiles
@@ -34,7 +134,7 @@ class CALENDAR extends API {
 				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
 
-			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked)"];
+			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked, 'schedule')"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[LANG::GET('calendar.event_complete')]['checked'] = true;
@@ -57,8 +157,7 @@ class CALENDAR extends API {
 						'type' => 'checkbox',
 						'content' => $completed,
 						'hint' => $completed_hint
-					],
-					
+					],					
 				]
 			];
 			if (array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) {
@@ -309,92 +408,6 @@ class CALENDAR extends API {
 	}
 	
 	/**
-	 * search scheduled events by $this->_requestedId (search string)
-	 * 
-	 * reroutes to calendar method without search string
-	 * responds with events or empty message
-	 */
-	public function search(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		if (!$this->_requestedId) $this->calendar();
-		$result = ['body' => ['content' => [
-			[
-				[
-					'type' => 'scanner',
-					'destination' => 'recordfilter',
-					'description' => LANG::GET('assemble.scan_button')
-				], [
-					'type' => 'searchinput',
-					'attributes' => [
-						'id' => 'recordfilter',
-						'name' => LANG::GET('calendar.event_search'),
-						'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
-						'onblur' => "api.calendar('get', 'search', this.value); return false;",
-					]
-				]
-			]
-		]]];
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$dbevents = $calendar->search($this->_requestedId);
-		$events = [
-			[
-				'type' => 'text',
-				'description' => LANG::GET ('calendar.events_none')
-			]
-		];
-		if ($dbevents) $events = $this->scheduledEvents($dbevents, $calendar);
-		$result['body']['content'][] = $events;
-		$this->response($result);
-	}
-
-	/**
-	 * updates scheduled events in terms of completion
-	 */
-	public function complete(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true')) $this->response([
-			'status' => [
-				'msg' => $this->_requestedComplete === 'true' ? LANG::GET('calendar.event_completed') : LANG::GET('calendar.event_incompleted'),
-				'type' => 'success'
-			]]);
-		else $this->response([
-			'status' => [
-				'msg' => LANG::GET('calendar.event_not_found'),
-				'type' => 'error'
-			]]);
-	}
-
-	/**
-	 * alerts a user group if selected
-	 * used by service worker
-	 */
-	public function alert(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$alerts = $calendar->alert(date('Y-m-d'));
-		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => explode(',', $event['organizational_unit'])], LANG::GET('calendar.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
-		}
-	}
-
-	/**
-	 * checks for uncompleted scheduled tasks and does respond with number
-	 * used by service worker
-	 */
-	public function notification (){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
-		$uncompleted = 0;
-		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $uncompleted++;
-		}
-		$this->response([
-			'uncompletedevents' => $uncompleted
-		]);
-	}
-
-	/**
 	 * renders timesheet entries as tiles
 	 * @param array $dbevents db query results
 	 * @param object $calendar inherited CALENDARUTILITY-object
@@ -441,7 +454,30 @@ class CALENDAR extends API {
 					],					
 				]
 			];
-			if (array_intersect(['admin'], $_SESSION['user']['permissions'])) {
+			/**
+			 * approval can only be set by
+			 * admin, ceo and supervisor of assigned unit
+			 */
+			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked, 'timesheet')"];
+			$completed_hint = '';
+			if ($row['closed']) {
+				$completed[LANG::GET('calendar.timesheet_approve')]['checked'] = true;
+				$row['closed'] = json_decode($row['closed'], true);
+				$completed_hint = LANG::GET('calendar.timesheet_approved_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
+			}
+			$events[count($events)-1]['content'][] = [
+				'type' => 'checkbox',
+				'content' => $completed,
+				'hint' => $completed_hint,
+				'disabled' => !(array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) || (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))
+			];
+
+			/**
+			 * editing and deleting is only allowed for admin and owning user on unapproved entries
+			 */
+			if (array_intersect(['admin'], $_SESSION['user']['permissions']) || 
+				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed'])
+			) {
 				$columns = [
 					':id' => $row['id'],
 					':type' => 'timesheet',
