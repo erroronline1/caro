@@ -1,5 +1,5 @@
 ![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
-# CARO - Cloud Assisted Record and Operation
+# CARO - Cloud Assisted Records and Operations
 
 ## Content
 * [Aims](#Aims)
@@ -365,7 +365,9 @@ graph TD;
 [Content](#Content)
 
 ### Forms
-To create tracked and versioned forms and documents create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
+Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all your documents can be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
+
+To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
 An approvement request is delivered by the applications [messenger](#conversations) to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in in the respective assigned role/permission. 
 
