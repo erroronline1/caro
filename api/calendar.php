@@ -64,6 +64,10 @@ class CALENDAR extends API {
 	 */
 	public function complete(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if ($this->_requestedCalendarType === 'timesheet'
+			&& !(array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
+			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
+			&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
 		$response = [
 			'schedule' => [
 				0 => LANG::GET('calendar.event_incompleted'),
@@ -246,6 +250,7 @@ class CALENDAR extends API {
 					]]);
 				break;
 			case 'PUT':
+				if (!array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
@@ -392,6 +397,7 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'DELETE':
+				if (!array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
@@ -579,6 +585,10 @@ class CALENDAR extends API {
 					]]);
 				break;
 			case 'PUT':
+				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
+				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed']))
+				) $this->response([], 401);
+
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
@@ -754,6 +764,10 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'DELETE':
+				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
+				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed']))
+				) $this->response([], 401);
+
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
@@ -784,6 +798,8 @@ class CALENDAR extends API {
 		}
 		$last = clone $days[count($days) - 1];
 		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
+
+
 		var_dump($month);
 		$this->response([]);
 
