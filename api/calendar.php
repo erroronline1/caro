@@ -60,6 +60,7 @@ class CALENDAR extends API {
 
 	/**
 	 * updates scheduled events in terms of completion
+	 * $this->_requestedId string with eventually comma separated integers
 	 */
 	public function complete(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
@@ -134,7 +135,7 @@ class CALENDAR extends API {
 				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
 
-			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked, 'schedule')"];
+			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'schedule')"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[LANG::GET('calendar.event_complete')]['checked'] = true;
@@ -458,7 +459,7 @@ class CALENDAR extends API {
 			 * approval can only be set by
 			 * admin, ceo and supervisor of assigned unit
 			 */
-			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', " . $row['id'] . ", this.checked, 'timesheet')"];
+			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[LANG::GET('calendar.timesheet_approve')]['checked'] = true;
@@ -658,14 +659,20 @@ class CALENDAR extends API {
 						':span_start' => $this->_requestedDate,
 						':organizational_unit' => implode(',', $_SESSION['user']['units'])
 					];
-					$events = [];
+					$events = $bulkapproval = [];
 					$displayabsentmates = '';
 
 					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					foreach ($thisDaysEvents as $id => $row){
-						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+						if ($row['type'] === 'timesheet'
+							&& !in_array($row['subject'], INI['calendar']['hide_offduty_reasons'])
+							&& array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+						if ($row['type'] === 'timesheet'
+							&& !$row['closed']
+							&& (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
+							|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])))
+							) $bulkapproval[] = $row['id'];
 					}
-
 					$events[] = [
 						'type' => 'text',
 						'description' => $this->_requestedDate,
@@ -683,6 +690,15 @@ class CALENDAR extends API {
 						]
 					];
 					if ($thisDaysEvents) array_push($events, ...$this->timesheetEntries($thisDaysEvents, $calendar));
+					if ($bulkapproval){
+						$events[] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('calendar.timesheet_bulk_approve', [':number' => count($bulkapproval)]),
+								'onpointerup' => "api.calendar('put', 'complete', '" . implode(',', $bulkapproval) . "', this.checked, 'timesheet')"
+							]
+						];
+					}
 					$result['body']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));

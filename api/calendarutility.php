@@ -325,23 +325,20 @@ class CALENDARUTILITY {
 								'value' => $span_end->format('H:i'),
 								'required' => true
 							]
-						],
-						[
+						],[
 							'type' => 'timeinput',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_break_time'),
 								'value' => array_key_exists('break', $misc) ? $misc['break'] : '',
 								'required' => true
 							]
-						],
-						[
+						],[
 							'type' => 'textinput',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_pto_note'),
 								'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
 							]
-						],
-						[
+						],[
 							'type' => 'numberinput',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_weekly_hours'),
@@ -350,27 +347,28 @@ class CALENDARUTILITY {
 								'required' => true,
 							]
 						],[
+							'type' => 'checkbox',
+							'description' => LANG::GET('calendar.event_alert_description'),
+							'content' => $alert
+						],[
 							'type' => 'hiddeninput',
 							'attributes' => [
 								'name' => LANG::GET('calendar.event_organizational_unit'),
 								'value' => $columns[':organizational_unit']
 							]
-						],
-						[
+						],[
 							'type' => 'hiddeninput',
 							'attributes' => [
 								'name' => LANG::GET('calendar.event_type'),
 								'value' => $columns[':type']
 							]
-						],
-						[
+						],[
 							'type' => 'hiddeninput',
 							'attributes' => [
 								'name' => 'calendarEventId',
 								'value' => $columns[':id']
 							]
-						],
-						[
+						],[
 							'type' => 'hiddeninput',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_foreign_contributor'),
@@ -495,18 +493,34 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * @param int $id
+	 * @param str $id eventually comma separated multiple ints
 	 * @param any $close boolval false will clear
 	 * @return int affected rows
 	 */
-	public function complete($id = 0, $close = null){
+	public function complete($id = '0', $close = null){
 		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_complete'));
-		$statement->execute([
-			':id' => $id,
-			':closed' => $close ? json_encode($close) : '',
-		]);
-		return $statement->rowCount();
+		$ids = explode (',', $id);
+		$sqlchunks = [];
+		$affected_rows = 0;
+		foreach ($ids as $id){
+			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
+				[
+					':id' => $this->_pdo->quote($id),
+					':closed' => $this->_pdo->quote($close ? json_encode($close) : ''),
+				]
+			));
+		}
+		foreach ($sqlchunks as $chunk){
+			$statement = $this->_pdo->prepare($chunk);
+			try {
+				if ($statement->execute()) $affected_rows += $statement->rowCount();
+			}
+			catch (Exception $e) {
+				echo $e, $chunk;
+				die();
+			}
+		}
+		return $affected_rows;
 	}
 
 	/**
