@@ -25,7 +25,7 @@ class MESSAGE extends API {
 				$message = [
 					'from_user' => $_SESSION['user']['id'],
 					'to_user' => $recipient['id'],
-					'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))
+					'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]))
 				];
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_message'));
@@ -100,7 +100,7 @@ class MESSAGE extends API {
 							'type' => 'message',
 							'content' => [
 								'img' => $conversation['image'],
-								'user' => $conversation['conversation_user_name'],
+								'user' => $conversation['conversation_user_name'] ? : LANG::GET('message.deleted_user'),
 								'text' => $conversation['message'],
 								'date' => $conversation['timestamp'],
 							],
@@ -159,7 +159,7 @@ class MESSAGE extends API {
 						]
 					];
 					$result['body']['content'][] = $conversation_content;
-					if ($conversation['conversation_user'] !== 1) {
+					if ($conversation['conversation_user'] !== 1 && $conversation_user['name']) {
 						$result['body']['content'][] = [
 							[
 								'type' => 'hiddeninput',
@@ -172,7 +172,8 @@ class MESSAGE extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('message.message_to', [':user' => $conversation_user['name']]),
-								]
+								],
+								'hint' => LANG::GET('message.forward_hint')
 							]
 						];
 						$result['body']['form'] = [
@@ -247,7 +248,7 @@ class MESSAGE extends API {
 									'type' => 'message',
 									'content' => [
 										'img' => $conversation['image'],
-										'user' => $conversation['conversation_user_name'],
+										'user' => $conversation['conversation_user_name'] ? : LANG::GET('message.deleted_user'),
 										'text' => (strlen($conversation['message'])>128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $conversation['timestamp'],
 										'unseen' => intval($unseen['unseen'])
