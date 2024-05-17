@@ -41,7 +41,7 @@ class CALENDARUTILITY {
 	 * @param int $year Y
 	 * @return array containing holiday dates for a given year
 	 */
-	private function holidays($year){
+	public function holidays($year){
 		$holidays = $this->_holidays;
 		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
 
