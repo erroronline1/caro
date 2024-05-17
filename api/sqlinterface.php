@@ -132,209 +132,57 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
 		],
 
-		'user_post' => [
-			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings)",
-			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
+
+
+		'calendar_post' => [
+			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (NULL, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
+			'sqlsrv' => "INSERT INTO caro_calendar (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (:type, CAST(:span_start AS SMALLDATETIME), CAST(:span_end AS SMALLDATETIME), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
 		],
-		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id LIMIT 1",
-			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
+		'calendar_put' => [
+			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed alert = :alert WHERE id = :id",
 		],
-		'user_get-datalist' => [
-			'mysql' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC"
+		'calendar_complete' => [
+			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 		],
-		'user_get' => [
-			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
+		'calendar_get-day' => [
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') AND DATE_FORMAT(caro_calendar.span_end, '%Y-%m-%d') ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') AND FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') ORDER BY caro_calendar.span_end ASC",
 		],
-		'user_get-orderauth' => [
-			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth LIMIT 1",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
+		'calendar_get-within-date-range' => [
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_start BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
 		],
-		'user_delete' => [
-			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id",
-			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id"
+		'calendar_search' => [
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
+		],
+		'calendar_delete' => [
+			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
+		],
+		'calendar_alert' => [
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
 		],
 
-		'message_get_unnotified' => [
-			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
-			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"
+
+
+		'checks_post' => [
+			'mysql' => "INSERT INTO caro_checks (id, type, date, author, content) VALUES (NULL, :type, CURRENT_TIMESTAMP, :author, :content)",
+			'sqlsrv' => "INSERT INTO caro_checks (type, date, author, content) VALUES (:type, CURRENT_TIMESTAMP, :author, :content)"
 		],
-		'message_put_notified' => [
-			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
-			'sqlsrv' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user"
-		],		
-		'message_get_unseen' => [
-			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
-			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
+		'checks_get-types' => [
+			'mysql' => "SELECT type FROM caro_checks GROUP BY type",
+			'sqlsrv' => "SELECT type FROM caro_checks GROUP BY type"
 		],
-		'message_post_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)",
-			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (:to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)"
-		],
-		'message_post_system_message' => [
-			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)",
-			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)"
+		'checks_get' => [
+			'mysql' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
 		],
 
-		'message_get_conversations' => [
-			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC",
-			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC"
-		],
-		'message_get_unseen_conversations' => [
-			'mysql' => "SELECT COUNT(id) as unseen FROM caro_messages WHERE user_id = :user AND seen = 0 AND conversation_user = :conversation",
-			'sqlsrv' => "SELECT COUNT(id) as unseen FROM caro_messages WHERE user_id = :user AND seen = 0 AND conversation_user = :conversation"
-		],
-		'message_get_conversation' => [
-			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.sender = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.conversation_user = :conversation ORDER BY caro_messages.timestamp ASC; UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user AND conversation_user = :conversation",
-			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.sender = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.conversation_user = :conversation ORDER BY caro_messages.timestamp ASC; UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user AND conversation_user = :conversation"
-		],
-		'message_delete_conversation' => [
-			'mysql' => "DELETE FROM caro_messages WHERE user_id = :user AND conversation_user = :conversation",
-			'sqlsrv' => "DELETE FROM caro_messages WHERE user_id = :user AND conversation_user = :conversation"
-		],
 
-		'texttemplate-post' => [
-			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, language, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, language, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"
-		],
-		'texttemplate-put' => [
-			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id"
-		],
-		'texttemplate-datalist' => [
-			'mysql' => "SELECT * FROM caro_texttemplates ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_texttemplates name ORDER BY name ASC, date DESC"
-		],
-		'texttemplate_get-chunk' => [
-			'mysql' => "SELECT * FROM caro_texttemplates WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_texttemplates WHERE id = :id"
-		],
-		'texttemplate_get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_texttemplates WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_texttemplates WHERE name= :name ORDER BY id DESC"
-		],
-
-		'file_bundles-post' => [
-			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
-			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
-		],
-		'file_bundles-datalist' => [
-			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
-		],
-		'file_bundles-get' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
-		],
-		'file_bundles-get-active' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
-			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
-		],
-		'file_external_documents-get' => [
-			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
-			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"
-		],
-		'file_external_documents-get-active' => [
-			'mysql' => "SELECT * FROM caro_file_external_documents WHERE IFNULL(retired, 'null') = 'null' ORDER BY path ASC",
-			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, CAST('1900-01-01 00:00:00' AS SMALLDATETIME) ) = '1900-01-01 00:00:00' OR retired = '1900-01-01 00:00:00' ORDER BY path ASC"
-		],
-		'file_external_documents-retire' => [
-			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id"
-		],
-		'file_external_documents-unretire' => [
-			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CAST('1900-01-01 00:00:00' AS SMALLDATETIME) WHERE id = :id"
-		],
-		'file_external_documents-context' => [
-			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id"
-		],
-		'file_external_documents-post' => [
-			'mysql' => "INSERT INTO caro_file_external_documents (id, path, author, regulatory_context, retired) VALUES (NULL, :path, :author, '', NULL)",
-			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, author, regulatory_context, retired) VALUES (:path, :author, '', NULL)"
-		],
-		
-
-		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)"
-		],
-		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id"
-		],
-		'form_put-approve' => [
-			'mysql' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id"
-		],
-		'form_form-datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
-		],
-		'form_form-datalist-approved' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
-		],
-		'form_component-datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
-		],
-		'form_component-datalist-approved' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
-		],
-		'form_bundle-datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
-		],
-		'form_form-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
-		],
-		'form_form-get-latest-by-context' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = :context AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE context= :context AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
-		],
-		'form_component-get-latest-by-name-approved' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
-		],
-		'form_component-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' ORDER BY id DESC"
-		],
-		'form_bundle-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'bundle' ORDER BY id DESC"
-		],
-		'form_get' => [
-			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
-		],
-		'form_delete' => [
-			'mysql' => "DELETE FROM caro_form WHERE id = :id AND (ceo_approval IS NULL OR qmo_approval IS NULL OR supervisor_approval IS NULL)",
-			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND (ceo_approval IS NULL OR qmo_approval IS NULL OR supervisor_approval IS NULL)"
-		],
-
-		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)",
-			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content) VALUES (:context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)"
-		],
-		'records_import' => [
-			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
-			'sqlsrv' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
-		],
-		'records_identifiers' => [
-			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MIN(IFNULL(r.closed, 0)) AS closed, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
-			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MIN(ISNULL(r.closed, 0)) AS closed, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
-		],
-		'records_close' => [
-			'mysql' => "UPDATE caro_records SET closed = 1 WHERE identifier = :identifier",
-			'sqlsrv' => "UPDATE caro_records SET closed = 1 WHERE identifier = :identifier"
-		],
 
 		'consumables_post-vendor' => [
 			'mysql' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
@@ -419,6 +267,177 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND protected = 0"
 		],
 
+
+
+		'csvfilter-post' => [
+			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_csvfilter (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
+		],
+		'csvfilter-put' => [
+			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
+		],
+		'csvfilter-datalist' => [
+			'mysql' => "SELECT * FROM caro_csvfilter ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_csvfilter name ORDER BY name ASC, date DESC"
+		],
+		'csvfilter_get-filter' => [
+			'mysql' => "SELECT * FROM caro_csvfilter WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_csvfilter WHERE id = :id"
+		],
+		'csvfilter_get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name= :name ORDER BY id DESC"
+		],
+
+
+
+		'file_bundles-post' => [
+			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
+			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
+		],
+		'file_bundles-datalist' => [
+			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
+			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
+		],
+		'file_bundles-get' => [
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
+		],
+		'file_bundles-get-active' => [
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
+			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
+		],
+		'file_external_documents-get' => [
+			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"
+		],
+		'file_external_documents-get-active' => [
+			'mysql' => "SELECT * FROM caro_file_external_documents WHERE IFNULL(retired, 'null') = 'null' ORDER BY path ASC",
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, CAST('1900-01-01 00:00:00' AS SMALLDATETIME) ) = '1900-01-01 00:00:00' OR retired = '1900-01-01 00:00:00' ORDER BY path ASC"
+		],
+		'file_external_documents-retire' => [
+			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id"
+		],
+		'file_external_documents-unretire' => [
+			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CAST('1900-01-01 00:00:00' AS SMALLDATETIME) WHERE id = :id"
+		],
+		'file_external_documents-context' => [
+			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id"
+		],
+		'file_external_documents-post' => [
+			'mysql' => "INSERT INTO caro_file_external_documents (id, path, author, regulatory_context, retired) VALUES (NULL, :path, :author, '', NULL)",
+			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, author, regulatory_context, retired) VALUES (:path, :author, '', NULL)"
+		],
+
+
+
+		'form_post' => [
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)"
+		],
+		'form_put' => [
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id"
+		],
+		'form_put-approve' => [
+			'mysql' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id"
+		],
+		'form_form-datalist' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
+		],
+		'form_form-datalist-approved' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
+		],
+		'form_component-datalist' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
+		],
+		'form_component-datalist-approved' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
+		],
+		'form_bundle-datalist' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
+		],
+		'form_form-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
+		],
+		'form_form-get-latest-by-context' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = :context AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE context= :context AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
+		],
+		'form_component-get-latest-by-name-approved' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
+		],
+		'form_component-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' ORDER BY id DESC"
+		],
+		'form_bundle-get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'bundle' ORDER BY id DESC"
+		],
+		'form_get' => [
+			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
+		],
+		'form_delete' => [
+			'mysql' => "DELETE FROM caro_form WHERE id = :id AND (ceo_approval IS NULL OR qmo_approval IS NULL OR supervisor_approval IS NULL)",
+			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND (ceo_approval IS NULL OR qmo_approval IS NULL OR supervisor_approval IS NULL)"
+		],
+
+
+
+		'message_get_unnotified' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"
+		],
+		'message_put_notified' => [
+			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
+			'sqlsrv' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user"
+		],		
+		'message_get_unseen' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
+		],
+		'message_post_message' => [
+			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (:to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)"
+		],
+		'message_post_system_message' => [
+			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)",
+			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)"
+		],
+
+		'message_get_conversations' => [
+			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC",
+			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC"
+		],
+		'message_get_unseen_conversations' => [
+			'mysql' => "SELECT COUNT(id) as unseen FROM caro_messages WHERE user_id = :user AND seen = 0 AND conversation_user = :conversation",
+			'sqlsrv' => "SELECT COUNT(id) as unseen FROM caro_messages WHERE user_id = :user AND seen = 0 AND conversation_user = :conversation"
+		],
+		'message_get_conversation' => [
+			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.sender = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.conversation_user = :conversation ORDER BY caro_messages.timestamp ASC; UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user AND conversation_user = :conversation",
+			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.sender = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.conversation_user = :conversation ORDER BY caro_messages.timestamp ASC; UPDATE caro_messages SET notified = 1, seen = 1 WHERE user_id = :user AND conversation_user = :conversation"
+		],
+		'message_delete_conversation' => [
+			'mysql' => "DELETE FROM caro_messages WHERE user_id = :user AND conversation_user = :conversation",
+			'sqlsrv' => "DELETE FROM caro_messages WHERE user_id = :user AND conversation_user = :conversation"
+		],
+
+
+
 		'order_get-product-search' => [
 			'mysql' => "SELECT prod.*, IFNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1",
 			'sqlsrv' => "SELECT prod.*, ISNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1"
@@ -499,71 +518,73 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ISNULL(ordered, 100) = 100",
 		],
 
-		'csvfilter-post' => [
-			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_csvfilter (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
+
+
+		'records_post' => [
+			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)",
+			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content) VALUES (:context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)"
 		],
-		'csvfilter-put' => [
-			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
+		'records_import' => [
+			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
+			'sqlsrv' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
-		'csvfilter-datalist' => [
-			'mysql' => "SELECT * FROM caro_csvfilter ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_csvfilter name ORDER BY name ASC, date DESC"
+		'records_identifiers' => [
+			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MIN(IFNULL(r.closed, 0)) AS closed, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
+			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MIN(ISNULL(r.closed, 0)) AS closed, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
 		],
-		'csvfilter_get-filter' => [
-			'mysql' => "SELECT * FROM caro_csvfilter WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_csvfilter WHERE id = :id"
-		],
-		'csvfilter_get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name= :name ORDER BY id DESC"
+		'records_close' => [
+			'mysql' => "UPDATE caro_records SET closed = 1 WHERE identifier = :identifier",
+			'sqlsrv' => "UPDATE caro_records SET closed = 1 WHERE identifier = :identifier"
 		],
 
-		'checks_post' => [
-			'mysql' => "INSERT INTO caro_checks (id, type, date, author, content) VALUES (NULL, :type, CURRENT_TIMESTAMP, :author, :content)",
-			'sqlsrv' => "INSERT INTO caro_checks (type, date, author, content) VALUES (:type, CURRENT_TIMESTAMP, :author, :content)"
+
+
+		'texttemplate-post' => [
+			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, language, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, language, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"
 		],
-		'checks_get-types' => [
-			'mysql' => "SELECT type FROM caro_checks GROUP BY type",
-			'sqlsrv' => "SELECT type FROM caro_checks GROUP BY type"
+		'texttemplate-put' => [
+			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id"
 		],
-		'checks_get' => [
-			'mysql' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
+		'texttemplate-datalist' => [
+			'mysql' => "SELECT * FROM caro_texttemplates ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_texttemplates name ORDER BY name ASC, date DESC"
+		],
+		'texttemplate_get-chunk' => [
+			'mysql' => "SELECT * FROM caro_texttemplates WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_texttemplates WHERE id = :id"
+		],
+		'texttemplate_get-latest-by-name' => [
+			'mysql' => "SELECT * FROM caro_texttemplates WHERE name = :name ORDER BY id DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_texttemplates WHERE name= :name ORDER BY id DESC"
 		],
 
-		'calendar_post' => [
-			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (NULL, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
-			'sqlsrv' => "INSERT INTO caro_calendar (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (:type, CAST(:span_start AS SMALLDATETIME), CAST(:span_end AS SMALLDATETIME), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
+
+		
+		'user_post' => [
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings)",
+			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
 		],
-		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed alert = :alert WHERE id = :id",
+		'user_put' => [
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id LIMIT 1",
+			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
 		],
-		'calendar_complete' => [
-			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
+		'user_get-datalist' => [
+			'mysql' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC"
 		],
-		'calendar_get-day' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') AND DATE_FORMAT(caro_calendar.span_end, '%Y-%m-%d') ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') AND FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') ORDER BY caro_calendar.span_end ASC",
+		'user_get' => [
+			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
-		'calendar_get-within-date-range' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_start BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
+		'user_get-orderauth' => [
+			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth LIMIT 1",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
 		],
-		'calendar_search' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
-		],
-		'calendar_delete' => [
-			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
-		],
-		'calendar_alert' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
+		'user_delete' => [
+			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id",
+			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id"
 		],
 
 	];
