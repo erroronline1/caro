@@ -34,6 +34,8 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_homeoffice'));
+				$user['app_settings']['annualvacation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$user['app_settings']['weeklyhours'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
 				}
@@ -132,6 +134,18 @@ class USER extends API {
 						],
 						'hint' => LANG::GET('user.settings_hint'),
 						'content' => $primary_unit
+					], [
+						'type' => 'numberinput',
+						'attributes' => [
+							'name' => LANG::GET('user.settings_weekly_hours'),
+							'value' => array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours']: 0
+						]
+					], [
+						'type' => 'numberinput',
+						'attributes' => [
+							'name' => LANG::GET('user.settings_annual_vacation'),
+							'value' => array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation']: 0
+						]
 					]
 				];
 				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
@@ -195,6 +209,9 @@ class USER extends API {
 				}
 				$user['units'] = implode(',', $units);
 
+				$user['app_settings']['annualvacation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$user['app_settings']['weeklyhours'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
@@ -241,7 +258,7 @@ class USER extends API {
 					':token' => $user['token'],
 					':orderauth' => $user['orderauth'],
 					':image' => $user['image'],
-					':app_settings' => $user['app_settings']
+					':app_settings' => json_encode($user['app_settings'])
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
@@ -289,6 +306,10 @@ class USER extends API {
 					}
 				}
 				$user['units'] = implode(',', $units);
+				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+				$user['app_settings']['annualvacation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$user['app_settings']['weeklyhours'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+
 
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_revoke')){
@@ -342,7 +363,7 @@ class USER extends API {
 					':token' => $user['token'],
 					':orderauth' => $user['orderauth'],
 					':image' => $user['image'],
-					':app_settings' => $user['app_settings']
+					':app_settings' => json_encode($user['app_settings'])
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],
@@ -376,14 +397,15 @@ class USER extends API {
 				$statement->execute([
 					':id' => $this->_requestedID
 				]);
-				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)){$user = [
+				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)){ $user = [
 					'id' => null,
 					'name' => '',
 					'permissions' => '',
 					'units' => '',
 					'token' => '',
 					'orderauth' => '',
-					'image' => ''
+					'image' => '',
+					'app_settings' => ''
 				];}
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
@@ -396,48 +418,74 @@ class USER extends API {
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
+				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+
 				$result['body']=['content' => [
 					[
-						['type' => 'datalist',
-						'content' => $datalist,
-						'attributes' => [
-							'id' => 'users'
-						]],
-						['type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('user.edit_existing_user_select'),
-							'onchange' => "api.user('get', 'user', this.value)"
+						[
+							'type' => 'datalist',
+							'content' => $datalist,
+							'attributes' => [
+								'id' => 'users'
+							]
 						],
-						'content' => $options],
-						['type' => 'searchinput',
-						'attributes' => [
-							'name' => LANG::GET('user.edit_existing_user'),
-							'list' => 'users',
-							'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
-						]]
-					],[
-						['type' => 'textinput',
-						'attributes' => [
-							'name' => LANG::GET('user.edit_name'),
-							'required' => true,
-							'value' => $user['name'] ? : ''
-						]],
-						['type' => 'checkbox',
-						'description' => LANG::GET('user.edit_permissions'),
-						'content' => $permissions,
-						'hint' => LANG::GET('user.edit_permissions_hint')
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_existing_user_select'),
+								'onchange' => "api.user('get', 'user', this.value)"
+							],
+							'content' => $options
 						],
-						['type' => 'checkbox',
-						'description' => LANG::GET('user.edit_units'),
-						'content' => $units,
-						'hint' => LANG::GET('user.edit_units_hint')
+						[
+							'type' => 'searchinput',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_existing_user'),
+								'list' => 'users',
+								'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
+							]
 						]
 					],[
-						['type' => 'photo',
-						'attributes' => [
-							'name' => LANG::GET('user.edit_take_photo')
+						[
+							'type' => 'textinput',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_name'),
+								'required' => true,
+								'value' => $user['name'] ? : ''
+							]
 						],
-						'hint' => LANG::GET('user.edit_take_photo_hint')],
+						[
+							'type' => 'checkbox',
+							'description' => LANG::GET('user.edit_permissions'),
+							'content' => $permissions,
+							'hint' => LANG::GET('user.edit_permissions_hint')
+						],
+						[
+							'type' => 'checkbox',
+							'description' => LANG::GET('user.edit_units'),
+							'content' => $units,
+							'hint' => LANG::GET('user.edit_units_hint')
+						], [
+							'type' => 'numberinput',
+							'attributes' => [
+								'name' => LANG::GET('user.settings_weekly_hours'),
+								'value' => array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours']: 0
+							]
+						], [
+							'type' => 'numberinput',
+							'attributes' => [
+								'name' => LANG::GET('user.settings_annual_vacation'),
+								'value' => array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation']: 0
+							]
+						]
+					],[
+						[
+							'type' => 'photo',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_take_photo')
+							],
+							'hint' => LANG::GET('user.edit_take_photo_hint')
+						],
 					],[
 						[
 							'type' => 'file',
@@ -453,30 +501,36 @@ class USER extends API {
 							'hint' => LANG::GET('user.edit_add_document_rename_hint')
 						]
 					],[
-						['type' => 'radio',
-						'attributes' => [
-							'name' => LANG::GET('user.edit_order_authorization')
-						],
-						'content' => [
-							LANG::GET('user.edit_order_authorization_generate') => [],
-							LANG::GET('user.edit_order_authorization_revoke') => []
+						[
+							'type' => 'radio',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_order_authorization')
+							],
+							'content' => [
+								LANG::GET('user.edit_order_authorization_generate') => [],
+								LANG::GET('user.edit_order_authorization_revoke') => []
 							]
 						]
 					],[
-						['type' => 'checkbox',
-						'description' => LANG::GET('user.edit_token'),
-						'content' => [LANG::GET('user.edit_token_renew') => []]
+						[
+							'type' => 'checkbox',
+							'description' => LANG::GET('user.edit_token'),
+							'content' => [
+								LANG::GET('user.edit_token_renew') => []
+							]
 						],
-						['type' => 'deletebutton',
-						'attributes' => [
-							'value' => LANG::GET('user.edit_delete_button'),
-							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
-								"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
-								"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
-							'disabled' => $user['id'] < 2
-						]]
+						[
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => LANG::GET('user.edit_delete_button'),
+								'type' => 'button', // apparently defaults to submit otherwise
+								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
+									"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
+									"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
+								'disabled' => $user['id'] < 2
+							]
+						]
 					]],
 					'form' => [
 						'data-usecase' => 'user',
