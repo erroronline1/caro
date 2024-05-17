@@ -266,7 +266,7 @@ class APPLICATION extends API {
 		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
 		foreach ($pastEvents as $row){
-			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $row['span_start'] . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . substr($row['span_start'], 0, 10) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',
