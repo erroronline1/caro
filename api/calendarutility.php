@@ -62,7 +62,7 @@ class CALENDARUTILITY {
 	 * @param string $format month|week
 	 * @param string $date yyyy-mm-dd
 	 */
-	private function days($format = '', $date = ''){
+	public function days($format = '', $date = ''){
 		$result = [];
 		$date = new DateTime($date ? : 'now', new DateTimeZone(INI['timezone']));
 		if ($format === 'week') {
