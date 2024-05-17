@@ -294,7 +294,6 @@ class CALENDARUTILITY {
 					LANG::GET('calendar.timesheet_start_time') => true,
 					LANG::GET('calendar.timesheet_end_time') => true,
 					LANG::GET('calendar.timesheet_break_time') => true,
-					LANG::GET('calendar.timesheet_weekly_hours') => true,
 					LANG::GET('calendar.timesheet_homeoffice') => true
 				];
 				array_push($inputs, ...[
@@ -347,40 +346,14 @@ class CALENDARUTILITY {
 								'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
 							]
 						],[
-							'type' => 'numberinput',
-							'attributes' => [
-								'name' => LANG::GET('calendar.timesheet_weekly_hours'),
-								'value' => array_key_exists('weeklyhours', $misc) ? $misc['weeklyhours'] : '',
-								'step' => .1,
-								'required' => true,
-							]
-						],[
 							'type' => 'checkbox',
 							'description' => LANG::GET('calendar.event_alert_description'),
 							'content' => $alert
 						],[
 							'type' => 'hiddeninput',
 							'attributes' => [
-								'name' => LANG::GET('calendar.event_organizational_unit'),
-								'value' => $columns[':organizational_unit']
-							]
-						],[
-							'type' => 'hiddeninput',
-							'attributes' => [
-								'name' => LANG::GET('calendar.event_type'),
-								'value' => $columns[':type']
-							]
-						],[
-							'type' => 'hiddeninput',
-							'attributes' => [
 								'name' => 'calendarEventId',
 								'value' => $columns[':id']
-							]
-						],[
-							'type' => 'hiddeninput',
-							'attributes' => [
-								'name' => LANG::GET('calendar.timesheet_foreign_contributor'),
-								'value' => $columns[':author_id']
 							]
 						]
 					]);

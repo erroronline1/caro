@@ -420,10 +420,11 @@ class CALENDAR extends API {
 		foreach($dbevents as $row){
 			$date = new DateTime($row['span_start'], new DateTimeZone(INI['timezone']));
 			$due = new DateTime($row['span_end'], new DateTimeZone(INI['timezone']));
-			if ($row['type'] !== 'timesheet' || !(
-				$row['affected_user_id'] === $_SESSION['user']['id'] ||
-				array_intersect(['humanressources', 'admin', 'ceo'], $_SESSION['user']['permissions']) ||
-				(array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
+			if ($row['type'] !== 'timesheet'
+				|| !($row['affected_user_id'] === $_SESSION['user']['id']
+				|| array_intersect(['humanressources', 'admin', 'ceo'], $_SESSION['user']['permissions'])
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
+				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
 			)) continue;
 
 			$hint = '';
@@ -529,21 +530,26 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
+				$statement->execute([
+					':id' => $affected_user_id
+				]);
+				$affected_user = $statement->fetch(PDO::FETCH_ASSOC);
+		
 				$event = [
 					':type' => 'timesheet',
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_start_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_start_time')) . ':00',
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_time')) . ':00',
-//					':author_id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_foreign_contributor')) ? : $_SESSION['user']['id'],
 					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $_SESSION['user']['id'],
-					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
+					':affected_user_id' => $affected_user['id'],
+					':organizational_unit' => $affected_user['units'],
 					':subject' => '',
 					':misc' => '',
 					':closed' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
 				$misc = [
-					'weeklyhours' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_weekly_hours')),
 					'note' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_break_time'))
 				];
@@ -570,21 +576,26 @@ class CALENDAR extends API {
 					]]);
 				break;
 			case 'PUT':
+				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
+				$statement->execute([
+					':id' => $affected_user_id
+				]);
+				$affected_user = $statement->fetch(PDO::FETCH_ASSOC);
+		
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_start_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_start_time')) . ':00',
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_time')) . ':00',
-//					':author_id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_foreign_contributor')) ? : $_SESSION['user']['id'],
 					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $_SESSION['user']['id'],
-					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
+					':affected_user_id' => $affected_user['id'],
+					':organizational_unit' => $affected_user['units'],
 					':subject' => '',
 					':misc' => '',
 					':closed' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
 				$misc = [
-					'weeklyhours' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_weekly_hours')),
 					'note' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_break_time'))
 				];
