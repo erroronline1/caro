@@ -720,6 +720,14 @@ class CALENDAR extends API {
 							]
 						];
 					}
+					$events[] = [
+						'type' => 'button',
+						'attributes' => [
+							'value' => LANG::GET('calendar.timesheet_monthly_summary'),
+							'onpointerup' => "api.calendar('get', 'monthlyTimesheet', '" . $this->_requestedDate . "')"
+						]
+					];
+
 					$result['body']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
@@ -760,6 +768,24 @@ class CALENDAR extends API {
 				break;
 		}
 		$this->response($result);
+	}
+
+	public function monthlyTimesheet(){
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar->days('month', $this->_requestedDate);
+		$days = $calendar->_days;
+		$first = $last = '';
+		foreach($days as $day){
+			if ($day === null) continue;
+			else {
+				$first = clone $day;
+				break;
+			}
+		}
+		$last = clone $days[count($days) - 1];
+		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
+		var_dump($month);
+		$this->response([]);
 
 	}
 }

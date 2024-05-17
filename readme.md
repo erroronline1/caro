@@ -51,14 +51,8 @@
 
 #### user considerations
 * time tracking
-    * permission handling
-    * adding by human ressources and supervisor
-        * select user, read respective units
-        * import user data onchange of selection?(hours) 
     * export, calculate plausibility check
-    * yearly vacation data?
-    * vacation calculation
-    * import vacation and weekly hours from last entry
+    * calculate hours, vacation, type in weekly hours and annual vacation days on export
 * holiday, sickness overview (special permissions?)
 
 #### planning considerations
@@ -489,7 +483,7 @@ Scheduling and its events are not part of the records per se as any action is su
 
 Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
 
-This ensures a transparent communication, data safety and collective agreements on timetracking. It is supposed to address all known concerns of german law and staff council/union.
+This ensures a transparent communication, data safety and collective agreements on timetracking. It is supposed to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database storing user ids instead of names, so once a registered user is deleted permanently it's hard to tell who "deleted user" meant to be. Timesheets can be exported, which is preferred anyway by current experience.
 
 ```mermaid
 graph TD;
