@@ -151,8 +151,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') AND FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_get-within-date-range' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_start BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
+			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_end BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_end BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_search' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name as author, c_u2.name as affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
@@ -561,7 +561,7 @@ class SQLQUERY {
 		],
 
 
-		
+
 		'user_post' => [
 			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings)",
 			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
@@ -571,8 +571,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
 		],
 		'user_get-datalist' => [
-			'mysql' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name, orderauth, permissions, units FROM caro_user ORDER BY name ASC"
+			'mysql' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
