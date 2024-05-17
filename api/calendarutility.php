@@ -45,13 +45,20 @@ class CALENDARUTILITY {
 		$holidays = $this->_holidays;
 		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
 
-		$easter = new DateTime();
-		$easter->setTimestamp(easter_date($year)); //suppoed to be easter sunday but isn't?
-		$easter->modify('+1 day');
+		$easter = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$easter->setTimestamp(easter_date($year));
 		foreach($this->_easter_holidays as $day => $offset){
 			$easterholiday = clone $easter;
 			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
 			$holidays[] = $easterholiday->format('Y-m-d');
+		}
+		$day = new DateTime($year . '-01-01', new DateTimeZone(INI['timezone']));
+		$newyearseve = new DateTime($year . '-12-31', new DateTimeZone(INI['timezone']));
+		while ($day <= $newyearseve){
+			if (!in_array($day->format('N'), $this->_workdays)
+				&& !in_array($day->format('Y-m-d'), $holidays)
+			) $holidays[] = $day->format('Y-m-d');
+			$day->modify('+1 day');
 		}
 		return $holidays;
 	}
@@ -126,7 +133,7 @@ class CALENDARUTILITY {
 					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
 					'selected' => $date === $day->format('Y-m-d'),
-					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
+					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y')))
 				];
 				if ($result['header']) continue;
 				if ($format === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
