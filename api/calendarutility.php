@@ -93,6 +93,10 @@ class CALENDARUTILITY {
 			}
 			$result[] = $date;
 		}
+		// ensure the last day lasts to midnight for time comparisons
+		$last_day = clone $result[count($result) - 1];
+		$last_day->modify('+23 hours')->modify('+59 seconds');
+		$result[count($result)-1] = $last_day;
 		$this->_days = $result;
 	}
 
