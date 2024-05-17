@@ -471,7 +471,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#Content)
 
 ### Calendar
-Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events at a quick glance. Events can be added by every user, editing and deleting is permitted to elevated users including supervisors only.
+Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to elevated users including supervisors only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -483,7 +483,7 @@ Scheduling and its events are not part of the records per se as any action is su
 
 Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
 
-This ensures a transparent communication, data safety and collective agreements on timetracking. It is supposed to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database storing user ids instead of names, so once a registered user is deleted permanently it's hard to tell who "deleted user" meant to be. Timesheets can be exported, which is preferred anyway by current experience.
+This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database storing user ids instead of names, so once a formerly registered user is deleted it's hard to tell who "deleted user" meant to be. Timesheets can be exported, which is preferred anyway by current experience.
 
 ```mermaid
 graph TD;
@@ -977,6 +977,7 @@ Tested devices:
 * Desktop PC Win10 Edge-browser
 * Notebook Win11 Firefox-browser
 * Smartphone Android12 Firefox-browser
+Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 
 [Content](#Content)
 
