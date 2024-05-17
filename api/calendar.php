@@ -461,6 +461,10 @@ class CALENDAR extends API {
 			 * admin, ceo and supervisor of assigned unit
 			 */
 			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
+			if (!(array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
+				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))))
+				$completed[LANG::GET('calendar.timesheet_approve')]['disabled'] = true;
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[LANG::GET('calendar.timesheet_approve')]['checked'] = true;
@@ -471,7 +475,6 @@ class CALENDAR extends API {
 				'type' => 'checkbox',
 				'content' => $completed,
 				'hint' => $completed_hint,
-				'disabled' => !(array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) || (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))
 			];
 
 			/**
@@ -693,14 +696,21 @@ class CALENDAR extends API {
 							'data-type' => 'calendar'
 						]
 					];
-					$events[] = [
-						'type' => 'calendarbutton',
-						'attributes' => [
-							'value' => LANG::GET('calendar.timesheet_new'),
-							'onpointerup' => $calendar->dialog($columns)
-						]
-					];
-					if ($thisDaysEvents) array_push($events, ...$this->timesheetEntries($thisDaysEvents, $calendar));
+					$displayedEvents = [];
+					if ($thisDaysEvents) $displayedEvents = $this->timesheetEntries($thisDaysEvents, $calendar);
+					// avoid multiple entries by non elevated users
+					if (!$displayedEvents
+						|| (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])
+						|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])))){
+						$events[] = [
+							'type' => 'calendarbutton',
+							'attributes' => [
+								'value' => LANG::GET('calendar.timesheet_new'),
+								'onpointerup' => $calendar->dialog($columns)
+							]
+						];
+					}
+					if ($displayedEvents) array_push($events, ...$displayedEvents);
 					if ($bulkapproval){
 						$events[] = [
 							'type' => 'button',
