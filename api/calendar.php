@@ -121,7 +121,6 @@ class CALENDAR extends API {
 		]);
 	}
 
-
 	/**
 	 * renders scheduled events as tiles
 	 * @param array $dbevents db query results
@@ -138,6 +137,10 @@ class CALENDAR extends API {
 			$display = LANG::GET('calendar.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
 				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
+
+			// replace deleted user names
+			if (!$row['author']) $row['author'] = LANG::GET('message.deleted_user');
+			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 
 			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'schedule')"];
 			$completed_hint = '';
@@ -350,6 +353,7 @@ class CALENDAR extends API {
 
 					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					foreach ($thisDaysEvents as $id => $row){
+						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 					}
 
@@ -432,6 +436,10 @@ class CALENDAR extends API {
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
 				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
 			)) continue;
+
+			// replace deleted user names
+			if (!$row['author']) $row['author'] = LANG::GET('message.deleted_user');
+			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 
 			$hint = '';
 			$display = '';
@@ -688,6 +696,7 @@ class CALENDAR extends API {
 
 					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					foreach ($thisDaysEvents as $id => $row){
+						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 						if ($row['type'] === 'timesheet'
 							&& !in_array($row['subject'], INI['calendar']['hide_offduty_reasons'])
 							&& array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
