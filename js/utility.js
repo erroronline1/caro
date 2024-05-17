@@ -114,6 +114,37 @@ const calendarClient = {
 		}
 		if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));
 	},
+	setFieldVisibilityByNames: (names = "", display = true) => {
+		/**
+		 * @param string names json stringified {'input name' : required bool}
+		 * @param bool display
+		 */
+		names = JSON.parse(names);
+		let fields;
+		for (const [name, required] of Object.entries(names)) {
+			fields = document.getElementsByName(name);
+			for (const [id, field] of Object.entries(fields)) {
+				field.parentNode.style.display = display ? "initial" : "none";
+				if (required) {
+					if (display) field.setAttribute("required", true);
+					else field.removeAttribute("required");
+				}
+				if (!field.value) {
+					switch (field.type) {
+						case "number":
+							field.value = 0;
+							break;
+						case "text":
+							field.value = "";
+							break;
+						case "time":
+							field.value = "00:00";
+							break;
+					}
+				}
+			}
+		}
+	},
 };
 
 const orderClient = {

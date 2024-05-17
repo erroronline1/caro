@@ -289,12 +289,20 @@ class CALENDARUTILITY {
 						]
 					];
 				}
-
+				// name => required bool
+				$setFieldVisibility = [
+					LANG::GET('calendar.timesheet_start_time') => true,
+					LANG::GET('calendar.timesheet_end_time') => true,
+					LANG::GET('calendar.timesheet_break_time') => true,
+					LANG::GET('calendar.timesheet_weekly_hours') => true,
+					LANG::GET('calendar.timesheet_homeoffice') => true
+				];
 				array_push($inputs, ...[
 					[
 						'type' => 'select',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_pto_exemption'),
+							'onchange' => "calendarClient.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === LANG.GET('calendar.timesheet_pto.regular'))"
 						],
 						'content' => $ptoselect
 					],[
