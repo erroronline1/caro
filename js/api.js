@@ -322,6 +322,20 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
+				switch (request[1]) {
+					case "monthlyTimesheets":
+						successFn = function (data) {
+							if (data.body !== undefined) {
+								const options = {};
+								options[LANG.GET("general.ok_button")] = false;
+								new Dialog({
+									type: "input",
+									body: data.body,
+									options: options,
+								});
+							}
+						};
+				}
 				break;
 			case "post":
 				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()

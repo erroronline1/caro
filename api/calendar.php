@@ -1,6 +1,7 @@
 <?php
 // scheduling, contributing to calendar
-require_once('calendarutility.php');
+require_once('./calendarutility.php');
+require_once('./pdf.php');
 
 class CALENDAR extends API {
 
@@ -858,13 +859,19 @@ class CALENDAR extends API {
 					continue;
 				}
 				
-				if (!array_key_exists($entry['affected_user_id'], $timesheets)) $timesheets[$entry['affected_user_id']] = [
-					'name' => $entry['affected_user'],
-					'units' => $entry['affected_user_units'],
-					'days' => [],
-					'hours' => 0,
-					'targethours' => $users[array_search($entry['affected_user_id'], array_column($users, 'id'))]['app_settings']['weeklyhours'] / 7 * $virtualworkingdays
-				];
+				if (!array_key_exists($entry['affected_user_id'], $timesheets)) {
+					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
+					$timesheets[$entry['affected_user_id']] = [
+						'name' => $entry['affected_user'],
+						'units' => implode(', ', $units),
+						'month' => LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
+						'days' => [],
+						'pto' => [],
+						'performed' => 0,
+						'projected' => $users[array_search($entry['affected_user_id'], array_column($users, 'id'))]['app_settings']['weeklyhours'] / 7 * $virtualworkingdays,
+						'weeklyhours' => $users[array_search($entry['affected_user_id'], array_column($users, 'id'))]['app_settings']['weeklyhours']
+					];
+				}
 				
 				$span_start = new DateTime($entry['span_start'], new DateTimeZone(INI['timezone']));
 				$span_end = new DateTime($entry['span_end'], new DateTimeZone(INI['timezone']));
@@ -887,9 +894,9 @@ class CALENDAR extends API {
 							'break' => array_key_exists('break', $misc) ? $misc['break'] : '',
 							'homeoffice' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
 							'note' => array_key_exists('note', $misc) ? $misc['note'] : '',
-							'hours' => $hours
+							'hours' => $hours,
 						];
-						$timesheets[$entry['affected_user_id']]['hours'] += $hours;
+						$timesheets[$entry['affected_user_id']]['performed'] += $hours;
 					}
 					// else state subject
 					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => $entry['subject'], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
@@ -903,23 +910,93 @@ class CALENDAR extends API {
 				$dateobj = new DateTime($date, new DateTimeZone(INI['timezone']));
 				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $pto => $translation){
 					if ($day['subject'] === $translation && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)){
-						if (!array_key_exists($pto, $timesheets[$id])) $timesheets[$id][$pto] = 1;
-						else $timesheets[$id][$pto]++;
+						if (!array_key_exists($pto, $timesheets[$id]['pto'])) $timesheets[$id]['pto'][$pto] = 1;
+						else $timesheets[$id]['pto'][$pto]++;
 					}
 				}
 			}
 			// append missing dates for overview, after all the output shall be comprehensible
 			foreach ($days as $day){
 				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
+				$timesheets[$id]['days'][$day->format('Y-m-d')]['weekday'] = LANGUAGEFILE['general']['weekday'][$day->format('N')];
 			}
 			// sort date keys
 			ksort($timesheets[$id]['days']);
-
 		}
 
-		var_dump($timesheets);
-		die();
+		//var_dump($this->prepareTimesheetOutput($timesheets));
+		//die();
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('menu.calendar_timesheet') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => $this->prepareTimesheetOutput($timesheets),
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('menu.calendar_timesheet'),
+			'date' => date('y-m-d H:i')
+		];
 
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.calendar_timesheet')] = [
+			'href' => PDF::timesheetPDF($summary)
+		];
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('calendar.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'body' => $body,
+		]);
+	}
+
+	/**
+	 * filter by permission, prepare output for pdf handler
+	 * @param array $timesheets prepared database results
+	 * 
+	 * @return array suitable for pdf processing by simplified key=>value pairs
+	 */
+	private function prepareTimesheetOutput($timesheets = []){
+		$result = [];
+		foreach($timesheets as $id => $user){
+			$rows = [];
+			if (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
+				|| $id === $_SESSION['user']['id']
+			){
+				// summary
+				$rows[$user['name']] = LANG::GET('calendar.export_sheet_subject', [
+					':appname' => INI['system']['caroapp'],
+					':id' => $id,
+					':units' => $user['units'],
+					':weeklyhours' => $user['weeklyhours'],
+					':performed' => $user['performed'],
+					':projected' => $user['projected'],
+					':month' => $user['month'],
+					':overtime' => strval($user['performed'] - $user['projected'])
+				]);
+				// pto
+				foreach ($user['pto'] as $pto => $number){
+					$rows[LANGUAGEFILE['calendar']['timesheet_pto'][$pto]] = LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number]);
+				}
+				// days
+				foreach ($user['days'] as $date => $day){
+					$dayinfo = [];
+					if (array_key_exists('subject', $day)) $dayinfo[] = $day['subject'];
+					foreach(LANGUAGEFILE['calendar']['export_sheet_daily'] as $key => $value){
+						if (array_key_exists($key, $day) && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
+					}
+					if (array_key_exists('note', $day) && $day['note']) $dayinfo[] = $day['note'];
+					
+					$rows[$day['weekday'] . ' ' . $date] = implode(', ', $dayinfo);
+				}
+				$result[] = $rows;
+			}
+		}
+		return $result;
 	}
 }
 
