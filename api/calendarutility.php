@@ -479,18 +479,24 @@ class CALENDARUTILITY {
 	/**
 	 * @param str $id eventually comma separated multiple ints
 	 * @param any $close boolval false will clear
+	 * @param any $alert null remains state, bool updates
 	 * @return int affected rows
 	 */
-	public function complete($id = '0', $close = null){
+	public function complete($id = '0', $close = null, $alert = null){
 		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
 		$ids = explode (',', $id);
 		$sqlchunks = [];
 		$affected_rows = 0;
-		foreach ($ids as $id){
+		$query = strtr(SQLQUERY::PREPARE('calendar_get-by-id'), [':id' => implode(",", array_map(Fn($id) => $this->_pdo->quote($id), $ids))]);
+		$statement = $this->_pdo->prepare($query);
+		$statement->execute();
+		$entries = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($entries as $entry){
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
 				[
-					':id' => $this->_pdo->quote($id),
+					':id' => $this->_pdo->quote($entry['id']),
 					':closed' => $this->_pdo->quote($close ? json_encode($close) : ''),
+					':alert' => $alert === null ? $entry['alert'] : intval($alert)
 				]
 			));
 		}
