@@ -100,7 +100,7 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$alerts = $calendar->alert(date('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => explode(',', $event['organizational_unit'])], LANG::GET('calendar.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
 		}
 	}
 
@@ -226,7 +226,7 @@ class CALENDAR extends API {
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
 					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => 0,
+					':affected_user_id' => $_SESSION['user']['id'],
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':subject' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
 					':misc' => '',
@@ -259,7 +259,7 @@ class CALENDAR extends API {
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
 					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => 0,
+					':affected_user_id' => $_SESSION['user']['id'],
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':subject' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
 					':misc' => '',
@@ -507,7 +507,7 @@ class CALENDAR extends API {
 					':span_end' => $due->format('Y-m-d H:i'),
 					':author_id' => $row['author_id'],
 					':affected_user_id' => $row['affected_user_id'],
-					':organizational_unit' => $row['organizational_unit'],
+					':organizational_unit' => '',
 					':subject' => $row['subject'],
 					':misc' => $row['misc'],
 					':closed' => '',
@@ -563,7 +563,7 @@ class CALENDAR extends API {
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_time')) . ':00',
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
-					':organizational_unit' => $affected_user['units'],
+					':organizational_unit' => '',
 					':subject' => '',
 					':misc' => '',
 					':closed' => '',
@@ -613,7 +613,7 @@ class CALENDAR extends API {
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_end_time')) . ':00',
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
-					':organizational_unit' => $affected_user['units'],
+					':organizational_unit' => '',
 					':subject' => '',
 					':misc' => '',
 					':closed' => '',
@@ -696,7 +696,6 @@ class CALENDAR extends API {
 					$columns = [
 						':type' => 'timesheet',
 						':span_start' => $this->_requestedDate,
-						':organizational_unit' => implode(',', $_SESSION['user']['units'])
 					];
 					$events = $bulkapproval = [];
 					$displayabsentmates = '';
@@ -706,11 +705,11 @@ class CALENDAR extends API {
 						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 						if ($row['type'] === 'timesheet'
 							&& !in_array($row['subject'], INI['calendar']['hide_offduty_reasons'])
-							&& array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+							&& array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 						if ($row['type'] === 'timesheet'
 							&& !$row['closed']
 							&& (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
-							|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])))
+							|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])))
 							) $bulkapproval[] = $row['id'];
 					}
 					$events[] = [
@@ -727,7 +726,7 @@ class CALENDAR extends API {
 					// avoid multiple entries by non elevated users
 					if (!$displayedEvents
 						|| (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])
-						|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])))){
+						|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])))){
 						$events[] = [
 							'type' => 'calendarbutton',
 							'attributes' => [
@@ -750,7 +749,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => LANG::GET('calendar.timesheet_monthly_summary'),
-							'onpointerup' => "api.calendar('get', 'monthlyTimesheet', '" . $this->_requestedDate . "')"
+							'onpointerup' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
 						]
 					];
 
@@ -761,7 +760,7 @@ class CALENDAR extends API {
 					if ($pastEvents) {
 						$uncompleted = [];
 						foreach ($pastEvents as $id => $row){
-							if ($row['type'] !== 'schedule' || !array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['closed']) unset($pastEvents[$id]);
+							if ($row['type'] !== 'schedule' || !array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']) || $row['closed']) unset($pastEvents[$id]);
 						}
 						if ($pastEvents){
 							$events = [
@@ -800,7 +799,12 @@ class CALENDAR extends API {
 		$this->response($result);
 	}
 
-	public function monthlyTimesheet(){
+	/**
+	 * retrieve all timesheet entries from the database,
+	 * prepare and calculate hours, vacation days and other pto
+	 * gathers all the entries though, supposed to be filtered by different methods 
+	 */
+	public function monthlyTimesheets(){
 		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$calendar->days('month', $this->_requestedTimespan);
@@ -822,11 +826,6 @@ class CALENDAR extends API {
 		}
 		$last = clone $days[count($days) - 1];
 		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
-		// order by start date unbiased by id. saves on ordering later.
-		usort($month, function ($a, $b){
-			if ($a['span_start'] === $b['span_start']) return 0;
-			return ($a['span_start'] < $b['span_start']) ? -1: 1;
-		});
 		// process and store user settings regarding weekly hours 
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();
@@ -837,7 +836,7 @@ class CALENDAR extends API {
 			$user['app_settings']['annualvacation'] = array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation'] : 0;
 		}
 
-		$timesheets = $offduty = [];
+		$timesheets = [];
 		$minuteInterval = new DateInterval('PT1M');
 
 		// detect first day of month
@@ -849,21 +848,20 @@ class CALENDAR extends API {
 			if ($firstnotnull === null) $firstnotnull = $i;
 			if (!in_array($day->format('Y-m-d'), $holidays)) $virtualworkingdays++;
 		}
-
-		foreach ($days as $i => $day){
-			if (!$day) continue;
+		//iterate over all days of the selected month
+		foreach ($days as $day){
+			if (!$day) continue; // null, beginning of month
+			// iterate over all entries within the selected month
 			foreach ($month as $id => $entry){
 				if ($entry['type'] !== 'timesheet'){
 					unset($month[$id]); // default delete for next iteration
 					continue;
 				}
-				if (!$entry['affected_user']) continue; // no name -> deleted user
 				
 				if (!array_key_exists($entry['affected_user_id'], $timesheets)) $timesheets[$entry['affected_user_id']] = [
 					'name' => $entry['affected_user'],
+					'units' => $entry['affected_user_units'],
 					'days' => [],
-					'vacation' => 0,
-					'sickleave' => 0,
 					'hours' => 0,
 					'targethours' => $users[array_search($entry['affected_user_id'], array_column($users, 'id'))]['app_settings']['weeklyhours'] / 7 * $virtualworkingdays
 				];
@@ -874,20 +872,23 @@ class CALENDAR extends API {
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
 					&& !array_key_exists($day->format('Y-m-d'), $timesheets[$entry['affected_user_id']]['days'])){
-					// calculate hours for regular days only
+					// calculate hours for stored regular working days only
 					$misc = json_decode($entry['misc'], true);
 					if (!strlen($entry['subject'])) {
-						$firstday = $days[$firstnotnull];
-						$lastday = $days[count($days) - 1];
+						$firstday = $days[$firstnotnull]; // copy object for down below method usage
+						$lastday = $days[count($days) - 1];  // copy object for down below method usage
 						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
 						$hours = iterator_count($periods) / 60;
 						if (array_key_exists('homeoffice', $misc)) $hours += timeStrToFloat($misc['homeoffice']);
 						if (array_key_exists('break', $misc)) $hours -= timeStrToFloat($misc['break']);
+
 						$timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = [
 							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
 							'break' => array_key_exists('break', $misc) ? $misc['break'] : '',
 							'homeoffice' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
-							'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
+							'note' => array_key_exists('note', $misc) ? $misc['note'] : '',
+							'hours' => $hours
+						];
 						$timesheets[$entry['affected_user_id']]['hours'] += $hours;
 					}
 					// else state subject
@@ -895,16 +896,29 @@ class CALENDAR extends API {
 				}
 			}
 		}
+		// postprocess array
 		foreach($timesheets as $id => $user){
+			// count pto days and append to respective user
 			foreach($user['days'] as $date => $day){
 				$dateobj = new DateTime($date, new DateTimeZone(INI['timezone']));
-				if ($day['subject'] === LANG::GET('calendar.timesheet_pto.vacation') && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)) $timesheets[$id]['vacation']++;
-				if ($day['subject'] === LANG::GET('calendar.timesheet_pto.sickleave') && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)) $timesheets[$id]['sickleave']++;
+				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $pto => $translation){
+					if ($day['subject'] === $translation && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)){
+						if (!array_key_exists($pto, $timesheets[$id])) $timesheets[$id][$pto] = 1;
+						else $timesheets[$id][$pto]++;
+					}
+				}
 			}
+			// append missing dates for overview, after all the output shall be comprehensible
+			foreach ($days as $day){
+				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
+			}
+			// sort date keys
+			ksort($timesheets[$id]['days']);
+
 		}
 
 		var_dump($timesheets);
-		$this->response([]);
+		die();
 
 	}
 }

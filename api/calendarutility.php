@@ -120,7 +120,7 @@ class CALENDARUTILITY {
 								$numbers++;
 							break;
 						case 'timesheet':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))
+							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))
 							$numbers++;
 					}	
 				}
@@ -275,7 +275,7 @@ class CALENDARUTILITY {
 							'name' => LANG::GET('calendar.event_affected_user')
 						]
 					];
-				} elseif (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])){
+				} elseif (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])){
 					$inputs[] = [
 						'type' => 'select',
 						'content' => $affected_unit_users,
