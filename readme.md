@@ -525,6 +525,19 @@ graph TD;
     entrytype-->|unavailable|usertype3{usertype};
     usertype3-->usertype2;
     usertype3-->|human ressources|display_only[display]
+    
+    database2-->export[export];
+    export-->permission2{permission};
+    permission2-->|admin, ceo, human ressources|fullexport["full export of all
+    user timesheets
+    for selected month"];
+    permission2-->|supervisor|partexport["export of all
+    user timesheets
+    of assigned units
+    for selected month"];
+    permission2-->|user|ownexport["export of own
+    timesheet display only
+    for selected month"]
 ```
 [Content](#Content)
 
