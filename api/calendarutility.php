@@ -26,7 +26,7 @@ class CALENDARUTILITY {
 	 */
 	private $_holidays = [];
 	private $_easter_holidays = [];
-	private $_workdays = [];
+	public $_workdays = [];
 
 	public function __construct($pdo){
 		$this->_pdo = $pdo;
@@ -51,14 +51,6 @@ class CALENDARUTILITY {
 			$easterholiday = clone $easter;
 			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
 			$holidays[] = $easterholiday->format('Y-m-d');
-		}
-		$day = new DateTime($year . '-01-01', new DateTimeZone(INI['timezone']));
-		$newyearseve = new DateTime($year . '-12-31', new DateTimeZone(INI['timezone']));
-		while ($day <= $newyearseve){
-			if (!in_array($day->format('N'), $this->_workdays)
-				&& !in_array($day->format('Y-m-d'), $holidays)
-			) $holidays[] = $day->format('Y-m-d');
-			$day->modify('+1 day');
 		}
 		return $holidays;
 	}
@@ -137,7 +129,7 @@ class CALENDARUTILITY {
 					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
 					'selected' => $date === $day->format('Y-m-d'),
-					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y')))
+					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
 				];
 				if ($result['header']) continue;
 				if ($format === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
