@@ -483,7 +483,7 @@ Scheduling and its events are not part of the records per se as any action is su
 
 Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
 
-This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database storing user ids instead of names, so once a formerly registered user is deleted it's hard to tell who "deleted user" meant to be. Timesheets can be exported, which is preferred anyway by current experience.
+This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience.
 
 ```mermaid
 graph TD;
