@@ -1,4 +1,4 @@
-const cacheName = "20240425_0101"; // Change value to force update
+const cacheName = "20240519_0101"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
@@ -13,13 +13,13 @@ addEventListener("message", async (message) => {
 		case "getnotifications":
 			const response = {};
 
-			await fetch("api/api.php/planning/alert/", {
+			await fetch("api/api.php/calendar/alert/", {
 				method: "GET",
 				cache: "no-cache",
 				body: null,
 			});
 
-			let events = await fetch("api/api.php/planning/notification/", {
+			let events = await fetch("api/api.php/calendar/notification/", {
 				method: "GET",
 				cache: "no-cache",
 				body: null,
