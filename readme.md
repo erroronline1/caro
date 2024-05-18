@@ -49,12 +49,6 @@
 * user selectable color themes?
 * risk management?
 
-#### user considerations
-* time tracking
-    * export, calculate plausibility check
-    * calculate hours, vacation, type in weekly hours and annual vacation days on export
-* holiday, sickness overview (special permissions?)
-
 #### planning considerations
 * list / reminder for unfinished cases, current state?
 
@@ -211,6 +205,7 @@ The application provides some options for registered users. The whole content is
     * can only see orders for own assigned organizational units
     * can incorporate and sample check articles
     * can contribute to schedules and timesheets
+    * can export own timesheet
 * Group
     * has access to all non writeable content
     * can **not** add records due to limited identification data
@@ -223,11 +218,13 @@ The application provides some options for registered users. The whole content is
 * Supervisor
     * can approve form components and forms
     * can add timesheet entries for users of own assigned units, change closure state
+    * can export all timesheets of assigned unit members
 * Office
     * can contribute to file manager
     * can access CSV-filter
 * Human Ressources
     * can add timesheet entries for other users
+    * can export all timesheets
 * Purchase
     * has full access to vendor and product management
     * can see all orders
@@ -242,6 +239,7 @@ The application provides some options for registered users. The whole content is
     * can approve components and forms
     * can add CSV filters
     * can manage users
+    * can export all timesheets
 * Application admin
     * **full access**
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
@@ -481,9 +479,9 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and ceo only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave; they are allowed to see all leaves as well. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
+Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor, ceo and human ressources only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
 
-This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience.
+This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly. Since this value is currently not persistently stored and can be accomodated any time, exports of past months will likely be incorrect calculated.
 
 ```mermaid
 graph TD;
