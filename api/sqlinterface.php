@@ -60,34 +60,6 @@ class SQLQUERY {
 	}
 
 	/**
-	 * creates packages of sql queries with IN clause to handle sql package size
-	 * e.g. for update where id in (huge list) clauses
-	 * @param string $query sql query
-	 * @param string $replace string for strtr replacement
-	 * @param array $items for IN clause
-	 * @return array $chunks packages
-	 */
-	public static function CHUNKIFY_IN($query = null, $replace = null, $items = null){
-		$chunks = [];
-		if ($query && $replace && $items){
-			$chunkeditems = [];
-			foreach($items as $item){
-				if (count($chunkeditems)){
-					$index = count($chunkeditems) - 1;
-					if (strlen(strtr($query, [$replace=> implode(',', [$item, ...$chunkeditems[$index]])])) < INI['sql'][INI['sql']['use']]['packagesize']){
-						$chunkeditems[$index][] = $item;
-					}
-					else $chunkeditems[] = [$item];
-				} else $chunkeditems[] = [$item];
-			}
-			foreach($chunkeditems as $items){
-				$chunks[] = strtr($query, [$replace => implode(',', $items)]);
-			}
-		}
-		return $chunks;
-	}
-
-	/**
 	 * 'context' => [
 	 *  	'mysql' => "SELECT age FROM person ORDER BY age ASC LIMIT 3",
 	 *  	'sqlsrv' => "SELECT TOP 3 WITH TIES * FROM person ORDER BY age ASC"
@@ -142,6 +114,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed alert = :alert WHERE id = :id",
 		],
+		'calendar_get-by-id' => [
+			'mysql' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
+		],
 		'calendar_complete' => [
 			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
@@ -163,8 +139,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
 		],
 		'calendar_alert' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.closed = '' AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
+			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
 		],
 
 
