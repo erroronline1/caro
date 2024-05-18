@@ -34,8 +34,6 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_homeoffice'));
-				$user['app_settings']['annualvacation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
-				$user['app_settings']['weeklyhours'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
 				}
@@ -134,18 +132,6 @@ class USER extends API {
 						],
 						'hint' => LANG::GET('user.settings_hint'),
 						'content' => $primary_unit
-					], [
-						'type' => 'numberinput',
-						'attributes' => [
-							'name' => LANG::GET('user.settings_weekly_hours'),
-							'value' => array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours']: 0
-						]
-					], [
-						'type' => 'numberinput',
-						'attributes' => [
-							'name' => LANG::GET('user.settings_annual_vacation'),
-							'value' => array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation']: 0
-						]
 					]
 				];
 				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
