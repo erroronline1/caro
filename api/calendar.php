@@ -79,9 +79,11 @@ class CALENDAR extends API {
 				1 => LANG::GET('calendar.timesheet_approved')
 			],
 		];
+		$alert = null;
+		if ($this->_requestedCalendarType === 'schedule') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
 
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true')) $this->response([
+		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
 			'status' => [
 				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
 				'type' => 'success'
@@ -101,7 +103,7 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$alerts = $calendar->alert(date('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => $event['content'], ':date' => $event['date'], ':author' => $event['author'], ':due' => $event['due']]));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => $event['subject'], ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
 		}
 	}
 
@@ -115,7 +117,7 @@ class CALENDAR extends API {
 		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
 		$uncompleted = 0;
 		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['paused']) $uncompleted++;
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted++;
 		}
 		$this->response([
 			'uncompletedevents' => $uncompleted
@@ -919,6 +921,7 @@ class CALENDAR extends API {
 			foreach ($days as $day){
 				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
 				$timesheets[$id]['days'][$day->format('Y-m-d')]['weekday'] = LANGUAGEFILE['general']['weekday'][$day->format('N')];
+				$timesheets[$id]['days'][$day->format('Y-m-d')]['holiday'] = in_array($day->format('Y-m-d'), $holidays) || !in_array($day->format('N'), $calendar->_workdays);
 			}
 			// sort date keys
 			ksort($timesheets[$id]['days']);
@@ -957,7 +960,16 @@ class CALENDAR extends API {
 	 * filter by permission, prepare output for pdf handler
 	 * @param array $timesheets prepared database results
 	 * 
-	 * @return array suitable for pdf processing by simplified key=>value pairs
+	 * @return array prepared for pdf processing
+	 * [
+	 * 		[ // user
+	 * 			[], // empty row
+	 * 			[
+	 * 				[str description, bool greyed out], // marked holidays and non working day as per ini
+	 * 				str content
+	 * 			]
+	 * 		]
+	 * ]
 	 */
 	private function prepareTimesheetOutput($timesheets = []){
 		$result = [];
@@ -968,20 +980,28 @@ class CALENDAR extends API {
 				|| $id === $_SESSION['user']['id']
 			){
 				// summary
-				$rows[$user['name']] = LANG::GET('calendar.export_sheet_subject', [
-					':appname' => INI['system']['caroapp'],
-					':id' => $id,
-					':units' => $user['units'],
-					':weeklyhours' => $user['weeklyhours'],
-					':performed' => $user['performed'],
-					':projected' => $user['projected'],
-					':month' => $user['month'],
-					':overtime' => strval($user['performed'] - $user['projected'])
-				]);
+				$rows[] = [
+					[$user['name'], false],
+					LANG::GET('calendar.export_sheet_subject', [
+						':appname' => INI['system']['caroapp'],
+						':id' => $id,
+						':units' => $user['units'],
+						':weeklyhours' => $user['weeklyhours'],
+						':performed' => $user['performed'],
+						':projected' => $user['projected'],
+						':month' => $user['month'],
+						':overtime' => strval($user['performed'] - $user['projected'])
+					])
+				];
+				$rows[] = [];
 				// pto
 				foreach ($user['pto'] as $pto => $number){
-					$rows[LANGUAGEFILE['calendar']['timesheet_pto'][$pto]] = LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number]);
+					$rows[] = [
+						[LANGUAGEFILE['calendar']['timesheet_pto'][$pto], false],
+						LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number])
+					];
 				}
+				if ($user['pto']) $rows[] = [];
 				// days
 				foreach ($user['days'] as $date => $day){
 					$dayinfo = [];
@@ -991,7 +1011,10 @@ class CALENDAR extends API {
 					}
 					if (array_key_exists('note', $day) && $day['note']) $dayinfo[] = $day['note'];
 					
-					$rows[$day['weekday'] . ' ' . $date] = implode(', ', $dayinfo);
+					$rows[] = [
+						[$day['weekday'] . ' ' . $date, $day['holiday']],
+						implode(', ', $dayinfo)
+					];
 				}
 				$result[] = $rows;
 			}

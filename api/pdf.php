@@ -277,11 +277,12 @@ class PDF{
 		foreach($content['content'] as $user){
 			$pdf->startPageGroup();
 			$pdf->AddPage();
-			foreach($user as $key => $value){
+			foreach($user as $row){
+				$key = array_key_exists(0, $row) ? $row[0][0] : '';
+				$value = array_key_exists(1, $row) ? $row[1] : '';
+				if (array_key_exists(0, $row) && $row[0][1]) $pdf->SetTextColor(192, 192, 192);
 				$pdf->MultiCell(50, 2, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-				if (gettype($value) === 'array') {
-					$value = implode("\n", array_keys($value));
-				}
+				$pdf->SetTextColor(0, 0, 0);
 				$pdf->MultiCell(150, 2, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			}
 
