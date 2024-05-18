@@ -117,7 +117,7 @@ class CALENDAR extends API {
 		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
 		$uncompleted = 0;
 		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted++;
+			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;
 		}
 		$this->response([
 			'uncompletedevents' => $uncompleted
