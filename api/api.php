@@ -162,6 +162,7 @@ class API {
 		if ($permission) $recipients = $permission;
 		if ($unit) $recipients = $unit;
 		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
+		$recipients = array_unique($recipients);
 		foreach($recipients as $rcpnt_id) {
 			$postmessage = [
 				'to_user' => $rcpnt_id,
