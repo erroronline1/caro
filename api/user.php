@@ -90,10 +90,10 @@ class USER extends API {
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
 								LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" .
-								(array_key_exists('initialovertime', $user['app_settings']) ? " \n" . LANG::GET('user.settings_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-								(array_key_exists('weeklyhours', $user['app_settings']) ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . $user['app_settings']['weeklyhours'] : '') .
-								(array_key_exists('annualvacation', $user['app_settings']) ? " \n" . LANG::GET('user.settings_annual_vacation') . ': ' . $user['app_settings']['annualvacation'] : '') .
-								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '')
+								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '') .
+								(array_key_exists('initialovertime', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
+								(array_key_exists('weeklyhours', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
+								(array_key_exists('annualvacation', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '')
 							]
 						],[
 							[
@@ -201,8 +201,11 @@ class USER extends API {
 				}
 				$user['units'] = implode(',', $units);
 
-				$user['app_settings']['annualvacation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
-				$user['app_settings']['weeklyhours'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+				$annualvacation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
+				$weeklyhours = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
+				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
 
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
@@ -299,9 +302,11 @@ class USER extends API {
 				}
 				$user['units'] = implode(',', $units);
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-				$user['app_settings']['annualvacation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
-				$user['app_settings']['weeklyhours'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
-
+				$annualvacation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
+				$weeklyhours = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
+				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
 
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_revoke')){
@@ -464,7 +469,7 @@ class USER extends API {
 								'type' => 'textinput',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_initial_overtime'),
-									'value' => array_key_exists('initialovertime', $user['app_settings']) ? $user['app_settings']['initialovertime']: 0
+									'value' => array_key_exists('initialovertime', $user['app_settings']) ? $user['app_settings']['initialovertime'] : 0
 								],
 								'hint' => LANG::GET('user.settings_initial_overtime_hint')
 							],
@@ -472,7 +477,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_weekly_hours'),
-									'value' => array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours']: ''
+									'value' => array_key_exists('weeklyhours', $user['app_settings']) ? str_replace(';', "\n", $user['app_settings']['weeklyhours']) : ''
 								],
 								'hint' => LANG::GET('user.settings_weekly_hours_hint')
 							]
@@ -481,7 +486,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_annual_vacation'),
-									'value' => array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation']: ''
+									'value' => array_key_exists('annualvacation', $user['app_settings']) ? str_replace(';', "\n", $user['app_settings']['annualvacation']) : ''
 								],
 								'hint' => LANG::GET('user.settings_annual_vacation_hint')
 							]
@@ -546,7 +551,7 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) $result['body']['content'][2]=[
+					if ($user['image']) $result['body']['content'][3]=[
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_user_image'),
@@ -555,7 +560,7 @@ class USER extends API {
 								'url' => $user['image']]
 							]
 						],
-						$result['body']['content'][2]
+						$result['body']['content'][3]
 					];
 
 					$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
@@ -566,7 +571,7 @@ class USER extends API {
 						}
 					}
 					if ($userfiles) {
-						array_push($result['body']['content'][3], 
+						array_push($result['body']['content'][4], 
 						['type' => 'br'],
 						[
 							'type' => 'links',
@@ -574,7 +579,7 @@ class USER extends API {
 						]);
 					}
 
-					if ($user['orderauth']) $result['body']['content'][4]=[
+					if ($user['orderauth']) $result['body']['content'][5]=[
 						[
 							['type' => 'textinput',
 							'attributes' => [
@@ -583,9 +588,9 @@ class USER extends API {
 								]
 							]
 						],
-						$result['body']['content'][4]
+						$result['body']['content'][5]
 					];
-					if ($user['token']) $result['body']['content'][5]=[
+					if ($user['token']) $result['body']['content'][6]=[
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
@@ -594,7 +599,7 @@ class USER extends API {
 							'qrcode' => $user['token']]
 							]
 						],
-						$result['body']['content'][5]
+						$result['body']['content'][6]
 					];
 
 				$this->response($result);
