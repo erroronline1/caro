@@ -865,6 +865,7 @@ class CALENDAR extends API {
 					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
 					$timesheets[$entry['affected_user_id']] = [
 						'name' => $entry['affected_user'],
+						'user_id' => $entry['affected_user_id'],
 						'units' => implode(', ', $units),
 						'month' => LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
 						'days' => [],
@@ -926,9 +927,14 @@ class CALENDAR extends API {
 			// sort date keys
 			ksort($timesheets[$id]['days']);
 		}
+		// sort by user name
+		usort($timesheets, function ($a, $b) {
+			return $a['name'] === $b['name'] ? 0 : ($a['name'] < $b['name'] ? -1 : 1); 
+		});
+		// set self to top 
+		$self = array_splice($timesheets, array_search($_SESSION['user']['id'], array_column($timesheets, 'user_id')), 1);
+		array_splice($timesheets, 0, 0, $self);
 
-		//var_dump($this->prepareTimesheetOutput($timesheets));
-		//die();
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('menu.calendar_timesheet') . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -973,7 +979,7 @@ class CALENDAR extends API {
 	 */
 	private function prepareTimesheetOutput($timesheets = []){
 		$result = [];
-		foreach($timesheets as $id => $user){
+		foreach($timesheets as $user){
 			$rows = [];
 			if (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
@@ -984,7 +990,7 @@ class CALENDAR extends API {
 					[$user['name'], false],
 					LANG::GET('calendar.export_sheet_subject', [
 						':appname' => INI['system']['caroapp'],
-						':id' => $id,
+						':id' => $user['user_id'],
 						':units' => $user['units'],
 						':weeklyhours' => $user['weeklyhours'],
 						':performed' => $user['performed'],

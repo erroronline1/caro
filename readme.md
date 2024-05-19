@@ -483,6 +483,8 @@ Beside scheduling, the calendar can be used to document working hours of the sta
 
 This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly. Since this value is currently not persistently stored and can be accomodated any time, exports of past months will likely be incorrect calculated.
 
+Exports are ordered by user name with exporting user coming first regardless, for convenience.
+
 ```mermaid
 graph TD;
     scheduling((scheduling))-->select_day[select day];
