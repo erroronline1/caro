@@ -1055,7 +1055,7 @@ export class Assemble {
 
 		input.type = "file";
 		input.id = getNextElementID();
-		input.accept = "image/*";
+		input.accept = "image/jpeg, image/gif, image/png";
 		input.capture = true;
 		input.onchange = changeEvent;
 		input = this.apply_attributes(this.currentElement.attributes, input);
