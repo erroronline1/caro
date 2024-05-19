@@ -90,13 +90,19 @@ class USER extends API {
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
 								LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" .
-								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '')]
+								(array_key_exists('initialovertime', $user['app_settings']) ? " \n" . LANG::GET('user.settings_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
+								(array_key_exists('weeklyhours', $user['app_settings']) ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . $user['app_settings']['weeklyhours'] : '') .
+								(array_key_exists('annualvacation', $user['app_settings']) ? " \n" . LANG::GET('user.settings_annual_vacation') . ': ' . $user['app_settings']['annualvacation'] : '') .
+								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '')
+							]
 						],[
-							['type' => 'photo',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_take_photo')
+							[
+								'type' => 'photo',
+								'attributes' => [
+									'name' => LANG::GET('user.edit_take_photo')
+								],
+								'hint' => LANG::GET('user.edit_take_photo_hint')
 							],
-							'hint' => LANG::GET('user.edit_take_photo_hint')],
 						]
 					],
 					'form' => [
@@ -451,20 +457,37 @@ class USER extends API {
 							'description' => LANG::GET('user.edit_units'),
 							'content' => $units,
 							'hint' => LANG::GET('user.edit_units_hint')
-						], [
-							'type' => 'numberinput',
-							'attributes' => [
-								'name' => LANG::GET('user.settings_weekly_hours'),
-								'value' => array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours']: 0
-							]
-						], [
-							'type' => 'numberinput',
-							'attributes' => [
-								'name' => LANG::GET('user.settings_annual_vacation'),
-								'value' => array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation']: 0
-							]
 						]
 					],[
+						[
+							[
+								'type' => 'textinput',
+								'attributes' => [
+									'name' => LANG::GET('user.settings_initial_overtime'),
+									'value' => array_key_exists('initialovertime', $user['app_settings']) ? $user['app_settings']['initialovertime']: 0
+								],
+								'hint' => LANG::GET('user.settings_initial_overtime_hint')
+							],
+							[
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => LANG::GET('user.settings_weekly_hours'),
+									'value' => array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours']: ''
+								],
+								'hint' => LANG::GET('user.settings_weekly_hours_hint')
+							]
+						], [
+							[
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => LANG::GET('user.settings_annual_vacation'),
+									'value' => array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation']: ''
+								],
+								'hint' => LANG::GET('user.settings_annual_vacation_hint')
+							]
+						]
+					],
+					[
 						[
 							'type' => 'photo',
 							'attributes' => [
