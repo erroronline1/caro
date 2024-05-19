@@ -64,6 +64,7 @@ class CALENDARUTILITY {
 	public function days($format = '', $date = ''){
 		$result = [];
 		$date = new DateTime($date ? : 'now', new DateTimeZone(INI['timezone']));
+		$date->setTime(0, 0);
 		if ($format === 'week') {
 			$date->modify('- ' . ($date->format('N') - 1) . ' days');
 			while ($date->format('N') < 7){
@@ -88,7 +89,7 @@ class CALENDARUTILITY {
 		// ensure the last day lasts to midnight for time comparisons
 		$last_day = clone $result[count($result) - 1];
 		$last_day->modify('+23 hours')->modify('+59 seconds');
-		$result[count($result)-1] = $last_day;
+		$result[count($result) - 1] = $last_day;
 		$this->_days = $result;
 	}
 

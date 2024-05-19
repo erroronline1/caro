@@ -268,7 +268,7 @@ class UTILITY {
 		if (!file_exists($folder)) mkdir($folder, 0777, true);
 		$targets = [];
 		for ($i = 0; $i < count($name); $i++) {
-			if (gettype($_FILES[$name[$i]]['name'])!=='array') {
+			if (gettype($_FILES[$name[$i]]['name']) !== 'array') {
 				if ($_FILES[$name[$i]]['tmp_name']) $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder, $replace);
 			}
 			else {
@@ -283,7 +283,7 @@ class UTILITY {
 		return $targets; // including path e.g. to store in database if needed, has to be prefixed with "api/" eventually 
 	}
 	private static function handle($tmpname, $name, $i, $prefix, $folder, $replace = false){
-		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix)-1)] : null;
+		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
 		$target = $folder . '/' . ($_prefix ? $_prefix . '_' : '') . $name;
 		if (!$replace){
 			$extension = '.' . pathinfo($target)['extension'];
@@ -316,7 +316,7 @@ class UTILITY {
 	public static function delete($paths = []){
 		$result = false;
 		$allowed = false;
-		if (gettype($paths)==='string') $paths=[$paths];
+		if (gettype($paths) === 'string') $paths=[$paths];
 		foreach ($paths as $path) {
 			foreach (array_keys(INI['fileserver']) as $fileserver){
 				if (stristr($path, self::directory($fileserver))) $allowed = true;
@@ -344,7 +344,7 @@ class UTILITY {
 	 * 
 	 * @return array file list 
 	 */
-	public static function listFiles($folder, $order='desc'){
+	public static function listFiles($folder, $order = 'desc'){
 		$result=[];
 		if (!file_exists($folder)) return $result;
 		switch ($order){
@@ -369,7 +369,7 @@ class UTILITY {
 	 * 
 	 * @return array file list 
 	 */
-	public static function listDirectories($folder, $order='desc'){
+	public static function listDirectories($folder, $order = 'desc'){
 		$result=[];
 		if (!file_exists($folder)) return $result;
 		switch ($order){
@@ -394,7 +394,7 @@ class UTILITY {
 	 * 
 	 * @return string directory
 	 */
-	public static function directory($request, $replace=[]){
+	public static function directory($request, $replace = []){
 		if (!array_key_exists($request, INI['fileserver'])){
 			return '../fileserver';
 		}
@@ -421,7 +421,7 @@ class UTILITY {
 	 * 
 	 * @return bool if 
 	 */
-	public static function tidydir($dir= '', $lifespan = null){
+	public static function tidydir($dir = '', $lifespan = null){
 		if (!$dir) return false;
 		$success = !file_exists(self::directory($dir)) ? mkdir(self::directory($dir), 0777, true) : true;
 		if ($lifespan && file_exists(self::directory($dir))){
