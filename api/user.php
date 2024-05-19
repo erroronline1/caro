@@ -172,7 +172,7 @@ class USER extends API {
 					'token' => '',
 					'orderauth' => '',
 					'image' => '',
-					'app_settings' => ''
+					'app_settings' => []
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
