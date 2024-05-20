@@ -103,7 +103,7 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$alerts = $calendar->alert(date('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => $event['subject'], ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']], ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
 		}
 	}
 
@@ -360,7 +360,7 @@ class CALENDAR extends API {
 					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					foreach ($thisDaysEvents as $id => $row){
 						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
-						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 					}
 
 					$events[] = [
@@ -449,7 +449,7 @@ class CALENDAR extends API {
 
 			$hint = '';
 			$display = '';
-			if ($row['subject']) $display .= LANG::GET('calendar.timesheet_irregular') . ': ' . $row['subject'] . "\n";
+			if ($row['subject']) $display .= LANG::GET('calendar.timesheet_irregular') . ': ' . LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . "\n";
 			$display .=	LANG::GET('calendar.timesheet_start') . ': ' . $date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n" .
 				LANG::GET('calendar.timesheet_end') . ': ' . $due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n";
 
@@ -567,15 +567,12 @@ class CALENDAR extends API {
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
 					':organizational_unit' => '',
-					':subject' => '',
+					':subject' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_exemption')) ? : '',
 					':misc' => '',
 					':closed' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
-				$pto = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_exemption'));
-				if ($pto !== LANG::GET('calendar.timesheet_pto.regular')){
-					$event[':subject'] = $pto;
-				}
+				if ($event[':subject'] === 'regular') $event[':subject'] = '';
 				$misc = $event[':subject'] ? [] : [
 					'note' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_break_time'))
@@ -617,15 +614,12 @@ class CALENDAR extends API {
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
 					':organizational_unit' => '',
-					':subject' => '',
+					':subject' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_exemption')) ? : '',
 					':misc' => '',
 					':closed' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
-				$pto = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_exemption'));
-				if ($pto !== LANG::GET('calendar.timesheet_pto.regular')){
-					$event[':subject'] = $pto;
-				}
+				if ($event[':subject'] === 'regular') $event[':subject'] = '';
 				$misc = $event[':subject'] ? [] : [
 					'note' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.timesheet_break_time'))
@@ -708,7 +702,7 @@ class CALENDAR extends API {
 						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 						if ($row['type'] === 'timesheet'
 							&& !in_array($row['subject'], INI['calendar']['hide_offduty_reasons'])
-							&& array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $row['subject'] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+							&& array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 						if ($row['type'] === 'timesheet'
 							&& !$row['closed']
 							&& (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
@@ -911,11 +905,9 @@ class CALENDAR extends API {
 			// count pto days and append to respective user
 			foreach($user['days'] as $date => $day){
 				$dateobj = new DateTime($date, new DateTimeZone(INI['timezone']));
-				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $pto => $translation){
-					if ($day['subject'] === $translation && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)){
-						if (!array_key_exists($pto, $timesheets[$id]['pto'])) $timesheets[$id]['pto'][$pto] = 1;
-						else $timesheets[$id]['pto'][$pto]++;
-					}
+				if (in_array($day['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)){
+					if (!array_key_exists($pto, $timesheets[$id]['pto'])) $timesheets[$id]['pto'][$pto] = 1;
+					else $timesheets[$id]['pto'][$pto]++;
 				}
 			}
 			// append missing dates for overview, after all the output shall be comprehensible
