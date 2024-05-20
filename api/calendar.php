@@ -896,7 +896,7 @@ class CALENDAR extends API {
 						$timesheets[$entry['affected_user_id']]['performed'] += $hours;
 					}
 					// else state subject
-					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => $entry['subject'], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
+					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => LANGUAGEFILE['calendar']['timesheet_pto'][$entry['subject']], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
 				}
 			}
 		}
@@ -906,8 +906,8 @@ class CALENDAR extends API {
 			foreach($user['days'] as $date => $day){
 				$dateobj = new DateTime($date, new DateTimeZone(INI['timezone']));
 				if (in_array($day['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)){
-					if (!array_key_exists($pto, $timesheets[$id]['pto'])) $timesheets[$id]['pto'][$pto] = 1;
-					else $timesheets[$id]['pto'][$pto]++;
+					if (!array_key_exists($day['subject'], $timesheets[$id]['pto'])) $timesheets[$id]['pto'][$day['subject']] = 1;
+					else $timesheets[$id]['pto'][$day['subject']]++;
 				}
 			}
 			// append missing dates for overview, after all the output shall be comprehensible
