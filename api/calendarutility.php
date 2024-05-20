@@ -261,9 +261,9 @@ class CALENDARUTILITY {
 				$misc = $columns[':misc'] ? json_decode($columns[':misc'], true) : [];
 				
 				$ptoselect = [];
-				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $reason){
-					$ptoselect[$reason] = ['value' => $reason];
-					if ($columns[':subject'] === $reason) $ptoselect[$reason]['selected'] = true;
+				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $subject => $reason){
+					$ptoselect[$reason] = ['value' => $subject];
+					if ($columns[':subject'] === $subject) $ptoselect[$reason]['selected'] = true;
 				}
 
 				$inputs = [];
@@ -377,6 +377,108 @@ class CALENDARUTILITY {
 
 		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
 			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
+	}
+
+	/**
+	 * calculates overtime and left vacation days for users from beginning of a given month to the end of another given month
+	 * 
+	 * @param array $ids array of user ids
+	 * @param object|string $from_date DateTime|Y-m-d
+	 * @param object|string $to_date DateTime|Y-m-d
+	 * 
+	 * @return array
+	 * 	[
+	 * 		user_id => [
+	 * 			'overtime' => float
+	 * 			'vacation' => int
+	 * 		]
+	 * 	]
+	 */
+	public function calculateTimesheets($ids = [], $from_date = '', $to_date = ''){
+		$datetimezone = new DateTimeZone(INI['timezone']);
+		$minuteInterval = new DateInterval('PT1M');
+		$from_date = new DateTime($from_date ? : '0001-01-01', $datetimezone);
+		$from_date->modify('first day of this month');
+		$from_date->setTime(0, 0);
+		$to_date = new DateTime($to_date ? : 'now', $datetimezone);
+		$to_date->modify('last day of this month');
+		$to_date->setTime(24, 00);
+		$entries = $this->getWithinDateRange($from_date->format('Y-m-d H:i:s'), $to_date->format('Y-m-d H:i:s'));
+		$result = $usersetting = [];
+		// sort result span_start to process user-settings in the right order
+		array_multisort(array_column($entries, 'span_start'), SORT_ASC, $entries);
+
+		foreach ($entries as $entry){
+			if ($entry['type'] !== 'timesheet' || !in_array($entry['affected_user_id'], $ids)) continue;
+			$userid = $entry['affected_user_id']; // shortening
+			// buffer user settings to avoid repeatedly reading and decoding
+			if (!array_key_exists($userid, $usersetting)) {
+				$settings = json_decode($entry['app_settings'], true);
+				$weeklyhours = $annualvacation = [];
+				if (array_key_exists('weeklyhours', $settings)){
+					$settingentries = explode(';', $settings['weeklyhours']);
+					natsort($settingentries);
+					foreach($settingentries as $line){
+						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+						$weeklyhours[$lineentry[1]] = floatval(str_replace(',', '.', $lineentry[2]));
+					}
+				} else $weeklyhours = ['0001-01-01' => 0];
+				if (array_key_exists('annualvacation', $settings)){
+					$settingentries = explode(';', $settings['annualvacation']);
+					natsort($settingentries);
+					foreach($settingentries as $line){
+						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+						$annualvacation[$lineentry[1]] = floatval(str_replace(',', '.', $lineentry[2]));
+					}
+				} else $annualvacation = ['0001-01-01' => 0];
+				if (array_key_exists('initialovertime', $settings)){
+					$initialovertime = floatval(str_replace(',', '.', preg_split('/\s+/', $settings['initialovertime'])[1]));
+				} else $initialovertime = 0;
+				$usersetting[$userid] = [
+					'initialovertime' => $initialovertime,
+					'annualvacation' => $annualvacation,
+					'weeklyhours' => $weeklyhours
+				];
+			}
+			if (!array_key_exists($userid, $result)) $result[$userid] = [
+				'overtime' => $usersetting[$userid]['initialovertime'],
+				'leftvacation' => $usersetting[$userid]['annualvacation'][array_key_first($usersetting[$userid]['annualvacation'])],
+			];
+
+			$span_start = new DateTime($entry['span_start'], $datetimezone);
+			$span_end = new DateTime($entry['span_end'], $datetimezone);
+			$misc = json_decode($entry['misc'], true);
+
+			if (!strlen($entry['subject'])) {
+				$periods = new DatePeriod($span_start , $minuteInterval, $span_end);
+				$hours = iterator_count($periods) / 60;
+				if (array_key_exists('homeoffice', $misc)) $hours += $this->timeStrToFloat($misc['homeoffice']);
+				if (array_key_exists('break', $misc)) $hours -= $this->timeStrToFloat($misc['break']);
+				$result[$userid]['overtime'] += $hours;
+			}
+			else{
+				$span_start->setTime(0, 0);
+				$span_end->setTime(24, 00);
+				$periods = new DatePeriod($span_start , $minuteInterval, $span_end);
+				$days = iterator_count($periods) / (60 * 24);
+				if (!array_key_exists($entry['subject'], $result[$userid])) $result[$userid][$entry['subject']] = 0;
+				$result[$userid][$entry['subject']] += $days;
+				if ($entry['subject'] === 'vacation') $result[$userid]['leftvacation'] -= $days;
+			}
+		}
+		var_dump($result);
+	}
+
+	/**
+	 * returns a float from H:i format
+	 * 
+	 * @param string $string H:i
+	 * 
+	 * @return float
+	 */
+	public function timeStrToFloat($string){
+		$string = explode(':', $string);
+		return intval($string[0]) + (intval($string[1]) / 60);
 	}
 
 	/**

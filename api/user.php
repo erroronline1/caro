@@ -1,5 +1,7 @@
 <?php
 // add, edit and delete users
+require_once('./calendarutility.php');
+
 class USER extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
@@ -63,6 +65,9 @@ class USER extends API {
 
 				break;
 			case 'GET':
+				//$calendar = new CALENDARUTILITY($this->_pdo);
+				//$calendar->calculateTimesheets([$_SESSION['user']['id']]);
+				//die();
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
 					':id' => $_SESSION['user']['id']
