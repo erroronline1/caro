@@ -380,7 +380,9 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * calculates overtime and left vacation days for users from beginning of a given month to the end of another given month
+	 * calculates time and off-duty days for users from beginning of a given month to the end of another given month
+	 * overtime and vacation calculation only works if $from_date starts from the dawn of time
+	 * so you might have to do two queries and combine their output 
 	 * 
 	 * @param array $ids array of user ids
 	 * @param object|string $from_date DateTime|Y-m-d
@@ -390,7 +392,10 @@ class CALENDARUTILITY {
 	 * 	[
 	 * 		user_id => [
 	 * 			'overtime' => float
-	 * 			'vacation' => int
+	 * 			'leftvacation' => int
+	 * 
+	 * 			any pto days will be counted by theit respective key
+	 * 			'hours' => float
 	 * 		]
 	 * 	]
 	 */
@@ -415,53 +420,103 @@ class CALENDARUTILITY {
 			if (!array_key_exists($userid, $usersetting)) {
 				$settings = json_decode($entry['app_settings'], true);
 				$weeklyhours = $annualvacation = [];
+
+				// extract weekly hours by start date, sort and try to find the first applicable setting
 				if (array_key_exists('weeklyhours', $settings)){
 					$settingentries = explode(';', $settings['weeklyhours']);
 					natsort($settingentries);
 					foreach($settingentries as $line){
 						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-						$weeklyhours[$lineentry[1]] = floatval(str_replace(',', '.', $lineentry[2]));
+						$weeklyhours[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
-				} else $weeklyhours = ['0001-01-01' => 0];
+				} else $weeklyhours = ['date' => new DateTime('0001-01-01', $datetimezone), 'value' => 0];
+				array_multisort(array_column($weeklyhours, 'date'), SORT_ASC, $weeklyhours);
+				$lastappliedweeklyhours = 0;
+				foreach($weeklyhours as $i => $line){
+					if ($line['date'] > $from_date) break;
+					$lastappliedweeklyhours = $i;
+				}
+
+				// extract annual vacation by start date, sort and try to find the first applicable setting
 				if (array_key_exists('annualvacation', $settings)){
 					$settingentries = explode(';', $settings['annualvacation']);
 					natsort($settingentries);
 					foreach($settingentries as $line){
 						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-						$annualvacation[$lineentry[1]] = floatval(str_replace(',', '.', $lineentry[2]));
+						$annualvacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
-				} else $annualvacation = ['0001-01-01' => 0];
+				} else $annualvacation[] = ['date' => new DateTime('0001-01-01', $datetimezone), 'value' => 0];
+				array_multisort(array_column($annualvacation, 'date'), SORT_DESC, $annualvacation);
+				$lastappliedannualvacation = 0;
+				foreach($annualvacation as $i => $line){
+					if ($line['date'] > $from_date) break;
+					$lastappliedannualvacation = $i;
+				}
+
 				if (array_key_exists('initialovertime', $settings)){
 					$initialovertime = floatval(str_replace(',', '.', preg_split('/\s+/', $settings['initialovertime'])[1]));
 				} else $initialovertime = 0;
+
 				$usersetting[$userid] = [
 					'initialovertime' => $initialovertime,
+					'weeklyhours' => $weeklyhours,
+					'lastappliedweeklyhours' => $lastappliedweeklyhours,
 					'annualvacation' => $annualvacation,
-					'weeklyhours' => $weeklyhours
+					'lastappliedannualvacation' => $lastappliedannualvacation,
 				];
 			}
 			if (!array_key_exists($userid, $result)) $result[$userid] = [
 				'overtime' => $usersetting[$userid]['initialovertime'],
-				'leftvacation' => $usersetting[$userid]['annualvacation'][array_key_first($usersetting[$userid]['annualvacation'])],
+				'leftvacation' => $usersetting[$userid]['annualvacation'][0]['value'],
+				'performed' => 0
 			];
 
+			// convert to datetime, limit to month boundaries if necessary
 			$span_start = new DateTime($entry['span_start'], $datetimezone);
+			if ($span_start < $from_date) $span_start = $from_date;
 			$span_end = new DateTime($entry['span_end'], $datetimezone);
+			if ($span_end > $to_date) $span_end = $to_date;
+
+			/**
+			 * todo:
+			 * apply weeky hours and annual vacation to subtract as projected from performed hours / calculate vacation
+			 * 
+			 * combine this whole thing into timsheet clalculation within calendar.php
+			 */
+
+
+
+
+			// get breaks and homeoffice times
 			$misc = json_decode($entry['misc'], true);
 
 			if (!strlen($entry['subject'])) {
+				// calculate hours
 				$periods = new DatePeriod($span_start , $minuteInterval, $span_end);
 				$hours = iterator_count($periods) / 60;
 				if (array_key_exists('homeoffice', $misc)) $hours += $this->timeStrToFloat($misc['homeoffice']);
 				if (array_key_exists('break', $misc)) $hours -= $this->timeStrToFloat($misc['break']);
+				$result[$userid]['performed'] += $hours;
 				$result[$userid]['overtime'] += $hours;
-			}
-			else{
+			} else {
+				// count off duty days
 				$span_start->setTime(0, 0);
 				$span_end->setTime(24, 00);
 				$periods = new DatePeriod($span_start , $minuteInterval, $span_end);
 				$days = iterator_count($periods) / (60 * 24);
 				if (!array_key_exists($entry['subject'], $result[$userid])) $result[$userid][$entry['subject']] = 0;
+
+				// subtract holidays and weekends
+				$holiday_num = 0;
+				$holidays = $this->holidays($span_start->format('Y'));
+				while ($span_start < $span_end){
+					$year = $span_start->format('Y');
+					if (in_array($span_start->format('Y-m-d'), $holidays) || !in_array($span_start->format('N'), $this->_workdays)) $holiday_num++;
+					$span_start->modify('+1 day');
+					if ($year !== $span_start->format('Y')) $holidays = $this->holidays($span_start->format('Y'));
+				}
+				$days -= $holiday_num;
+
 				$result[$userid][$entry['subject']] += $days;
 				if ($entry['subject'] === 'vacation') $result[$userid]['leftvacation'] -= $days;
 			}

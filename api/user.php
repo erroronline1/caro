@@ -65,9 +65,9 @@ class USER extends API {
 
 				break;
 			case 'GET':
-				//$calendar = new CALENDARUTILITY($this->_pdo);
-				//$calendar->calculateTimesheets([$_SESSION['user']['id']]);
-				//die();
+				$calendar = new CALENDARUTILITY($this->_pdo);
+				$calendar->calculateTimesheets([$_SESSION['user']['id']]);//, '2024-05-01');
+				die();
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
 					':id' => $_SESSION['user']['id']
