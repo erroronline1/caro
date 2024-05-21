@@ -454,7 +454,7 @@ class CALENDARUTILITY {
 				}
 
 				if (array_key_exists('initialovertime', $settings)){
-					$initialovertime = floatval(str_replace(',', '.', preg_split('/\s+/', $settings['initialovertime'])[1]));
+					$initialovertime = floatval(str_replace(',', '.', $settings['initialovertime']));
 				} else $initialovertime = 0;
 
 				$usersetting[$userid] = [
