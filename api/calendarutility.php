@@ -402,7 +402,7 @@ class CALENDARUTILITY {
 	public function calculateTimesheets($ids = [], $from_date = '', $to_date = ''){
 		$datetimezone = new DateTimeZone(INI['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
-		$from_date = new DateTime($from_date ? : '0001-01-01', $datetimezone);
+		$from_date = new DateTime($from_date ? : '1900-01-01', $datetimezone);
 		$from_date->modify('first day of this month');
 		$from_date->setTime(0, 0);
 		$to_date = new DateTime($to_date ? : 'now', $datetimezone);
@@ -429,7 +429,7 @@ class CALENDARUTILITY {
 						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						$weeklyhours[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
-				} else $weeklyhours = ['date' => new DateTime('0001-01-01', $datetimezone), 'value' => 0];
+				} else $weeklyhours = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
 				array_multisort(array_column($weeklyhours, 'date'), SORT_ASC, $weeklyhours);
 				$lastappliedweeklyhours = 0;
 				foreach($weeklyhours as $i => $line){
@@ -445,7 +445,7 @@ class CALENDARUTILITY {
 						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						$annualvacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
-				} else $annualvacation[] = ['date' => new DateTime('0001-01-01', $datetimezone), 'value' => 0];
+				} else $annualvacation[] = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
 				array_multisort(array_column($annualvacation, 'date'), SORT_DESC, $annualvacation);
 				$lastappliedannualvacation = 0;
 				foreach($annualvacation as $i => $line){
@@ -571,8 +571,8 @@ class CALENDARUTILITY {
 	public function getWithinDateRange($earlier = '', $later = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-within-date-range'));
 		$statement->execute([
-			':earlier' => $earlier ? : '0001-01-01 00:00:01',
-			':later' => $later ? : '9999-12-31 23:59:59'
+			':earlier' => $earlier ? : '1900-01-01 00:00:01',
+			':later' => $later ? : '2079-06-06 23:59:59'
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}

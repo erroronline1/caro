@@ -108,7 +108,7 @@ class SQLQUERY {
 
 		'calendar_post' => [
 			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (NULL, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
-			'sqlsrv' => "INSERT INTO caro_calendar (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (:type, CAST(:span_start AS SMALLDATETIME), CAST(:span_end AS SMALLDATETIME), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
+			'sqlsrv' => "INSERT INTO caro_calendar (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert) VALUES (:type, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert)",
 		],
 		'calendar_put' => [
 			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert WHERE id = :id",
