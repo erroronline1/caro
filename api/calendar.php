@@ -827,11 +827,10 @@ class CALENDAR extends API {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();
 		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($users as &$user){
-			$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-			$user['app_settings']['weeklyhours'] = array_key_exists('weeklyhours', $user['app_settings']) ? $user['app_settings']['weeklyhours'] : 0;
-			$user['app_settings']['annualvacation'] = array_key_exists('annualvacation', $user['app_settings']) ? $user['app_settings']['annualvacation'] : 0;
-		}
+
+		var_dump($calendar->calculateTimesheets(array_column($users, 'id'), null, $last->format('Y-m-d')));
+
+		die();
 
 		$timesheets = [];
 		$minuteInterval = new DateInterval('PT1M');

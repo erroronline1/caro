@@ -394,8 +394,8 @@ class CALENDARUTILITY {
 	 * 	[
 	 * 		user_id => [
 	 * 			'overtime' => float,
-	 * 			'leftvacation' => int,
 	 * 			'performed' => float,
+	 * 			'leftvacation' => int,
 	 * 			...
 	 * 			any pto days will be counted by their respective languagefile key
 	 * 		]
@@ -415,25 +415,6 @@ class CALENDARUTILITY {
 		// sort result span_start to process user-settings in the right order
 		array_multisort(array_column($entries, 'span_start'), SORT_ASC, $entries);
 		
-		/**
-		 * @param datetime $start
-		 * @param datetime $end
-		 * 
-		 * @return int number of holdays within timespan
-		 */
-		function holidays($start, $end){
-				// subtract holidays and weekends
-				$holiday_num = 0;
-				$holidays = $this->holidays($start->format('Y'));
-				while ($start < $end){
-					$year = $start->format('Y');
-					if (in_array($start->format('Y-m-d'), $holidays) || !in_array($start->format('N'), $this->_workdays)) $holiday_num++;
-					$start->modify('+1 day');
-					if ($year !== $start->format('Y')) $holidays = $this->holidays($start->format('Y'));
-				}
-				return $holiday_num;
-		}
-
 		foreach ($entries as $entry){
 			if ($entry['type'] !== 'timesheet' || !in_array($entry['affected_user_id'], $ids)) continue;
 			$userid = $entry['affected_user_id']; // shortening
@@ -444,10 +425,7 @@ class CALENDARUTILITY {
 				/**[
 				 * 		'initialovertime' => float,
 				 * 		'weeklyhours' => array [datetime, float],
-				 * 		'lastappliedweeklyhours' => int,
 				 * 		'annualvacation' => array [datetime, float],
-				 * 		'lastappliedannualvacation' => int,
-				 * 		'current' => ['year' => int] // track to apply annual vacation
 				 * ]*/
 
 				if (array_key_exists('initialovertime', $settings)){
@@ -467,8 +445,6 @@ class CALENDARUTILITY {
 					} else $hours_vacation = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
 					array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
 					$usersetting[$userid][$setting] = $hours_vacation;
-
-					$usersetting[$userid]['lastapplied' . $setting] = 0;
 				}
 			}
 			if (!array_key_exists($userid, $result)) $result[$userid] = [
@@ -487,62 +463,62 @@ class CALENDARUTILITY {
 			$misc = json_decode($entry['misc'], true);
 
 			if (!strlen($entry['subject'])) {
-				if (!$usersetting[$userid]['weeklyhours'] || $span_start < $usersetting[$userid]['weeklyhours'][$usersetting[$userid]['lastappliedweeklyhours']]['date']){
+				if (!$usersetting[$userid]['weeklyhours'] || $span_start < $usersetting[$userid]['weeklyhours'][0]['date']){
 					// if setting is empty timesheets are obviously not used by this user
-					// since entries are sorted by date, if dated earlier than the last applied weeklyhours this can not be applicable
+					// since entries are sorted by date, if dated earlier than the initial applied weeklyhours this can not be applicable
 					continue;
-				} else {
-					// if greater than that check the next applicable setting
-					foreach($usersetting[$userid]['weeklyhours'] as $i => $line){
-						if ($line['date'] > $span_start) break;
-						$usersetting[$userid]['lastappliedweeklyhours'] = $i;
-					}
 				}
 				// calculate hours
 				$periods = new DatePeriod($span_start, $minuteInterval, $span_end);
 				$hours = iterator_count($periods) / 60;
 				if (array_key_exists('homeoffice', $misc)) $hours += $this->timeStrToFloat($misc['homeoffice']);
 				if (array_key_exists('break', $misc)) $hours -= $this->timeStrToFloat($misc['break']);
-
-				$holidays = holidays($span_start, $span_end);
-				$daynum = $span_start->diff($span_end)->format('a') + 1;
-				$projected = $usersetting[$userid]['weeklyhours'][$usersetting[$userid]['lastappliedweeklyhours']]['value'] / 7 * ($daynum - $holidays);
 				// add counted hours, subtract projected daily hours
-				$result[$userid]['performed'] += $hours - $projected;
-				$result[$userid]['overtime'] += $hours - $projected;
+				$result[$userid]['performed'] += $hours;
 			} else {
 				// count off duty days
 				$span_start->setTime(0, 0);
 				$span_end->setTime(24, 00);
 
-				if (!$usersetting[$userid]['annualvacation'] || $span_start < $usersetting[$userid]['annualvacation'][$usersetting[$userid]['lastappliedannualvacation']]['date']){
+				if (!$usersetting[$userid]['annualvacation'] || $span_start < $usersetting[$userid]['annualvacation'][0]['date']){
 					// if setting is empty timesheets are obviously not used by this user
 					// since entries are sorted by date, if dated earlier than the last applied annualvacation this can not be applicable
 					continue;
-				} else {
-					// if greater than that check the next applicable setting
-					foreach($usersetting[$userid]['annualvacation'] as $i => $line){
-						if ($line['date'] > $span_start) break;
-						$usersetting[$userid]['lastappliedannualvacation'] = $i;
-					}
-					// if year changes add leftvacation by applicable value
-					if ($span_start->format('Y') !== $usersetting[$userid]['current']['year']){
-						$result[$userid]['leftvacation'] += $usersetting[$userid]['annualvacation'][$usersetting[$userid]['lastappliedannualvacation']]['value'];
-						$usersetting[$userid]['current']['year'] = $span_start->format('Y');
-					}
 				}
-
 				$periods = new DatePeriod($span_start , $minuteInterval, $span_end);
 				$days = iterator_count($periods) / (60 * 24);
 				if (!array_key_exists($entry['subject'], $result[$userid])) $result[$userid][$entry['subject']] = 0;
 
-				$days -= holidays($span_start, $span_end);
-
+				$days -= $this->holidayNumber($span_start, $span_end);
 				$result[$userid][$entry['subject']] += $days;
-				if ($entry['subject'] === 'vacation') $result[$userid]['leftvacation'] -= $days;
 			}
 		}
-		var_dump($result);
+		// iterate over users, gather all projected working hours and set overtime += performed - projected
+		// iterate over users, gather all annual vacations and set leftvacation += allvacations - vacation
+		// outside of database for possibility of not having submitted entries
+		foreach($result as $userid => $user){
+			$last = count($usersetting[$userid]['weeklyhours']) - 1;
+			for($i = 0; $i < count($usersetting[$userid]['weeklyhours']); $i++){
+				$startdate = $usersetting[$userid]['weeklyhours'][$i]['date'];
+				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
+				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
+				$holidays = $this->holidayNumber($startdate, $enddate);
+				$projected_hours = ($daynum - $holidays) * ($usersetting[$userid]['weeklyhours'][$i]['value'] / 7);
+				var_dump($daynum, $holidays, $projected_hours);
+				$result[$userid]['overtime'] += $projected_hours - $result[$userid]['performed'];
+			}
+			$result[$userid]['leftvacation'] = $usersetting[$userid]['annualvacation'][0]['value'];
+			$last = count($usersetting[$userid]['annualvacation']) - 1;
+			for($i = 0; $i < count($usersetting[$userid]['annualvacation']); $i++){
+				$startdate = $usersetting[$userid]['annualvacation'][$i]['date'];
+				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
+				if ($startdate->format('Y') != $enddate->format('Y'))
+					$result[$userid]['leftvacation'] += $usersetting[$userid]['annualvacation'][$i]['value'];
+			}
+			if (array_key_exists('vacation', $user)) $result[$userid]['leftvacation'] -= $user['vacation'];
+		}
+		
+		return $result;
 	}
 
 	/**
@@ -555,6 +531,25 @@ class CALENDARUTILITY {
 	public function timeStrToFloat($string){
 		$string = explode(':', $string);
 		return intval($string[0]) + (intval($string[1]) / 60);
+	}
+
+	/**
+	 * @param datetime $start
+	 * @param datetime $end
+	 * 
+	 * @return int number of holdays within timespan
+	 */
+	private function holidayNumber($start, $end){
+		// subtract holidays and weekends
+		$holiday_num = 0;
+		$holidays = $this->holidays($start->format('Y'));
+		while ($start < $end){
+			$year = $start->format('Y');
+			if (in_array($start->format('Y-m-d'), $holidays) || !in_array($start->format('N'), $this->_workdays)) $holiday_num++;
+			$start->modify('+1 day');
+			if ($year !== $start->format('Y')) $holidays = $this->holidays($start->format('Y'));
+		}
+		return $holiday_num;
 	}
 
 	/**
