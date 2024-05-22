@@ -494,7 +494,7 @@ class CALENDARUTILITY {
 				} else {
 					// if greater than that check the next applicable setting
 					foreach($usersetting[$userid]['weeklyhours'] as $i => $line){
-						if ($line['date'] > $from_date) break;
+						if ($line['date'] > $span_start) break;
 						$usersetting[$userid]['lastappliedweeklyhours'] = $i;
 					}
 				}
@@ -522,7 +522,7 @@ class CALENDARUTILITY {
 				} else {
 					// if greater than that check the next applicable setting
 					foreach($usersetting[$userid]['annualvacation'] as $i => $line){
-						if ($line['date'] > $from_date) break;
+						if ($line['date'] > $span_start) break;
 						$usersetting[$userid]['lastappliedannualvacation'] = $i;
 					}
 					// if year changes add leftvacation by applicable value
