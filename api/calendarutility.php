@@ -419,51 +419,42 @@ class CALENDARUTILITY {
 			// buffer user settings to avoid repeatedly reading and decoding
 			if (!array_key_exists($userid, $usersetting)) {
 				$settings = json_decode($entry['app_settings'], true);
-				$weeklyhours = $annualvacation = [];
-
-				// extract weekly hours by start date, sort and try to find the first applicable setting
-				if (array_key_exists('weeklyhours', $settings)){
-					$settingentries = explode(';', $settings['weeklyhours']);
-					natsort($settingentries);
-					foreach($settingentries as $line){
-						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-						$weeklyhours[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
-					}
-				} else $weeklyhours = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
-				array_multisort(array_column($weeklyhours, 'date'), SORT_ASC, $weeklyhours);
-				$lastappliedweeklyhours = 0;
-				foreach($weeklyhours as $i => $line){
-					if ($line['date'] > $from_date) break;
-					$lastappliedweeklyhours = $i;
-				}
-
-				// extract annual vacation by start date, sort and try to find the first applicable setting
-				if (array_key_exists('annualvacation', $settings)){
-					$settingentries = explode(';', $settings['annualvacation']);
-					natsort($settingentries);
-					foreach($settingentries as $line){
-						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-						$annualvacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
-					}
-				} else $annualvacation[] = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
-				array_multisort(array_column($annualvacation, 'date'), SORT_DESC, $annualvacation);
-				$lastappliedannualvacation = 0;
-				foreach($annualvacation as $i => $line){
-					if ($line['date'] > $from_date) break;
-					$lastappliedannualvacation = $i;
-				}
+				$usersetting[$userid] = [];
+				/**
+				 * [
+				 * 		'initialovertime' => $initialovertime,
+				 * 		'weeklyhours' => $weeklyhours,
+				 * 		'lastappliedweeklyhours' => $lastappliedweeklyhours,
+				 * 		'annualvacation' => $annualvacation,
+				 * 		'lastappliedannualvacation' => $lastappliedannualvacation,
+				 * 	]
+				 */
 
 				if (array_key_exists('initialovertime', $settings)){
-					$initialovertime = floatval(str_replace(',', '.', $settings['initialovertime']));
-				} else $initialovertime = 0;
+					$usersetting[$userid]['initialovertime'] = floatval(str_replace(',', '.', $settings['initialovertime']));
+				} else $usersetting[$userid]['initialovertime'] = 0;
 
-				$usersetting[$userid] = [
-					'initialovertime' => $initialovertime,
-					'weeklyhours' => $weeklyhours,
-					'lastappliedweeklyhours' => $lastappliedweeklyhours,
-					'annualvacation' => $annualvacation,
-					'lastappliedannualvacation' => $lastappliedannualvacation,
-				];
+				foreach(['weeklyhours', 'annualvacation'] as $setting){
+					$hours_vacation = [];
+					// extract by start date, sort and try to find the first applicable setting
+					if (array_key_exists($setting, $settings)){
+						$settingentries = explode(';', $settings[$setting]);
+						natsort($settingentries);
+						foreach($settingentries as $line){
+							preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+							$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
+						}
+					} else $hours_vacation = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
+					array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
+					$usersetting[$userid][$setting] = $hours_vacation;
+
+					$lastapplied = 0;
+					foreach($hours_vacation as $i => $line){
+						if ($line['date'] > $from_date) break;
+						$lastapplied = $i;
+					}
+					$usersetting[$userid]['lastapplied' . $setting] = $lastapplied;
+				}
 			}
 			if (!array_key_exists($userid, $result)) $result[$userid] = [
 				'overtime' => $usersetting[$userid]['initialovertime'],
