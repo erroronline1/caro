@@ -393,7 +393,9 @@ class CALENDARUTILITY {
 	 * @return array
 	 * 	[
 	 * 		user_id => [
+	 * 			'usersetting' => array,
 	 * 			'overtime' => float,
+	 * 			'projected' => float,
 	 * 			'performed' => float,
 	 * 			'leftvacation' => int,
 	 * 			...
@@ -421,11 +423,17 @@ class CALENDARUTILITY {
 			// buffer user settings to avoid repeatedly reading and decoding
 			if (!array_key_exists($userid, $usersetting)) {
 				$settings = json_decode($entry['app_settings'], true);
-				$usersetting[$userid] = ['current' => ['year' => 0, 'month' => 0]];
+				$usersetting[$userid] = [
+					'name' => $entry['affected_user'],
+					'current' => ['year' => 0, 'month' => 0],
+					'units' => $entry['affected_user_units'],
+					'span_end_weeklyhours' => null // last applied due to given timespan
+				];
 				/**[
 				 * 		'initialovertime' => float,
 				 * 		'weeklyhours' => array [datetime, float],
 				 * 		'annualvacation' => array [datetime, float],
+				 * 		'span_end_weeklyhours => float;
 				 * ]*/
 
 				if (array_key_exists('initialovertime', $settings)){
@@ -450,7 +458,8 @@ class CALENDARUTILITY {
 			if (!array_key_exists($userid, $result)) $result[$userid] = [
 				'overtime' => $usersetting[$userid]['initialovertime'],
 				'leftvacation' => $usersetting[$userid]['annualvacation'][0]['value'],
-				'performed' => 0
+				'performed' => 0,
+				'projected' => 0,
 			];
 
 			// convert to datetime, limit to month boundaries if necessary
@@ -502,7 +511,11 @@ class CALENDARUTILITY {
 			$last = count($usersetting[$userid]['weeklyhours']) - 1;
 			for($i = 0; $i < count($usersetting[$userid]['weeklyhours']); $i++){
 				$startdate = $usersetting[$userid]['weeklyhours'][$i]['date'];
+				if ($startdate > $span_end) break;
 				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
+				if ($enddate > $span_end) break;
+
+				$usersetting[$userid]['span_end_weeklyhours'] = $usersetting[$userid]['weeklyhours'][$i]['value'];
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
 				$holidays = $this->numberOfWorkdays($startdate, $enddate, false);
 				// add reasonable pto to holidays for correction of projected_hours
@@ -510,18 +523,23 @@ class CALENDARUTILITY {
 					if ($key === 'timeoff') continue;
 					if (array_key_exists($key, $user)) $holidays += $result[$userid][$key];
 				}
-				$projected_hours = ($daynum - $holidays) * ($usersetting[$userid]['weeklyhours'][$i]['value'] / 7);
-				$result[$userid]['overtime'] += $result[$userid]['performed'] - $projected_hours;
+				$result[$userid]['projected'] = ($daynum - $holidays) * ($usersetting[$userid]['weeklyhours'][$i]['value'] / 7);
+				$result[$userid]['overtime'] += $result[$userid]['performed'] - $result[$userid]['projected'];
 			}
 			$result[$userid]['leftvacation'] = $usersetting[$userid]['annualvacation'][0]['value'];
+
 			$last = count($usersetting[$userid]['annualvacation']) - 1;
 			for($i = 0; $i < count($usersetting[$userid]['annualvacation']); $i++){
 				$startdate = $usersetting[$userid]['annualvacation'][$i]['date'];
+				if ($startdate > $span_end) break;
 				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
+				if ($enddate > $span_end) break;
+
 				if ($startdate->format('Y') != $enddate->format('Y'))
 					$result[$userid]['leftvacation'] += $usersetting[$userid]['annualvacation'][$i]['value'];
 			}
 			if (array_key_exists('vacation', $user)) $result[$userid]['leftvacation'] -= $user['vacation'];
+			$result[$userid]['usersetting'] = $usersetting[$userid];
 		}
 		return $result;
 	}

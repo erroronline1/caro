@@ -822,16 +822,17 @@ class CALENDAR extends API {
 			}
 		}
 		$last = clone $days[count($days) - 1];
-		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
-		// process and store user settings regarding weekly hours 
+
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();
 		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		var_dump($calendar->calculateTimesheets(array_column($users, 'id'), null, $last->format('Y-m-d')));
+		$timesheet_stats_month = $calendar->calculateTimesheets(array_column($users, 'id'), $first->format('Y-m-d'), $last->format('Y-m-d'));
+		$timesheet_stats_all = $calendar->calculateTimesheets(array_column($users, 'id'), null, $last->format('Y-m-d'));
 
+		var_dump($timesheet_stats_month, $timesheet_stats_all);
 		die();
-
+		
 		$timesheets = [];
 		$minuteInterval = new DateInterval('PT1M');
 
