@@ -827,12 +827,12 @@ class CALENDAR extends API {
 		$statement->execute();
 		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-		$timesheet_stats_month = $calendar->calculateTimesheets(array_column($users, 'id'), $first->format('Y-m-d'), $last->format('Y-m-d'));
-		$timesheet_stats_all = $calendar->calculateTimesheets(array_column($users, 'id'), null, $last->format('Y-m-d'));
+		$timesheet_stats_month = $calendar->calculateTimesheets($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
+		$timesheet_stats_all = $calendar->calculateTimesheets($users, null, $last->format('Y-m-d'));
 
 		var_dump($timesheet_stats_month, $timesheet_stats_all);
 		die();
-		
+
 		$timesheets = [];
 		$minuteInterval = new DateInterval('PT1M');
 

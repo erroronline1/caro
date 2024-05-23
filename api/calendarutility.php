@@ -386,7 +386,7 @@ class CALENDARUTILITY {
 	 * e.g. leftvacation and overtime have to be calculated for the whole database timespan,
 	 * pto might make sense for a given month only
 	 * 
-	 * @param array $ids array of user ids
+	 * @param array $users array of users with columns
 	 * @param object|string $from_date DateTime|Y-m-d
 	 * @param object|string $to_date DateTime|Y-m-d
 	 * 
@@ -403,7 +403,7 @@ class CALENDARUTILITY {
 	 * 		]
 	 * 	]
 	 */
-	public function calculateTimesheets($ids = [], $from_date = '', $to_date = ''){
+	public function calculateTimesheets($users = [], $from_date = '', $to_date = ''){
 		$datetimezone = new DateTimeZone(INI['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
 		$from_date = new DateTime($from_date ? : '1900-01-01', $datetimezone);
@@ -413,54 +413,54 @@ class CALENDARUTILITY {
 		$to_date->modify('last day of this month');
 		$to_date->setTime(23, 59, 59);
 		$entries = $this->getWithinDateRange($from_date->format('Y-m-d H:i:s'), $to_date->format('Y-m-d H:i:s'));
-		$result = $usersetting = [];
+		$result = [];
 		// sort result span_start to process user-settings in the right order
 		array_multisort(array_column($entries, 'span_start'), SORT_ASC, $entries);
 		
-		foreach ($entries as $entry){
-			if ($entry['type'] !== 'timesheet' || !in_array($entry['affected_user_id'], $ids)) continue;
-			$userid = $entry['affected_user_id']; // shortening
-			// buffer user settings to avoid repeatedly reading and decoding
-			if (!array_key_exists($userid, $usersetting)) {
-				$settings = json_decode($entry['app_settings'], true);
-				$usersetting[$userid] = [
-					'name' => $entry['affected_user'],
-					'current' => ['year' => 0, 'month' => 0],
-					'units' => $entry['affected_user_units'],
-					'span_end_weeklyhours' => null // last applied due to given timespan
-				];
-				/**[
-				 * 		'initialovertime' => float,
-				 * 		'weeklyhours' => array [datetime, float],
-				 * 		'annualvacation' => array [datetime, float],
-				 * 		'span_end_weeklyhours => float;
-				 * ]*/
-
-				if (array_key_exists('initialovertime', $settings)){
-					$usersetting[$userid]['initialovertime'] = floatval(str_replace(',', '.', $settings['initialovertime']));
-				} else $usersetting[$userid]['initialovertime'] = 0;
-
-				foreach(['weeklyhours', 'annualvacation'] as $setting){
-					$hours_vacation = [];
-					// extract by start date, sort and try to find the first applicable setting
-					if (array_key_exists($setting, $settings)){
-						$settingentries = explode(';', $settings[$setting]);
-						natsort($settingentries);
-						foreach($settingentries as $line){
-							preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-							$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
-						}
-					} else $hours_vacation = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
-					array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
-					$usersetting[$userid][$setting] = $hours_vacation;
-				}
+		// prepare all users eligible for timetracking due to average weekly hours set
+		foreach ($users as $row => $user){
+			$user['app_settings'] = $users[$row]['app_settings'] = json_decode($user['app_settings'] ? : '', true);
+			if (!$user['app_settings'] || !array_key_exists('weeklyhours', $user['app_settings'])){
+				unset ($users[$row]);
+				continue;
 			}
-			if (!array_key_exists($userid, $result)) $result[$userid] = [
-				'overtime' => $usersetting[$userid]['initialovertime'],
-				'leftvacation' => $usersetting[$userid]['annualvacation'][0]['value'],
-				'performed' => 0,
-				'projected' => 0,
+			// prepare timesheet settings, double entries will be passed later on
+			$users[$row]['timesheet'] = [
+				'_id' => $user['id'],
+				'_name' => $user['name'],
+				'_units' => $user['units'],
+				'_weeklyhours' => [],
+				'_span_end_weeklyhours' => null, // last applied due to given timespan
+				'_annualvacation' => [],
+				'_leftvacation' => 0,
+				'_projected' => 0,
+				'_performed' => 0,
+				'_overtime' => array_key_exists('initialovertime', $user['app_settings']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
 			];
+			// prepare occasionally changing contract settings
+			foreach(['weeklyhours', 'annualvacation'] as $setting){
+				$hours_vacation = [];
+				// extract by start date, sort and try to find the first applicable setting
+				if (array_key_exists($setting, $user['app_settings'])){
+					$settingentries = explode(';', $user['app_settings'][$setting]);
+					natsort($settingentries);
+					foreach($settingentries as $line){
+						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+						$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
+					}
+				} else $hours_vacation = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
+				array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
+				$users[$row]['timesheet']['_' . $setting] = $hours_vacation;
+			}
+		}
+		// process actual entries and contribute to user timesheet array
+		foreach ($entries as $entry){
+			if ($entry['type'] !== 'timesheet' || !in_array($entry['affected_user_id'], array_column($users, 'id'))) continue;
+			$row = array_search($entry['affected_user_id'], array_column($users, 'id'));
+
+//var_dump($entry['affected_user_id'], array_search($entry['affected_user_id'], $users)), array_column($users, 'id'), $users);
+
+			$user = $users[$row];
 
 			// convert to datetime, limit to month boundaries if necessary
 			$span_start = new DateTime($entry['span_start'], $datetimezone);
@@ -472,74 +472,64 @@ class CALENDARUTILITY {
 			$misc = json_decode($entry['misc'], true);
 
 			if (!strlen($entry['subject'])) {
-				if (!$usersetting[$userid]['weeklyhours'] || $span_start < $usersetting[$userid]['weeklyhours'][0]['date']){
-					// if setting is empty timesheets are obviously not used by this user
+				if ($span_start < $user['timesheet']['_weeklyhours'][0]['date']){
 					// since entries are sorted by date, if dated earlier than the initial applied weeklyhours this can not be applicable
 					continue;
 				}
-				// calculate hours
+				// calculate and add hours
 				$periods = new DatePeriod($span_start, $minuteInterval, $span_end);
 				$hours = iterator_count($periods) / 60;
 				if (array_key_exists('homeoffice', $misc)) $hours += $this->timeStrToFloat($misc['homeoffice']);
 				if (array_key_exists('break', $misc)) $hours -= $this->timeStrToFloat($misc['break']);
-				// add counted hours, subtract projected daily hours
-				$result[$userid]['performed'] += $hours;
+				$users[$row]['timesheet']['_performed'] += $hours;
 			} else {
 				// count off duty days
 				$span_start->setTime(0, 0);
 				$span_end->setTime(23, 59, 59);
 
-				if (!$usersetting[$userid]['annualvacation'] || $span_start < $usersetting[$userid]['annualvacation'][0]['date']){
+				if (!$user['timesheet']['_annualvacation'] || $span_start < $user['timesheet']['_annualvacation'][0]['date']){
 					// if setting is empty timesheets are obviously not used by this user
 					// since entries are sorted by date, if dated earlier than the last applied annualvacation this can not be applicable
 					continue;
 				}
-				$periods = new DatePeriod($span_start , $minuteInterval, $span_end);
-				$days = iterator_count($periods) / (60 * 24);
-				if (!array_key_exists($entry['subject'], $result[$userid])) $result[$userid][$entry['subject']] = 0;
+				//$periods = new DatePeriod($span_start, $minuteInterval, $span_end);
+				//$days = iterator_count($periods) / (60 * 24);
+				$days = intval($span_start->diff($span_end)->format('%a')) + 1;
 
-				$days -= $this->numberOfWorkdays($span_start, $span_end, true);
-				$result[$userid][$entry['subject']] += $days;
+				if (!array_key_exists($entry['subject'], $users[$row]['timesheet'])) $users[$row]['timesheet'][$entry['subject']] = 0;
+				$days -= $this->numberOfWorkdays($span_start, $span_end);
+				$users[$row]['timesheet'][$entry['subject']] += $days;
 			}
 		}
-		/** iterate over users
+		/** reiterate over users
 		 * gather all projected working hours and set overtime += performed - projected
-		 * iterate over users, gather all annual vacations and set leftvacation += allvacations - vacation
+		 * gather all annual vacations and set leftvacation += allvacations - vacation
 		 * outside of database for possibility of not having submitted entries
 		 */
-		foreach($result as $userid => $user){
-			$last = count($usersetting[$userid]['weeklyhours']) - 1;
-			for($i = 0; $i < count($usersetting[$userid]['weeklyhours']); $i++){
-				$startdate = $usersetting[$userid]['weeklyhours'][$i]['date'];
-				if ($startdate > $span_end) break;
-				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
-				if ($enddate > $span_end) break;
+		foreach ($users as $row => $user){
+			// accumulate projected hours for given timespan
+/*			for($i = 0; $i < count($user['timesheet']['_weeklyhours']); $i++){
+				$startdate = $user['timesheet']['_weeklyhours'][$i]['date'];
+				if ($startdate > $to_date) break;
+				$enddate = ($i === count($user['timesheet']['_weeklyhours']) - 1) ? $to_date : $user['timesheet']['_weeklyhours'][$i + 1]['date'];
 
-				$usersetting[$userid]['span_end_weeklyhours'] = $usersetting[$userid]['weeklyhours'][$i]['value'];
+				$users[$row]['timesheet']['_span_end_weeklyhours'] = $user['timesheet']['_weeklyhours'][$i]['value'];
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
-				$holidays = $this->numberOfWorkdays($startdate, $enddate, false);
-				// add reasonable pto to holidays for correction of projected_hours
-				foreach (LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $value){
-					if ($key === 'timeoff') continue;
-					if (array_key_exists($key, $user)) $holidays += $result[$userid][$key];
-				}
-				$result[$userid]['projected'] = ($daynum - $holidays) * ($usersetting[$userid]['weeklyhours'][$i]['value'] / 7);
-				$result[$userid]['overtime'] += $result[$userid]['performed'] - $result[$userid]['projected'];
+				$holidays = $this->numberOfWorkdays($startdate, $enddate);
+				$user[$row]['timesheet']['_projected'] = ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
+				$user[$row]['timesheet']['_overtime'] -= $result[$row]['timesheet']['_projected']; // performed will be added later according to db entries
 			}
-			$result[$userid]['leftvacation'] = $usersetting[$userid]['annualvacation'][0]['value'];
-
-			$last = count($usersetting[$userid]['annualvacation']) - 1;
-			for($i = 0; $i < count($usersetting[$userid]['annualvacation']); $i++){
-				$startdate = $usersetting[$userid]['annualvacation'][$i]['date'];
-				if ($startdate > $span_end) break;
-				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
-				if ($enddate > $span_end) break;
+			// accumulate annual vacation days
+			$users[$row]['timesheet']['_leftvacation'] = $user['timesheet']['_annualvacation'][0]['value'];
+			for($i = 1; $i < count($user['timesheet']['_annualvacation']); $i++){
+				$startdate = $user['timesheet']['_annualvacation'][$i]['date'];
+				if ($startdate > $to_date) break;
+				$enddate = ($i === count($user['timesheet']['_annualvacation']) - 1) ? $to_date : $user['timesheet']['_annualvacation'][$i + 1]['date'];
 
 				if ($startdate->format('Y') != $enddate->format('Y'))
-					$result[$userid]['leftvacation'] += $usersetting[$userid]['annualvacation'][$i]['value'];
+				$users[$row]['timesheet']['_leftvacation'] += $user['timesheet']['_annualvacation'][$i]['value'];
 			}
-			if (array_key_exists('vacation', $user)) $result[$userid]['leftvacation'] -= $user['vacation'];
-			$result[$userid]['usersetting'] = $usersetting[$userid];
+*/			$result[] = $users[$row]['timesheet'];
 		}
 		return $result;
 	}
@@ -559,11 +549,10 @@ class CALENDARUTILITY {
 	/**
 	 * @param datetime $start
 	 * @param datetime $end
-	 * @param bool $weekends true if weekends / non working days shall be added as defined within setup.ini
 	 * 
 	 * @return int number of non-working days within timespan
 	 */
-	private function numberOfWorkdays($start, $end, $weekends = true){
+	private function numberOfWorkdays($start, $end){
 		$start = clone $start; // not passed by value but by reference
 		$end = clone $end; // not passed by value but by reference
 		// subtract holidays and weekends
@@ -571,7 +560,7 @@ class CALENDARUTILITY {
 		$holidays = $this->holidays($start->format('Y'));
 		while ($start < $end){
 			$year = $start->format('Y');
-			if (in_array($start->format('Y-m-d'), $holidays) || ($weekends && !in_array($start->format('N'), $this->_workdays))) $holiday_num++;
+			if (in_array($start->format('Y-m-d'), $holidays) || !in_array($start->format('N'), $this->_workdays)) $holiday_num++;
 			$start->modify('+1 day');
 			if ($year !== $start->format('Y')) $holidays = $this->holidays($start->format('Y'));
 		}
