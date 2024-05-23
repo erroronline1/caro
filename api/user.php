@@ -65,15 +65,17 @@ class USER extends API {
 
 				break;
 			case 'GET':
-				$calendar = new CALENDARUTILITY($this->_pdo);
-				$calendar->calculateTimesheets([$_SESSION['user']['id']]);//, '2024-05-01');
-				die();
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
 				$statement->execute([
 					':id' => $_SESSION['user']['id']
 				]);
 				// prepare user-array to update, return error if not found
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+
+				$calendar = new CALENDARUTILITY($this->_pdo);
+				$timesheet_stats =$calendar->calculateTimesheets([$_SESSION['user']['id']]);//, '2024-05-01'));
+				if (array_key_exists($user['id'], $timesheet_stats)) $timesheet_stats = $timesheet_stats[$user['id']];
+
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
 				$permissions = [];
@@ -97,8 +99,10 @@ class USER extends API {
 								LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" .
 								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '') .
 								(array_key_exists('initialovertime', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-								(array_key_exists('weeklyhours', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
-								(array_key_exists('annualvacation', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '')
+								(array_key_exists('weeklyhours', $user['app_settings']) ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
+								(array_key_exists('overtime', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['overtime'], 2)]) : '') .
+								(array_key_exists('annualvacation', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
+								(array_key_exists('leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['leftvacation']]) : '')
 							]
 						],[
 							[

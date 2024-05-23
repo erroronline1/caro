@@ -493,9 +493,11 @@ class CALENDARUTILITY {
 				$result[$userid][$entry['subject']] += $days;
 			}
 		}
-		// iterate over users, gather all projected working hours and set overtime += performed - projected
-		// iterate over users, gather all annual vacations and set leftvacation += allvacations - vacation
-		// outside of database for possibility of not having submitted entries
+		/** iterate over users
+		 * gather all projected working hours and set overtime += performed - projected
+		 * iterate over users, gather all annual vacations and set leftvacation += allvacations - vacation
+		 * outside of database for possibility of not having submitted entries
+		 */
 		foreach($result as $userid => $user){
 			$last = count($usersetting[$userid]['weeklyhours']) - 1;
 			for($i = 0; $i < count($usersetting[$userid]['weeklyhours']); $i++){
@@ -503,8 +505,12 @@ class CALENDARUTILITY {
 				$enddate = ($i === $last) ? $span_end : $usersetting[$userid]['annualvacation'][$i + 1]['date'];
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
 				$holidays = $this->numberOfWorkdays($startdate, $enddate, false);
+				// add reasonable pto to holidays for correction of projected_hours
+				foreach (LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $value){
+					if ($key === 'timeoff') continue;
+					if (array_key_exists($key, $user)) $holidays += $result[$userid][$key];
+				}
 				$projected_hours = ($daynum - $holidays) * ($usersetting[$userid]['weeklyhours'][$i]['value'] / 7);
-				//var_dump($usersetting[$userid]['weeklyhours'][$i]['value'] / 7, $daynum, $holidays, $projected_hours, $startdate, $enddate, $to_date);
 				$result[$userid]['overtime'] += $result[$userid]['performed'] - $projected_hours;
 			}
 			$result[$userid]['leftvacation'] = $usersetting[$userid]['annualvacation'][0]['value'];
@@ -537,11 +543,11 @@ class CALENDARUTILITY {
 	 * @param datetime $end
 	 * @param bool $weekends true if weekends / non working days shall be added as defined within setup.ini
 	 * 
-	 * @return int number of workdays within timespan
+	 * @return int number of non-working days within timespan
 	 */
 	private function numberOfWorkdays($start, $end, $weekends = true){
-		$start = clone $start;
-		$end = clone $end;
+		$start = clone $start; // not passed by value but by reference
+		$end = clone $end; // not passed by value but by reference
 		// subtract holidays and weekends
 		$holiday_num = 0;
 		$holidays = $this->holidays($start->format('Y'));
