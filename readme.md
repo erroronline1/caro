@@ -9,7 +9,6 @@
     * [What it is not](#what-it-is-not)
     * [Data integrity](#data-integrity)
 * [Regulatory fulfillment suggestions](#regulatory-fulfillment-suggestions)
-* [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
     * [Conversations](#conversations)
@@ -21,6 +20,7 @@
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
     * [Tools](#tools)
+* [User management](#user-management)
 * [CSV processor](#csv-processor)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -207,66 +207,6 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Create forms and assign a *Equipment surveillance*-form-context and the fitting regulatory context.
     * ISO 13485 7.6
     * MPBetreibV
-
-[Content](#Content)
-
-### User management
-The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions:
-* User
-    * has access to all non writeable content
-    * can access forms and add records
-    * can contribute to open sharepoint
-    * can place orders
-    * can only see orders for own assigned organizational units
-    * can incorporate and sample check articles
-    * can contribute to schedules and timesheets
-    * can export own timesheet
-* Group
-    * has access to all non writeable content
-    * can **not** add records due to limited identification data
-    * can contribute to open sharepoint
-    * can place orders, will be prompted to identify themself
-    * can only see orders for own assigned organizational units
-    * can **not** incorporate and sample check due to limited identification data
-    * can contribute to schedules
-    * can **not** contribute to timesheets
-* Supervisor
-    * can approve form components and forms
-    * can add timesheet entries for users of own assigned units, change closure state
-    * can export all timesheets of assigned unit members
-* Office
-    * can contribute to file manager
-    * can access CSV-filter
-* Human Ressources
-    * can add timesheet entries for other users
-    * can export all timesheets
-* Purchase
-    * has full access to vendor and product management
-    * can see all orders
-* Purchase assistant
-    * has limited access to product management, can modify alias
-* Quality management officer
-    * can approve form components and forms
-    * can add CSV filters
-    * can manage users
-* CEO
-    * Supervisor +
-    * can approve components and forms
-    * can add CSV filters
-    * can manage users
-    * can export all timesheets
-* Application admin
-    * **full access**
-    * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
-    * assign only to trusted staff members, preferably administative members
-
-Permissions of QMO and CEO do hardly differ, but are necessary being assigned to have a reliable alert on submission of a new form.
-
-Users can have multiple assigned organizational units.
-
-On registering a new user a default profile picture is generated. Custom set pictures can not be deleted, only overwritten.
-
-Adding files is granted to elevated users only, to make sure certificates are acknowledged.
 
 [Content](#Content)
 
@@ -740,6 +680,66 @@ The audit module gathers data from the application in regards of proofing lists 
 
 [Content](#Content)
 
+### User management
+The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions:
+* User
+    * has access to all non writeable content
+    * can access forms and add records
+    * can contribute to open sharepoint
+    * can place orders
+    * can only see orders for own assigned organizational units
+    * can incorporate and sample check articles
+    * can contribute to schedules and timesheets
+    * can export own timesheet
+* Group
+    * has access to all non writeable content
+    * can **not** add records due to limited identification data
+    * can contribute to open sharepoint
+    * can place orders, will be prompted to identify themself
+    * can only see orders for own assigned organizational units
+    * can **not** incorporate and sample check due to limited identification data
+    * can contribute to schedules
+    * can **not** contribute to timesheets
+* Supervisor
+    * can approve form components and forms
+    * can add timesheet entries for users of own assigned units, change closure state
+    * can export all timesheets of assigned unit members
+* Office
+    * can contribute to file manager
+    * can access CSV-filter
+* Human Ressources
+    * can add timesheet entries for other users
+    * can export all timesheets
+* Purchase
+    * has full access to vendor and product management
+    * can see all orders
+* Purchase assistant
+    * has limited access to product management, can modify alias
+* Quality management officer
+    * can approve form components and forms
+    * can add CSV filters
+    * can manage users
+* CEO
+    * Supervisor +
+    * can approve components and forms
+    * can add CSV filters
+    * can manage users
+    * can export all timesheets
+* Application admin
+    * **full access**
+    * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
+    * assign only to trusted staff members, preferably administative members
+
+Permissions of QMO and CEO do hardly differ, but are necessary being assigned to have a reliable alert on submission of a new form.
+
+Users can have multiple assigned organizational units.
+
+On registering a new user a default profile picture is generated. Custom set pictures can not be deleted, only overwritten.
+
+Adding files is granted to elevated users only, to make sure certificates are acknowledged.
+
+[Content](#Content)
+
 ## CSV processor
 
 The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
@@ -1148,6 +1148,7 @@ dialect["escape"] = ""
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
+* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to 32-bit unix time restrictions as time of writing.
 
 #### Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
