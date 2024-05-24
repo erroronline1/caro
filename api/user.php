@@ -74,7 +74,8 @@ class USER extends API {
 
 				$calendar = new CALENDARUTILITY($this->_pdo);
 				$timesheet_stats = $calendar->calculateTimesheets([$user]);//, '2024-05-01'));
-				if (array_key_exists($user['id'], $timesheet_stats)) $timesheet_stats = $timesheet_stats[$user['id']];
+				$usertimesheet = array_search($user['id'], array_column($timesheet_stats, '_id'));
+				if ($usertimesheet !== false) $timesheet_stats = $timesheet_stats[$usertimesheet];
 
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
@@ -100,9 +101,9 @@ class USER extends API {
 								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '') .
 								(array_key_exists('initialovertime', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
 								(array_key_exists('weeklyhours', $user['app_settings']) ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
-								(array_key_exists('overtime', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['overtime'], 2)]) : '') .
+								(array_key_exists('_overtime', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
 								(array_key_exists('annualvacation', $user['app_settings']) ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
-								(array_key_exists('leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['leftvacation']]) : '')
+								(array_key_exists('_leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '')
 							]
 						],[
 							[

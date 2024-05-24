@@ -453,13 +453,12 @@ class CALENDARUTILITY {
 				$users[$row]['timesheet']['_' . $setting] = $hours_vacation;
 			}
 		}
+		$users = array_values($users); // reindex
+
 		// process actual entries and contribute to user timesheet array
 		foreach ($entries as $entry){
 			if ($entry['type'] !== 'timesheet' || !in_array($entry['affected_user_id'], array_column($users, 'id'))) continue;
 			$row = array_search($entry['affected_user_id'], array_column($users, 'id'));
-
-//var_dump($entry['affected_user_id'], array_search($entry['affected_user_id'], $users)), array_column($users, 'id'), $users);
-
 			$user = $users[$row];
 
 			// convert to datetime, limit to month boundaries if necessary
@@ -488,7 +487,7 @@ class CALENDARUTILITY {
 				$span_end->setTime(23, 59, 59);
 
 				if (!$user['timesheet']['_annualvacation'] || $span_start < $user['timesheet']['_annualvacation'][0]['date']){
-					// if setting is empty timesheets are obviously not used by this user
+					// if setting is empty vacations are obviously not used by this user
 					// since entries are sorted by date, if dated earlier than the last applied annualvacation this can not be applicable
 					continue;
 				}
@@ -508,7 +507,7 @@ class CALENDARUTILITY {
 		 */
 		foreach ($users as $row => $user){
 			// accumulate projected hours for given timespan
-/*			for($i = 0; $i < count($user['timesheet']['_weeklyhours']); $i++){
+			for($i = 0; $i < count($user['timesheet']['_weeklyhours']); $i++){
 				$startdate = $user['timesheet']['_weeklyhours'][$i]['date'];
 				if ($startdate > $to_date) break;
 				$enddate = ($i === count($user['timesheet']['_weeklyhours']) - 1) ? $to_date : $user['timesheet']['_weeklyhours'][$i + 1]['date'];
@@ -516,8 +515,15 @@ class CALENDARUTILITY {
 				$users[$row]['timesheet']['_span_end_weeklyhours'] = $user['timesheet']['_weeklyhours'][$i]['value'];
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
 				$holidays = $this->numberOfWorkdays($startdate, $enddate);
-				$user[$row]['timesheet']['_projected'] = ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
-				$user[$row]['timesheet']['_overtime'] -= $result[$row]['timesheet']['_projected']; // performed will be added later according to db entries
+				// add reasonable pto to holidays, that are not expected to contribute to projected
+				
+/// BUT FOR THE CURRENT TIMESPAN
+				//foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $subject => $reason){
+				//	if ($subject !== 'timeoff' && in_array($subject, $user['timesheet'])) $holidays += $user['timesheet'][$subject];
+				//	var_dump ($holidays);
+				//}
+				$users[$row]['timesheet']['_projected'] = ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
+				$users[$row]['timesheet']['_overtime'] -= $users[$row]['timesheet']['_projected']; // performed has been added previously according to db entries
 			}
 			// accumulate annual vacation days
 			$users[$row]['timesheet']['_leftvacation'] = $user['timesheet']['_annualvacation'][0]['value'];
@@ -525,11 +531,18 @@ class CALENDARUTILITY {
 				$startdate = $user['timesheet']['_annualvacation'][$i]['date'];
 				if ($startdate > $to_date) break;
 				$enddate = ($i === count($user['timesheet']['_annualvacation']) - 1) ? $to_date : $user['timesheet']['_annualvacation'][$i + 1]['date'];
-
-				if ($startdate->format('Y') != $enddate->format('Y'))
-				$users[$row]['timesheet']['_leftvacation'] += $user['timesheet']['_annualvacation'][$i]['value'];
+				$annualstart = clone $startdate;
+				$year = '';
+				while ($annualstart < $enddate){
+					if ($annualstart->format('Y') != $year){
+						$users[$row]['timesheet']['_leftvacation'] += $user['timesheet']['_annualvacation'][$i]['value'];
+						$year = $annualstart->format('Y');
+					}
+					$annualstart->modify('+1 month');
+				}
 			}
-*/			$result[] = $users[$row]['timesheet'];
+			if (array_key_exists('vacation', $user['timesheet'])) $users[$row]['timesheet']['_leftvacation'] -= $users[$row]['timesheet']['vacation'];
+			$result[] = $users[$row]['timesheet'];
 		}
 		return $result;
 	}
