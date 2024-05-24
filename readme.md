@@ -2,7 +2,7 @@
 # CARO - Cloud Assisted Records and Operations
 
 ## Content
-* [Aims](#Aims)
+* [Aims](#aims)
     * [Intended ISO 13485 goals](#intended-iso-13485-goals)
     * [Extras](#extras)
     * [Necessary infrastructure](#necessary-infrastructure)
@@ -142,7 +142,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * fulfilment of regulatory issues considered by forms
     * also see [tools](#tools)
 
-[Content](#Content)
+[Content](#content)
 
 ### Extras
 * Text recommendations
@@ -154,7 +154,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * CSV filtering
     * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
 
-[Content](#Content)
+[Content](#content)
 
 ### Necessary infrastructure 
 You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
@@ -177,7 +177,7 @@ Form data and requests occasionally contain ids to access distinct contents. Tec
 
 Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
 
-[Content](#Content)
+[Content](#content)
 
 ### Regulatory fulfillment suggestions
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#tools).
@@ -208,7 +208,7 @@ Beside the apps architecture you will still have to set up your quality manageme
     * ISO 13485 7.6
     * MPBetreibV
 
-[Content](#Content)
+[Content](#content)
 
 ## Modules
 
@@ -253,14 +253,14 @@ graph TD;
     on units"))
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 ![landing page](assets/conversation.png)
 
-[Content](#Content)
+[Content](#content)
 
 ### Text recommendations
 To avoid unneccesary or repetitive poetry and support a consistent linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
@@ -317,7 +317,7 @@ graph TD;
     edittemplate -->|add template|chunks3;
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ### Forms
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
@@ -366,7 +366,7 @@ graph TD;
     if named item is not hidden")
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ### Records
 Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. 
@@ -420,7 +420,7 @@ graph TD;
     missing-->|no|nonemissing(status message);
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ### Files
 Admin, CEO, QMO and office can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
@@ -433,7 +433,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 
 ![landing page](assets/files.png)
 
-[Content](#Content)
+[Content](#content)
 
 ### Calendar
 Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to elevated users including supervisors only.
@@ -512,7 +512,7 @@ graph TD;
     timesheet display only
     for selected month"]
 ```
-[Content](#Content)
+[Content](#content)
 
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
@@ -570,7 +570,7 @@ graph TD;
     edit_product-->product_inactive;
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ### Order
 The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
@@ -662,7 +662,7 @@ graph TD;
     prepared_orders-->add_product;
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ### Tools
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
@@ -678,7 +678,7 @@ The audit module gathers data from the application in regards of proofing lists 
 
 ![landing page](assets/audit.png)
 
-[Content](#Content)
+[Content](#content)
 
 ### User management
 The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions:
@@ -738,7 +738,7 @@ On registering a new user a default profile picture is generated. Custom set pic
 
 Adding files is granted to elevated users only, to make sure certificates are acknowledged.
 
-[Content](#Content)
+[Content](#content)
 
 ## CSV processor
 
@@ -1011,7 +1011,7 @@ A generic sample:
 }
 ```
 
-[Content](#Content)
+[Content](#content)
 
 ## Prerequisites
 * PHP >= 8
@@ -1030,7 +1030,7 @@ Tested devices:
 
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 
-[Content](#Content)
+[Content](#content)
 
 ### Installation
 * php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers.
@@ -1162,7 +1162,7 @@ If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
 
-[Content](#Content)
+[Content](#content)
 
 ### Importing vendor pricelists
 Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
@@ -1226,7 +1226,7 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
 
-[Content](#Content)
+[Content](#content)
 
 ## Ressources
 ### external libraries
@@ -1247,6 +1247,6 @@ You can as well define all products as trading goods and set to 0 conditionally 
 * [custom md pdf](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf)
 * [mermaid charts](https://mermaid.js.org/)
 
-[Content](#Content)
+[Content](#content)
 
 (c) 2023-2024 error on line 1 (dev@erroronline.one)
