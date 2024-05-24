@@ -822,29 +822,21 @@ class CALENDAR extends API {
 			}
 		}
 		$last = clone $days[count($days) - 1];
-
+		$days = array_values($days);
+		
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();
 		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		$timesheet_stats_month = $calendar->calculateTimesheets($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
-		$timesheet_stats_all = $calendar->calculateTimesheets($users, null, $last->format('Y-m-d'));
-
-		var_dump($timesheet_stats_month, $timesheet_stats_all);
-		die();
+		// retrieve stats in advance
+		$timesheet_stats_month = $calendar->timesheetSummary($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
+		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $last->format('Y-m-d'));
+		// item listing still needs another request for all monthly events and entries
+		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
 
 		$timesheets = [];
+		// prepare interval for daily hours display
 		$minuteInterval = new DateInterval('PT1M');
 
-		// detect first day of month
-		// count working days
-		$firstnotnull = null;
-		$virtualworkingdays = 0;
-		foreach ($days as $i => $day){
-			if (!$day) continue;
-			if ($firstnotnull === null) $firstnotnull = $i;
-			if (!in_array($day->format('Y-m-d'), $holidays)) $virtualworkingdays++;
-		}
 		//iterate over all days of the selected month
 		foreach ($days as $day){
 			if (!$day) continue; // null, beginning of month
@@ -854,46 +846,56 @@ class CALENDAR extends API {
 					unset($month[$id]); // default delete for next iteration
 					continue;
 				}
-				
+				//retrieve stats for affected user
+				$stats_month_row = array_search($entry['affected_user_id'], array_column($timesheet_stats_month, '_id'));
+				if ($stats_month_row === false) continue;
+
+				$stats_month_row = $timesheet_stats_month[$stats_month_row];
+				$stats_all_row = $timesheet_stats_all[array_search($entry['affected_user_id'], array_column($timesheet_stats_all, '_id'))];
 				if (!array_key_exists($entry['affected_user_id'], $timesheets)) {
 					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
+					$pto = [];
+					foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $translation){
+						if (array_key_exists($key, $stats_month_row)) $pto[$key] = $stats_month_row[$key];
+					}
 					$timesheets[$entry['affected_user_id']] = [
 						'name' => $entry['affected_user'],
 						'user_id' => $entry['affected_user_id'],
 						'units' => implode(', ', $units),
 						'month' => LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
 						'days' => [],
-						'pto' => [],
-						'performed' => 0,
-						'projected' => $users[array_search($entry['affected_user_id'], array_column($users, 'id'))]['app_settings']['weeklyhours'] / 7 * $virtualworkingdays,
-						'weeklyhours' => $users[array_search($entry['affected_user_id'], array_column($users, 'id'))]['app_settings']['weeklyhours']
+						'pto' => $pto,
+						'performed' => $stats_month_row['_performed'],
+						'projected' => $stats_month_row['_projected'],
+						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
+						'leftvacation' => $stats_all_row['_leftvacation'],
+						'overtime' => $stats_all_row['_overtime'],
+						'monthlyovertime' => $stats_month_row['_overtime']
 					];
 				}
 				
 				$span_start = new DateTime($entry['span_start'], new DateTimeZone(INI['timezone']));
 				$span_end = new DateTime($entry['span_end'], new DateTimeZone(INI['timezone']));
-				$hours = 0;
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
 					&& !array_key_exists($day->format('Y-m-d'), $timesheets[$entry['affected_user_id']]['days'])){
 					// calculate hours for stored regular working days only
 					$misc = json_decode($entry['misc'], true);
 					if (!strlen($entry['subject'])) {
-						$firstday = $days[$firstnotnull]; // copy object for down below method usage
+						$firstday = $days[0]; // copy object for down below method usage
 						$lastday = $days[count($days) - 1];  // copy object for down below method usage
 						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
-						$hours = iterator_count($periods) / 60;
-						if (array_key_exists('homeoffice', $misc)) $hours += timeStrToFloat($misc['homeoffice']);
-						if (array_key_exists('break', $misc)) $hours -= timeStrToFloat($misc['break']);
+						$dailyhours = iterator_count($periods) / 60;
+						if (array_key_exists('homeoffice', $misc)) $dailyhours += timeStrToFloat($misc['homeoffice']);
+						if (array_key_exists('break', $misc)) $dailyhours -= timeStrToFloat($misc['break']);
 
 						$timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = [
 							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
 							'break' => array_key_exists('break', $misc) ? $misc['break'] : '',
 							'homeoffice' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
 							'note' => array_key_exists('note', $misc) ? $misc['note'] : '',
-							'hours' => $hours,
+							'hours' => $dailyhours,
 						];
-						$timesheets[$entry['affected_user_id']]['performed'] += $hours;
 					}
 					// else state subject
 					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => LANGUAGEFILE['calendar']['timesheet_pto'][$entry['subject']], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
@@ -902,14 +904,6 @@ class CALENDAR extends API {
 		}
 		// postprocess array
 		foreach($timesheets as $id => $user){
-			// count pto days and append to respective user
-			foreach($user['days'] as $date => $day){
-				$dateobj = new DateTime($date, new DateTimeZone(INI['timezone']));
-				if (in_array($day['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) && !in_array($date, $holidays) && in_array($dateobj->format('N'), $calendar->_workdays)){
-					if (!array_key_exists($day['subject'], $timesheets[$id]['pto'])) $timesheets[$id]['pto'][$day['subject']] = 1;
-					else $timesheets[$id]['pto'][$day['subject']]++;
-				}
-			}
 			// append missing dates for overview, after all the output shall be comprehensible
 			foreach ($days as $day){
 				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
@@ -985,21 +979,9 @@ class CALENDAR extends API {
 						':id' => $user['user_id'],
 						':units' => $user['units'],
 						':weeklyhours' => $user['weeklyhours'],
-						':performed' => $user['performed'],
-						':projected' => $user['projected'],
-						':month' => $user['month'],
-						':overtime' => strval($user['performed'] - $user['projected'])
 					])
 				];
 				$rows[] = [];
-				// pto
-				foreach ($user['pto'] as $pto => $number){
-					$rows[] = [
-						[LANGUAGEFILE['calendar']['timesheet_pto'][$pto], false],
-						LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number])
-					];
-				}
-				if ($user['pto']) $rows[] = [];
 				// days
 				foreach ($user['days'] as $date => $day){
 					$dayinfo = [];
@@ -1014,7 +996,30 @@ class CALENDAR extends API {
 						implode(', ', $dayinfo)
 					];
 				}
-				$result[] = $rows;
+				$rows[] = [];
+				// pto
+				foreach ($user['pto'] as $pto => $number){
+					$rows[] = [
+						[LANGUAGEFILE['calendar']['timesheet_pto'][$pto], false],
+						LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number])
+					];
+				}
+				if ($user['pto']) $rows[] = [];
+				$rows[] = [
+					[LANG::GET('calendar.export_sheet_summary'), false],
+					LANG::GET('calendar.export_sheet_summary_text', [
+						':name' => $user['name'],
+						':performed' => $user['performed'],
+						':projected' => $user['projected'],
+						':month' => $user['month'],
+						':overtime' => $user['overtime'],
+						':_monthlyovertime' => $user['monthlyovertime'],
+						':vacation' => $user['leftvacation'],
+					])
+				];
+				$rows[] = [];
+
+				$result[] = $rows;				
 			}
 		}
 		return $result;
