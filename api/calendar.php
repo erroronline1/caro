@@ -360,7 +360,7 @@ class CALENDAR extends API {
 					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					foreach ($thisDaysEvents as $id => $row){
 						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
-						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 					}
 
 					$events[] = [
