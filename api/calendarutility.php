@@ -511,6 +511,8 @@ class CALENDARUTILITY {
 				$startdate = $user['timesheet']['_weeklyhours'][$i]['date'];
 				if ($startdate > $to_date) break;
 				$enddate = ($i === count($user['timesheet']['_weeklyhours']) - 1) ? $to_date : $user['timesheet']['_weeklyhours'][$i + 1]['date'];
+				if ($enddate < $from_date) continue;
+				if ($startdate < $from_date) $startdate = clone $from_date;
 
 				$users[$row]['timesheet']['_span_end_weeklyhours'] = $user['timesheet']['_weeklyhours'][$i]['value'];
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
@@ -522,10 +524,11 @@ class CALENDARUTILITY {
 				//	if ($subject !== 'timeoff' && in_array($subject, $user['timesheet'])) $holidays += $user['timesheet'][$subject];
 				//	var_dump ($holidays);
 				//}
-				$users[$row]['timesheet']['_projected'] = ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
-				$users[$row]['timesheet']['_overtime'] -= $users[$row]['timesheet']['_projected']; // performed has been added previously according to db entries
+				$users[$row]['timesheet']['_projected'] += ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
 			}
-			// accumulate annual vacation days
+			$users[$row]['timesheet']['_overtime'] += $users[$row]['timesheet']['_performed'] - $users[$row]['timesheet']['_projected'];
+
+			// accumulate annual vacation days always from the beginning of tracking
 			$users[$row]['timesheet']['_leftvacation'] = $user['timesheet']['_annualvacation'][0]['value'];
 			for($i = 1; $i < count($user['timesheet']['_annualvacation']); $i++){
 				$startdate = $user['timesheet']['_annualvacation'][$i]['date'];
