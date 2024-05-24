@@ -380,10 +380,10 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * calculates time and off-duty days for users from beginning of a given month to the end of another given month
+	 * calculates time and off-duty days summes up for users from beginning of a given month to the end of another given month
 	 * overtime and vacation calculation only works if $from_date starts from the dawn of time
 	 * so you might have to do two queries and combine their output,
-	 * e.g. leftvacation and overtime have to be calculated for the whole database timespan,
+	 * e.g. leftvacation and alltime overtime have to be calculated for the whole database timespan,
 	 * pto might make sense for a given month only
 	 * 
 	 * @param array $users array of users with columns
@@ -392,26 +392,31 @@ class CALENDARUTILITY {
 	 * 
 	 * @return array
 	 * 	[
-	 * 		user_id => [
-	 * 			'usersetting' => array,
-	 * 			'overtime' => float,
-	 * 			'projected' => float,
-	 * 			'performed' => float,
-	 * 			'leftvacation' => int,
-	 * 			...
-	 * 			any pto days will be counted by their respective languagefile key
-	 * 		]
+	 * 		[
+	 *			'_id' => int,
+	 *			'_name' => string,
+	 *			'_units' => string,
+	 *			'_weeklyhours' => array with start datetime and value,
+	 *			'_span_end_weeklyhours' => int, // last applied due to given timespan
+	 *			'_annualvacation' => array with start datetime and value,
+	 *			'_leftvacation' => int,
+	 *			'_projected' => float,
+	 *			'_performed' => float,
+	 *			'_overtime' => float,
+	 *			'_pto' => array with datetime and value
+	 *			...
+	 * 			any pto days will be counted by their respective languagefile key as int
+	 * 		],
+	 * 		...
 	 * 	]
 	 */
 	public function calculateTimesheets($users = [], $from_date = '', $to_date = ''){
 		$datetimezone = new DateTimeZone(INI['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
-		$from_date = new DateTime($from_date ? : '1900-01-01', $datetimezone);
-		$from_date->modify('first day of this month');
-		$from_date->setTime(0, 0);
-		$to_date = new DateTime($to_date ? : 'now', $datetimezone);
-		$to_date->modify('last day of this month');
-		$to_date->setTime(23, 59, 59);
+		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1900-01-01', $datetimezone);
+		$from_date->modify('first day of this month')->setTime(0, 0);
+		$to_date = gettype($to_date) === 'object' ? $to_date : new DateTime($to_date ? : 'now', $datetimezone);
+		$to_date->modify('last day of this month')->setTime(23, 59, 59);
 		$entries = $this->getWithinDateRange($from_date->format('Y-m-d H:i:s'), $to_date->format('Y-m-d H:i:s'));
 		$result = [];
 		// sort result span_start to process user-settings in the right order
@@ -436,6 +441,7 @@ class CALENDARUTILITY {
 				'_projected' => 0,
 				'_performed' => 0,
 				'_overtime' => array_key_exists('initialovertime', $user['app_settings']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
+				'_pto' => []
 			];
 			// prepare occasionally changing contract settings
 			foreach(['weeklyhours', 'annualvacation'] as $setting){
@@ -491,13 +497,13 @@ class CALENDARUTILITY {
 					// since entries are sorted by date, if dated earlier than the last applied annualvacation this can not be applicable
 					continue;
 				}
-				//$periods = new DatePeriod($span_start, $minuteInterval, $span_end);
-				//$days = iterator_count($periods) / (60 * 24);
 				$days = intval($span_start->diff($span_end)->format('%a')) + 1;
 
 				if (!array_key_exists($entry['subject'], $users[$row]['timesheet'])) $users[$row]['timesheet'][$entry['subject']] = 0;
-				$days -= $this->numberOfWorkdays($span_start, $span_end);
+				$days -= $this->numberOfNonWorkdays($span_start, $span_end);
 				$users[$row]['timesheet'][$entry['subject']] += $days;
+
+				if ($entry['subject'] !== 'timeoff') $users[$row]['timesheet']['_pto'][] = ['start' => $span_start, 'end' => $span_end, 'value' => $days];
 			}
 		}
 		/** reiterate over users
@@ -516,14 +522,21 @@ class CALENDARUTILITY {
 
 				$users[$row]['timesheet']['_span_end_weeklyhours'] = $user['timesheet']['_weeklyhours'][$i]['value'];
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
-				$holidays = $this->numberOfWorkdays($startdate, $enddate);
+				$holidays = $this->numberOfNonWorkdays($startdate, $enddate);
 				// add reasonable pto to holidays, that are not expected to contribute to projected
-				
-/// BUT FOR THE CURRENT TIMESPAN
-				//foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $subject => $reason){
-				//	if ($subject !== 'timeoff' && in_array($subject, $user['timesheet'])) $holidays += $user['timesheet'][$subject];
-				//	var_dump ($holidays);
-				//}
+				foreach($user['timesheet']['_pto'] as $pto){
+					$ptostart = $pto['start'];
+					$ptoend = $pto['end'];
+					if ($ptostart >= $startdate && $ptoend <= $enddate) {
+						$holidays += $pto['value'];
+						continue;
+					}
+					if ($ptostart > $enddate || $ptoend < $startdate) continue;
+					if ($ptostart < $startdate) $ptostart = $startdate;
+					if ($ptoend > $enddate) $ptoend = $enddate;
+					$holidays += $pto['value'] - intval($ptostart->diff($ptoend)->format('%a')) + 1;
+				}
+				var_dump($holidays);
 				$users[$row]['timesheet']['_projected'] += ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
 			}
 			$users[$row]['timesheet']['_overtime'] += $users[$row]['timesheet']['_performed'] - $users[$row]['timesheet']['_projected'];
@@ -568,7 +581,7 @@ class CALENDARUTILITY {
 	 * 
 	 * @return int number of non-working days within timespan
 	 */
-	private function numberOfWorkdays($start, $end){
+	private function numberOfNonWorkdays($start, $end){
 		$start = clone $start; // not passed by value but by reference
 		$end = clone $end; // not passed by value but by reference
 		// subtract holidays and weekends
