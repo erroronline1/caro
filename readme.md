@@ -4,6 +4,7 @@
 ## Content
 * [Aims](#Aims)
     * [Intended ISO 13485 goals](#intended-iso-13485-goals)
+    * [Extras](#extras)
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
     * [Data integrity](#data-integrity)
@@ -62,6 +63,8 @@
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment, although it could be run on any webserver. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being easy to use and recognizable.
+
+![landing page](assets/landing%20page.png)
 
 ### Intended ISO 13485 goals
 * ISO 13485 4.2.3 Medical device file
@@ -138,6 +141,18 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
         * fulfilment of regulatory issues considered by forms
     * also see [tools](#tools)
+
+[Content](#Content)
+
+### Extras
+* Text recommendations
+    * Default and adaptive [texts can be defined](#text-recommendations) to support a consistent company language.
+* Time tracking
+    * Registered users can contribute their working hours, vacations, sick leaves, etc. to the [calendar](#calendar). These inputs can be exported for documentation regarding labour laws.
+* File sharing
+    * The application has a [sharepoint](#files) for files and an [STL-viewer](#tools) to easily exchange information.
+* CSV filtering
+    * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
 
 [Content](#Content)
 
@@ -262,6 +277,8 @@ Beside [permission settings](#user-management) users can have multiple assigned 
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
+![landing page](assets/user.png)
+
 ```mermaid
 graph TD;
     application((application))-->login[login];
@@ -301,6 +318,8 @@ graph TD;
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
+![landing page](assets/conversation.png)
+
 [Content](#Content)
 
 ### Text recommendations
@@ -323,6 +342,8 @@ On creating a text you can make use of predefined replacements that may contain 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
 Output will be copied to clipboad on clicking or tapping the output field.
+
+![landing page](assets/text%20recommendation.png)
 
 ```mermaid
 graph TD;
@@ -359,7 +380,7 @@ graph TD;
 [Content](#Content)
 
 ### Forms
-Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all your documents can be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
+Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
 
 To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
@@ -370,6 +391,8 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
 Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to elevated users to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
+
+![landing page](assets/forms.png)
 
 ```mermaid
 graph TD;
@@ -415,6 +438,8 @@ The identifier is always a QR-code with additional readable content that will ap
 Checking for completeness of form bundles can be applied on display of a record summary.
 
 Records can be marked as closed to disappear from the records overwiew and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword, name or identifier. On contributing the closed state is revoked by default.
+
+![landing page](assets/records.png)
 
 ```mermaid
 graph TD;
@@ -466,6 +491,8 @@ This source can also be used to provide documents that are [unsuitable to be fil
 
 External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
+![landing page](assets/files.png)
+
 [Content](#Content)
 
 ### Calendar
@@ -483,9 +510,11 @@ Beside scheduling, the calendar can be used to document working hours of the sta
 
 This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly.
 
-*Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution!*
+*Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution! On minor changes it is recommended to export the most recent timesheets and start tracking anew.*
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
+
+![landing page](assets/calendar.png)
 
 ```mermaid
 graph TD;
@@ -552,6 +581,8 @@ Disabled products are not accessible through the order module. Products can be d
 
 The special permission of *purchase assistant* can edit the alias definition of products to disburden purchase and enhance identification of products with company customs. 
 
+![landing page](assets/vendor%20manager.png)
+
 ```mermaid
 graph TD;
     manage_vendors((manage vendors))-->edit_vendor[edit existing vendor];
@@ -608,6 +639,8 @@ Ordered products identify themself as incorporated or not or whether they are qu
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin or elevated users including supervisors.
 
 Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
+
+![landing page](assets/orders.png)
 
 ```mermaid
 graph TD;
@@ -702,6 +735,8 @@ The audit module gathers data from the application in regards of proofing lists 
 * user certificates
 * vendor list
 * regulatory issues
+
+![landing page](assets/audit.png)
 
 [Content](#Content)
 
@@ -992,6 +1027,7 @@ Tested devices:
 * Desktop PC Win10 Edge-browser
 * Notebook Win11 Firefox-browser
 * Smartphone Android12 Firefox-browser
+
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 
 [Content](#Content)
@@ -1055,8 +1091,12 @@ easter_holidays[easter_monday] = 1
 easter_holidays[ascension] = 39
 easter_holidays[pentecost] = 50
 easter_holidays[corpus_christi] = 60
+
 workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
-default_due = 12 ; events are due in x months by default
+default_due = 7 ; scheduled events are due in x days by default
+
+hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
+; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.xx.ini to adhere to your company policies regarding data safety
 
 ; forbidden names as regex-patterns
 [forbidden]
@@ -1116,7 +1156,6 @@ dialect["escape"] = ""
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
-* calendar.php contains the calendar-class. It computes fixed holidays as defined within setup.ini as well as moving holidays according to easter. Comment not applicable holidays out.
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
