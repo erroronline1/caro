@@ -73,7 +73,7 @@ class USER extends API {
 				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
 
 				$calendar = new CALENDARUTILITY($this->_pdo);
-				$timesheet_stats = $calendar->calculateTimesheets([$user]);//, '2024-05-01'));
+				$timesheet_stats = $calendar->timesheetSummary([$user]);//, '2024-05-01'));
 				$usertimesheet = array_search($user['id'], array_column($timesheet_stats, '_id'));
 				if ($usertimesheet !== false) $timesheet_stats = $timesheet_stats[$usertimesheet];
 
