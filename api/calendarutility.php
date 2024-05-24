@@ -516,7 +516,11 @@ class CALENDARUTILITY {
 			for($i = 0; $i < count($user['timesheet']['_weeklyhours']); $i++){
 				$startdate = $user['timesheet']['_weeklyhours'][$i]['date'];
 				if ($startdate > $to_date) break;
-				$enddate = ($i === count($user['timesheet']['_weeklyhours']) - 1) ? $to_date : $user['timesheet']['_weeklyhours'][$i + 1]['date'];
+				if ($i === count($user['timesheet']['_weeklyhours']) - 1) $enddate = clone $to_date;
+				else {
+					$enddate = clone $user['timesheet']['_weeklyhours'][$i + 1]['date'];
+					$enddate->modify('-1 day');
+				}
 				if ($enddate < $from_date) continue;
 				if ($startdate < $from_date) $startdate = clone $from_date;
 
@@ -534,9 +538,9 @@ class CALENDARUTILITY {
 					if ($ptostart > $enddate || $ptoend < $startdate) continue;
 					if ($ptostart < $startdate) $ptostart = $startdate;
 					if ($ptoend > $enddate) $ptoend = $enddate;
-					$holidays += $pto['value'] - intval($ptostart->diff($ptoend)->format('%a')) + 1;
+					$ptonum = intval($ptostart->diff($ptoend)->format('%a')) + 1;
+					if ($ptonum) $holidays += $pto['value'] - $ptonum;
 				}
-				var_dump($holidays);
 				$users[$row]['timesheet']['_projected'] += ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
 			}
 			$users[$row]['timesheet']['_overtime'] += $users[$row]['timesheet']['_performed'] - $users[$row]['timesheet']['_projected'];
