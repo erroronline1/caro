@@ -380,7 +380,7 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * calculates time and off-duty days summes up for users from beginning of a given month to the end of another given month
+	 * calculates time and off-duty days summed up for users from beginning of a given month to the end of another given month
 	 * overtime and vacation calculation only works if $from_date starts from the dawn of time
 	 * so you might have to do two queries and combine their output,
 	 * e.g. leftvacation and alltime overtime have to be calculated for the whole database timespan,
@@ -410,7 +410,7 @@ class CALENDARUTILITY {
 	 * 		...
 	 * 	]
 	 */
-	public function calculateTimesheets($users = [], $from_date = '', $to_date = ''){
+	public function timesheetSummary($users = [], $from_date = '', $to_date = ''){
 		$datetimezone = new DateTimeZone(INI['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
 		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1970-01-01', $datetimezone);
@@ -429,11 +429,9 @@ class CALENDARUTILITY {
 				unset ($users[$row]);
 				continue;
 			}
-			// prepare timesheet settings, double entries will be passed later on
+			// prepare timesheet settings, use _ to avoid overwriting from dynamically prepared keys
 			$users[$row]['timesheet'] = [
 				'_id' => $user['id'],
-				'_name' => $user['name'],
-				'_units' => $user['units'],
 				'_weeklyhours' => [],
 				'_span_end_weeklyhours' => null, // last applied due to given timespan
 				'_annualvacation' => [],
@@ -444,9 +442,9 @@ class CALENDARUTILITY {
 				'_pto' => []
 			];
 			// prepare occasionally changing contract settings
+			// create array with start date of changes and applicable value
 			foreach(['weeklyhours', 'annualvacation'] as $setting){
 				$hours_vacation = [];
-				// extract by start date, sort and try to find the first applicable setting
 				if (array_key_exists($setting, $user['app_settings'])){
 					$settingentries = explode(';', $user['app_settings'][$setting]);
 					natsort($settingentries);
@@ -476,7 +474,7 @@ class CALENDARUTILITY {
 			// get breaks and homeoffice times
 			$misc = json_decode($entry['misc'], true);
 
-			if (!strlen($entry['subject'])) {
+			if (!strlen($entry['subject'])) { // aka regular working day
 				if ($span_start < $user['timesheet']['_weeklyhours'][0]['date']){
 					// since entries are sorted by date, if dated earlier than the initial applied weeklyhours this can not be applicable
 					continue;
@@ -503,6 +501,7 @@ class CALENDARUTILITY {
 				$days -= $this->numberOfNonWorkdays($span_start, $span_end);
 				$users[$row]['timesheet'][$entry['subject']] += $days;
 
+				// add eligible pto to a dated array for below use
 				if ($entry['subject'] !== 'timeoff') $users[$row]['timesheet']['_pto'][] = ['start' => $span_start, 'end' => $span_end, 'value' => $days];
 			}
 		}
@@ -512,7 +511,7 @@ class CALENDARUTILITY {
 		 * outside of database for possibility of not having submitted entries
 		 */
 		foreach ($users as $row => $user){
-			// accumulate projected hours for given timespan
+			// accumulate projected hours for given timespan according to applicable contract settings at the respective time
 			for($i = 0; $i < count($user['timesheet']['_weeklyhours']); $i++){
 				$startdate = $user['timesheet']['_weeklyhours'][$i]['date'];
 				if ($startdate > $to_date) break;
@@ -545,7 +544,7 @@ class CALENDARUTILITY {
 			}
 			$users[$row]['timesheet']['_overtime'] += $users[$row]['timesheet']['_performed'] - $users[$row]['timesheet']['_projected'];
 
-			// accumulate annual vacation days always from the beginning of tracking
+			// accumulate annual vacation days always from the beginning of tracking according to applicable contract settings at the respective time
 			$users[$row]['timesheet']['_leftvacation'] = $user['timesheet']['_annualvacation'][0]['value'];
 			for($i = 1; $i < count($user['timesheet']['_annualvacation']); $i++){
 				$startdate = $user['timesheet']['_annualvacation'][$i]['date'];
