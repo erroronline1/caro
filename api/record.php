@@ -197,7 +197,7 @@ class record extends API {
 					}
 					if ($subs['type'] === 'calendarbutton'){
 						$subs['attributes']['value'] = LANG::GET('calendar.event_new');
-						$subs['attributes']['onpointerup'] = $calendar->schedule();
+						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
 					}
 					if (in_array($subs['type'], ['textarea', 'textinput', 'scanner', 'textinput', 'numberinput', 'dateinput', 'timeinput'])){
 						$subs['attributes']['data-loss'] = 'prevent';
