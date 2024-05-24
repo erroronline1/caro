@@ -413,7 +413,7 @@ class CALENDARUTILITY {
 	public function calculateTimesheets($users = [], $from_date = '', $to_date = ''){
 		$datetimezone = new DateTimeZone(INI['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
-		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1900-01-01', $datetimezone);
+		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1970-01-01', $datetimezone);
 		$from_date->modify('first day of this month')->setTime(0, 0);
 		$to_date = gettype($to_date) === 'object' ? $to_date : new DateTime($to_date ? : 'now', $datetimezone);
 		$to_date->modify('last day of this month')->setTime(23, 59, 59);
@@ -425,7 +425,7 @@ class CALENDARUTILITY {
 		// prepare all users eligible for timetracking due to average weekly hours set
 		foreach ($users as $row => $user){
 			$user['app_settings'] = $users[$row]['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-			if (!$user['app_settings'] || !array_key_exists('weeklyhours', $user['app_settings'])){
+			if (!$user['app_settings'] || !array_key_exists('weeklyhours', $user['app_settings']) || !$user['app_settings']['weeklyhours']){
 				unset ($users[$row]);
 				continue;
 			}
@@ -454,7 +454,7 @@ class CALENDARUTILITY {
 						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
-				} else $hours_vacation = ['date' => new DateTime('1900-01-01', $datetimezone), 'value' => 0];
+				} else $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
 				array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
 				$users[$row]['timesheet']['_' . $setting] = $hours_vacation;
 			}
@@ -635,7 +635,7 @@ class CALENDARUTILITY {
 	public function getWithinDateRange($earlier = '', $later = ''){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('calendar_get-within-date-range'));
 		$statement->execute([
-			':earlier' => $earlier ? : '1900-01-01 00:00:01',
+			':earlier' => $earlier ? : '1970-01-01 00:00:01',
 			':later' => $later ? : '2079-06-06 23:59:59'
 		]);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
