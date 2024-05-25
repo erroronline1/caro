@@ -97,9 +97,7 @@ export const compose_helper = {
 				if (element.type === "signature") {
 					const signatureform = document.querySelector("form>span[data-type=signature").parentNode;
 					for (const node of signatureform) {
-						console.log(node);
 						if (node.dataset.type === "addblock") {
-							console.log(node);
 							node.disabled = true;
 							compose_helper.componentSignature++;
 						}
