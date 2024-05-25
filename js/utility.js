@@ -279,16 +279,19 @@ const orderClient = {
 		} else new Toast(LANG.GET("order.sample_check_failure"), "error");
 	},
 	performIncorporation(formdata, productid) {
-		const check = [];
+		const check = [],
+			submit = new FormData();
+		console.log(formdata);
 		for (const [key, value] of Object.entries(formdata)) {
-			if (value && value !== "on") check.push(key + ": " + value);
+			if (key.startsWith("_")) {
+				submit.append(key, value);
+			} else if (value && value !== "on") check.push(key + ": " + value);
 			else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
 		}
 		if (check.length) {
 			const result = check.join("\n");
-			formdata = new FormData();
-			formdata.append("content", result);
-			api.purchase("post", "incorporation", productid, formdata);
+			submit.append("content", result);
+			api.purchase("post", "incorporation", productid, submit);
 		} else new Toast(LANG.GET("order.incorporation_failure"), "error");
 	},
 };

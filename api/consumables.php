@@ -161,6 +161,24 @@ class CONSUMABLES extends API {
 	}
 
 	/**
+	 * returns a js dialog script as defined within assemble.js
+	 * @param string $target document elementId
+	 * @param array $similarproducts prepared named array for checkbox
+	 * @param string|array $substring start or [start, end]
+	 * @param string $type input|input2
+	 */
+	private function selectSimilarDialog($target = '', $similarproducts = [], $substring = '0', $type = 'input'){
+		if (gettype($substring) === 'array') $substring = implode(',', $substring);
+		return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
+			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
+			"new Dialog({type: '" . $type . "', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => INI['likeliness']['consumables_article_no_similarity']]) . 
+			"', body: [{type: 'checkbox', content: similarproducts}], options:{".
+			"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
+			"'".LANG::GET('consumables.edit_product_batch_confirm')."': {value: true, class: 'reducedCTA'}".
+			"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key=>{return key.substring(" . $substring . ")}).join(',') : '';})";
+	}
+
+	/**
 	 * returns the mdr sample check body response for modal
 	 * processes contents of the sample check and writes to the caro_checks database
 	 * 
@@ -170,10 +188,10 @@ class CONSUMABLES extends API {
 		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' => intval($this->_requestedID)
+				]));
+				$statement->execute();
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
 				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
@@ -199,10 +217,10 @@ class CONSUMABLES extends API {
 					]]);
 				break;
 			case 'GET':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' => intval($this->_requestedID)
+				]));
+				$statement->execute();
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$result = ['body' => [
@@ -242,13 +260,21 @@ class CONSUMABLES extends API {
 		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
-				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n";
-				
+				$batchincorporate = UTILITY::propertySet($this->_payload, '_batchincorporate');
+				$ids = [];
+				if ($batchincorporate){
+					$ids = explode(',', $batchincorporate);
+				}
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' =>implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)])
+				]));
+				$statement->execute();
+				if (!($products = $statement->fetchAll(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
+				$content = '';
+				foreach($products as $product){
+					$content .= $product['vendor_name']. ' ' . $product['article_no'] . ' ' . $product['article_name'] . "\n";
+				}
+
 				// check denial
 				preg_match("/" . LANG::GET('order.incorporation_denied') . ".*/m", $this->_payload->content, $denied);
 				if ($denied) $content .= $denied[0];
@@ -260,11 +286,11 @@ class CONSUMABLES extends API {
 					':author' => $_SESSION['user']['name'],
 					':content' => $content
 				])) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-incorporation'));
-					if ($statement->execute([
-						':id' => $product['id'],
+					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-incorporation'),[
+						':ids' => implode(',', [intval($product['id']), ...array_map(Fn($id)=> intval($id), $ids)]),
 						':incorporated' => intval(!boolval($denied))
-					])) $this->response([
+					]));
+					if ($statement->execute()) $this->response([
 						'status' => [
 							'msg' => LANG::GET('order.incorporation_success'),
 							'type' => 'success'
@@ -278,12 +304,47 @@ class CONSUMABLES extends API {
 				break;
 			case 'GET':
 				$result = [];
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' => intval($this->_requestedID)
+				]));
+				$statement->execute();
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
+				$incorporationform = $this->components('product_incorporation_form');
+
+				// select all products from selected vendor
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
+				$statement->execute([
+					':search' => $product['vendor_id']
+				]);
+				$vendorproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$similarproducts = [];
+				foreach($vendorproducts as $vendorproduct){
+					if ($vendorproduct['article_no'] === $product['article_no']) continue;
+					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
+					if ($percent >= INI['likeliness']['consumables_article_no_similarity']) {
+						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
+					}
+				}
+				if ($similarproducts){
+					$incorporationform[] = [
+						'type' => 'button',
+						'content' => $similarproducts,
+						'attributes' => [
+							'type' => 'button',
+							'value' => LANG::GET('order.incorporation_batch'),
+							'onpointerup' => $this->selectSimilarDialog('_batchincorporate', $similarproducts, '1', 'input2')
+						]
+					];
+					$incorporationform[] = [
+						'type' => 'hiddeninput',
+						'attributes' => [
+							'id' => '_batchincorporate',
+							'name' => '_batchincorporate'
+						]
+					];	
+				}
+
 				$result['body'] = [
 					'content' => [
 						[
@@ -292,7 +353,7 @@ class CONSUMABLES extends API {
 								$product['article_no'] ? : '',
 								$product['article_name'] ? : '',
 								$product['vendor_name'] ? : ''])
-						], ...$this->components('product_incorporation_form')
+						], ...$incorporationform
 					],
 					'options' => [
 							LANG::GET('order.incorporation_cancel') => false,
@@ -311,13 +372,13 @@ class CONSUMABLES extends API {
 				foreach($checks as $check){
 					$check['content'] = explode("\n", $check['content']);
 					$probability = [ 'article_no' => [], 'vendor_name' => []];
-					$identifyproduct = implode(' ', array_slice($check['content'], 0, 3));
+					$identifyproduct = implode(' ', $check['content']);
 					if (!in_array($identifyproduct, $hideduplicates)){
 						foreach ($check['content'] as $information){
 							similar_text($information, $product['article_no'], $article_no_percent);
-							if ($article_no_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['article_no'][] = $check['id'];
+							if ($article_no_percent >= INI['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== LANG::GET('order.incorporation_revoked')) $probability['article_no'][] = $check['id'];
 							similar_text($information, $product['vendor_name'], $vendor_name_percent);
-							if ($vendor_name_percent >= INI['likeliness']['consumables_article_no_similarity']) $probability['vendor_name'][] = $check['id'];
+							if ($vendor_name_percent >= INI['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== LANG::GET('order.incorporation_revoked')) $probability['vendor_name'][] = $check['id'];
 						}
 						if (array_intersect($probability['article_no'], $probability['vendor_name'])){
 							$article = intval(count($matches) - 1);
@@ -768,11 +829,10 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'PUT':
-		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' => intval($this->_requestedID)
+				]));
+				$statement->execute();
 				// prepare product-array to update, return error if not found
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -830,7 +890,7 @@ class CONSUMABLES extends API {
 				]);
 				$batchrevoke = UTILITY::propertySet($this->_payload, '_batchrevoke');
 				if ($product['incorporated'] === null){
-					$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . LANG::GET('order.incorporation_revoked');
+					$content = implode(' ', [$product['vendor_name'], $product['article_no'], $product['article_name']]);
 
 					if ($batchrevoke){
 						$ids = explode(',', $batchrevoke);
@@ -840,15 +900,17 @@ class CONSUMABLES extends API {
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
 						]));
 						$statement->execute();
-						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-products-in-ids'), [
+						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
 						]));
 						$statement->execute();
 						$allsimilar = $statement->fetchAll(PDO::FETCH_ASSOC);
 						foreach($allsimilar as $similar){
-							$content .= "\n" . implode("\n", [$similar['vendor_name'], $similar['article_no'] . ' '. $similar['article_name']]) . "\n" . LANG::GET('order.incorporation_revoked');
+							$content .= "\n" . implode(' ', [$similar['vendor_name'], $similar['article_no'], $similar['article_name']]);
 						}
 					}
+					$content .= "\n" . LANG::GET('order.incorporation_revoked');
+
 					// record revoked state
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
 					$statement->execute([
@@ -892,10 +954,10 @@ class CONSUMABLES extends API {
 				$vendors=[];
 
 				// select single product based on id or name
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' => intval($this->_requestedID)
+				]));
+				$statement->execute();
 				if (!$product = $statement->fetch(PDO::FETCH_ASSOC)) $product = [
 					'id' => null,
 					'vendor_id' => '',
@@ -940,26 +1002,16 @@ class CONSUMABLES extends API {
 					}
 				}
 
-				function selectSimilarDialog($target, $similarproducts){
-					return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
-						"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
-						"new Dialog({type: 'input', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => INI['likeliness']['consumables_article_no_similarity']]) . 
-						"', body: [{type: 'checkbox', content: similarproducts}], options:{".
-						"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
-						"'".LANG::GET('consumables.edit_product_batch_confirm')."': {value: true, class: 'reducedCTA'}".
-						"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key=>{return key.substring(1)}).join(',') : '';})";
-				}
-
 				$isactive = $product['active'] ? ['checked' => true] : []; // 
 				$isinactive = !$product['active'] ? ['checked' => true] : [];
-				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = selectSimilarDialog('_batchactive', $similarproducts);
+				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = $this->selectSimilarDialog('_batchactive', $similarproducts, '1');
 				
 				$tradinggood = [LANG::GET('consumables.edit_product_article_trading_good') => []];
 				if ($product['trading_good']) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
-				if ($similarproducts) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = selectSimilarDialog('_batchtradinggood', $similarproducts);
+				if ($similarproducts) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchtradinggood', $similarproducts, '1');
 
 				$revoke = [LANG::GET('consumables.edit_product_incorporated_revoke') => []];
-				if ($similarproducts) $revoke[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = selectSimilarDialog('_batchrevoke', $similarproducts);
+				if ($similarproducts) $revoke[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchrevoke', $similarproducts, '1');
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
@@ -1188,10 +1240,10 @@ class CONSUMABLES extends API {
 				break;
 		case 'DELETE':
 				// prefetch to return proper name after deletion
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+					':ids' => intval($this->_requestedID)
+				]));
+				$statement->execute();
 				$product = $statement->fetch(PDO::FETCH_ASSOC);
 
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-unprotected-product'));
