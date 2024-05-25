@@ -37,7 +37,6 @@
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
-* batch deactivate inaccessible products?
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
 * vendor list
@@ -565,6 +564,8 @@ graph TD;
     deleted"];
     has_docs-->|yes|product_inactive["deactivate
     product"]
+    product_inactive-->similar[select similar products];
+    similar-->inorderable;
     product_deleted-->inorderable;
     product_inactive-->inorderable;
     edit_product-->product_inactive;

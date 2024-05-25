@@ -188,6 +188,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id LIMIT 1",
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
 		],
+		'consumables_put-batchactive' => [
+			'mysql' => "UPDATE caro_consumables_products SET active = :active WHERE id IN (:ids)",
+			'sqlsrv' => "UPDATE caro_consumables_products SET active = :active WHERE id IN (:ids)"
+		],
 		'consumables_put-check' => [
 			'mysql' => "UPDATE caro_consumables_products SET protected = 1, checked = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET protected = 1, checked = CURRENT_TIMESTAMP WHERE id = :id"

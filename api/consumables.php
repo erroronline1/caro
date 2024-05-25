@@ -801,6 +801,18 @@ class CONSUMABLES extends API {
 					$product['protected'] = 1;
 				}
 
+				// activate or deactivate selects similar products
+				$batchactivate = UTILITY::propertySet($this->_payload, '_batchactivate');
+				$batchdeactivate = UTILITY::propertySet($this->_payload, '_batchdeactivate');
+				if ($batchactivate || $batchdeactivate){
+					$ids = explode(',', $batchactivate ? : $batchdeactivate);
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-batchactive'));
+					$statement->execute([
+						':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
+						':active' => $batchactivate ? 1 : 0
+					]);
+				}
+
 				// sql server has a problem with actual updating null value
 				$query = strtr(SQLQUERY::PREPARE('consumables_put-product'),[
 					':incorporated' => $product['incorporated'] === null ? 'NULL' : $product['incorporated'], // without quotes
@@ -871,9 +883,6 @@ class CONSUMABLES extends API {
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$isactive = $product['active'] ? ['checked' => true] : [];
-				$isinactive = !$product['active'] ? ['checked' => true] : [];
-
 				$certificates = [];
 				$documents = [];
 				if ($product['id']) {
@@ -886,6 +895,45 @@ class CONSUMABLES extends API {
 							$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
 					}
 				}
+				// select all products from selected vendor
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
+				$statement->execute([
+					':search' => $product['vendor_id']
+				]);
+				$vendorproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$similarproducts = [];
+				foreach($vendorproducts as $vendorproduct){
+					if ($vendorproduct['article_no'] === $product['article_no']) continue;
+					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
+					if ($percent >= INI['likeliness']['consumables_article_no_similarity']) {
+						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
+					}
+				}
+
+				$isactive = $product['active'] ? ['checked' => true] : []; // 
+				if ($similarproducts) $isactive['onchange'] = "if (this.checked) { document.getElementById('_batchdeactivate').value = ''; new Dialog({type: 'input', header: '" . LANG::GET('consumables.edit_product_batch_activate') . "', body: JSON.parse('" . 
+					json_encode([
+						[
+							'type' => 'checkbox',
+							'content' => $similarproducts
+						]
+					]) .
+					"'), options:{".
+					"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
+					"'".LANG::GET('consumables.edit_product_batch_activate_confirm')."': {value: true, class: 'reducedCTA'}".
+					"}}).then(response => { document.getElementById('_batchactivate').value = Object.keys(response).map(key=>{return key.substring(1)}).join(',');})}";
+				$isinactive = !$product['active'] ? ['checked' => true] : [];
+				if ($similarproducts) $isinactive['onchange'] = "if (this.checked) { document.getElementById('_batchactivate').value = ''; new Dialog({type: 'input', header: '" . LANG::GET('consumables.edit_product_batch_deactivate') . "', body: JSON.parse('" . 
+					json_encode([
+						[
+							'type' => 'checkbox',
+							'content' => $similarproducts
+						]
+					]) .
+					"'), options:{".
+					"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
+					"'".LANG::GET('consumables.edit_product_batch_deactivate_confirm')."': {value: true, class: 'reducedCTA'}".
+					"}}).then(response => { document.getElementById('_batchdeactivate').value = Object.keys(response).map(key=>{return key.substring(1)}).join(',');})}";
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
@@ -899,7 +947,6 @@ class CONSUMABLES extends API {
 					$options[$row['name']] = [];
 					if ($row['name'] === $product['vendor_name']) $options[$row['name']]['selected'] = true;
 					$vendors[$row['name']] = ['value' => $row['id']];
-
 				}
 
 				// prepare existing unit lists
@@ -1029,7 +1076,19 @@ class CONSUMABLES extends API {
 								LANG::GET('consumables.edit_product_isactive') => $isactive,
 								LANG::GET('consumables.edit_product_isinactive') => $isinactive
 							]
-						]
+						], [
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => '_batchactivate',
+								'id' => '_batchactivate'
+							]
+						], [
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => '_batchdeactivate',
+								'id' => '_batchdeactivate'
+							]
+						] 
 					]
 				],
 				'form' => [
@@ -1085,9 +1144,9 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'value' => LANG::GET('consumables.edit_product_delete'),
 								'type' => 'button', // apparently defaults to submit otherwise
-								'onpointerup' => $product['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('consumables.edit_product_delete_confirm_header', [':name' => $product['article_name']]) ."', 'options':{".
+								'onpointerup' => $product['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('consumables.edit_product_delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
 									"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
-									"'".LANG::GET('consumables.edit_product_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+									"'".LANG::GET('consumables.edit_product_delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
 									"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
 							]
 						]
