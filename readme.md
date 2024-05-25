@@ -550,8 +550,14 @@ graph TD;
     update info"];
     add_pinfo-->known_vendor;
 
-    edit_product-->add_pinfo["add documents,
+    edit_product-->similar{select similar products};
+    similar-->add_pinfo["add documents,
     update info"];
+    similar-->database[("update selected products
+    within database,
+    apply active state,
+    trading good,
+    revoke incorporation")];
     known_vendor{vendor in database}-->|yes|add_pinfo;
     known_vendor-->|no|new_vendor
     edit_product-->delete_product(delete product);
@@ -563,9 +569,8 @@ graph TD;
     has_docs-->|no|product_deleted["product
     deleted"];
     has_docs-->|yes|product_inactive["deactivate
-    product"]
-    product_inactive-->similar[select similar products];
-    similar-->inorderable;
+    product"];
+    database-->|inactive|product_inactive
     product_deleted-->inorderable;
     product_inactive-->inorderable;
     edit_product-->product_inactive;

@@ -801,25 +801,55 @@ class CONSUMABLES extends API {
 					$product['protected'] = 1;
 				}
 
-				// activate or deactivate selects similar products
-				$batchactivate = UTILITY::propertySet($this->_payload, '_batchactivate');
-				$batchdeactivate = UTILITY::propertySet($this->_payload, '_batchdeactivate');
-				if ($batchactivate || $batchdeactivate){
-					$ids = explode(',', $batchactivate ? : $batchdeactivate);
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-batchactive'));
-					$statement->execute([
+				// activate or deactivate selected similar products
+				$batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
+				if ($batchactive){
+					$ids = explode(',', $batchactive);
+					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
+						':field' => 'active',
+						':value' => $product['active'],
 						':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
-						':active' => $batchactivate ? 1 : 0
-					]);
+					]));
+					$statement->execute();
+				}
+				// apply trading good to selected similar products
+				$batchtradinggood = UTILITY::propertySet($this->_payload, '_batchtradinggood');
+				if ($batchtradinggood){
+					$ids = explode(',', $batchtradinggood);
+					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
+						':field' => 'trading_good',
+						':value' => $product['trading_good'],
+						':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
+					]));
+					$statement->execute();
 				}
 
 				// sql server has a problem with actual updating null value
-				$query = strtr(SQLQUERY::PREPARE('consumables_put-product'),[
+				$query = strtr(SQLQUERY::PREPARE('consumables_put-product'), [
 					':incorporated' => $product['incorporated'] === null ? 'NULL' : $product['incorporated'], // without quotes
 				]);
+				$batchrevoke = UTILITY::propertySet($this->_payload, '_batchrevoke');
 				if ($product['incorporated'] === null){
-					// record revoked state
 					$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . LANG::GET('order.incorporation_revoked');
+
+					if ($batchrevoke){
+						$ids = explode(',', $batchrevoke);
+						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
+							':field' => 'incorporated',
+							':value' => 'NULL',
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
+						]));
+						$statement->execute();
+						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-products-in-ids'), [
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
+						]));
+						$statement->execute();
+						$allsimilar = $statement->fetchAll(PDO::FETCH_ASSOC);
+						foreach($allsimilar as $similar){
+							$content .= "\n" . implode("\n", [$similar['vendor_name'], $similar['article_no'] . ' '. $similar['article_name']]) . "\n" . LANG::GET('order.incorporation_revoked');
+						}
+					}
+					// record revoked state
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
 					$statement->execute([
 						':type' => 'incorporation',
@@ -843,7 +873,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]),
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]) . ($batchactive || $batchtradinggood || $batchrevoke ? '. ' . LANG::GET('consumables.edit_product_batch_saved'): ''),
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -910,30 +940,26 @@ class CONSUMABLES extends API {
 					}
 				}
 
+				function selectSimilarDialog($target, $similarproducts){
+					return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
+						"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
+						"new Dialog({type: 'input', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => INI['likeliness']['consumables_article_no_similarity']]) . 
+						"', body: [{type: 'checkbox', content: similarproducts}], options:{".
+						"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
+						"'".LANG::GET('consumables.edit_product_batch_confirm')."': {value: true, class: 'reducedCTA'}".
+						"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key=>{return key.substring(1)}).join(',') : '';})";
+				}
+
 				$isactive = $product['active'] ? ['checked' => true] : []; // 
-				if ($similarproducts) $isactive['onchange'] = "if (this.checked) { document.getElementById('_batchdeactivate').value = ''; new Dialog({type: 'input', header: '" . LANG::GET('consumables.edit_product_batch_activate') . "', body: JSON.parse('" . 
-					json_encode([
-						[
-							'type' => 'checkbox',
-							'content' => $similarproducts
-						]
-					]) .
-					"'), options:{".
-					"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
-					"'".LANG::GET('consumables.edit_product_batch_activate_confirm')."': {value: true, class: 'reducedCTA'}".
-					"}}).then(response => { document.getElementById('_batchactivate').value = Object.keys(response).map(key=>{return key.substring(1)}).join(',');})}";
 				$isinactive = !$product['active'] ? ['checked' => true] : [];
-				if ($similarproducts) $isinactive['onchange'] = "if (this.checked) { document.getElementById('_batchactivate').value = ''; new Dialog({type: 'input', header: '" . LANG::GET('consumables.edit_product_batch_deactivate') . "', body: JSON.parse('" . 
-					json_encode([
-						[
-							'type' => 'checkbox',
-							'content' => $similarproducts
-						]
-					]) .
-					"'), options:{".
-					"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
-					"'".LANG::GET('consumables.edit_product_batch_deactivate_confirm')."': {value: true, class: 'reducedCTA'}".
-					"}}).then(response => { document.getElementById('_batchdeactivate').value = Object.keys(response).map(key=>{return key.substring(1)}).join(',');})}";
+				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = selectSimilarDialog('_batchactive', $similarproducts);
+				
+				$tradinggood = [LANG::GET('consumables.edit_product_article_trading_good') => []];
+				if ($product['trading_good']) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
+				if ($similarproducts) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = selectSimilarDialog('_batchtradinggood', $similarproducts);
+
+				$revoke = [LANG::GET('consumables.edit_product_incorporated_revoke') => []];
+				if ($similarproducts) $revoke[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = selectSimilarDialog('_batchrevoke', $similarproducts);
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
@@ -1053,8 +1079,14 @@ class CONSUMABLES extends API {
 						],
 						[
 							'type' => 'checkbox',
-							'content' => [
-								LANG::GET('consumables.edit_product_article_trading_good') => [],
+							'content' => $tradinggood,
+							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
+						],
+						[
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'id' => '_batchtradinggood',
+								'name' => '_batchtradinggood'
 							]
 						]
 					], [
@@ -1072,6 +1104,7 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_product_active')
 							],
+							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 							'content' => [
 								LANG::GET('consumables.edit_product_isactive') => $isactive,
 								LANG::GET('consumables.edit_product_isinactive') => $isinactive
@@ -1079,14 +1112,8 @@ class CONSUMABLES extends API {
 						], [
 							'type' => 'hiddeninput',
 							'attributes' => [
-								'name' => '_batchactivate',
-								'id' => '_batchactivate'
-							]
-						], [
-							'type' => 'hiddeninput',
-							'attributes' => [
-								'name' => '_batchdeactivate',
-								'id' => '_batchdeactivate'
+								'name' => '_batchactive',
+								'id' => '_batchactive'
 							]
 						] 
 					]
@@ -1118,7 +1145,6 @@ class CONSUMABLES extends API {
 					],
 					$result['body']['content'][3]
 				];
-				if ($product['trading_good']) $result['body']['content'][2][count($result['body']['content'][2]) -1]['content'][LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
 				if ($product['incorporated'] !== null) {
 					array_push($result['body']['content'][2],
 						[
@@ -1126,10 +1152,16 @@ class CONSUMABLES extends API {
 							'description' => ($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
 						], [
 							'type' => 'checkbox',
-							'content' => [
-								LANG::GET('consumables.edit_product_incorporated_revoke') => []
+							'content' => $revoke,
+							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
+						], [
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => '_batchrevoke',
+								'id' => '_batchrevoke'
 							]
-						]);
+						]
+					);
 				}
 				else {
 					$result['body']['content'][2][] = [
