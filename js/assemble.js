@@ -129,8 +129,12 @@ export class Dialog {
 
 		let dialog = document.getElementById("modal");
 		if (this.type) {
+			if (this.type === "input") modal = "inputmodal";
+			if (this.type === "input2") {
+				modal = "inputmodal2";
+				this.type = "input";
+			}
 			if (this.type === "input") {
-				modal = "inputmodal";
 				if (this.body.content === undefined) this.body = { content: this.body };
 				this.assemble = new Assemble(this.body);
 			}
@@ -522,9 +526,8 @@ export class Assemble {
 			this.currentElement = elements;
 			try {
 				if (elements.type) content = content.concat(this[elements.type]());
-			}
-			catch (e) {
-				console.trace( elements.type, e);
+			} catch (e) {
+				console.trace(elements.type, e);
 				return false;
 			}
 		}
@@ -825,7 +828,7 @@ export class Assemble {
 		if (type === "email") input.multiple = true;
 
 		if (type === "checkboxinput") {
-			input.type ="text";
+			input.type = "text";
 			const inputvalue = [];
 			for (const [key, value] of Object.entries(this.currentElement.content)) {
 				if (value.checked != undefined && value.checked) inputvalue.push(key);
@@ -833,27 +836,28 @@ export class Assemble {
 			input.value = inputvalue.join(", ");
 			input.onpointerup = new Function(
 				"new Dialog({type: 'input', header: '" +
-				this.currentElement.attributes.name.replace(/\[\]/g, "") +
-				"', body:" +
-				JSON.stringify([
-					[
-						{
-							type: "checkbox",
-							content: this.currentElement.content,
-						},
-					],
-				]) +
-				", " +
-				"options:{" +
-				"'" +
-				LANG.GET("assemble.compose_form_cancel") +
-				"': false," +
-				"'" +
-				LANG.GET("assemble.compose_form_confirm") +
-				"': {value: true, class: 'reducedCTA'}," +
-				"}}).then(response => { const e = document.getElementById('" +
-				input.id +
-				"'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}; e.dispatchEvent(new Event('change'));})");
+					this.currentElement.attributes.name.replace(/\[\]/g, "") +
+					"', body:" +
+					JSON.stringify([
+						[
+							{
+								type: "checkbox",
+								content: this.currentElement.content,
+							},
+						],
+					]) +
+					", " +
+					"options:{" +
+					"'" +
+					LANG.GET("assemble.compose_form_cancel") +
+					"': false," +
+					"'" +
+					LANG.GET("assemble.compose_form_confirm") +
+					"': {value: true, class: 'reducedCTA'}," +
+					"}}).then(response => { const e = document.getElementById('" +
+					input.id +
+					"'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}; e.dispatchEvent(new Event('change'));})"
+			);
 		}
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
