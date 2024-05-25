@@ -96,14 +96,48 @@ class CALENDAR extends API {
 	}
 
 	/**
+	 * checks system processable expiry dates, adds calendar reminders if applicable
 	 * alerts a user group if selected
 	 * used by service worker
 	 */
 	public function alert(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
+
+		// check certificate validity
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
+		$statement->execute();
+		$vendors = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		foreach ($vendors as $vendor){
+			$certificate = json_decode($vendor['certificate'], true);
+			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['timezone']));
+			else continue;
+			if ($validity > $today) continue;
+			// check for open reminders. if none add a new
+			$reminders = $calendar->search(LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]));
+			$open = false;
+			foreach($reminders as $reminder){
+				if (!$reminder['closed']) $open = true;
+			}
+			if (!$open){
+				$calendar->post([
+					':type' => 'schedule',
+					':span_start' => $today->format('Y-m-d H:i:s'),
+					':span_end' => $today->format('Y-m-d H:i:s'),
+					':author_id' => 1,
+					':affected_user_id' => 1,
+					':organizational_unit' => 'admin,office',
+					':subject' => LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]),
+					':misc' => '',
+					':closed' => '',
+					':alert' => 1
+					]);		   
+			}
+		}
+
 		$alerts = $calendar->alert(date('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']], ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (array_key_exists($event['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
 		}
 	}
 
