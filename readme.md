@@ -9,6 +9,7 @@
     * [What it is not](#what-it-is-not)
     * [Data integrity](#data-integrity)
 * [Regulatory fulfillment suggestions](#regulatory-fulfillment-suggestions)
+    * [Tips](#tips)
 * [Modules](#modules)
     * [Users](#users)
     * [Conversations](#conversations)
@@ -61,7 +62,7 @@
 ## Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment, although it could be run on any webserver. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
-Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being easy to use and recognizable.
+Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
 ![landing page](assets/landing%20page.png)
 
@@ -206,6 +207,13 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Create forms and assign a *Equipment surveillance*-form-context and the fitting regulatory context.
     * ISO 13485 7.6
     * MPBetreibV
+
+#### Tips
+* Use a calendar-button within surveillance forms to immediately set the next due date while handling the current documentation.
+* Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
+* If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
+
+![sample form](assets/sample%20form.png)
 
 [Content](#content)
 
@@ -518,7 +526,11 @@ Order operations rely on a vendor and product database. Also this is related to 
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
-The special permission of *purchase assistant* can edit the alias definition of products to disburden purchase and enhance identification of products with company customs. 
+The special permission of *purchase assistant* can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
+
+Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
+
+While editing products, one can edit the *trading good*-setting, revoke a possible *incorporated*-state and set the product *active and available* or *inactive*. On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
 
 ![landing page](assets/vendor%20manager.png)
 
