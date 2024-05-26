@@ -443,7 +443,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#content)
 
 ### Calendar
-Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to elevated users including supervisors only.
+Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to elevated users including supervisors only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -456,6 +456,8 @@ Scheduling and its events are not part of the records per se as any action is su
 Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor, ceo and human ressources only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
 
 This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly.
+
+Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
 
 *Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution! On minor changes it is recommended to export the most recent timesheets and start tracking anew.*
 
