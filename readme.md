@@ -1248,13 +1248,13 @@ You can as well define all products as trading goods and set to 0 conditionally 
 
 ## Ressources
 ### external libraries
-* https://github.com/mebjas/html5-qrcode
-* https://github.com/szimek/signature_pad
-* https://github.com/nimiq/qr-creator
-* https://github.com/lindell/JsBarcode/
-* https://github.com/omrips/viewstl
-* https://github.com/mk-j/PHP_XLSXWriter
-* https://github.com/tecnickcom/TCPDF
+* [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
+* [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
+* [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
+* [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
+* [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
+* [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
+* [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
 
 ### kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
