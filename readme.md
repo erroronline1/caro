@@ -45,8 +45,6 @@
 * vendor evaluation
 
 #### application considerations
-* ux tabs?
-* hash sum check for data completeness?
 * user selectable color themes?
 * risk management?
 
