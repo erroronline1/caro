@@ -108,6 +108,7 @@ class CALENDAR extends API {
 		$statement->execute();
 		$vendors = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$today->setTime(0, 0);
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'], true);
 			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['timezone']));
