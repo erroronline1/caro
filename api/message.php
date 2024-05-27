@@ -294,31 +294,8 @@ class MESSAGE extends API {
 
 		foreach($users as $user){
 			$mailto = [
-				LANG::GET('order.message_orderer', [':orderer' => $user['name']]) => ['href' => 'javascript:void(0)', 'data-type' => 'input', 'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', body: JSON.parse('" . 
-					json_encode(
-							[
-								[
-									'type' => 'hiddeninput',
-									'attributes' => [
-										'name' => LANG::GET('message.to'),
-										'value' => $user['name']
-									]
-								], [
-									'type' => 'textarea',
-									'attributes' => [
-										'name' => LANG::GET('message.message'),
-										'rows' => 8
-									]
-								]
-							]
-						) . "'), options:{".
-					"'".LANG::GET('order.add_information_cancel')."': false,".
-					"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => {if (response[LANG.GET('message.message')]) {".
-						"const formdata = new FormData();".
-						"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
-						"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
-						"api.message('post', 'message', formdata)}})"]
+				LANG::GET('order.message_orderer', [':orderer' => $user['name']]) => ['href' => 'javascript:void(0)', 'data-type' => 'input',
+				'onpointerup' => "messageClient('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', null, null)"]
 			];
 			$result['name'][] = $mailto;
 			if ($user['units'])
