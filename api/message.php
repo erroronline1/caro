@@ -290,26 +290,55 @@ class MESSAGE extends API {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();
 		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$result = ['units' => [], 'permissions' => [], 'name' => []];
-
+		$groups = ['units' => [], 'permissions' => [], 'name' => []];
+		$result = ['body' => ['content' => []]];
 		foreach($users as $user){
-			$mailto = [
-				LANG::GET('order.message_orderer', [':orderer' => $user['name']]) => ['href' => 'javascript:void(0)', 'data-type' => 'input',
-				'onpointerup' => "messageClient('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', null, null)"]
+			if ($user['id']==1) continue;
+			$mailto =  [
+				'href' => 'javascript:void(0)',
+				'data-type' => 'input',
+				'onpointerup' => "messageClient.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 			];
-			$result['name'][] = $mailto;
+			$groups['name'][$user['name']] = $mailto;
 			if ($user['units'])
 				foreach(explode(',', $user['units']) as $unit){
-					if (!array_key_exists($unit, $result['units'])) $result['units'][$unit] = [];
-					$result['units'][$unit][] = $mailto;
+					if (!array_key_exists($unit, $groups['units'])) $groups['units'][$unit] = [];
+					$groups['units'][$unit][$user['name']] = $mailto;
 				}
 			if ($user['permissions'])
 				foreach(explode(',', $user['permissions']) as $permission){
-					if (!array_key_exists($permission, $result['permissions'])) $result['permissions'][$permission] = [];
-					$result['permissions'][$permission][] = $mailto;
+					if (in_array($permission, ['user', 'group'])) continue;
+					if (!array_key_exists($permission, $groups['permissions'])) $groups['permissions'][$permission] = [];
+					$groups['permissions'][$permission][$user['name']] = $mailto;
 				}
 		}
-		var_dump($result);
+
+		foreach($groups as $group => $content){
+			ksort($content);
+			if ($group === 'name'){
+				$result['body']['content'][] = [
+					[
+						'type' => 'links',
+						'description' => 'users',
+						'content' => $content,
+					]
+				];
+			} else {
+				$panel = [];
+				foreach($content as $sub => $users){
+					ksort($users);
+					$panel[] = [
+						[
+							'type' => 'links',
+							'description' => LANGUAGEFILE[$group][$sub],
+							'content' => $users,
+						]
+					];
+				}
+				$result['body']['content'][] = $panel;
+			}
+		}
+		$this->response($result);
 	}
 }
 
