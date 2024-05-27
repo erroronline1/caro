@@ -69,41 +69,6 @@ const _serviceWorker = {
 	},
 };
 
-const texttemplateClient = {
-	data: null,
-	update: () => {
-		const replacements = {},
-			genii = document.getElementsByName(LANG.GET("texttemplate.use_person")),
-			blocks = document.querySelectorAll("[data-usecase=useblocks]"),
-			placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
-		let selectedgenus = 0,
-			output = "",
-			blockcontent;
-		for (const [key, value] of Object.entries(texttemplateClient.data.replacements)) {
-			replacements[key] = value.split(/\r\n|\n/);
-		}
-		for (let i = 0; i < genii.length; i++) {
-			if (genii[i].checked) {
-				selectedgenus = i;
-				break;
-			}
-		}
-		for (const block of blocks) {
-			if (block.checked) {
-				blockcontent = texttemplateClient.data.blocks[":" + block.name.replaceAll(/\(.*?\)/g, "")];
-				for (const input of placeholder) {
-					if (input.value) blockcontent = blockcontent.replaceAll(":" + input.id, input.value);
-				}
-				for (const [key, replacement] of Object.entries(replacements)) {
-					blockcontent = blockcontent.replaceAll(key, replacement[selectedgenus]);
-				}
-				output += blockcontent;
-			}
-		}
-		document.getElementById("texttemplate").value = output;
-	},
-};
-
 const calendarClient = {
 	createFormData: (data) => {
 		window.calendarFormData = new FormData();
@@ -144,6 +109,58 @@ const calendarClient = {
 				}
 			}
 		}
+	},
+};
+
+const messageClient = {
+	newMessage: (subject = "", recipient = "", body = "", options = {}, datalist = []) => {
+		//returns a message modal dialog
+		if (!Object.keys(options)) {
+			options[LANG.GET("order.add_information_cancel")] = false;
+			options[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+		}
+
+		const formbody = [
+			{
+				type: "hiddeninput",
+				attributes: {
+					name: LANG.GET("message.to"),
+					value: recipient,
+				},
+			},
+			{
+				type: "textarea",
+				attributes: {
+					name: LANG.GET("message.message"),
+					rows: 8,
+					value: body,
+				},
+			},
+		];
+		if (datalist) {
+			formbody[0].type = "textinput";
+			formbody[0].attributes.list = "rcptlist";
+			formbody.push({
+				type: "datalist",
+				content: datalist,
+				attributes: {
+					id: "rcptlist",
+				},
+			});
+		}
+		new Dialog({
+			type: "input",
+			header: subject,
+			body: formbody,
+			options: options,
+		}).then((response) => {
+			if (response[LANG.GET("message.message")]) {
+				const formdata = new FormData();
+				formdata.append(LANG.GET("message.to"), response[LANG.GET("message.to")]);
+				formdata.append(LANG.GET("message.message"), response[LANG.GET("message.message")]);
+				api.message("post", "message", formdata);
+			}
+		});
 	},
 };
 
@@ -296,7 +313,42 @@ const orderClient = {
 	},
 };
 
-const toolModule = {
+const texttemplateClient = {
+	data: null,
+	update: () => {
+		const replacements = {},
+			genii = document.getElementsByName(LANG.GET("texttemplate.use_person")),
+			blocks = document.querySelectorAll("[data-usecase=useblocks]"),
+			placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
+		let selectedgenus = 0,
+			output = "",
+			blockcontent;
+		for (const [key, value] of Object.entries(texttemplateClient.data.replacements)) {
+			replacements[key] = value.split(/\r\n|\n/);
+		}
+		for (let i = 0; i < genii.length; i++) {
+			if (genii[i].checked) {
+				selectedgenus = i;
+				break;
+			}
+		}
+		for (const block of blocks) {
+			if (block.checked) {
+				blockcontent = texttemplateClient.data.blocks[":" + block.name.replaceAll(/\(.*?\)/g, "")];
+				for (const input of placeholder) {
+					if (input.value) blockcontent = blockcontent.replaceAll(":" + input.id, input.value);
+				}
+				for (const [key, replacement] of Object.entries(replacements)) {
+					blockcontent = blockcontent.replaceAll(key, replacement[selectedgenus]);
+				}
+				output += blockcontent;
+			}
+		}
+		document.getElementById("texttemplate").value = output;
+	},
+};
+
+const toolClient = {
 	stlviewer: null,
 	initStlViewer: function (file) {
 		if (file === "../null") return;
