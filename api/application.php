@@ -72,6 +72,7 @@ class APPLICATION extends API {
 		$menu=[
 			LANG::GET('menu.communication_header') => [
 				LANG::GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
+				LANG::GET('menu.message_register') => ['onpointerup' => "api.message('get', 'register')"],
 				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
 			LANG::GET('menu.record_header') => [

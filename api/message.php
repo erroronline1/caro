@@ -283,6 +283,57 @@ class MESSAGE extends API {
 		}
 		$this->response($result);
 	}
+
+	public function register(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		// prepare existing users lists
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
+		$statement->execute();
+		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$result = ['units' => [], 'permissions' => [], 'name' => []];
+
+		foreach($users as $user){
+			$mailto = [
+				LANG::GET('order.message_orderer', [':orderer' => $user['name']]) => ['href' => 'javascript:void(0)', 'data-type' => 'input', 'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', body: JSON.parse('" . 
+					json_encode(
+							[
+								[
+									'type' => 'hiddeninput',
+									'attributes' => [
+										'name' => LANG::GET('message.to'),
+										'value' => $user['name']
+									]
+								], [
+									'type' => 'textarea',
+									'attributes' => [
+										'name' => LANG::GET('message.message'),
+										'rows' => 8
+									]
+								]
+							]
+						) . "'), options:{".
+					"'".LANG::GET('order.add_information_cancel')."': false,".
+					"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
+					"}}).then(response => {if (response[LANG.GET('message.message')]) {".
+						"const formdata = new FormData();".
+						"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
+						"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
+						"api.message('post', 'message', formdata)}})"]
+			];
+			$result['name'][] = $mailto;
+			if ($user['units'])
+				foreach(explode(',', $user['units']) as $unit){
+					if (!array_key_exists($unit, $result['units'])) $result['units'][$unit] = [];
+					$result['units'][$unit][] = $mailto;
+				}
+			if ($user['permissions'])
+				foreach(explode(',', $user['permissions']) as $permission){
+					if (!array_key_exists($permission, $result['permissions'])) $result['permissions'][$permission] = [];
+					$result['permissions'][$permission][] = $mailto;
+				}
+		}
+		var_dump($result);
+	}
 }
 
 $api = new MESSAGE();
