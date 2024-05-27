@@ -195,7 +195,7 @@ class TOOL extends API {
 				['type' => 'select',
 				'attributes' => [
 					'name' => LANG::GET('tool.stl_viewer_select'),
-					'onchange' => "toolModule.initStlViewer('../' + this.value)"
+					'onchange' => "toolClient.initStlViewer('../' + this.value)"
 				],
 				'content' => $options],
 				['type' => 'stlviewer',
