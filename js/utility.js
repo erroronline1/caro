@@ -137,7 +137,7 @@ const messageClient = {
 				},
 			},
 		];
-		if (datalist) {
+		if (datalist.length) {
 			formbody[0].type = "textinput";
 			formbody[0].attributes.list = "rcptlist";
 			formbody.push({
