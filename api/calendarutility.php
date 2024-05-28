@@ -305,7 +305,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_pto_exemption'),
-							'onchange' => "calendarClient.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === LANG.GET('calendar.timesheet_pto.regular'))"
+							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === LANG.GET('calendar.timesheet_pto.regular'))"
 						],
 						'content' => $ptoselect
 					],[
@@ -376,7 +376,7 @@ class CALENDARUTILITY {
 		}
 
 		return "new Dialog({type:'input', header: '', body: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
-			".then(response => {if (response) {calendarClient.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
+			".then(response => {if (response) {_client.calendar.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
 	}
 
 	/**

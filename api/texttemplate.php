@@ -614,7 +614,7 @@ class TEXTTEMPLATE extends API {
 				'attributes' => [
 					'type' => 'button',
 					'value' => LANG::GET('texttemplate.use_refresh'),
-					'onpointerup' => 'texttemplateClient.update();'
+					'onpointerup' => '_client.texttemplate.update();'
 				],
 				'hint' => LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
 			];
@@ -629,7 +629,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $content,
 						'rows' => 13,
 						'readonly' => true,
-						'onpointerup' => 'orderClient.toClipboard(this.value)'
+						'onpointerup' => '_client.order.toClipboard(this.value)'
 						]
 				]
 			];

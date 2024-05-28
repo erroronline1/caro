@@ -182,7 +182,7 @@ class CONSUMABLES extends API {
 	 * returns the mdr sample check body response for modal
 	 * processes contents of the sample check and writes to the caro_checks database
 	 * 
-	 * $this->_payload->content is a string passed by utility.js orderClient.performSampleCheck()
+	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
 	 */
 	public function mdrsamplecheck(){
 		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
@@ -253,7 +253,7 @@ class CONSUMABLES extends API {
 	 * 
 	 * processes contents of the incorporation and writes to the caro_checks database
 	 * 
-	 * $this->_payload->content is a string passed by utility.js orderClient.performIncorporation()
+	 * $this->_payload->content is a string passed by utility.js _client.order.performIncorporation()
 	 * incorporation denial is detected by pattern matching LANG::GET('order.incorporation_denied')
 	 */
 	public function incorporation(){

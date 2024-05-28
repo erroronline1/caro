@@ -172,7 +172,7 @@ export const compose_helper = {
 					{
 						type: "text",
 						description: key,
-						content: texttemplateClient.data[key],
+						content: _client.texttemplate.data[key],
 					},
 				],
 			],
@@ -359,7 +359,7 @@ export const compose_helper = {
 				texts.content.push({
 					type: "text",
 					description: key,
-					content: texttemplateClient.data[key],
+					content: _client.texttemplate.data[key],
 				});
 				texts.keys.push(key);
 			}

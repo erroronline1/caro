@@ -203,7 +203,7 @@ class ORDER extends API {
 	}
 
 	public function productsearch(){
-		// order to be taken into account in utility.js orderClient.addProduct() method and this->order() method as well!
+		// order to be taken into account in utility.js _client.order.addProduct() method and this->order() method as well!
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
@@ -255,7 +255,7 @@ class ORDER extends API {
 						$matches[$article][$slide][] = [
 						'type' => 'tile',
 						'attributes' => [
-							'onpointerup' => "orderClient.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+							'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
 						],
 						'content' => [
 							['type' => 'text',
@@ -573,7 +573,7 @@ class ORDER extends API {
 									"'".LANG::GET('order.add_manually_confirm')."': true,".
 									"'".LANG::GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
 								"}}).then(response => {if (Object.keys(response).length) {".
-									"orderClient.addProduct(response[LANG.GET('order.quantity_label')] || '', response[LANG.GET('order.unit_label')] || '', response[LANG.GET('order.ordernumber_label')] || '', response[LANG.GET('order.productname_label')] || '', response[LANG.GET('order.barcode_label')] || '', response[LANG.GET('order.vendor_label')] || '');".
+									"_client.order.addProduct(response[LANG.GET('order.quantity_label')] || '', response[LANG.GET('order.unit_label')] || '', response[LANG.GET('order.ordernumber_label')] || '', response[LANG.GET('order.productname_label')] || '', response[LANG.GET('order.barcode_label')] || '', response[LANG.GET('order.vendor_label')] || '');".
 									"api.preventDataloss.monitor = true;}".
 									"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
 						]]
@@ -672,7 +672,7 @@ class ORDER extends API {
 					]);
 				}
 
-				// cart-content has a twin within utility.js orderClient.addProduct() method
+				// cart-content has a twin within utility.js _client.order.addProduct() method
 				if ($order['items']){
 					$items=[];
 					for ($i = 0; $i < count($order['items']); $i++){
@@ -993,10 +993,10 @@ class ORDER extends API {
 							'name' => LANG::GET('order.order_filter')
 						],
 						'content' => [
-							LANG::GET('order.untreated')=>['checked' => true, 'onchange' => 'orderClient.filter()'],
-							LANG::GET('order.ordered')=>['onchange' => 'orderClient.filter("ordered")'],
-							LANG::GET('order.received')=>['onchange' => 'orderClient.filter("received")'],
-							LANG::GET('order.archived')=>['onchange' => 'orderClient.filter("archived")'],
+							LANG::GET('order.untreated')=>['checked' => true, 'onchange' => '_client.order.filter()'],
+							LANG::GET('order.ordered')=>['onchange' => '_client.order.filter("ordered")'],
+							LANG::GET('order.received')=>['onchange' => '_client.order.filter("received")'],
+							LANG::GET('order.archived')=>['onchange' => '_client.order.filter("archived")'],
 						]],
 						['type' => 'searchinput',
 						'attributes' => [
@@ -1074,7 +1074,7 @@ class ORDER extends API {
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
 								'name' => LANG::GET('order.ordernumber_label'),
 								'readonly' => true,
-								'onpointerup' => 'orderClient.toClipboard(this)'
+								'onpointerup' => '_client.order.toClipboard(this)'
 							]
 						],
 						[
@@ -1083,7 +1083,7 @@ class ORDER extends API {
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
 								'name' => LANG::GET('order.commission'),
 								'readonly' => true,
-								'onpointerup' => 'orderClient.toClipboard(this)'
+								'onpointerup' => '_client.order.toClipboard(this)'
 							],
 							'hint' => LANG::GET('order.copy_values')
 						],

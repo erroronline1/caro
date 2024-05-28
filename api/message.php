@@ -297,7 +297,7 @@ class MESSAGE extends API {
 			$mailto =  [
 				'href' => 'javascript:void(0)',
 				'data-type' => 'input',
-				'onpointerup' => "messageClient.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
+				'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 			];
 			$groups['name'][$user['name']] = $mailto;
 			if ($user['units'])

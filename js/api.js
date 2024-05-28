@@ -339,14 +339,14 @@ export const api = {
 				}
 				break;
 			case "post":
-				payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
+				payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
 				break;
 			case "put":
 				switch (request[1]) {
 					case "complete":
 						break;
 					default:
-						payload = window.calendarFormData; // as prepared by utility.js calendarClient.createFormData()
+						payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
 				}
 				break;
 			case "delete":
@@ -809,7 +809,7 @@ export const api = {
 									options: data.body.options,
 								}).then((response) => {
 									if (response) {
-										orderClient.performIncorporation(response, data.body.productid);
+										_client.order.performIncorporation(response, data.body.productid);
 									}
 								});
 							}
@@ -826,7 +826,7 @@ export const api = {
 									options: data.body.options,
 								}).then((response) => {
 									if (response) {
-										orderClient.performSampleCheck(response, data.body.productid);
+										_client.order.performSampleCheck(response, data.body.productid);
 									}
 								});
 							}
@@ -840,7 +840,7 @@ export const api = {
 								const body = new Assemble(data.body);
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();
-								if (request[1] === "approved") orderClient.filter();
+								if (request[1] === "approved") _client.order.filter();
 								api.preventDataloss.start();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
@@ -1092,7 +1092,7 @@ export const api = {
 								new Dialog({ type: "input", header: LANG.GET("menu.texttemplate_texts"), body: data.body });
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							if (data.data !== undefined) texttemplateClient.data = data.data;
+							if (data.data !== undefined) _client.texttemplate.data = data.data;
 							if (data.selected !== undefined && data.selected.length) {
 								compose_helper.importTextTemplate(data.selected);
 							}
@@ -1107,7 +1107,7 @@ export const api = {
 								body.processAfterInsertion();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							if (data.data !== undefined) texttemplateClient.data = data.data;
+							if (data.data !== undefined) _client.texttemplate.data = data.data;
 							if (data.selected !== undefined && data.selected.length) {
 								compose_helper.importTextTemplate(data.selected);
 							}
