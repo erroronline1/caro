@@ -311,6 +311,7 @@ class CONSUMABLES extends API {
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				$incorporationform = $this->components('product_incorporation_form');
+				if ($product['trading_good']) array_push($incorporationform, ...$this->components('mdr_sample_check_form'));
 
 				// select all products from selected vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
