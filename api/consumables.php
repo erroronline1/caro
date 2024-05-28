@@ -773,7 +773,7 @@ class CONSUMABLES extends API {
 	 * $this->_payload as genuine form data
 	 */
 	public function product(){
-		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo', 'purchase_assistant'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$product = [
@@ -837,17 +837,18 @@ class CONSUMABLES extends API {
 				// prepare product-array to update, return error if not found
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) && UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
-				$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
-				$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
-				$product['article_unit'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit'));
-				$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
-				$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
-				$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
-				$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
-				$product['protected'] = intval(boolval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')))) ? : $product['protected'];
-				
+				if (!array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])){
+					$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) && UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
+					$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
+					$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
+					$product['article_unit'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit'));
+					$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
+					$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
+					$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
+					$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
+					$product['protected'] = intval(boolval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')))) ? : $product['protected'];
+				}
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
@@ -1127,7 +1128,26 @@ class CONSUMABLES extends API {
 								'name' => LANG::GET('consumables.edit_product_article_ean'),
 								'value' => $product['article_ean'],
 							]
-						], [
+						], 
+					]
+				],
+				'form' => [
+					'data-usecase' => 'purchase',
+					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
+					'data-confirm' => true
+					]];
+				
+				if (array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])){
+					$result['body']['content'][0][2]['attributes']['disabled'] = // add new product
+					$result['body']['content'][2][0]['attributes']['disabled'] = // select vendor
+					$result['body']['content'][2][1]['attributes']['readonly'] = // type vendor
+					$result['body']['content'][2][2]['attributes']['readonly'] = // article number
+					$result['body']['content'][2][3]['attributes']['readonly'] = // article name
+					$result['body']['content'][2][5]['attributes']['readonly'] = // order unit
+					true; 
+				} else {
+					array_push($result['body']['content'][2], [
+						[
 							'type' => 'br'
 						],
 						[
@@ -1142,7 +1162,8 @@ class CONSUMABLES extends API {
 								'name' => '_batchtradinggood'
 							]
 						]
-					], [
+					]);
+					$result['body']['content'][] = [
 						[
 							'type' => 'file',
 							'attributes' => [
@@ -1151,70 +1172,71 @@ class CONSUMABLES extends API {
 							],
 							'hint' => LANG::GET('consumables.edit_product_documents_update_hint')
 						]
-					], [
+					];
+					$result['body']['content'][] = [
 						[
-							'type' => 'radio',
-							'attributes' => [
-								'name' => LANG::GET('consumables.edit_product_active')
-							],
-							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
-							'content' => [
-								LANG::GET('consumables.edit_product_isactive') => $isactive,
-								LANG::GET('consumables.edit_product_isinactive') => $isinactive
-							]
-						], [
-							'type' => 'hiddeninput',
-							'attributes' => [
-								'name' => '_batchactive',
-								'id' => '_batchactive'
-							]
-						] 
-					]
-				],
-				'form' => [
-					'data-usecase' => 'purchase',
-					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
-					'data-confirm' => true
-					]];
-				
-				if (array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])){
-					$result['body']['content'][0][2]['attributes']['disabled'] =
-					$result['body']['content'][2][0]['attributes']['disabled'] =
-					$result['body']['content'][2][1]['attributes']['readonly'] =
-					$result['body']['content'][2][2]['attributes']['readonly'] =
-					$result['body']['content'][2][3]['attributes']['readonly'] =
-					$result['body']['content'][2][5]['attributes']['readonly'] =
-					$result['body']['content'][2][6]['attributes']['readonly'] =
-					$result['body']['content'][3][0]['attributes']['readonly'] = true;
+							[
+								'type' => 'radio',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_product_active')
+								],
+								'hint' => LANG::GET('consumables.edit_product_similar_hint'),
+								'content' => [
+									LANG::GET('consumables.edit_product_isactive') => $isactive,
+									LANG::GET('consumables.edit_product_isinactive') => $isinactive
+								]
+							], [
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => '_batchactive',
+									'id' => '_batchactive'
+								]
+							] 
+						]
+					];
 				}
 
-				if ($documents) $result['body']['content'][3]=[
-					[
+				if ($documents) {
+					if (array_key_exists(3, $result['body']['content']))
+						$result['body']['content'][3] = [
+							[
+								[
+									'type' => 'links',
+									'description' => LANG::GET('consumables.edit_product_documents_download'),
+									'content' => $documents
+								]
+							],
+							$result['body']['content'][3]
+						];
+					else $result['body']['content'][] = [
 						[
-							'type' => 'links',
-							'description' => LANG::GET('consumables.edit_product_documents_download'),
-							'content' => $documents
+							[
+								'type' => 'links',
+								'description' => LANG::GET('consumables.edit_product_documents_download'),
+								'content' => $documents
+							]
 						]
-					],
-					$result['body']['content'][3]
-				];
-				if ($product['incorporated'] !== null) {
+					];
+				}
+				if ($product['incorporated'] !== null ) {
 					array_push($result['body']['content'][2],
 						[
 							'type' => 'text',
 							'description' => ($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
-						], [
-							'type' => 'checkbox',
-							'content' => $revoke,
-							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
-						], [
-							'type' => 'hiddeninput',
-							'attributes' => [
-								'name' => '_batchrevoke',
-								'id' => '_batchrevoke'
+						]);
+					if (!array_intersect(['purchase_assistant'], $_SESSION['user']['permissions']))
+						array_push($result['body']['content'][2], [
+								'type' => 'checkbox',
+								'content' => $revoke,
+								'hint' => LANG::GET('consumables.edit_product_similar_hint'),
+							], [
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'name' => '_batchrevoke',
+									'id' => '_batchrevoke'
+								]
 							]
-						]
-					);
+						);
 				}
 				else {
 					$result['body']['content'][2][] = [
@@ -1222,7 +1244,7 @@ class CONSUMABLES extends API {
 						'description' => LANG::GET('consumables.edit_product_incorporated_not')
 					];
 				}
-				if ($product['id'] && !$product['protected']) array_push($result['body']['content'],
+				if ($product['id'] && !$product['protected'] && !array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])) array_push($result['body']['content'],
 					[
 						[
 							'type' => 'deletebutton',
