@@ -63,8 +63,12 @@ const _serviceWorker = {
 			ordernotif.setAttribute("data-notification", data.unprocessed);
 		}
 		if ("uncompletedevents" in data) {
-			const planningnotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header") + "]");
-			planningnotif.setAttribute("data-notification", data.uncompletedevents);
+			const schedulenotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header") + "]");
+			schedulenotif.setAttribute("data-notification", data.uncompletedevents);
+		}
+		if ("formapproval" in data) {
+			const pendingformapproval = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header") + "]");
+			pendingformapproval.setAttribute("data-notification", data.formapproval);
 		}
 	},
 };

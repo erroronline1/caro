@@ -232,6 +232,45 @@ class APPLICATION extends API {
 			];
 		}
 
+		// unapproved forms and components
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
+		$statement->execute();
+		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement->execute();
+		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$unapproved = 0;
+		$hidden = [];
+		foreach(array_merge($components, $forms) as $element){
+			if ($element['context'] === 'bundle') continue;
+			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($element['context'] . $element['name'], $hidden)){
+				if ((array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval'])
+				|| (array_intersect(['qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval'])
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval'])
+				) $unapproved++;
+				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
+			}
+		}
+		if ($unapproved){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.form('get', 'approval')",
+				],
+				'content' => [
+					[
+						'type' => 'text',
+						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
+						'description' => LANG::GET('menu.forms_manage_approval'),
+						'attributes' => [
+							'data-type' => 'record'
+						]
+					]
+				]
+			];
+		}
+
 		if (count($tiles)) $result['body']['content'][] = $tiles;
 
 		// calendar scheduled events

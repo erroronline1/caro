@@ -11,6 +11,36 @@ class FORMS extends API {
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 * alerts eligible users about forms and components having to be approved
+	 */
+	public function notification(){
+		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
+		// prepare all unapproved elements
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
+		$statement->execute();
+		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+		$statement->execute();
+		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$unapproved = 0;
+		$hidden = [];
+		foreach(array_merge($components, $forms) as $element){
+			if ($element['context'] === 'bundle') continue;
+			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($element['context'] . $element['name'], $hidden)){
+				if ((array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval'])
+				|| (array_intersect(['qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval'])
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval'])
+				) $unapproved++;
+				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
+			}
+		}
+		$this->response([
+			'formapproval' => $unapproved
+		]);
+	}
+
 	public function component_editor(){
 		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$componentdatalist = [];

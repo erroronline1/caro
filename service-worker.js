@@ -1,4 +1,4 @@
-const cacheName = "20240519_0101"; // Change value to force update
+const cacheName = "20240528_0101"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
@@ -38,6 +38,27 @@ addEventListener("message", async (message) => {
 			);
 			if (events) {
 				response["uncompletedevents"] = events.body.uncompletedevents;
+			}
+
+			let formapproval = await fetch("api/api.php/form/notification/", {
+				method: "GET",
+				cache: "no-cache",
+				body: null,
+			}).then(
+				async (response) => {
+					if (response.statusText === "OK")
+						return {
+							status: response.status,
+							body: await response.json(),
+						};
+					else return undefined;
+				},
+				() => {
+					return undefined;
+				}
+			);
+			if (formapproval) {
+				response["formapproval"] = formapproval.body.formapproval;
 			}
 
 			let messages = await fetch("api/api.php/message/notification/", {
@@ -81,7 +102,6 @@ addEventListener("message", async (message) => {
 			if (orders) {
 				response["unprocessed"] = orders.body.unprocessed;
 			}
-
 			if (Object.keys(response).length !== 0) client.postMessage(response);
 			break;
 	}
