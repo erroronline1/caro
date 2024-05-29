@@ -142,6 +142,7 @@ const _client = {
 				},
 			];
 			if (datalist.length) {
+				if (typeof datalist === 'string') datalist = datalist.split(',');
 				body[0].type = "textinput";
 				body[0].attributes.list = "rcptlist";
 				body.push({
