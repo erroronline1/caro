@@ -38,6 +38,7 @@
 * permission prrc
 * sample check pending state? approve by elevated users
 * more detailed module descriptions in readme
+* set permissions for modules and methods within ini
 
 #### purchase considerations
 * order only assigned units selecteable?
