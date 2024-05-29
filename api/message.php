@@ -106,42 +106,9 @@ class MESSAGE extends API {
 							],
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
-								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('message.forward') ."', body: JSON.parse('" . 
-									json_encode(
-											[
-												[
-													'type' => 'datalist',
-													'content' => $datalist,
-													'attributes' => [
-														'id' => 'users'
-													]
-												],
-												[
-													'type' => 'textinput',
-													'attributes' => [
-														'name' => LANG::GET('message.to'),
-														'required' => true,
-														'list' => 'users',
-													]
-												],
-												[
-													'type' => 'textarea',
-													'attributes' => [
-														'name' => LANG::GET('message.message'),
-														'value' => preg_replace(["/\r/","/\n/"], ["\\r", "\\n"], LANG::GET('message.forward_message', [':message' => $conversation['message'], ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])),
-														'rows' => 8
-													]
-												]
-											]
-									 ) . "'), options:{".
-									"'".LANG::GET('order.add_information_cancel')."': false,".
-									"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(response => {if (response[LANG.GET('message.message')]) {".
-										"const formdata = new FormData();".
-										"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
-										"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
-										"api.message('post', 'message', formdata)}})"
-
+								'onpointerup' => "_client.message.newMessage('". LANG::GET('message.forward') ."', '', '" . 
+									preg_replace(["/\r/","/\n/"], ["\\r", "\\n"], LANG::GET('message.forward_message', [':message' => $conversation['message'], ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
+									"', {}, '" . implode(',', $datalist). "')"
 							]
 						];
 					}
@@ -189,40 +156,7 @@ class MESSAGE extends API {
 							'attributes' => [
 								'value' => LANG::GET('message.new'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('message.new') ."', body: JSON.parse('" . 
-									json_encode(
-											[
-												[
-													'type' => 'datalist',
-													'content' => $datalist,
-													'attributes' => [
-														'id' => 'users'
-													]
-												],
-												[
-													'type' => 'textinput',
-													'attributes' => [
-														'name' => LANG::GET('message.to'),
-														'required' => true,
-														'list' => 'users',
-													]
-												],
-												[
-													'type' => 'textarea',
-													'attributes' => [
-														'name' => LANG::GET('message.message'),
-														'rows' => 8
-													]
-												]
-											]
-									 ) . "'), options:{".
-									"'".LANG::GET('order.add_information_cancel')."': false,".
-									"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(response => {if (response[LANG.GET('message.message')]) {".
-										"const formdata = new FormData();".
-										"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
-										"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
-										"api.message('post', 'message', formdata)}})"
+								'onpointerup' => "_client.message.newMessage('". LANG::GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
 							]
 						]
 					];

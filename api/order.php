@@ -1193,32 +1193,13 @@ class ORDER extends API {
 					$content[] = [
 						'type' => 'links',
 						'content' => [
-							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'input', 'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', body: JSON.parse('" . 
-								json_encode(
-										[
-											[
-												'type' => 'hiddeninput',
-												'attributes' => [
-													'name' => LANG::GET('message.to'),
-													'value' => $messageorderer
-												]
-											], [
-												'type' => 'textarea',
-												'attributes' => [
-													'name' => LANG::GET('message.message'),
-													'value' => LANG::GET('order.message', $messagepayload),
-													'rows' => 8
-												]
-											]
-										]
-								 ) . "'), options:{".
+							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'input', 'onpointerup' => "
+							_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', '" . 
+							$messageorderer . "', '" . 
+							LANG::GET('order.message', $messagepayload) . "', {".
 								"'".LANG::GET('order.add_information_cancel')."': false,".
 								"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(response => {if (response[LANG.GET('message.message')]) {".
-									"const formdata = new FormData();".
-									"formdata.append('" . LANG::GET('message.to') . "', response[LANG.GET('message.to')]);".
-									"formdata.append('" . LANG::GET('message.message') . "', response[LANG.GET('message.message')]);".
-									"api.message('post', 'message', formdata)}})"]
+								"})"]
 						]
 					];
 					$content[] = $copy;
