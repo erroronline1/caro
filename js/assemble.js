@@ -264,8 +264,15 @@ export class Dialog {
 	}
 	select() {
 		const buttons = document.createElement("div");
-		let button;
+		let button, firststring, optgroup;
 		for (const [option, value] of Object.entries(this.options)) {
+			if (firststring !== option.substring(0,1)){
+				firststring = option.substring(0,1);
+				optgroup = document.createElement('h2');
+				optgroup.classList.add('modaloptgroup');
+				optgroup.append(document.createTextNode(firststring));
+				buttons.append(optgroup);
+			}
 			button = document.createElement("button");
 			button.classList.add("discreetButton");
 			button.append(document.createTextNode(option));

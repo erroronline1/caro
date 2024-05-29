@@ -562,6 +562,11 @@ button {
 	}
 }
 
+.modaloptgroup{
+	font-family: inherit;
+	text-align: center;
+}
+
 /* Large devices such as laptops (1024px and up) */
 @media only screen and (min-width: 64em) {
 	button {
