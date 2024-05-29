@@ -169,7 +169,7 @@ class CALENDARUTILITY {
 		// prepare lists and datetime types for modification 
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
-			$units[$description] = in_array($unit, explode(',', $columns[':organizational_unit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
+			$units[$description] = (in_array($unit, explode(',', $columns[':organizational_unit'])) || (!$columns[':organizational_unit'] && array_key_exists('primaryUnit', $_SESSION['user']['app_settings']) && $unit === $_SESSION['user']['app_settings']['primaryUnit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
 
 		$affected_users = $affected_unit_users = [];
