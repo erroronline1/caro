@@ -13,11 +13,12 @@ class TOOL extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	public function code(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$types=[
 			'qrcode_text' => ['name' => LANG::GET('tool.qrcode_text'),
 				'content'=> [
@@ -160,7 +161,6 @@ class TOOL extends API {
 	}
 
 	public function scanner(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body']=['content' => [
 			[
 				['type' => 'scanner',
@@ -180,7 +180,6 @@ class TOOL extends API {
 	}
 	
 	public function stlviewer(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
 		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 		foreach ($folders as $folder) {

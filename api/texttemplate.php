@@ -8,12 +8,14 @@ class TEXTTEMPLATE extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_modal = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
 	public function chunk(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$chunk = [
@@ -256,7 +258,7 @@ class TEXTTEMPLATE extends API {
 	}
 
 	public function template(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$template = [
@@ -497,7 +499,6 @@ class TEXTTEMPLATE extends API {
 	}
 
 	public function text(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
 
 		// get selected template

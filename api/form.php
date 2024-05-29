@@ -8,6 +8,8 @@ class FORMS extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
@@ -15,7 +17,6 @@ class FORMS extends API {
 	 * alerts eligible users about forms and components having to be approved
 	 */
 	public function notification(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		// prepare all unapproved elements
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
@@ -30,8 +31,8 @@ class FORMS extends API {
 			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($element['context'] . $element['name'], $hidden)){
 				if ((array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval'])
-				|| (array_intersect(['qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval'])
-				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval'])
+				|| (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval'])
+				|| (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval'])
 				) $unapproved++;
 				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 			}
@@ -42,7 +43,7 @@ class FORMS extends API {
 	}
 
 	public function component_editor(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
 		$componentdatalist = [];
 		$options = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$alloptions = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
@@ -250,7 +251,7 @@ class FORMS extends API {
 	}
 
 	public function component(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$component = json_decode($this->_payload->composedComponent, true);
@@ -398,7 +399,7 @@ class FORMS extends API {
 	}
 
 	public function form_editor(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
 		$formdatalist = $componentdatalist = [];
 		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$alloptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
@@ -631,7 +632,7 @@ class FORMS extends API {
 	}
 
 	public function form(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 
@@ -750,7 +751,7 @@ class FORMS extends API {
 	}
 
 	public function approval(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!(array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions']))) $this->response([], 401); // hardcoded for database structure
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approveas = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.approve_as_select'));
@@ -937,7 +938,7 @@ class FORMS extends API {
 	}
 
 	public function bundle(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_content'))) $content = implode(',', preg_split('/[\n\r]{1,}/', $content));

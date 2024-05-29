@@ -103,43 +103,33 @@ class APPLICATION extends API {
 				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"]
 			],
 		];
-		if (array_intersect(['user'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
-		}
-		if (array_intersect(['user'], $_SESSION['user']['permissions']) && array_key_exists('weeklyhours', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours']){
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && array_key_exists('weeklyhours', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'])
 			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
-		}
 
-		if (array_intersect(['admin', 'office', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
-		}
-		if (array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+		if ($this->permissionFor('files')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
+		if ($this->permissionFor('externaldocuments')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
+		if ($this->permissionFor('formcomposer')){
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_bundles')] = ['onpointerup' => "api.form('get', 'bundle')"];
-			$menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
-			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
+		}
+		if ($this->permissionFor('filebundles')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
+		if ($this->permissionFor('users')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
+		if ($this->permissionFor('texttemplates')) {
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
-			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
 		}
-		if (array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
-		}
-		if (array_intersect(['admin', 'purchase_assistant', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['onpointerup' => "api.purchase('get', 'product')"];
-		}
-		if (array_intersect(['admin', 'office', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
-		}
+		if ($this->permissionFor('audits')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
+		if ($this->permissionFor('vendors')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
+		if ($this->permissionFor('products')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['onpointerup' => "api.purchase('get', 'product')"];
+		if ($this->permissionFor('csvfilter')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
 		if (array_intersect(['admin', 'supervisor', 'qmo', 'ceo'], $_SESSION['user']['permissions'])){
 			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
 		}
-		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
-			$menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
-		}
+		if ($this->permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
+		if ($this->permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
+
 		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
 	}
 
@@ -184,7 +174,7 @@ class APPLICATION extends API {
 		}
 
 		// unprocessed orders
-		if (array_intersect(['purchase'], $_SESSION['user']['permissions'])){
+		if ($this->permissionFor('orderprocessing')){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
 			$statement->execute();
 			$unprocessed = $statement->fetch(PDO::FETCH_ASSOC);
@@ -344,7 +334,7 @@ class APPLICATION extends API {
 	 * respond with form to add or edit manual entries 
 	 */
 	public function manual(){
-		if (!(array_intersect(['admin'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('appmanual')) $this->response([], 401);
 		$result = [
 			'user' => $_SESSION['user']['name'],
 			'body' => ['content' => []]

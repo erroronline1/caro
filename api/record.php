@@ -14,12 +14,13 @@ class record extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_passedIdentify = $this->_formExport = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
 	}
 
 	public function identifier(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content=UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'))) $content .= ' ' . date('Y-m-d H:i');
@@ -72,7 +73,6 @@ class record extends API {
 	}
 
 	public function formfilter(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -94,7 +94,6 @@ class record extends API {
 	}
 
 	public function recordfilter(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
 		$statement->execute();
 		$records = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -110,7 +109,6 @@ class record extends API {
 	}
 
 	public function forms(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$formdatalist = $forms = [];
 		$return = [];
 
@@ -166,8 +164,6 @@ class record extends API {
 	}
 
 	public function form(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-
 		// prepare existing forms lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
 		$statement->execute([
@@ -240,8 +236,7 @@ class record extends API {
 				]
 			]
 		];
-		$exportpermissions = ['admin', 'supervisor', 'ceo', 'qmo'];
-		if (array_intersect($exportpermissions, $_SESSION['user']['permissions'])){
+		if ($this->permissionFor('formexport')){
 			$return['body']['content'][]= [
 				[
 					'type' => 'button',
@@ -258,7 +253,7 @@ class record extends API {
 			$return['body']['content'][]= [
 				[
 					'type' => 'text',
-					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], $exportpermissions))])
+					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], $this->permissionFor('formexport', true)))])
 				]
 			];
 		}
@@ -268,7 +263,6 @@ class record extends API {
 	}
 
 	public function matchbundles(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$forms = [];
 		$return = [];
 
@@ -318,7 +312,6 @@ class record extends API {
 	}
 
 	public function record(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$context = $form_name = $form_id = null;
@@ -434,7 +427,7 @@ class record extends API {
 		
 				$return['body']['content'] = $body;
 
-				if (array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
 					// simple groups are not allowed to append to form
 					$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
 					// match against bundles
@@ -473,7 +466,7 @@ class record extends API {
 							]
 						]
 					];
-					if (array_intersect(['supervisor', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']) && !$content['closed']){
+					if ($this->permissionFor('recordsclosing') && !$content['closed']){
 						array_unshift($return['body']['content'][count($return['body']['content']) - 1], [
 							'type' => 'button',
 							'attributes' => [
@@ -494,7 +487,7 @@ class record extends API {
 	}
 
 	public function close(){
-		if (!array_intersect(['supervisor', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])) $this->response([], 401);
+		if (!$this->permissionFor('recordsclosing')) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_close'));
 		$statement->execute([
 			':identifier' => $this->_requestedID
@@ -508,7 +501,6 @@ class record extends API {
 	}
 
 	public function import(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
 		$statement->execute([
 			':identifier' => $this->_payload->IDENTIFY_BY_
@@ -534,7 +526,6 @@ class record extends API {
 	}
 
 	public function records(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$return = ['body' => ['content' => []]];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
 		$statement->execute();
@@ -628,17 +619,14 @@ class record extends API {
 	}
 
 	public function fullexport(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$this->export('full');
 	}
 
 	public function simplifiedexport(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$this->export('simplified');
 	}
 
 	public function formexport(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$this->export('form');
 	}
 
@@ -663,7 +651,7 @@ class record extends API {
 	}
 
 	public function exportform(){
-		if (!(array_intersect(['admin', 'supervisor', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('formexport')) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 		$statement->execute([
 			':id' => $this->_requestedID

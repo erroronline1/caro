@@ -10,6 +10,7 @@
     * [Data integrity](#data-integrity)
 * [Regulatory fulfillment suggestions](#regulatory-fulfillment-suggestions)
     * [Tips](#tips)
+    * [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
     * [Conversations](#conversations)
@@ -21,7 +22,6 @@
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
     * [Tools](#tools)
-* [User management](#user-management)
 * [CSV processor](#csv-processor)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -34,11 +34,9 @@
 
 # development
 * offline indicator
-* revise permissions within code, don't rely on avaialbility within menu
 * permission prrc
-* sample check pending state? approve by elevated users
+* sample check pending state? approve by defined user permissions
 * more detailed module descriptions in readme
-* set permissions for modules and methods within ini
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -78,11 +76,11 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
-    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to admin, CEO and quality management officers  (QMO) only.
+    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined user permissions only.
     * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and CEO. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
-    * Forms can be exported blank by elevated users including supervisors to limit distribution of outdated versions.
+    * Forms can be exported blank by defined user permissions to limit distribution of outdated versions.
     * External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting.
     * also see [forms](#forms), [files](#files)
 * ISO 13485 4.2.5 Record control
@@ -93,9 +91,10 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * also see [user management](#user-management), [records](#records)
 * ISO 13485 5.5.1 Responsibility and authority
     * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items.
+    * Permissions define access to app functions.
     * Users can be assigned a pin to approve orders.
-    * A user register summarizes all users, also grouped by oranizational unit and permission
-    * also see [user management](#user-management), [conversations](#conversations)
+    * A user register summarizes all users, also grouped by organizational unit and permission
+    * also see [user management](#user-management), [conversations](#conversations), [runtime variables](#runtime-variables)
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
@@ -120,7 +119,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * a sample check has been made
         * any document to the product has been provided
         * an alias has been modified
-    * Vendor and product editing is permitted by elevated users including purchase only.
+    * Vendor and product editing is permitted by defined user permissions only.
     * also see [vendor and product management](#vendor-and-product-management), [order](#order)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
@@ -169,7 +168,7 @@ Main goal is a distribution of mobile devices to the whole staff or at least key
 For technical details see [prerequisites](#prerequisites). 
 
 ### What it is not
-Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes and documents for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues.
+Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default setting.*
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
@@ -222,10 +221,50 @@ Beside the apps architecture you will still have to set up your quality manageme
 
 [Content](#content)
 
+#### User management
+The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible. These can be set and modified within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
+
+Some permissions are default set though:
+
+* User
+    * can only see orders for own assigned organizational units
+    * can export own timesheet
+* Group
+    * can **NEVER** add records due to limited identification data
+    * can place orders, but will be prompted to identify themself
+    * can only see orders for own assigned organizational units
+    * can **NEVER** incorporate and sample check due to limited identification data
+    * can **NEVER** contribute to timesheets
+* Supervisor
+    * can approve forms and components
+    * can export all timesheets of assigned unit members
+    * can edit, delete and close scheduled events and timesheet entries of assigned units and unit members
+* Office
+* Human Ressources
+    * can export all timesheets
+* Purchase
+    * can see all orders
+* Purchase assistant
+* Quality management officer
+    * can approve forms and components
+* CEO
+    * can approve forms and components
+    * can export all timesheets
+* Application admin
+    * **full access**
+    * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
+    * assign only to trusted staff members, preferably administative members
+
+Users can have multiple assigned organizational units and permissions.
+
+Form approval is necessary by CEO, QMO and supervisors due to the database structure and because it makes sense in the regulatory context. However if you feel like it, assign multiple permissions to one person. This person can grant approval checking multiple respective roles.
+
+[Content](#content)
+
 ## Modules
 
 ### Users
-Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to elevated users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
+Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to defined user permissions only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
@@ -344,7 +383,7 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to elevated users to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to defined user permissions to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -450,7 +489,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#content)
 
 ### Calendar
-Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to elevated users including supervisors only.
+Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined user permissions only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -460,7 +499,7 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor, ceo and human ressources only. Human ressources is allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors and ceo only.
+Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined user permissions only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined user permissions for full access only.
 
 This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly.
 
@@ -603,7 +642,7 @@ graph TD;
 The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up.
 
-Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin or elevated users including supervisors.
+Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
 
 Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
 
@@ -704,66 +743,6 @@ The audit module gathers data from the application in regards of proofing lists 
 * regulatory issues
 
 ![audit screenshot](assets/audit.png)
-
-[Content](#content)
-
-### User management
-The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions:
-* User
-    * has access to all non writeable content
-    * can access forms and add records
-    * can contribute to open sharepoint
-    * can place orders
-    * can only see orders for own assigned organizational units
-    * can incorporate and sample check articles
-    * can contribute to schedules and timesheets
-    * can export own timesheet
-* Group
-    * has access to all non writeable content
-    * can **not** add records due to limited identification data
-    * can contribute to open sharepoint
-    * can place orders, will be prompted to identify themself
-    * can only see orders for own assigned organizational units
-    * can **not** incorporate and sample check due to limited identification data
-    * can contribute to schedules
-    * can **not** contribute to timesheets
-* Supervisor
-    * can approve form components and forms
-    * can add timesheet entries for users of own assigned units, change closure state
-    * can export all timesheets of assigned unit members
-* Office
-    * can contribute to file manager
-    * can access CSV-filter
-* Human Ressources
-    * can add timesheet entries for other users
-    * can export all timesheets
-* Purchase
-    * has full access to vendor and product management
-    * can see all orders
-* Purchase assistant
-    * has limited access to product management, can modify alias
-* Quality management officer
-    * can approve form components and forms
-    * can add CSV filters
-    * can manage users
-* CEO
-    * Supervisor +
-    * can approve components and forms
-    * can add CSV filters
-    * can manage users
-    * can export all timesheets
-* Application admin
-    * **full access**
-    * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
-    * assign only to trusted staff members, preferably administative members
-
-Permissions of QMO and CEO do hardly differ, but are necessary being assigned to have a reliable alert on submission of a new form.
-
-Users can have multiple assigned organizational units.
-
-On registering a new user a default profile picture is generated. Custom set pictures can not be deleted, only overwritten.
-
-Adding files is granted to elevated users only, to make sure certificates are acknowledged.
 
 [Content](#content)
 
@@ -1093,20 +1072,6 @@ language = "en" ; en, de, etc. according to available language.xx.ini files
 ; timezone for calendar handling
 timezone = "Europe/Berlin"
 
-[lifespan]
-sharepoint = 48 ; HOURS, after these files will be deleted
-tmp = 24 ; HOURS, after these files will be deleted
-order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
-
-[splitresults]
-bundle_files_per_slide = 12
-products_per_slide = 6
-
-[limits]
-max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-mdr14_sample_interval = 365 ; days until a new sample check is required
-mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
-
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
 ; comment out if any of these holidays don't apply
@@ -1125,7 +1090,14 @@ default_due = 7 ; scheduled events are due in x days by default
 hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
 ; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.xx.ini to adhere to your company policies regarding data safety
 
-; forbidden names as regex-patterns
+; default values for csv processing if left out of filter rules
+[csv]
+headerrowindex = 0
+dialect["separator"] = ";"
+dialect["enclosure"] = "\"" ; coding environments may mess up colouring after this escaped quote
+dialect["escape"] = ""
+
+;"forbidden names as regex-patterns
 [forbidden]
 names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whitespace, decimals, special characters 
 names[] = "^.{0,3}$" ; less than 4 characters
@@ -1134,12 +1106,51 @@ names[] = "^.{0,3}$" ; less than 4 characters
 names[] = "IDENTIFY_BY_" ; special substrings |-separated
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
 
+[lifespan]
+sharepoint =  48 ; HOURS, after these files will be deleted
+tmp =  24 ; HOURS, after these files will be deleted
+order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+
 ; probability factor for similarity of texts in percent
 [likeliness]
 consumables_article_no_similarity = 70 ; percent
 file_search_similarity = 50 ; percent
 records_search_similarity = 20 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
+
+[limits]
+max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
+mdr14_sample_interval = 365 ; days until a new sample check is required
+mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
+
+; permissions based of and matching languages.xx.ini permissions
+; dynamic handling for modules and methods
+; admin by default
+[permissions]
+appmanual = "qmo" ; contribute to and edit application manual
+audits = "ceo, qmo" ; access audits
+calendaredit = "ceo, qmo, supervisor" ; edit, delete ot complete events and entries
+calendarfullaccess = "ceo" ; edit, delete ot complete events and entries 
+calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreight timesheet entries
+csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
+csvrules = "qmo" ; add csv filter
+externaldocuments = "office, ceo, qmo" ; upload and manage external documents
+filebundles = "ceo, qmo" ; create file bundles
+files = "office, ceo, qmo" ; upload and delete files
+formcomposer = "ceo, qmo" ; compose forms
+formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
+incorporation = "ceo, qmo, user" ; incorporate products
+mdrsamplecheck = "ceo, qmo, user" ; perform the mdr §14 sample check
+orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
+ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
+orderdisplayall = "purchase" ; display all orders by default, not only for own units
+orderprocessing = "purchase"; process orders
+products = "ceo, qmo, purchase, purchase_assistant" ; add and edit products
+productslimited = "purchase_assistant" ; limited editing of products 
+recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
+texttemplates = "ceo, qmo" ; add and edit text templates
+users = "ceo, qmo" ; add and edit application users
+vendors = "ceo, qmo, purchase" ; add and edit vendors
 
 ; page settings for pdf
 [pdf]
@@ -1155,12 +1166,9 @@ record[marginbottom] = 15 ; in points
 record[marginleft] = 20 ; in points
 exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
 
-; default values for csv processing if left out of filter rules
-[csv]
-headerrowindex = 0
-dialect["separator"] = ";"
-dialect["enclosure"] = "\""
-dialect["escape"] = ""
+[splitresults]
+bundle_files_per_slide = 12
+products_per_slide = 6
 ```
 
 #### Useage notes and caveats

@@ -18,6 +18,8 @@ class AUDIT extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
+		if (!$this->permissionFor('audits')) $this->response([], 401);
+
 		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
@@ -27,7 +29,6 @@ class AUDIT extends API {
 	 * calls $this->_requestedType method if set
 	 */
 	public function checks(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
 		$result['body'] = ['content' => []];
 		$selecttypes = [];
 		
@@ -183,8 +184,6 @@ class AUDIT extends API {
 	 * if check type within caro_checks database
 	 */
 	public function exportchecks(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
 		$statement->execute([':type' => $this->_requestedType]);
 		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -396,8 +395,6 @@ class AUDIT extends API {
 	 * processes the result of $this->forms() and translates the body object into more simple strings
 	 */
 	public function exportforms(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -491,8 +488,6 @@ class AUDIT extends API {
 	 * processes the result of $this->vendors() and translates the body object into more simple strings
 	 */
 	public function exportvendors(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.vendors') . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -590,8 +585,6 @@ class AUDIT extends API {
 	 * processes the result of $this->regulatory() and translates the body object into more simple strings
 	 */
 	public function exportregulatory(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
-
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.regulatory') . '_' . date('Y-m-d H:i')),
 			'identifier' => null,

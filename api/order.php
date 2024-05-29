@@ -10,15 +10,16 @@ class ORDER extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 		$this->_borrowedModule = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	public function notification(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$unprocessed = ['num' => 0];
-		if (array_intersect(['purchase'], $_SESSION['user']['permissions'])){
+		if ($this->permissionFor('orderprocessing')){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
 			$statement->execute([
 			]);
@@ -30,7 +31,6 @@ class ORDER extends API {
 	}
 
 	public function prepared(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approval = false;
@@ -90,7 +90,7 @@ class ORDER extends API {
 				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
 				// display all orders assigned to organizational unit
 				if ($this->_requestedID) $units = [$this->_requestedID]; // see orders from selected unit
-				elseif (array_intersect(['admin'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				elseif ($this->permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // see only orders for own units
 
 				$organizational_orders = [];
@@ -177,7 +177,7 @@ class ORDER extends API {
 							]);		
 						}
 					}
-					if ((array_intersect(['admin', 'purchase', 'supervisor'], $_SESSION['user']['permissions']) || $_SESSION['user']['orderauth']) && count($organizational_orders)) {
+					if ($_SESSION['user']['orderauth'] && count($organizational_orders)) {
 						array_push($result['body']['content'], [
 							[
 								['type' => 'signature',
@@ -204,7 +204,6 @@ class ORDER extends API {
 
 	public function productsearch(){
 		// order to be taken into account in utility.js _client.order.addProduct() method and this->order() method as well!
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				$result = ['body'=>[]];
@@ -277,8 +276,7 @@ class ORDER extends API {
 	}
 
 	public function filter(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+		if ($this->permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 		else $units = $_SESSION['user']['units']; // display only orders for own units
 
 		// in clause doesnt work without manually preparing
@@ -412,7 +410,6 @@ class ORDER extends API {
 	}
 
 	public function order(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$processedOrderData = $this->processOrderForm();
@@ -640,7 +637,7 @@ class ORDER extends API {
 						]
 					],
 				]];
-				if (!array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
 					array_splice($result['body']['content'][2], 1, 0, [[
 							'type' => 'textinput',
 							'hint' => LANG::GET('order.orderer_group_hint'),
@@ -793,7 +790,6 @@ class ORDER extends API {
 	}
 
 	public function approved(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
@@ -1008,7 +1004,7 @@ class ORDER extends API {
 						['type' => 'filter']
 					]
 				]]];
-				if (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				if ($this->permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
 				// get unincorporated
@@ -1098,7 +1094,7 @@ class ORDER extends API {
 						else {
 							if ( 
 								(in_array($s, ['received', 'archived']) && (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)))
-								|| (in_array($s, ['ordered']) && (array_intersect(['admin', 'purchase'], $_SESSION['user']['permissions'])))
+								|| (in_array($s, ['ordered']) && $this->permissionFor('orderprocessing'))
 							) $status[LANG::GET('order.' . $s)] = [
 								'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.setAttribute('data-".$s."', 'true');",
 								'data-'.$s => 'false'
@@ -1127,7 +1123,7 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['ordered'] && !$row['received'] && (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units))) $status[LANG::GET('order.cancellation')]=[
+					if ($row['ordered'] && !$row['received'] && ($this->permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $units))) $status[LANG::GET('order.cancellation')]=[
 						'data_cancellation' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', body:JSON.parse('" . 
 							json_encode(
@@ -1145,7 +1141,7 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['received'] && $row['ordertype'] === 'order' && (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units))) $status[LANG::GET('order.return')]=[
+					if ($row['received'] && $row['ordertype'] === 'order' && ($this->permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $units))) $status[LANG::GET('order.return')]=[
 						'data_return' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', body:JSON.parse('" . 
 							json_encode(
@@ -1216,7 +1212,7 @@ class ORDER extends API {
 						];
 					}
 
-					if (array_intersect(['admin', 'ceo', 'purchase'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)) $content[]=[
+					if ($this->permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units)) $content[]=[
 						'type' => 'button',
 						'attributes' => [
 							'value' => LANG::GET('order.add_information'),
@@ -1249,7 +1245,7 @@ class ORDER extends API {
 					}
 
 					// add statechange if applicable
-					if ($row['ordered'] && !$row['received'] && (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units))) {
+					if ($row['ordered'] && !$row['received'] && ($this->permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) {
 						$content[] = [
 							'type' => 'select',
 							'content' => $statechange,
@@ -1279,7 +1275,7 @@ class ORDER extends API {
 					// request incorporation
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							if (array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+							if ($this->permissionFor('incorporation')){
 								$content[] = [
 									'type' => 'button',
 									'attributes' => [
@@ -1301,7 +1297,7 @@ class ORDER extends API {
 					// request MDR §14 sample check
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							if (array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions'])){
+							if ($this->permissionFor('mdrsamplecheck')){
 									$content[] = [
 									'type' => 'button',
 									'attributes' => [
@@ -1320,8 +1316,8 @@ class ORDER extends API {
 						}
 					}
 
-					// delete order button if permitted
-					if (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)) {
+					// delete order button if authorized
+					if ($this->permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $units)) {
 						$content[] = [
 							'type' => 'deletebutton',
 							'hint' => $autodelete,

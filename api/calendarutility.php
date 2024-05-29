@@ -268,7 +268,7 @@ class CALENDARUTILITY {
 
 				$inputs = [];
 
-				if (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])){
+				if (array_intersect(preg_split('/\W+/', INI['permissions']['calendaraddforeigntimesheet']), $_SESSION['user']['permissions'])){
 					$inputs[] = [
 						'type' => 'select',
 						'content' => $affected_users,

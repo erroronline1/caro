@@ -15,6 +15,8 @@ class CALENDAR extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedTimespan = $this->_requestedId = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_requestedDate = $this->_requestedComplete = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 		$this->_requestedCalendarType = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
@@ -27,7 +29,6 @@ class CALENDAR extends API {
 	 * responds with events or empty message
 	 */
 	public function search(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		if (!$this->_requestedId) $this->calendar();
 		$result = ['body' => ['content' => [
 			[
@@ -64,9 +65,8 @@ class CALENDAR extends API {
 	 * $this->_requestedId string with eventually comma separated integers
 	 */
 	public function complete(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		if ($this->_requestedCalendarType === 'timesheet'
-			&& !(array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
+			&& !($this->permissionFor('calendarfullaccess')
 			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
 			&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
 		$response = [
@@ -147,7 +147,6 @@ class CALENDAR extends API {
 	 * used by service worker
 	 */
 	public function notification (){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
 		$uncompleted = 0;
@@ -206,7 +205,7 @@ class CALENDAR extends API {
 					],					
 				]
 			];
-			if (array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) {
+			if ($this->permissionFor('calendaredit')) {
 				$columns = [
 					':id' => $row['id'],
 					':type' => 'schedule',
@@ -254,7 +253,6 @@ class CALENDAR extends API {
 	 * responds with render data for assemble.js
 	 */
 	public function schedule(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -291,7 +289,7 @@ class CALENDAR extends API {
 					]]);
 				break;
 			case 'PUT':
-				if (!array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) $this->response([], 401);
+				if (!$this->permissionFor('calendaredit')) $this->response([], 401);
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
@@ -442,7 +440,7 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'DELETE':
-				if (!array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions'])) $this->response([], 401);
+				if (!$this->permissionFor('calendaredit')) $this->response([], 401);
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
@@ -473,7 +471,7 @@ class CALENDAR extends API {
 			$due = new DateTime($row['span_end'], new DateTimeZone(INI['timezone']));
 			if ($row['type'] !== 'timesheet'
 				|| !($row['affected_user_id'] === $_SESSION['user']['id']
-				|| array_intersect(['humanressources', 'admin', 'ceo'], $_SESSION['user']['permissions'])
+				|| $this->permissionFor('calendarfulltimesheetexport')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
 				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
 			)) continue;
@@ -516,7 +514,7 @@ class CALENDAR extends API {
 			 * admin, ceo and supervisor of assigned unit
 			 */
 			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
-			if (!(array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
+			if (!($this->permissionFor('calendarfullaccess')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
 				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))))
 				$completed[LANG::GET('calendar.timesheet_approve')]['disabled'] = true;
@@ -584,7 +582,6 @@ class CALENDAR extends API {
 	 * responds with render data for assemble.js
 	 */
 	public function timesheet(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -740,7 +737,7 @@ class CALENDAR extends API {
 							&& array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 						if ($row['type'] === 'timesheet'
 							&& !$row['closed']
-							&& (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions'])
+							&& ($this->permissionFor('calendarfullaccess')
 							|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])))
 							) $bulkapproval[] = $row['id'];
 					}
@@ -755,10 +752,10 @@ class CALENDAR extends API {
 					];
 					$displayedEvents = [];
 					if ($thisDaysEvents) $displayedEvents = $this->timesheetEntries($thisDaysEvents, $calendar);
-					// avoid multiple entries by non elevated users
+					// avoid multiple entries by non authorized users
 					if (!$displayedEvents
-						|| (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])
-						|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])))){
+						|| $this->permissionFor('calendarfulltimesheetexport')
+						|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))){
 						$events[] = [
 							'type' => 'calendarbutton',
 							'attributes' => [
@@ -812,7 +809,7 @@ class CALENDAR extends API {
 				break;
 			case 'DELETE':
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
-				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed']))
+					($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed']))
 				) $this->response([], 401);
 
 				if ($calendar->delete($this->_requestedId)) $this->response([
@@ -837,7 +834,6 @@ class CALENDAR extends API {
 	 * gathers all the entries though, supposed to be filtered by different methods 
 	 */
 	public function monthlyTimesheets(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$calendar->days('month', $this->_requestedTimespan);
 		$holidays = $calendar->holidays(substr($this->_requestedTimespan, 0, 4));
@@ -1002,7 +998,7 @@ class CALENDAR extends API {
 		$result = [];
 		foreach($timesheets as $user){
 			$rows = [];
-			if (array_intersect(['admin', 'ceo', 'humanressources'], $_SESSION['user']['permissions'])
+			if ($this->permissionFor('calendarfulltimesheetexport')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
 				|| $id === $_SESSION['user']['id']
 			){

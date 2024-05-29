@@ -32,8 +32,7 @@ class API {
 	 * no parameters, no response
 	 */
 	public function __construct(){
-		//$payload = new PAYLOAD;
-		$this->_payload = UTILITY::parsePayload();//(object) $payload->_payload;
+		$this->_payload = UTILITY::parsePayload();
 		
 		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password']);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
@@ -134,7 +133,7 @@ class API {
 	/**
 	 * posts a system message to a user group
 	 * @param array $group 'permission'=>[] ||&& 'unit'=>[] reach out for permission holders or unit member or permission holders within units
-	 * @param str $message actual message content
+	 * @param string $message actual message content
 	 * no return
 	 * 
 	 * if permission and unit are both set only permission holders within units get the message! 
@@ -175,7 +174,7 @@ class API {
 
 	/**
 	 * returns a default content for lack of database entries
-	 * @param str $type type of requested but mission content
+	 * @param string $type type of requested but mission content
 	 * @return array assemble object
 	 */
 	public function noContentAvailable($type){
@@ -185,6 +184,22 @@ class API {
 		]];
 	}
 
+	/**
+	 * retuns a boolean if user is authorized for requested app-function, array of permissions if $values argument is true
+	 * @param string $function as defined within setup.ini
+	 * @param bool $values
+	 * @return bool|array
+	 */
+	public function permissionFor($function, $values = false){
+		if (array_key_exists($function, INI['permissions'])){
+			if (!$values) {
+				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
+				return boolval(array_intersect(['admin', ...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
+			}
+			return preg_split('/\W+/', INI['permissions'][$function]);
+		}
+		$this->response(['error' => 'permission ' . $function . ' not found in setup.ini file'], 501);
+	}
 }
 
 if (in_array(REQUEST[0], ['application', 'form', 'user', 'consumables', 'order', 'message', 'file', 'tool', 'texttemplate', 'csvfilter', 'record', 'audit', 'calendar'])) require_once(REQUEST[0] . '.php');

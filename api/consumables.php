@@ -41,6 +41,8 @@ class CONSUMABLES extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
@@ -185,7 +187,7 @@ class CONSUMABLES extends API {
 	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
 	 */
 	public function mdrsamplecheck(){
-		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('mdrsamplecheck')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
@@ -257,7 +259,7 @@ class CONSUMABLES extends API {
 	 * incorporation denial is detected by pattern matching LANG::GET('order.incorporation_denied')
 	 */
 	public function incorporation(){
-		if (!(array_intersect(['user', 'admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('incorporation')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$batchincorporate = UTILITY::propertySet($this->_payload, '_batchincorporate');
@@ -446,7 +448,7 @@ class CONSUMABLES extends API {
 	 * $this->_payload as genuine form data
 	 */
 	 public function vendor(){
-		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('vendors')) $this->response([], 401);
 		// Y U NO DELETE? because of audit safety, that's why!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -773,7 +775,7 @@ class CONSUMABLES extends API {
 	 * $this->_payload as genuine form data
 	 */
 	public function product(){
-		if (!(array_intersect(['admin', 'purchase', 'ceo', 'qmo', 'purchase_assistant'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('products')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$product = [
@@ -838,7 +840,7 @@ class CONSUMABLES extends API {
 				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
-				if (!array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])){
+				if (!$this->permissionFor('productslimited')){
 					$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) && UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
 					$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
 					$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
@@ -1137,7 +1139,7 @@ class CONSUMABLES extends API {
 					'data-confirm' => true
 					]];
 				
-				if (array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])){
+				if ($this->permissionFor('productslimited')){
 					$result['body']['content'][0][2]['attributes']['disabled'] = // add new product
 					$result['body']['content'][2][0]['attributes']['disabled'] = // select vendor
 					$result['body']['content'][2][1]['attributes']['readonly'] = // type vendor
@@ -1224,7 +1226,7 @@ class CONSUMABLES extends API {
 							'type' => 'text',
 							'description' => ($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
 						]);
-					if (!array_intersect(['purchase_assistant'], $_SESSION['user']['permissions']))
+					if (!$this->permissionFor('productslimited'))
 						array_push($result['body']['content'][2], [
 								'type' => 'checkbox',
 								'content' => $revoke,
@@ -1244,7 +1246,7 @@ class CONSUMABLES extends API {
 						'description' => LANG::GET('consumables.edit_product_incorporated_not')
 					];
 				}
-				if ($product['id'] && !$product['protected'] && !array_intersect(['purchase_assistant'], $_SESSION['user']['permissions'])) array_push($result['body']['content'],
+				if ($product['id'] && !$product['protected'] && !$this->permissionFor('productslimited')) array_push($result['body']['content'],
 					[
 						[
 							'type' => 'deletebutton',

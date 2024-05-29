@@ -7,11 +7,12 @@ class MESSAGE extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_conversation = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	public function message(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// get recipient id
@@ -47,7 +48,6 @@ class MESSAGE extends API {
 	}
 	
 	public function notification(){
-		if (!array_key_exists('user', $_SESSION)) $this->response(['status' => ['msg' => LANG::GET('menu.signin_header'), 'type' => 'info']], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id']
@@ -68,8 +68,6 @@ class MESSAGE extends API {
 	}
 
 	public function conversation(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				$result = ['body'=>['content'=> []]];
@@ -219,7 +217,6 @@ class MESSAGE extends API {
 	}
 
 	public function register(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		// prepare existing users lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();

@@ -9,11 +9,12 @@ class USER extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	public function profile(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
@@ -175,7 +176,7 @@ class USER extends API {
 	}
 
 	public function user(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!$this->permissionFor('users')) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
