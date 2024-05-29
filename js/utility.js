@@ -117,14 +117,14 @@ const _client = {
 		},
 	},
 	message: {
-		newMessage: (subject = "", recipient = "", body = "", options = {}, datalist = []) => {
+		newMessage: (dialogheader = "", recipient = "", message = "", options = {}, datalist = []) => {
 			//returns a message modal dialog
 			if (!Object.keys(options)) {
 				options[LANG.GET("order.add_information_cancel")] = false;
 				options[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
 			}
 
-			const formbody = [
+			const body = [
 				{
 					type: "hiddeninput",
 					attributes: {
@@ -137,14 +137,14 @@ const _client = {
 					attributes: {
 						name: LANG.GET("message.message"),
 						rows: 8,
-						value: body,
+						value: message,
 					},
 				},
 			];
 			if (datalist.length) {
-				formbody[0].type = "textinput";
-				formbody[0].attributes.list = "rcptlist";
-				formbody.push({
+				body[0].type = "textinput";
+				body[0].attributes.list = "rcptlist";
+				body.push({
 					type: "datalist",
 					content: datalist,
 					attributes: {
@@ -154,8 +154,8 @@ const _client = {
 			}
 			new Dialog({
 				type: "input",
-				header: subject,
-				body: formbody,
+				header: dialogheader,
+				body: body,
 				options: options,
 			}).then((response) => {
 				if (response[LANG.GET("message.message")]) {
