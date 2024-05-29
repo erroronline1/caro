@@ -33,15 +33,10 @@
 
 
 # development
-
 * offline indicator
-* calendar schedule reselect primary unit
 * revise permissions within code, don't rely on avaialbility within menu
-* process sample check inputs on incorporation
-* assemble.js: optgoups as letter within modal
 * permission prrc
 * sample check pending state? approve by elevated users
-* user register -> role overview
 * more detailed module descriptions in readme
 
 #### purchase considerations
@@ -72,7 +67,7 @@ This software aims to support you with your ISO 13485 quality management system 
 
 Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
-![landing page](assets/landing%20page.png)
+![landing page screenshot](assets/landing%20page.png)
 
 ### Intended ISO 13485 goals
 * ISO 13485 4.2.3 Medical device file
@@ -98,7 +93,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 5.5.1 Responsibility and authority
     * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items.
     * Users can be assigned a pin to approve orders.
-    * also see [user management](#user-management)
+    * A user register summarizes all users, also grouped by oranizational unit and permission
+    * also see [user management](#user-management), [conversations](#conversations)
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
@@ -221,7 +217,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 * If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
 
-![sample form](assets/sample%20form.png)
+![sample form screenshot](assets/sample%20form.png)
 
 [Content](#content)
 
@@ -273,7 +269,9 @@ graph TD;
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
-![landing page](assets/conversation.png)
+The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
+
+![conversation screenshot](assets/conversation.png)
 
 [Content](#content)
 
@@ -298,7 +296,7 @@ Text templates arrange generic text chunks. Arrange or group chunks within the [
 
 Output will be copied to clipboad on clicking or tapping the output field.
 
-![landing page](assets/text%20recommendation.png)
+![text recommendation screenshot](assets/text%20recommendation.png)
 
 ```mermaid
 graph TD;
@@ -347,7 +345,7 @@ The respective manager provides a selection for recent approved elements as well
 
 Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to elevated users to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
 
-![landing page](assets/forms.png)
+![form composer screenshot](assets/forms.png)
 
 ```mermaid
 graph TD;
@@ -394,7 +392,7 @@ Checking for completeness of form bundles can be applied on display of a record 
 
 Records can be marked as closed to disappear from the records overwiew and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword, name or identifier. On contributing the closed state is revoked by default.
 
-![landing page](assets/records.png)
+![record screenshot](assets/records.png)
 
 ```mermaid
 graph TD;
@@ -446,7 +444,7 @@ This source can also be used to provide documents that are [unsuitable to be fil
 
 External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
-![landing page](assets/files.png)
+![files screenshot](assets/files.png)
 
 [Content](#content)
 
@@ -471,7 +469,7 @@ Off duty events are displayed with the scheduled events, but scheduled events ar
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
-![landing page](assets/calendar.png)
+![calendar screenshot](assets/calendar.png)
 
 ```mermaid
 graph TD;
@@ -542,7 +540,7 @@ Vendors can be enriched with certificate files. The application will match the p
 
 While editing products, one can edit the *trading good*-setting, revoke a possible *incorporated*-state and set the product *active and available* or *inactive*. On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
 
-![landing page](assets/vendor%20manager.png)
+![vendor manager screenshot](assets/vendor%20manager.png)
 
 ```mermaid
 graph TD;
@@ -608,7 +606,7 @@ Orders may have to be approved; pending approvals sum up and can be batch approv
 
 Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
 
-![landing page](assets/orders.png)
+![orders screenshot](assets/orders.png)
 
 ```mermaid
 graph TD;
@@ -704,7 +702,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * vendor list
 * regulatory issues
 
-![landing page](assets/audit.png)
+![audit screenshot](assets/audit.png)
 
 [Content](#content)
 
@@ -1265,6 +1263,7 @@ You can as well define all products as trading goods and set to 0 conditionally 
 * [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
+* [Font Awesome 5](https://fontawesome.com/)
 
 ### kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
