@@ -34,6 +34,16 @@
 
 # development
 
+* offline indicator
+* calendar schedule reselect primary unit
+* revise permissions within code, don't rely on avaialbility within menu
+* process sample check inputs on incorporation
+* assemble.js: optgoups as letter within modal
+* permission prrc
+* sample check pending state? approve by elevated users
+* user register -> role overview
+* more detailed module descriptions in readme
+
 #### purchase considerations
 * order only assigned units selecteable?
 * general orders select workshop storage number
