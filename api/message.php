@@ -290,7 +290,7 @@ class MESSAGE extends API {
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
 		$statement->execute();
 		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$groups = ['units' => [], 'permissions' => [], 'name' => []];
+		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		$result = ['body' => ['content' => []]];
 		foreach($users as $user){
 			if ($user['id']==1) continue;
@@ -300,6 +300,7 @@ class MESSAGE extends API {
 				'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 			];
 			$groups['name'][$user['name']] = $mailto;
+			if ($user['orderauth']) $groups['orderauth'][$user['name']] = $mailto;
 			if ($user['units'])
 				foreach(explode(',', $user['units']) as $unit){
 					if (!array_key_exists($unit, $groups['units'])) $groups['units'][$unit] = [];
@@ -319,7 +320,15 @@ class MESSAGE extends API {
 				$result['body']['content'][] = [
 					[
 						'type' => 'links',
-						'description' => 'users',
+						'description' => LANG::GET('message.register_users'),
+						'content' => $content,
+					]
+				];
+			} elseif ($group === 'orderauth'){
+				$result['body']['content'][] = [
+					[
+						'type' => 'links',
+						'description' => LANG::GET('message.register_orderauth'),
 						'content' => $content,
 					]
 				];
