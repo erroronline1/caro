@@ -103,7 +103,20 @@ body > header {
 		font-size: 1.5em;
 	}
 
-	& > div {
+	& > div:first-of-type {
+		right: 1em;
+		top: 1em;
+		height: 2em;
+		width: 2em;
+		position: fixed;
+		background-image: none;
+		background-color: var(--red);
+		-webkit-mask-image: url("./media/cloud.svg");
+		mask-image: url("./media/cloud.svg");
+		display: none;
+	}
+
+	& > div:last-of-type {
 		left: 0;
 		height: 0.4em;
 		position: fixed;
@@ -562,7 +575,7 @@ button {
 	}
 }
 
-.modaloptgroup{
+.modaloptgroup {
 	font-family: inherit;
 	text-align: center;
 }

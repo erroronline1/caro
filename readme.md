@@ -33,7 +33,6 @@
 
 
 # development
-* offline indicator
 * permission prrc
 * sample check pending state? approve by defined user permissions
 * more detailed module descriptions in readme

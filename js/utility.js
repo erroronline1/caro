@@ -381,6 +381,6 @@ const applicationModule = {
 
 window.addEventListener("scroll", function () {
 	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
-	document.querySelector("header>div").style.width = percentScrolled + "%";
+	document.querySelector("header>div:last-of-type").style.width = percentScrolled + "%";
 });
 window.addEventListener("pointerup", applicationModule.clearMenu);
