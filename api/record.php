@@ -23,7 +23,16 @@ class record extends API {
 	public function identifier(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if ($content=UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'))) $content .= ' ' . date('Y-m-d H:i');
+				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'))) {
+					$possibledate = substr($content, -16);
+					try {
+						new DateTime($possibledate);
+					}
+					catch (Exception $e){
+						$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+						$content .= ' ' . $now->format('Y-m-d H:i');
+					}
+				}
 				if ($content){
 					$downloadfiles = [];
 					$downloadfiles[LANG::GET('record.create_identifier')] = [
