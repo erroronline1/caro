@@ -10,7 +10,6 @@
     * [Data integrity](#data-integrity)
 * [Regulatory fulfillment suggestions](#regulatory-fulfillment-suggestions)
     * [Tips](#tips)
-    * [User management](#user-management)
 * [Modules](#modules)
     * [Users](#users)
     * [Conversations](#conversations)
@@ -34,8 +33,7 @@
 
 # development
 * permission prrc
-* sample check pending state? approve by defined user permissions
-* more detailed module descriptions in readme
+* sample check pending state? approve by defined authorized users
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -71,43 +69,44 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
     * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
-    * also see [records](#records)
+    * also see [Records](#records)
 * ISO 13485 4.2.4 Document control
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
-    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined user permissions only.
-    * Form components and forms need to be [approved by](#user-management) a unit supervisor, quality management officer and CEO. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
+    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined authorized users only.
+    * Form components and forms need to be [approved by](#users) a unit supervisor, quality management officer and CEO. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
-    * Forms can be exported blank by defined user permissions to limit distribution of outdated versions.
+    * Forms can be exported blank by defined authorized users to limit distribution of outdated versions.
     * External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting.
-    * also see [forms](#forms), [files](#files)
+    * also see [Forms](#forms), [Files](#files)
 * ISO 13485 4.2.5 Record control
     * All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.
     * Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.
     * Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.
     * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
-    * also see [user management](#user-management), [records](#records)
+    * also see [Users](#users), [Records](#records)
 * ISO 13485 5.5.1 Responsibility and authority
-    * Users are assigned [special permissions](#user-management) that limit access and unclutter menu items.
+    * Users are assigned [special permissions](#users) that limit access and unclutter menu items.
     * Permissions define access to app functions.
     * Users can be assigned a pin to approve orders.
     * A user register summarizes all users, also grouped by organizational unit and permission
-    * also see [user management](#user-management), [conversations](#conversations), [runtime variables](#runtime-variables)
+    * also see [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables)
 * ISO 13485 5.5.3 Internal communication
     * The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g.
         * alerting user groups for approving new form components and forms
         * alerting user groups about disapproved orders and order state changes
         * messaging inquiries to ordering users
+        * alerting user groups about scheduled events
     * The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc. 
-    * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
+    * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
     * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
     * The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.
     * Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.
-    * also see [conversations](#conversations), [calendar](#calendar), [order](#order), [files](#files), [tools](#tools)
+    * also see [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Tools](#tools)
 * ISO 13485 6.2 Human resources
     * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
-    * also see [users](#users), [tools](#tools)
+    * also see [Users](#users), [Tools](#tools)
 * ISO 13485 7.4.1 Procurement process
     * Procurement is guided through the application. Vendors and products can be added into the database.
     * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
@@ -118,20 +117,20 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * a sample check has been made
         * any document to the product has been provided
         * an alias has been modified
-    * Vendor and product editing is permitted by defined user permissions only.
-    * also see [vendor and product management](#vendor-and-product-management), [order](#order)
+    * Vendor and product editing is permitted by defined authorized users only.
+    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
     * Sample check information is to be enriched through a dedicated form with the respective context.
-    * also see [vendor and product management](#vendor-and-product-management), [order](#order)
+    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
 * ISO 13485 7.5.1 Control of production and service
     * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
     * Form contexts allow the definition as process or work instructions.
     * The inbuilt calendar assists in scheduling operations.
-    * also see [forms](#forms), [records](#records), [calendar](#calendar)
+    * also see [Forms](#forms), [Records](#records), [Calendar](#calendar)
 * ISO 13485 7.5.8 Product indentification
     * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
-    * also see [records](#records)
+    * also see [Records](#records)
 * ISO 13485 7.6 Surveillance and measuring equipment control
     * Dedicated forms make use of an identifier like production forms. Measuring equipment may each have assigned their distinct identifier.
     * Adding a form component to adress scheduling helps with future events that will show up and alert user groups where reasonable.
@@ -143,7 +142,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * user files (e.g. certificates)
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
         * fulfilment of regulatory issues considered by forms
-    * also see [tools](#tools)
+    * also see [Tools](#tools)
 
 [Content](#content)
 
@@ -162,7 +161,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ### Necessary infrastructure 
 You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
 
-Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well.
+Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. After all, administration can not demand going digital without providing a decent infrastructure. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well. 
 
 For technical details see [prerequisites](#prerequisites). 
 
@@ -174,7 +173,7 @@ The application does not replace an ERP system. Procurement data is solely acces
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan. This module is for operational communication only, not for persistent documentation purpose.
 
 ### Data integrity
-As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Administration, CEO and quality management officers can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
@@ -220,7 +219,13 @@ Beside the apps architecture you will still have to set up your quality manageme
 
 [Content](#content)
 
-#### User management
+## Modules
+
+### Users
+On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
+
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
+
 The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible. These can be set and modified within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
 
 Some permissions are default set though:
@@ -228,6 +233,7 @@ Some permissions are default set though:
 * User
     * can only see orders for own assigned organizational units
     * can export own timesheet
+    * can access timesheets only if weekly hours are defined
 * Group
     * can **NEVER** add records due to limited identification data
     * can place orders, but will be prompted to identify themself
@@ -258,16 +264,7 @@ Users can have multiple assigned organizational units and permissions.
 
 Form approval is necessary by CEO, QMO and supervisors due to the database structure and because it makes sense in the regulatory context. However if you feel like it, assign multiple permissions to one person. This person can grant approval checking multiple respective roles.
 
-[Content](#content)
-
-## Modules
-
-### Users
-Beside [permission settings](#user-management) users can have multiple assigned organizational units. On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to defined user permissions only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
-
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
-
-![landing page](assets/user.png)
+![user screenshot](assets/user.png)
 
 ```mermaid
 graph TD;
@@ -306,7 +303,7 @@ graph TD;
 [Content](#content)
 
 ### Conversations
-This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
+This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
 
@@ -382,7 +379,7 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to defined user permissions to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to defined authorized users to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -426,6 +423,8 @@ Records store all inputs for any selected form. Some form contexts require an id
 Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
 The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
+
+![sample identifier code](assets/sample%20identifier%20code.png)
 
 Checking for completeness of form bundles can be applied on display of a record summary.
 
@@ -475,9 +474,9 @@ graph TD;
 [Content](#content)
 
 ### Files
-Admin, CEO, QMO and office can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
+Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
-Both cloud storages equip the [tools STL-Viewer](#tools) with sources to display.
+Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
 
@@ -488,7 +487,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#content)
 
 ### Calendar
-Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined user permissions only.
+Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -498,7 +497,7 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined user permissions only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined user permissions for full access only.
+Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only.
 
 This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly.
 
@@ -569,11 +568,11 @@ graph TD;
 [Content](#content)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Admin, CEO, QMO and purchase have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
-The special permission of *purchase assistant* can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
+Defined authorizes users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
 
@@ -644,6 +643,10 @@ Ordered products identify themself as incorporated or not or whether they are qu
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
 
 Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
+
+Information can be added anytime.
+Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one.
+All actions offer to append a message.
 
 ![orders screenshot](assets/orders.png)
 
@@ -732,7 +735,7 @@ graph TD;
 ### Tools
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
 
-Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by admin, ceo, qmo and office.
+Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defines authorized users.
 
 The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
 * incoporated articles
@@ -986,21 +989,6 @@ A generic sample:
     "split":{
         "DEPARTMENT": "(.*)",
         "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
-    },
-    "format":{
-        "sheet": {
-            "width": 125,
-            "orientation": "landscape",
-            "row-height":32
-        },
-        "columns":{
-            "ORIGININDEX":5,
-            "SOMEDATE":5,
-            "CUSTOMERID":5,
-            "NAME":10,
-            "AID":15,
-            "PRICE": null
-        }
     },
     "evaluate": {
         "EMAIL": "^((?!@).)*$"
