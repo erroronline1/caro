@@ -24,7 +24,7 @@ $queries = [
 				"	`token` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`orderauth` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`image` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`app_settings` json NOT NULL," .
+				"	`app_settings` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -37,9 +37,9 @@ $queries = [
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hidden` tinyint NOT NULL," .
-				"	`ceo_approval` json NULL DEFAULT NULL," .
-				"	`qmo_approval` json NULL DEFAULT NULL," .
-				"	`supervisor_approval` json NULL DEFAULT NULL" .
+				"	`ceo_approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`qmo_approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`supervisor_approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -63,8 +63,8 @@ $queries = [
 				"	`active` tinyint(1) NOT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`info` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`certificate` json NOT NULL," .
-				"	`pricelist` json NOT NULL," .
+				"	`certificate` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`pricelist` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
@@ -92,20 +92,20 @@ $queries = [
 				"	`active` tinyint NULL DEFAULT NULL," .
 				"	`protected` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
-				"	`checked` datetime NULL DEFAULT NULLE," .
+				"	`checked` datetime NULL DEFAULT NULL," .
 				"	`incorporated` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_prepared_orders` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`order_data` json NOT NULL," .
+				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_approved_orders` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`order_data` json NOT NULL," .
+				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`organizational_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`approval` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`approved` datetime NOT NULL," .
@@ -120,7 +120,7 @@ $queries = [
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
-				"	`content` json NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`active` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -160,7 +160,7 @@ $queries = [
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not json to avoid messing up any almost comprehensible structure
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not text COLLATE utf8mb4_unicode_ci to avoid messing up any almost comprehensible structure
 				"   `hidden` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -190,7 +190,7 @@ $queries = [
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
+				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '');",
 				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
 			]
 		]
@@ -371,7 +371,7 @@ $queries = [
 				");"
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png');",
+				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '');",
 				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
 			]
 		]

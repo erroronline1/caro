@@ -38,7 +38,7 @@ class APPLICATION extends API {
 				'image' => './' . $result['image'],
 				'id' => $result['id'],
 				'orderauth' => boolval($result['orderauth']),
-				'app_settings' => json_decode($result['app_settings'], true)
+				'app_settings' => $result['app_settings'] ? json_decode($result['app_settings'], true) : []
 			];
 			$this->response(['body' => $_SESSION['user']]);
 		}
@@ -308,7 +308,7 @@ class APPLICATION extends API {
 			'content' => $uncompleted
 		];
 
-		$result['body']['content'][] = $overview;
+		if ($overview) $result['body']['content'][] = $overview;
 
 		// manual
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
@@ -323,7 +323,7 @@ class APPLICATION extends API {
 					'content' => $row['content']
 				]];
 		}
-		$result['body']['content'][] = $topics;
+		if ($topics) $result['body']['content'][] = $topics;
 		$this->response($result);
 	}
 

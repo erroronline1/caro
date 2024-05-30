@@ -1013,12 +1013,14 @@ A generic sample:
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
 Tested server environments:
-* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31
+* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
+* Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
 * Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
 
 Tested devices:
 * Desktop PC Win10 Edge-browser
-* Notebook Win11 Firefox-browser
+* Notebook Win11 Firefox-browser (until 2024-05-30)
+* Notebook Linux Mint Firefox-Browser (from 2024-05-30)
 * Smartphone Android12 Firefox-browser
 
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
