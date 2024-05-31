@@ -245,7 +245,7 @@ class record extends API {
 				]
 			]
 		];
-		if ($this->permissionFor('formexport')){
+		if (PERMISSION::permissionFor('formexport')){
 			$return['body']['content'][]= [
 				[
 					'type' => 'button',
@@ -262,7 +262,7 @@ class record extends API {
 			$return['body']['content'][]= [
 				[
 					'type' => 'text',
-					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], $this->permissionFor('formexport', true)))])
+					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
 				]
 			];
 		}
@@ -475,7 +475,7 @@ class record extends API {
 							]
 						]
 					];
-					if ($this->permissionFor('recordsclosing') && !$content['closed']){
+					if (PERMISSION::permissionFor('recordsclosing') && !$content['closed']){
 						array_unshift($return['body']['content'][count($return['body']['content']) - 1], [
 							'type' => 'button',
 							'attributes' => [
@@ -496,7 +496,7 @@ class record extends API {
 	}
 
 	public function close(){
-		if (!$this->permissionFor('recordsclosing')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_close'));
 		$statement->execute([
 			':identifier' => $this->_requestedID
@@ -660,7 +660,7 @@ class record extends API {
 	}
 
 	public function exportform(){
-		if (!$this->permissionFor('formexport')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formexport')) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 		$statement->execute([
 			':id' => $this->_requestedID

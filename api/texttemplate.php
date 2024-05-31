@@ -15,7 +15,7 @@ class TEXTTEMPLATE extends API {
 	}
 
 	public function chunk(){
-		if (!$this->permissionFor('texttemplates')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$chunk = [
@@ -258,7 +258,7 @@ class TEXTTEMPLATE extends API {
 	}
 
 	public function template(){
-		if (!$this->permissionFor('texttemplates')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$template = [

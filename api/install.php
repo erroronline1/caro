@@ -37,9 +37,7 @@ $queries = [
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hidden` tinyint NOT NULL," .
-				"	`ceo_approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`qmo_approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`supervisor_approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -219,9 +217,7 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	hidden tinyint NOT NULL," .
-				"	ceo_approval varchar(MAX) NULL DEFAULT NULL," .
-				"	qmo_approval varchar(MAX) NULL DEFAULT NULL," .
-				"	supervisor_approval varchar(MAX) NULL DEFAULT NULL," .
+				"	approval varchar(MAX) NULL DEFAULT NULL," .
 				"	regulatory_context varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				,

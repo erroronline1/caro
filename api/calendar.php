@@ -66,7 +66,7 @@ class CALENDAR extends API {
 	 */
 	public function complete(){
 		if ($this->_requestedCalendarType === 'timesheet'
-			&& !($this->permissionFor('calendarfullaccess')
+			&& !(PERMISSION::permissionFor('calendarfullaccess')
 			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
 			&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
 		$response = [
@@ -205,7 +205,7 @@ class CALENDAR extends API {
 					],					
 				]
 			];
-			if ($this->permissionFor('calendaredit')) {
+			if (PERMISSION::permissionFor('calendaredit')) {
 				$columns = [
 					':id' => $row['id'],
 					':type' => 'schedule',
@@ -289,7 +289,7 @@ class CALENDAR extends API {
 					]]);
 				break;
 			case 'PUT':
-				if (!$this->permissionFor('calendaredit')) $this->response([], 401);
+				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
@@ -440,7 +440,7 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'DELETE':
-				if (!$this->permissionFor('calendaredit')) $this->response([], 401);
+				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
@@ -471,7 +471,7 @@ class CALENDAR extends API {
 			$due = new DateTime($row['span_end'], new DateTimeZone(INI['timezone']));
 			if ($row['type'] !== 'timesheet'
 				|| !($row['affected_user_id'] === $_SESSION['user']['id']
-				|| $this->permissionFor('calendarfulltimesheetexport')
+				|| PERMISSION::permissionFor('calendarfulltimesheetexport')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
 				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
 			)) continue;
@@ -514,7 +514,7 @@ class CALENDAR extends API {
 			 * admin, ceo and supervisor of assigned unit
 			 */
 			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
-			if (!($this->permissionFor('calendarfullaccess')
+			if (!(PERMISSION::permissionFor('calendarfullaccess')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
 				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))))
 				$completed[LANG::GET('calendar.timesheet_approve')]['disabled'] = true;
@@ -737,7 +737,7 @@ class CALENDAR extends API {
 							&& array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 						if ($row['type'] === 'timesheet'
 							&& !$row['closed']
-							&& ($this->permissionFor('calendarfullaccess')
+							&& (PERMISSION::permissionFor('calendarfullaccess')
 							|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])))
 							) $bulkapproval[] = $row['id'];
 					}
@@ -754,7 +754,7 @@ class CALENDAR extends API {
 					if ($thisDaysEvents) $displayedEvents = $this->timesheetEntries($thisDaysEvents, $calendar);
 					// avoid multiple entries by non authorized users
 					if (!$displayedEvents
-						|| $this->permissionFor('calendarfulltimesheetexport')
+						|| PERMISSION::permissionFor('calendarfulltimesheetexport')
 						|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))){
 						$events[] = [
 							'type' => 'calendarbutton',
@@ -998,7 +998,7 @@ class CALENDAR extends API {
 		$result = [];
 		foreach($timesheets as $user){
 			$rows = [];
-			if ($this->permissionFor('calendarfulltimesheetexport')
+			if (PERMISSION::permissionFor('calendarfulltimesheetexport')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
 				|| $id === $_SESSION['user']['id']
 			){

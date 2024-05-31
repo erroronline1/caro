@@ -316,57 +316,60 @@ class SQLQUERY {
 
 
 		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, ceo_approval, qmo_approval, supervisor_approval, regulatory_context) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, NULL, NULL, NULL, :regulatory_context)"
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, approval, regulatory_context) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context)"
 		],
 		'form_put' => [
 			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id"
 		],
 		'form_put-approve' => [
-			'mysql' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET ceo_approval = :ceo_approval, qmo_approval = :qmo_approval, supervisor_approval = :supervisor_approval WHERE id = :id"
+			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET approval = :approval WHERE id = :id"
 		],
 		'form_form-datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
 		],
-		'form_form-datalist-approved' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
-		],
 		'form_component-datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
-		],
-		'form_component-datalist-approved' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
 		],
 		'form_bundle-datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
 		],
-		'form_form-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
+/*		'form_form-datalist-approved' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
 		],
-		'form_form-get-latest-by-context' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = :context AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE context= :context AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
+*/		
+/*		'form_component-datalist-approved' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY name ASC, date DESC"
 		],
-		'form_component-get-latest-by-name-approved' => [
+*/		
+		'form_form-get-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
+		],
+		'form_form-get-by-context' => [
+			'mysql' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC"
+		],
+		'form_component-get-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC"
+		],
+		'form_bundle-get-by-name' => [
+			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC"
+		],
+/*		'form_component-get-latest-by-name-approved' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' AND ceo_approval IS NOT NULL AND qmo_approval IS NOT NULL AND supervisor_approval IS NOT NULL ORDER BY id DESC"
 		],
-		'form_component-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'component' ORDER BY id DESC"
-		],
-		'form_bundle-get-latest-by-name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_form WHERE name= :name AND context = 'bundle' ORDER BY id DESC"
-		],
+*/		
 		'form_get' => [
 			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"

@@ -10,6 +10,8 @@ class FILE extends API {
 
 	public function __construct(){
 		parent::__construct();
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+
 		$this->_requestedFolder = $this->_requestedId = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_requestedFile = $this->_accessible = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
@@ -31,7 +33,6 @@ class FILE extends API {
 	 * responds with paths matching request
 	 */
 	public function filter(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
 		if ($this->_requestedFolder && $this->_requestedFolder == 'users') $files = UTILITY::listFiles(UTILITY::directory('users') ,'asc');
 		else {
@@ -57,7 +58,6 @@ class FILE extends API {
 	 * responds with bundle ids matching request
 	 */
 	public function bundlefilter(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
 		$statement->execute();
 		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -75,7 +75,6 @@ class FILE extends API {
 	 * responds with content of available files for restricted uploads and external documents
 	 */
 	public function files(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body'] = [
 		'content' => [
 				[
@@ -133,7 +132,7 @@ class FILE extends API {
 	 * thus directories can not be renamed
 	 */
 	public function filemanager(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo', 'office'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!PERMISSION::permissionFor('files')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, LANG::PROPERTY('file.manager_new_folder')));
@@ -332,7 +331,7 @@ class FILE extends API {
 	 * no delete for audit safety
 	 */
 	public function externalfilemanager(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo', 'office'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!PERMISSION::permissionFor('externaldocuments')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name']) {
@@ -504,7 +503,6 @@ class FILE extends API {
 	 * responds with content of available file bundles
 	 */
 	public function bundle(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		$result['body'] = [
 			'content' => [
 				[
@@ -551,7 +549,7 @@ class FILE extends API {
 	 * no delete nor put for audit safety
 	 */
 	public function bundlemanager(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo'], $_SESSION['user']['permissions']))) $this->response([], 401);
+		if (!PERMISSION::permissionFor('filebundles')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$unset = LANG::PROPERTY('file.edit_existing_bundle_select');
@@ -706,7 +704,6 @@ class FILE extends API {
 	 * no delete for being automated
 	 */
 	public function sharepoint(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (array_key_exists(LANG::PROPERTY('file.sharepoint_upload_header'), $_FILES) && $_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
@@ -782,7 +779,6 @@ class FILE extends API {
 		}
 	}
 }
-
 
 $api = new FILE();
 $api->processApi();

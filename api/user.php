@@ -176,7 +176,7 @@ class USER extends API {
 	}
 
 	public function user(){
-		if (!$this->permissionFor('users')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('users')) $this->response([], 401);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':

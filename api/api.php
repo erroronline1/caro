@@ -183,23 +183,6 @@ class API {
 			'content' => LANG::GET('general.no_content_available', [':content' => $type])]
 		]];
 	}
-
-	/**
-	 * retuns a boolean if user is authorized for requested app-function, array of permissions if $values argument is true
-	 * @param string $function as defined within setup.ini
-	 * @param bool $values
-	 * @return bool|array
-	 */
-	public function permissionFor($function, $values = false){
-		if (array_key_exists($function, INI['permissions'])){
-			if (!$values) {
-				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
-				return boolval(array_intersect(['admin', ...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
-			}
-			return preg_split('/\W+/', INI['permissions'][$function]);
-		}
-		$this->response(['error' => 'permission ' . $function . ' not found in setup.ini file'], 501);
-	}
 }
 
 if (in_array(REQUEST[0], ['application', 'form', 'user', 'consumables', 'order', 'message', 'file', 'tool', 'texttemplate', 'csvfilter', 'record', 'audit', 'calendar'])) require_once(REQUEST[0] . '.php');

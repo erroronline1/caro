@@ -18,7 +18,7 @@ class AUDIT extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		if (!$this->permissionFor('audits')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('audits')) $this->response([], 401);
 
 		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}

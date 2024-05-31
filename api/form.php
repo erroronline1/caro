@@ -30,10 +30,14 @@ class FORMS extends API {
 			if ($element['context'] === 'bundle') continue;
 			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($element['context'] . $element['name'], $hidden)){
-				if ((array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval'])
-				|| (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval'])
-				|| (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval'])
-				) $unapproved++;
+				// check per user permission so there is only one count per unapproved element even on multiple permissions
+				$element['approval'] = $element['approval'] ? json_decode($element['approval'], true) : []; 
+				$tobeapprovedby = $this->permissionFor('formapproval', true);
+				$pending = false;
+				foreach($tobeapprovedby as $permission){
+					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $element['approval'])) $pending = true;
+				}
+				if ($pending) $unapproved++;
 				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 			}
 		}
@@ -41,6 +45,7 @@ class FORMS extends API {
 			'formapproval' => $unapproved
 		]);
 	}
+
 
 	public function component_editor(){
 		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
@@ -55,11 +60,17 @@ class FORMS extends API {
 			$statement->execute([
 				':id' => $this->_requestedID
 			]);
+			if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['id' => '', 'name' =>''];
 		} else {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-by-name'));
 			$statement->execute([
 				':name' => $this->_requestedID
 			]);
+			$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+			foreach ($components as $component){
+
+			}			
+
 		}
 		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['id' => '', 'name' =>''];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -75,7 +86,7 @@ class FORMS extends API {
 				$componentdatalist[] = $row['name'];
 				$options[$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = ($row['ceo_approval'] && $row['qmo_approval'] && $row['supervisor_approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+			$approved = $this->approved($row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']]) . ' - ' . $approved] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
@@ -765,31 +776,24 @@ class FORMS extends API {
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 				$statement->execute([':id' => $this->_requestedID]);
 				$approve = $statement->fetch(PDO::FETCH_ASSOC);
-				$approval = json_encode(
-					[
-						'name' => $_SESSION['user']['name'],
-						'date' => date('Y-m-d H:i:s')
-					]
-				);
-				if (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.ceo'), $approveas)){
-					$approve['ceo_approval'] = $approval;
+				$approve['approval'] = $approve['approval'] ? json_decode($approve['approval'], true) : []; 
+				$tobeapprovedby = $this->permissionFor('formapproval', true);
+				$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+				foreach($tobeapprovedby as $permission){
+					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.' . $permission), $approveas)){
+						$approve[$permission] = [
+							'name' => $_SESSION['user']['name'],
+							'date' => $time->format('Y-m-d-H:i')
+						];
+					}
 				}
-				if (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.qmo'), $approveas)){
-					$approve['qmo_approval'] = $approval;
-				}
-				if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.supervisor'), $approveas)){
-					$approve['supervisor_approval'] = $approval;
-				}
-
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put-approve'));
 				if ($statement->execute([
 					':id' => $approve['id'],
-					':ceo_approval' => $approve['ceo_approval'] ? : '',
-					':qmo_approval' =>$approve['qmo_approval'] ? : '',
-					':supervisor_approval' => $approve['supervisor_approval'] ? : ''
+					':approval' => json_encode($approve['approval']) ? : ''
 				])) $this->response([
 						'status' => [
-							'msg' => LANG::GET('assemble.approve_saved') . "<br />". ($approve['ceo_approval'] && $approve['qmo_approval'] && $approve['supervisor_approval'] ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
+							'msg' => LANG::GET('assemble.approve_saved') . "<br />". (count(array_keys($approve['approval'])) === count($tobeapprovedby) ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
 							'type' => 'success',
 							'reload' => 'approval',
 							]]);

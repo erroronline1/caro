@@ -438,4 +438,59 @@ class UTILITY {
 		return $success;
 	}
 }
+
+/**
+ * permission handling, checking if necessary permissions have been given
+ * 
+ */
+class PERMISSION {
+
+	/**
+	 * returns a boolean if user is authorized for requested app-function, array of permissions if $returnvalues argument is true
+	 * @param string $function as defined within setup.ini
+	 * @param bool $returnvalues
+	 * @return bool|array
+	 */
+	public static function permissionFor($function = '', $returnvalues = false){
+		if (array_key_exists($function, INI['permissions'])){
+			if (!$returnvalues) {
+				// limited functions don't include admin by default
+				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
+				return boolval(array_intersect(['admin', ...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
+			}
+			return preg_split('/\W+/', INI['permissions'][$function]);
+		}
+		var_dump('permission ' . $function . ' not found in setup.ini file');
+	}
+
+	/**
+	 * check whether an approvalcolumn has been fully approved according to function
+	 * @param string $function as defined within setup.ini
+	 * @param string|array $approvalcolumn 'approval'-column
+	 * @return bool
+	 * 
+	 */
+	public static function fullyapproved($function = '', $approvalcolumn = ''){
+		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
+		return (count(array_keys($approvalcolumn)) === count(self::permissionFor($function, true)));
+	}
+
+	/**
+	 * check whether an approvalcolumn has a pending approval according to function
+	 * check per user permission so there is only one count per unapproved element even on multiple permissions
+	 * @param string $function as defined within setup.ini
+	 * @param string|array $approvalcolumn 'approval'-column
+	 * @return bool
+	 * 
+	 */
+	public static function pending($function = '', $approvalcolumn = ''){
+		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
+		$pending = false;
+		foreach(self::permissionFor($function, true) as $permission){
+			if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $element['approval'])) $pending = true;
+		}
+		return $pending;
+	}
+
+}
 ?>

@@ -20,7 +20,7 @@ class CSVFILTER extends API {
 	 * no putting though for audit safety
 	 */
 	public function rule(){
-		if (!$this->permissionFor('csvrules')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('csvrules')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$filter = [
@@ -199,7 +199,7 @@ class CSVFILTER extends API {
 	 * post responds with a download link to the result file after processing
 	 */
 	public function filter(){
-		if (!$this->permissionFor('csvfilter')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-filter'));
