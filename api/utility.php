@@ -476,21 +476,20 @@ class PERMISSION {
 	}
 
 	/**
-	 * check whether an approvalcolumn has a pending approval according to function
+	 * check whether an approvalcolumn has pending approvals according to function
 	 * check per user permission so there is only one count per unapproved element even on multiple permissions
 	 * @param string $function as defined within setup.ini
 	 * @param string|array $approvalcolumn 'approval'-column
-	 * @return bool
+	 * @return array of pending approval permission
 	 * 
 	 */
 	public static function pending($function = '', $approvalcolumn = ''){
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
-		$pending = false;
+		$pending = [];
 		foreach(self::permissionFor($function, true) as $permission){
-			if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $element['approval'])) $pending = true;
+			if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $approvalcolumn)) $pending[] = $permission;
 		}
 		return $pending;
 	}
-
 }
 ?>

@@ -223,7 +223,7 @@ class APPLICATION extends API {
 			];
 		}
 
-/*		// unapproved forms and components
+		// unapproved forms and components
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
 		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -236,10 +236,7 @@ class APPLICATION extends API {
 			if ($element['context'] === 'bundle') continue;
 			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($element['context'] . $element['name'], $hidden)){
-				if ((array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval'])
-				|| (array_intersect(['qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval'])
-				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval'])
-				) $unapproved++;
+				if (PERMISSION::pending('formapproval', $element['approval'])) $unapproved++;
 				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 			}
 		}
@@ -261,7 +258,7 @@ class APPLICATION extends API {
 				]
 			];
 		}
-*/
+
 		if (count($tiles)) $result['body']['content'][] = $tiles;
 
 		// calendar scheduled events

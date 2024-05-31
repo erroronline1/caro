@@ -24,6 +24,26 @@ class AUDIT extends API {
 	}
 
 	/**
+	 * returns the latest approved form, component by name from query
+	 * @param string $query as defined within sqlinterface
+	 * @param string $name
+	 * @return array|bool either query row or false
+	 */
+	private function latestApprovedName($query = '', $name = ''){
+		// get latest approved by name
+		$element = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($query));
+		$statement->execute([
+			':name' => $name
+		]);
+		$elements = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($elements as $element){
+			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+		}
+		return false;
+	}
+
+	/**
 	 * main entry point for module
 	 * displays a selection of available options
 	 * calls $this->_requestedType method if set
@@ -259,11 +279,12 @@ class AUDIT extends API {
 		$content = [];
 
 		// get all current approved forms
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = $currentforms = [];
 		foreach($forms as $form){
+			if (!PERMISSION::fullyapproved('formapproval', $form['approval'])) continue;
 			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
 		}
@@ -291,49 +312,36 @@ class AUDIT extends API {
 			$components = explode(',', $form['content'] ? : '');
 			$componentlist = [];
 			foreach($components as $component){
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
-				$statement->execute([':name' => $component]);
-				$cmpnnt = $statement->fetch(PDO::FETCH_ASSOC);
+				$cmpnnt = $this->latestApprovedName('form_component-get-by-name', $component);
 				if ($cmpnnt)
-					$componentlist[] = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n" .
-						LANG::GET('audit.documents_in_use_approved', [
-							':permission' => LANG::GET('permissions.supervisor'),
-							':name' => json_decode($cmpnnt['supervisor_approval'], true)['name'],
-							':date' => json_decode($cmpnnt['supervisor_approval'], true)['date'],
-						]) . "\n" .
-						LANG::GET('audit.documents_in_use_approved', [
-							':permission' => LANG::GET('permissions.qmo'),
-							':name' => json_decode($cmpnnt['qmo_approval'], true)['name'],
-							':date' => json_decode($cmpnnt['qmo_approval'], true)['date'],
-						]) . "\n" .
-						LANG::GET('audit.documents_in_use_approved', [
-							':permission' => LANG::GET('permissions.ceo'),
-							':name' => json_decode($cmpnnt['ceo_approval'], true)['name'],
-							':date' => json_decode($cmpnnt['ceo_approval'], true)['date'],
-						]);
+					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
+					$entry = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
+					foreach(PERMISSION::permissionFor('formapproval', true) as $position){
+						$entry .= LANG::GET('audit.documents_in_use_approved', [
+							':permission' => LANG::GET('permissions.' . $position),
+							':name' => $cmpnnt['approval'][$position]['name'],
+							':date' => $cmpnnt['approval'][$position]['date'],
+						]) . "\n";
+					}
+					$componentlist[] = $entry;
 			}
 			$regulatory_context = [];
 			foreach(explode(',', $form['regulatory_context'] ? : '') as $context){
 				if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
 			}
+			$entry = '';
+			foreach(PERMISSION::permissionFor('formapproval', true) as $position){
+				$entry .= LANG::GET('audit.documents_in_use_approved', [
+					':permission' => LANG::GET('permissions.' . $position),
+					':name' => $cmpnnt['approval'][$position]['name'],
+					':date' => $cmpnnt['approval'][$position]['date'],
+				]) . "\n";
+			}
+
 			$formscontent[] = [
 				'type' => 'text',
 				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
-				'content' => LANG::GET('audit.documents_in_use_approved', [
-					':permission' => LANG::GET('permissions.supervisor'),
-					':name' => json_decode($form['supervisor_approval'], true)['name'],
-					':date' => json_decode($form['supervisor_approval'], true)['date'],
-				]) . "\n" .
-				LANG::GET('audit.documents_in_use_approved', [
-					':permission' => LANG::GET('permissions.qmo'),
-					':name' => json_decode($form['qmo_approval'], true)['name'],
-					':date' => json_decode($form['qmo_approval'], true)['date'],
-				]) . "\n" .
-				LANG::GET('audit.documents_in_use_approved', [
-					':permission' => LANG::GET('permissions.ceo'),
-					':name' => json_decode($form['ceo_approval'], true)['name'],
-					':date' => json_decode($form['ceo_approval'], true)['date'],
-				]) . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
+				'content' => $entry . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
 			];
 		}
 

@@ -30,14 +30,7 @@ class FORMS extends API {
 			if ($element['context'] === 'bundle') continue;
 			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($element['context'] . $element['name'], $hidden)){
-				// check per user permission so there is only one count per unapproved element even on multiple permissions
-				$element['approval'] = $element['approval'] ? json_decode($element['approval'], true) : []; 
-				$tobeapprovedby = $this->permissionFor('formapproval', true);
-				$pending = false;
-				foreach($tobeapprovedby as $permission){
-					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $element['approval'])) $pending = true;
-				}
-				if ($pending) $unapproved++;
+				if (PERMISSION::pending('formapproval', $element['approval'])) $unapproved++;
 				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 			}
 		}
@@ -46,9 +39,28 @@ class FORMS extends API {
 		]);
 	}
 
+	/**
+	 * returns the latest approved form, component by name from query
+	 * @param string $query as defined within sqlinterface
+	 * @param string $name
+	 * @return array|bool either query row or false
+	 */
+	private function latestApprovedName($query = '', $name = ''){
+		// get latest approved by name
+		$element = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($query));
+		$statement->execute([
+			':name' => $this->_requestedID
+		]);
+		$elements = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($elements as $element){
+			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+		}
+		return false;
+	}
 
 	public function component_editor(){
-		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		$componentdatalist = [];
 		$options = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$alloptions = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
@@ -62,18 +74,9 @@ class FORMS extends API {
 			]);
 			if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['id' => '', 'name' =>''];
 		} else {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-by-name'));
-			$statement->execute([
-				':name' => $this->_requestedID
-			]);
-			$components = $statement->fetchAll(PDO::FETCH_ASSOC);
-			foreach ($components as $component){
-
-			}			
-
+			if (!$component = $this->latestApprovedName('form_component-get-by-name', $this->_requestedID)) $component = ['id' => '', 'name' =>''];
 		}
-		if (!$component = $statement->fetch(PDO::FETCH_ASSOC)) $component = ['id' => '', 'name' =>''];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing component lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
@@ -82,11 +85,11 @@ class FORMS extends API {
 		$hidden = [];
 		foreach($components as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden) && ($row['ceo_approval'] && $row['qmo_approval'] && $row['supervisor_approval'])) {
+			if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
 				$options[$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = $this->approved($row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']]) . ' - ' . $approved] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
@@ -246,7 +249,7 @@ class FORMS extends API {
 				]]
 			]
 		];
-		if ($component['name'] && (!$component['ceo_approval'] || !$component['qmo_approval'] || !$component['supervisor_approval']))
+		if ($component['name'] && !PERMISSION::fullyapproved('formapproval', $row['approval']))
 			$return['body']['content'][count($return['body']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
@@ -262,7 +265,7 @@ class FORMS extends API {
 	}
 
 	public function component(){
-		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$component = json_decode($this->_payload->composedComponent, true);
@@ -274,11 +277,8 @@ class FORMS extends API {
 				unset($component['approve']);
 
 				// put hidden attribute if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
-				$statement->execute([
-					':name' => $component_name
-				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				// get latest approved by name
+				$exists = $this->latestApprovedName('form_component-get-by-name', $this->_requestedID);
 				if ($exists && json_decode($exists['content'], true) == $component) {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
@@ -342,8 +342,10 @@ class FORMS extends API {
 					':regulatory_context' => ''
 					])) {
 						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => $component_name]);
-						$this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
-						$this->alertUserGroup(['permission' => ['ceo', 'qmo']], $message);
+						foreach(PERMISSION::permissionFor('formapproval', true) as $permission){
+							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
+							else $this->alertUserGroup(['permission' => [$permission]], $message);
+						}
 						$this->response([
 						'status' => [
 							'name' => $component_name,
@@ -365,13 +367,12 @@ class FORMS extends API {
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
+					$component = $statement->fetch(PDO::FETCH_ASSOC);
 				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
-					$statement->execute([
-						':name' => $this->_requestedID
-					]);
+					// get latest approved by name
+					$component = $this->latestApprovedName('form_component-get-by-name', $this->_requestedID);
 				}
-				if ($component = $statement->fetch(PDO::FETCH_ASSOC)){
+				if ($component){
 					$component['content'] = json_decode($component['content']);
 					$this->response(['body' => $component, 'name' => $component['name']]);
 				}
@@ -383,7 +384,7 @@ class FORMS extends API {
 					':id' => $this->_requestedID
 				]);
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
-				if ($component['ceo_approval'] && $component['qmo_approval'] && $component['supervisor_approval']) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
+				if (PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
 				
 				// recursively check for identifier
 				function deleteImages($element){
@@ -410,7 +411,7 @@ class FORMS extends API {
 	}
 
 	public function form_editor(){
-		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		$formdatalist = $componentdatalist = [];
 		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$alloptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
@@ -424,19 +425,18 @@ class FORMS extends API {
 			$statement->execute([
 				':id' => $this->_requestedID
 			]);
+			$form = $statement->fetch(PDO::FETCH_ASSOC);
 		} else{
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
-			$statement->execute([
-				':name' => $this->_requestedID
-			]);
+			// get latest approved by name
+			$form = $this->latestApprovedName('form_form-get-by-name', $this->_requestedID);
 		}
-		if (!$result = $statement->fetch(PDO::FETCH_ASSOC)) $result = [
+		if (!$form) $form= [
 			'name' => '',
 			'alias' => '',
 			'context' => '',
 			'regulatory_context' => ''
 		];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$result['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing forms lists
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
@@ -445,12 +445,12 @@ class FORMS extends API {
 		$hidden = [];
 		foreach($fd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!array_key_exists($row['name'], $formoptions) && !in_array($row['name'], $hidden) && ($row['ceo_approval'] && $row['qmo_approval'] && $row['supervisor_approval'])) {
+			if (!array_key_exists($row['name'], $formoptions) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$formdatalist[] = $row['name'];
-				$formoptions[$row['name']] = ($row['name'] === $result['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				$formoptions[$row['name']] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = ($row['ceo_approval'] && $row['qmo_approval'] && $row['supervisor_approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']]) . ' - ' . $approved] = ($row['name'] === $result['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']]) . ' - ' . $approved] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		// prepare existing component list
@@ -462,7 +462,7 @@ class FORMS extends API {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!array_key_exists($row['name'], $componentoptions) && !in_array($row['name'], $hidden)) {
 				$componentdatalist[] = $row['name'];
-				$approved = ($row['ceo_approval'] && $row['qmo_approval'] && $row['supervisor_approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+				$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
 				$componentoptions[$row['name'] . ' - ' . $approved] = ['value' => $row['id']];
 			}
 		}
@@ -476,23 +476,24 @@ class FORMS extends API {
 		foreach($cd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden) && 
-			in_array($result['name'], explode(',', $row['content'])) && 
-			!in_array($result['name'], $dependedbundles)) $dependedbundles[] = $result['name']; 
+			in_array($form['name'], explode(',', $row['content'])) && 
+			!in_array($form['name'], $dependedbundles)) $dependedbundles[] = $form['name']; 
 		}
 
-		// check for dependencies in components (linked forms)
+		// check for dependencies in approved components (linked forms)
 		$dependedcomponents = [];
-		if ($result['name']){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist-approved'));
+		if ($form['name']){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 			$statement->execute();
 			$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
 			$hidden = [];
 			foreach($fd as $row) {
 				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+				if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 				if (!in_array($row['name'], $dependedcomponents) && !in_array($row['name'], $hidden)) {
 					// don't bother disassembling content, just look for an expression
-					if (stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_display_button', [':form' => $result['name']]) . '"')
-						|| stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_continue_button', [':form' => $result['name']]) . '"')) $dependedcomponents[] = $row['name'];
+					if (stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_display_button', [':form' => $form['name']]) . '"')
+						|| stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_continue_button', [':form' => $form['name']]) . '"')) $dependedcomponents[] = $row['name'];
 				}
 			}
 		}		
@@ -501,7 +502,7 @@ class FORMS extends API {
 		foreach(LANGUAGEFILE['formcontext'] as $type => $contexts){
 			foreach($contexts as $context => $display){
 				if ($type === 'identify') $display .= ' *';
-				$contextoptions[$display] = $context===$result['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
+				$contextoptions[$display] = $context===$form['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 			}
 		}
 
@@ -515,10 +516,10 @@ class FORMS extends API {
 			$approve['content'][$value] = [];
 		}
 		$regulatory_context = [];
-		$result['regulatory_context'] = explode(',', $result['regulatory_context']);
+		$form['regulatory_context'] = explode(',', $form['regulatory_context']);
 		foreach(LANGUAGEFILE['regulatory'] as $key => $value){
 			$regulatory_context[$value] = ['value' => $key];
-			if (in_array($key, $result['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
+			if (in_array($key, $form['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 		}
 		$return['body'] = [
 			'content' => [
@@ -585,21 +586,21 @@ class FORMS extends API {
 					[
 						'type' => 'compose_form',
 						'description' => LANG::GET('assemble.compose_form'),
-						'value' => $result['name'] ? : '',
+						'value' => $form['name'] ? : '',
 						'alias' => [
 							'name' => LANG::GET('assemble.edit_form_alias'),
-							'value' => $result['alias'] ? : ''
+							'value' => $form['alias'] ? : ''
 						],
 						'context' => [
 							'name' => LANG::GET('assemble.edit_form_context'),
 							'content' => $contextoptions,
 							'hint' => LANG::GET('assemble.edit_form_context_hint')
 						],
-						'hint' => ($result['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $result['author'], ':date' => $result['date']]) . '<br />' : '') .
+						'hint' => ($form['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]) . '<br />' : '') .
 						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '<br />' : '') .
 						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '<br />' : '')
 						,
-						'hidden' => $result['name'] ? intval($result['hidden']) : 1,
+						'hidden' => $form['name'] ? intval($form['hidden']) : 1,
 						'approve' => $approve,
 						'regulatory_context' => $regulatory_context ? : ' '
 					]
@@ -611,26 +612,23 @@ class FORMS extends API {
 				]
 			]
 		];
-		if ($result['name'] && (!$result['ceo_approval'] || !$result['qmo_approval'] || !$result['supervisor_approval']))
+		if ($form['name'] && (!$form['ceo_approval'] || !$form['qmo_approval'] || !$form['supervisor_approval']))
 			$return['body']['content'][count($return['body']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => LANG::GET('assemble.edit_delete'),
-						'onpointerup' => "api.form('delete', 'form', " . $result['id'] . ")" 
+						'onpointerup' => "api.form('delete', 'form', " . $form['id'] . ")" 
 					]
 				]
 			];
 
 		// add used components to response
-		if (array_key_exists('content', $result)) {
+		if (array_key_exists('content', $form)) {
 			$return['body']['components'] = [];
-			foreach(explode(',', $result['content']) as $usedcomponent) {
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
-				$statement->execute([
-					':name' => $usedcomponent
-				]);
-				$component = $statement->fetch(PDO::FETCH_ASSOC);
+			foreach(explode(',', $form['content']) as $usedcomponent) {
+				// get latest approved by name
+				$component = $this->latestApprovedName('form_component-get-by-name', $usedcomponent);
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
 					$component['content']['name'] = $usedcomponent;
@@ -643,7 +641,7 @@ class FORMS extends API {
 	}
 
 	public function form(){
-		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 
@@ -670,11 +668,8 @@ class FORMS extends API {
 				if (in_array($this->_payload->context, array_keys(LANGUAGEFILE['formcontext']['identify']))){
 					$hasindentifier = false;
 					foreach($this->_payload->content as $component){
-						$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
-						$statement->execute([
-							':name' => $component
-						]);
-						$latestcomponent = $statement->fetch(PDO::FETCH_ASSOC);
+						// get latest approved by name
+						$latestcomponent = $this->latestApprovedName('form_component-get-by-name', $component);
 						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
 					}
 					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
@@ -689,11 +684,8 @@ class FORMS extends API {
 				}
 				
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
-				$statement->execute([
-					':name' => $this->_payload->name
-				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				// get latest approved by name
+				$exists = $this->latestApprovedName('form_form-get-by-name', $this->_payload->name);
 				if ($exists && $exists['content'] == implode(',', $this->_payload->content)) {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
@@ -724,8 +716,10 @@ class FORMS extends API {
 					':regulatory_context' => implode(',', $regulatory_context)
 					])) {
 						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => $this->_payload->name]);
-						$this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
-						$this->alertUserGroup(['permission' => ['ceo', 'qmo']], $message);
+						foreach(PERMISSION::permissionFor('formapproval', true) as $permission){
+							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
+							else $this->alertUserGroup(['permission' => [$permission]], $message);
+						}
 						$this->response([
 						'status' => [
 							'name' => $this->_payload->name,
@@ -747,7 +741,7 @@ class FORMS extends API {
 					':id' => $this->_requestedID
 				]);
 				$component = $statement->fetch(PDO::FETCH_ASSOC);
-				if ($component['ceo_approval'] && $component['qmo_approval'] && $component['supervisor_approval']) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_delete_failure'), 'type' => 'error']]);
+				if (PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_delete_failure'), 'type' => 'error']]);
 				
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_delete'));
 				if ($statement->execute([
@@ -762,7 +756,7 @@ class FORMS extends API {
 	}
 
 	public function approval(){
-		if (!(array_intersect(['admin', 'ceo', 'qmo', 'supervisor'], $_SESSION['user']['permissions']))) $this->response([], 401); // hardcoded for database structure
+		if (!PERMISSION::permissionFor('formapproval')) $this->response([], 401); // hardcoded for database structure
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approveas = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.approve_as_select'));
@@ -777,13 +771,13 @@ class FORMS extends API {
 				$statement->execute([':id' => $this->_requestedID]);
 				$approve = $statement->fetch(PDO::FETCH_ASSOC);
 				$approve['approval'] = $approve['approval'] ? json_decode($approve['approval'], true) : []; 
-				$tobeapprovedby = $this->permissionFor('formapproval', true);
+				$tobeapprovedby = PERMISSION::permissionFor('formapproval', true);
 				$time = new DateTime('now', new DateTimeZone(INI['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.' . $permission), $approveas)){
-						$approve[$permission] = [
+						$approve['approval'][$permission] = [
 							'name' => $_SESSION['user']['name'],
-							'date' => $time->format('Y-m-d-H:i')
+							'date' => $time->format('Y-m-d H:i')
 						];
 					}
 				}
@@ -793,7 +787,7 @@ class FORMS extends API {
 					':approval' => json_encode($approve['approval']) ? : ''
 				])) $this->response([
 						'status' => [
-							'msg' => LANG::GET('assemble.approve_saved') . "<br />". (count(array_keys($approve['approval'])) === count($tobeapprovedby) ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
+							'msg' => LANG::GET('assemble.approve_saved') . "<br />". (PERMISSION::fullyapproved('formapproval', $approve['approval']) ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
 							'type' => 'success',
 							'reload' => 'approval',
 							]]);
@@ -820,7 +814,7 @@ class FORMS extends API {
 					if ($element['context'] === 'bundle') continue;
 					if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($element['context'] . $element['name'], $hidden)){
-						if (!$element['ceo_approval'] || !$element['qmo_approval'] || !$element['supervisor_approval']) {
+						if (!PERMISSION::fullyapproved('formapproval', $element['approval'])) {
 							switch ($element['context']){
 								case 'component':
 									$sort = ['unapproved' => 'components', 'selection' => 'componentselection'];
@@ -830,13 +824,7 @@ class FORMS extends API {
 							}						
 							if (!in_array($element['name'], array_keys($unapproved[$sort['unapproved']]))){
 								$unapproved[$sort['unapproved']][$element['name']] = $element['content'];
-								if (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$element['ceo_approval']){
-									${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
-								}
-								if (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && !$element['qmo_approval']){
-									${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
-								}
-								if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && !$element['supervisor_approval']){
+								if (PERMISSION::pending('formapproval', $element['approval'])){
 									${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
 								}
 							}
@@ -891,25 +879,18 @@ class FORMS extends API {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
 					$statement->execute([':id' => $this->_requestedID]);
 					$approve = $statement->fetch(PDO::FETCH_ASSOC);
-					if (array_intersect(['admin', 'ceo'], $_SESSION['user']['permissions']) && !$approve['ceo_approval']){
-						$approvalposition[LANG::GET('permissions.ceo')] = [];
-					}
-					if (array_intersect(['admin', 'qmo'], $_SESSION['user']['permissions']) && !$approve['qmo_approval']){
-						$approvalposition[LANG::GET('permissions.qmo')] = [];
-					}
-					if (array_intersect(['admin', 'supervisor'], $_SESSION['user']['permissions']) && !$approve['supervisor_approval']){
-						$approvalposition[LANG::GET('permissions.supervisor')] = [];
+					foreach(PERMISSION::pending('formapproval', $approve['approval']) as $position){
+						$approvalposition[LANG::GET('permissions.' . $position)] = [];
 					}
 					if ($approve['context'] === 'component'){
 						array_push($return['body']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
 					}
 					else {
 						foreach(explode(',', $approve['content']) as $component){
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name'));
-							$statement->execute([':name' => $component]);
-							$cmpnnt = $statement->fetch(PDO::FETCH_ASSOC);
+							// get latest approved by name
+							$cmpnnt = $this->latestApprovedName('form_component-get-by-name', $component);
 							if ($cmpnnt) {
-								if (!($cmpnnt['ceo_approval'] && $cmpnnt['qmo_approval'] && $cmpnnt['supervisor_approval'])){
+								if (!PERMISSION::fullyapproved('formapproval', $cmpnnt['approval'])){
 									$alert .= LANG::GET('assemble.approve_form_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
 								}
 								array_push($return['body']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
@@ -942,7 +923,7 @@ class FORMS extends API {
 	}
 
 	public function bundle(){
-		if (!$this->permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_content'))) $content = implode(',', preg_split('/[\n\r]{1,}/', $content));
@@ -959,11 +940,17 @@ class FORMS extends API {
 				if (!trim($bundle[':name']) || !trim($bundle[':content'])) $this->response([], 400);
 
 				// put hidden attribute if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-latest-by-name'));
+				// get latest by name
+				$exists = [];
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-by-name'));
 				$statement->execute([
 					':name' => $bundle[':name']
 				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach ($forms as $exists){
+					break;
+				}
+				
 				if ($exists && $exists['content'] === $bundle[':content']) {
 					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_put'));
 					if ($statement->execute([
@@ -1011,13 +998,20 @@ class FORMS extends API {
 					$statement->execute([
 						':id' => $this->_requestedID
 					]);
+					$bundle = $statement->fetch(PDO::FETCH_ASSOC);
 				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-latest-by-name'));
+					// get latest by name
+					$bundle = [];
+					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-by-name'));
 					$statement->execute([
 						':name' => $this->_requestedID
 					]);
+					$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+					foreach ($forms as $bundle){
+						break;
+					}
 				}
-				if (!$bundle = $statement->fetch(PDO::FETCH_ASSOC)) $bundle = [
+				if (!$bundle) $bundle = [
 					'id' => '',
 					'name' => '',
 					'alias' => '',
@@ -1044,11 +1038,14 @@ class FORMS extends API {
 				}
 
 				// prepare available forms lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
-				$statement->execute();
-				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+				// get latest approved by name
+				$cmpnnt = [];
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
+				$statement->execute([]);
+				$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$hidden = [];
-				foreach($bundles as $key => $row) {
+				foreach($forms as $key => $row) {
+					if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($row['name'], $hidden)) {
 							$insertform[$row['name']] = ['value' => $row['name'] . "\n"];

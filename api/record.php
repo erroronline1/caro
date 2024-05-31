@@ -20,6 +20,26 @@ class record extends API {
 		$this->_passedIdentify = $this->_formExport = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
 	}
 
+	/**
+	 * returns the latest approved form, component by name from query
+	 * @param string $query as defined within sqlinterface
+	 * @param string $name
+	 * @return array|bool either query row or false
+	 */
+	private function latestApprovedName($query = '', $name = ''){
+		// get latest approved by name
+		$element = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($query));
+		$statement->execute([
+			':name' => $name
+		]);
+		$elements = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($elements as $element){
+			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+		}
+		return false;
+	}
+
 	public function identifier(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -122,11 +142,12 @@ class record extends API {
 		$return = [];
 
 		// prepare existing forms lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = [];
 		foreach($fd as $key => $row) {
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
 				$formdatalist[] = $row['name'];
@@ -174,11 +195,7 @@ class record extends API {
 
 	public function form(){
 		// prepare existing forms lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-name'));
-		$statement->execute([
-			':name' => $this->_requestedID
-		]);
-		$form = $statement->fetch(PDO::FETCH_ASSOC);
+		$form = $this->latestApprovedName('form_form-get-by-name', $this->_requestedID);
 		if (!$form || $form['hidden']) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $form['name'], 'body' => [
@@ -214,11 +231,7 @@ class record extends API {
 		};
 
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
-			$statement->execute([
-				':name' => $usedcomponent
-			]);
-			$component = $statement->fetch(PDO::FETCH_ASSOC);
+			$component = $this->latestApprovedName('form_component-get-by-name', $usedcomponent);
 			if ($component){
 				$component['content'] = json_decode($component['content'], true);
 				array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
@@ -276,18 +289,16 @@ class record extends API {
 		$return = [];
 
 		// prepare existing bundle lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-get-latest-by-name'));
-		$statement->execute([
-			':name' => $this->_requestedID
-		]);
-		if(!($bundle = $statement->fetch(PDO::FETCH_ASSOC))) $bundle = ['content' => []];
+		$bundle = $this->latestApprovedName('form_bundle-get-by-name', $this->_requestedID);
+		if(!$bundle) $bundle = ['content' => []];
 		$necessaryforms = $bundle['content'] ? explode(',', $bundle['content']) : [];
 
 		// unset hidden forms from bundle presets
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$allforms = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach($allforms as $row){
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 			if ($row['hidden'] && ($key = array_search($row['name'], $necessaryforms)) !== false) unset($necessaryforms[$key]);
 		}
 
@@ -717,11 +728,7 @@ class record extends API {
 		};
 		$componentscontent = [];
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
-			$statement->execute([
-				':name' => $usedcomponent
-			]);
-			$component = $statement->fetch(PDO::FETCH_ASSOC);
+			$component = $this->latestApprovedName('form_component-get-by-name', $usedcomponent);
 			$component['content'] = json_decode($component['content'], true);
 
 			$printablecontent = printable($component['content']['content']);

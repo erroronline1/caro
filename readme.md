@@ -74,7 +74,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The application enables you to design reusable form components and forms.
     * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
     * Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined authorized users only.
-    * Form components and forms need to be [approved by](#users) a unit supervisor, quality management officer and CEO. Respective user groups will be alerted by system message on saving of a new element. All supervisors can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
+    * Form components and forms need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
     * Forms can be exported blank by defined authorized users to limit distribution of outdated versions.
@@ -371,9 +371,9 @@ graph TD;
 ### Forms
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
 
-To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by a supervisor, CEO and QMO to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
+To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by defined authorized users to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
-An approvement request is delivered by the applications [messenger](#conversations) to users with CEO and QMO permission as well as supervisor permission for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in in the respective assigned role/permission. 
+An approvement request is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in in the respective assigned role/permission. 
 
 Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
 
@@ -400,7 +400,7 @@ graph TD;
     manage_forms-->|existing form|edit_form;
     edit_form-->add_component[add component];
     add_component-->forms_database[(forms database)];
-    forms_database-->|latest unhidden component|edit_form;
+    forms_database-->|latest unhidden, approved component|edit_form;
     edit_form-->|save|new_forms_database;
 
     manage_bundles(("manage
@@ -408,11 +408,11 @@ graph TD;
     manage_bundles-->|existing bundle|edit_bundle;
     edit_bundle-->add_form[add form];
     add_form-->forms_database2[(forms database)];
-    forms_database2-->|latest unhidden form|edit_bundle;
+    forms_database2-->|latest unhidden, approved form|edit_bundle;
     edit_bundle-->|save|new_forms_database
 
     new_forms_database-->returns("returns only latest dataset on request
-    if named item is not hidden")
+    if named item is not hidden and approved")
 ```
 
 [Content](#content)
@@ -1008,7 +1008,7 @@ A generic sample:
 
 ## Prerequisites
 * PHP >= 8
-* MySQL or SQL Server (or some other database, but queries may have to be adjusted. As I chose pdo as database connectivity I assume this is possible)
+* MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted. As I chose pdo as database connectivity I assume this is possible)
 * SSL (camera access for qr-scanner and serviceworkers don't work otherwise)
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
@@ -1018,10 +1018,10 @@ Tested server environments:
 * Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
 
 Tested devices:
-* Desktop PC Win10 Edge-browser
-* Notebook Win11 Firefox-browser (until 2024-05-30)
-* Notebook Linux Mint Firefox-Browser (from 2024-05-30)
-* Smartphone Android12 Firefox-browser
+* Win10 Edge-browser
+* Win11 Firefox-browser (until 2024-05-30)
+* Linux Mint 21.3 Firefox-Browser (from 2024-05-30)
+* Android12 Firefox-browser
 
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 
@@ -1115,17 +1115,19 @@ mdr14_sample_reusable = 1825 ; days until a new sample check on the same product
 ; permissions based of and matching languages.xx.ini permissions
 ; dynamic handling for modules and methods
 ; admin by default
+; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
 [permissions]
 appmanual = "qmo" ; contribute to and edit application manual
 audits = "ceo, qmo" ; access audits
-calendaredit = "ceo, qmo, supervisor" ; edit, delete ot complete events and entries
-calendarfullaccess = "ceo" ; edit, delete ot complete events and entries 
-calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreight timesheet entries
+calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
+calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
+calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
 csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 filebundles = "ceo, qmo" ; create file bundles
 files = "office, ceo, qmo" ; upload and delete files
+formapproval = "ceo, qmo, supervisor, prrc" ; approve forms and components - SEE WARNING ABOVE
 formcomposer = "ceo, qmo" ; compose forms
 formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
 incorporation = "ceo, qmo, user" ; incorporate products
