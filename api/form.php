@@ -612,7 +612,7 @@ class FORMS extends API {
 				]
 			]
 		];
-		if ($form['name'] && (!$form['ceo_approval'] || !$form['qmo_approval'] || !$form['supervisor_approval']))
+		if ($form['name'] && (!PERMISSION::fullyapproved('formapproval', $form['approval'])))
 			$return['body']['content'][count($return['body']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
