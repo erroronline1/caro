@@ -319,7 +319,8 @@ nav {
 	vertical-align: top;
 	text-align: center;
 
-	div[data-notification]::after {
+	div[data-notification]::after,
+	button[data-notification]::after {
 		content: attr(data-notification);
 		color: var(--article);
 		position: absolute;
@@ -330,8 +331,13 @@ nav {
 		padding: 0 0.25em;
 		border-radius: 3px;
 	}
+	button[data-notification]::after {
+		margin-top: -0.75em;
+		margin-left: 0.75em;
+	}
 
-	div[data-notification="0"]::after {
+	div[data-notification="0"]::after,
+	button[data-notification="0"]::after {
 		display: none;
 	}
 
