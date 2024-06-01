@@ -32,8 +32,7 @@
 
 
 # development
-* permission prrc
-* sample check pending state? approve by defined authorized users
+* sample check, incorporation pending state? approve by defined authorized users
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -230,39 +229,28 @@ The application provides some options for registered users. The whole content is
 
 Some permissions are default set though:
 
+Timesheets are accessible only if weekly hours are defined for the user - even the application admin
+
 * User
     * can only see orders for own assigned organizational units
-    * can export own timesheet
-    * can access timesheets only if weekly hours are defined
+    * can export own timesheet only
 * Group
     * can **NEVER** add records due to limited identification data
     * can place orders, but will be prompted to identify themself
     * can only see orders for own assigned organizational units
     * can **NEVER** incorporate and sample check due to limited identification data
-    * can **NEVER** contribute to timesheets
+    * can **NEVER** access nor contribute to timesheets
 * Supervisor
-    * can approve forms and components
     * can export all timesheets of assigned unit members
     * can edit, delete and close scheduled events and timesheet entries of assigned units and unit members
-* Office
-* Human Ressources
-    * can export all timesheets
-* Purchase
-    * can see all orders
-* Purchase assistant
-* Quality management officer
-    * can approve forms and components
-* CEO
-    * can approve forms and components
-    * can export all timesheets
 * Application admin
     * **full access**
+    * can approve as all eligible permission groups
+    * can export all timesheets
     * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
     * assign only to trusted staff members, preferably administative members
 
 Users can have multiple assigned organizational units and permissions.
-
-Form approval is necessary by CEO, QMO and supervisors due to the database structure and because it makes sense in the regulatory context. However if you feel like it, assign multiple permissions to one person. This person can grant approval checking multiple respective roles.
 
 ![user screenshot](assets/user.png)
 
@@ -1180,6 +1168,7 @@ products_per_slide = 6
 * The manual is intentionally editable to accomodate it to users comprehension.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+    * [permission]
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
