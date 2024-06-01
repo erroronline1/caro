@@ -164,17 +164,20 @@ class FILE extends API {
 		break;
 			case 'GET':
 				$result=['body'=>
-				['form' => [
-					'data-usecase' => 'file',
-					'action' => "javascript:api.file('post', 'filemanager')"],
-					'content'=>[]
-				]];
+					[
+						'form' => [
+							'data-usecase' => 'file',
+							'action' => "javascript:api.file('post', 'filemanager')"
+						],
+						'content'=>[]
+					]
+				];
 
+				$result['body']['content'][] = [];
 				if (!$this->_requestedFolder){
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
 						$content=[];
-						$result['body']['content'][] = [];
 						foreach ($folders as $folder){
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
 							array_push($result['body']['content'][0],
