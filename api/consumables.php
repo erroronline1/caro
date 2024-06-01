@@ -145,20 +145,29 @@ class CONSUMABLES extends API {
 	 */
 	private function components($forContext){
 		$formBody = [];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-latest-by-context'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-by-context'));
 		$statement->execute([':context' => $forContext]);
-		if ($form = $statement->fetch(PDO::FETCH_ASSOC))
+		if ($forms = $statement->fetchAll(PDO::FETCH_ASSOC)){
+			foreach($forms as $form){
+				if (PERMISSION::fullyapproved('formapproval', $form['approval'])) break;
+			}
 			foreach(explode(',', $form['content']) as $usedcomponent) {
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-latest-by-name-approved'));
+				// get latest approved by name
+				$component = [];
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-by-name'));
 				$statement->execute([
 					':name' => $usedcomponent
 				]);
-				$component = $statement->fetch(PDO::FETCH_ASSOC);
+				$components = $statement->fetchAll(PDO::FETCH_ASSOC);
+				foreach ($components as $component){
+					if (PERMISSION::fullyapproved('formapproval', $element['approval'])) break;
+				}
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
 					array_push($formBody, ...$component['content']['content']);
 				}
 			}
+		}
 		return $formBody;
 	}
 
