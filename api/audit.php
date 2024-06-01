@@ -539,11 +539,12 @@ class AUDIT extends API {
 	public function regulatory(){
 		$content = $issues = [];
 		// prepare existing forms lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist-approved'));
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
 		$statement->execute();
 		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$hidden = $regulatory = [];
 		foreach($fd as $key => $row) {
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
