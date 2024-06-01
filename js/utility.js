@@ -8,7 +8,7 @@ const _serviceWorker = {
 			navigator.serviceWorker.ready.then((registration) => {
 				setInterval(() => {
 					if (registration) _serviceWorker.postMessage("getnotifications");
-				}, 300000);
+				}, 10000);
 				navigator.serviceWorker.addEventListener("message", (message) => {
 					this.onMessage(message.data);
 				});
@@ -54,21 +54,30 @@ const _serviceWorker = {
 				this.showLocalNotification(LANG.GET("menu.communication_header"), body);
 			}
 		}
+		let notif;
 		if ("unseen" in data) {
-			const mailnotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header") + "]");
-			mailnotif.setAttribute("data-notification", data.unseen);
+			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.unseen);
+			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.unseen);
 		}
 		if ("unprocessed" in data) {
-			const ordernotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header") + "]");
-			ordernotif.setAttribute("data-notification", data.unprocessed);
+			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.unprocessed);
+			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.unprocessed);
 		}
 		if ("uncompletedevents" in data) {
-			const schedulenotif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header") + "]");
-			schedulenotif.setAttribute("data-notification", data.uncompletedevents);
+			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.uncompletedevents);
+			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.uncompletedevents);
 		}
 		if ("formapproval" in data) {
-			const pendingformapproval = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header") + "]");
-			pendingformapproval.setAttribute("data-notification", data.formapproval);
+			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.formapproval);
+			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", data.formapproval);
 		}
 	},
 };
@@ -78,8 +87,7 @@ const _client = {
 			window.calendarFormData = new FormData();
 			units = [];
 			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit")
-					units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+				if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
 			if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));

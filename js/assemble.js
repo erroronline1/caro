@@ -48,7 +48,7 @@ export const assemble_helper = {
 
 			label.htmlFor = "userMenu" + group;
 			label.style.maskImage = label.style.webkitMaskImage = icons[group];
-			div.setAttribute("data-for", "userMenu" + group);
+			div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
 			div.setAttribute("data-notification", 0);
 			div.append(label);
 
@@ -71,6 +71,8 @@ export const assemble_helper = {
 					}
 					button.type = "button";
 					button.classList.add("discreetButton");
+					button.setAttribute("data-for", "userMenuItem" + description.replace(" ", "_"));
+					button.setAttribute("data-notification", 0);
 					button.appendChild(document.createTextNode(description));
 					div2.append(button);
 				} else {
@@ -266,10 +268,10 @@ export class Dialog {
 		const buttons = document.createElement("div");
 		let button, firststring, optgroup;
 		for (const [option, value] of Object.entries(this.options)) {
-			if (Object.entries(this.options) > 15 && firststring !== option.substring(0,1)){
-				firststring = option.substring(0,1);
-				optgroup = document.createElement('h2');
-				optgroup.classList.add('modaloptgroup');
+			if (Object.entries(this.options) > 15 && firststring !== option.substring(0, 1)) {
+				firststring = option.substring(0, 1);
+				optgroup = document.createElement("h2");
+				optgroup.classList.add("modaloptgroup");
 				optgroup.append(document.createTextNode(firststring));
 				buttons.append(optgroup);
 			}
