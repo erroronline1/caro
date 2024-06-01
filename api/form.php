@@ -50,7 +50,7 @@ class FORMS extends API {
 		$element = [];
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($query));
 		$statement->execute([
-			':name' => $this->_requestedID
+			':name' => $name
 		]);
 		$elements = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($elements as $element){
