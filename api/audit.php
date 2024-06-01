@@ -316,11 +316,11 @@ class AUDIT extends API {
 				if ($cmpnnt)
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
 					$entry = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
-					foreach(PERMISSION::permissionFor('formapproval', true) as $position){
+					foreach($cmpnnt['approval'] as $position => $data){
 						$entry .= LANG::GET('audit.documents_in_use_approved', [
 							':permission' => LANG::GET('permissions.' . $position),
-							':name' => $cmpnnt['approval'][$position]['name'],
-							':date' => $cmpnnt['approval'][$position]['date'],
+							':name' => $data['name'],
+							':date' => $data['date'],
 						]) . "\n";
 					}
 					$componentlist[] = $entry;
@@ -330,11 +330,11 @@ class AUDIT extends API {
 				if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
 			}
 			$entry = '';
-			foreach(PERMISSION::permissionFor('formapproval', true) as $position){
+			foreach($cmpnnt['approval'] as $position => $data){
 				$entry .= LANG::GET('audit.documents_in_use_approved', [
 					':permission' => LANG::GET('permissions.' . $position),
-					':name' => $cmpnnt['approval'][$position]['name'],
-					':date' => $cmpnnt['approval'][$position]['date'],
+					':name' => $data['name'],
+					':date' => $data['date'],
 				]) . "\n";
 			}
 

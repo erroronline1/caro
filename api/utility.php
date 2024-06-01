@@ -472,7 +472,11 @@ class PERMISSION {
 	 */
 	public static function fullyapproved($function = '', $approvalcolumn = ''){
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
-		return (count(array_keys($approvalcolumn)) === count(self::permissionFor($function, true)));
+		$approved = true;
+		foreach(self::permissionFor($function, true) as $permission){
+			if (!array_key_exists($permission, $approvalcolumn)) $approved = false;
+		}
+		return $approved;
 	}
 
 	/**
