@@ -741,6 +741,7 @@ export const api = {
 		post consumables/mdrsamplecheck
 		post consumables/incorporation
 		get consumables/incorporation
+		get consumables/pendingincorporations
 
 		get order/prepared/{unit}
 		get order/productsearch/{id|name}
@@ -756,7 +757,7 @@ export const api = {
 		get order/filtered/{filter}
 		*/
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", 'pendingincorporations'].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -770,6 +771,7 @@ export const api = {
 				order: LANG.GET("menu.purchase_order"),
 				prepared: LANG.GET("menu.purchase_prepared_orders"),
 				approved: LANG.GET("menu.purchase_approved_orders"),
+				pendingincorporations:LANG.GET("menu.purchase_incorporated_pending"),
 			};
 		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {

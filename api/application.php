@@ -127,6 +127,7 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('formapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 		if (PERMISSION::permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
+		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
 
 		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
 	}

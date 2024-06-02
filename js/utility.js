@@ -8,7 +8,7 @@ const _serviceWorker = {
 			navigator.serviceWorker.ready.then((registration) => {
 				setInterval(() => {
 					if (registration) _serviceWorker.postMessage("getnotifications");
-				}, 300000);
+				}, 10000);
 				navigator.serviceWorker.addEventListener("message", (message) => {
 					this.onMessage(message.data);
 				});
@@ -61,11 +61,21 @@ const _serviceWorker = {
 			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
 			if (notif) notif.setAttribute("data-notification", data.unseen);
 		}
-		if ("unprocessed" in data) {
+		if ("unprocessed" in data || "pendingincorporation" in data) {
+			let unprocessed = 0,
+				pendingincorporation = 0;
+			if ("unprocessed" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.unprocessed);
+				unprocessed = data.unprocessed;
+			}
+			if ("pendingincorporation" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.pendingincorporation);
+				pendingincorporation = data.pendingincorporation;
+			}
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.unprocessed);
-			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.unprocessed);
+			if (notif) notif.setAttribute("data-notification", unprocessed + pendingincorporation);
 		}
 		if ("uncompletedevents" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");

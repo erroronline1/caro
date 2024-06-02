@@ -445,6 +445,55 @@ class CONSUMABLES extends API {
 	}
 
 	/**
+	 * notify on pending incorporations, used by service worker
+	 */
+	public function notification(){
+		$unapproved = 0;
+		if (PERMISSION::permissionFor('incorporation')){
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
+			$statement->execute();
+			$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+			foreach($allproducts as $product) {
+				if ($product['incorporated'] === '') continue;
+				$product['incorporated'] = json_decode($product['incorporated'], true);
+				if (array_key_exists('_denied', $product['incorporated'])) continue;
+				elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $unapproved++;
+			}
+		}
+		$this->response([
+			'pendingincorporation' => $unapproved
+		]);
+	}
+
+	/**
+	 * display pending incorporations, links to product editing
+	 */
+	public function pendingincorporations(){
+		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
+		$result = ['body' => ['content' => []]];
+		$links = [];
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
+		$statement->execute();
+		$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($allproducts as $product) {
+			if ($product['incorporated'] === '') continue;
+			$product['incorporated'] = json_decode($product['incorporated'], true);
+			if (array_key_exists('_denied', $product['incorporated'])) continue;
+			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onpointerup' => "api.purchase('get', 'product', " . $product['id'] . ")"];
+		}
+		if ($links){
+			$result['body']['content'][] = [
+				[
+					'type' => 'links',
+					'content' => $links
+					]
+			];
+			$this->response($result);
+		}
+		else $this->response(['body' => ['content' => $this->noContentAvailable(LANG::GET('consumables.incorporation_no_approvals'))]]);
+	}
+
+	/**
 	 * vendor management
 	 * posts new vendors
 	 * updates (put) existing vendors
@@ -858,7 +907,7 @@ class CONSUMABLES extends API {
 				}
 				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
 					if ($incorporation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.incorporation_state_approve'))){
-						$incorporation = explode(',', $incorporation);
+						$incorporation = explode(', ', $incorporation);
 						if (in_array(LANG::GET('consumables.edit_product_incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
 						else {
 							$product['incorporated'] = json_decode($product['incorporated'], true);
@@ -870,10 +919,9 @@ class CONSUMABLES extends API {
 								];
 							}
 							$product['incorporated'] = json_encode($product['incorporated']);
-						}					
+						}
 					}
 				}
-
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([

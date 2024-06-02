@@ -32,8 +32,7 @@
 
 
 # development
-* incorporation audit
-* notif about pending incorporations (audit)
+* pending incorporations on landing page
 * revoke sample checks (audit)
 * permission to message user groups
 
