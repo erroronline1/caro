@@ -32,7 +32,10 @@
 
 
 # development
-* sample check, incorporation pending state? approve by defined authorized users
+* incorporation audit
+* notif about pending incorporations (audit)
+* revoke sample checks (audit)
+* permission to message user groups
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -110,7 +113,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Procurement is guided through the application. Vendors and products can be added into the database.
     * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
     * Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.
-    * Products are supposed to be incorporated. Incorporation can be granted, denied and - through product management - revoked. All inputs will result in an entry to the respective audit check list. Incorporation information is to be enriched through a dedicated form with the respective context.
+    * Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.
     * Products are deleted by default on update of the pricelist unless
         * an incorporation has been made
         * a sample check has been made
@@ -120,7 +123,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
-    * Sample check information is to be enriched through a dedicated form with the respective context.
+    * Sample check information is to be enriched through a dedicated form with the respective context. All users can gather the required information and commit the check. 
+    * Sample checks can be revoked by authorized users.
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
 * ISO 13485 7.5.1 Control of production and service
     * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
@@ -229,11 +233,12 @@ The application provides some options for registered users. The whole content is
 
 Some permissions are default set though:
 
-Timesheets are accessible only if weekly hours are defined for the user - even the application admin
+Timesheets are accessible only if weekly hours are defined for the user - even the application admin.
 
 * User
     * can only see orders for own assigned organizational units
     * can export own timesheet only
+    * can perform the MDR§14 sample check and gather information for product incorporation
 * Group
     * can **NEVER** add records due to limited identification data
     * can place orders, but will be prompted to identify themself
@@ -560,7 +565,7 @@ Order operations rely on a vendor and product database. Also this is related to 
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
-Defined authorizes users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
+Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
 
@@ -1115,11 +1120,11 @@ csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 filebundles = "ceo, qmo" ; create file bundles
 files = "office, ceo, qmo" ; upload and delete files
-formapproval = "ceo, qmo, supervisor, prrc" ; approve forms and components - SEE WARNING ABOVE
+formapproval = "ceo, qmo, supervisor" ; approve forms and components - SEE WARNING ABOVE
 formcomposer = "ceo, qmo" ; compose forms
 formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
-incorporation = "ceo, qmo, user" ; incorporate products
-mdrsamplecheck = "ceo, qmo, user" ; perform the mdr §14 sample check
+incorporation = "ceo, qmo, prrc" ; incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+mdrsamplecheck = "ceo, qmo, prrc" ; perform the mdr §14 sample check, user by default for gathering information, set up permissions have to approve and are authorized to revoke
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
 orderdisplayall = "purchase" ; display all orders by default, not only for own units

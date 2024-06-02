@@ -90,7 +90,7 @@ class CONSUMABLES extends API {
 			]);
 			$remained = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($remained as $row) {
-				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? 1 : 'NULL') : 0) ];
+				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated']];
 			}
 
 			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
@@ -117,7 +117,7 @@ class CONSUMABLES extends API {
 					':active' => 1,
 					':protected' => 0,
 					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => 'NULL'
+					':incorporated' => ''
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT(SQLQUERY::PREPARE('consumables_post-product'), $insertions));
@@ -160,7 +160,7 @@ class CONSUMABLES extends API {
 				]);
 				$components = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($components as $component){
-					if (PERMISSION::fullyapproved('formapproval', $element['approval'])) break;
+					if (PERMISSION::fullyapproved('formapproval', $component['approval'])) break;
 				}
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
@@ -262,7 +262,7 @@ class CONSUMABLES extends API {
 	 * returns the incorporation body response for modal
 	 * creates a list of possible identical products to refer to
 	 * 
-	 * processes contents of the incorporation and writes to the caro_checks database
+	 * processes contents of the incorporation and updates the products database
 	 * 
 	 * $this->_payload->content is a string passed by utility.js _client.order.performIncorporation()
 	 * incorporation denial is detected by pattern matching LANG::GET('order.incorporation_denied')
@@ -281,32 +281,30 @@ class CONSUMABLES extends API {
 				]));
 				$statement->execute();
 				if (!($products = $statement->fetchAll(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
-				$content = '';
-				foreach($products as $product){
-					$content .= $product['vendor_name']. ' ' . $product['article_no'] . ' ' . $product['article_name'] . "\n";
-				}
-
-				// check denial
+				// check content denial or not
 				preg_match("/" . LANG::GET('order.incorporation_denied') . ".*/m", $this->_payload->content, $denied);
-				if ($denied) $content .= $denied[0];
-				else $content .= $this->_payload->content;
+				$approve = ['_check' => $denied ? $denied[0] : $this->_payload->content];
+				if ($denied) $approve['_denied'] = true;
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
-				if ($statement->execute([
-					':type' => 'incorporation',
-					':author' => $_SESSION['user']['name'],
-					':content' => $content
-				])) {
-					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-incorporation'),[
-						':ids' => implode(',', [intval($product['id']), ...array_map(Fn($id)=> intval($id), $ids)]),
-						':incorporated' => intval(!boolval($denied))
-					]));
-					if ($statement->execute()) $this->response([
-						'status' => [
-							'msg' => LANG::GET('order.incorporation_success'),
-							'type' => 'success'
-						]]);
+				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('formapproval', true)];
+				$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+				foreach($tobeapprovedby as $permission){
+					if (in_array($permission, $_SESSION['user']['permissions'])){
+						$approve[$permission] = [
+							'name' => $_SESSION['user']['name'],
+							'date' => $time->format('Y-m-d H:i')
+						];
+					}
 				}
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-incorporation'),[
+					':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)]),
+					':incorporated' => $this->_pdo->quote(json_encode($approve))
+				]));
+				if ($statement->execute()) $this->response([
+					'status' => [
+						'msg' => LANG::GET('order.incorporation_success'),
+						'type' => 'success'
+					]]);
 				$this->response([
 					'status' => [
 						'msg' => LANG::GET('order.incorporation_failure'),
@@ -797,7 +795,7 @@ class CONSUMABLES extends API {
 					'article_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')),
 					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')),
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
-					'protected' => intval(boolval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')))),
+					'protected' => 0,
 					'trading_good' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0
 				];
 
@@ -857,9 +855,25 @@ class CONSUMABLES extends API {
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
 					$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
-					$product['incorporated'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_incorporated_revoke')) ? null : $product['incorporated'];
-					$product['protected'] = intval(boolval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')))) ? : $product['protected'];
 				}
+				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
+					if ($incorporation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.incorporation_state_approve'))){
+						$incorporation = explode(',', $incorporation);
+						if (in_array(LANG::GET('consumables.edit_product_incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
+						else {
+							$product['incorporated'] = json_decode($product['incorporated'], true);
+							$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+							foreach(LANGUAGEFILE['permissions'] as $permission => $translation){
+								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
+									'name' => $_SESSION['user']['name'],
+									'date' => $time->format('Y-m-d H:i')
+								];
+							}
+							$product['incorporated'] = json_encode($product['incorporated']);
+						}					
+					}
+				}
+
 				// validate vendor
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
 				$statement->execute([
@@ -897,43 +911,20 @@ class CONSUMABLES extends API {
 					$statement->execute();
 				}
 
-				// sql server has a problem with actual updating null value
-				$query = strtr(SQLQUERY::PREPARE('consumables_put-product'), [
-					':incorporated' => $product['incorporated'] === null ? 'NULL' : $product['incorporated'], // without quotes
-				]);
-				$batchrevoke = UTILITY::propertySet($this->_payload, '_batchrevoke');
-				if ($product['incorporated'] === null){
-					$content = implode(' ', [$product['vendor_name'], $product['article_no'], $product['article_name']]);
-
-					if ($batchrevoke){
-						$ids = explode(',', $batchrevoke);
+				$_batchincorporation = UTILITY::propertySet($this->_payload, '_batchincorporation');
+				if (PERMISSION::permissionFor('incorporation')){
+					if ($_batchincorporation){
+						$ids = explode(',', $_batchincorporation);
 						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
 							':field' => 'incorporated',
-							':value' => 'NULL',
+							':value' => $this->_pdo->quote($product['incorporated']),
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
 						]));
 						$statement->execute();
-						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
-						]));
-						$statement->execute();
-						$allsimilar = $statement->fetchAll(PDO::FETCH_ASSOC);
-						foreach($allsimilar as $similar){
-							$content .= "\n" . implode(' ', [$similar['vendor_name'], $similar['article_no'], $similar['article_name']]);
-						}
 					}
-					$content .= "\n" . LANG::GET('order.incorporation_revoked');
-
-					// record revoked state
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
-					$statement->execute([
-						':type' => 'incorporation',
-						':author' => $_SESSION['user']['name'],
-						':content' => $content
-					]);
 				}
 
-				$statement = $this->_pdo->prepare($query);
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-product'));
 				if ($statement->execute([
 					':id' => $this->_requestedID,
 					':vendor_id' => $product['vendor_id'],
@@ -945,10 +936,12 @@ class CONSUMABLES extends API {
 					':active' => $product['active'],
 					':protected' => $product['protected'],
 					':trading_good' => $product['trading_good'],
+					':incorporated' => $product['incorporated']
+
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]) . ($batchactive || $batchtradinggood || $batchrevoke ? '. ' . LANG::GET('consumables.edit_product_batch_saved'): ''),
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]) . ($batchactive || $batchtradinggood || $_batchincorporation ? '. ' . LANG::GET('consumables.edit_product_batch_saved'): ''),
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -984,7 +977,7 @@ class CONSUMABLES extends API {
 					'active' => 1,
 					'protected' => 0,
 					'trading_good' => 0,
-					'incorporated' => null,
+					'incorporated' => '',
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1022,9 +1015,6 @@ class CONSUMABLES extends API {
 				$tradinggood = [LANG::GET('consumables.edit_product_article_trading_good') => []];
 				if ($product['trading_good']) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
 				if ($similarproducts) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchtradinggood', $similarproducts, '1');
-
-				$revoke = [LANG::GET('consumables.edit_product_incorporated_revoke') => []];
-				if ($similarproducts) $revoke[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchrevoke', $similarproducts, '1');
 
 				// prepare existing vendor lists
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
@@ -1186,24 +1176,22 @@ class CONSUMABLES extends API {
 					];
 					$result['body']['content'][] = [
 						[
-							[
-								'type' => 'radio',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_product_active')
-								],
-								'hint' => LANG::GET('consumables.edit_product_similar_hint'),
-								'content' => [
-									LANG::GET('consumables.edit_product_isactive') => $isactive,
-									LANG::GET('consumables.edit_product_isinactive') => $isinactive
-								]
-							], [
-								'type' => 'hiddeninput',
-								'attributes' => [
-									'name' => '_batchactive',
-									'id' => '_batchactive'
-								]
-							] 
-						]
+							'type' => 'radio',
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_product_active')
+							],
+							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
+							'content' => [
+								LANG::GET('consumables.edit_product_isactive') => $isactive,
+								LANG::GET('consumables.edit_product_isinactive') => $isinactive
+							]
+						], [
+							'type' => 'hiddeninput',
+							'attributes' => [
+								'name' => '_batchactive',
+								'id' => '_batchactive'
+							]
+						] 
 					];
 				}
 
@@ -1229,22 +1217,36 @@ class CONSUMABLES extends API {
 						]
 					];
 				}
-				if ($product['incorporated'] !== null ) {
+				if ($product['incorporated'] !== '' ) {					
+					$product['incorporated'] = json_decode($product['incorporated'], true);
+					$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
+					foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+						if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+					}
+
 					array_push($result['body']['content'][2],
 						[
 							'type' => 'text',
-							'description' => ($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
+							'content' => $incorporationInfo//$product['incorporated'] //($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
 						]);
-					if (!PERMISSION::permissionFor('productslimited'))
+					if (PERMISSION::permissionFor('incorporation'))
+						$incorporation = [];
+						foreach(PERMISSION::pending('incorporation', $product['incorporated']) as $position){
+							$incorporation[LANG::GET('permissions.' . $position)] = [];
+							if ($similarproducts) $incorporation[LANG::GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
+						}
+						$incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')] = [];
+						if ($similarproducts) $incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
 						array_push($result['body']['content'][2], [
 								'type' => 'checkbox',
-								'content' => $revoke,
+								'description' => LANG::GET('order.incorporation_state_approve'),
+								'content' => $incorporation,
 								'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 							], [
 								'type' => 'hiddeninput',
 								'attributes' => [
-									'name' => '_batchrevoke',
-									'id' => '_batchrevoke'
+									'name' => '_batchincorporation',
+									'id' => '_batchincorporation'
 								]
 							]
 						);
@@ -1255,7 +1257,7 @@ class CONSUMABLES extends API {
 						'description' => LANG::GET('consumables.edit_product_incorporated_not')
 					];
 				}
-				if ($product['id'] && !$product['protected'] && !PERMISSION::permissionFor('productslimited')) array_push($result['body']['content'],
+				if ($product['id'] && !$product['protected'] && !$product['article_alias'] && !$product['checked'] && !$product['incorporated'] && !PERMISSION::permissionFor('productslimited')) array_push($result['body']['content'],
 					[
 						[
 							'type' => 'deletebutton',

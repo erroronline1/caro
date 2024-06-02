@@ -176,9 +176,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id LIMIT 1",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
+
 		'consumables_post-product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '')",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '')"
 		],
 		'consumables_put-product' => [
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id LIMIT 1",
@@ -193,16 +194,20 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)"
 		],
 		'consumables_put-check' => [
-			'mysql' => "UPDATE caro_consumables_products SET protected = 1, checked = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET protected = 1, checked = CURRENT_TIMESTAMP WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET checked = CURRENT_TIMESTAMP WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET pchecked = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'consumables_put-incorporation' => [
-			'mysql' => "UPDATE caro_consumables_products SET protected = 1, incorporated = :incorporated WHERE id IN (:ids)",
-			'sqlsrv' => "UPDATE caro_consumables_products SET protected = 1, incorporated = :incorporated WHERE id IN (:ids)"
+			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)",
+			'sqlsrv' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)"
 		],
 		'consumables_get-product' => [ // preprocess via strtr
-			'mysql' => "SELECT prod.*, IFNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id IN (:ids) AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.*, ISNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) IN (:ids) AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id IN (:ids) AND prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) IN (:ids) AND prod.vendor_id = dist.id"
+		],
+		'consumables_get-products-incorporation' => [
+			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id"
 		],
 		'consumables_get-product-search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id",
@@ -224,27 +229,21 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT TOP(1) prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 			. "(ISNULL(prod.checked, 100) != 100) ORDER BY prod.checked"
 		],
-
-		'consumables_get-not-incorporated' => [
-			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id AND IFNULL(prod.incorporated, 100) = 100",
-			'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id AND ISNULL(prod.incorporated, 100) = 100"
-		],
-
 		'consumables_get-product-units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC"
 		],
 		'consumables_get-products-by-vendor-id' => [
-			'mysql' => "SELECT prod.*, IFNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE dist.id = :search AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.*, ISNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) = :search AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE dist.id = :search AND prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) = :search AND prod.vendor_id = dist.id"
 		],
 		'consumables_delete-all-unprotected-products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND protected = 0",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND protected = 0"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND AND protected = 0"
 		],
 		'consumables_delete-unprotected-product' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND protected = 0",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND protected = 0"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0"
 		],
 
 
@@ -407,8 +406,8 @@ class SQLQUERY {
 
 
 		'order_get-product-search' => [
-			'mysql' => "SELECT prod.*, IFNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1",
-			'sqlsrv' => "SELECT prod.*, ISNULL(prod.incorporated, 100) as incorporated, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1"
+			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1",
+			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1"
 		],
 		'order_post-prepared-order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",

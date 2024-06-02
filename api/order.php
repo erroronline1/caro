@@ -250,18 +250,26 @@ class ORDER extends API {
 								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 							]
 						];
-					else
+					else {
+						$incorporationState = '';
+						if ($row['incorporated'] === '') $incorporationState = LANG::GET('order.incorporation_neccessary');
+						else {
+							$row['incorporated'] = json_decode($row['incorporated'], true);
+							if (array_key_exists('_denied', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+							elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
+						}
 						$matches[$article][$slide][] = [
-						'type' => 'tile',
-						'attributes' => [
-							'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
-						],
-						'content' => [
-							['type' => 'text',
-							'description' => ($row['incorporated'] ? (intval($row['incorporated']) === 1 ? '' : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied')),
-							'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
-						]
-					];
+							'type' => 'tile',
+							'attributes' => [
+								'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+							],
+							'content' => [
+								['type' => 'text',
+								'description' => $incorporationState,
+								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
+							]
+						];
+					}
 
 				}
 				if (!$matches[0]) $matches[0][] = [
@@ -1008,9 +1016,26 @@ class ORDER extends API {
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
 				// get unincorporated
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-incorporated'));
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
 				$statement->execute();
-				$unincorporated = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$unincorporated = [];
+				$incorporationdenied = [];
+				$pendingincorporation = [];
+				foreach($allproducts as $product) {
+					if ($product['incorporated'] === '') {
+						$unincorporated[] = ['id' => $product['id'], 'article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+						continue;
+					}
+					$product['incorporated'] = json_decode($product['incorporated'], true);
+					if (array_key_exists('_denied', $product['incorporated'])) {
+						$incorporationdenied[] = ['article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+						continue;
+					}
+					elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
+						$pendingincorporation[] = ['article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+					}
+				}
 
 				// get unchecked articles for MDR §14 sample check
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
@@ -1271,11 +1296,10 @@ class ORDER extends API {
 						];
 					}
 
-					
-					// request incorporation
+					// incorporation state
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							if (PERMISSION::permissionFor('incorporation')){
+							if (!in_array('group', $_SESSION['user']['permissions'])){
 								$content[] = [
 									'type' => 'button',
 									'attributes' => [
@@ -1293,11 +1317,27 @@ class ORDER extends API {
 							}
 						}
 					}
+					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($incorporationdenied, 'article_no'))) !== false){
+						if (array_key_exists('vendor_label', $decoded_order_data) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+							$content[] = [
+								'type' => 'text',
+								'description' => LANG::GET('order.incorporation_denied')
+							];
+						}
+					}
+					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($pendingincorporation, 'article_no'))) !== false){
+						if (array_key_exists('vendor_label', $decoded_order_data) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+							$content[] = [
+								'type' => 'text',
+								'description' => LANG::GET('order.incorporation_pending')
+							];
+						}
+					}
 					
 					// request MDR §14 sample check
-					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
+					if (!in_array('group', $_SESSION['user']['permissions']) && array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							if (PERMISSION::permissionFor('mdrsamplecheck')){
+							if (!in_array('group', $_SESSION['user']['permissions'])){
 									$content[] = [
 									'type' => 'button',
 									'attributes' => [
