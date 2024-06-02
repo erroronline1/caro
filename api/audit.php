@@ -60,6 +60,9 @@ class AUDIT extends API {
 			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
 			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 		}
+		// incorporated products
+		$selecttypes[LANG::GET('audit.checks_type.incorporation')] = ['value' => 'incorporation'];
+		if ($this->_requestedType==='incorporation') $selecttypes[LANG::GET('audit.checks_type.incorporation')]['selected'] = true;
 		// forms
 		$selecttypes[LANG::GET('audit.checks_type.forms')] = ['value' => 'forms'];
 		if ($this->_requestedType==='forms') $selecttypes[LANG::GET('audit.checks_type.forms')]['selected'] = true;
@@ -138,68 +141,6 @@ class AUDIT extends API {
 	}
 
 	/**
-	 * returns all incorporation records from the caro_checks database in descending chronological order
-	 * displays a warning if products within approved orders require an incorporation
-	 */
-	private function incorporation(){
-		$content = $orderedunincorporated = $entries = [];
-		// get unincorporated articles from approved orders
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-incorporated'));
-		$statement->execute();
-		$unincorporated = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
-		$statement->execute([
-			':substr' => 'ordernumber_label'
-		]);
-		$approvedorders = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($approvedorders as $row){
-			$decoded_order_data = json_decode($row['order_data'], true);
-			if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
-				if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-					$article = $decoded_order_data['ordernumber_label'] . $decoded_order_data['vendor_label'];
-					if (!in_array($article, $orderedunincorporated)) $orderedunincorporated[] = $article;
-				}
-			}
-		}
-		// display warning
-		if ($orderedunincorporated) $content[] = [
-			[
-				'type' => 'text',
-				'description' => LANG::GET('audit.incorporation_warning_description'),
-				'content' => LANG::GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
-			]
-		];
-		// add export button
-		$content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportchecks', '" . $this->_requestedType . "')"
-				]
-			]
-		];
-		// add check records
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
-		$statement->execute([':type' => $this->_requestedType]);
-		$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
-		foreach($checks as $row){
-			$entries[] = [
-				'type' => 'text',
-				'description' => LANG::GET('audit.check_description', [
-					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
-					':date' => $row['date'],
-					':author' => $row['author']
-				]),
-				'content' => $row['content']
-			];
-		}
-		if ($entries) $content[] = $entries;
-		return $content;
-	}
-
-	/**
 	 * creates and returns a download link to the export file for requested check
 	 * if check type within caro_checks database
 	 */
@@ -242,6 +183,118 @@ class AUDIT extends API {
 		]);
 	}
 
+		/**
+	 * returns all incorporation records from the products database in descending chronological order
+	 * displays a warning if products within approved orders require an incorporation
+	 */
+	private function incorporation(){
+		$content = $orderedunincorporated = $entries = $incorporated = [];
+		// get unincorporated articles from approved orders
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
+		$statement->execute();
+		$unincorporated = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach($unincorporated as $id => $row){
+			if (!$row['incorporated']) continue;
+			$row['incorporated'] = json_decode($row['incorporated'], true);
+			if (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
+			$incorporated[] = $row;
+			unset($unincorporated[$id]);
+		}
+
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
+		$statement->execute([
+			':substr' => 'ordernumber_label'
+		]);
+		$approvedorders = $statement->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($approvedorders as $row){
+			$decoded_order_data = json_decode($row['order_data'], true);
+			if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
+				if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+					$article = $decoded_order_data['ordernumber_label'] . $decoded_order_data['vendor_label'];
+					if (!in_array($article, $orderedunincorporated)) $orderedunincorporated[] = $article;
+				}
+			}
+		}
+		// display warning
+		if ($orderedunincorporated) $content[] = [
+			[
+				'type' => 'text',
+				'description' => LANG::GET('audit.incorporation_warning_description'),
+				'content' => LANG::GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
+			]
+		];
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'exportincorporation', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		// add incorporations
+		// order descending based on approval date of random authorized person. a bit fuzzy though. hope all act within a reasonable time
+		$permission = PERMISSION::permissionFor('incorporation', true)[array_rand(PERMISSION::permissionFor('incorporation', true))];
+		usort($incorporated, function ($a, $b) use ($permission) {
+			if ($a['incorporated'][$permission]['date'] === $b['incorporated'][$permission]['date']) return 0;
+			return $a['incorporated'][$permission]['date'] < $b['incorporated'][$permission]['date'] ? -1: 1;
+		});
+
+		foreach($incorporated as $product){
+			$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
+			foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+				if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+			}
+			$entries[] = [
+				'type' => 'text',
+				'description' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name'],
+				'content' => $incorporationInfo
+			];
+		}
+		if ($entries) $content[] = $entries;
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for forms and form bundles
+	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 */
+	public function exportincorporation(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+			'date' => date('y-m-d H:i')
+		];
+
+		$forms = $this->incorporation();
+
+		for($i = 1; $i<count($forms); $i++){
+			foreach($forms[$i] as $item){
+				$summary['content'][$item['description']] = $item['content'];	
+			}
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'body' => $body,
+		]);
+	}
 	/**
 	 * returns all users with file attachments to review e.g. certificates
 	 */

@@ -1227,7 +1227,7 @@ class CONSUMABLES extends API {
 					array_push($result['body']['content'][2],
 						[
 							'type' => 'text',
-							'content' => $incorporationInfo//$product['incorporated'] //($product['incorporated'] ? (intval($product['incorporated']) === 1 ? LANG::GET('order.incorporation_accepted') : LANG::GET('order.incorporation_neccessary')) : LANG::GET('order.incorporation_denied'))
+							'content' => $incorporationInfo
 						]);
 					if (PERMISSION::permissionFor('incorporation'))
 						$incorporation = [];
