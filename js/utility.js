@@ -75,7 +75,7 @@ const _serviceWorker = {
 				pendingincorporation = data.pendingincorporation;
 			}
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", unprocessed + pendingincorporation);
+			if (notif) notif.setAttribute("data-notification", parseInt(unprocessed, 10) + parseInt(pendingincorporation, 10));
 		}
 		if ("uncompletedevents" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
