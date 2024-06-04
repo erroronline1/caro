@@ -436,16 +436,16 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)"
 		],
 		'order_put-approved-order-ordered' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET ordered = CURRENT_TIMESTAMP WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id"
 		],
 		'order_put-approved-order-received' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET received = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET received = CURRENT_TIMESTAMP WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id"
 		],
 		'order_put-approved-order-archived' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET archived = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET archived = CURRENT_TIMESTAMP WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET archived = :state WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET archived = :state WHERE id = :id"
 		],
 		'order_put-approved-order-addinformation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",

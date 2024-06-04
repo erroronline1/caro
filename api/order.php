@@ -6,6 +6,7 @@ class ORDER extends API {
 	private $_requestedID = null;
 	private $_subMethod = null;
 	private $_borrowedModule = null;
+	private $_subMethodState = null;
 	private $_message = null;
 
 	public function __construct(){
@@ -14,7 +15,7 @@ class ORDER extends API {
 
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_borrowedModule = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_borrowedModule = $this->_subMethodState = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	public function notification(){
@@ -763,6 +764,7 @@ class ORDER extends API {
 
 				break;
 			case 'DELETE':
+				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 				// delete attachments
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-order'));
 				$statement->execute([
@@ -805,6 +807,7 @@ class ORDER extends API {
 				':id' => $this->_requestedID
 				]);
 			$order = $statement->fetch(PDO::FETCH_ASSOC);
+			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 			if (in_array($this->_subMethod, ['ordered', 'received', 'archived'])){
 					switch ($this->_subMethod){
 						case 'ordered':
@@ -825,19 +828,19 @@ class ORDER extends API {
 									]];
 							}
 							elseif ($order['ordertype'] === 'return') {
-								$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
+								$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-received'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
 								$statement->execute([
 									':id' => $this->_requestedID
 									]);
-								$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
+								$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-ordered'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
 							}
-							else $statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-ordered'));
+							else $statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-ordered'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
 							break;
 						case 'received':
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-received'));
+							$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-received'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
 							break;
 						case 'archived':
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-archived'));
+							$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-archived'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
 							break;
 					}
 					$statement->execute([
@@ -975,7 +978,7 @@ class ORDER extends API {
 				}
 				$result = isset($result) ? $result: [
 					'status' => [
-						'msg' => LANG::GET('order.' . $this->_subMethod),
+						'msg' => LANG::GET('order.ora_set', [':type' => LANG::GET('order.' . $this->_subMethod)]),
 						'type' => 'info'
 					]];
 				break;
@@ -1112,22 +1115,26 @@ class ORDER extends API {
 
 					$status = [];
 					foreach(['ordered', 'received', 'archived'] as $s){
+						$status[LANG::GET('order.' . $s)] = [
+							'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "', this.checked); this.setAttribute('data-".$s."', this.checked.toString());",
+							'data-' . $s => boolval($row[$s]) ? 'true' : 'false',
+						];
 						if (boolval($row[$s])) {
-							$status[LANG::GET('order.' . $s)] = ['disabled' => true, 'checked' => true, 'data-' . $s => 'true'];
+							$status[LANG::GET('order.' . $s)]['checked'] = true;
 							$text .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
-						else {
-							if ( 
-								(in_array($s, ['received', 'archived']) && (array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $units)))
-								|| (in_array($s, ['ordered']) && PERMISSION::permissionFor('orderprocessing'))
-							) $status[LANG::GET('order.' . $s)] = [
-								'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "'); this.disabled=true; this.setAttribute('data-".$s."', 'true');",
-								'data-'.$s => 'false'
-							];
-							else $status[LANG::GET('order.' . $s)] = [
-								'disabled' => true,
-								'data-'.$s => 'false'
-							];
+						switch ($s){
+							case 'ordered':
+								if (!PERMISSION::permissionFor('orderprocessing')){
+									$status[LANG::GET('order.' . $s)]['disabled'] = true;
+								}
+								break;
+							case 'received':
+							case 'archived':
+								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
+									$status[LANG::GET('order.' . $s)]['disabled'] = true;
+								}
+								break;
 						}
 					}
 					if (!($row['ordered'] || $row['received']) && $row['ordertype'] === 'order') $status[LANG::GET('order.disapprove')]=[
@@ -1148,7 +1155,7 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $units))) $status[LANG::GET('order.cancellation')]=[
+					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')]=[
 						'data_cancellation' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', body:JSON.parse('" . 
 							json_encode(
@@ -1166,7 +1173,7 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['received'] && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $units))) $status[LANG::GET('order.return')]=[
+					if ($row['received'] && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')]=[
 						'data_return' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', body:JSON.parse('" . 
 							json_encode(
@@ -1357,7 +1364,7 @@ class ORDER extends API {
 					}
 
 					// delete order button if authorized
-					if (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $units)) {
+					if (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])) {
 						$content[] = [
 							'type' => 'deletebutton',
 							'hint' => $autodelete,
