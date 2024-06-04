@@ -5,7 +5,7 @@ require_once('./pdf.php');
 require_once('calendarutility.php');
 
 
-class record extends API {
+class RECORD extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
@@ -823,7 +823,7 @@ class record extends API {
 	}
 }
 
-$api = new record();
+$api = new RECORD();
 $api->processApi();
 
 exit;

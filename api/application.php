@@ -502,9 +502,4 @@ class APPLICATION extends API {
 		$this->response($result);
 	}
 }
-
-$api = new APPLICATION();
-$api->processApi();
-
-exit;
 ?>

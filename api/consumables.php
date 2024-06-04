@@ -1344,9 +1344,4 @@ class CONSUMABLES extends API {
 		}
 	}
 }
-
-$api = new CONSUMABLES();
-$api->processApi();
-
-exit;
 ?>

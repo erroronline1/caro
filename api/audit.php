@@ -680,9 +680,4 @@ class AUDIT extends API {
 		]);
 	}
 }
-
-$api = new AUDIT();
-$api->processApi();
-
-exit;
 ?>

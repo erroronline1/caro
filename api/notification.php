@@ -158,9 +158,4 @@ class NOTIFICATION extends API {
 
 	}
 }
-
-$api = new NOTIFICATION();
-$api->processApi();
-
-exit;
 ?>

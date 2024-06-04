@@ -782,9 +782,4 @@ class FILE extends API {
 		}
 	}
 }
-
-$api = new FILE();
-$api->processApi();
-
-exit;
 ?>

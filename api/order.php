@@ -1418,9 +1418,4 @@ class ORDER extends API {
 		]);
 	}
 }
-
-$api = new ORDER();
-$api->processApi();
-
-exit;
 ?>

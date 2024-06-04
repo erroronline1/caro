@@ -1,7 +1,7 @@
 <?php
 // add and edit form components and forms
 
-class FORMS extends API {
+class FORM extends API {
    // processed parameters for readability
    public $_requestedMethod = REQUEST[1];
    private $_requestedID = null;
@@ -1118,9 +1118,4 @@ class FORMS extends API {
 		}
 	}
 }
-
-$api = new FORMS();
-$api->processApi();
-
-exit;
 ?>

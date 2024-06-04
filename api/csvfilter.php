@@ -417,9 +417,4 @@ class CSVFILTER extends API {
 		}
 	}
 }
-
-$api = new CSVFILTER();
-$api->processApi();
-
-exit;
 ?>

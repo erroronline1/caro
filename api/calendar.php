@@ -993,9 +993,4 @@ class CALENDAR extends API {
 		return $result;
 	}
 }
-
-$api = new CALENDAR();
-$api->processApi();
-
-exit;
 ?>

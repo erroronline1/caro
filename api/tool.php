@@ -205,9 +205,4 @@ class TOOL extends API {
 	}
 	
 }
-
-$api = new TOOL();
-$api->processApi();
-
-exit;
 ?>

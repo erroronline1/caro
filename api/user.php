@@ -665,9 +665,4 @@ class USER extends API {
 		return $image;
 	}
 }
-
-$api = new USER();
-$api->processApi();
-
-exit;
 ?>

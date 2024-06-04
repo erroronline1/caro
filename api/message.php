@@ -47,26 +47,6 @@ class MESSAGE extends API {
 		$this->response($result);
 	}
 	
-	public function notification(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		$unnotified = $statement->fetch(PDO::FETCH_ASSOC);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_put_notified'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		$unseen = $statement->fetch(PDO::FETCH_ASSOC);
-		$this->response([
-			'unnotified' => $unnotified['number'], 'unseen' => $unseen['number']
-		]);
-	}
-
 	public function conversation(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
@@ -281,9 +261,4 @@ class MESSAGE extends API {
 		$this->response($result);
 	}
 }
-
-$api = new MESSAGE();
-$api->processApi();
-
-exit;
 ?>

@@ -639,9 +639,4 @@ class TEXTTEMPLATE extends API {
 		$this->response($return);
 	}
 }
-
-$api = new TEXTTEMPLATE();
-$api->processApi();
-
-exit;
 ?>
