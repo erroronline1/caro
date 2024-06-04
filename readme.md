@@ -33,6 +33,7 @@
 
 # development
 * pending incorporations on landing page
+* toggle order state
 * revoke sample checks (audit)
 * permission to message user groups
 
