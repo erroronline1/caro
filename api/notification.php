@@ -26,7 +26,7 @@ class NOTIFICATION extends API {
 		$this->response($result);
 	}
 
-	private function calendar(){
+	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		/**
 		 * checks system processable expiry dates, adds calendar reminders if applicable
@@ -80,7 +80,7 @@ class NOTIFICATION extends API {
 	/**
 	 * notify on pending incorporations
 	 */
-	private function consumables(){
+	public function consumables(){
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
@@ -99,7 +99,7 @@ class NOTIFICATION extends API {
 	/**
 	 * alerts eligible users about forms and components having to be approved
 	 */
-	private function forms(){
+	public function forms(){
 		// prepare all unapproved elements
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
 		$statement->execute();
@@ -120,7 +120,7 @@ class NOTIFICATION extends API {
 		return $unapproved;
 	}
 
-	private function messageunnotified(){
+	public function messageunnotified(){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id']
@@ -132,7 +132,7 @@ class NOTIFICATION extends API {
 		]);
 		return $unnotified['number'];
 	}
-	private function messageunseen(){
+	public function messageunseen(){
 		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
 		$statement->execute([
 			':user' => $_SESSION['user']['id']
@@ -141,7 +141,7 @@ class NOTIFICATION extends API {
 		return $unseen['number'];
 	}
 
-	private function order(){
+	public function order(){
 		$unprocessed = ['num' => 0];
 		if (PERMISSION::permissionFor('orderprocessing')){
 			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
@@ -152,10 +152,15 @@ class NOTIFICATION extends API {
 		return $unprocessed['num'];
 	}
 
-
-
-	public function landingpage(){
-
+	public function records(){
+		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
+		$statement->execute();
+		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$number = 0;
+		foreach ($data as $row){
+			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units']) && !$row['closed']) $number++;
+		}
+		return $number;
 	}
 }
 ?>
