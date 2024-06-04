@@ -239,7 +239,7 @@ class SQLQUERY {
 		],
 		'consumables_delete-all-unprotected-products' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND AND protected = 0"
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0"
 		],
 		'consumables_delete-unprotected-product' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
