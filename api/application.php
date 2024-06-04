@@ -95,7 +95,8 @@ class APPLICATION extends API {
 			LANG::GET('menu.purchase_header') => [
 				LANG::GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
 				LANG::GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
-				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"]
+				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
+				LANG::GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"]
 			],
 			LANG::GET('menu.tools_header') => [
 				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],

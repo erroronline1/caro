@@ -831,9 +831,9 @@ class CONSUMABLES extends API {
 	 * $this->_payload as genuine form data
 	 */
 	public function product(){
-		if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 				$product = [
 					'id' => null,
 					'vendor_id' => null,
@@ -888,6 +888,7 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'PUT':
+				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) $this->response([], 401);
 				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
 					':ids' => intval($this->_requestedID)
 				]));
@@ -1179,23 +1180,31 @@ class CONSUMABLES extends API {
 							]
 						], 
 					]
-				],
-				'form' => [
+				]];
+				if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
+					$result['body']['form'] = [
 					'data-usecase' => 'purchase',
 					'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
 					'data-confirm' => true
-					]];
-				
-				if (PERMISSION::permissionFor('productslimited')){
+					];
+				}
+
+				if (!PERMISSION::permissionFor('products')){
 					$result['body']['content'][0][2]['attributes']['disabled'] = // add new product
 					$result['body']['content'][2][0]['attributes']['disabled'] = // select vendor
 					$result['body']['content'][2][1]['attributes']['readonly'] = // type vendor
 					$result['body']['content'][2][2]['attributes']['readonly'] = // article number
 					$result['body']['content'][2][3]['attributes']['readonly'] = // article name
+					$result['body']['content'][2][4]['attributes']['readonly'] = // article alias
 					$result['body']['content'][2][5]['attributes']['readonly'] = // order unit
 					true; 
-				} else {
-					array_push($result['body']['content'][2], [
+				}
+				if (PERMISSION::permissionFor('productslimited')){
+					unset($result['body']['content'][2][4]['attributes']['readonly']); // article alias
+				}
+
+				if (PERMISSION::permissionFor('products')){
+ 					array_push($result['body']['content'][2], [
 						[
 							'type' => 'br'
 						],
@@ -1267,6 +1276,10 @@ class CONSUMABLES extends API {
 				}
 				if ($product['incorporated'] !== '' ) {					
 					$product['incorporated'] = json_decode($product['incorporated'], true);
+					$incorporationState = '';
+					if (array_key_exists('_denied', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+					elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
+
 					$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 					foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 						if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
@@ -1275,9 +1288,10 @@ class CONSUMABLES extends API {
 					array_push($result['body']['content'][2],
 						[
 							'type' => 'text',
+							'description' => $incorporationState,
 							'content' => $incorporationInfo
 						]);
-					if (PERMISSION::permissionFor('incorporation'))
+					if (PERMISSION::permissionFor('incorporation')){
 						$incorporation = [];
 						foreach(PERMISSION::pending('incorporation', $product['incorporated']) as $position){
 							$incorporation[LANG::GET('permissions.' . $position)] = [];
@@ -1298,6 +1312,7 @@ class CONSUMABLES extends API {
 								]
 							]
 						);
+					}
 				}
 				else {
 					$result['body']['content'][2][] = [
@@ -1323,28 +1338,29 @@ class CONSUMABLES extends API {
 				$this->response($result);
 				break;
 		case 'DELETE':
-				// prefetch to return proper name after deletion
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' => intval($this->_requestedID)
-				]));
-				$statement->execute();
-				$product = $statement->fetch(PDO::FETCH_ASSOC);
+			if (!PERMISSION::permissionFor('products')) $this->response([], 401);
+			// prefetch to return proper name after deletion
+			$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
+				':ids' => intval($this->_requestedID)
+			]));
+			$statement->execute();
+			$product = $statement->fetch(PDO::FETCH_ASSOC);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-unprotected-product'));
-				if ($statement->execute([
-					':id' => $product['id']
-				])) $this->response([
-					'status' => [
-						'msg' => LANG::GET('consumables.edit_product_deleted', [':name' => $product['article_name']]),
-						'id' => false,
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'status' => [
-						'msg' => LANG::GET('consumables.edit_product_not_deleted', [':name' => $product['article_name']]),
-						'id' => $product['id'],
-						'type' => 'error'
-					]]);
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-unprotected-product'));
+			if ($statement->execute([
+				':id' => $product['id']
+			])) $this->response([
+				'status' => [
+					'msg' => LANG::GET('consumables.edit_product_deleted', [':name' => $product['article_name']]),
+					'id' => false,
+					'type' => 'success'
+				]]);
+			else $this->response([
+				'status' => [
+					'msg' => LANG::GET('consumables.edit_product_not_deleted', [':name' => $product['article_name']]),
+					'id' => $product['id'],
+					'type' => 'error'
+				]]);
 			break;
 		}
 	}
