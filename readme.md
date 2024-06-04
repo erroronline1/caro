@@ -32,8 +32,6 @@
 
 
 # development
-* notifications in one file? 1 request from service worker, 1 method, another for landing page
-* pending incorporations on landing page
 * revoke sample checks (audit)
 * permission to message user groups
 

@@ -1,6 +1,7 @@
 <?php
 // login handler, menu and landing page methods
 require_once('calendarutility.php');
+require_once('notification.php');
 
 class APPLICATION extends API {
     // processed parameters for readability
@@ -148,13 +149,11 @@ class APPLICATION extends API {
 		$result = ['user' => $_SESSION['user']['name'], 'body' => ['content' => []]];
 		$tiles = [];
 
+		$notifications = new NOTIFICATION;
+
 		// messages
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		$unseen = $statement->fetch(PDO::FETCH_ASSOC);
-		if ($unseen['number']) {
+		$unseen = $notifications->messageunseen();
+		if ($unseen) {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
@@ -163,7 +162,7 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'text',
-						'content' => LANG::GET('application.overview_messages', [':number' => $unseen['number']]),
+						'content' => LANG::GET('application.overview_messages', [':number' => $unseen]),
 						'description' => LANG::GET('menu.message_conversations'),
 						'attributes' => [
 							'data-type' => 'message'
@@ -175,10 +174,8 @@ class APPLICATION extends API {
 
 		// unprocessed orders
 		if (PERMISSION::permissionFor('orderprocessing')){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
-			$statement->execute();
-			$unprocessed = $statement->fetch(PDO::FETCH_ASSOC);
-			if ($unprocessed['num']) {
+			$unprocessed = $notifications->order();
+			if ($unprocessed) {
 				$tiles[] = [
 					'type' => 'tile',
 					'attributes' => [
@@ -187,7 +184,7 @@ class APPLICATION extends API {
 					'content' => [
 						[
 							'type' => 'text',
-							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed['num']]),
+							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed]),
 							'description' => LANG::GET('menu.purchase_approved_orders'),
 							'attributes' => [
 								'data-type' => 'purchase'
@@ -199,13 +196,7 @@ class APPLICATION extends API {
 		}
 
 		// unclosed case documentation for own unit
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
-		$statement->execute();
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$number = 0;
-		foreach ($data as $row){
-			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units']) && !$row['closed']) $number++;
-		}
+		$number = $notifications->records();
 		if ($number){
 			$tiles[] = [
 				'type' => 'tile',
@@ -226,22 +217,7 @@ class APPLICATION extends API {
 		}
 
 		// unapproved forms and components
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
-		$statement->execute();
-		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-		$statement->execute();
-		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$unapproved = 0;
-		$hidden = [];
-		foreach(array_merge($components, $forms) as $element){
-			if ($element['context'] === 'bundle') continue;
-			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($element['context'] . $element['name'], $hidden)){
-				if (PERMISSION::pending('formapproval', $element['approval'])) $unapproved++;
-				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
-			}
-		}
+		$unapproved = $notifications->forms();
 		if ($unapproved){
 			$tiles[] = [
 				'type' => 'tile',
@@ -261,6 +237,27 @@ class APPLICATION extends API {
 			];
 		}
 
+		// pending product incorporations
+		$unapproved = $notifications->consumables();
+		if ($unapproved){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.purchase('get', 'pendingincorporations')",
+				],
+				'content' => [
+					[
+						'type' => 'text',
+						'content' => LANG::GET('consumables.approve_landing_page', [':number' => $unapproved]),
+						'description' => LANG::GET('menu.purchase_incorporated_pending'),
+						'attributes' => [
+							'data-type' => 'purchase'
+						]
+					]
+				]
+			];
+		}
+		
 		if (count($tiles)) $result['body']['content'][] = $tiles;
 
 		// calendar scheduled events
