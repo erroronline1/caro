@@ -445,27 +445,6 @@ class CONSUMABLES extends API {
 	}
 
 	/**
-	 * notify on pending incorporations, used by service worker
-	 */
-	public function notification(){
-		$unapproved = 0;
-		if (PERMISSION::permissionFor('incorporation')){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
-			$statement->execute();
-			$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
-			foreach($allproducts as $product) {
-				if ($product['incorporated'] === '') continue;
-				$product['incorporated'] = json_decode($product['incorporated'], true);
-				if (array_key_exists('_denied', $product['incorporated'])) continue;
-				elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $unapproved++;
-			}
-		}
-		$this->response([
-			'pendingincorporation' => $unapproved
-		]);
-	}
-
-	/**
 	 * display pending incorporations, links to product editing
 	 */
 	public function pendingincorporations(){

@@ -14,32 +14,6 @@ class FORMS extends API {
 	}
 
 	/**
-	 * alerts eligible users about forms and components having to be approved
-	 */
-	public function notification(){
-		// prepare all unapproved elements
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
-		$statement->execute();
-		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-		$statement->execute();
-		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$unapproved = 0;
-		$hidden = [];
-		foreach(array_merge($components, $forms) as $element){
-			if ($element['context'] === 'bundle') continue;
-			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($element['context'] . $element['name'], $hidden)){
-				if (PERMISSION::pending('formapproval', $element['approval'])) $unapproved++;
-				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
-			}
-		}
-		$this->response([
-			'formapproval' => $unapproved
-		]);
-	}
-
-	/**
 	 * returns the latest approved form, component by name from query
 	 * @param string $query as defined within sqlinterface
 	 * @param string $name

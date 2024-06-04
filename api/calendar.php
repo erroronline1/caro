@@ -96,69 +96,6 @@ class CALENDAR extends API {
 	}
 
 	/**
-	 * checks system processable expiry dates, adds calendar reminders if applicable
-	 * alerts a user group if selected
-	 * used by service worker
-	 */
-	public function alert(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
-
-		// check certificate validity
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
-		$statement->execute();
-		$vendors = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
-		$today->setTime(0, 0);
-		foreach ($vendors as $vendor){
-			$certificate = json_decode($vendor['certificate'], true);
-			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['timezone']));
-			else continue;
-			if ($validity > $today) continue;
-			// check for open reminders. if none add a new
-			$reminders = $calendar->search(LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]));
-			$open = false;
-			foreach($reminders as $reminder){
-				if (!$reminder['closed']) $open = true;
-			}
-			if (!$open){
-				$calendar->post([
-					':type' => 'schedule',
-					':span_start' => $today->format('Y-m-d H:i:s'),
-					':span_end' => $today->format('Y-m-d H:i:s'),
-					':author_id' => 1,
-					':affected_user_id' => 1,
-					':organizational_unit' => 'admin,office',
-					':subject' => LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]),
-					':misc' => '',
-					':closed' => '',
-					':alert' => 1
-					]);		   
-			}
-		}
-
-		$alerts = $calendar->alert(date('Y-m-d'));
-		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (array_key_exists($event['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
-		}
-	}
-
-	/**
-	 * checks for uncompleted scheduled tasks and does respond with number
-	 * used by service worker
-	 */
-	public function notification (){
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
-		$uncompleted = 0;
-		foreach ($events as $row){
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;
-		}
-		$this->response([
-			'uncompletedevents' => $uncompleted
-		]);
-	}
-
-	/**
 	 * renders scheduled events as tiles
 	 * @param array $dbevents db query results
 	 * @param object $calendar inherited CALENDARUTILITY-object

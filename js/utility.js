@@ -43,51 +43,52 @@ const _serviceWorker = {
 		}
 	},
 	onMessage: function (data) {
-		if ("unnotified" in data) {
-			if (parseInt(data.unnotified, 10)) {
+		if ("message_unnotified" in data) {
+			if (parseInt(data.message_unnotified, 10)) {
 				let body =
-					data.unnotified > 1
+					data.message_unnotified > 1
 						? LANG.GET("message.new_messages", {
-								":amount": data.unnotified,
+								":amount": data.message_unnotified,
 						  })
 						: LANG.GET("message.new_message");
 				this.showLocalNotification(LANG.GET("menu.communication_header"), body);
 			}
 		}
 		let notif;
-		if ("unseen" in data) {
+
+		if ("message_unseen" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.unseen);
+			if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.unseen);
+			if (notif) notif.setAttribute("data-notification", data.message_unseen);
 		}
-		if ("unprocessed" in data || "pendingincorporation" in data) {
-			let unprocessed = 0,
-				pendingincorporation = 0;
-			if ("unprocessed" in data) {
+		if ("order_unprocessed" in data || "consumables_pendingincorporation" in data) {
+			let order_unprocessed = 0,
+			consumables_pendingincorporation = 0;
+			if ("order_unprocessed" in data) {
 				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.unprocessed);
-				unprocessed = data.unprocessed;
+				if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
+				order_unprocessed = data.order_unprocessed;
 			}
-			if ("pendingincorporation" in data) {
+			if ("consumables_pendingincorporation" in data) {
 				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.pendingincorporation);
-				pendingincorporation = data.pendingincorporation;
+				if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
+				consumables_pendingincorporation = data.consumables_pendingincorporation;
 			}
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", parseInt(unprocessed, 10) + parseInt(pendingincorporation, 10));
+			if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 		}
-		if ("uncompletedevents" in data) {
+		if ("calendar_uncompletedevents" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.uncompletedevents);
+			if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.uncompletedevents);
+			if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 		}
-		if ("formapproval" in data) {
+		if ("form_approval" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.formapproval);
+			if (notif) notif.setAttribute("data-notification", data.form_approval);
 			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.formapproval);
+			if (notif) notif.setAttribute("data-notification", data.form_approval);
 		}
 	},
 };

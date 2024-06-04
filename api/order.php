@@ -18,19 +18,6 @@ class ORDER extends API {
 		$this->_borrowedModule = $this->_subMethodState = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
-	public function notification(){
-		$unprocessed = ['num' => 0];
-		if (PERMISSION::permissionFor('orderprocessing')){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
-			$statement->execute([
-			]);
-			$unprocessed = $statement->fetch(PDO::FETCH_ASSOC);
-		}
-		$this->response([
-			'unprocessed' => $unprocessed['num']
-		]);
-	}
-
 	public function prepared(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':

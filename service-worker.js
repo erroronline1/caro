@@ -1,4 +1,4 @@
-const cacheName = "20240601_0101"; // Change value to force update
+const cacheName = "20240604_0101"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
@@ -13,13 +13,7 @@ addEventListener("message", async (message) => {
 		case "getnotifications":
 			const response = {};
 
-			await fetch("api/api.php/calendar/alert/", {
-				method: "GET",
-				cache: "no-cache",
-				body: null,
-			});
-
-			let events = await fetch("api/api.php/calendar/notification/", {
+			let notifs = await fetch("api/api.php/notification/notifs/", {
 				method: "GET",
 				cache: "no-cache",
 				body: null,
@@ -36,96 +30,7 @@ addEventListener("message", async (message) => {
 					return undefined;
 				}
 			);
-			if (events) {
-				response["uncompletedevents"] = events.body.uncompletedevents;
-			}
-
-			let formapproval = await fetch("api/api.php/form/notification/", {
-				method: "GET",
-				cache: "no-cache",
-				body: null,
-			}).then(
-				async (response) => {
-					if (response.statusText === "OK")
-						return {
-							status: response.status,
-							body: await response.json(),
-						};
-					else return undefined;
-				},
-				() => {
-					return undefined;
-				}
-			);
-			if (formapproval) {
-				response["formapproval"] = formapproval.body.formapproval;
-			}
-
-			let messages = await fetch("api/api.php/message/notification/", {
-				method: "GET",
-				cache: "no-cache",
-				body: null,
-			}).then(
-				async (response) => {
-					if (response.statusText === "OK")
-						return {
-							status: response.status,
-							body: await response.json(),
-						};
-					else return undefined;
-				},
-				() => {
-					return undefined;
-				}
-			);
-			if (messages) {
-				response["unnotified"] = messages.body.unnotified;
-				response["unseen"] = messages.body.unseen;
-			}
-
-			let orders = await fetch("api/api.php/order/notification/", {
-				method: "GET",
-				cache: "no-cache",
-				body: null,
-			}).then(
-				async (response) => {
-					if (response.statusText === "OK")
-						return {
-							status: response.status,
-							body: await response.json(),
-						};
-					else return undefined;
-				},
-				() => {
-					return undefined;
-				}
-			);
-			if (orders) {
-				response["unprocessed"] = orders.body.unprocessed;
-			}
-
-			let incorporation = await fetch("api/api.php/consumables/notification/", {
-				method: "GET",
-				cache: "no-cache",
-				body: null,
-			}).then(
-				async (response) => {
-					if (response.statusText === "OK")
-						return {
-							status: response.status,
-							body: await response.json(),
-						};
-					else return undefined;
-				},
-				() => {
-					return undefined;
-				}
-			);
-			if (incorporation) {
-				response["pendingincorporation"] = incorporation.body.pendingincorporation;
-			}
-
-			if (Object.keys(response).length !== 0) client.postMessage(response);
+			client.postMessage(notifs.body);
 			break;
 	}
 });

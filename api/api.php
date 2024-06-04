@@ -185,7 +185,7 @@ class API {
 	}
 }
 
-if (in_array(REQUEST[0], ['application', 'form', 'user', 'consumables', 'order', 'message', 'file', 'tool', 'texttemplate', 'csvfilter', 'record', 'audit', 'calendar'])) require_once(REQUEST[0] . '.php');
+if (in_array(REQUEST[0], ['application', 'form', 'user', 'consumables', 'order', 'message', 'file', 'tool', 'texttemplate', 'csvfilter', 'record', 'audit', 'calendar', 'notification'])) require_once(REQUEST[0] . '.php');
 
 exit();
 ?>
