@@ -28,6 +28,7 @@
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
+* [Technical guidelines on sata security](#technical-guidelines-on-sata-security)
 * [Ressources](#ressources)
 
 
@@ -37,6 +38,7 @@
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
 * permission to message user groups
 * https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/Technische-Richtlinien/TR-nach-Thema-sortiert/tr03161/tr-03161.html
+* data deletion in accordance to dsgvo, eg. recommend deletion after x years
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -1248,6 +1250,300 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
 
 [Content](#content)
+
+## Technical guidelines on sata security
+[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
+
+### 3.1.1 Prüfaspekt (1): Anwendungszweck
+* O.Purp_1 Der Hersteller MUSS die rechtmäßigen Zwecke der Web-Anwendung und die 
+Verarbeitung von personenbezogenen Daten offenlegen (etwa in der Beschreibung der 
+Nutzungsbedingungen der Web-Anwendung) und den Nutzer spätestens bei der 
+erstmaligen Nutzung der Anwendung darüber informieren. 
+* O.Purp_2 Die Web-Anwendung DARF KEINE Daten erheben und verarbeiten, die nicht dem 
+rechtmäßigen Zweck der Anwendung dienen.
+* O.Purp_3 Die Web-Anwendung MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
+* O.Purp_4 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN 
+NICHT von der Web-Anwendung oder dem Hintergrundsystem erfasst, erhalten oder 
+genutzt werden.
+* O.Purp_5 Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte 
+Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die 
+Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten 
+der Anwendung informiert werden. 
+* O.Purp_6 Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den 
+Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses 
+angefordert werden können.
+Bundesamt für Sicherheit in der Informationstechnik 17
+* O.Purp_7 Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten 
+Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die 
+Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige 
+oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen
+werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur 
+Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software
+steht.
+* O.Purp_8 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. 
+Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe 
+von Anwendungsdaten vollumfänglich informieren und sein Einverständnis einholen 
+(OPT-IN).
+* O.Purp_9 Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer 
+dies ist für den primären Zweck der Anwendung erforderlich.
+
+### 3.1.2 Prüfaspekt (2): Architektur
+* O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus‘ für 
+die gesamte Web-Anwendung und das Hintergrundsystem sein. 
+* O.Arch_2 Bereits in der Designphase von Web-Anwendung und Hintergrundsystem MUSS 
+berücksichtigt werden, dass die Anwendung in der Produktivphase sensible Daten 
+verarbeiten wird. Die Architektur der Anwendung MUSS dafür die sichere Erhebung, 
+Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem 
+Datenlebenszyklus gewährleisten. 
+* O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten 
+Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur 
+Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, 
+Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf 
+anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
+* O.Arch_4 In Backups gespeicherte sensiblen Daten MÜSSEN gemäß dem aktuellen Stand der
+Technik verschlüsselt sein. Dies schließt das Persistieren sensibler Daten durch den 
+Browser, etwa in dessen Cache, mit ein.
+* O.Arch_5 Nutzt die Web-Anwendung Drittanbieter-Software, MUSS der Hersteller sicherstellen5
+, 
+dass nur solche Drittanbieter-Software zum Einsatz kommen, deren zu nutzenden 
+Funktionen sicher genutzt werden können und dem Nutzer Informationen über den 
+Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellen. Die 
+Anwendung MUSS diese Funktionen sicher nutzten. Der Hersteller MUSS darüber 
+hinaus sicherstellen5
+, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden 
+können.
+* O.Arch_6 Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und 
+mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN 
+keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden. 
+* O.Arch_7 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um 
+Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten 
+Kanal stattfinden.
+ * O.Arch_8 Die Web-Anwendung MUSS beim Start die Aktualität des genutzten Web-Browsers 
+prüfen. Wenn die Installation eines sicherheitsrelevanten Updates noch nicht erfolgt ist, 
+DARF die Web-Anwendung KEINEN Zugriff auf sensible Daten ermöglichen. 
+* O.Arch_9 Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der 
+Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter 
+anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und 
+X-Frame-Options.
+
+### 3.1.3 Prüfaspekt (3): Quellcode
+* O.Source_1 Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell 
+bösartige Werte vor der Verarbeitung herauszufiltern.
+* O.Source_2 Die Anwendung MUSS eingehende und ausgehende Daten maskieren beziehungsweise 
+von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
+* O.Source_3 Fehlermeldungen und Log-Dateien DÜRFEN KEINE sensiblen Daten (z. B. User Identifier 
+oder Session-IDs) enthalten.
+* O.Source_4 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, 
+kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen 
+(z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden. 
+* O.Source_5 Bei Ausnahmen im Programmablauf (Exceptions) SOLL die Web-Anwendung Zugriffe 
+auf sensible Daten abbrechen und diese im Speicher sicher löschen. 
+* O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, 
+Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein. 
+* O.Source_7 Vor der produktiven Bereitstellung der Anwendung SOLLEN moderne 
+Sicherheitsmechanismen, wie beispielsweise Obfuskation und Bundler, verwendet 
+werden. 
+* O.Source_8 Für die Entwicklung der Anwendung SOLLEN Werkzeuge zur statischen Codeanalyse 
+eingesetzt werden. 
+* O.Source_9 Nutzt die Web-Anwendung URL-Weiterleitungen (URL-Redirects), MUSS diese 
+kontrolliert erfolgen.
+* O.Source_10 Die Web-Anwendung MUSS Maßnahmen vorsehen, die verhindern, dass Funktionalitäten, die nicht in der Entwicklungshoheit des Herstellers liegen, in die WebAnwendung eingeschleust und zur Ausführung gebracht werden.
+* O.Source_11 Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS 
+solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten. 
+
+### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
+* O.TrdP_1 [List of third party software](#ressources)
+* O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die 
+Veröffentlichung vorgesehenen Version verwendet werden. 
+* O.TrdP_3 Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung 
+öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) 
+auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der 
+Entwicklung (vgl.O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller 
+Bundesamt für Sicherheit in der Informationstechnik 19
+MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die 
+Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. 
+Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die 
+Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden. 
+* O.TrdP_4 Sicherheitsupdates für Drittanbieter-Software MUSS zeitnah integriert und per Update 
+dem Nutzer zur Verfügung gestellt werden. Der Hersteller MUSS ein Sicherheitskonzept 
+vorlegen, das anhand der Kritikalität ausnutzbarer Schwachstellen die geduldete 
+Weiternutzung für die Web-Anwendung, bzw. das Hintergrundsystem festlegt. Nachdem 
+die Übergangsfrist (Grace Period) abgelaufen ist, DARF die Web-Anwendung NICHT 
+mehr zur Benutzung angeboten werden.
+* O.TrdP_5 Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf 
+Vertrauenswürdigkeit geprüft werden. 
+* O.TrdP_6 Caro App does not communicate to third parties
+* O.TrdP_7 Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden. 
+* O.TrdP_8 Drittanbieter-Software, die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
+
+### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
+* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest 
+einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
+* O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
+* O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und 
+dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen.
+* O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt 
+werden. 
+* O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik 
+entsprechen (siehe [TR02102-1]).
+
+### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
+* O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem 
+Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden 
+einer Anwendungssitzung dokumentieren.
+* O.Auth_2 Die Anwendung SOLL Authentisierungsmechanismen und Autorisierungsfunktionen 
+separat realisieren. Sind für die Anwendung verschiedene Rollen notwendig, MUSS eine 
+Autorisierung bei jedem Datenzugriff separat realisiert werden. 
+* O.Auth_3 Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei-FaktorAuthentifizierung umgesetzt werden.
+* O.Auth_4 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen 
+Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach 
+umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf 
+einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher 
+Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 
+* O.Auth_5 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen 
+(z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit 
+einbezogen werden. 
+* O.Auth_6 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche 
+Anmeldevorgänge informieren zu lassen.
+* O.Auth_7 Die Anwendung MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
+* O.Auth_8 Wurde die Anwendung unterbrochen (in den Hintergrundbetrieb versetzt), MUSS nach 
+Ablauf einer angemessenen Frist (Grace Period) eine erneute Authentisierung 
+durchgeführt werden.
+* O.Auth_9 Die Anwendung MUSS nach einer angemessenen Zeit in der sie nicht aktiv verwendet 
+wurde (idle time) eine erneute Authentisierung fordern. 
+* O.Auth_10 Die Anwendung MUSS nach einer angemessenen Zeit in der sie aktiv verwendet wurde 
+(active time) eine erneute Authentisierung zur Reaktivierung der Serversitzung fordern. 
+* O.Auth_11 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des 
+Nutzers geändert werden.
+* O.Auth_12 Die Anwendung MUSS für die Anbindung eines Hintergrundsystems eine dem Stand der 
+Technik entsprechende Authentifizierung verwenden. 
+* O.Auth_13 Authentisierungsdaten, wie bspw. Session-Identifier bzw. Authentisierungstoken, 
+MÜSSEN als sensible Daten geschützt werden. 
+* O.Auth_14 Die Anwendung MUSS es dem Nutzer ermöglichen einen oder alle zuvor ausgestellten 
+Session-Identifier bzw. Authentisierungstoken zu invalidieren.
+* O.Auth_15 Wird eine Anwendungssitzung ordnungsgemäß beendet, MUSS die Anwendung das 
+Hintergrundsystem darüber informieren, sodass Session-Identifier bzw. 
+Authentisierungstoken sicher gelöscht werden. Dies gilt sowohl für das aktive Beenden
+durch den Benutzer (log-out), als auch für das automatische Beenden durch die 
+Anwendung (vgl. O.Auth_9 und O.Auth_10).
+* O.Auth_16 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, 
+gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über 
+diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und 
+nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
+* O.Auth_17 Der Nutzer MUSS in den Nutzungsbedingungen der Web-Anwendung auf das Restrisiko 
+hingewiesen werden, welches mit der Speicherung der Login-Credentials im WebBrowser oder auch einem anderen externen Programm für einen komfortableren 
+Anmeldevorgang verbunden ist. 
+
+### 3.1.6.1 Authentifizierung über Passwort
+* O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke 
+Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
+* O.Pass_2 Für die Einrichtung der Authentisierung mittels Benutzername und Passwort KANN die 
+Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über 
+die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden. 
+* O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern. 
+Bundesamt für Sicherheit in der Informationstechnik 21
+* O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden. 
+* O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen 
+Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter 
+Salts gehasht werden.
+
+### 3.1.7 Prüfaspekt (7): Datensicherheit
+* O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
+* O.Data_2 Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die 
+Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt. 
+* O.Data_3 Die Web-Anwendung DARF Ressourcen, die einen Zugriff auf sensible Daten 
+ermöglichen, gegenüber Dritten NICHT verfügbar machen. 
+* O.Data_4 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen 
+Verarbeitung hinaus in der Web-Anwendung gehalten werden.
+* O.Data_5 Die Web-Anwendung MUSS die Grundsätze der Datensparsamkeit und Zweckbindung 
+berücksichtigen. 
+* O.Data_6 Die Speicherung und Verarbeitung von sensiblen Daten SOLL im Hintergrundsystem 
+erfolgen.
+* O.Data_7 Bei der Verwendung von Aufnahmegeräten (z. B. Kamera) MÜSSEN sämtliche Metadaten 
+mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf die GPS-Koordinaten des 
+Aufnahmeorts, eingesetzte Hardware etc., entfernt werden. 
+* O.Data_8 Bei der Erhebung von sensiblen Daten durch die Verwendung von Aufnahmegeräten (z. 
+B. Kamera), MUSS vorgebeugt werden, dass andere Anwendungen darauf Zugriff 
+erlangen könnten, etwa über eine Mediengalerie.
+* O.Data_9 Bei der Eingabe sensibler Daten über die Tastatur SOLL die Web-Anwendung 
+unterbinden, dass Aufzeichnungen für Dritte erkennbar werden. 
+* O.Data_10 Bei der Eingabe sensibler Daten SOLL der Export in die Zwischenablage unterbunden 
+werden. Die Anwendung KANN alternativ eine eigene Zwischenablage implementieren, 
+welche vor dem Zugriff durch andere Anwendungen geschützt ist.
+* O.Data_11 Sensible Daten DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, 
+exportiert werden.
+* O.Data_12 Durch die Web-Anwendung kann der Zugriff für Dritte und die Speicherung des 
+Bildschirms (z. B. Screenshots und Anzeigen für das App-Switching) nicht unterbunden 
+werden. Über die Nutzungsbedingungen MUSS der Nutzer darüber informiert werden, 
+dass sensible Daten über Screenshots oder Anzeigen für das App-Switching
+kompromittiert werden können.
+* O.Data_13 Über die Nutzungsbedingungen der Web-Anwendung MUSS der Nutzer über das Risiko 
+informiert werden, welches damit verbunden ist, dass im gesperrten Zustand des 
+Endgeräts die Verbindung zum Hintergrundsystem weiter geöffnet bleibt, wenn der 
+Nutzer sich nicht explizit ausgeloggt hat.
+* O.Data_14 Die Web-Anwendung SOLL sicherstellen, dass bei ihrer Beendigung alle sensiblen Daten 
+und anwendungsspezifischen Anmeldeinformationen im Web-Browser nicht mehr 
+zugreifbar sind. Dies schließt insbesondere Cookies und Webstorage mit ein. 
+Bundesamt für Sicherheit in der Informationstechnik 22
+* O.Data_15 Die Web-Anwendung MUSS dem Nutzer die Möglichkeit geben, dass bei endgültiger 
+Beendigung der Nutzung alle sensiblen Daten und anwendungsspezifischen 
+Anmeldeinformationen vollständig gelöscht bzw. unzugänglich gemacht werden. 
+* O.Data_16 Für alle Cookies, auf die nicht mittels JavaScript zugegriffen wird, MUSS das HTTP-OnlyFlag verwendet werden. 
+* O.Data_17 Für alle Cookies, die sensible Daten enthalten, MUSS das Secure-Flag gesetzt sein.
+* O.Data_18 Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion 
+abgeschaltet sein.
+* O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein 
+(d.h. Vermeidung von Domain-Cookies).
+
+### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
+not applicable
+
+
+### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
+* O.Ntwk_1 Jegliche Netzwerkkommunikation der Web-Anwendung MUSS durchgängig mit 
+gegenseitiger Authentisierung verschlüsselt werden. 
+* O.Ntwk_2 Die Konfiguration der TLS-Verbindungen MUSS dem aktuellen Stand der Technik 
+entsprechen (vgl. [TR02102-2]).
+Bundesamt für Sicherheit in der Informationstechnik 23
+* O.Ntwk_3 Die Web-Anwendung MUSS die Sicherheitsfunktionalität der jeweilig verwendeten 
+Betriebssystem-Plattform und des Browsers verwenden, um sichere 
+Kommunikationskanäle aufzubauen.
+* O.Ntwk_4 Die Web-Anwendung SOLL die Verwendung von Zertifikaten, deren Zertifikatskette 
+dem Hersteller nicht vertrauenswürdig erscheint, unterbinden. 
+
+### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
+* O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten 
+Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten 
+Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken 
+aufklären.
+* O.Plat_2 Die Web-Anwendung DARF Berechtigungen, die für die Erfüllung ihres primären 
+Zwecks nicht notwendig sind, NICHT einfordern.
+* O.Plat_3 Die Web-Anwendung MUSS den Nutzer auf den rechtmäßigen Zweck der 
+anzufragenden Berechtigungen und auf die Auswirkungen hinweisen, die eintreten, falls 
+der Nutzer diese nicht gewährt.
+* O.Plat_4 Die Web-Anwendung DARF KEINE sensiblen Daten in erweiterten Meldungen oder 
+Benachrichtigungen, die nicht vom Nutzer explizit eingeschaltet wurden (siehe O.Plat_5), 
+anzeigen.
+* O.Plat_5 Die Web-Anwendung KANN dem Nutzer die Optionen bieten, erweiterte Meldungen 
+und Benachrichtigungen, ggf. auch mit sensiblen Inhalten, anzuzeigen. Bei 
+Werkseinstellung MUSS diese deaktiviert sein.
+* O.Plat_6 Die Web-Anwendung MUSS das Nachladen von Inhalten auf Quellen beschränken, die 
+unter der Kontrolle des Herstellers sind oder durch den Hersteller autorisiert wurden. 
+* O.Plat_7 Die Web-Anwendung MUSS den Nutzer über das Risiko informieren, dass ggf. nach 
+Beendigung der Web-Anwendung nutzerspezifischen Daten im Arbeitsspeicher 
+verbleiben können.
+* O.Plat_8 Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch 
+den Nutzer umsetzbar sind. 
+
+### 3.1.11 Prüfaspekt (11): Resilienz
+* O.Resi_1 Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen 
+zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
+* O.Resi_2 Die Web-Anwendung MUSS über die Nutzungsbedingungen dem Nutzer darstellen, 
+welche Risiken für die Daten des Nutzers bei einer Benutzung von Geräten, deren 
+Betriebssystem in keinem vom Betriebssystemhersteller vorgesehenen Betriebszustand
+ist, bestehen. 
+
+
 
 ## Ressources
 ### external libraries
