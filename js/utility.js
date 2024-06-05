@@ -6,9 +6,12 @@ const _serviceWorker = {
 			this.worker = await navigator.serviceWorker.register("./service-worker.js");
 			this.permission = await window.Notification.requestPermission();
 			navigator.serviceWorker.ready.then((registration) => {
-				setInterval(() => {
-					if (registration) _serviceWorker.postMessage("getnotifications");
-				}, 10000);
+				if (registration) {
+					_serviceWorker.postMessage("getnotifications");
+					setInterval(() => {
+						_serviceWorker.postMessage("getnotifications");
+					}, 300000);
+				}
 				navigator.serviceWorker.addEventListener("message", (message) => {
 					this.onMessage(message.data);
 				});
@@ -64,19 +67,27 @@ const _serviceWorker = {
 		}
 		if ("order_unprocessed" in data || "consumables_pendingincorporation" in data) {
 			let order_unprocessed = 0,
-			consumables_pendingincorporation = 0;
+				consumables_pendingincorporation = 0;
 			if ("order_unprocessed" in data) {
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+				notif = document.querySelector(
+					"[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]"
+				);
 				if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 				order_unprocessed = data.order_unprocessed;
 			}
 			if ("consumables_pendingincorporation" in data) {
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
+				notif = document.querySelector(
+					"[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]"
+				);
 				if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 				consumables_pendingincorporation = data.consumables_pendingincorporation;
 			}
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
+			if (notif)
+				notif.setAttribute(
+					"data-notification",
+					parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)
+				);
 		}
 		if ("calendar_uncompletedevents" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
@@ -98,7 +109,8 @@ const _client = {
 			window.calendarFormData = new FormData();
 			units = [];
 			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+				if (value === "unit")
+					units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
 			if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));
