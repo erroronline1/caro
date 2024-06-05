@@ -86,6 +86,7 @@ export const assemble_helper = {
 			elements.push(div2);
 		}
 		menu.replaceChildren(...elements);
+		_serviceWorker.postMessage("getnotifications");
 	},
 };
 
