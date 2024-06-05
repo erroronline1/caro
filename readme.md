@@ -32,6 +32,7 @@
 
 
 # development
+* incorporation on same article_no
 * token & order-pin encrypted
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
 * permission to message user groups
