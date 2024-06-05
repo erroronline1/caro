@@ -114,6 +114,7 @@ body > header {
 		-webkit-mask-image: url("./media/cloud.svg");
 		mask-image: url("./media/cloud.svg");
 		display: none;
+		z-index: 1;
 	}
 
 	& > div:last-of-type {
