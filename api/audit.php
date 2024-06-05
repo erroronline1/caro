@@ -135,6 +135,18 @@ class AUDIT extends API {
 				]),
 				'content' => $row['content']
 			];
+			$entries[] = [
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'value' => LANG::GET('audit.sample_check_revoke'),
+					'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('order.disapprove') . "', " .
+						"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('audit.sample_check_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
+						"if (response !== false) {" .
+						"api.purchase('delete', 'mdrsamplecheck', " . $row['id']. "); this.disabled=true" .
+						"}});"
+				]
+			];
 		}
 		if ($entries) $content[] = $entries;
 		return $content;

@@ -102,7 +102,7 @@ class CONSUMABLES extends API {
 					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
 					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
 					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => $remainder[$update]['incorporated']
+					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
 				]) . '; ');
 			}
 			$insertions = [];
@@ -117,7 +117,7 @@ class CONSUMABLES extends API {
 					':active' => 1,
 					':protected' => 0,
 					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => ''
+					':incorporated' => "''"
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT(SQLQUERY::PREPARE('consumables_post-product'), $insertions));
@@ -212,14 +212,17 @@ class CONSUMABLES extends API {
 					':author' => $_SESSION['user']['name'],
 					':content' => $content
 				])) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-check'));
+					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-check'), [':checked' => 'CURRENT_TIMESTAMP']));
 					if ($statement->execute([
-						':id' => $product['id'],
-					])) $this->response([
+						':ids' => $product['id'],
+					])) {
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)], LANG::GET('order.sample_check_alert') . $content);
+						$this->response([
 						'status' => [
 							'msg' => LANG::GET('order.sample_check_success'),
 							'type' => 'success'
 						]]);
+					}
 				}
 				$this->response([
 					'status' => [
@@ -254,6 +257,46 @@ class CONSUMABLES extends API {
 					'productid' => $product['id']
 				]];
 				$this->response($result);
+				break;
+			case 'DELETE':
+				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
+				// get check
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('checks_get-by-id'), [
+					':id' => intval($this->_requestedID)
+				]));
+				$statement->execute();
+				$check = $statement->fetch(PDO::FETCH_ASSOC);
+				// get product(s)
+				$content = preg_split("/\n/", $check['content']);
+				$vendor = $content[0];
+				$article_no = $content[1];
+
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product-by-article_no-vendor'), [
+					':article_no' => $this->_pdo->quote($article_no),
+					':vendor' => $this->_pdo->quote($vendor)
+				]));
+				$statement->execute();
+				$products = $statement->fetchAll(PDO::FETCH_ASSOC);
+				// set check to null
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-check'), [
+					':checked' => 'NULL',
+					':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
+				]));
+				$statement->execute();
+				// delete check from check-db
+				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('checks_delete'), [
+					':id' => intval($this->_requestedID)
+				]));
+				if ($statement->execute()) $this->response([
+					'status' => [
+						'msg' => LANG::GET('order.sample_check_revoked'),
+						'type' => 'success'
+					]]);
+				$this->response([
+					'status' => [
+						'msg' => LANG::GET('order.sample_check_failure'),
+						'type' => 'error'
+					]]);
 				break;
 		}
 	}

@@ -157,6 +157,14 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
 		],
+		'checks_get-by-id' => [
+			'mysql' => "SELECT * FROM caro_checks WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_checks WHERE id = :id"
+		],
+		'checks_delete' => [
+			'mysql' => "DELETE FROM caro_checks WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_checks WHERE id = :id"
+		],
 
 
 
@@ -193,11 +201,11 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)"
 		],
-		'consumables_put-check' => [
-			'mysql' => "UPDATE caro_consumables_products SET checked = CURRENT_TIMESTAMP WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET pchecked = CURRENT_TIMESTAMP WHERE id = :id"
+		'consumables_put-check' => [ // preprocess via strtr
+			'mysql' => "UPDATE caro_consumables_products SET checked = :checked WHERE id IN (:ids)",
+			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked WHERE id IN (:ids)"
 		],
-		'consumables_put-incorporation' => [
+		'consumables_put-incorporation' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)"
 		],
@@ -212,6 +220,10 @@ class SQLQUERY {
 		'consumables_get-product-search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id"
+		],
+		'consumables_get-product-by-article_no-vendor' => [
+			'mysql' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id"
 		],
 		'consumables_get-not-checked' => [
 			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "

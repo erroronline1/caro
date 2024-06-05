@@ -1299,7 +1299,7 @@ class ORDER extends API {
 									'attributes' => [
 										'value' => LANG::GET('order.incorporation'),
 										'type' => 'button',
-										'onpointerup' => "api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . ");"
+										'onpointerup' => "if (!this.disabled) api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . "); this.disabled=true"
 									]
 								];
 							} else {
@@ -1337,7 +1337,7 @@ class ORDER extends API {
 									'attributes' => [
 										'value' => LANG::GET('order.sample_check'),
 										'type' => 'button',
-										'onpointerup' => "api.purchase('get', 'mdrsamplecheck', " . $sampleCheck[$tocheck]['id'] . ");"
+										'onpointerup' => "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " . $sampleCheck[$tocheck]['id'] . "); this.disabled=true"
 									]
 								];
 							} else {

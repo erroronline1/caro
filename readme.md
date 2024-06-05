@@ -34,7 +34,6 @@
 # development
 * token & order-pin encrypted
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
-* revoke sample checks (audit)
 * permission to message user groups
 * https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/Technische-Richtlinien/TR-nach-Thema-sortiert/tr03161/tr-03161.html
 
