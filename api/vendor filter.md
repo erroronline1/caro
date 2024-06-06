@@ -65,12 +65,12 @@ delete first two columns and rows
 ```json
 {
 	"filesetting": {
-		"headerrowindex": 2,
-		"columns": ["Neue Artikel Nummer", "Bezeichnung", "GTIN"]
+		"headerrowindex": 0,
+		"columns": ["NeueArtikelNummer", "Bezeichnung", "GTIN"]
 	},
 	"modify": {
 		"rewrite": [{
-			"article_no": ["Neue Artikel Nummer"],
+			"article_no": ["NeueArtikelNummer"],
 			"article_name": ["Bezeichnung"],
 			"article_unit": [""],
 			"article_ean": ["GTIN"]
