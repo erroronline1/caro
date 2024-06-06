@@ -38,6 +38,8 @@
 
 # development
 * UTILITY::scriptfilter()
+* sqlquery further implementation, safe executing chunks
+* error response on empty timesheet exports
 * incorporation on same article_no
 * token & order-pin encrypted
 * https://stackoverflow.com/questions/10165424/how-secure-are-php-sessions
