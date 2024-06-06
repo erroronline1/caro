@@ -28,7 +28,7 @@
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
-* [Technical guidelines on sata security](#technical-guidelines-on-sata-security)
+* [Technical guidelines on data security](#technical-guidelines-on-data-security)
     * [Web Application](#web-application)
     * [Backend](#backend)
 * [Ressources](#ressources)
@@ -1257,7 +1257,7 @@ You can as well define all products as trading goods and set to 0 conditionally 
 
 [Content](#content)
 
-## Technical guidelines on sata security
+## Technical guidelines on data security
 ### Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
 
