@@ -37,11 +37,11 @@
 
 
 # development
+* UTILITY::scriptfilter()
 * incorporation on same article_no
 * token & order-pin encrypted
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
 * permission to message user groups
-* https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/Technische-Richtlinien/TR-nach-Thema-sortiert/tr03161/tr-03161.html
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years
 
 #### purchase considerations
@@ -1412,244 +1412,208 @@ A generic sample:
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
 
 #### 3.1.1 Prüfaspekt (1): Anwendungszweck
-* O.Purp_1 Der Hersteller MUSS die rechtmäßigen Zwecke der Web-Anwendung und die 
-Verarbeitung von personenbezogenen Daten offenlegen (etwa in der Beschreibung der 
-Nutzungsbedingungen der Web-Anwendung) und den Nutzer spätestens bei der 
-erstmaligen Nutzung der Anwendung darüber informieren. 
-* O.Purp_2 Die Web-Anwendung DARF KEINE Daten erheben und verarbeiten, die nicht dem 
-rechtmäßigen Zweck der Anwendung dienen.
-* O.Purp_3 Die Web-Anwendung MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
-* O.Purp_4 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN 
-NICHT von der Web-Anwendung oder dem Hintergrundsystem erfasst, erhalten oder 
-genutzt werden.
-* O.Purp_5 Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte 
-Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die 
-Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten 
-der Anwendung informiert werden. 
-* O.Purp_6 Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den 
-Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses 
-angefordert werden können.
-Bundesamt für Sicherheit in der Informationstechnik 17
-* O.Purp_7 Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten 
-Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die 
-Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige 
-oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen
-werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur 
-Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software
-steht.
-* O.Purp_8 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. 
-Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe 
-von Anwendungsdaten vollumfänglich informieren und sein Einverständnis einholen 
-(OPT-IN).
-* O.Purp_9 Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer 
-dies ist für den primären Zweck der Anwendung erforderlich.
+* O.Purp_1
+    > Der Hersteller MUSS die rechtmäßigen Zwecke der Web-Anwendung und die Verarbeitung von personenbezogenen Daten offenlegen (etwa in der Beschreibung der Nutzungsbedingungen der Web-Anwendung) und den Nutzer spätestens bei der erstmaligen Nutzung der Anwendung darüber informieren. 
+* O.Purp_2
+    > Die Web-Anwendung DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
+    * only active and intentional user input is processed and stored.
+* O.Purp_3
+    > Die Web-Anwendung MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
+* O.Purp_4
+    > Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von der Web-Anwendung oder dem Hintergrundsystem erfasst, erhalten oder genutzt werden.
+    * only active and intentional user input is processed and stored.
+* O.Purp_5
+    > Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden. 
+* O.Purp_6
+    > Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
+* O.Purp_7
+    > Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
+    * [Ressources](#ressources)
+* O.Purp_8
+    > Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
+    * [Ressources](#ressources)
+* O.Purp_9
+    > Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer dies ist für den primären Zweck der Anwendung erforderlich.
+    * sensitive data is displayed only on intented demand (case records)
 
 #### 3.1.2 Prüfaspekt (2): Architektur
-* O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus‘ für 
-die gesamte Web-Anwendung und das Hintergrundsystem sein. 
-* O.Arch_2 Bereits in der Designphase von Web-Anwendung und Hintergrundsystem MUSS 
-berücksichtigt werden, dass die Anwendung in der Produktivphase sensible Daten 
-verarbeiten wird. Die Architektur der Anwendung MUSS dafür die sichere Erhebung, 
-Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem 
-Datenlebenszyklus gewährleisten. 
-* O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten 
-Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur 
-Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, 
-Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf 
-anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
-* O.Arch_4 In Backups gespeicherte sensiblen Daten MÜSSEN gemäß dem aktuellen Stand der
-Technik verschlüsselt sein. Dies schließt das Persistieren sensibler Daten durch den 
-Browser, etwa in dessen Cache, mit ein.
-* O.Arch_5 Nutzt die Web-Anwendung Drittanbieter-Software, MUSS der Hersteller sicherstellen, 
-dass nur solche Drittanbieter-Software zum Einsatz kommen, deren zu nutzenden 
-Funktionen sicher genutzt werden können und dem Nutzer Informationen über den 
-Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellen. Die 
-Anwendung MUSS diese Funktionen sicher nutzten. Der Hersteller MUSS darüber 
-hinaus sicherstellen5
-, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden 
-können.
-* O.Arch_6 Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und 
-mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN 
-keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden. 
-* O.Arch_7 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um 
-Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten 
-Kanal stattfinden.
- * O.Arch_8 Die Web-Anwendung MUSS beim Start die Aktualität des genutzten Web-Browsers 
-prüfen. Wenn die Installation eines sicherheitsrelevanten Updates noch nicht erfolgt ist, 
-DARF die Web-Anwendung KEINEN Zugriff auf sensible Daten ermöglichen. 
-* O.Arch_9 Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der 
-Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter 
-anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und 
-X-Frame-Options.
+* O.Arch_1
+    > „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus‘ für die gesamte Web-Anwendung und das Hintergrundsystem sein. 
+    * user login and permissions have been mandatory from the early stages on
+* O.Arch_2
+    > Bereits in der Designphase von Web-Anwendung und Hintergrundsystem MUSS berücksichtigt werden, dass die Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur der Anwendung MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten. 
+    * user login and permissions have been mandatory from the early stages on
+* O.Arch_3
+    > Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
+* O.Arch_4
+    > In Backups gespeicherte sensiblen Daten MÜSSEN gemäß dem aktuellen Stand der Technik verschlüsselt sein. Dies schließt das Persistieren sensibler Daten durch den Browser, etwa in dessen Cache, mit ein.
+* O.Arch_5
+    > Nutzt die Web-Anwendung Drittanbieter-Software, MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommen, deren zu nutzenden Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellen. Die Anwendung MUSS diese Funktionen sicher nutzten. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
+* O.Arch_6
+    > Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden.
+    * used languages and are solely limited to html, css, javascript and php
+* O.Arch_7
+    > Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
+ * O.Arch_8
+    > Die Web-Anwendung MUSS beim Start die Aktualität des genutzten Web-Browsers prüfen. Wenn die Installation eines sicherheitsrelevanten Updates noch nicht erfolgt ist, DARF die Web-Anwendung KEINEN Zugriff auf sensible Daten ermöglichen. 
+* O.Arch_9
+    > Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und X-Frame-Options.
+    * [Prerequisites](#prerequisites)
 
 #### 3.1.3 Prüfaspekt (3): Quellcode
-* O.Source_1 Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell 
-bösartige Werte vor der Verarbeitung herauszufiltern.
-* O.Source_2 Die Anwendung MUSS eingehende und ausgehende Daten maskieren beziehungsweise 
-von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
-* O.Source_3 Fehlermeldungen und Log-Dateien DÜRFEN KEINE sensiblen Daten (z. B. User Identifier 
-oder Session-IDs) enthalten.
-* O.Source_4 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, 
-kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen 
-(z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden. 
-* O.Source_5 Bei Ausnahmen im Programmablauf (Exceptions) SOLL die Web-Anwendung Zugriffe 
-auf sensible Daten abbrechen und diese im Speicher sicher löschen. 
-* O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, 
-Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein. 
-* O.Source_7 Vor der produktiven Bereitstellung der Anwendung SOLLEN moderne 
-Sicherheitsmechanismen, wie beispielsweise Obfuskation und Bundler, verwendet 
-werden. 
-* O.Source_8 Für die Entwicklung der Anwendung SOLLEN Werkzeuge zur statischen Codeanalyse 
-eingesetzt werden. 
-* O.Source_9 Nutzt die Web-Anwendung URL-Weiterleitungen (URL-Redirects), MUSS diese 
-kontrolliert erfolgen.
-* O.Source_10 Die Web-Anwendung MUSS Maßnahmen vorsehen, die verhindern, dass Funktionalitäten, die nicht in der Entwicklungshoheit des Herstellers liegen, in die WebAnwendung eingeschleust und zur Ausführung gebracht werden.
-* O.Source_11 Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS 
-solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten. 
+* O.Source_1
+    > Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
+* O.Source_2
+    > Die Anwendung MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
+* O.Source_3
+    > Fehlermeldungen und Log-Dateien DÜRFEN KEINE sensiblen Daten (z. B. User Identifier oder Session-IDs) enthalten.
+* O.Source_4
+    > Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen (z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden. 
+* O.Source_5
+    > Bei Ausnahmen im Programmablauf (Exceptions) SOLL die Web-Anwendung Zugriffe auf sensible Daten abbrechen und diese im Speicher sicher löschen.
+    * sensitive data is passed to callbacks and is not available after occuring exceptions
+* O.Source_6
+    > Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein.
+* O.Source_7
+    > Vor der produktiven Bereitstellung der Anwendung SOLLEN moderne Sicherheitsmechanismen, wie beispielsweise Obfuskation und Bundler, verwendet werden. 
+* O.Source_8
+    > Für die Entwicklung der Anwendung SOLLEN Werkzeuge zur statischen Codeanalyse eingesetzt werden.
+    * [Code design patterns](#code-design-patterns)
+* O.Source_9
+    > Nutzt die Web-Anwendung URL-Weiterleitungen (URL-Redirects), MUSS diese kontrolliert erfolgen.
+    * redirects are not used
+* O.Source_10
+    > Die Web-Anwendung MUSS Maßnahmen vorsehen, die verhindern, dass Funktionalitäten, die nicht in der Entwicklungshoheit des Herstellers liegen, in die WebAnwendung eingeschleust und zur Ausführung gebracht werden.
+* O.Source_11
+    > Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten.
+    * sentitive data is always handled as PUT or POST
+    * [API documendation](#api-documentation)
 
 #### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
-* O.TrdP_1 [List of third party software](#ressources)
-* O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die 
-Veröffentlichung vorgesehenen Version verwendet werden. 
-* O.TrdP_3 Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung 
-öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) 
-auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der 
-Entwicklung (vgl.O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller 
-Bundesamt für Sicherheit in der Informationstechnik 19
-MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die 
-Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. 
-Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die 
-Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden. 
-* O.TrdP_4 Sicherheitsupdates für Drittanbieter-Software MUSS zeitnah integriert und per Update 
-dem Nutzer zur Verfügung gestellt werden. Der Hersteller MUSS ein Sicherheitskonzept 
-vorlegen, das anhand der Kritikalität ausnutzbarer Schwachstellen die geduldete 
-Weiternutzung für die Web-Anwendung, bzw. das Hintergrundsystem festlegt. Nachdem 
-die Übergangsfrist (Grace Period) abgelaufen ist, DARF die Web-Anwendung NICHT 
-mehr zur Benutzung angeboten werden.
-* O.TrdP_5 Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf 
-Vertrauenswürdigkeit geprüft werden. 
-* O.TrdP_6 Caro App does not communicate to third parties
-* O.TrdP_7 Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden. 
-* O.TrdP_8 Drittanbieter-Software, die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
+* O.TrdP_1
+    > Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen.
+    * [List of third party software](#ressources)
+* O.TrdP_2
+    > Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die Veröffentlichung vorgesehenen Version verwendet werden. 
+    * [List of third party software](#ressources)
+* O.TrdP_3
+    > Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der Entwicklung (vgl.O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden. 
+* O.TrdP_4
+    > Sicherheitsupdates für Drittanbieter-Software MUSS zeitnah integriert und per Update dem Nutzer zur Verfügung gestellt werden. Der Hersteller MUSS ein Sicherheitskonzept vorlegen, das anhand der Kritikalität ausnutzbarer Schwachstellen die geduldete Weiternutzung für die Web-Anwendung, bzw. das Hintergrundsystem festlegt. Nachdem die Übergangsfrist (Grace Period) abgelaufen ist, DARF die Web-Anwendung NICHT mehr zur Benutzung angeboten werden.
+* O.TrdP_5
+    > Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf Vertrauenswürdigkeit geprüft werden.
+    * [List of third party software](#ressources)
+* O.TrdP_6
+    > Die Anwendung SOLL sensible Daten nicht an Drittanbieter-Software weitergeben.
+    * [List of third party software](#ressources)
+* O.TrdP_7
+    > Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden. 
+* O.TrdP_8
+    > Drittanbieter-Software, die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
 
 #### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
-* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest 
-einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
-* O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
-* O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und 
-dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen.
-* O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt 
-werden. 
-* O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik 
-entsprechen (siehe [TR02102-1]).
+* O.Cryp_1
+    > Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
+* O.Cryp_2
+    > Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
+* O.Cryp_3
+    > Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen.
+* O.Cryp_4
+    > Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt werden. 
+* O.Cryp_5
+    > Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
 
 #### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
-* O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem 
-Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden 
-einer Anwendungssitzung dokumentieren.
-* O.Auth_2 Die Anwendung SOLL Authentisierungsmechanismen und Autorisierungsfunktionen 
-separat realisieren. Sind für die Anwendung verschiedene Rollen notwendig, MUSS eine 
-Autorisierung bei jedem Datenzugriff separat realisiert werden. 
-* O.Auth_3 Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei-FaktorAuthentifizierung umgesetzt werden.
-* O.Auth_4 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen 
-Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach 
-umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf 
-einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher 
-Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 
-* O.Auth_5 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen 
-(z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit 
-einbezogen werden. 
-* O.Auth_6 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche 
-Anmeldevorgänge informieren zu lassen.
-* O.Auth_7 Die Anwendung MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
-* O.Auth_8 Wurde die Anwendung unterbrochen (in den Hintergrundbetrieb versetzt), MUSS nach 
-Ablauf einer angemessenen Frist (Grace Period) eine erneute Authentisierung 
-durchgeführt werden.
-* O.Auth_9 Die Anwendung MUSS nach einer angemessenen Zeit in der sie nicht aktiv verwendet 
-wurde (idle time) eine erneute Authentisierung fordern. 
-* O.Auth_10 Die Anwendung MUSS nach einer angemessenen Zeit in der sie aktiv verwendet wurde 
-(active time) eine erneute Authentisierung zur Reaktivierung der Serversitzung fordern. 
-* O.Auth_11 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des 
-Nutzers geändert werden.
-* O.Auth_12 Die Anwendung MUSS für die Anbindung eines Hintergrundsystems eine dem Stand der 
-Technik entsprechende Authentifizierung verwenden. 
-* O.Auth_13 Authentisierungsdaten, wie bspw. Session-Identifier bzw. Authentisierungstoken, 
-MÜSSEN als sensible Daten geschützt werden. 
-* O.Auth_14 Die Anwendung MUSS es dem Nutzer ermöglichen einen oder alle zuvor ausgestellten 
-Session-Identifier bzw. Authentisierungstoken zu invalidieren.
-* O.Auth_15 Wird eine Anwendungssitzung ordnungsgemäß beendet, MUSS die Anwendung das 
-Hintergrundsystem darüber informieren, sodass Session-Identifier bzw. 
-Authentisierungstoken sicher gelöscht werden. Dies gilt sowohl für das aktive Beenden
-durch den Benutzer (log-out), als auch für das automatische Beenden durch die 
-Anwendung (vgl. O.Auth_9 und O.Auth_10).
-* O.Auth_16 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, 
-gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über 
-diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und 
-nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
-* O.Auth_17 Der Nutzer MUSS in den Nutzungsbedingungen der Web-Anwendung auf das Restrisiko 
-hingewiesen werden, welches mit der Speicherung der Login-Credentials im WebBrowser oder auch einem anderen externen Programm für einen komfortableren 
-Anmeldevorgang verbunden ist. 
+* O.Auth_1
+    > Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden einer Anwendungssitzung dokumentieren.
+* O.Auth_2
+    > Die Anwendung SOLL Authentisierungsmechanismen und Autorisierungsfunktionen separat realisieren. Sind für die Anwendung verschiedene Rollen notwendig, MUSS eine Autorisierung bei jedem Datenzugriff separat realisiert werden. 
+* O.Auth_3
+    > Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei-FaktorAuthentifizierung umgesetzt werden.
+* O.Auth_4
+    > Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 
+* O.Auth_5
+    > Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen (z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit einbezogen werden. 
+* O.Auth_6
+    > Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche Anmeldevorgänge informieren zu lassen.
+* O.Auth_7
+    > Die Anwendung MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
+* O.Auth_8
+    > Wurde die Anwendung unterbrochen (in den Hintergrundbetrieb versetzt), MUSS nach Ablauf einer angemessenen Frist (Grace Period) eine erneute Authentisierung durchgeführt werden.
+* O.Auth_9
+    > Die Anwendung MUSS nach einer angemessenen Zeit in der sie nicht aktiv verwendet wurde (idle time) eine erneute Authentisierung fordern. 
+* O.Auth_10
+    > Die Anwendung MUSS nach einer angemessenen Zeit in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung zur Reaktivierung der Serversitzung fordern. 
+* O.Auth_11
+    > Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
+* O.Auth_12
+    > Die Anwendung MUSS für die Anbindung eines Hintergrundsystems eine dem Stand der Technik entsprechende Authentifizierung verwenden. 
+* O.Auth_13
+    > Authentisierungsdaten, wie bspw. Session-Identifier bzw. Authentisierungstoken, MÜSSEN als sensible Daten geschützt werden. 
+* O.Auth_14
+    > Die Anwendung MUSS es dem Nutzer ermöglichen einen oder alle zuvor ausgestellten Session-Identifier bzw. Authentisierungstoken zu invalidieren.
+* O.Auth_15
+    > Wird eine Anwendungssitzung ordnungsgemäß beendet, MUSS die Anwendung das Hintergrundsystem darüber informieren, sodass Session-Identifier bzw. Authentisierungstoken sicher gelöscht werden. Dies gilt sowohl für das aktive Beenden durch den Benutzer (log-out), als auch für das automatische Beenden durch die Anwendung (vgl. O.Auth_9 und O.Auth_10).
+* O.Auth_16
+    > Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
+* O.Auth_17
+    > Der Nutzer MUSS in den Nutzungsbedingungen der Web-Anwendung auf das Restrisiko hingewiesen werden, welches mit der Speicherung der Login-Credentials im WebBrowser oder auch einem anderen externen Programm für einen komfortableren Anmeldevorgang verbunden ist. 
 
 #### 3.1.6.1 Authentifizierung über Passwort
-* O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke 
-Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
-* O.Pass_2 Für die Einrichtung der Authentisierung mittels Benutzername und Passwort KANN die 
-Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über 
-die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden. 
-* O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern. 
-Bundesamt für Sicherheit in der Informationstechnik 21
-* O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden. 
-* O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen 
-Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter 
-Salts gehasht werden.
+* O.Pass_1
+    > Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
+* O.Pass_2
+    > Für die Einrichtung der Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden. 
+* O.Pass_3
+    > Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
+* O.Pass_4
+    > Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden. 
+* O.Pass_5
+    > Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
 
 #### 3.1.7 Prüfaspekt (7): Datensicherheit
-* O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
-* O.Data_2 Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die 
-Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt. 
-* O.Data_3 Die Web-Anwendung DARF Ressourcen, die einen Zugriff auf sensible Daten 
-ermöglichen, gegenüber Dritten NICHT verfügbar machen. 
-* O.Data_4 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen 
-Verarbeitung hinaus in der Web-Anwendung gehalten werden.
-* O.Data_5 Die Web-Anwendung MUSS die Grundsätze der Datensparsamkeit und Zweckbindung 
-berücksichtigen. 
-* O.Data_6 Die Speicherung und Verarbeitung von sensiblen Daten SOLL im Hintergrundsystem 
-erfolgen.
-* O.Data_7 Bei der Verwendung von Aufnahmegeräten (z. B. Kamera) MÜSSEN sämtliche Metadaten 
-mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf die GPS-Koordinaten des 
-Aufnahmeorts, eingesetzte Hardware etc., entfernt werden. 
-* O.Data_8 Bei der Erhebung von sensiblen Daten durch die Verwendung von Aufnahmegeräten (z. 
-B. Kamera), MUSS vorgebeugt werden, dass andere Anwendungen darauf Zugriff 
-erlangen könnten, etwa über eine Mediengalerie.
-* O.Data_9 Bei der Eingabe sensibler Daten über die Tastatur SOLL die Web-Anwendung 
-unterbinden, dass Aufzeichnungen für Dritte erkennbar werden. 
-* O.Data_10 Bei der Eingabe sensibler Daten SOLL der Export in die Zwischenablage unterbunden 
-werden. Die Anwendung KANN alternativ eine eigene Zwischenablage implementieren, 
-welche vor dem Zugriff durch andere Anwendungen geschützt ist.
-* O.Data_11 Sensible Daten DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, 
-exportiert werden.
-* O.Data_12 Durch die Web-Anwendung kann der Zugriff für Dritte und die Speicherung des 
-Bildschirms (z. B. Screenshots und Anzeigen für das App-Switching) nicht unterbunden 
-werden. Über die Nutzungsbedingungen MUSS der Nutzer darüber informiert werden, 
-dass sensible Daten über Screenshots oder Anzeigen für das App-Switching
-kompromittiert werden können.
-* O.Data_13 Über die Nutzungsbedingungen der Web-Anwendung MUSS der Nutzer über das Risiko 
-informiert werden, welches damit verbunden ist, dass im gesperrten Zustand des 
-Endgeräts die Verbindung zum Hintergrundsystem weiter geöffnet bleibt, wenn der 
-Nutzer sich nicht explizit ausgeloggt hat.
-* O.Data_14 Die Web-Anwendung SOLL sicherstellen, dass bei ihrer Beendigung alle sensiblen Daten 
-und anwendungsspezifischen Anmeldeinformationen im Web-Browser nicht mehr 
-zugreifbar sind. Dies schließt insbesondere Cookies und Webstorage mit ein. 
-Bundesamt für Sicherheit in der Informationstechnik 22
-* O.Data_15 Die Web-Anwendung MUSS dem Nutzer die Möglichkeit geben, dass bei endgültiger 
-Beendigung der Nutzung alle sensiblen Daten und anwendungsspezifischen 
-Anmeldeinformationen vollständig gelöscht bzw. unzugänglich gemacht werden. 
-* O.Data_16 Für alle Cookies, auf die nicht mittels JavaScript zugegriffen wird, MUSS das HTTP-OnlyFlag verwendet werden. 
-* O.Data_17 Für alle Cookies, die sensible Daten enthalten, MUSS das Secure-Flag gesetzt sein.
-* O.Data_18 Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion 
-abgeschaltet sein.
-* O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein 
-(d.h. Vermeidung von Domain-Cookies).
+* O.Data_1
+    > Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
+* O.Data_2
+    > Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt. 
+* O.Data_3
+    > Die Web-Anwendung DARF Ressourcen, die einen Zugriff auf sensible Daten ermöglichen, gegenüber Dritten NICHT verfügbar machen. 
+* O.Data_4
+    > Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus in der Web-Anwendung gehalten werden.
+* O.Data_5
+    > Die Web-Anwendung MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen. 
+* O.Data_6
+    > Die Speicherung und Verarbeitung von sensiblen Daten SOLL im Hintergrundsystem erfolgen.
+* O.Data_7
+    > Bei der Verwendung von Aufnahmegeräten (z. B. Kamera) MÜSSEN sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf die GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernt werden. 
+* O.Data_8
+    > Bei der Erhebung von sensiblen Daten durch die Verwendung von Aufnahmegeräten (z.B. Kamera), MUSS vorgebeugt werden, dass andere Anwendungen darauf Zugriff erlangen könnten, etwa über eine Mediengalerie.
+* O.Data_9
+    > Bei der Eingabe sensibler Daten über die Tastatur SOLL die Web-Anwendung unterbinden, dass Aufzeichnungen für Dritte erkennbar werden. 
+* O.Data_10
+    > Bei der Eingabe sensibler Daten SOLL der Export in die Zwischenablage unterbunden werden. Die Anwendung KANN alternativ eine eigene Zwischenablage implementieren, welche vor dem Zugriff durch andere Anwendungen geschützt ist.
+* O.Data_11
+    > Sensible Daten DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, exportiert werden.
+* O.Data_12
+    > Durch die Web-Anwendung kann der Zugriff für Dritte und die Speicherung des Bildschirms (z. B. Screenshots und Anzeigen für das App-Switching) nicht unterbunden werden. Über die Nutzungsbedingungen MUSS der Nutzer darüber informiert werden, dass sensible Daten über Screenshots oder Anzeigen für das App-Switchingkompromittiert werden können.
+* O.Data_13
+    > Über die Nutzungsbedingungen der Web-Anwendung MUSS der Nutzer über das Risiko informiert werden, welches damit verbunden ist, dass im gesperrten Zustand des Endgeräts die Verbindung zum Hintergrundsystem weiter geöffnet bleibt, wenn der Nutzer sich nicht explizit ausgeloggt hat.
+* O.Data_14
+    > Die Web-Anwendung SOLL sicherstellen, dass bei ihrer Beendigung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen im Web-Browser nicht mehr zugreifbar sind. Dies schließt insbesondere Cookies und Webstorage mit ein. 
+* O.Data_15
+    > Die Web-Anwendung MUSS dem Nutzer die Möglichkeit geben, dass bei endgültiger Beendigung der Nutzung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig gelöscht bzw. unzugänglich gemacht werden. 
+* O.Data_16
+    > Für alle Cookies, auf die nicht mittels JavaScript zugegriffen wird, MUSS das HTTP-OnlyFlag verwendet werden. 
+    * only a session cookie is created
+* O.Data_17
+    > Für alle Cookies, die sensible Daten enthalten, MUSS das Secure-Flag gesetzt sein.
+* O.Data_18
+    > Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion abgeschaltet sein.
+    * all inputs lack autocomplete by default
+* O.Data_19
+    > Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
+    * only a session cookie is created
+    * indexedDB has same-origin pricible by default
 
 #### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 Not applicable, as there are no paid ressources
@@ -1658,36 +1622,30 @@ Not applicable, as there are no paid ressources
 The operator of the infrastructure is responsible for fulfilling these requirements, not the application. Caro App requires SSL consistently though.
 
 #### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
-* O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten 
-Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten 
-Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken 
-aufklären.
-* O.Plat_2 Die Web-Anwendung DARF Berechtigungen, die für die Erfüllung ihres primären 
-Zwecks nicht notwendig sind, NICHT einfordern.
-* O.Plat_3 Die Web-Anwendung MUSS den Nutzer auf den rechtmäßigen Zweck der 
-anzufragenden Berechtigungen und auf die Auswirkungen hinweisen, die eintreten, falls 
-der Nutzer diese nicht gewährt.
-* O.Plat_4 Die Web-Anwendung DARF KEINE sensiblen Daten in erweiterten Meldungen oder 
-Benachrichtigungen, die nicht vom Nutzer explizit eingeschaltet wurden (siehe O.Plat_5), 
-anzeigen.
-* O.Plat_5 Die Web-Anwendung KANN dem Nutzer die Optionen bieten, erweiterte Meldungen 
-und Benachrichtigungen, ggf. auch mit sensiblen Inhalten, anzuzeigen. Bei 
-Werkseinstellung MUSS diese deaktiviert sein.
-* O.Plat_6 Die Web-Anwendung MUSS das Nachladen von Inhalten auf Quellen beschränken, die 
-unter der Kontrolle des Herstellers sind oder durch den Hersteller autorisiert wurden. 
-* O.Plat_7 Die Web-Anwendung MUSS den Nutzer über das Risiko informieren, dass ggf. nach 
-Beendigung der Web-Anwendung nutzerspezifischen Daten im Arbeitsspeicher 
-verbleiben können.
-* O.Plat_8 Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch 
-den Nutzer umsetzbar sind. 
+* O.Plat_1
+    > Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken aufklären.
+    * The operator of the infrastructure is responsible for fulfilling this requirement, not the application.
+* O.Plat_2
+    > Die Web-Anwendung DARF Berechtigungen, die für die Erfüllung ihres primären Zwecks nicht notwendig sind, NICHT einfordern.
+* O.Plat_3
+    > Die Web-Anwendung MUSS den Nutzer auf den rechtmäßigen Zweck der anzufragenden Berechtigungen und auf die Auswirkungen hinweisen, die eintreten, falls der Nutzer diese nicht gewährt.
+* O.Plat_4
+    > Die Web-Anwendung DARF KEINE sensiblen Daten in erweiterten Meldungen oder Benachrichtigungen, die nicht vom Nutzer explizit eingeschaltet wurden (siehe O.Plat_5), anzeigen.
+* O.Plat_5
+    > Die Web-Anwendung KANN dem Nutzer die Optionen bieten, erweiterte Meldungen und Benachrichtigungen, ggf. auch mit sensiblen Inhalten, anzuzeigen. Bei Werkseinstellung MUSS diese deaktiviert sein.
+* O.Plat_6
+    > Die Web-Anwendung MUSS das Nachladen von Inhalten auf Quellen beschränken, die unter der Kontrolle des Herstellers sind oder durch den Hersteller autorisiert wurden.
+    * lazyloading is not implemented, all contents are delivered by the backend only
+* O.Plat_7
+    > Die Web-Anwendung MUSS den Nutzer über das Risiko informieren, dass ggf. nach Beendigung der Web-Anwendung nutzerspezifischen Daten im Arbeitsspeicher verbleiben können.
+* O.Plat_8
+    > Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch den Nutzer umsetzbar sind. 
 
 #### 3.1.11 Prüfaspekt (11): Resilienz
-* O.Resi_1 Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen 
-zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
-* O.Resi_2 Die Web-Anwendung MUSS über die Nutzungsbedingungen dem Nutzer darstellen, 
-welche Risiken für die Daten des Nutzers bei einer Benutzung von Geräten, deren 
-Betriebssystem in keinem vom Betriebssystemhersteller vorgesehenen Betriebszustand
-ist, bestehen. 
+* O.Resi_1
+    > Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
+* O.Resi_2
+    > Die Web-Anwendung MUSS über die Nutzungsbedingungen dem Nutzer darstellen, welche Risiken für die Daten des Nutzers bei einer Benutzung von Geräten, deren Betriebssystem in keinem vom Betriebssystemhersteller vorgesehenen Betriebszustandist, bestehen. 
 
 [Content](#content)
 
@@ -1695,271 +1653,188 @@ ist, bestehen.
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-3.pdf?__blob=publicationFile&v=9) for web applications
 
 #### 3.1.1 Prüfaspekt (1): Anwendungszweck 
-* O.Purp_1 Das Hintergrundsystem DARF KEINE Daten erheben und verarbeiten, die nicht dem 
-rechtmäßigen Zweck der Anwendung dienen.
-* O.Purp_2 Das Hintergrundsystem MUSS vor jeglicher Erfassung oder Verarbeitung 
-personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des 
-Nutzers einholen.
-* O.Purp_3 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN 
-NICHT von dem Hintergrundsystem verarbeitet werden. 
-* O.Purp_4 Das Hintergrundsystem MUSS ermöglichen, dass der Nutzer eine bereits erteilte 
-Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die 
-Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten 
-der Anwendung informiert werden. 
-* O.Purp_5 Der Anbieter3 MUSS ein Verzeichnis führen, welches erkennen lässt, welche 
-Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für 
-den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses 
-angefordert werden können.
-* O.Purp_6 Setzt das Hintergrundsystem Drittanbieter-Software ein, SOLLEN alle verwendeten 
-Funktionen für den rechtmäßigen Zweck des Gesamtsystems erforderlich sein. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter 
-bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.
-Anderweitige Funktionen SOLLEN sicher deaktiviert sein. Wird nur eine einzige oder 
-sehr wenige Funktionen der Drittanbieter-Software benötigt, SOLL abgewogen werden, 
-ob die Einbindung der gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung 
-der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
-* O.Purp_7 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer 
-Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. 
-Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere 
-Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen 
-einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder 
-rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis 
-einholen (OPT-IN).
+* O.Purp_1
+    > Das Hintergrundsystem DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
+* O.Purp_2
+    > Das Hintergrundsystem MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
+* O.Purp_3
+    > Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von dem Hintergrundsystem verarbeitet werden. 
+* O.Purp_4
+    > Das Hintergrundsystem MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden. 
+* O.Purp_5
+    > Der Anbieter MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
+* O.Purp_6
+    > Setzt das Hintergrundsystem Drittanbieter-Software ein, SOLLEN alle verwendeten Funktionen für den rechtmäßigen Zweck des Gesamtsystems erforderlich sein. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.Anderweitige Funktionen SOLLEN sicher deaktiviert sein. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, SOLL abgewogen werden, ob die Einbindung der gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
+* O.Purp_7
+    > Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
+
 #### 3.1.2 Prüfaspekt (2): Architektur 
-* O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für 
-die gesamte Anwendung sein.
-* O.Arch_2 Bereits in der Designphase des Hintergrundsystems MUSS berücksichtigt werden, dass 
-das Hintergrundsystem der Anwendung in der Produktivphase sensible Daten 
-verarbeiten wird. Die Architektur des Hintergrundsystems MUSS dafür die sichere 
-Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem 
-Datenlebenszyklus gewährleisten. 
-* O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten 
-Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur 
-Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, 
-Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf 
-anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
-* O.Arch_4 In Backups gespeicherte sensible Daten MÜSSEN gemäß dem Stand der Technik 
-verschlüsselt sein.
-* O.Arch_5 Sicherheitsfunktionen MÜSSEN immer auf allen Außenschnittstellen und APIEndpunkten implementiert werden.
-* O.Arch_6 Nutzt das Hintergrundsystem Drittanbieter-Software (etwa für Datenbanken, 
-Authentifizierung oder Logging), MUSS der Hersteller sicherstellen, dass nur solche 
-Drittanbieter-Software zum Einsatz kommt, deren zu nutzende Funktionen sicher 
-genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und 
-die eingesetzten Sicherheitsmechanismen klar darstellt. Das Hintergrundsystem MUSS 
-diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass 
-ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
-* O.Arch_7 Das Hintergrundsystem MUSS alle Anfragen der Anwendung über eine vollständig 
-dokumentierte API entgegennehmen. Es DARF KEINE nicht dokumentierten 
-Zugriffsmöglichkeiten enthalten.
-* O.Arch_8 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um 
-Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten 
-Kanal stattfinden.
-* O.Arch_9 Das Hintergrundsystem MUSS so implementiert sein, dass ungewollte Zugriffe über 
-eventuelle Management-Schnittstellen effektiv unterbunden werden. Insbesondere bei 
-externem Hosting (s. Kapitel 2.3.2) und Cloud-Diensten (s. Kapitel 2.3.3) MUSS 
-sichergestellt werden, dass der Betreiber Zugriffsmöglichkeiten zwischen verschiedenen 
-Kunden unterbindet.
-* O.Arch_10 Dienste, die das Hintergrundsystem zur Verfügung stellt, SOLLEN nur mit den 
-notwendigen Rechten ausgeführt werden. Dienste, die von außen erreichbar sind, 
-DÜRFEN NICHT mit Administrator-, System- bzw. Root-Rechten laufen.
-* O.Arch_11 Das Hintergrundsystem MUSS über ein zentrales Protokollierungssystem verfügen, in 
-dem alle Log-Nachrichten der verschiedenen Dienste zusammenlaufen. Protokolle 
-SOLLEN auf einem dedizierten System (sog. Logserver) gesammelt werden, um einem 
-Löschen und Manipulieren auf den Quellsystemen entgegenzuwirken. 
-* O.Arch_12 Das Hintergrundsystem MUSS die Anwendung über sicherheitsrelevante Updates 
-informieren und nach einer Übergangsfrist (Grace Period) die Benutzung einer 
-veralteten Anwendung unterbinden. 
+* O.Arch_1
+    > „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für die gesamte Anwendung sein.
+* O.Arch_2
+    > Bereits in der Designphase des Hintergrundsystems MUSS berücksichtigt werden, dass das Hintergrundsystem der Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur des Hintergrundsystems MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten. 
+* O.Arch_3
+    > Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
+* O.Arch_4
+    > In Backups gespeicherte sensible Daten MÜSSEN gemäß dem Stand der Technik verschlüsselt sein.
+* O.Arch_5
+    > Sicherheitsfunktionen MÜSSEN immer auf allen Außenschnittstellen und APIEndpunkten implementiert werden.
+* O.Arch_6
+    > Nutzt das Hintergrundsystem Drittanbieter-Software (etwa für Datenbanken, Authentifizierung oder Logging), MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommt, deren zu nutzende Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellt. Das Hintergrundsystem MUSS diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
+* O.Arch_7
+    > Das Hintergrundsystem MUSS alle Anfragen der Anwendung über eine vollständig dokumentierte API entgegennehmen. Es DARF KEINE nicht dokumentierten Zugriffsmöglichkeiten enthalten.
+* O.Arch_8
+    > Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
+* O.Arch_9
+    > Das Hintergrundsystem MUSS so implementiert sein, dass ungewollte Zugriffe über eventuelle Management-Schnittstellen effektiv unterbunden werden. Insbesondere bei externem Hosting (s. Kapitel 2.3.2) und Cloud-Diensten (s. Kapitel 2.3.3) MUSS sichergestellt werden, dass der Betreiber Zugriffsmöglichkeiten zwischen verschiedenen Kunden unterbindet.
+* O.Arch_10
+    > Dienste, die das Hintergrundsystem zur Verfügung stellt, SOLLEN nur mit den notwendigen Rechten ausgeführt werden. Dienste, die von außen erreichbar sind, DÜRFEN NICHT mit Administrator-, System- bzw. Root-Rechten laufen.
+* O.Arch_11
+    > Das Hintergrundsystem MUSS über ein zentrales Protokollierungssystem verfügen, in dem alle Log-Nachrichten der verschiedenen Dienste zusammenlaufen. Protokolle SOLLEN auf einem dedizierten System (sog. Logserver) gesammelt werden, um einem Löschen und Manipulieren auf den Quellsystemen entgegenzuwirken. 
+* O.Arch_12
+    > Das Hintergrundsystem MUSS die Anwendung über sicherheitsrelevante Updates informieren und nach einer Übergangsfrist (Grace Period) die Benutzung einer veralteten Anwendung unterbinden. 
 
 #### 3.1.3 Prüfaspekt (3): Quellcode 
-* O.Source_1 Das Hintergrundsystem MUSS alle Eingaben vor deren Verarbeitung prüfen, um 
-potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
-* O.Source_2 Das Hintergrundsystem MUSS eingehende und ausgehende Daten maskieren 
-beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren 
-Verarbeitung ablehnen. 
-* O.Source_3 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, 
-kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen 
-(z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden. 
-* O.Source_4 Bei Ausnahmen im Programmablauf (Exceptions SOLL das Hintergrundsystem Zugriffe 
-auf sensible Daten abbrechen und die Anwendung anweisen, diese im Speicher sicher zu 
-löschen.
-* O.Source_5 Sofern das Hintergrundsystem oder Teile davon über eine manuelle Speicherverwaltung 
-verfügen (d.h., das entsprechende Programm kann selbst exakt festlegen, wann und wo 
-Speicher gelesen und beschrieben wird), MUSS für lesende und schreibende Zugriffe auf 
-Speichersegmente auf sichere Funktionsalternativen (z. B. sprintf_s statt printf) 
-zurückgegriffen werden. 
-* O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, 
-Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein. 
-* O.Source_7 Das Hintergrundsystem MUSS sicherstellen, dass alle sensiblen Daten unverzüglich nach 
-der Erfüllung ihres Verarbeitungszwecks sicher gelöscht werden.
-* O.Source_8 Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, 
-Aktualisierungen und Abschaltung des Hintergrundsystems etablieren, der sicherstellt, 
-dass zu keinem Zeitpunkt die Veröffentlichung oder das Kompromittieren sensibler 
-Daten möglich ist. 
-* O.Source_9 Der Hersteller SOLL automatische Tools zur Identifikation von Programmfehlern und 
-Best-Practice Violations im Build Process verwenden. Jegliche Warnungen MÜSSEN von 
-dem Hersteller vor dem Produktivbetrieb mitigiert werden.
-* O.Source_10 Für den Bau des Hintergrundsystem SOLLEN moderne Sicherheitsmechanismen, wie 
-beispielsweise Obfuskation und Stack-Protection aktiviert werden. 
-* O.Source_11 Für die Entwicklung des Hintergrundsystems SOLLEN Werkzeuge zur statischen 
-Codeanalyse eingesetzt werden.
+* O.Source_1
+    > Das Hintergrundsystem MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
+* O.Source_2
+    > Das Hintergrundsystem MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
+* O.Source_3
+    > Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen (z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden. 
+* O.Source_4
+    > Bei Ausnahmen im Programmablauf (Exceptions) SOLL das Hintergrundsystem Zugriffe auf sensible Daten abbrechen und die Anwendung anweisen, diese im Speicher sicher zu löschen.
+* O.Source_5
+    > Sofern das Hintergrundsystem oder Teile davon über eine manuelle Speicherverwaltung verfügen (d.h., das entsprechende Programm kann selbst exakt festlegen, wann und wo Speicher gelesen und beschrieben wird), MUSS für lesende und schreibende Zugriffe auf Speichersegmente auf sichere Funktionsalternativen (z. B. sprintf_s statt printf) zurückgegriffen werden. 
+* O.Source_6
+    > Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein. 
+* O.Source_7
+    > Das Hintergrundsystem MUSS sicherstellen, dass alle sensiblen Daten unverzüglich nach der Erfüllung ihres Verarbeitungszwecks sicher gelöscht werden.
+* O.Source_8
+    > Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, Aktualisierungen und Abschaltung des Hintergrundsystems etablieren, der sicherstellt, dass zu keinem Zeitpunkt die Veröffentlichung oder das Kompromittieren sensibler Daten möglich ist. 
+* O.Source_9
+    > Der Hersteller SOLL automatische Tools zur Identifikation von Programmfehlern und Best-Practice Violations im Build Process verwenden. Jegliche Warnungen MÜSSEN von dem Hersteller vor dem Produktivbetrieb mitigiert werden.
+* O.Source_10
+    > Für den Bau des Hintergrundsystem SOLLEN moderne Sicherheitsmechanismen, wie beispielsweise Obfuskation und Stack-Protection aktiviert werden. 
+* O.Source_11
+    > Für die Entwicklung des Hintergrundsystems SOLLEN Werkzeuge zur statischen Codeanalyse eingesetzt werden.
+
 #### 3.1.4 Prüfaspekt (4): Drittanbieter-Software 
-* O.TrdP_1 Der Anbieter5 MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch 
-Drittanbieter-Software führen. 
-* O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die 
-Veröffentlichung vorgesehenen Version verwendet werden. 
-* O.TrdP_3 Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung 
-öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) 
-auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der 
-Entwicklung (vgl. O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller 
-MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die 
-Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. 
-Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die 
-Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden. 
-* O.TrdP_4 Sicherheitsupdates für Drittanbieter-Software sowie Betriebssysteme MÜSSEN zeitnah 
-eingespielt werden. Der Hersteller MUSS ein Sicherheitskonzept vorlegen, das anhand 
-der Kritikalität ausnutzbarer Schwachstellen die geduldete Weiternutzung für das 
-Hintergrundsystem festlegt. Nachdem die Übergangsfrist (Grace Period) abgelaufen ist, 
-MUSS das Hintergrundsystem bis zur Behebung der Schwachstelle deaktiviert werden.
-* O.TrdP_5 Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf 
-Vertrauenswürdigkeit geprüft werden.
-* O.TrdP_6 Die Anwendung SOLL sensible Daten NICHT an Drittanbieter-Software weitergeben. 
-* O.TrdP_7 Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden. 
-* O.TrdP_8 Drittanbieter-Software die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
-* O.TrdP_9 Wenn das Hintergrundsystem externe Dienste verwendet, die nicht unter der Kontrolle 
-des Herstellers stehen MUSS der Nutzer über die mit den Diensten geteilten Daten 
-informiert werden. Dies gilt auch, wenn das Hintergrundsystem oder Teile davon als 
-Cloud-Lösung realisiert sind. 
-* O.TrdP_10 Schnittstellen zwischen Hintergrundsystemen des Herstellers und externen Diensten 
-müssen gemäß O.Arch_5 geschützt werden. 
+* O.TrdP_1
+    > Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen. 
+* O.TrdP_2
+    > Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die Veröffentlichung vorgesehenen Version verwendet werden. 
+* O.TrdP_3
+    > Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der Entwicklung (vgl. O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden. 
+* O.TrdP_4
+    > Sicherheitsupdates für Drittanbieter-Software sowie Betriebssysteme MÜSSEN zeitnah eingespielt werden. Der Hersteller MUSS ein Sicherheitskonzept vorlegen, das anhand der Kritikalität ausnutzbarer Schwachstellen die geduldete Weiternutzung für das Hintergrundsystem festlegt. Nachdem die Übergangsfrist (Grace Period) abgelaufen ist, MUSS das Hintergrundsystem bis zur Behebung der Schwachstelle deaktiviert werden.
+* O.TrdP_5
+    > Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf Vertrauenswürdigkeit geprüft werden.
+* O.TrdP_6
+    > Die Anwendung SOLL sensible Daten NICHT an Drittanbieter-Software weitergeben. 
+* O.TrdP_7
+    > Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden. 
+* O.TrdP_8
+    > Drittanbieter-Software die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
+* O.TrdP_9
+    > Wenn das Hintergrundsystem externe Dienste verwendet, die nicht unter der Kontrolle des Herstellers stehen MUSS der Nutzer über die mit den Diensten geteilten Daten informiert werden. Dies gilt auch, wenn das Hintergrundsystem oder Teile davon als Cloud-Lösung realisiert sind. 
+* O.TrdP_10
+    > Schnittstellen zwischen Hintergrundsystemen des Herstellers und externen Diensten müssen gemäß O.Arch_5 geschützt werden. 
 
 #### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung 
-* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Anwendung DÜRFEN KEINE fest 
-einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
-* O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung 
-kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
-* O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und 
-dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter 
-bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.
-* O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt 
-werden. Der Hersteller des Hintergrundsystems MUSS ein Verschlüsselungskonzept 
-vorlegen, aus dem alle verwendeten Schlüssel und deren Hierarchien hervorgehen. 
-* O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik 
-entsprechen (siehe [TR02102-1]).
-* O.Cryp_6 Alle kryptographischen Schlüssel SOLLEN in einer vor Manipulation und Offenlegung 
-geschützten Umgebung liegen.
-* O.Cryp_7 Alle kryptographischen Operationen SOLLEN in einer vor Manipulation und 
-Offenlegung geschützten Umgebung stattfinden.
-* O.Cryp_8 Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen 
-DÜRFEN NICHT aufgebaut werden.
+* O.Cryp_1
+    > Beim Einsatz von Verschlüsselung in der Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
+* O.Cryp_2
+    > Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
+* O.Cryp_3
+    > Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.
+* O.Cryp_4
+    > Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt werden. Der Hersteller des Hintergrundsystems MUSS ein Verschlüsselungskonzept vorlegen, aus dem alle verwendeten Schlüssel und deren Hierarchien hervorgehen. 
+* O.Cryp_5
+    > Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
+* O.Cryp_6
+    > Alle kryptographischen Schlüssel SOLLEN in einer vor Manipulation und Offenlegung geschützten Umgebung liegen.
+* O.Cryp_7
+    > Alle kryptographischen Operationen SOLLEN in einer vor Manipulation und Offenlegung geschützten Umgebung stattfinden.
+* O.Cryp_8
+    > Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen DÜRFEN NICHT aufgebaut werden.
 
 #### 3.1.5.1 Zufallszahlen
-* O.Rand_1 Alle Zufallswerte MÜSSEN über einen starken kryptographischen 
-Zufallszahlengenerator erzeugt werden, welcher mit ausreichend Entropie geseedet 
-wurde (vgl. [TR02102-1]).
+* O.Rand_1
+    > Alle Zufallswerte MÜSSEN über einen starken kryptographischen Zufallszahlengenerator erzeugt werden, welcher mit ausreichend Entropie geseedet wurde (vgl. [TR02102-1]).
 
 #### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
-* O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem 
-Vertrauensniveau (vgl. [TR03107-1]), zur Autorisierung (Rollenkonzept) und zum 
-Beenden von Sitzungen dokumentieren. Das Konzept MUSS hierbei auch 
-Kommunikationsverbindungen innerhalb eines Hintergrundsystem-Netzwerkes 
-berücksichtigen.
-* O.Auth_2 Das Hintergrundsystem MUSS für die Anbindung einer Anwendung eine geeignete 
-Authentisierung unterstützen.
-* O.Auth_3 Das Hintergrundsystem SOLL Authentisierungsmechanismen und 
-Autorisierungsfunktionen separat realisieren. Sind für den Zugriff auf das 
-Hintergrundsystem verschiedene Rollen notwendig, MUSS eine Autorisierung bei jedem 
-Datenzugriff separat realisiert werden. 
-* O.Auth_4 Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei Faktor 
-Authentisierung umgesetzt werden. 
-* O.Auth_5 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen 
-Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach 
-umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf 
-einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher 
-Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 
-Abs. 8 SGB V mit ein. 
-* O.Auth_6 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen 
-(z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit 
-einbezogen werden. 
-* O.Auth_7 Das Hintergrundsystem MUSS jede Anfrage gemäß des Rechte- und Rollenkonzeptes 
-(vgl.O.Auth_1) authentifizieren und autorisieren.
-* O.Auth_8 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche 
-Anmeldevorgänge informieren zu lassen.
-* O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
-* O.Auth_10 Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in 
-der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute 
-Authentisierung fordern. 
-* O.Auth_11 Das Hintergrundsystem MUSS für die Anwendungssitzung nach einer angemessenen 
-Zeit, in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung fordern. 
-* O.Auth_12 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des 
-Nutzers geändert werden.
-* O.Auth_13 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, 
-gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über 
-diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und 
-nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
-* O.Auth_14 Der Hersteller MUSS ein Konzept zur Rechteverwaltung (z.B. Benutzerrollen) vorlegen. 
-* O.Auth_15 Alle einem Nutzer oder einer Sitzung zugeordneten Identifier MÜSSEN mit einem 
-Zufallszahlengenerator gemäß O.Rand_1 erzeugt werden und eine geeignete Länge 
-aufweisen.
-* O.Auth_16 Das Hintergrundsystem MUSS es dem Nutzer ermöglichen ein oder alle zuvor 
-ausgestellten Authentifizierungstoken bzw. Session-Identifier ungültig zu machen.
-* O.Auth_17 Wird eine Anwendungssitzung beendet, MUSS das Hintergrundsystem den 
-Authentifizierungstoken bzw. Session-Identifier sicher löschen. Dies gilt sowohl für das 
-aktive Beenden durch den Benutzer (log-out), als auch für das automatische Beenden 
-durch die Anwendung (vgl. O.Auth_9 und O.Auth_10).
-* O.Auth_18 Session-Identifier MÜSSEN als sensible Daten geschützt werden.
-* O.Auth_19 Es DÜRFEN KEINE sensiblen Daten in ein Authentisierungstoken eingebettet werden.
-* O.Auth_20 Ein Authentisierungstoken MUSS ausschließlich die erwarteten Felder enthalten.
-* O.Auth_21 Authentisierungstoken MÜSSEN mit einem geeigneten Verfahren signiert werden (vgl. 
-[TR02102-1]). Das Hintergrundsystem MUSS die Signatur des Authentisierungstokens 
-prüfen. Dabei ist darauf zu achten, dass der Signaturtyp nicht none sein darf und das 
-Hintergrundsystem Anfragen mit einem ungültigen oder abgelaufenen 
-Authentifizierungstoken ablehnt.
+* O.Auth_1
+    > Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau (vgl. [TR03107-1]), zur Autorisierung (Rollenkonzept) und zum Beenden von Sitzungen dokumentieren. Das Konzept MUSS hierbei auch Kommunikationsverbindungen innerhalb eines Hintergrundsystem-Netzwerkes berücksichtigen.
+* O.Auth_2
+    > Das Hintergrundsystem MUSS für die Anbindung einer Anwendung eine geeignete Authentisierung unterstützen.
+* O.Auth_3
+    > Das Hintergrundsystem SOLL Authentisierungsmechanismen und Autorisierungsfunktionen separat realisieren. Sind für den Zugriff auf das Hintergrundsystem verschiedene Rollen notwendig, MUSS eine Autorisierung bei jedem Datenzugriff separat realisiert werden. 
+* O.Auth_4
+    > Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei Faktor Authentisierung umgesetzt werden. 
+* O.Auth_5
+    > Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 Abs. 8 SGB V mit ein. 
+* O.Auth_6
+    > Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen (z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit einbezogen werden. 
+* O.Auth_7
+    > Das Hintergrundsystem MUSS jede Anfrage gemäß des Rechte- und Rollenkonzeptes (vgl.O.Auth_1) authentifizieren und autorisieren.
+* O.Auth_8
+    > Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche Anmeldevorgänge informieren zu lassen.
+* O.Auth_9
+    > Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
+* O.Auth_10
+    > Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute Authentisierung fordern. 
+* O.Auth_11
+    > Das Hintergrundsystem MUSS für die Anwendungssitzung nach einer angemessenen Zeit, in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung fordern. 
+* O.Auth_12
+    > Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
+* O.Auth_13
+    > Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
+* O.Auth_14
+    > Der Hersteller MUSS ein Konzept zur Rechteverwaltung (z.B. Benutzerrollen) vorlegen. 
+* O.Auth_15
+    > Alle einem Nutzer oder einer Sitzung zugeordneten Identifier MÜSSEN mit einem Zufallszahlengenerator gemäß O.Rand_1 erzeugt werden und eine geeignete Länge aufweisen.
+* O.Auth_16
+    > Das Hintergrundsystem MUSS es dem Nutzer ermöglichen ein oder alle zuvor ausgestellten Authentifizierungstoken bzw. Session-Identifier ungültig zu machen.
+* O.Auth_17
+    > Wird eine Anwendungssitzung beendet, MUSS das Hintergrundsystem den Authentifizierungstoken bzw. Session-Identifier sicher löschen. Dies gilt sowohl für das aktive Beenden durch den Benutzer (log-out), als auch für das automatische Beenden durch die Anwendung (vgl. O.Auth_9 und O.Auth_10).
+* O.Auth_18
+    > Session-Identifier MÜSSEN als sensible Daten geschützt werden.
+* O.Auth_19
+    > Es DÜRFEN KEINE sensiblen Daten in ein Authentisierungstoken eingebettet werden.
+* O.Auth_20
+    > Ein Authentisierungstoken MUSS ausschließlich die erwarteten Felder enthalten.
+* O.Auth_21
+    > Authentisierungstoken MÜSSEN mit einem geeigneten Verfahren signiert werden (vgl. [TR02102-1]). Das Hintergrundsystem MUSS die Signatur des Authentisierungstokens prüfen. Dabei ist darauf zu achten, dass der Signaturtyp nicht none sein darf und das Hintergrundsystem Anfragen mit einem ungültigen oder abgelaufenen Authentifizierungstoken ablehnt.
 
 #### 3.1.6.1 Authentifizierung über Passwort
-* O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke 
-Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
-* O.Pass_2 Für die Einrichtung einer Authentisierung mittels Benutzername und Passwort KANN 
-die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen 
-über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
-* O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
-* O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden ohne das 
-Passwort selbst zu protokollieren. 
-* O.Pass_5 Werden Passwörtergespeichert, MÜSSEN diese mit einer den aktuellen 
-Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter 
-Salts gehasht werden.
+* O.Pass_1
+    > Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
+* O.Pass_2
+    > Für die Einrichtung einer Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
+* O.Pass_3
+    > Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
+* O.Pass_4
+    > Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden ohne das Passwort selbst zu protokollieren. 
+* O.Pass_5
+    > Werden Passwörtergespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
 
 #### 3.1.7 Prüfaspekt (7): Datensicherheit 
-* O.Data_1 Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL 
-sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder 
-entschlüsselt werden können.
-* O.Data_2 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen 
-Verarbeitung hinaus im Hintergrundsystem gehalten werden.
-* O.Data_3 Das Hintergrundsystem MUSS die Grundsätze der Datensparsamkeit und Zweckbindung 
-berücksichtigen. 
-* O.Data_4 Das Hintergrundsystem MUSS sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa 
-Rückschlüsse auf den GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., 
-entfernen, wenn diese Daten nicht für den rechtmäßigen Zweck der Anwendung 
-benötigt werden. 
-* O.Data_5 Sensible Daten wie private Schlüssel DÜRFEN NICHT aus der Komponente, auf der sie 
-erzeugt wurden, exportiert werden, außer es ist für den rechtmäßigen Zweck der 
-Anwendung notwendig (s. Tabelle 15).
-* O.Data_6 Das Hintergrundsystem DARF KEINE sensiblen Daten in Meldungen oder 
-Benachrichtigungen, die nicht vom Benutzer explizit eingeschaltet wurden, schreiben. 
-* O.Data_7 Das Hintergrundsystem MUSS dem Nutzer die Möglichkeit geben, dass bei 
-Deinstallation der Anwendung alle sensiblen Daten und anwendungsspezifischen 
-Anmeldeinformationen vollständig vom Hintergrundsystem gelöscht bzw. unzugänglich 
-gemacht werden. Entscheidet sich der Nutzer, die Daten im Hintergrundsystem nicht zu 
-löschen, MUSS eine für den Zweck angemessene maximale Verweildauer definiert sein. 
-Der Nutzer MUSS über die Verweildauer informiert werden. Nach Ablauf der maximalen 
-Verweildauer MÜSSEN alle sensiblen Daten und anwendungsspezifischen 
-Anmeldeinformationen vollständig gelöscht werden. Dem Nutzer MUSS die Möglichkeit 
-gegeben werden alle Daten auch vor Ablauf der Verweildauer vollständig zu löschen 
-oder unzugänglich zu machen.
-* O.Data_8 Um dem Missbrauch von sensiblen Daten nach einem Geräteverlust entgegenzuwirken, 
-KANN die Anwendung einen Kill-Switch realisieren, d.h. ein absichtliches, sicheres 
-Überschreiben von Nutzerdaten im Gerät auf Applikationsebene, ausgelöst durch das 
-Hintergrundsystem. Der Hersteller MUSS die Auslösung des Kill-Switches durch den 
-Anwender über das Hintergrundsystem durch erneute Authentifizierung vor 
-missbräuchlicher Nutzung schützen.
+* O.Data_1
+    > Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder entschlüsselt werden können.
+* O.Data_2
+    > Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus im Hintergrundsystem gehalten werden.
+* O.Data_3
+    > Das Hintergrundsystem MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen. 
+* O.Data_4
+    > Das Hintergrundsystem MUSS sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf den GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernen, wenn diese Daten nicht für den rechtmäßigen Zweck der Anwendung benötigt werden. 
+* O.Data_5
+    > Sensible Daten wie private Schlüssel DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, exportiert werden, außer es ist für den rechtmäßigen Zweck der Anwendung notwendig (s. Tabelle 15).
+* O.Data_6
+    > Das Hintergrundsystem DARF KEINE sensiblen Daten in Meldungen oder Benachrichtigungen, die nicht vom Benutzer explizit eingeschaltet wurden, schreiben. 
+* O.Data_7
+    > Das Hintergrundsystem MUSS dem Nutzer die Möglichkeit geben, dass bei Deinstallation der Anwendung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig vom Hintergrundsystem gelöscht bzw. unzugänglich gemacht werden. Entscheidet sich der Nutzer, die Daten im Hintergrundsystem nicht zu löschen, MUSS eine für den Zweck angemessene maximale Verweildauer definiert sein. Der Nutzer MUSS über die Verweildauer informiert werden. Nach Ablauf der maximalen Verweildauer MÜSSEN alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig gelöscht werden. Dem Nutzer MUSS die Möglichkeit gegeben werden alle Daten auch vor Ablauf der Verweildauer vollständig zu löschen oder unzugänglich zu machen.
+* O.Data_8
+    > Um dem Missbrauch von sensiblen Daten nach einem Geräteverlust entgegenzuwirken, KANN die Anwendung einen Kill-Switch realisieren, d.h. ein absichtliches, sicheres Überschreiben von Nutzerdaten im Gerät auf Applikationsebene, ausgelöst durch das Hintergrundsystem. Der Hersteller MUSS die Auslösung des Kill-Switches durch den Anwender über das Hintergrundsystem durch erneute Authentifizierung vor missbräuchlicher Nutzung schützen.
 
 #### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 Not applicable, as there are no paid ressources
@@ -2011,7 +1886,7 @@ The operator of the infrastructure is responsible for fulfilling these requireme
     * SVG ui-icon files, not executable
     * author has professional license
 
-All libraries are embedded locally, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries adhere to the current code language standards, libraries without recent contributions too.
+All libraries are embedded locally, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries adhere to the current code language standards, this applies to libraries without recent contributions too.
 
 ### Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
