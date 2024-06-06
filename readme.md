@@ -1505,16 +1505,7 @@ abgeschaltet sein.
 Not applicable, as there are no paid ressources
 
 #### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
-* O.Ntwk_1 Jegliche Netzwerkkommunikation der Web-Anwendung MUSS durchgängig mit 
-gegenseitiger Authentisierung verschlüsselt werden. 
-* O.Ntwk_2 Die Konfiguration der TLS-Verbindungen MUSS dem aktuellen Stand der Technik 
-entsprechen (vgl. [TR02102-2]).
-Bundesamt für Sicherheit in der Informationstechnik 23
-* O.Ntwk_3 Die Web-Anwendung MUSS die Sicherheitsfunktionalität der jeweilig verwendeten 
-Betriebssystem-Plattform und des Browsers verwenden, um sichere 
-Kommunikationskanäle aufzubauen.
-* O.Ntwk_4 Die Web-Anwendung SOLL die Verwendung von Zertifikaten, deren Zertifikatskette 
-dem Hersteller nicht vertrauenswürdig erscheint, unterbinden. 
+The operator of the infrastructure is responsible for fulfilling these requirements, not the application. Caro App requires SSL consistently though.
 
 #### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
 * O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten 
@@ -1646,7 +1637,7 @@ Speicher gelesen und beschrieben wird), MUSS für lesende und schreibende Zugrif
 Speichersegmente auf sichere Funktionsalternativen (z. B. sprintf_s statt printf) 
 zurückgegriffen werden. 
 * O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, 
-Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein. 
+Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein. 
 * O.Source_7 Das Hintergrundsystem MUSS sicherstellen, dass alle sensiblen Daten unverzüglich nach 
 der Erfüllung ihres Verarbeitungszwecks sicher gelöscht werden.
 * O.Source_8 Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, 
@@ -1707,7 +1698,7 @@ entsprechen (siehe [TR02102-1]).
 geschützten Umgebung liegen.
 * O.Cryp_7 Alle kryptographischen Operationen SOLLEN in einer vor Manipulation und 
 Offenlegung geschützten Umgebung stattfinden.
-* O.Cryp_8 Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen 
+* O.Cryp_8 Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen 
 DÜRFEN NICHT aufgebaut werden.
 
 #### 3.1.5.1 Zufallszahlen
@@ -1742,7 +1733,7 @@ einbezogen werden.
 (vgl.O.Auth_1) authentifizieren und autorisieren.
 * O.Auth_8 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche 
 Anmeldevorgänge informieren zu lassen.
-* O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
+* O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren. 
 * O.Auth_10 Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in 
 der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute 
 Authentisierung fordern. 
@@ -1775,7 +1766,7 @@ Authentifizierungstoken ablehnt.
 
 #### 3.1.6.1 Authentifizierung über Passwort
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke 
-Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
+Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
 * O.Pass_2 Für die Einrichtung einer Authentisierung mittels Benutzername und Passwort KANN 
 die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen 
 über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
@@ -1823,48 +1814,11 @@ missbräuchlicher Nutzung schützen.
 #### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 Not applicable, as there are no paid ressources
 
-#### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
-* O.Ntwk_1 Jegliche Netzwerkkommunikation des Hintergrundsystems MUSS durchgängig 
-verschlüsselt (zum Beispiel TLS) werden. Dies schließt auch die Kommunikation 
-innerhalb des Hintergrundsystem-Netzwerks mit ein.
-* O.Ntwk_2 Jedes System eines Hintergrundsystem-Netzwerks MUSS über ein von einer 
-beglaubigten Certification Authority ausgestelltes Zertifikat verfügen.
-* O.Ntwk_3 Jedes System MUSS, bei Kommunikationsverbindungen in denen es als Client fungiert, 
-die gesamte Zertifikatskette prüfen. 
-* O.Ntwk_4 Die Konfiguration der verschlüsselten Verbindungen MUSS dem aktuellen Stand der 
-Technik entsprechen (vgl. [TR02102-2]).
-* O.Ntwk_5 Die Anwendung MUSS sicherheitsüberprüfte Drittanbieter-Software verwenden, um 
-sichere Kommunikationskanäle aufzubauen. Dies schließt die im Betriebssystem 
-mitgelieferte Bibliothek mit ein.
-* O.Ntwk_6 Das Hintergrundsystem MUSS die Integrität und Authentizität der Antworten der 
-Anwendung validieren. 
-* O.Ntwk_7 Das Hintergrundsystem MUSS für alle aufgebauten Verbindungen sowie 
-Verbindungsversuche Log-Dateien vorhalten.
-* O.Ntwk_8 Ein abgebrochener Verbindungsaufbau MUSS als Sicherheitsereignis im 
-Hintergrundsystem protokolliert werden.
-* O.Ntwk_9 Wenn das Hintergrundsystem aus mehreren Systemen besteht, die ein Netzwerk bilden, 
-so MUSS dieses Netzwerk durch Firewalls an allen Schnittstellen nach außen geschützt 
-werden. 
-* O.Ntwk_10 Die Firewalls, die das Hintergrundsystem-Netzwerk schützen, MÜSSEN auf dem DENYALL Ansatz basieren, also explizit alle nicht erlaubten Verbindungen verwerfen. 
+#### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation
+The operator of the infrastructure is responsible for fulfilling these requirements, not the application.
 
 #### 3.1.10 Prüfaspekt (10): Organisatorische Sicherheit 
-* O.Org_1 Der Betreiber der Hintergrundsysteme MUSS eine Zertifizierung nach [ISO27001], auf 
-der Basis von IT-Grundschutz [BSI27001] oder einem vergleichbaren Standard 
-nachweisen.
-* O.Org_2 Ist das Hintergrundsystem komplett oder teilweise als Cloud-Lösung realisiert, MUSS der 
-Cloud-Anbieter über den gesamten Nutzungszeitraum für die genutzten Cloud-Dienste 
-aus der genutzten Region über ein C5 Testat vom Typ 2 oder ein vergleichbares Testat 
-oder Zertifikat verfügen. Sofern Abweichungen oder Mängel im Testat oder Zertifikat 
-aufgeführt werden, muss der Anbieter des Hintergrundsystems die daraus entstehenden 
-Risiken analysieren und angemessen auf diese Risiken reagieren.
-* O.Org_3 Der Betreiber des Hintergrundsystems MUSS über ein Monitoring-System verfügen, das 
-bei verdächtigen Operationen einen Alarm auslöst. Darüber hinaus KANN er zusätzlich
-ein Intrusion Detection/Prevention System einsetzen.
-* O.Org_4 Der Anbieter MUSS Prozesse für den Umgang mit jedem möglichen Alarmtyp des 
-Monitoring-Systems definieren. Nicht definierte Alarmtypen MÜSSEN manuell bewertet 
-werden. 
-* O.Org_5 Der Anbieter MUSS ein Notfallvorsorgekonzept vorlegen, das beschreibt, wie die 
-Versorgung bei Notfällen sichergestellt wird.
+The operator of the infrastructure is responsible for fulfilling these requirements, not the application.
 
 [Content](#content)
 
