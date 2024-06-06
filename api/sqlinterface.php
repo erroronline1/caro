@@ -11,6 +11,47 @@ class SQLQUERY {
 	}
 
 	/**
+	 * execute a query defined by queries
+	 * ensuring string sanitation
+	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]
+	 * 
+	 * @param object $_pdo preset database connection, passed from main application
+	 * @param string $query
+	 * @param array $values pdo execution passing tokens
+	 * @param array $prepare strtr tokens for IN queries
+	 * 
+	 * @return false|int|array sql result not executed|affectedRows|selection
+	 */
+	public static function EXECUTE($_pdo, $query = '', $values = [], $prepared = []){
+		$query = self::PREPARE($query);
+		foreach ($values as $key => $value){
+			if ($value === null || $value === false) {
+				$query = strtr($query, [$key => 'NULL']);
+				unset($values[$key]);
+			}
+		}
+		if ($prepared) {
+			foreach ($prepared as $key => $value){
+				$list = explode(',', $value);
+				if (count($list) > 2){
+					foreach ($list as $index => $value2){
+						if (gettype($value2) === 'string' && $value2 != 'NULL') $list[$index] = $_pdo->quote($value2);
+					}
+					$value = implode(',', $list);
+				}
+				else if (gettype($value) === 'string' && $value != 'NULL') $prepared[$key] = $_pdo->quote($value);
+			}
+			$query = strtr($query, $prepared);
+		}
+		//var_dump($query, $values);
+		//die();
+		$statement = $_pdo->prepare($query);
+		if (!$statement->execute($values)) return false;
+		if (str_starts_with($query, 'SELECT'))return $statement->fetchAll();
+		return $statement->rowCount();
+	}
+
+	/**
 	 * creates packages of sql queries to handle sql package size
 	 * @param array $chunks packages so far
 	 * @param string $query next sql query
@@ -95,7 +136,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_manual ORDER BY title",
 			'sqlsrv' => "SELECT * FROM caro_manual ORDER BY title"
 		],
-		'application_get_manual-by-id' => [
+		'application_get_manual_by_id' => [
 			'mysql' => "SELECT * FROM caro_manual WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_manual WHERE id = :id"
 		],
@@ -173,7 +214,7 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)"
 		],
 		'consumables_put-vendor' => [
-			'mysql' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id"
 		],
 		'consumables_get-vendor-datalist' => [
@@ -181,7 +222,7 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC"
 		],
 		'consumables_get-vendor' => [
-			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id LIMIT 1",
+			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 
@@ -190,11 +231,11 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '')"
 		],
 		'consumables_put-product' => [
-			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
 		],
 		'consumables_put-product-protected' => [
-			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
 		],
 		'consumables_put-batch' => [ // preprocess via strtr
@@ -485,7 +526,7 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE received < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
 		],		
 		'order_delete-approved-order' => [
-			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id LIMIT 1",
+			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
 		'order_get_filter' => [
@@ -546,7 +587,7 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
 		],
 		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id LIMIT 1",
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
 		],
 		'user_get-datalist' => [
@@ -554,11 +595,11 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
-			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id LIMIT 1",
+			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 		'user_get-orderauth' => [
-			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth LIMIT 1",
+			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
 		],
 		'user_delete' => [

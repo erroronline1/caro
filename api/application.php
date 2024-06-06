@@ -26,12 +26,11 @@ class APPLICATION extends API {
 		if (!boolval($this->_requestedToken) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
 			$this->response(['body' => $_SESSION['user']]);
 		}
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_login'));
-		$statement->execute([
+		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 			':token' => $this->_requestedToken
 		]);
-		
-		if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
+		if ($query){
+			$result = $query[0];
 			$_SESSION['user'] = [
 				'name' => $result['name'],
 				'permissions' => explode(',', $result['permissions']),
@@ -305,11 +304,9 @@ class APPLICATION extends API {
 		if ($overview) $result['body']['content'][] = $overview;
 
 		// manual
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
-		$statement->execute();
-		$manual = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 		$topics = [];
-		foreach ($manual as $row){
+		foreach ($query as $row){
 			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
 				[[
 					'type' => 'text',
@@ -354,12 +351,13 @@ class APPLICATION extends API {
 				}
 				$entry['permissions'] = implode(',', $permissions);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_post_manual'));
-				if ($statement->execute([
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_post_manual', [
 					':title' => $entry['title'],
 					':content' => $entry['content'],
 					':permissions' => $entry['permissions']
-				])) $this->response([
+				]);
+		
+				if ($query) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
 						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
@@ -392,13 +390,13 @@ class APPLICATION extends API {
 				}
 				$entry['permissions'] = implode(',', $permissions);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_put_manual'));
-				if ($statement->execute([
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_put_manual', [
 					':title' => $entry['title'],
 					':content' => $entry['content'],
 					':permissions' => $entry['permissions'],
 					':id' => $this->_requestedManual
-				])) $this->response([
+				]);
+				if ($query) $this->response([
 					'status' => [
 						'id' => $this->_requestedManual,
 						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
@@ -413,23 +411,24 @@ class APPLICATION extends API {
 
 				break;
 			case 'GET':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual-by-id'));
-				$statement->execute([':id' => $this->_requestedManual]);
-				if (!$entry = $statement->fetch(PDO::FETCH_ASSOC)) $entry=[
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual_by_id', [
+					':id' => $this->_requestedManual
+				]);
+				if (!$query) $entry =[
 					'id' => null,
 					'title' => '',
 					'content' => '',
 					'permissions' => ''
 				];
+				else $entry = $query[0];
+
 				$result['body']['form'] = [
 					'data-usecase' => 'manual',
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_manual'));
-				$statement->execute();
-				$manual = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 				$options = ['...' . LANG::GET('application.edit_new_manual_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . LANG::GET('application.edit_new_manual_topic')) ? ['selected' => true] : []];
-				foreach ($manual as $row){
+				foreach ($query as $row){
 					$options[$row['title']] = ['value' => $row['id']];
 					if ($entry['id'] === $row['id']) $options[$row['title']]['selected'] = true; 
 				}
@@ -479,10 +478,10 @@ class APPLICATION extends API {
 	
 				break;
 			case 'DELETE':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_delete_manual'));
-				if ($statement->execute([
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', [
 					':id' => $this->_requestedManual
-				])) $this->response([
+				]);
+				if ($query) $this->response([
 					'status' => [
 						'msg' => LANG::GET('application.edit_manual_deleted'),
 						'id' => false,

@@ -523,11 +523,9 @@ class CALENDAR extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
+				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					':id' => $affected_user_id
-				]);
-				$affected_user = $statement->fetch(PDO::FETCH_ASSOC);
+				])) $affected_user = $affected_user[0];
 		
 				$event = [
 					':type' => 'timesheet',
@@ -570,11 +568,9 @@ class CALENDAR extends API {
 				) $this->response([], 401);
 
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
+				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					':id' => $affected_user_id
-				]);
-				$affected_user = $statement->fetch(PDO::FETCH_ASSOC);
+				])) $affected_user = $affected_user[0];
 		
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
@@ -792,9 +788,7 @@ class CALENDAR extends API {
 		$last = clone $days[count($days) - 1];
 		$days = array_values($days);
 		
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-		$statement->execute();
-		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get-datalist');
 		// retrieve stats in advance
 		$timesheet_stats_month = $calendar->timesheetSummary($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
 		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $last->format('Y-m-d'));
