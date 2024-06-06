@@ -3,7 +3,7 @@ import { compose_helper } from "./compose.js";
 
 export const api = {
 	/**
-	 * tracks GET queries and alerts if a chenged form is about to get left
+	 * tracks GET queries and alerts if a changed form is about to get left
 	 */
 	preventDataloss: {
 		// explicitly start this on any eligible successFn
@@ -652,7 +652,6 @@ export const api = {
 
 	/**
 	 * handles internal messenger
-	 * notification indicator of unread messages
 	 *
 	 * @param {string} method get|post|delete
 	 * @param  {array} request api method, filter term / message id / message form data, occasionally query selector
@@ -671,9 +670,6 @@ export const api = {
 		call by api.message('get', 'message', '{queryselector}') 
 		results in get message/message?to=recipient&message=messagetext
 		alternatively prepare third parameter as formdata
-
-		get notification // (returns number of unnotified/unread messages, only used within service-worker)
-
 		*/
 		request = [...request];
 		request.splice(0, 0, "message");
