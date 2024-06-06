@@ -21,13 +21,15 @@
     * [Vendor and product management](#vendor-and-product-management)
     * [Order](#order)
     * [Tools](#tools)
-* [CSV processor](#csv-processor)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Runtime variables](#runtime-variables)
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
+* [API documentation](#api-documentation)
+* [Code design patterns](#code-design-patterns)
+* [CSV processor](#csv-processor)
 * [Technical guidelines on data security](#technical-guidelines-on-data-security)
     * [Web Application](#web-application)
     * [Backend](#backend)
@@ -746,8 +748,409 @@ The audit module gathers data from the application in regards of proofing lists 
 
 [Content](#content)
 
-## CSV processor
+## Prerequisites
+* Server with
+    * PHP >= 8.2
+    * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted)
+    * SSL (camera access for qr-scanner and serviceworkers don't work otherwise)
+* Network access for endpoints and a browser
+    * Desktop pcs
+    * Mobile devices
+* Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
+Tested server environments:
+* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
+* Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
+* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
+
+Tested devices:
+* Win10 Edge-browser
+* Win11 Firefox-browser (until 2024-05-30)
+* Linux Mint 21.3 Firefox-Browser (from 2024-05-30)
+* Android12 Firefox-browser
+
+Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
+
+[Content](#content)
+
+### Installation
+* php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers.
+    * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
+    * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
+* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
+* php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
+    * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 2 minutes on SQL Server
+    * pricelist import @ 660k rows currently takes about 4 minutes to import and process on Uniform Server, 10 minutes on SQL Server
+* php.ini enable extensions:
+    * gd
+    * gettext
+    * mbstring
+    * exif
+    * pdo_odbc
+    * zip
+    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
+* my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
+* Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
+* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
+* Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
+* Change system users default token immidiately and store it in a safe place!
+* Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
+
+### Runtime variables
+Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
+
+```
+; application language
+language = "en" ; en, de, etc. according to available language.xx.ini files
+
+; timezone for calendar handling
+timezone = "Europe/Berlin"
+
+[calendar]
+holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
+; comment out if any of these holidays don't apply
+; second key is just for comprehension, value is offset to easter sunday
+; easter_holidays[maundy_thursday] = -3
+easter_holidays[good_friday] = -2
+; easter_holidays[holy_saturday] = -1
+easter_holidays[easter_monday] = 1
+easter_holidays[ascension] = 39
+easter_holidays[pentecost] = 50
+easter_holidays[corpus_christi] = 60
+
+workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
+default_due = 7 ; scheduled events are due in x days by default
+
+hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
+; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.xx.ini to adhere to your company policies regarding data safety
+
+; default values for csv processing if left out of filter rules
+[csv]
+headerrowindex = 0
+dialect["separator"] = ";"
+dialect["enclosure"] = "\"" ; coding environments may mess up colouring after this escaped quote
+dialect["escape"] = ""
+
+;"forbidden names as regex-patterns
+[forbidden]
+names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whitespace, decimals, special characters 
+names[] = "^.{0,3}$" ; less than 4 characters
+
+; immutable hardcoded reserved keywords
+names[] = "IDENTIFY_BY_" ; special substrings |-separated
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
+
+[lifespan]
+sharepoint =  48 ; HOURS, after these files will be deleted
+tmp =  24 ; HOURS, after these files will be deleted
+order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+
+; probability factor for similarity of texts in percent
+[likeliness]
+consumables_article_no_similarity = 70 ; percent
+file_search_similarity = 50 ; percent
+records_search_similarity = 20 ; percent
+csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
+
+[limits]
+max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
+mdr14_sample_interval = 365 ; days until a new sample check is required
+mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
+
+; permissions based of and matching languages.xx.ini permissions
+; dynamic handling for modules and methods
+; admin by default
+; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
+[permissions]
+appmanual = "qmo" ; contribute to and edit application manual
+audits = "ceo, qmo" ; access audits
+calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
+calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
+calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
+csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
+csvrules = "qmo" ; add csv filter
+externaldocuments = "office, ceo, qmo" ; upload and manage external documents
+filebundles = "ceo, qmo" ; create file bundles
+files = "office, ceo, qmo" ; upload and delete files
+formapproval = "ceo, qmo, supervisor" ; approve forms and components - SEE WARNING ABOVE
+formcomposer = "ceo, qmo" ; compose forms
+formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
+incorporation = "ceo, qmo, prrc" ; incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+mdrsamplecheck = "ceo, qmo, prrc" ; perform the mdr §14 sample check, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
+ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
+orderdisplayall = "purchase" ; display all orders by default, not only for own units
+orderprocessing = "purchase"; process orders
+products = "ceo, qmo, purchase, purchase_assistant" ; add and edit products
+productslimited = "purchase_assistant" ; limited editing of products 
+recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
+texttemplates = "ceo, qmo" ; add and edit text templates
+users = "ceo, qmo" ; add and edit application users
+vendors = "ceo, qmo, purchase" ; add and edit vendors
+
+; page settings for pdf
+[pdf]
+labelsheet[format] = 'A4'
+labelsheet[rows] = 11
+labelsheet[columns] = 5
+labelsheet[margintop] = 0 ; in points
+labelsheet[marginbottom] = 10 ; in points
+record[format] = 'A4'
+record[margintop] = 35 ; in points
+record[marginright] = 15 ; in points
+record[marginbottom] = 15 ; in points
+record[marginleft] = 20 ; in points
+exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
+
+[splitresults]
+bundle_files_per_slide = 12
+products_per_slide = 6
+```
+
+#### Useage notes and caveats
+
+##### Network connection handling
+* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
+* Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue.
+
+##### Miscellaneous
+* Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
+* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
+* Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
+* Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
+* Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
+* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to 32-bit unix time restrictions as time of writing.
+
+#### Customisation
+* The manual is intentionally editable to accomodate it to users comprehension.
+* Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+    * [permission]
+    * [units]
+    * [formcontext][anonymous]
+    * [regulatory]
+
+If you ever fiddle around with the sourcecode:
+* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
+* Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
+
+[Content](#content)
+
+### Importing vendor pricelists
+Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
+
+| Article Number | Article Name | EAN         | Sales Unit |
+| :------------- | :----------- | :---------- | :--------- |
+| 1234           | Shirt        | 90879087    | Piece      |
+| 2345           | Trousers     | 23459907    | Package    |
+| 3456           | Socks        | 90897345    | Pair       |
+
+while setting up a vendor an import rule must be defined like:
+```js
+{
+    "filesettings": {
+        "headerrowindex": 0,
+        "dialect": {
+            "separator": ";",
+            "enclosure": "\"",
+            "escape": ""
+        },
+        "columns": [
+            "Article Number",
+            "Article Name",
+            "EAN",
+            "Sales Unit"
+        ]
+    },
+    "modify": {
+        "add": {
+            "trading_good": "0"
+        },
+        "replace":[
+            ["EAN", "\\s+", ""]
+        ],
+        "conditional": [
+            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+        ],
+        "rewrite": [{
+            "article_no": ["Article Number"],
+            "article_name": ["Article Name"],
+            "article_ean": ["EAN"],
+            "article_unit": ["Sales Unit"]
+        }]
+    }
+}
+```
+*headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+
+Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
+
+```js
+"replace": [
+    ["Article Number", "(product)(X)(.*?)", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ["Article Number", "(product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    ["Article Number", "(product...)(Z)", "L", "R"]
+]
+```
+
+#### Sample Check
+*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default.
+
+You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
+
+[Content](#content)
+
+## API documentation
+
+get ./api/api.php/application/language
+get ./api/api.php/application/login
+get ./api/api.php/application/menu
+get ./api/api.php/application/start
+
+get ./api/api.php/audit/checks/{type}
+get ./api/api.php/audit/export/{type}
+
+get ./api/api.php/calendar/schedule
+get ./api/api.php/calendar/schedule/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
+post ./api/api.php/calendar/schedule
+put ./api/api.php/calendar/schedule/{id}
+delete ./api/api.php/calendar/schedule/{id}
+
+post ./api/api.php/csvfilter/rule
+get ./api/api.php/csvfilter/rule
+post ./api/api.php/csvfilter/filter
+get ./api/api.php/csvfilter/filter
+
+get ./api/api.php/file/filter/{directory}
+get ./api/api.php/file/files/{directory}
+post ./api/api.php/file/filemanager
+get ./api/api.php/file/filemanager/{directory}
+delete ./api/api.php/file/filemanager/{directory}/{file}
+post ./api/api.php/file/externalfilemanager
+put ./api/api.php/file/externalfilemanager/{id}/{int accessible}
+get ./api/api.php/file/externalfilemanager
+get ./api/api.php/file/bundle/{bundle}
+post ./api/api.php/file/bundlemanager
+get ./api/api.php/file/bundlemanager/{bundle}
+post ./api/api.php/file/sharepoint
+get ./api/api.php/file/sharepoint
+
+get ./api/api.php/form/component_editor/{name|id}
+get ./api/api.php/form/form_editor/{name|id}
+get ./api/api.php/form/component/{name}
+post ./api/api.php/form/component
+delete ./api/api.php/form/component/{id}
+get ./api/api.php/form/approval/{id}
+put ./api/api.php/form/approval/{id}
+get ./api/api.php/form/form/{name}
+post ./api/api.php/form/form
+delete ./api/api.php/form/form/{id}
+
+post ./api/api.php/message/message/{formdata}
+get ./api/api.php/message/register
+
+get ./api/api.php/consumables/vendor/{id|name}
+post ./api/api.php/consumables/vendor
+put ./api/api.php/consumables/vendor/{id}
+get ./api/api.php/consumables/product/{id}
+get ./api/api.php/consumables/product/{id|name}/search
+post ./api/api.php/consumables/product
+put ./api/api.php/consumables/product/{id}
+delete ./api/api.php/consumables/product/{id}
+post ./api/api.php/consumables/mdrsamplecheck
+get ./api/api.php/consumables/mdrsamplecheck
+delete ./api/api.php/consumables/mdrsamplecheck
+post ./api/api.php/consumables/incorporation
+get ./api/api.php/consumables/incorporation
+get ./api/api.php/consumables/pendingincorporations
+get ./api/api.php/order/prepared/{unit}
+get ./api/api.php/order/productsearch/{id|name}
+get ./api/api.php/order/order/{id}
+post ./api/api.php/order/order
+put ./api/api.php/order/order/{id}
+delete ./api/api.php/order/order/{id}
+get ./api/api.php/order/approved/
+put ./api/api.php/order/approved/{id}/{ordered|received|archived|disapproved}/{message}
+delete ./api/api.php/order/approved/{id}
+get ./api/api.php/order/filtered/{filter}
+
+post ./api/api.php/record/identifier
+get ./api/api.php/record/identifier
+get ./api/api.php/record/forms
+get ./api/api.php/record/form/{optional identifier}
+get ./api/api.php/record/formfilter
+get ./api/api.php/record/identifierfilter
+post ./api/api.php/record/record
+put ./api/api.php/record/close/{identifier}
+get ./api/api.php/record/import
+get ./api/api.php/record/records
+get ./api/api.php/records/export
+
+post ./api/api.php/texttemplate/chunk
+get ./api/api.php/texttemplate/chunk
+post ./api/api.php/texttemplate/template
+get ./api/api.php/texttemplate/template
+get ./api/api.php/texttemplate/text opens form properly from menu
+get ./api/api.php/texttemplate/text/modal opens form within modal
+
+get ./api/api.php/tool/code
+get ./api/api.php/tool/code/display?key=value
+get ./api/api.php/tool/scanner
+get ./api/api.php/tool/stlviewer
+
+get ./api/api.php/user/profile
+get ./api/api.php/user/user/{id|name}
+post ./api/api.php/user/user
+put ./api/api.php/user/user/{id}
+delete ./api/api.php/user/user/{id}
+
+[Content](#content)
+
+## Code design patterns
+For static code analysis
+### Frontend design
+All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
+
+A service-worker catches requests, routes if available or returns a response for connectivity exceptions. (./service-worker.js)
+
+DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
+
+_client-object handles module specific recurring tasks of form preparations (./js/utility.js)
+
+
+### Backend design
+There is a UTILITY class handling
+* parsing of requests
+* file handling within permitted directories
+* image processing
+* sanitizing backend responses (avoiding unintended script execution)
+Using these methods for fitting usecases is mandatory. (./api/utility.php)
+
+There is a PERMISSION class handling
+* permissions as set within setup.ini
+* full approval check
+* pending approval check
+Using these methods is mandatory. (./api/utility.php) Deviations are allowed only in limiting access for
+* supervisors having access to assigned organizational unit content only
+* groups not having access to records
+
+There is a SQLQUERY class handling
+* database connections
+* most of the query preparation
+* support of chunkifying queries for improved performance
+Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-sice quoting to inhibit injections. (./api/sqlinterface.php)
+
+All requests have to be executed through the api ensuring
+* responses for logged in users only
+* reaching only intended endpoints
+Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
+
+Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings possible (sensitive data).
+
+[Content](#content)
+
+## CSV processor
 The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
 
 Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
@@ -1001,259 +1404,6 @@ A generic sample:
 	}
 }
 ```
-
-[Content](#content)
-
-## Prerequisites
-* Server with
-    * PHP >= 8.2
-    * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted)
-    * SSL (camera access for qr-scanner and serviceworkers don't work otherwise)
-* Network access for endpoints and a browser
-    * Desktop pcs
-    * Mobile devices
-* Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
-
-Tested server environments:
-* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
-* Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
-* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
-
-Tested devices:
-* Win10 Edge-browser
-* Win11 Firefox-browser (until 2024-05-30)
-* Linux Mint 21.3 Firefox-Browser (from 2024-05-30)
-* Android12 Firefox-browser
-
-Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
-
-[Content](#content)
-
-### Installation
-* php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers.
-    * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
-    * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
-* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
-* php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
-    * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 2 minutes on SQL Server
-    * pricelist import @ 660k rows currently takes about 4 minutes to import and process on Uniform Server, 10 minutes on SQL Server
-* php.ini enable extensions:
-    * gd
-    * gettext
-    * mbstring
-    * exif
-    * pdo_odbc
-    * zip
-    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
-* my.ini (MySQL) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
-* Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
-* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
-* Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
-* Change system users default token immidiately and store it in a safe place!
-* Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
-
-### Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
-
-```
-; application language
-language = "en" ; en, de, etc. according to available language.xx.ini files
-
-; timezone for calendar handling
-timezone = "Europe/Berlin"
-
-[calendar]
-holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
-; comment out if any of these holidays don't apply
-; second key is just for comprehension, value is offset to easter sunday
-; easter_holidays[maundy_thursday] = -3
-easter_holidays[good_friday] = -2
-; easter_holidays[holy_saturday] = -1
-easter_holidays[easter_monday] = 1
-easter_holidays[ascension] = 39
-easter_holidays[pentecost] = 50
-easter_holidays[corpus_christi] = 60
-
-workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
-default_due = 7 ; scheduled events are due in x days by default
-
-hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
-; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.xx.ini to adhere to your company policies regarding data safety
-
-; default values for csv processing if left out of filter rules
-[csv]
-headerrowindex = 0
-dialect["separator"] = ";"
-dialect["enclosure"] = "\"" ; coding environments may mess up colouring after this escaped quote
-dialect["escape"] = ""
-
-;"forbidden names as regex-patterns
-[forbidden]
-names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whitespace, decimals, special characters 
-names[] = "^.{0,3}$" ; less than 4 characters
-
-; immutable hardcoded reserved keywords
-names[] = "IDENTIFY_BY_" ; special substrings |-separated
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
-
-[lifespan]
-sharepoint =  48 ; HOURS, after these files will be deleted
-tmp =  24 ; HOURS, after these files will be deleted
-order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
-
-; probability factor for similarity of texts in percent
-[likeliness]
-consumables_article_no_similarity = 70 ; percent
-file_search_similarity = 50 ; percent
-records_search_similarity = 20 ; percent
-csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
-
-[limits]
-max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-mdr14_sample_interval = 365 ; days until a new sample check is required
-mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
-
-; permissions based of and matching languages.xx.ini permissions
-; dynamic handling for modules and methods
-; admin by default
-; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
-[permissions]
-appmanual = "qmo" ; contribute to and edit application manual
-audits = "ceo, qmo" ; access audits
-calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
-calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
-calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
-csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
-csvrules = "qmo" ; add csv filter
-externaldocuments = "office, ceo, qmo" ; upload and manage external documents
-filebundles = "ceo, qmo" ; create file bundles
-files = "office, ceo, qmo" ; upload and delete files
-formapproval = "ceo, qmo, supervisor" ; approve forms and components - SEE WARNING ABOVE
-formcomposer = "ceo, qmo" ; compose forms
-formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
-incorporation = "ceo, qmo, prrc" ; incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
-mdrsamplecheck = "ceo, qmo, prrc" ; perform the mdr §14 sample check, user by default for gathering information, set up permissions have to approve and are authorized to revoke
-orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
-ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
-orderdisplayall = "purchase" ; display all orders by default, not only for own units
-orderprocessing = "purchase"; process orders
-products = "ceo, qmo, purchase, purchase_assistant" ; add and edit products
-productslimited = "purchase_assistant" ; limited editing of products 
-recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
-texttemplates = "ceo, qmo" ; add and edit text templates
-users = "ceo, qmo" ; add and edit application users
-vendors = "ceo, qmo, purchase" ; add and edit vendors
-
-; page settings for pdf
-[pdf]
-labelsheet[format] = 'A4'
-labelsheet[rows] = 11
-labelsheet[columns] = 5
-labelsheet[margintop] = 0 ; in points
-labelsheet[marginbottom] = 10 ; in points
-record[format] = 'A4'
-record[margintop] = 35 ; in points
-record[marginright] = 15 ; in points
-record[marginbottom] = 15 ; in points
-record[marginleft] = 20 ; in points
-exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
-
-[splitresults]
-bundle_files_per_slide = 12
-products_per_slide = 6
-```
-
-#### Useage notes and caveats
-
-##### Network connection handling
-* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue.
-
-##### Miscellaneous
-* Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
-* Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
-* Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
-* Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
-* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to 32-bit unix time restrictions as time of writing.
-
-#### Customisation
-* The manual is intentionally editable to accomodate it to users comprehension.
-* Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
-    * [permission]
-    * [units]
-    * [formcontext][anonymous]
-    * [regulatory]
-
-If you ever fiddle around with the sourcecode:
-* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
-* Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
-
-[Content](#content)
-
-### Importing vendor pricelists
-Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
-
-| Article Number | Article Name | EAN         | Sales Unit |
-| :------------- | :----------- | :---------- | :--------- |
-| 1234           | Shirt        | 90879087    | Piece      |
-| 2345           | Trousers     | 23459907    | Package    |
-| 3456           | Socks        | 90897345    | Pair       |
-
-while setting up a vendor an import rule must be defined like:
-```js
-{
-    "filesettings": {
-        "headerrowindex": 0,
-        "dialect": {
-            "separator": ";",
-            "enclosure": "\"",
-            "escape": ""
-        },
-        "columns": [
-            "Article Number",
-            "Article Name",
-            "EAN",
-            "Sales Unit"
-        ]
-    },
-    "modify": {
-        "add": {
-            "trading_good": "0"
-        },
-        "replace":[
-            ["EAN", "\\s+", ""]
-        ],
-        "conditional": [
-            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
-        ],
-        "rewrite": [{
-            "article_no": ["Article Number"],
-            "article_name": ["Article Name"],
-            "article_ean": ["EAN"],
-            "article_unit": ["Sales Unit"]
-        }]
-    }
-}
-```
-*headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
-
-Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
-
-```js
-"replace": [
-    ["Article Number", "(product)(X)(.*?)", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    ["Article Number", "(product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
-    ["Article Number", "(product...)(Z)", "L", "R"]
-]
-```
-
-#### Sample Check
-*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default.
-
-You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
 
 [Content](#content)
 
