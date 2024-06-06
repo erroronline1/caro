@@ -34,10 +34,13 @@ class API {
 	public function __construct(){
 		$this->_payload = UTILITY::parsePayload();
 		
-		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password']);
+		$options = [
+			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
+			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
+		];
+		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
-		$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true); // reuse tokens in prepared statements
 	}
 	
 	/**
