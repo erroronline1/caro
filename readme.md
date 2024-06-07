@@ -30,7 +30,7 @@
 * [API documentation](#api-documentation)
 * [Code design patterns](#code-design-patterns)
 * [CSV processor](#csv-processor)
-* [Technical guidelines on data security](#technical-guidelines-on-data-security)
+* [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
     * [Web Application](#web-application)
     * [Backend](#backend)
 * [Ressources](#ressources)
@@ -1418,8 +1418,8 @@ A generic sample:
 
 [Content](#content)
 
-## Technical guidelines on data security
-This software aims to match all relevant aspects of security measures. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
+## Statement on technical guidelines on data security
+This software aims to match as much relevant aspects of security measures as possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
 
 ### Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
@@ -1584,7 +1584,7 @@ This software aims to match all relevant aspects of security measures. The softw
 > Not applicable, as there are no paid ressources.
 
 #### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
-> The operator of the infrastructure is responsible for fulfilling these.requirements. Caro App [requires SSL](#prerequisites) consistently though.
+> The operator of the infrastructure is responsible for fulfilling these requirements. Caro App [requires SSL](#prerequisites) consistently though.
 
 #### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
 * O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken aufklären.
@@ -1618,7 +1618,7 @@ This software aims to match all relevant aspects of security measures. The softw
     > Only active and intentional user input is processed and stored.
 * O.Purp_4 Das Hintergrundsystem MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden. 
 * O.Purp_5 Der Anbieter MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
-    > All user settings are displayed within the profile. selectable options are disabled by default
+    > All user settings are displayed within the profile. Selectable options are disabled by default.
 * O.Purp_6 Setzt das Hintergrundsystem Drittanbieter-Software ein, SOLLEN alle verwendeten Funktionen für den rechtmäßigen Zweck des Gesamtsystems erforderlich sein. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.Anderweitige Funktionen SOLLEN sicher deaktiviert sein. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, SOLL abgewogen werden, ob die Einbindung der gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
     > [Ressources](#ressources)
 * O.Purp_7 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
@@ -1626,9 +1626,9 @@ This software aims to match all relevant aspects of security measures. The softw
 
 #### 3.1.2 Prüfaspekt (2): Architektur 
 * O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für die gesamte Anwendung sein.
-    > User login and permissions have been mandatory from the early stages on
+    > User login and permissions have been mandatory from the early stages on.
 * O.Arch_2 Bereits in der Designphase des Hintergrundsystems MUSS berücksichtigt werden, dass das Hintergrundsystem der Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur des Hintergrundsystems MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten. 
-    > User login and permissions have been mandatory from the early stages on
+    > User login and permissions have been mandatory from the early stages on.
 * O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
 * O.Arch_4 In Backups gespeicherte sensible Daten MÜSSEN gemäß dem Stand der Technik verschlüsselt sein.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
