@@ -54,6 +54,7 @@
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
 * permission to message user groups
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years
+* mdr_reusable_timespan defined for vendors with limited products
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -79,7 +80,7 @@
 
 
 ## Aims
-This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment; while being usable on any webserver this does not adhere to [data safety requirements](#technical-guidelines-on-sata-security) and is **not recommended**. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
+This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment; while technically being usable on any webserver this does not adhere to [data safety requirements](#technical-guidelines-on-sata-security) and is **not recommended**. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
@@ -153,8 +154,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
     * also see [Records](#records)
 * ISO 13485 7.6 Surveillance and measuring equipment control
-    * Dedicated forms make use of an identifier like production forms. Measuring equipment may each have assigned their distinct identifier.
-    * Adding a form component to adress scheduling helps with future events that will show up and alert user groups where reasonable.
+    * Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.
+    * Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.
 * ISO 13485 8.2.4 Internal audit
     * The audit module aquires data from the application and is partially able to export
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
@@ -187,7 +188,7 @@ Main goal is a distribution of mobile devices to the whole staff or at least key
 For technical details see [prerequisites](#prerequisites). 
 
 ### What it is not
-Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default setting.*
+Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
@@ -205,7 +206,7 @@ Forms can contain a digital signature pad. Please note this is not legally docum
 ### Regulatory fulfillment suggestions
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#tools).
 * Create forms describing required documentation of processes and assign a *Process or work instruction*-form-context and the fitting regulatory context.
-    * ISO 13485 all chapters should be adressed
+    * ISO 13485 all chapters should be applicationed
     * You may refer to this documentation regarding the chapters stated in the [aims above](#aims).
 * Create forms that can be exported for a written form and assign a *General company record*-form-context and the fitting regulatory context.
     * ISO 13485 4.1.5
@@ -243,24 +244,24 @@ Beside the apps architecture you will still have to set up your quality manageme
 ## Modules
 
 ### Users
-On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and e.g. used as a laminated card.
+On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and, for example, used as a laminated card.
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
 The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible. These can be set and modified within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
 
-Some permissions are default set though:
+Some permissions/restrictions are default set though:
 
 Timesheets are accessible only if weekly hours are defined for the user - even the application admin.
 
 * User
-    * can only see orders for own assigned organizational units
+    * can see orders for own assigned organizational units only
     * can export own timesheet only
     * can perform the MDR§14 sample check and gather information for product incorporation
 * Group
     * can **NEVER** add records due to limited identification data
     * can place orders, but will be prompted to identify themself
-    * can only see orders for own assigned organizational units
+    * can see orders for own assigned organizational units only
     * can **NEVER** incorporate and sample check due to limited identification data
     * can **NEVER** access nor contribute to timesheets
 * Supervisor
@@ -333,7 +334,7 @@ To avoid unneccesary or repetitive poetry and support a consistent linguistic st
 * Informal you - "buddy"
 * Formal you - "your honor" (this is the german model part where there is more than just "you")
 
-Such a replacement may be named addressee. If a generic text chunk contains :adressee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+Such a replacement may be named addressee. If a generic text chunk contains :applicationee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
 
@@ -390,7 +391,7 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to defined authorized users to prevent distribution of outdated versions and support a improved data collecting within the application. It is recommended to transfer the data later or at least append the file to the applicable record.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -498,7 +499,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#content)
 
 ### Calendar
-Add events to the calendar. The landing page gives a brief overview of weekly and daily scheduled events as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
+Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -740,6 +741,8 @@ graph TD;
     mark_bulk-->|no|prepared_orders;
     prepared_orders-->add_product;
 ```
+Initialized incorporations are marked as approved by all applicable users permissions/roles. They may still have to be fully approved by defined authorized roles.
+Sample checks are added to the records. Defined authorized users can revoke the sample check from within the [audit module](#tools). New checks trigger a sytem message to these users.
 
 [Content](#content)
 
@@ -750,6 +753,7 @@ Also a CSV-Filter and its manager are sorted here. The CSV-filter processes resp
 
 The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
 * incoporated articles
+* MDR §14 sample checks
 * current documents in use including external documents
 * user certificates
 * vendor list
@@ -875,8 +879,9 @@ mdr14_sample_reusable = 1825 ; days until a new sample check on the same product
 ; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
 [permissions]
 appmanual = "qmo" ; contribute to and edit application manual
-audits = "ceo, qmo" ; access audits
+audits = "ceo, qmo, prrc" ; access audits
 calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
+calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert sick days after calling in
 calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
 calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
@@ -884,21 +889,21 @@ csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 filebundles = "ceo, qmo" ; create file bundles
 files = "office, ceo, qmo" ; upload and delete files
-formapproval = "ceo, qmo, supervisor" ; approve forms and components - SEE WARNING ABOVE
+formapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve forms and components
 formcomposer = "ceo, qmo" ; compose forms
 formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
-incorporation = "ceo, qmo, prrc" ; incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
-mdrsamplecheck = "ceo, qmo, prrc" ; perform the mdr §14 sample check, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+mdrsamplecheck = "ceo, qmo, prrc"; must have access to audit as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
 orderdisplayall = "purchase" ; display all orders by default, not only for own units
 orderprocessing = "purchase"; process orders
-products = "ceo, qmo, purchase, purchase_assistant" ; add and edit products
+products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products 
 recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
 texttemplates = "ceo, qmo" ; add and edit text templates
 users = "ceo, qmo" ; add and edit application users
-vendors = "ceo, qmo, purchase" ; add and edit vendors
+vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
 
 ; page settings for pdf
 [pdf]
@@ -931,7 +936,7 @@ products_per_slide = 6
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
-* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to 32-bit unix time restrictions as time of writing.
+* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 
 #### Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
@@ -1123,7 +1128,7 @@ For static code analysis
 ### Frontend design
 All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
 
-A service-worker catches requests, routes if available or returns a response for connectivity exceptions. (./service-worker.js)
+A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
 
 DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
 
@@ -1135,20 +1140,20 @@ There is a UTILITY class handling
 * parsing of requests
 * file handling within permitted directories
 * image processing
-* sanitizing backend responses (avoiding unintended script execution)
 Using these methods for fitting usecases is mandatory. (./api/utility.php)
 
 There is a PERMISSION class handling
 * permissions as set within setup.ini
 * full approval check
 * pending approval check
-Using these methods is mandatory. (./api/utility.php) Deviations are allowed only in limiting access for
-* supervisors having access to assigned organizational unit content only
-* groups not having access to records
+Using these methods is mandatory. (./api/utility.php) Deviations are allowed only in extending access to *admin* or limiting access for
+* *supervisors* having access to assigned organizational unit content only
+* *groups* not having access to recording
 
 There is a SQLQUERY class handling
 * database connections
-* most of the query preparation
+* query preparation
+* sanitizing and masking input (avoiding unintended script execution)
 * support of chunkifying queries for improved performance
 Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-sice quoting to inhibit injections. (./api/sqlinterface.php)
 
@@ -1157,7 +1162,7 @@ All requests have to be executed through the api ensuring
 * reaching only intended endpoints
 Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
 
-Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings possible (sensitive data).
+Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
 
 [Content](#content)
 
@@ -1434,9 +1439,9 @@ This software aims to match as much relevant aspects of security measures as pos
 * O.Purp_5 Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden. 
 * O.Purp_6 Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
 * O.Purp_7 Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
-    > [Ressources](#ressources)
+    > [List of third party software](#ressources)
 * O.Purp_8 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten vollumfänglich infrandormieren und sein Einverständnis einholen (OPT-IN).
-    > [Ressources](#ressources)
+    > [List of third party software](#ressources)
 * O.Purp_9 Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer dies ist für den primären Zweck der Anwendung erforderlich.
     > Sensitive data is displayed only on intended and active user request.
 
@@ -1448,7 +1453,7 @@ This software aims to match as much relevant aspects of security measures as pos
 * O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
 * O.Arch_4 In Backups gespeicherte sensiblen Daten MÜSSEN gemäß dem aktuellen Stand der Technik verschlüsselt sein. Dies schließt das Persistieren sensibler Daten durch den Browser, etwa in dessen Cache, mit ein.
 * O.Arch_5 Nutzt die Web-Anwendung Drittanbieter-Software, MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommen, deren zu nutzenden Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellen. Die Anwendung MUSS diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
-    > [Ressources](#ressources)
+    > [List of third party software](#ressources)
 * O.Arch_6 Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden.
     > Used languages and are solely limited to HTML, CSS, JavaScript and PHP. Contents are delivered by the backend only.
 * O.Arch_7 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
@@ -1569,7 +1574,7 @@ This software aims to match as much relevant aspects of security measures as pos
 * O.Data_12 Durch die Web-Anwendung kann der Zugriff für Dritte und die Speicherung des Bildschirms (z. B. Screenshots und Anzeigen für das App-Switching) nicht unterbunden werden. Über die Nutzungsbedingungen MUSS der Nutzer darüber informiert werden, dass sensible Daten über Screenshots oder Anzeigen für das App-Switching kompromittiert werden können.
 * O.Data_13 Über die Nutzungsbedingungen der Web-Anwendung MUSS der Nutzer über das Risiko informiert werden, welches damit verbunden ist, dass im gesperrten Zustand des Endgeräts die Verbindung zum Hintergrundsystem weiter geöffnet bleibt, wenn der Nutzer sich nicht explizit ausgeloggt hat.
 * O.Data_14 Die Web-Anwendung SOLL sicherstellen, dass bei ihrer Beendigung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen im Web-Browser nicht mehr zugreifbar sind. Dies schließt insbesondere Cookies und Webstorage mit ein.
-    > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss.
+    > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling)
 * O.Data_15 Die Web-Anwendung MUSS dem Nutzer die Möglichkeit geben, dass bei endgültiger Beendigung der Nutzung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig gelöscht bzw. unzugänglich gemacht werden.
     > Authorized users can delete users permanently.
 * O.Data_16 Für alle Cookies, auf die nicht mittels JavaScript zugegriffen wird, MUSS das HTTP-OnlyFlag verwendet werden. 
@@ -1620,9 +1625,9 @@ This software aims to match as much relevant aspects of security measures as pos
 * O.Purp_5 Der Anbieter MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
     > All user settings are displayed within the profile. Selectable options are disabled by default.
 * O.Purp_6 Setzt das Hintergrundsystem Drittanbieter-Software ein, SOLLEN alle verwendeten Funktionen für den rechtmäßigen Zweck des Gesamtsystems erforderlich sein. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.Anderweitige Funktionen SOLLEN sicher deaktiviert sein. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, SOLL abgewogen werden, ob die Einbindung der gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
-    > [Ressources](#ressources)
+    > [List of third party software](#ressources)
 * O.Purp_7 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
-    > [Ressources](#ressources)
+    > [List of third party software](#ressources)
 
 #### 3.1.2 Prüfaspekt (2): Architektur 
 * O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für die gesamte Anwendung sein.
@@ -1820,7 +1825,7 @@ This software aims to match as much relevant aspects of security measures as pos
     * SVG ui-icon files, not executable
     * author has professional license
 
-All libraries are embedded locally, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries adhere to the current code language standards, this applies to libraries without recent contributions too. All used libraries do not affect the security of the application.
+All libraries are embedded locally, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
 ### Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
