@@ -132,7 +132,7 @@ const _ = {
 	},
 	getInputs: function (querySelector, form_data = false) {
 		let fields;
-		if (form_data) {
+		if (form_data && document.querySelector(querySelector)) {
 			fields = new FormData(document.querySelector(querySelector));
 			// add special comma separated dataset for checkboxes with data-grouped attribute
 			const grouped = document.querySelectorAll("[data-grouped]"),
