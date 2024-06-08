@@ -43,11 +43,11 @@ class SQLQUERY {
 				$list = explode(',', $value);
 				if (count($list) > 2){
 					foreach ($list as $index => $value2){
-						if (gettype($value2) === 'string' && $value2 != 'NULL') $list[$index] = $_pdo->quote($value2);
+						if (gettype($value2) === 'string' && !in_array($value2, ['NULL', 'CURRENT_TIMESTAMP'])) $list[$index] = $_pdo->quote($value2);
 					}
 					$value = implode(',', $list);
 				}
-				else if (gettype($value) === 'string' && $value != 'NULL') $parameters['replacements'][$key] = $_pdo->quote($value);
+				else if (gettype($value) === 'string' && !in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) $parameters['replacements'][$key] = $_pdo->quote($value);
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
