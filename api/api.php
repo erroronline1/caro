@@ -41,6 +41,23 @@ class API {
 		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
+
+		// update user setting for each request
+		if (array_key_exists('user', $_SESSION)){
+			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+				'values' => [
+					':token' => $_SESSION['user']['token']
+				]
+			]);
+			if ($query){
+				$result = $query[0];
+				$_SESSION['user'] = $result;
+				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
+				$_SESSION['user']['units'] = explode(',', $result['units']);
+				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+				$_SESSION['user']['image'] = './' . $result['image'];
+			}
+		}
 	}
 	
 	/**

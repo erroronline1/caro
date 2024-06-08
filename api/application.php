@@ -33,16 +33,13 @@ class APPLICATION extends API {
 		]);
 		if ($query){
 			$result = $query[0];
-			$_SESSION['user'] = [
-				'name' => $result['name'],
-				'permissions' => explode(',', $result['permissions']),
-				'units' => explode(',', $result['units']),
-				'image' => './' . $result['image'],
-				'id' => $result['id'],
-				'orderauth' => boolval($result['orderauth']),
-				'app_settings' => $result['app_settings'] ? json_decode($result['app_settings'], true) : []
-			];
-			$this->response(['body' => $_SESSION['user']]);
+			$_SESSION['user'] = $result;
+			$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+			$_SESSION['user']['image'] = './' . $result['image'];
+			$this->response(['body' => [
+				'image' => $_SESSION['user']['image'],
+				'app_settings' => $_SESSION['user']['app_settings']
+			]]);
 		}
 		session_unset();
 		session_destroy();
