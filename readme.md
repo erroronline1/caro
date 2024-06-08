@@ -37,8 +37,6 @@
 
 
 # development
-* check htmlspecialchars application. if...
-* assemble.compose_link_form_choice after updates sql execution routine with htmlspecialchars
 * error response on empty timesheet exports
 * incorporation on same article_no
 * token & order-pin encrypted
@@ -1150,7 +1148,7 @@ Using these methods is mandatory. (./api/utility.php) Deviations are allowed onl
 There is a SQLQUERY class handling
 * database connections
 * query preparation
-* sanitizing and masking input (avoiding unintended script execution)
+* masking user input (avoiding injections)
 * support of chunkifying queries for improved performance
 Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/sqlinterface.php)
 
@@ -1461,9 +1459,9 @@ This software aims to match as much relevant aspects of security measures as pos
 
 #### 3.1.3 Prüfaspekt (3): Quellcode
 * O.Source_1 Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
-    > Inputs are sanitized by the backend by default.
+    > Inputs are masked as strings by the backend by default.
 * O.Source_2 Die Anwendung MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen.
-    > Outputs are preprocessed inputs only.
+    > Outputs on the front end are parsed as text nodes or unexecuted input values.
 * O.Source_3 Fehlermeldungen und Log-Dateien DÜRFEN KEINE sensiblen Daten (z. B. User Identifier oder Session-IDs) enthalten.
     > This is not the case.
 * O.Source_4 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen (z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden.
@@ -1653,9 +1651,9 @@ This software aims to match as much relevant aspects of security measures as pos
 
 #### 3.1.3 Prüfaspekt (3): Quellcode 
 * O.Source_1 Das Hintergrundsystem MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
-    > Inputs are sanitized by the backend by default.
+    > Inputs are masked as strings by the backend by default.
 * O.Source_2 Das Hintergrundsystem MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
-    > Outputs are preprocessed inputs only.
+    > Outputs on the front end are parsed as text nodes or unexecuted input values.
 * O.Source_3 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen (z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden.
     > This is not the case.
 * O.Source_4 Bei Ausnahmen im Programmablauf (Exceptions) SOLL das Hintergrundsystem Zugriffe auf sensible Daten abbrechen und die Anwendung anweisen, diese im Speicher sicher zu löschen.
