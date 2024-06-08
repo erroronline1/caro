@@ -39,18 +39,14 @@
 # development
 * check htmlspecialchars application. if...
 * assemble.compose_link_form_choice after updates sql execution routine with htmlspecialchars
-* clear metadata for uploaded images
 * error response on empty timesheet exports
 * incorporation on same article_no
 * token & order-pin encrypted
-* https://stackoverflow.com/questions/138670/how-unique-is-the-php-session-id
 * refresh user permissions etc on every request (e.g session only holds id, user array fetched every time)
 * idle logout
-* sessionid cookie secure
 * user terms of service, warnings, risks, effects of browser permissions revoked
 * export data warning
 * frontend lockout need to restart browser on failed login attempt?
-* https://stackoverflow.com/questions/10165424/how-secure-are-php-sessions
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
 * permission to message user groups
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years
@@ -797,6 +793,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 * php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 2 minutes on SQL Server
     * pricelist import @ 660k rows currently takes about 4 minutes to import and process on Uniform Server, 10 minutes on SQL Server
+* php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * php.ini enable extensions:
     * gd
     * gettext
@@ -1563,7 +1560,8 @@ This software aims to match as much relevant aspects of security measures as pos
     > Only active and intentional user input is processed and stored.
 * O.Data_6 Die Speicherung und Verarbeitung von sensiblen Daten SOLL im Hintergrundsystem erfolgen.
     > This is the case, storing sensitive data within the frontend occurs only as offline fallback within same-origin IndexedDB, the storage is cleared as soon as the cached requests have been submitted.
-* O.Data_7 Bei der Verwendung von Aufnahmegeräten (z. B. Kamera) MÜSSEN sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf die GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernt werden. 
+* O.Data_7 Bei der Verwendung von Aufnahmegeräten (z. B. Kamera) MÜSSEN sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf die GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernt werden.
+    > All photos are processed and resized. Meta data is lost during this process.
 * O.Data_8 Bei der Erhebung von sensiblen Daten durch die Verwendung von Aufnahmegeräten (z.B. Kamera), MUSS vorgebeugt werden, dass andere Anwendungen darauf Zugriff erlangen könnten, etwa über eine Mediengalerie.
     > Camera pictures are not stored in shared folders and exist only as form data before submission.
 * O.Data_9 Bei der Eingabe sensibler Daten über die Tastatur SOLL die Web-Anwendung unterbinden, dass Aufzeichnungen für Dritte erkennbar werden. 
@@ -1765,7 +1763,8 @@ This software aims to match as much relevant aspects of security measures as pos
 * O.Data_2 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus im Hintergrundsystem gehalten werden.
 * O.Data_3 Das Hintergrundsystem MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen.
     > Only active and intentional user input is processed and stored.
-* O.Data_4 Das Hintergrundsystem MUSS sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf den GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernen, wenn diese Daten nicht für den rechtmäßigen Zweck der Anwendung benötigt werden. 
+* O.Data_4 Das Hintergrundsystem MUSS sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf den GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernen, wenn diese Daten nicht für den rechtmäßigen Zweck der Anwendung benötigt werden.
+    > All photos are processed and resized. Meta data is lost during this process.
 * O.Data_5 Sensible Daten wie private Schlüssel DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, exportiert werden, außer es ist für den rechtmäßigen Zweck der Anwendung notwendig (s. Tabelle 15).
     > Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
 * O.Data_6 Das Hintergrundsystem DARF KEINE sensiblen Daten in Meldungen oder Benachrichtigungen, die nicht vom Benutzer explizit eingeschaltet wurden, schreiben.
