@@ -103,6 +103,22 @@ const _serviceWorker = {
 	},
 };
 const _client = {
+	application : {
+		clearMenu: (event) => {
+			const inputs = document.getElementsByName("userMenu");
+			for (const input of inputs) {
+				input.checked = false;
+			}
+		},
+		dialogToFormdata : (dialogData) => {
+			if (!Object.keys.length) return false;
+			formdata = new FormData();
+			for (const [key, value] of Object.entries(dialogData)) {
+				formdata.append(key, value);
+			}
+			return formdata;
+		}
+	},
 	calendar: {
 		createFormData: (data) => {
 			window.calendarFormData = new FormData();
@@ -398,19 +414,8 @@ const _client = {
 	},
 };
 
-//general
-
-const applicationModule = {
-	clearMenu: (event) => {
-		const inputs = document.getElementsByName("userMenu");
-		for (const input of inputs) {
-			input.checked = false;
-		}
-	},
-};
-
 window.addEventListener("scroll", function () {
 	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
 	document.querySelector("header>div:last-of-type").style.width = percentScrolled + "%";
 });
-window.addEventListener("pointerup", applicationModule.clearMenu);
+window.addEventListener("pointerup", _client.application.clearMenu);

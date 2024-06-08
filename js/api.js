@@ -868,6 +868,10 @@ export const api = {
 				if (
 					["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])
 				) {
+					if (typeof request[4] === 'object') {
+						payload = request[4];
+						delete request[4];
+					}
 					successFn = function (data) {
 						new Toast(data.status.msg, data.status.type);
 					};
@@ -878,7 +882,7 @@ export const api = {
 						api.purchase("get", "prepared");
 					};
 				}
-				if (request[1] !== "approved") payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+				if (request[1] !== "approved" && !payload) payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
 				break;
 			case "delete":
 				switch (request[1]) {

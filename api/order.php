@@ -7,7 +7,6 @@ class ORDER extends API {
 	private $_subMethod = null;
 	private $_borrowedModule = null;
 	private $_subMethodState = null;
-	private $_message = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -15,7 +14,7 @@ class ORDER extends API {
 
 		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_borrowedModule = $this->_subMethodState = $this->_message = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_borrowedModule = $this->_subMethodState = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	public function prepared(){
@@ -899,13 +898,13 @@ class ORDER extends API {
 								':order' => LANG::GET('order.message', $messagepayload),
 								':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
 								':user' => $_SESSION['user']['name']
-							])) . "\n \n" . $this->_message);
+							])) . "\n \n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')));
 							break;
 						case 'addinformation':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
+								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info'));
 							}
-							else $decoded_order_data['additional_info'] = $this->_message;
+							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info'));
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_addinformation', [
 								'values' => [
 									':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
@@ -913,9 +912,9 @@ class ORDER extends API {
 								]
 							]);
 							$this->_subMethod = 'add_information_confirmation';
-							if (str_starts_with($this->_message, LANG::GET('order.orderstate_description'))){
+							if (str_starts_with(UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info')), LANG::GET('order.orderstate_description'))){
 								// inform user group
-								$messagepayload=[];
+								$messagepayload = [];
 								foreach (['quantity'=> 'quantity_label',
 									'unit' => 'unit_label',
 									'number' => 'ordernumber_label',
@@ -934,9 +933,9 @@ class ORDER extends API {
 							break;
 						case 'cancellation':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
+								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							}
-							else $decoded_order_data['additional_info'] = $this->_message;
+							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
@@ -949,9 +948,9 @@ class ORDER extends API {
 							break;
 						case 'return':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
+								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							}
-							else $decoded_order_data['additional_info'] = $this->_message;
+							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.received') . ': ' . $order['received'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
@@ -1150,7 +1149,7 @@ class ORDER extends API {
 							 ) . "'), " .
 							"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('order.disapprove_message_ok') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 							"if (response !== false) {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
+							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
 					];
 					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')]=[
@@ -1168,7 +1167,7 @@ class ORDER extends API {
 							 ) . "'), " .
 							"options:{'" . LANG::GET('order.cancellation_message_cancel') . "': false, '" . LANG::GET('order.cancellation_message_ok') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 							"if (response !== false) {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
+							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
 					];
 					if ($row['received'] && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')]=[
@@ -1186,7 +1185,7 @@ class ORDER extends API {
 							 ) . "'), " .
 							"options:{'" . LANG::GET('order.return_message_cancel') . "': false, '" . LANG::GET('order.return_message_ok') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 							"if (response !== false) {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'return', response[LANG.GET('message.message')] || ''); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
+							"api.purchase('put', 'approved', " . $row['id']. ", 'return', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
 					];
 
@@ -1261,7 +1260,7 @@ class ORDER extends API {
 								 ) . "'), options:{".
 								"'".LANG::GET('order.add_information_cancel')."': false,".
 								"'".LANG::GET('order.add_information_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(response => {if (response[LANG.GET('order.additional_info')]) api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', response[LANG.GET('order.additional_info')])})"
+								"}}).then(response => {if (response) api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', _client.application.dialogToFormdata(response))})"
 						]
 					];
 
@@ -1281,7 +1280,7 @@ class ORDER extends API {
 							'content' => $statechange,
 							'attributes' => [
 								'name' => LANG::GET('order.orderstate_description'),
-								'onchange' => "new Dialog({type: 'input', header: '". LANG::GET('order.orderstate_description') ." ' + this.value, body: JSON.parse('" . 
+								'onchange' => "new Dialog({type: 'input', header: LANG.GET('order.orderstate_description') + ' ' + this.value, body: JSON.parse('" . 
 									json_encode(
 										[
 											[
@@ -1295,9 +1294,8 @@ class ORDER extends API {
 									 ) . "'), options:{".
 									"'".LANG::GET('order.add_information_cancel')."': false,".
 									"'".LANG::GET('order.add_information_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(response => {if (response[LANG.GET('order.additional_info')]) api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', '". LANG::GET('order.orderstate_description') ." - ' + this.value + ': ' + response[LANG.GET('order.additional_info')])})"
-								]
-
+									"}}).then(response => {if (response) {response[LANG.GET('order.additional_info')] = LANG.GET('order.orderstate_description') + ' - ' + this.value + ': ' + response[LANG.GET('order.additional_info')]; api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', _client.application.dialogToFormdata(response))}})"
+							]
 						];
 					}
 
