@@ -125,7 +125,7 @@ export const api = {
 	application: async (method, ...request) => {
 		/*
 		get application/language
-		get application/login
+		post application/login
 		get application/menu
 		get application/start
 		*/
@@ -139,10 +139,8 @@ export const api = {
 				};
 				break;
 			case "login":
-				const logintoken = document.querySelector("[data-usecase=login]");
-				if (logintoken) {
-					request.push(logintoken.value ? logintoken.value : null);
-				}
+				payload = _.getInputs("[data-usecase=login]", true);
+
 				successFn = async function (data) {
 					await api.application("get", "menu");
 					if (data.body.form) {
@@ -163,7 +161,7 @@ export const api = {
 						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
 						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
 					}
-					if (data.body.app_settings)
+					if (data.body.app_settings){
 						for (const [key, value] of Object.entries(data.body.app_settings)) {
 							switch (key) {
 								case "forceDesktop":
@@ -177,6 +175,7 @@ export const api = {
 									break;
 							}
 						}
+					}
 					api.application("get", "start");
 				};
 				break;

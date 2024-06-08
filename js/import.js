@@ -17,4 +17,4 @@ window.compose_helper = compose_helper;
 import { LANG } from "../js/language.js";
 window.LANG = LANG;
 
-api.application("get", "login");
+api.application("post", "login");

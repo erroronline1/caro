@@ -6,7 +6,7 @@ require_once('notification.php');
 class APPLICATION extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
-    private $_requestedToken = null;
+    private $_requestedLogout = null;
     private $_requestedManual = null;
 
 	/**
@@ -14,7 +14,7 @@ class APPLICATION extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedToken = $this->_requestedManual = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedLogout = $this->_requestedManual = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -22,44 +22,72 @@ class APPLICATION extends API {
 	 * without current user respond with login form
 	 */
 	public function login(){
-		// select single user based on token
-		if (!boolval($this->_requestedToken) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
-			$this->response(['body' => $_SESSION['user']]);
-		}
-		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
-			'values' => [
-				':token' => $this->_requestedToken
-			]
-		]);
-		if ($query){
-			$result = $query[0];
-			$_SESSION['user'] = $result;
-			$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
-			$_SESSION['user']['image'] = './' . $result['image'];
-			$this->response(['body' => [
-				'image' => $_SESSION['user']['image'],
-				'app_settings' => $_SESSION['user']['app_settings']
-			]]);
+		if (!$this->_requestedLogout){
+			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
+				$this->response(['body' => [
+					'image' => $_SESSION['user']['image'],
+					'app_settings' => $_SESSION['user']['app_settings']
+				]]);
+			}
+			// select single user based on token
+			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+				'values' => [
+					':token' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description'))
+				]
+			]);
+			if ($query && UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.terms_of_service_accepted'))){
+				$result = $query[0];
+				$_SESSION['user'] = $result;
+				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+				$_SESSION['user']['image'] = './' . $result['image'];
+				$this->response(['body' => [
+					'image' => $_SESSION['user']['image'],
+					'app_settings' => $_SESSION['user']['app_settings']
+				]]);
+			}
 		}
 		session_unset();
 		session_destroy();
-		$this->response(['body' =>
+		$response = ['body' =>
 			[
 				'form' => [
-					'action' => "javascript:api.application('get','login')"
+					'action' => "javascript:api.application('post','login')",
+					'data-usecase'=> 'login',
 				],
 				'content' => [
-					[[
-						'type' => 'scanner',
-						'attributes' => [
-                            'data-usecase'=> 'login',
-							'name' => LANG::GET('user.login_description'),
-							'type' => 'password'
+					[
+						[
+							'type' => 'scanner',
+							'attributes' => [
+								'name' => LANG::GET('user.login_description'),
+								'type' => 'password'
+							]
 						]
-					]]
+					]
 				]
 			]
-		]);
+		];
+		$tos = [];
+		$replacements = [
+			':issue_mail' => INI['issue_mail']
+		];
+		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
+			$tos[] = [[
+				'type' => 'text',
+				'description' => $description,
+				'content' => strtr($content, $replacements)
+			]];
+		}
+		$response['body']['content'][] = $tos;
+		$response['body']['content'][] = [
+			[
+				'type' => 'checkbox',
+				'content' => [
+					LANG::GET('application.terms_of_service_accepted') => []
+				]
+			]
+		];
+		$this->response($response);
 	}
 
 	/**
@@ -82,7 +110,7 @@ class APPLICATION extends API {
 				LANG::GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
 			],
 			LANG::GET('menu.application_header') => [
-				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('get','login', 'null')"],
+				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('post', 'login', 'logout')"],
 				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
 				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
 			],
