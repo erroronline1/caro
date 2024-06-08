@@ -17,12 +17,14 @@ class USER extends API {
 	public function profile(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
-					':id' => $_SESSION['user']['id']
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'values' => [
+						':id' => $_SESSION['user']['id']
+					]
 				]);
+				$user = $user ? $user[0] : null;
 				// prepare user-array to update, return error if not found
-				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+				if (!$user) $this->response(null, 406);
 
 				// convert image
 				// save and convert image
@@ -41,16 +43,17 @@ class USER extends API {
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
 				}
 				
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
-				if ($statement->execute([
-					':id' => $user['id'],
-					':name' => $user['name'],
-					':permissions' => $user['permissions'],
-					':units' => $user['units'],
-					':token' => $user['token'],
-					':orderauth' => $user['orderauth'],
-					':image' => $user['image'],
-					':app_settings' => json_encode($user['app_settings'])
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
+					'values' => [
+						':id' => $user['id'],
+						':name' => $user['name'],
+						':permissions' => $user['permissions'],
+						':units' => $user['units'],
+						':token' => $user['token'],
+						':orderauth' => $user['orderauth'],
+						':image' => $user['image'],
+						':app_settings' => json_encode($user['app_settings'])
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],
@@ -66,12 +69,14 @@ class USER extends API {
 
 				break;
 			case 'GET':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
-					':id' => $_SESSION['user']['id']
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'values' => [
+						':id' => $_SESSION['user']['id']
+					]
 				]);
+				$user = $user ? $user[0] : null;
 				// prepare user-array to update, return error if not found
-				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+				if (!$user) $this->response(null, 406);
 
 				$calendar = new CALENDARUTILITY($this->_pdo);
 				$timesheet_stats = $calendar->timesheetSummary([$user]);//, '2024-05-01'));
@@ -220,10 +225,8 @@ class USER extends API {
 
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-					$statement->execute();
 					$orderauths = [];
-					$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
 						$orderauths[] = $row['orderauth'];
 					}
@@ -256,15 +259,16 @@ class USER extends API {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name'] . '_' . date('YmdHis')], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_post'));
-				if ($statement->execute([
-					':name' => $user['name'],
-					':permissions' => $user['permissions'],
-					':units' => $user['units'],
-					':token' => $user['token'],
-					':orderauth' => $user['orderauth'],
-					':image' => $user['image'],
-					':app_settings' => json_encode($user['app_settings'])
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
+					'values' => [
+						':name' => $user['name'],
+						':permissions' => $user['permissions'],
+						':units' => $user['units'],
+						':token' => $user['token'],
+						':orderauth' => $user['orderauth'],
+						':image' => $user['image'],
+						':app_settings' => json_encode($user['app_settings'])
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
@@ -283,12 +287,14 @@ class USER extends API {
 				$permissions = [];
 				$units = [];
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
 				]);
+				$user = $user ? $user[0] : null;
 				// prepare user-array to update, return error if not found
-				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(null, 406);
+				if (!$user) $this->response(null, 406);
 				
 				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name')));
 				$user['name'] = UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name'));
@@ -324,10 +330,8 @@ class USER extends API {
 					$user['orderauth'] = '';
 				}
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-					$statement->execute();
 					$orderauths = [];
-					$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
 						$orderauths[] = $row['orderauth'];
 					}
@@ -362,16 +366,17 @@ class USER extends API {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name'] . '_' . date('YmdHis')], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
 				}
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_put'));
-				if ($statement->execute([
-					':id' => $user['id'],
-					':name' => $user['name'],
-					':permissions' => $user['permissions'],
-					':units' => $user['units'],
-					':token' => $user['token'],
-					':orderauth' => $user['orderauth'],
-					':image' => $user['image'],
-					':app_settings' => json_encode($user['app_settings'])
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
+					'values' => [
+						':id' => $user['id'],
+						':name' => $user['name'],
+						':permissions' => $user['permissions'],
+						':units' => $user['units'],
+						':token' => $user['token'],
+						':orderauth' => $user['orderauth'],
+						':image' => $user['image'],
+						':app_settings' => json_encode($user['app_settings'])
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $user['id'],
@@ -392,20 +397,20 @@ class USER extends API {
 				$result = [];
 				
 				// prepare existing users lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-				$statement->execute();
-				$user = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = ($row['name'] === $this->_requestedID) ? ['selected' => true] : [];
 				}
 		
 				// select single user based on id or name
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'values' => [
+						':id' => htmlspecialchars($this->_requestedID ? : '')
+					]
 				]);
-				if (!$user = $statement->fetch(PDO::FETCH_ASSOC)){ $user = [
+				$user = $user ? $user[0] : null;
+				if (!$user){ $user = [
 					'id' => null,
 					'name' => '',
 					'permissions' => '',
@@ -618,17 +623,19 @@ class USER extends API {
 
 			case 'DELETE':
 				// prefetch to return proper name after deletion
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
 				]);
-				$user = $statement->fetch(PDO::FETCH_ASSOC);
+				$user = $user[0];
 				if ($user['id'] < 2) $this->response([], 401);
 				if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_delete'));
-				if ($statement->execute([
-					':id' => $user['id']
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
+					'values' => [
+						':id' => $user['id']
+					]
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('user.edit_user_deleted', [':name' => $user['name']]),

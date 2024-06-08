@@ -32,7 +32,9 @@ class AUDIT extends API {
 	private function latestApprovedName($query = '', $name = ''){
 		// get latest approved by name
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
-			':name' => $name
+			'values' => [
+				':name' => htmlspecialchars($name)
+			]
 		]);
 		foreach ($elements as $element){
 			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
@@ -50,7 +52,7 @@ class AUDIT extends API {
 		$selecttypes = [];
 		
 		// checks
-		$types = SQLQUERY::EXECUTE($this->_pdo, 'checks_get-types');
+		$types = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_types');
 		foreach($types as $type){
 			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
 			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
@@ -95,7 +97,7 @@ class AUDIT extends API {
 	private function mdrsamplecheck(){
 		$content = $unchecked = $entries = [];
 		// get unchecked articles for MDR §14 sample check
-		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], SQLQUERY::EXECUTE($this->_pdo, 'consumables_get-not-checked')));
+		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_checked')));
 		// display warning
 		if ($unchecked) $content[] = [
 			[
@@ -115,7 +117,11 @@ class AUDIT extends API {
 			]
 		];
 		// add check records
-		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get',[':type' => $this->_requestedType]);
+		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
+			'values' => [
+				':type' => $this->_requestedType
+			]
+		]);
 		foreach($checks as $row){
 			$entries[] = [
 				'type' => 'text',
@@ -148,7 +154,11 @@ class AUDIT extends API {
 	 * if check type within caro_checks database
 	 */
 	public function exportchecks(){
-		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get',[':type' => $this->_requestedType]);
+		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
+			'values' => [
+				':type' => $this->_requestedType
+			]
+		]);
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -191,7 +201,7 @@ class AUDIT extends API {
 	private function incorporation(){
 		$content = $orderedunincorporated = $entries = $incorporated = [];
 		// get unincorporated articles from approved orders
-		$unincorporated = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get-products-incorporation');
+		$unincorporated = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation');
 		foreach($unincorporated as $id => $row){
 			if (!$row['incorporated']) continue;
 			$row['incorporated'] = json_decode($row['incorporated'], true);
@@ -200,8 +210,10 @@ class AUDIT extends API {
 			unset($unincorporated[$id]);
 		}
 
-		$approvedorders = SQLQUERY::EXECUTE($this->_pdo, 'order_get-approved-order-by-substr',[
-			':substr' => 'ordernumber_label'
+		$approvedorders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
+			'values' => [
+				':substr' => 'ordernumber_label'
+			]
 		]);
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
@@ -298,7 +310,7 @@ class AUDIT extends API {
 	private function userfiles(){
 		$content = [];
 		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get-datalist');
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		foreach ($users as $user){
 			$userfiles = [];
 			foreach ($storedfiles as $file){
@@ -327,7 +339,7 @@ class AUDIT extends API {
 		$content = [];
 
 		// get all current approved forms
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form-datalist');
+		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = $currentforms = [];
 		foreach($forms as $form){
 			if (!PERMISSION::fullyapproved('formapproval', $form['approval'])) continue;
@@ -336,7 +348,7 @@ class AUDIT extends API {
 		}
 
 		// get all current bundles
-		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle-datalist');
+		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
 		$hidden = $currentbundles = [];
 		foreach($bundles as &$bundle){
 			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
@@ -356,7 +368,7 @@ class AUDIT extends API {
 			$components = explode(',', $form['content'] ? : '');
 			$componentlist = [];
 			foreach($components as $component){
-				$cmpnnt = $this->latestApprovedName('form_component-get-by-name', $component);
+				$cmpnnt = $this->latestApprovedName('form_component_get_by_name', $component);
 				if ($cmpnnt)
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
 					$entry = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
@@ -396,7 +408,7 @@ class AUDIT extends API {
 				'content' => ''
 			]
 		];
-		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents-get-active')) {
+		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
 				$externalcontent[] = [
 					'type' => 'text',
@@ -485,8 +497,8 @@ class AUDIT extends API {
 	 */
 	private function vendors(){
 		$vendorlist = $hidden = [];
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get-vendor-datalist');
-		$lastchecks = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get-last_checked');
+		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$lastchecks = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_last_checked');
 
 		// add export button
 		$content[] = [
@@ -577,7 +589,7 @@ class AUDIT extends API {
 	public function regulatory(){
 		$content = $issues = [];
 		// prepare existing forms lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form-datalist');
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = $regulatory = [];
 		foreach($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
@@ -589,7 +601,7 @@ class AUDIT extends API {
 			}
 		}
 		// get active external documents
-		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents-get-active')) {
+		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
 				foreach(explode(',', $file['regulatory_context']) as $context){
 					$regulatory[$context][$file['path'] . ' (' . date('Y-m-d H:i', filemtime($file['path'])) . ')'] = ['href' => substr($file['path'], 1)];

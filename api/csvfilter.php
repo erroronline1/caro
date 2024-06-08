@@ -36,30 +36,33 @@ class CSVFILTER extends API {
 				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['status' => ['msg' => LANG::GET('csvfilter.edit_filter_content_hint'), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-latest-by-name'));
-				$statement->execute([
-					':name' => $filter[':name']
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+					'values' => [
+						':name' => $filter[':name']
+					]
 				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				$exists = $exists ? $exists[0] : null;
 				if ($exists && $exists['content'] === $filter[':content']) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-put'));
-					if ($statement->execute([
-						':hidden' => $filter[':hidden'],
-						':id' => $exists['id']
-						])) $this->response([
-							'status' => [
-								'name' => $filter[':name'],
-								'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
-								'type' => 'success'
-							]]);	
+					if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_put', [
+						'values' => [
+							':hidden' => $filter[':hidden'],
+							':id' => $exists['id']
+						]
+					])) $this->response([
+						'status' => [
+							'name' => $filter[':name'],
+							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
+							'type' => 'success'
+						]]);	
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-post'));
-				if ($statement->execute($filter)) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
+					'values' => $filter
+				])) $this->response([
 						'status' => [
 							'name' => $filter[':name'],
 							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
@@ -80,17 +83,20 @@ class CSVFILTER extends API {
 
 				// get selected filter
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-filter'));
-					$statement->execute([
-						':id' => $this->_requestedID
+					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
 					]);
 				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-latest-by-name'));
-					$statement->execute([
-						':name' => $this->_requestedID
+					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+						'values' => [
+							':name' => $this->_requestedID
+						]
 					]);
 				}
-				if (!$filter = $statement->fetch(PDO::FETCH_ASSOC)) $filter = [
+				$filter = $filter ? $filter[0] : null;
+				if (!$filter) $filter = [
 					'id' => '',
 					'name' => '',
 					'content' => ''
@@ -98,9 +104,7 @@ class CSVFILTER extends API {
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-datalist'));
-				$statement->execute();
-				$filters = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
 				$dependedtemplates = [];
 				foreach($filters as $key => $row) {
@@ -202,11 +206,12 @@ class CSVFILTER extends API {
 		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-filter'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+						]
 				]);
-				$filter = $statement->fetch(PDO::FETCH_ASSOC);
+				$filter = $filter ? $filter[0] : null;
 
 				if (!$filter) $this->response([
 					'status' => [
@@ -306,19 +311,22 @@ class CSVFILTER extends API {
 				$options = ['...' . LANG::GET('csvfilter.use_filter_select') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$return = [];
 
-				// get selected template
+				// get selected filter
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-filter'));
-					$statement->execute([
-						':id' => $this->_requestedID
+					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
 					]);
 				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter_get-latest-by-name'));
-					$statement->execute([
-						':name' => $this->_requestedID
+					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+						'values' => [
+							':name' => $this->_requestedID
+						]
 					]);
 				}
-				if (!$filter = $statement->fetch(PDO::FETCH_ASSOC)) $filter = [
+				$filter = $filter ? $filter[0] : null;
+				if (!$filter) $filter = [
 					'id' => '',
 					'name' => '',
 					'content' => ''
@@ -326,9 +334,7 @@ class CSVFILTER extends API {
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('csvfilter-datalist'));
-				$statement->execute();
-				$filters = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
 				foreach($filters as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped

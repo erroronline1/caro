@@ -11,27 +11,35 @@ class SQLQUERY {
 	}
 
 	/**
-	 * execute a query defined by queries
-	 * ensuring string sanitation
+	 * execute a query
 	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]
 	 * 
+	 * REPLACEMENTS ARE PROCESED RAW
+	 * MASKING HAS TO BE DONE BEFOREHAND
+	 * 
 	 * @param object $_pdo preset database connection, passed from main application
-	 * @param string $query
-	 * @param array $values pdo execution passing tokens
-	 * @param array $prepare strtr tokens for IN queries
+	 * @param string $query either defined within queries below or prepared chunkified
+	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries
 	 * 
 	 * @return false|int|array sql result not executed|affectedRows|selection
 	 */
-	public static function EXECUTE($_pdo, $query = '', $values = [], $prepared = []){
-		$query = self::PREPARE($query);
-		foreach ($values as $key => $value){
-			if ($value === null || $value === false) {
-				$query = strtr($query, [$key => 'NULL']);
-				unset($values[$key]);
+	public static function EXECUTE($_pdo, $query = '', $parameters = ['values' => [], 'replacements' => []]){
+		// retrive query matching sql driver, else process raw query
+		if (array_key_exists($query, self::QUERIES)) $query = self::QUERIES[$query][INI['sql'][INI['sql']['use']]['driver']];
+		
+		// substitute NULL values and mask/sanitize values
+		if (array_key_exists('values', $parameters) && $parameters['values']){
+			foreach ($parameters['values'] as $key => $value){
+				if ($value === null || $value === false) {
+					$query = strtr($query, [$key => 'NULL']);
+					unset($parameters['values'][$key]);
+				}
+				else $parameters['values'][$key] = trim($value);
 			}
-		}
-		if ($prepared) {
-			foreach ($prepared as $key => $value){
+		} else $parameters['values'] = [];
+		// replace tokens in query that can not be executed
+		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
+			foreach ($parameters['replacements'] as $key => $value){
 				$list = explode(',', $value);
 				if (count($list) > 2){
 					foreach ($list as $index => $value2){
@@ -39,20 +47,20 @@ class SQLQUERY {
 					}
 					$value = implode(',', $list);
 				}
-				else if (gettype($value) === 'string' && $value != 'NULL') $prepared[$key] = $_pdo->quote($value);
+				else if (gettype($value) === 'string' && $value != 'NULL') $parameters['replacements'][$key] = $_pdo->quote($value);
 			}
-			$query = strtr($query, $prepared);
+			$query = strtr($query, $parameters['replacements']);
 		}
-		//var_dump($query, $values);
-		//die();
 		$statement = $_pdo->prepare($query);
-		if (!$statement->execute($values)) return false;
-		if (str_starts_with($query, 'SELECT'))return $statement->fetchAll();
+		//var_dump($query, $parameters['values']);
+
+		if (!$statement->execute($parameters['values'])) return false;
+		if (str_starts_with($query, 'SELECT')) return $statement->fetchAll();
 		return $statement->rowCount();
 	}
 
 	/**
-	 * creates packages of sql queries to handle sql package size
+	 * creates packages of well prepared sql queries to handle sql package size
 	 * @param array $chunks packages so far
 	 * @param string $query next sql query
 	 * @return array $chunks extended packages so far
@@ -72,18 +80,23 @@ class SQLQUERY {
 	/**
 	 * creates packages of sql INSERTIONS to handle sql package size
 	 * e.g. for multiple inserts
+	 * 
+	 * MASKING HAS TO BE DONE BEFOREHAND
+	 * 
 	 * @param string $query sql query
-	 * @param array $items named array to replace query by strtr
+	 * @param array $items named array to replace query by strtr have to be sanitized and masked
 	 * @return array $chunks extended packages so far
 	 * 
 	 * this does make sense to only have to define one valid (and standalone as well) reusable dummy query
 	 */
-	public static function CHUNKIFY_INSERT($query = null, $items = null){
+	public static function CHUNKIFY_INSERT($_pdo, $query = null, $items = null){
 		$chunks = [];
 		if ($query && $items){
 			[$query, $values] = explode('VALUES', $query);
 			$chunkeditems = [];
 			foreach($items as $item){
+				if ($item === '') $item = "''";
+				elseif (gettype($item) === 'string') $item = $_pdo->quote($item);
 				$item = strtr($values, $item);
 				if (count($chunkeditems)){
 					$index = count($chunkeditems) - 1;
@@ -155,7 +168,7 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed alert = :alert WHERE id = :id",
 		],
-		'calendar_get-by-id' => [
+		'calendar_get_by_id' => [
 			'mysql' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
 			'sqlsrv' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
 		],
@@ -163,11 +176,11 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 		],
-		'calendar_get-day' => [
+		'calendar_get_day' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') AND DATE_FORMAT(caro_calendar.span_end, '%Y-%m-%d') ORDER BY caro_calendar.span_end ASC",
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN FORMAT(caro_calendar.span_start, 'yyyy-MM-dd') AND FORMAT(caro_calendar.span_end, 'yyyy-MM-dd') ORDER BY caro_calendar.span_end ASC",
 		],
-		'calendar_get-within-date-range' => [
+		'calendar_get_within_date_range' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_end BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_end BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
 		],
@@ -190,7 +203,7 @@ class SQLQUERY {
 			'mysql' => "INSERT INTO caro_checks (id, type, date, author, content) VALUES (NULL, :type, CURRENT_TIMESTAMP, :author, :content)",
 			'sqlsrv' => "INSERT INTO caro_checks (type, date, author, content) VALUES (:type, CURRENT_TIMESTAMP, :author, :content)"
 		],
-		'checks_get-types' => [
+		'checks_get_types' => [
 			'mysql' => "SELECT type FROM caro_checks GROUP BY type",
 			'sqlsrv' => "SELECT type FROM caro_checks GROUP BY type"
 		],
@@ -198,7 +211,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
 		],
-		'checks_get-by-id' => [
+		'checks_get_by_id' => [
 			'mysql' => "SELECT * FROM caro_checks WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_checks WHERE id = :id"
 		],
@@ -209,64 +222,64 @@ class SQLQUERY {
 
 
 
-		'consumables_post-vendor' => [
+		'consumables_post_vendor' => [
 			'mysql' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)",
 			'sqlsrv' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver)"
 		],
-		'consumables_put-vendor' => [
+		'consumables_put_vendor' => [
 			'mysql' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist WHERE id = :id"
 		],
-		'consumables_get-vendor-datalist' => [
+		'consumables_get_vendor_datalist' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC"
 		],
-		'consumables_get-vendor' => [
+		'consumables_get_vendor' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
 
-		'consumables_post-product' => [
+		'consumables_post_product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '')",
 			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '')"
 		],
-		'consumables_put-product' => [
+		'consumables_put_product' => [
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
 		],
-		'consumables_put-product-protected' => [
+		'consumables_put_product_protected' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
 		],
-		'consumables_put-batch' => [ // preprocess via strtr
+		'consumables_put_batch' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)"
 		],
-		'consumables_put-check' => [ // preprocess via strtr
+		'consumables_put_check' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET checked = :checked WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked WHERE id IN (:ids)"
 		],
-		'consumables_put-incorporation' => [ // preprocess via strtr
+		'consumables_put_incorporation' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)"
 		],
-		'consumables_get-product' => [ // preprocess via strtr
+		'consumables_get_product' => [ // preprocess via strtr
 			'mysql' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id IN (:ids) AND prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) IN (:ids) AND prod.vendor_id = dist.id"
 		],
-		'consumables_get-products-incorporation' => [
+		'consumables_get_products_incorporation' => [
 			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id"
 		],
-		'consumables_get-product-search' => [
+		'consumables_get_product_search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id"
 		],
-		'consumables_get-product-by-article_no-vendor' => [
+		'consumables_get_product_by_article_no_vendor' => [
 			'mysql' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id"
 		],
-		'consumables_get-not-checked' => [
+		'consumables_get_not_checked' => [
 			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 				. "(IFNULL(prod.checked, " . (INI['limits']['mdr14_sample_interval'] + 1) . ") > " . INI['limits']['mdr14_sample_interval'] . " OR DATEDIFF(prod.checked, CURRENT_TIMESTAMP) > " . INI['limits']['mdr14_sample_interval'] . ") AND "
 				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(checked, CURRENT_TIMESTAMP) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
@@ -276,91 +289,91 @@ class SQLQUERY {
 				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
 				. "prod.id NOT IN(select id from caro_consumables_products where ISNULL(checked, 0) != 0 AND DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_reusable'] . ")"
 		],
-		'consumables_get-last_checked' => [
+		'consumables_get_last_checked' => [
 			'mysql' => "SELECT prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 				. "(IFNULL(prod.checked, 100) != 100) ORDER BY prod.checked DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP(1) prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 			. "(ISNULL(prod.checked, 100) != 100) ORDER BY prod.checked"
 		],
-		'consumables_get-product-units' => [
+		'consumables_get_product_units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC"
 		],
-		'consumables_get-products-by-vendor-id' => [
+		'consumables_get_products_by_vendor_id' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE dist.id = :search AND prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) = :search AND prod.vendor_id = dist.id"
 		],
-		'consumables_delete-all-unprotected-products' => [
+		'consumables_delete_all_unprotected_products' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
 			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND ISNULL(checked, CAST('2079-06-06' AS SMALLDATETIME) ) = CAST('2079-06-06' AS SMALLDATETIME) AND incorporated = '' AND protected = 0"
 		],
-		'consumables_delete-unprotected-product' => [
+		'consumables_delete_unprotected_product' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
 			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND ISNULL(checked, CAST('2079-06-06' AS SMALLDATETIME) ) = CAST('2079-06-06' AS SMALLDATETIME) AND incorporated = '' AND protected = 0"
 		],
 
 
 
-		'csvfilter-post' => [
+		'csvfilter_post' => [
 			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
 			'sqlsrv' => "INSERT INTO caro_csvfilter (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
 		],
-		'csvfilter-put' => [
+		'csvfilter_put' => [
 			'mysql' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_csvfilter SET hidden = :hidden WHERE id = :id"
 		],
-		'csvfilter-datalist' => [
+		'csvfilter_datalist' => [
 			'mysql' => "SELECT * FROM caro_csvfilter ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_csvfilter name ORDER BY name ASC, date DESC"
 		],
-		'csvfilter_get-filter' => [
+		'csvfilter_get_filter' => [
 			'mysql' => "SELECT * FROM caro_csvfilter WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_csvfilter WHERE id = :id"
 		],
-		'csvfilter_get-latest-by-name' => [
+		'csvfilter_get_latest_by_name' => [
 			'mysql' => "SELECT * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name= :name ORDER BY id DESC"
 		],
 
 
 
-		'file_bundles-post' => [
+		'file_bundles_post' => [
 			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
 			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
 		],
-		'file_bundles-datalist' => [
+		'file_bundles_datalist' => [
 			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
 			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
 		],
-		'file_bundles-get' => [
+		'file_bundles_get' => [
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
 		],
-		'file_bundles-get-active' => [
+		'file_bundles_get_active' => [
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
 			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
 		],
-		'file_external_documents-get' => [
+		'file_external_documents_get' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
 			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"
 		],
-		'file_external_documents-get-active' => [
+		'file_external_documents_get_active' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents WHERE IFNULL(retired, 'null') = 'null' ORDER BY path ASC",
 			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, CAST('1900-01-01 00:00:00' AS SMALLDATETIME) ) = '1900-01-01 00:00:00' OR retired = '1900-01-01 00:00:00' ORDER BY path ASC"
 		],
-		'file_external_documents-retire' => [
+		'file_external_documents_retire' => [
 			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id"
 		],
-		'file_external_documents-unretire' => [
+		'file_external_documents_unretire' => [
 			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CAST('1900-01-01 00:00:00' AS SMALLDATETIME) WHERE id = :id"
 		],
-		'file_external_documents-context' => [
+		'file_external_documents_context' => [
 			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id"
 		],
-		'file_external_documents-post' => [
+		'file_external_documents_post' => [
 			'mysql' => "INSERT INTO caro_file_external_documents (id, path, author, regulatory_context, retired) VALUES (NULL, :path, :author, '', NULL)",
 			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, author, regulatory_context, retired) VALUES (:path, :author, '', NULL)"
 		],
@@ -375,35 +388,35 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id"
 		],
-		'form_put-approve' => [
+		'form_put_approve' => [
 			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_form SET approval = :approval WHERE id = :id"
 		],
-		'form_form-datalist' => [
+		'form_form_datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
 		],
-		'form_component-datalist' => [
+		'form_component_datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
 		],
-		'form_bundle-datalist' => [
+		'form_bundle_datalist' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
 		],
-		'form_form-get-by-name' => [
+		'form_form-get_by_name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
 		],
-		'form_form-get-by-context' => [
+		'form_form_get_by_context' => [
 			'mysql' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC"
 		],
-		'form_component-get-by-name' => [
+		'form_component_get_by_name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC"
 		],
-		'form_bundle-get-by-name' => [
+		'form_bundle_get_by_name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC"
 		],
@@ -458,74 +471,74 @@ class SQLQUERY {
 
 
 
-		'order_get-product-search' => [
+		'order_get_product_search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1"
 		],
-		'order_post-prepared-order' => [
+		'order_post_prepared_order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",
 			'sqlsrv' => "INSERT INTO caro_consumables_prepared_orders (order_data) VALUES (:order_data)"
 		],
-		'order_put-prepared-order' => [
+		'order_put_prepared_order' => [
 			'mysql' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id"
 		],
-		'order_get-prepared-order' => [
+		'order_get_prepared_order' => [
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_consumables_prepared_orders WHERE CONVERT(VARCHAR, id) = :id"
 		],
-		'order_delete-prepared-orders' => [
+		'order_delete_prepared_orders' => [
 			'mysql' => "DELETE FROM caro_consumables_prepared_orders WHERE id IN (:id)",
 			'sqlsrv' => "DELETE FROM caro_consumables_prepared_orders WHERE id IN (:id)"
 		],
 
-		'order_get-prepared-orders' => [
+		'order_get_prepared_orders' => [
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders",
 			'sqlsrv' => "SELECT * FROM caro_consumables_prepared_orders"
 		],
 
-		'order_post-approved-order' => [
+		'order_post_approved_order' => [
 			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)",
 			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)"
 		],
-		'order_put-approved-order-ordered' => [
+		'order_put_approved_order_ordered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id"
 		],
-		'order_put-approved-order-received' => [
+		'order_put_approved_order_received' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id"
 		],
-		'order_put-approved-order-archived' => [
+		'order_put_approved_order_archived' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET archived = :state WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET archived = :state WHERE id = :id"
 		],
-		'order_put-approved-order-addinformation' => [
+		'order_put_approved_order_addinformation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id"
 		],
-		'order_put-approved-order-cancellation' => [
+		'order_put_approved_order_cancellation' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 
-		'order_get-approved-order-by-unit' => [
+		'order_get_approved_order_by_unit' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC"
 		],
-		'order_get-approved-order-by-id' => [
+		'order_get_approved_order_by_id' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id"
 		],
-		'order_get-approved-order-by-substr' => [ // CASE SENSITIVE JUST TO BE SURE
+		'order_get_approved_order_by_substr' => [ // CASE SENSITIVE JUST TO BE SURE
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
 		],
-		'order_get-approved-order-by-received' => [
+		'order_get_approved_order_by_received' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE received < :date_time AND archived IS NULL",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE received < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
 		],		
-		'order_delete-approved-order' => [
+		'order_delete_approved_order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
@@ -559,23 +572,23 @@ class SQLQUERY {
 
 
 
-		'texttemplate-post' => [
+		'texttemplate_post' => [
 			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, language, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
 			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, language, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"
 		],
-		'texttemplate-put' => [
+		'texttemplate_put' => [
 			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id"
 		],
-		'texttemplate-datalist' => [
+		'texttemplate_datalist' => [
 			'mysql' => "SELECT * FROM caro_texttemplates ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_texttemplates name ORDER BY name ASC, date DESC"
 		],
-		'texttemplate_get-chunk' => [
+		'texttemplate_get_chunk' => [
 			'mysql' => "SELECT * FROM caro_texttemplates WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_texttemplates WHERE id = :id"
 		],
-		'texttemplate_get-latest-by-name' => [
+		'texttemplate_get_latest_by_name' => [
 			'mysql' => "SELECT * FROM caro_texttemplates WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_texttemplates WHERE name= :name ORDER BY id DESC"
 		],
@@ -590,7 +603,7 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
 		],
-		'user_get-datalist' => [
+		'user_get_datalist' => [
 			'mysql' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC",
 			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC"
 		],
@@ -598,7 +611,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
-		'user_get-orderauth' => [
+		'user_get_orderauth' => [
 			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
 		],

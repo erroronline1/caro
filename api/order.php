@@ -22,12 +22,14 @@ class ORDER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approval = false;
-				if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-orderauth'));
-					$statement->execute([
-						':orderauth' => $this->_payload->{LANG::PROPERTY('user.edit_order_authorization')}
+				if ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
+					$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
+						'values' => [
+							':orderauth' => orderauth
+						]
 					]);
-					if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
+					$result = $result ? $result[0] : null;
+					if ($result){
 						$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 					}
 				}
@@ -41,9 +43,7 @@ class ORDER extends API {
 
 				$order_data=['items'=>[]];
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-orders'));
-				$statement->execute();
-				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 				$index=0;
 				foreach ($orders as $order){
 					if (array_search($order['id'], $approvedIDs) === false) continue;
@@ -52,12 +52,12 @@ class ORDER extends API {
 						if (is_array($items)){
 							foreach($items as $item){
 								foreach($item as $key => $subvalue){
-									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));;
+									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($subvalue)));
 								}
 								$index++;
 							}
 						} else {
-							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $items));;
+							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($items)));
 						}
 					}
 				}
@@ -66,16 +66,15 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 
 				if ($result['status']['msg'] === LANG::GET('order.saved')){
-					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => implode(",", array_map(Fn($id) => $this->_pdo->quote($id),$approvedIDs))]);
-					$statement = $this->_pdo->prepare($query);
-					$statement->execute();
+					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
+						'replacements' => [
+							':id' => implode(",", array_map(Fn($id) => intval($id), $approvedIDs))
+						]
+					]);
 				}
-
 				break;
 			case 'GET':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-orders'));
-				$statement->execute();
-				$orders = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 				// display all orders assigned to organizational unit
 				if ($this->_requestedID) $units = [$this->_requestedID]; // see orders from selected unit
 				elseif (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
@@ -199,17 +198,15 @@ class ORDER extends API {
 					$result['body']['content'] = [];
 					break;
 				}
-				// because in clause doesn't work
-				$query = strtr($this->_borrowedModule == 'editconsumables' ? SQLQUERY::PREPARE('consumables_get-product-search') : SQLQUERY::PREPARE('order_get-product-search'),
-					[
-						':vendors' => implode(",", array_map(fn($el) => $this->_pdo->quote($el), explode('_', $this->_requestedID))),
-						':search' => $this->_pdo->quote($this->_subMethod)
-					]
-				);
 
-				$statement = $this->_pdo->prepare($query);
-				$statement->execute();
-				$search = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$search = SQLQUERY::EXECUTE($this->_pdo, $this->_borrowedModule === 'editconsumables' ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
+					'values' => [
+						':search' => htmlspecialchars($this->_subMethod)
+					],
+					'replacements' => [
+						':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $this->_requestedID))),
+					]
+				]);
 
 				$productsPerSlide = 0;
 				$matches = [[]];
@@ -275,15 +272,14 @@ class ORDER extends API {
 		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 		else $units = $_SESSION['user']['units']; // display only orders for own units
 
-		// in clause doesnt work without manually preparing
-		$query = strtr(SQLQUERY::PREPARE('order_get_filter'),
-		[
-			':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units)),
-			':orderfilter' => $this->_pdo->quote($this->_requestedID)
+		$filtered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_filter', [
+			'values' => [
+				':orderfilter' => $this->_pdo->quote(htmlspecialchars($this->_requestedID))
+			],
+			'replacements' => [
+				':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units)),
+			]
 		]);
-		$statement = $this->_pdo->prepare($query);
-		$statement->execute();
-		$filtered = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$matches = [];
 		foreach ($filtered as $row){
 			$matches[] = strval($row['id']);
@@ -301,12 +297,14 @@ class ORDER extends API {
 
 		// detect approval
 		$approval = false;
-		if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-orderauth'));
-			$statement->execute([
-				':orderauth' => $this->_payload->{LANG::PROPERTY('user.edit_order_authorization')}
+		if ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
+			$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
+				'values' => [
+					':orderauth' => $orderauth
+				]
 			]);
-			if ($result = $statement->fetch(PDO::FETCH_ASSOC)){
+			$result = $result ? $result[0] : null;
+			if ($result){
 				$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 			}
 			unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
@@ -356,11 +354,11 @@ class ORDER extends API {
 				foreach($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
 						if (!array_key_exists(intval($index), $order_data['items'])) $order_data['items'][]=[];
-						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
+						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($subvalue)));
 					}
 				}
 			} else {
-				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
+				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($value)));
 			}
 		}
 		$order_data['orderer'] = $_SESSION['user']['name'];
@@ -377,7 +375,7 @@ class ORDER extends API {
 			foreach ($keys as $key){
 				if (!in_array($key, ['items', 'organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
-			$query .= strtr(SQLQUERY::PREPARE('order_post-approved-order'),
+			$query .= strtr(SQLQUERY::PREPARE('order_post_approved_order'),
 			[
 				':order_data' => $this->_pdo->quote(json_encode($order_data2, JSON_UNESCAPED_SLASHES)),
 				':organizational_unit' => $this->_pdo->quote($processedOrderData['order_data']['organizational_unit']),
@@ -385,15 +383,13 @@ class ORDER extends API {
 				':ordertype' => $this->_pdo->quote('order')
 			]) . '; ';
 		}
-		$statement = $this->_pdo->prepare($query);
-		if ($statement->execute()) {
+		if (SQLQUERY::EXECUTE($this->_pdo, $query)) {
 			$result=[
 			'status' => [
 				'id' => false,
 				'msg' => LANG::GET('order.saved'),
 				'type' => 'success'
 			]];
-			$statement->closeCursor();
 			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
 		}
 		else $result=[
@@ -411,9 +407,10 @@ class ORDER extends API {
 				$processedOrderData = $this->processOrderForm();
 
 				if (!$processedOrderData['approval']){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
-					$statement->execute([
-						':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES)
+					SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
+						'values' => [
+							':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES)
+						]
 					]);
 					$result = [
 						'status' => [
@@ -430,10 +427,11 @@ class ORDER extends API {
 				$processedOrderData = $this->processOrderForm();
 
 				if (!$processedOrderData['approval']){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-prepared-order'));
-					$statement->execute([
-						':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES),
-						':id' => $this->_requestedID
+					SQLQUERY::EXECUTE($this->_pdo, 'order_put_prepared_order', [
+						'values' => [
+							':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES),
+							':id' => $this->_requestedID
+						]
 					]);
 					$result = [
 						'status' => [
@@ -447,9 +445,11 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder($processedOrderData);
 
 				if ($result['status']['msg'] === LANG::GET('order.saved')){
-					$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => $this->_pdo->quote($this->_requestedID)]);
-					$statement = $this->_pdo->prepare($query);
-					$statement->execute();
+					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
+						'replace' => [
+							':id' => intval($this->_requestedID)
+						]
+					]);
 				}
 				break;
 			case 'GET':
@@ -458,10 +458,7 @@ class ORDER extends API {
 				$vendors = [];
 
 				// prepare existing vendor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
-				$statement->execute();
-
-				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 				
 				foreach($vendor as $key => $row) {
@@ -469,18 +466,19 @@ class ORDER extends API {
 					$vendors[$row['name']] = ['value' => $row['id']];
 				}
 				// prepare existing unit lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-units'));
-				$statement->execute();
-				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
 				foreach($vendor as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-order'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_order', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
 				]);
-				if (!$order = $statement->fetch(PDO::FETCH_ASSOC)){
+				$order = $order ? $order[0] : null;
+
+				if (!$order ){
 					$order = [
 						'additional_info' => '',
 						'organizational_unit' => '',
@@ -753,11 +751,13 @@ class ORDER extends API {
 			case 'DELETE':
 				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 				// delete attachments
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-prepared-order'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_order', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
 				]);
-				$order = $statement->fetch(PDO::FETCH_ASSOC);
+				$order = $order ? $order[0] : null;
+				if (!order) $this->response([], 404);
 				$order = json_decode($order['order_data'], true);
 				if (array_key_exists('attachments', $order)){
 					$files = explode(',', $order['attachments']);
@@ -765,9 +765,11 @@ class ORDER extends API {
 				}
 
 				// delete prepared order
-				$query = strtr(SQLQUERY::PREPARE('order_delete-prepared-orders'), [':id' => $this->_pdo->quote($this->_requestedID)]);
-				$statement = $this->_pdo->prepare($query);
-				if ($statement->execute()) {
+				if (SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				])) {
 					$result=[
 					'status' => [
 						'id' => false,
@@ -789,11 +791,12 @@ class ORDER extends API {
 	public function approved(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
-			$statement->execute([
-				':id' => $this->_requestedID
-				]);
-			$order = $statement->fetch(PDO::FETCH_ASSOC);
+			$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
+				'values' => [
+					':id' => intval($this->_requestedID)
+				]
+			]);
+			$order = $order ? $order[0] : null;
 			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 			if (in_array($this->_subMethod, ['ordered', 'received', 'archived'])){
 					switch ($this->_subMethod){
@@ -815,24 +818,33 @@ class ORDER extends API {
 									]];
 							}
 							elseif ($order['ordertype'] === 'return') {
-								$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-received'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
-								$statement->execute([
-									':id' => $this->_requestedID
-									]);
-								$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-ordered'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
+								SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_received', [
+									'values' => [
+										':id' => intval($this->_requestedID)
+									],
+									'replacements' => [
+										':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
+									]
+								]);
+								$query = 'order_put_approved_order_ordered';
 							}
-							else $statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-ordered'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
+							else $query = 'order_put_approved_order_ordered';
 							break;
 						case 'received':
-							$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-received'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
+							$query = 'order_put_approved_order_received';
 							break;
 						case 'archived':
-							$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('order_put-approved-order-archived'), [':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL']));
+							$query = 'order_put_approved_order_archived';
 							break;
 					}
-					$statement->execute([
-						':id' => $this->_requestedID
-						]);
+					SQLQUERY::EXECUTE($this->_pdo, $query, [
+						'values' => [
+							':id' => $this->_requestedID
+						],
+						'replacements' => [
+							':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
+						]
+					]);
 				}
 				else {
 					$decoded_order_data = json_decode($order['order_data'], true);
@@ -860,14 +872,17 @@ class ORDER extends API {
 					switch ($this->_subMethod){
 						case 'disapproved':
 							// add to prepared orders
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-prepared-order'));
-							$statement->execute([
-								':order_data' => json_encode($prepared, JSON_UNESCAPED_SLASHES)
+							SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
+								'values' => [
+									':order_data' => json_encode($prepared, JSON_UNESCAPED_SLASHES)
+								]
 							]);
+
 							// delete approved order
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
-							$statement->execute([
-								':id' => $this->_requestedID
+							SQLQUERY::EXECUTE($this->_pdo, 'order_delete_approved_order', [
+								'values' => [
+									':id' => intval($this->_requestedID)
+								]
 							]);
 							// inform user group
 							$messagepayload=[];
@@ -884,17 +899,18 @@ class ORDER extends API {
 								':order' => LANG::GET('order.message', $messagepayload),
 								':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
 								':user' => $_SESSION['user']['name']
-							])) . "\n \n" . $this->_message);
+							])) . "\n \n" . htmlspecialchars($this->_message));
 							break;
 						case 'addinformation':
 							if (array_key_exists('additional_info', $decoded_order_data)){
 								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
 							}
 							else $decoded_order_data['additional_info'] = $this->_message;
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-addinformation'));
-							$statement->execute([
-								':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
-								':id' => $this->_requestedID
+							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_addinformation', [
+								'values' => [
+									':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
+									':id' => intval($this->_requestedID)
+								]
 							]);
 							$this->_subMethod = 'add_information_confirmation';
 							if (str_starts_with($this->_message, LANG::GET('order.orderstate_description'))){
@@ -918,35 +934,37 @@ class ORDER extends API {
 							break;
 						case 'cancellation':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
+								$decoded_order_data['additional_info'] .= "\n" . htmlspecialchars($this->_message);
 							}
-							else $decoded_order_data['additional_info'] = $this->_message;
+							else $decoded_order_data['additional_info'] = htmlspecialchars($this->_message);
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_put-approved-order-cancellation'));
-							$statement->execute([
-								':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
-								':id' => $this->_requestedID
+							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
+								'values' => [
+									':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
+									':id' => intval($this->_requestedID)
+								]
 							]);
 							$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
 							break;
 						case 'return':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n".$this->_message;
+								$decoded_order_data['additional_info'] .= "\n" . htmlspecialchars($this->_message);
 							}
-							else $decoded_order_data['additional_info'] = $this->_message;
+							else $decoded_order_data['additional_info'] = htmlspecialchars($this->_message);
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.received') . ': ' . $order['received'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_post-approved-order'));
-							if ($statement->execute([
+							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
+								'values' => [
 								':order_data' => json_encode($decoded_order_data),
 								':organizational_unit' => $order['organizational_unit'],
 								':approval' => $order['approval'],
 								':ordertype' => 'return'
+								]
 							])) {
-								$result=[
+								$result = [
 								'status' => [
 									'id' => false,
 									'msg' => LANG::GET('order.saved'),
@@ -954,7 +972,7 @@ class ORDER extends API {
 								]];
 								$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));
 							}
-							else $result=[
+							else $result = [
 								'status' => [
 									'id' => false,
 									'msg' => LANG::GET('order.failed_save'),
@@ -971,11 +989,11 @@ class ORDER extends API {
 				break;
 			case 'GET':
 				// delete old received unarchived orders
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-received'));
-				$statement->execute([
-					':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24 * 3600)),
+				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_received', [
+					'values' => [
+						':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24 * 3600)),
+					]
 				]);
-				$old = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($old as $row){
 					$this->delete_approved_order($row);
 				}
@@ -1006,9 +1024,7 @@ class ORDER extends API {
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
 				// get unincorporated
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
-				$statement->execute();
-				$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation');
 				$unincorporated = [];
 				$incorporationdenied = [];
 				$pendingincorporation = [];
@@ -1028,23 +1044,18 @@ class ORDER extends API {
 				}
 
 				// get unchecked articles for MDR §14 sample check
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-not-checked'));
-				$statement->execute();
-				$sampleCheck = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_checked');
 
 				$statechange = [];
 				foreach(LANGUAGEFILE['order']['orderstate'] as $value){
 					$statechange[$value] = [];
 				}
 
-				// in clause doesnt work without manually preparing
-				$query = strtr(SQLQUERY::PREPARE('order_get-approved-order-by-unit'),
-				[
-					':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units))
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_unit', [
+					'replacements' => [
+						':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units))
+					]
 				]);
-				$statement = $this->_pdo->prepare($query);
-				$statement->execute();
-				$order = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach($order as $row) {
 					$content = [];
 					$text = "\n";
@@ -1373,11 +1384,12 @@ class ORDER extends API {
 				}
 				break;
 			case 'DELETE':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-id'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$row = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
 				]);
-				$row = $statement->fetch(PDO::FETCH_ASSOC);
+				$row = $row ? $row[0] : null;
 				
 				if ($row && $this->delete_approved_order($row)) {
 					$result = [
@@ -1402,19 +1414,20 @@ class ORDER extends API {
 		// delete order and attachments if not used by any other approved order
 		$order = json_decode($row['order_data'], true);
 		if (array_key_exists('attachments', $order)){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get-approved-order-by-substr'));
-			$statement->execute([
-				':substr' => $order['attachments']
+			$others = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
+				'values' => [
+					':substr' => $order['attachments']
+				]
 			]);
-			$others = $statement->fetchAll(PDO::FETCH_ASSOC);
 			if (count($others)<2){
 				$files = explode(',', $order['attachments']);
 				UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
 			}
 		}
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_delete-approved-order'));
-		return $statement->execute([
-			':id' => $row['id']
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_delete_approved_order', [
+			'values' => [
+				':id' => $row['id']
+			]
 		]);
 	}
 }

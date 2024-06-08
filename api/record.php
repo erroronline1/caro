@@ -29,11 +29,11 @@ class RECORD extends API {
 	private function latestApprovedName($query = '', $name = ''){
 		// get latest approved by name
 		$element = [];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($query));
-		$statement->execute([
-			':name' => $name
+		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
+			'values' => [
+				':name' => htmlspecialchars($name)
+			]
 		]);
-		$elements = $statement->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($elements as $element){
 			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
 		}
@@ -102,9 +102,7 @@ class RECORD extends API {
 	}
 
 	public function formfilter(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-		$statement->execute();
-		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = $matches = [];
 		foreach($fd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -123,9 +121,7 @@ class RECORD extends API {
 	}
 
 	public function recordfilter(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
-		$statement->execute();
-		$records = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		$matches = [];
 		foreach($records as $row) {
 			similar_text($this->_requestedID, $row['identifier'], $percent);
@@ -142,9 +138,7 @@ class RECORD extends API {
 		$return = [];
 
 		// prepare existing forms lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-		$statement->execute();
-		$fd = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = [];
 		foreach($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
@@ -294,19 +288,17 @@ class RECORD extends API {
 		$necessaryforms = $bundle['content'] ? explode(',', $bundle['content']) : [];
 
 		// unset hidden forms from bundle presets
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-		$statement->execute();
-		$allforms = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$allforms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		foreach($allforms as $row){
 			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 			if ($row['hidden'] && ($key = array_search($row['name'], $necessaryforms)) !== false) unset($necessaryforms[$key]);
 		}
 
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
-		$statement->execute([
-			':identifier' => $this->_passedIdentify
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
+			'values' => [
+				':identifier' => htmlspecialchars($this->_passedIdentify)
+			]
 		]);
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$considered = [];
 		foreach($data as $row){
 			$considered[] = $row['form_name'];
@@ -342,10 +334,10 @@ class RECORD extends API {
 				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
-						$identifier = $value;
+						$identifier = htmlspecialchars($value);
 						unset ($this->_payload->$key);
 					}
-					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					if (gettype($value) === 'array') $value = trim(implode(' ', array_map(Fn($v) => htmlspecialchars($v), $value)));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
 					////////////////////////////////////////
@@ -368,15 +360,16 @@ class RECORD extends API {
 				foreach($attachments as $input => $files){
 					$this->_payload->$input = implode(', ', $files);
 				}
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_post'));
-				if (boolval((array) $this->_payload) && $statement->execute([
-					':context' => $context,
-					':form_name' => $form_name,
-					':form_id' => $form_id,
-					':identifier' => $identifier,
-					':author' => $_SESSION['user']['name'],
-					':author_id' => $_SESSION['user']['id'],
-					':content' => json_encode($this->_payload)
+				if (boolval((array) $this->_payload) && SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+					'values' => [
+						':context' => $context,
+						':form_name' => $form_name,
+						':form_id' => $form_id,
+						':identifier' => $identifier,
+						':author' => $_SESSION['user']['name'],
+						':author_id' => $_SESSION['user']['id'],
+						':content' => json_encode($this->_payload)
+					]
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('record.record_saved'),
@@ -452,9 +445,7 @@ class RECORD extends API {
 					$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
 					// match against bundles
 					// prepare existing bundle lists
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_bundle-datalist'));
-					$statement->execute();
-					$bd = $statement->fetchAll(PDO::FETCH_ASSOC);
+					$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
 					$hidden = [];
 					foreach($bd as $key => $row) {
 						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -508,9 +499,10 @@ class RECORD extends API {
 
 	public function close(){
 		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_close'));
-		$statement->execute([
-			':identifier' => $this->_requestedID
+		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
+			'values' => [
+				':identifier' => htmlspecialchars($this->_requestedID)
+			]
 		]);
 		$this->response([
 			'status' => [
@@ -521,11 +513,11 @@ class RECORD extends API {
 	}
 
 	public function import(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
-		$statement->execute([
-			':identifier' => $this->_payload->IDENTIFY_BY_
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
+			'values' => [
+				':identifier' => UTILTY::propertySet($this->_payload, 'IDENTIFY_BY_')
+			]
 		]);
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
 		if ($data) {
 			$result = [];
 			foreach($data as $row)
@@ -547,9 +539,7 @@ class RECORD extends API {
 
 	public function records(){
 		$return = ['body' => ['content' => []]];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
-		$statement->execute();
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		if (!$data) {
 			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
 			$this->response($result);		
@@ -672,11 +662,12 @@ class RECORD extends API {
 
 	public function exportform(){
 		if (!PERMISSION::permissionFor('formexport')) $this->response([], 401);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_get'));
-		$statement->execute([
-			':id' => $this->_requestedID
+		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+			'values' => [
+				':id' => $this->_requestedID
+			]
 		]);
-		$form = $statement->fetch(PDO::FETCH_ASSOC);
+		$form = $form ? $form[0] : null;
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
 			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
@@ -752,11 +743,11 @@ class RECORD extends API {
 	}
 
 	private function summarizeRecord($type = 'full'){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_import'));
-		$statement->execute([
-			':identifier' => $this->_requestedID
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
+			'values' => [
+				':identifier' => htmlspecialchars($this->_requestedID)
+			]
 		]);
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . date('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,

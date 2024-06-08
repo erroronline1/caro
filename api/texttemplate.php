@@ -33,18 +33,20 @@ class TEXTTEMPLATE extends API {
 				if ($matches) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
-				$statement->execute([
-					':name' => $chunk[':name']
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
+					'values' => [
+						':name' => $chunk[':name']
+					]
 				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				$exists = $exists ? $exists[0] : null;
 				if ($exists && $exists['content'] === $chunk[':content'] && $exists['language'] === $chunk[':language'] && $exists['type'] === $chunk[':type']) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-put'));
-					if ($statement->execute([
-						':hidden' => $chunk[':hidden'],
-						':id' => $exists['id'],
-						':unit' => $chunk[':unit']
-						])) $this->response([
+					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
+						'values' => [
+							':hidden' => $chunk[':hidden'],
+							':id' => $exists['id'],
+							':unit' => $chunk[':unit']
+						]
+					])) $this->response([
 							'status' => [
 								'name' => $chunk[':name'],
 								'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
@@ -52,8 +54,9 @@ class TEXTTEMPLATE extends API {
 							]]);	
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-post'));
-				if ($statement->execute($chunk)) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
+					'values' => $chunk
+				])) $this->response([
 						'status' => [
 							'name' => $chunk[':name'],
 							'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
@@ -76,17 +79,20 @@ class TEXTTEMPLATE extends API {
 
 				// get selected chunk
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
-					$statement->execute([
-						':id' => $this->_requestedID
+					$chunk = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
+						'values' => [
+							':id' => intval($this->_requestedID)
+						]
 					]);
 				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
-					$statement->execute([
-						':name' => $this->_requestedID
+					$chunk = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
+						'values' => [
+							':name' => htmlspecialchars($this->_requestedID ? : '')
+						]
 					]);
 				}
-				if (!$chunk = $statement->fetch(PDO::FETCH_ASSOC)) $chunk = [
+				$chunk = $chunk ? $chunk[0] : null;
+				if (!$chunk) $chunk = [
 					'id' => '',
 					'name' => '',
 					'unit' => '',
@@ -97,9 +103,7 @@ class TEXTTEMPLATE extends API {
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing chunks lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
-				$statement->execute();
-				$chunks = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$chunks = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 				$hidden = [];
 				$dependedtemplates = [];
 				foreach($chunks as $key => $row) {
@@ -262,11 +266,11 @@ class TEXTTEMPLATE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$template = [
-					':name' => $this->_payload->name,
+					':name' => UTILITY::propertySet($this->_payload, 'name'),
 					':unit' => UTILITY::propertySet($this->_payload, 'unit') ? : array_key_first(LANGUAGEFILE['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($this->_payload->content),
-					':language' => $this->_payload->language,
+					':language' => UTILITY::propertySet($this->_payload, 'language'),
 					':type' => 'template',
 					':hidden' => $this->_payload->hidden ? 1 : 0,
 				];
@@ -274,36 +278,38 @@ class TEXTTEMPLATE extends API {
 				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
 
 				// put hidden attribute if anything else remains the same
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
-				$statement->execute([
-					':name' => $template[':name']
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
+					'values' => [
+						':name' => $template[':name']
+					]
 				]);
-				$exists = $statement->fetch(PDO::FETCH_ASSOC);
+				$exists = $exists ? $exists[0] : null;
 				if ($exists && $exists['content'] === $template[':content']) {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-put'));
-					if ($statement->execute([
-						':hidden' => $template[':hidden'],
-						':id' => $exists['id'],
-						'unit' => $template[':unit']
-						])) $this->response([
-							'status' => [
-								'name' => $template[':name'],
-								'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
-								'type' => 'success'
-							]]);	
+					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
+						'values' => [
+							':hidden' => $template[':hidden'],
+							':id' => $exists['id'],
+							'unit' => $template[':unit']
+						]
+					])) $this->response([
+						'status' => [
+							'name' => $template[':name'],
+							'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
+							'type' => 'success'
+						]]);	
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]), 'type' => 'error']]);
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-post'));
-				if ($statement->execute($template)) $this->response([
-						'status' => [
-							'name' => $template[':name'],
-							'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
-							'type' => 'success'
-						]]);
+				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
+					'values' => $template])) $this->response([
+					'status' => [
+						'name' => $template[':name'],
+						'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
+						'type' => 'success'
+					]]);
 				else $this->response([
 					'status' => [
 						'name' => false,
@@ -321,17 +327,20 @@ class TEXTTEMPLATE extends API {
 
 				// get selected template
 				if (intval($this->_requestedID)){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
-					$statement->execute([
-						':id' => $this->_requestedID
+					$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
+						'values' => [
+							':id' => intval($this->_requestedID)
+						]
 					]);
 				} else {
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-latest-by-name'));
-					$statement->execute([
-						':name' => $this->_requestedID
+					$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
+						'values' => [
+							':name' => htmlspecialchars($this->_requestedID ? : '')
+						]
 					]);
 				}
-				if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
+				$template = $template ? $template[0] : null;
+				if (!$template) $template = [
 					'id' => '',
 					'name' => '',
 					'unit' => '',
@@ -342,9 +351,7 @@ class TEXTTEMPLATE extends API {
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
-				$statement->execute();
-				$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 				$hidden = $chunks = [];
 				foreach($templates as $key => $row) {
 					if ($row['type'] === 'replacement') continue;
@@ -502,20 +509,20 @@ class TEXTTEMPLATE extends API {
 		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
 
 		// get selected template
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate_get-chunk'));
-		$statement->execute([
-			':id' => intval($this->_requestedID)
+		$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
+			'values' => [
+				':id' => intval($this->_requestedID)
+			]
 		]);
-		if (!$template = $statement->fetch(PDO::FETCH_ASSOC)) $template = [
+		$template = $template ? $template[0] : null;
+		if (!$template) $template = [
 			'name' => '',
 		];
 
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing templates lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('texttemplate-datalist'));
-		$statement->execute();
-		$templates = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 		if (!$templates) {
 			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
 			$this->response($result);		

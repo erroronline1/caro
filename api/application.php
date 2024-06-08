@@ -27,7 +27,9 @@ class APPLICATION extends API {
 			$this->response(['body' => $_SESSION['user']]);
 		}
 		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
-			':token' => $this->_requestedToken
+			'values' => [
+				':token' => $this->_requestedToken
+			]
 		]);
 		if ($query){
 			$result = $query[0];
@@ -352,9 +354,11 @@ class APPLICATION extends API {
 				$entry['permissions'] = implode(',', $permissions);
 
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_post_manual', [
-					':title' => $entry['title'],
-					':content' => $entry['content'],
-					':permissions' => $entry['permissions']
+					'values' => [
+						':title' => $entry['title'],
+						':content' => $entry['content'],
+						':permissions' => $entry['permissions']
+					]
 				]);
 		
 				if ($query) $this->response([
@@ -391,10 +395,12 @@ class APPLICATION extends API {
 				$entry['permissions'] = implode(',', $permissions);
 
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_put_manual', [
-					':title' => $entry['title'],
-					':content' => $entry['content'],
-					':permissions' => $entry['permissions'],
-					':id' => $this->_requestedManual
+					'values' => [
+						':title' => $entry['title'],
+						':content' => $entry['content'],
+						':permissions' => $entry['permissions'],
+						':id' => $this->_requestedManual
+					]
 				]);
 				if ($query) $this->response([
 					'status' => [
@@ -412,7 +418,9 @@ class APPLICATION extends API {
 				break;
 			case 'GET':
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual_by_id', [
-					':id' => $this->_requestedManual
+					'values' => [
+						':id' => $this->_requestedManual
+					]
 				]);
 				if (!$query) $entry =[
 					'id' => null,
@@ -479,7 +487,9 @@ class APPLICATION extends API {
 				break;
 			case 'DELETE':
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', [
-					':id' => $this->_requestedManual
+					'values' => [
+						':id' => $this->_requestedManual
+					]
 				]);
 				if ($query) $this->response([
 					'status' => [

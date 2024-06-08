@@ -173,7 +173,7 @@ class CALENDARUTILITY {
 		}
 
 		$affected_users = $affected_unit_users = [];
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get-datalist');
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		// unset system user
 		array_splice($users, array_search(1, array_column($users, 'id')), 1);
 		// set self to top 
@@ -605,8 +605,10 @@ class CALENDARUTILITY {
 	 * @return array sql result
 	 */
 	public function getDay($date = ''){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get-day', [
-			':date' => $date
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_day', [
+			'values' => [
+				':date' => $date
+			]
 		]);
 	}
 
@@ -625,9 +627,11 @@ class CALENDARUTILITY {
 	 * @return array sql result
 	 */
 	public function getWithinDateRange($earlier = '', $later = ''){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get-within-date-range', [
-			':earlier' => $earlier ? : '1970-01-01 00:00:01',
-			':later' => $later ? : '2079-06-06 23:59:59'
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_within_date_range', [
+			'values' => [
+				':earlier' => $earlier ? : '1970-01-01 00:00:01',
+				':later' => $later ? : '2079-06-06 23:59:59'	
+			]
 		]);
 	}
 
@@ -637,7 +641,9 @@ class CALENDARUTILITY {
 	 */
 	public function search($search = ''){
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
-			':subject' => $search
+			'values' => [
+				':subject' => $search
+			]
 		]);
 	}
 
@@ -658,7 +664,9 @@ class CALENDARUTILITY {
 	 * @return int|bool insert id
 	 */
 	public function post($columns = []){
-		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', $columns)) return $this->_pdo->lastInsertId();
+		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
+			'values' => $columns
+		])) return $this->_pdo->lastInsertId();
 		return false;
 	}
 
@@ -680,7 +688,9 @@ class CALENDARUTILITY {
 	 * @return int affected rows
 	 */
 	public function put($columns = []){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', $columns);
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
+			'values' => $columns
+		]);
 	}
 
 	/**
@@ -693,7 +703,11 @@ class CALENDARUTILITY {
 		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
 		$sqlchunks = [];
 		$affected_rows = 0;
-		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get-by-id', null, [':id' => $id]);
+		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+			'replacements' => [
+				':id' => $id
+			]
+		]);
 		foreach ($entries as $entry){
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
 				[
@@ -704,9 +718,9 @@ class CALENDARUTILITY {
 			));
 		}
 		foreach ($sqlchunks as $chunk){
-			$statement = $this->_pdo->prepare($chunk);
 			try {
-				if ($statement->execute()) $affected_rows += $statement->rowCount();
+				$rows = SQLQUERY::EXECUTE($this->_pdo, $chunk);
+				if ($rows) $affected_rows += $rows;
 			}
 			catch (Exception $e) {
 				echo $e, $chunk;
@@ -721,11 +735,11 @@ class CALENDARUTILITY {
 	 * @return int affected rows
 	 */
 	public function delete($id = 0){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE(''));
-		$statement->execute([
-			':id' => $id
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+			'values' => [
+				':id' => $id
+			]
 		]);
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [':id' => $id]);
 	}
 }
 ?>

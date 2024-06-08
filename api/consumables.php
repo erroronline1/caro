@@ -78,54 +78,54 @@ class CONSUMABLES extends API {
 		}
 		if (count($pricelist->_list[1])){
 			// purge all unprotected products for a fresh data set
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
-			$statement->execute([
-				':id' => $vendorID
+			SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+				'values' => [
+					':id' => $vendorID
+				]
 			]);
 			// retrieve left items
 			$remainder = [];
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
-			$statement->execute([
-				':search' => $vendorID
+			$remained = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+				'values' => [
+					':search' => $vendorID
+				]
 			]);
-			$remained = $statement->fetchAll(PDO::FETCH_ASSOC);
 			foreach($remained as $row) {
 				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated']];
 			}
 
 			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put-product-protected'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_protected'),
 				[
 					':id' => $remainder[$update]['id'],
-					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
-					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
-					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
+					':article_name' => $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['article_name'])),
+					':article_unit' => $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['article_unit'])),
+					':article_ean' => $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['article_ean'])),
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['trading_good'])) : 0,
+					':incorporated' => $this->_pdo->quote(htmlspecialchars($remainder[$update]['incorporated']))
 				]) . '; ');
 			}
 			$insertions = [];
 			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$insertions[]=[
 					':vendor_id' => $vendorID,
-					':article_no' => $this->_pdo->quote($pricelist->_list[1][$index]['article_no']),
-					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
-					':article_alias' => "''",
-					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
-					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
+					':article_no' => htmlspecialchars($pricelist->_list[1][$index]['article_no']),
+					':article_name' => htmlspecialchars($pricelist->_list[1][$index]['article_name']),
+					':article_alias' => '',
+					':article_unit' => htmlspecialchars($pricelist->_list[1][$index]['article_unit']),
+					':article_ean' => htmlspecialchars($pricelist->_list[1][$index]['article_ean']),
 					':active' => 1,
 					':protected' => 0,
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => "''"
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $pricelist->_list[1][$index]['trading_good'] : 0,
+					':incorporated' => ''
 				];
 			}
-			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT(SQLQUERY::PREPARE('consumables_post-product'), $insertions));
+			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
 
 			foreach ($sqlchunks as $chunk){
-				$statement = $this->_pdo->prepare($chunk);
 				try {
-					if ($statement->execute()) $date = date("d.m.Y");
+					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = date("d.m.Y");
 				}
 				catch (Exception $e) {
 					echo $e, $chunk;
@@ -145,20 +145,23 @@ class CONSUMABLES extends API {
 	 */
 	private function components($forContext){
 		$formBody = [];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-get-by-context'));
-		$statement->execute([':context' => $forContext]);
-		if ($forms = $statement->fetchAll(PDO::FETCH_ASSOC)){
+		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_get_by_context', [
+			'values' => [
+				':context' => $forContext
+			]
+		]);
+		if ($forms){
 			foreach($forms as $form){
 				if (PERMISSION::fullyapproved('formapproval', $form['approval'])) break;
 			}
 			foreach(explode(',', $form['content']) as $usedcomponent) {
 				// get latest approved by name
 				$component = [];
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-get-by-name'));
-				$statement->execute([
-					':name' => $usedcomponent
+				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
+					'values' => [
+						':name' => $usedcomponent
+					]
 				]);
-				$components = $statement->fetchAll(PDO::FETCH_ASSOC);
 				foreach ($components as $component){
 					if (PERMISSION::fullyapproved('formapproval', $component['approval'])) break;
 				}
@@ -196,25 +199,32 @@ class CONSUMABLES extends API {
 	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
 	 */
 	public function mdrsamplecheck(){
-		if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' => intval($this->_requestedID)
-				]));
-				$statement->execute();
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
-				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+					]
+				]);
+				$product = $product ? $product[0] : null;
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_post'));
-				if ($statement->execute([
-					':type' => 'mdrsamplecheck',
-					':author' => $_SESSION['user']['name'],
-					':content' => $content
-				])) {
-					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-check'), [':checked' => 'CURRENT_TIMESTAMP']));
-					if ($statement->execute([
-						':ids' => $product['id'],
+				if (!$product || !$this->_payload->content) $this->response([]);
+				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . htmlspecialchars($this->_payload->content);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_post', [
+					'values' => [
+						':type' => 'mdrsamplecheck',
+						':author' => $_SESSION['user']['name'],
+						':content' => $content
+					]
+				])){
+					if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
+						'values' => [
+							':ids' => $product['id'],
+						],
+						'replacements' => [
+							':checked' => 'CURRENT_TIMESTAMP'
+						]
 					])) {
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)], LANG::GET('order.sample_check_alert') . $content);
 						$this->response([
@@ -231,11 +241,13 @@ class CONSUMABLES extends API {
 					]]);
 				break;
 			case 'GET':
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' => intval($this->_requestedID)
-				]));
-				$statement->execute();
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+					]
+				]);
+				$product = $product ? $product[0] : null;
+				if (!$product) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$result = ['body' => [
 					'content' => [
@@ -261,33 +273,39 @@ class CONSUMABLES extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
 				// get check
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('checks_get-by-id'), [
-					':id' => intval($this->_requestedID)
-				]));
-				$statement->execute();
-				$check = $statement->fetch(PDO::FETCH_ASSOC);
+				$check = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_by_id', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				]);
+				$check = $check ? $check[0] : null;
+
 				// get product(s)
 				$content = preg_split("/\n/", $check['content']);
 				$vendor = $content[0];
 				$article_no = $content[1];
 
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product-by-article_no-vendor'), [
-					':article_no' => $this->_pdo->quote($article_no),
-					':vendor' => $this->_pdo->quote($vendor)
-				]));
-				$statement->execute();
-				$products = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+					'values' => [
+						':article_no' => $this->_pdo->quote($article_no),
+						':vendor' => $this->_pdo->quote($vendor)
+					]
+				]);
 				// set check to null
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-check'), [
-					':checked' => 'NULL',
-					':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
-				]));
-				$statement->execute();
+				SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
+					'values' => [
+						':checked' => 'NULL'
+					],
+					'replacements' => [
+						':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
+					]
+				]);
 				// delete check from check-db
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('checks_delete'), [
-					':id' => intval($this->_requestedID)
-				]));
-				if ($statement->execute()) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_delete', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('order.sample_check_revoked'),
 						'type' => 'success'
@@ -311,7 +329,6 @@ class CONSUMABLES extends API {
 	 * incorporation denial is detected by pattern matching LANG::GET('order.incorporation_denied')
 	 */
 	public function incorporation(){
-		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$batchincorporate = UTILITY::propertySet($this->_payload, '_batchincorporate');
@@ -319,14 +336,15 @@ class CONSUMABLES extends API {
 				if ($batchincorporate){
 					$ids = explode(',', $batchincorporate);
 				}
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' =>implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)])
-				]));
-				$statement->execute();
-				if (!($products = $statement->fetchAll(PDO::FETCH_ASSOC)) || !$this->_payload->content) $this->response([]);
+				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'replacements' => [
+						':ids' =>implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)])
+					]
+				]);
+				if (!$products || !$this->_payload->content) $this->response([]);
 				// check content denial or not
 				preg_match("/" . LANG::GET('order.incorporation_denied') . ".*/m", $this->_payload->content, $denied);
-				$approve = ['_check' => $denied ? $denied[0] : $this->_payload->content];
+				$approve = ['_check' => $denied ? $denied[0] : htmlspecialchars($this->_payload->content)];
 				if ($denied) $approve['_denied'] = true;
 
 				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('formapproval', true)];
@@ -339,11 +357,12 @@ class CONSUMABLES extends API {
 						];
 					}
 				}
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-incorporation'),[
-					':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)]),
-					':incorporated' => $this->_pdo->quote(json_encode($approve))
-				]));
-				if ($statement->execute()) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+					'replacements' => [
+						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)]),
+						':incorporated' => $this->_pdo->quote(json_encode($approve))
+					]
+				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('order.incorporation_success'),
 						'type' => 'success'
@@ -356,21 +375,23 @@ class CONSUMABLES extends API {
 				break;
 			case 'GET':
 				$result = [];
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' => intval($this->_requestedID)
-				]));
-				$statement->execute();
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+					]
+				]);
+				$product = $product ? $product[0] : null;
+				if (!$product) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				$incorporationform = $this->components('product_incorporation_form');
 				if ($product['trading_good']) array_push($incorporationform, ...$this->components('mdr_sample_check_form'));
 
 				// select all products from selected vendor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
-				$statement->execute([
-					':search' => $product['vendor_id']
+				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products', [
+					'values' => [
+						':search' => $product['vendor_id']
+					]
 				]);
-				$vendorproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$similarproducts = [];
 				foreach($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
@@ -415,10 +436,11 @@ class CONSUMABLES extends API {
 					'productid' => $product['id']
 				];
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('checks_get'));
-				$statement->execute([':type' => 'incorporation']);
-				$checks = $statement->fetchAll(PDO::FETCH_ASSOC);
-
+				$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
+					'values' => [
+						':type' => 'incorporation'
+					]
+				]);
 				$productsPerSlide = 0;
 				$matches = [[]];
 				$hideduplicates = [];
@@ -494,9 +516,7 @@ class CONSUMABLES extends API {
 		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 		$result = ['body' => ['content' => []]];
 		$links = [];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
-		$statement->execute();
-		$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation');
 		foreach($allproducts as $product) {
 			if ($product['incorporated'] === '') continue;
 			$product['incorporated'] = json_decode($product['incorporated'], true);
@@ -537,16 +557,15 @@ class CONSUMABLES extends API {
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')),
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
-					'info' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info')),
+					'info' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info')) ? : '',
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
-					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
+					'pricelist' => ['validity' => '', 'filter' => htmlspecialchars_decode(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter')))],
 					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . date('Ymd')
 				];
 				
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
-
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['status' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
 
@@ -559,14 +578,15 @@ class CONSUMABLES extends API {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
 				}
 	
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-vendor'));
-				if ($statement->execute([
-					':name' => $vendor['name'],
-					':active' => $vendor['active'],
-					':info' => $vendor['info'],
-					':certificate' => json_encode($vendor['certificate']),
-					':pricelist' => json_encode($vendor['pricelist']),
-					':immutable_fileserver' => $vendor['immutable_fileserver']
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
+					'values' => [
+						':name' => $vendor['name'],
+						':active' => $vendor['active'],
+						':info' => $vendor['info'],
+						':certificate' => json_encode($vendor['certificate']),
+						':pricelist' => json_encode($vendor['pricelist']),
+						':immutable_fileserver' => $vendor['immutable_fileserver']
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
@@ -582,24 +602,25 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'PUT':
-		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
-				$statement->execute([
-					':id' => $this->_requestedID
-				]);
 				// prepare vendor-array to update, return error if not found
-				if (!($vendor = $statement->fetch(PDO::FETCH_ASSOC))) $this->response(null, 406);
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+				$vendor = $vendor ? $vendor[0] : null;
+				if (!$vendor) $this->response(null, 406);
 
 				$vendor['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name'));
-				$vendor['info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info'));
+				$vendor['info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info')) ? : '';
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
-				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
+				$vendor['pricelist']['filter'] = htmlspecialchars_decode(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter')));
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
 
 				// ensure valid json for filters
@@ -622,21 +643,23 @@ class CONSUMABLES extends API {
 
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-all-unprotected-products'));
-					$statement->execute([
-						':id' => $vendor['id']
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+						'values' => [
+							':id' => $vendor['id']
+							]
 					]);
 					$vendor['pricelist']['validity'] = '';
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-vendor'));
-				if ($statement->execute([
-					':id' => $vendor['id'],
-					':active' => $vendor['active'],
-					':name' => $vendor['name'],
-					':info' => $vendor['info'],
-					':certificate' => json_encode($vendor['certificate']),
-					':pricelist' => json_encode($vendor['pricelist'])
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
+					'values' => [
+						':id' => $vendor['id'],
+						':active' => $vendor['active'],
+						':name' => $vendor['name'],
+						':info' => $vendor['info'],
+						':certificate' => json_encode($vendor['certificate']),
+						':pricelist' => json_encode($vendor['pricelist'])
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $vendor['id'],
@@ -657,11 +680,14 @@ class CONSUMABLES extends API {
 				$result = [];
 				
 				// select single vendor based on id or name
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
-				$statement->execute([
-					':id' => $this->_requestedID
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
 				]);
-				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $vendor = [
+				$vendor = $vendor ? $vendor[0] : null;
+
+				if (!$vendor) $vendor = [
 					'id' => null,
 					'name' => '',
 					'active' => 0,
@@ -678,9 +704,7 @@ class CONSUMABLES extends API {
 				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
 
 				// prepare existing vendor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
-				$statement->execute();
-				$vendorlist = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				foreach($vendorlist as $key => $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = [];
@@ -871,11 +895,13 @@ class CONSUMABLES extends API {
 				];
 
 				// validate vendor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
-				$statement->execute([
-					':id' => $product['vendor_name']
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					'values' => [
+						':id' => $product['vendor_name']
+					]
 				]);
-				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
+				$vendor = $vendor ? $vendor[0] : null;
+				if (!$vendor) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 
 				// save documents
@@ -884,17 +910,18 @@ class CONSUMABLES extends API {
 					$product['protected'] = 1;
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_post-product'));
-				if ($statement->execute([
-					':vendor_id' => $product['vendor_id'],
-					':article_no' => $product['article_no'],
-					':article_name' => $product['article_name'],
-					':article_alias' => $product['article_alias'],
-					':article_unit' => $product['article_unit'],
-					':article_ean' => $product['article_ean'],
-					':active' => $product['active'],
-					':protected' => $product['protected'],
-					':trading_good' => $product['trading_good'],
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_consumables_post_productget_vendor', [
+					'values' => [
+						':vendor_id' => $product['vendor_id'],
+						':article_no' => $product['article_no'],
+						':article_name' => $product['article_name'],
+						':article_alias' => $product['article_alias'],
+						':article_unit' => $product['article_unit'],
+						':article_ean' => $product['article_ean'],
+						':active' => $product['active'],
+						':protected' => $product['protected'],
+						':trading_good' => $product['trading_good'],
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $this->_pdo->lastInsertId(),
@@ -911,12 +938,14 @@ class CONSUMABLES extends API {
 
 			case 'PUT':
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) $this->response([], 401);
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' => intval($this->_requestedID)
-				]));
-				$statement->execute();
 				// prepare product-array to update, return error if not found
-				if (!($product = $statement->fetch(PDO::FETCH_ASSOC))) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+					]
+				]);
+				$product = $product ? $product[0] : null;
+				if (!$product) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
 				if (!PERMISSION::permissionFor('productslimited')){
@@ -946,11 +975,14 @@ class CONSUMABLES extends API {
 					}
 				}
 				// validate vendor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor'));
-				$statement->execute([
-					':id' => $product['vendor_name']
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					'values' => [
+						':id' => $product['vendor_name']
+					]
 				]);
-				if (!$vendor = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
+				$vendor = $vendor ? $vendor[0] : null;
+
+				if (!$vendor) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
@@ -963,52 +995,59 @@ class CONSUMABLES extends API {
 				$batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
 				if ($batchactive){
 					$ids = explode(',', $batchactive);
-					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
-						':field' => 'active',
-						':value' => $product['active'],
-						':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
-					]));
-					$statement->execute();
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => $product['active'],
+						],
+						'replacements' => [
+							':field' => 'active',
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+						]
+						]);
 				}
 				// apply trading good to selected similar products
 				$batchtradinggood = UTILITY::propertySet($this->_payload, '_batchtradinggood');
 				if ($batchtradinggood){
 					$ids = explode(',', $batchtradinggood);
-					$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
-						':field' => 'trading_good',
-						':value' => $product['trading_good'],
-						':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
-					]));
-					$statement->execute();
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => $product['trading_good'],
+						],
+						'replacements' => [
+							':field' => 'trading_good',
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+						]
+					]);
 				}
 
 				$_batchincorporation = UTILITY::propertySet($this->_payload, '_batchincorporation');
 				if (PERMISSION::permissionFor('incorporation')){
 					if ($_batchincorporation){
 						$ids = explode(',', $_batchincorporation);
-						$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_put-batch'), [
-							':field' => 'incorporated',
-							':value' => $this->_pdo->quote($product['incorporated']),
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),
-						]));
-						$statement->execute();
+						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+							'replacements' => [
+								':field' => 'incorporated',
+								':value' => $this->_pdo->quote($product['incorporated']),
+								':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+							]
+						]);
 					}
 				}
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_put-product'));
-				if ($statement->execute([
-					':id' => $this->_requestedID,
-					':vendor_id' => $product['vendor_id'],
-					':article_no' => $product['article_no'],
-					':article_name' => $product['article_name'],
-					':article_alias' => $product['article_alias'],
-					':article_unit' => $product['article_unit'],
-					':article_ean' => $product['article_ean'],
-					':active' => $product['active'],
-					':protected' => $product['protected'],
-					':trading_good' => $product['trading_good'],
-					':incorporated' => $product['incorporated']
-
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_product', [
+					'values' => [
+						':id' => $this->_requestedID,
+						':vendor_id' => $product['vendor_id'],
+						':article_no' => $product['article_no'],
+						':article_name' => $product['article_name'],
+						':article_alias' => $product['article_alias'],
+						':article_unit' => $product['article_unit'],
+						':article_ean' => $product['article_ean'],
+						':active' => $product['active'],
+						':protected' => $product['protected'],
+						':trading_good' => $product['trading_good'],
+						':incorporated' => $product['incorporated']
+					]
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
@@ -1031,11 +1070,14 @@ class CONSUMABLES extends API {
 				$vendors=[];
 
 				// select single product based on id or name
-				$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-					':ids' => intval($this->_requestedID)
-				]));
-				$statement->execute();
-				if (!$product = $statement->fetch(PDO::FETCH_ASSOC)) $product = [
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+						]
+				]);
+				$product = $product ? $product[0] : null;
+
+				if (!$product) $product = [
 					'id' => null,
 					'vendor_id' => '',
 					'vendor_name' => '',
@@ -1065,11 +1107,11 @@ class CONSUMABLES extends API {
 					}
 				}
 				// select all products from selected vendor
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-by-vendor-id'));
-				$statement->execute([
-					':search' => $product['vendor_id']
+				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+					'values' => [
+						':search' => $product['vendor_id']
+					]
 				]);
-				$vendorproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$similarproducts = [];
 				foreach($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
@@ -1088,9 +1130,7 @@ class CONSUMABLES extends API {
 				if ($similarproducts) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchtradinggood', $similarproducts, '1');
 
 				// prepare existing vendor lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
-				$statement->execute();
-				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
 				$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 
@@ -1102,9 +1142,7 @@ class CONSUMABLES extends API {
 				}
 
 				// prepare existing unit lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-product-units'));
-				$statement->execute();
-				$vendor = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
 				foreach($vendor as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
@@ -1362,15 +1400,17 @@ class CONSUMABLES extends API {
 		case 'DELETE':
 			if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 			// prefetch to return proper name after deletion
-			$statement = $this->_pdo->prepare(strtr(SQLQUERY::PREPARE('consumables_get-product'), [
-				':ids' => intval($this->_requestedID)
-			]));
-			$statement->execute();
-			$product = $statement->fetch(PDO::FETCH_ASSOC);
+			$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+				'values' => [
+					':ids' => intval($this->_requestedID)
+				]
+			]);
+			$product = $product ? $product[0] : ['id' => null];
 
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_delete-unprotected-product'));
-			if ($statement->execute([
-				':id' => $product['id']
+			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_pconsumables_delete_unprotected_productroduct', [
+				'values' => [
+					':id' => $product['id']
+					]
 			])) $this->response([
 				'status' => [
 					'msg' => LANG::GET('consumables.edit_product_deleted', [':name' => $product['article_name']]),

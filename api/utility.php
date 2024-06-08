@@ -240,16 +240,7 @@ class UTILITY {
 	 * @return string|bool property value or false
 	 */
 	public static function propertySet($object, $property){
-		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
-	}
-
-	/**
-	 * @param string $text e.g. from database user input
-	 * 
-	 * @return string to avoid malicious script execution
-	 */
-	public static function scriptFilter($text){
-		return htmlspecialchars(trim($text));
+		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? (gettype($object->{$property}) === 'string' ? htmlspecialchars($object->{$property}) : $object->{$property}) : false;
 	}
 
 	/**

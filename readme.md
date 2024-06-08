@@ -37,8 +37,8 @@
 
 
 # development
-* UTILITY::scriptfilter()
-* sqlquery further implementation, safe executing chunks
+* check htmlspecialchars application. if...
+* assemble.compose_link_form_choice after updates sql execution routine with htmlspecialchars
 * clear metadata for uploaded images
 * error response on empty timesheet exports
 * incorporation on same article_no
@@ -1155,7 +1155,7 @@ There is a SQLQUERY class handling
 * query preparation
 * sanitizing and masking input (avoiding unintended script execution)
 * support of chunkifying queries for improved performance
-Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-sice quoting to inhibit injections. (./api/sqlinterface.php)
+Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/sqlinterface.php)
 
 All requests have to be executed through the api ensuring
 * responses for logged in users only

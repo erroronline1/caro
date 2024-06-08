@@ -16,21 +16,22 @@ class MESSAGE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// get recipient id
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-				$statement->execute([
-					':id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))
+				$recipient = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'values' => [
+						':id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))
+					]
 				]);
-				if (!$recipient = $statement->fetch(PDO::FETCH_ASSOC)) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]), 'type' => 'error']], 400);
+				$recipient = $recipient ? $recipient[0]: null;
+				if (!$recipient) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]), 'type' => 'error']], 400);
 				if ($recipient['id'] < 2) $this->response(['status' => ['msg' => LANG::GET('message.forbidden'), 'type' => 'error']], 403);
 				
-				$message = [
-					'from_user' => $_SESSION['user']['id'],
-					'to_user' => $recipient['id'],
-					'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]))
-				];
-
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_message'));
-				if ($statement->execute($message)) $this->response([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
+					'values' => [
+						'from_user' => $_SESSION['user']['id'],
+						'to_user' => $recipient['id'],
+						'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]))
+					]
+				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_success'),
 						'redirect' => false,
@@ -52,27 +53,26 @@ class MESSAGE extends API {
 			case 'GET':
 				$result = ['body'=>['content'=> []]];
 				// prepare existing users lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-				$statement->execute();
-				$user = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $key => $row) {
 					if ($row['id'] > 1)	$datalist[] = $row['name'];
 				}
 
 				if ($this->_conversation){
 					// select conversation
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_conversation'));
-					$statement->execute([
-						':user' => $_SESSION['user']['id'],
-						':conversation' => $this->_conversation
+					$messages = SQLQUERY::EXECUTE($this->_pdo, 'message_get_conversation', [
+						'values' => [
+							':user' => $_SESSION['user']['id'],
+							':conversation' => $this->_conversation
+						]
 					]);
-					$messages = $statement->fetchAll(PDO::FETCH_ASSOC);
 					$conversation_content = [];
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get'));
-					$statement->execute([
-						':id' => $this->_conversation
+					$conversation_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+						'values' => [
+							':id' => $this->_conversation
+						]
 					]);
-					$conversation_user = $statement->fetch(PDO::FETCH_ASSOC);
+					$conversation_user = $conversation_user ? $conversation_user[0] : null;
 					foreach($messages as $conversation){
 						$conversation_content[] = [
 							'type' => 'message',
@@ -139,20 +139,21 @@ class MESSAGE extends API {
 						]
 					];
 					// select conversations
-					$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_conversations'));
-					$statement->execute([
-						':user' => $_SESSION['user']['id']
+					$conversations = SQLQUERY::EXECUTE($this->_pdo, 'message_get_conversations', [
+						'values' => [
+							':user' => $_SESSION['user']['id']
+						]
 					]);
-					$conversations = $statement->fetchAll(PDO::FETCH_ASSOC);
 					if ($conversations) {
 						foreach($conversations as $conversation){
 							// select unseen per conversation
-							$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen_conversations'));
-							$statement->execute([
-								':user' => $_SESSION['user']['id'],
-								':conversation' => $conversation['conversation_user']
+							$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen_conversations', [
+								'values' => [
+									':user' => $_SESSION['user']['id'],
+									':conversation' => $conversation['conversation_user']
+								]
 							]);
-							$unseen = $statement->fetch(PDO::FETCH_ASSOC);
+							$unseen = $unseen ? intval($unseen[0]['unseen']) : 0;
 
 							$conversation['message'] = preg_replace('/\n|\r/', ' ', $conversation['message']);
 							$result['body']['content'][] = [
@@ -163,7 +164,7 @@ class MESSAGE extends API {
 										'user' => $conversation['conversation_user_name'] ? : LANG::GET('message.deleted_user'),
 										'text' => (strlen($conversation['message'])>128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $conversation['timestamp'],
-										'unseen' => intval($unseen['unseen'])
+										'unseen' => $unseen
 									],
 									'attributes' =>  [
 										'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
@@ -175,10 +176,11 @@ class MESSAGE extends API {
 				}
 				break;
 			case 'DELETE':
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_delete_conversation'));
-				if ($statement->execute([
-					':conversation' => $this->_conversation,
-					':user' => $_SESSION['user']['id']
+				if (SQLQUERY::EXECUTE($this->_pdo, 'message_delete_conversation', [
+					'values' => [
+						':conversation' => $this->_conversation,
+						':user' => $_SESSION['user']['id']
+					]
 				])) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.delete_success'),
@@ -198,13 +200,11 @@ class MESSAGE extends API {
 
 	public function register(){
 		// prepare existing users lists
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('user_get-datalist'));
-		$statement->execute();
-		$users = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		$result = ['body' => ['content' => []]];
 		foreach($users as $user){
-			if ($user['id']==1) continue;
+			if ($user['id'] === 1) continue;
 			$mailto =  [
 				'href' => 'javascript:void(0)',
 				'data-type' => 'input',

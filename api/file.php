@@ -21,9 +21,7 @@ class FILE extends API {
 	 * @return array filepaths
 	 */
 	private function activeexternalfiles(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_external_documents-get-active'));
-		$statement->execute();
-		$files = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
 		if ($files) return array_column($files, 'path');
 		return [];
 	}
@@ -58,9 +56,7 @@ class FILE extends API {
 	 * responds with bundle ids matching request
 	 */
 	public function bundlefilter(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
-		$statement->execute();
-		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
 		$matches = [];
 		foreach($bundles as $row) {
 			similar_text($this->_requestedFolder, $row['name'], $percent);
@@ -346,12 +342,11 @@ class FILE extends API {
 							':path' => $this->_pdo->quote($file)
 						];
 					}
-					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT(SQLQUERY::PREPARE('file_external_documents-post'), $insertions);
+					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
 					foreach ($sqlchunks as $chunk){
 						$success = false;
-						$statement = $this->_pdo->prepare($chunk);
 						try {
-							if ($statement->execute()) $success = true;
+							if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $success = true;
 						}
 						catch (Exception $e) {
 							echo $e, $chunk;
@@ -373,7 +368,7 @@ class FILE extends API {
 			case 'PUT':
 				 switch ($this->_accessible){
 					case '0':
-						$prepare = 'file_external_documents-retire';
+						$prepare = 'file_external_documents_retire';
 						$tokens = [
 							':author' => $_SESSION['user']['name'],
 							':id' => $this->_requestedId
@@ -381,7 +376,7 @@ class FILE extends API {
 						$response = LANG::GET('file.external_file_retired_success');
 						break;
 					case '1':
-						$prepare = 'file_external_documents-unretire';
+						$prepare = 'file_external_documents_unretire';
 						$tokens = [
 							':author' => $_SESSION['user']['name'],
 							':id' => $this->_requestedId
@@ -393,15 +388,16 @@ class FILE extends API {
 						foreach(explode(', ', $this->_accessible) as $context){
 							$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
 						}
-						$prepare = 'file_external_documents-context';
+						$prepare = 'file_external_documents_context';
 						$tokens = [
 							':regulatory_context' => implode(',', $regulatory_context),
 							':id' => $this->_requestedId
 						];
 						$response = LANG::GET('file.external_file_regulatory_context');
 				}
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE($prepare));
-				if ($statement->execute($tokens)) $this->response(['status' => [
+				if (SQLQUERY::EXECUTE($this->_pdo, $prepare, [
+					'values' => $tokens
+				])) $this->response(['status' => [
 						'msg' => $response,
 						'type' => 'success'
 					]]);
@@ -418,10 +414,7 @@ class FILE extends API {
 					'content'=>[]
 				]];
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_external_documents-get'));
-				$statement->execute();
-				$files = $statement->fetchAll(PDO::FETCH_ASSOC);
-		
+				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
 				if ($files){
 					$result['body']['content'][]=[
 						[
@@ -521,9 +514,7 @@ class FILE extends API {
 				]
 			]
 		];
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get-active'));
-		$statement->execute();
-		$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
 		foreach($bundles as $row) {
 			$list=[];
 			foreach (json_decode($row['content'], true) as $file => $path){
@@ -566,12 +557,13 @@ class FILE extends API {
 				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
 				unset ($this->_payload->$active);
 
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-post'));
-				if ($statement->execute([
+				if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_post', [
+					'values' => [
 					':name' => $name,
 					':content' => json_encode($this->_payload),
 					':active' => $isactive
-					])) $this->response([
+					]
+				])) $this->response([
 						'status' => [
 							'name' => $name,
 							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name]),
@@ -590,19 +582,19 @@ class FILE extends API {
 				$return = [];
 				
 				// prepare existing bundle lists
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-datalist'));
-				$statement->execute();
-				$bundles = $statement->fetchAll(PDO::FETCH_ASSOC);
+				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
 				foreach($bundles as $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = [];
 				}
 		
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('file_bundles-get'));
-				$statement->execute([
-					':name' => $this->_requestedFolder
+				$bundle = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get', [
+					'values' => [
+						':name' => $this->_requestedFolder
+					]
 				]);
-				if (!$bundle = $statement->fetch(PDO::FETCH_ASSOC)) $bundle = ['name' => '', 'content' => '', 'active' => null];
+				$bundle = $bundle ? $bundle[0] : null;
+				if (!$bundle) $bundle = ['name' => '', 'content' => '', 'active' => null];
 				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['status'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
 		
 				$return['body'] = [

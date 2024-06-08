@@ -524,7 +524,9 @@ class CALENDAR extends API {
 			case 'POST':
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					':id' => $affected_user_id
+					'values' => [
+						':id' => $affected_user_id
+					]
 				])) $affected_user = $affected_user[0];
 		
 				$event = [
@@ -569,7 +571,9 @@ class CALENDAR extends API {
 
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					':id' => $affected_user_id
+					'values' => [
+						':id' => $affected_user_id
+					]
 				])) $affected_user = $affected_user[0];
 		
 				$event = [
@@ -703,7 +707,7 @@ class CALENDAR extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => LANG::GET('calendar.timesheet_bulk_approve', [':number' => count($bulkapproval)]),
-								'onpointerup' => "api.calendar('put', 'complete', '" . implode(',', $bulkapproval) . "', this.checked, 'timesheet')"
+								'onpointerup' => "api.calendar('put', 'complete', '" . implode(',', $bulkapproval) . "', true, 'timesheet')"
 							]
 						];
 					}
@@ -788,7 +792,7 @@ class CALENDAR extends API {
 		$last = clone $days[count($days) - 1];
 		$days = array_values($days);
 		
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get-datalist');
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		// retrieve stats in advance
 		$timesheet_stats_month = $calendar->timesheetSummary($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
 		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $last->format('Y-m-d'));

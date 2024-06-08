@@ -33,9 +33,7 @@ class NOTIFICATION extends API {
 		 * alerts a user group if selected
 		 * used by service worker
 		 */
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-vendor-datalist'));
-		$statement->execute();
-		$vendors = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		$today->setTime(0, 0);
 		foreach ($vendors as $vendor){
@@ -83,9 +81,7 @@ class NOTIFICATION extends API {
 	public function consumables(){
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('consumables_get-products-incorporation'));
-			$statement->execute();
-			$allproducts = $statement->fetchAll(PDO::FETCH_ASSOC);
+			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation');
 			foreach($allproducts as $product) {
 				if ($product['incorporated'] === '') continue;
 				$product['incorporated'] = json_decode($product['incorporated'], true);
@@ -101,12 +97,8 @@ class NOTIFICATION extends API {
 	 */
 	public function forms(){
 		// prepare all unapproved elements
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_component-datalist'));
-		$statement->execute();
-		$components = $statement->fetchAll(PDO::FETCH_ASSOC);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('form_form-datalist'));
-		$statement->execute();
-		$forms = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
+		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$unapproved = 0;
 		$hidden = [];
 		foreach(array_merge($components, $forms) as $element){
@@ -121,41 +113,40 @@ class NOTIFICATION extends API {
 	}
 
 	public function messageunnotified(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unnotified'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
+		$unnotified = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unnotified', [
+			'values' => [
+				':user' => $_SESSION['user']['id']
+			]
 		]);
-		$unnotified = $statement->fetch(PDO::FETCH_ASSOC);
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_put_notified'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
-		]);
-		return $unnotified['number'];
+		$unnotified = $unnotified ? $unnotified[0]['number'] : 0;
+		SQLQUERY::EXECUTE($this->_pdo, 'message_put_notified', [
+			'values' => [
+				':user' => $_SESSION['user']['id']
+			]
+			]);
+		return $unnotified;
 	}
 	public function messageunseen(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_get_unseen'));
-		$statement->execute([
-			':user' => $_SESSION['user']['id']
+		$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen', [
+			'values' => [
+				':user' => $_SESSION['user']['id']
+			]
 		]);
-		$unseen = $statement->fetch(PDO::FETCH_ASSOC);
-		return $unseen['number'];
+		$unseen = $unseen ? $unseen[0]['number'] : 0;
+		return $unseen;
 	}
 
 	public function order(){
-		$unprocessed = ['num' => 0];
+		$unprocessed = 0;
 		if (PERMISSION::permissionFor('orderprocessing')){
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('order_get_approved_unprocessed'));
-			$statement->execute([
-			]);
-			$unprocessed = $statement->fetch(PDO::FETCH_ASSOC);
+			$unprocessed = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed');
+			$unprocessed = $unprocessed ? $unprocessed[0]['num'] : 0;
 		}
-		return $unprocessed['num'];
+		return $unprocessed;
 	}
 
 	public function records(){
-		$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('records_identifiers'));
-		$statement->execute();
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		$number = 0;
 		foreach ($data as $row){
 			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units']) && !$row['closed']) $number++;
