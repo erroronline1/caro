@@ -87,7 +87,7 @@ class TEXTTEMPLATE extends API {
 				} else {
 					$chunk = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
 						'values' => [
-							':name' => htmlspecialchars($this->_requestedID ? : '')
+							':name' => $this->_requestedID
 						]
 					]);
 				}
@@ -335,7 +335,7 @@ class TEXTTEMPLATE extends API {
 				} else {
 					$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
 						'values' => [
-							':name' => htmlspecialchars($this->_requestedID ? : '')
+							':name' => $this->_requestedID
 						]
 					]);
 				}

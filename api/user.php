@@ -406,7 +406,7 @@ class USER extends API {
 				// select single user based on id or name
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'values' => [
-						':id' => htmlspecialchars($this->_requestedID ? : '')
+						':id' => $this->_requestedID
 					]
 				]);
 				$user = $user ? $user[0] : null;

@@ -31,7 +31,7 @@ class RECORD extends API {
 		$element = [];
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
 			'values' => [
-				':name' => htmlspecialchars($name)
+				':name' => $name
 			]
 		]);
 		foreach ($elements as $element){
@@ -296,7 +296,7 @@ class RECORD extends API {
 
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [
-				':identifier' => htmlspecialchars($this->_passedIdentify)
+				':identifier' => $this->_passedIdentify
 			]
 		]);
 		$considered = [];
@@ -334,10 +334,10 @@ class RECORD extends API {
 				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
-						$identifier = htmlspecialchars($value);
+						$identifier = $value;
 						unset ($this->_payload->$key);
 					}
-					if (gettype($value) === 'array') $value = trim(implode(' ', array_map(Fn($v) => htmlspecialchars($v), $value)));
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
 					////////////////////////////////////////
@@ -501,7 +501,7 @@ class RECORD extends API {
 		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
 		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
 			'values' => [
-				':identifier' => htmlspecialchars($this->_requestedID)
+				':identifier' => $this->_requestedID
 			]
 		]);
 		$this->response([
@@ -745,7 +745,7 @@ class RECORD extends API {
 	private function summarizeRecord($type = 'full'){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [
-				':identifier' => htmlspecialchars($this->_requestedID)
+				':identifier' => $this->_requestedID
 			]
 		]);
 		$summary = [

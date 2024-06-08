@@ -33,7 +33,7 @@ class AUDIT extends API {
 		// get latest approved by name
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
 			'values' => [
-				':name' => htmlspecialchars($name)
+				':name' => $name
 			]
 		]);
 		foreach ($elements as $element){

@@ -24,7 +24,7 @@ class FORM extends API {
 		$element = [];
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
 			'values' => [
-				':name' => htmlspecialchars($name)
+				':name' => $name
 			]
 		]);
 		foreach ($elements as $element){

@@ -52,12 +52,12 @@ class ORDER extends API {
 						if (is_array($items)){
 							foreach($items as $item){
 								foreach($item as $key => $subvalue){
-									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($subvalue)));
+									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
 								}
 								$index++;
 							}
 						} else {
-							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($items)));
+							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $items));
 						}
 					}
 				}
@@ -201,7 +201,7 @@ class ORDER extends API {
 
 				$search = SQLQUERY::EXECUTE($this->_pdo, $this->_borrowedModule === 'editconsumables' ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 					'values' => [
-						':search' => htmlspecialchars($this->_subMethod)
+						':search' => $this->_subMethod
 					],
 					'replacements' => [
 						':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $this->_requestedID))),
@@ -274,7 +274,7 @@ class ORDER extends API {
 
 		$filtered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_filter', [
 			'values' => [
-				':orderfilter' => $this->_pdo->quote(htmlspecialchars($this->_requestedID))
+				':orderfilter' => $this->_pdo->quote($this->_requestedID)
 			],
 			'replacements' => [
 				':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units)),
@@ -354,11 +354,11 @@ class ORDER extends API {
 				foreach($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
 						if (!array_key_exists(intval($index), $order_data['items'])) $order_data['items'][]=[];
-						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($subvalue)));
+						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
 					}
 				}
 			} else {
-				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], htmlspecialchars($value)));
+				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
 			}
 		}
 		$order_data['orderer'] = $_SESSION['user']['name'];
@@ -899,7 +899,7 @@ class ORDER extends API {
 								':order' => LANG::GET('order.message', $messagepayload),
 								':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
 								':user' => $_SESSION['user']['name']
-							])) . "\n \n" . htmlspecialchars($this->_message));
+							])) . "\n \n" . $this->_message);
 							break;
 						case 'addinformation':
 							if (array_key_exists('additional_info', $decoded_order_data)){
@@ -934,9 +934,9 @@ class ORDER extends API {
 							break;
 						case 'cancellation':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n" . htmlspecialchars($this->_message);
+								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
 							}
-							else $decoded_order_data['additional_info'] = htmlspecialchars($this->_message);
+							else $decoded_order_data['additional_info'] = $this->_message;
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
@@ -949,9 +949,9 @@ class ORDER extends API {
 							break;
 						case 'return':
 							if (array_key_exists('additional_info', $decoded_order_data)){
-								$decoded_order_data['additional_info'] .= "\n" . htmlspecialchars($this->_message);
+								$decoded_order_data['additional_info'] .= "\n" . $this->_message;
 							}
-							else $decoded_order_data['additional_info'] = htmlspecialchars($this->_message);
+							else $decoded_order_data['additional_info'] = $this->_message;
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.received') . ': ' . $order['received'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];

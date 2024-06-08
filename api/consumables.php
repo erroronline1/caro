@@ -99,22 +99,22 @@ class CONSUMABLES extends API {
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_protected'),
 				[
 					':id' => $remainder[$update]['id'],
-					':article_name' => $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['article_name'])),
-					':article_unit' => $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['article_unit'])),
-					':article_ean' => $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['article_ean'])),
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote(htmlspecialchars($pricelist->_list[1][$index]['trading_good'])) : 0,
-					':incorporated' => $this->_pdo->quote(htmlspecialchars($remainder[$update]['incorporated']))
+					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
+					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
+					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
+					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
 				]) . '; ');
 			}
 			$insertions = [];
 			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$insertions[]=[
 					':vendor_id' => $vendorID,
-					':article_no' => htmlspecialchars($pricelist->_list[1][$index]['article_no']),
-					':article_name' => htmlspecialchars($pricelist->_list[1][$index]['article_name']),
+					':article_no' => $pricelist->_list[1][$index]['article_no'],
+					':article_name' => $pricelist->_list[1][$index]['article_name'],
 					':article_alias' => '',
-					':article_unit' => htmlspecialchars($pricelist->_list[1][$index]['article_unit']),
-					':article_ean' => htmlspecialchars($pricelist->_list[1][$index]['article_ean']),
+					':article_unit' => $pricelist->_list[1][$index]['article_unit'],
+					':article_ean' => $pricelist->_list[1][$index]['article_ean'],
 					':active' => 1,
 					':protected' => 0,
 					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $pricelist->_list[1][$index]['trading_good'] : 0,
@@ -209,7 +209,7 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 
 				if (!$product || !$this->_payload->content) $this->response([]);
-				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . htmlspecialchars($this->_payload->content);
+				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_post', [
 					'values' => [
@@ -344,7 +344,7 @@ class CONSUMABLES extends API {
 				if (!$products || !$this->_payload->content) $this->response([]);
 				// check content denial or not
 				preg_match("/" . LANG::GET('order.incorporation_denied') . ".*/m", $this->_payload->content, $denied);
-				$approve = ['_check' => $denied ? $denied[0] : htmlspecialchars($this->_payload->content)];
+				$approve = ['_check' => $denied ? $denied[0] : $this->_payload->content];
 				if ($denied) $approve['_denied'] = true;
 
 				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('formapproval', true)];
@@ -559,7 +559,7 @@ class CONSUMABLES extends API {
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
 					'info' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_info')) ? : '',
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
-					'pricelist' => ['validity' => '', 'filter' => htmlspecialchars_decode(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter')))],
+					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
 					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . date('Ymd')
 				];
 				
@@ -617,7 +617,7 @@ class CONSUMABLES extends API {
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
-				$vendor['pricelist']['filter'] = htmlspecialchars_decode(UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter')));
+				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);

@@ -240,7 +240,7 @@ class UTILITY {
 	 * @return string|bool property value or false
 	 */
 	public static function propertySet($object, $property){
-		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? (gettype($object->{$property}) === 'string' ? htmlspecialchars($object->{$property}) : $object->{$property}) : false;
+		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
 	}
 
 	/**
