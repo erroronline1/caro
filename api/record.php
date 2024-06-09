@@ -189,7 +189,7 @@ class RECORD extends API {
 
 	public function form(){
 		// prepare existing forms lists
-		$form = $this->latestApprovedName('form_form-get-by-name', $this->_requestedID);
+		$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
 		if (!$form || $form['hidden']) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $form['name'], 'body' => [
@@ -225,7 +225,7 @@ class RECORD extends API {
 		};
 
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component-get-by-name', $usedcomponent);
+			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			if ($component){
 				$component['content'] = json_decode($component['content'], true);
 				array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
@@ -252,7 +252,7 @@ class RECORD extends API {
 				]
 			]
 		];
-		if (PERMISSION::permissionFor('formexport')){
+		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
 			$return['body']['content'][]= [
 				[
 					'type' => 'button',
@@ -283,7 +283,7 @@ class RECORD extends API {
 		$return = [];
 
 		// prepare existing bundle lists
-		$bundle = $this->latestApprovedName('form_bundle-get-by-name', $this->_requestedID);
+		$bundle = $this->latestApprovedName('form_bundle_get_by_name', $this->_requestedID);
 		if(!$bundle) $bundle = ['content' => []];
 		$necessaryforms = $bundle['content'] ? explode(',', $bundle['content']) : [];
 
@@ -661,13 +661,13 @@ class RECORD extends API {
 	}
 
 	public function exportform(){
-		if (!PERMISSION::permissionFor('formexport')) $this->response([], 401);
 		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
 			'values' => [
 				':id' => $this->_requestedID
 			]
 		]);
 		$form = $form ? $form[0] : null;
+		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export']) $this->response([], 401);
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
 			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
@@ -719,7 +719,7 @@ class RECORD extends API {
 		};
 		$componentscontent = [];
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component-get-by-name', $usedcomponent);
+			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			$component['content'] = json_decode($component['content'], true);
 
 			$printablecontent = printable($component['content']['content']);

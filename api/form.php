@@ -50,7 +50,7 @@ class FORM extends API {
 			$component = $component ? $component[0] : null;
 			if (!$component) $component = ['id' => '', 'name' =>''];
 		} else {
-			if (!$component = $this->latestApprovedName('form_component-get-by-name', $this->_requestedID)) $component = ['id' => '', 'name' =>''];
+			if (!$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID)) $component = ['id' => '', 'name' =>''];
 		}
 		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -257,7 +257,8 @@ class FORM extends API {
 							':context' => 'component',
 							':hidden' => $component_hidden,
 							':regulatory_context' => '',
-							':id' => $exists['id']
+							':id' => $exists['id'],
+							':permitted_export' => NULL
 						]
 					])) $this->response([
 							'status' => [
@@ -311,7 +312,8 @@ class FORM extends API {
 						':context' => 'component',
 						':author' => $_SESSION['user']['name'],
 						':content' => json_encode($component),
-						':regulatory_context' => ''
+						':regulatory_context' => '',
+						':permitted_export' => NULL
 					]
 				])) {
 						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => $component_name]);
@@ -344,7 +346,7 @@ class FORM extends API {
 					$component = $component ? $component[0] : null;
 				} else {
 					// get latest approved by name
-					$component = $this->latestApprovedName('form_component-get-by-name', $this->_requestedID);
+					$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID);
 				}
 				if ($component){
 					$component['content'] = json_decode($component['content']);
@@ -405,13 +407,14 @@ class FORM extends API {
 			$form = $form ? $form[0] : null;
 		} else{
 			// get latest approved by name
-			$form = $this->latestApprovedName('form_form-get-by-name', $this->_requestedID);
+			$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
 		}
 		if (!$form) $form= [
 			'name' => '',
 			'alias' => '',
 			'context' => '',
-			'regulatory_context' => ''
+			'regulatory_context' => '',
+			'permitted_export' => null
 		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -490,6 +493,13 @@ class FORM extends API {
 			$regulatory_context[$value] = ['value' => $key];
 			if (in_array($key, $form['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 		}
+		$permitted_export = [
+			'hint' => LANG::GET('assemble.edit_form_permitted_export_hint', [':permissions' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))]),
+			'content' => [
+				LANG::GET('assemble.edit_form_permitted_export') => $form['permitted_export'] ? ['checked' => true]: []
+			]
+		];
+
 		$return['body'] = [
 			'content' => [
 				[
@@ -571,7 +581,8 @@ class FORM extends API {
 						,
 						'hidden' => $form['name'] ? intval($form['hidden']) : 1,
 						'approve' => $approve,
-						'regulatory_context' => $regulatory_context ? : ' '
+						'regulatory_context' => $regulatory_context ? : ' ',
+						'permitted_export' => $permitted_export
 					]
 				], [
 					[
@@ -597,7 +608,7 @@ class FORM extends API {
 			$return['body']['components'] = [];
 			foreach(explode(',', $form['content']) as $usedcomponent) {
 				// get latest approved by name
-				$component = $this->latestApprovedName('form_component-get-by-name', $usedcomponent);
+				$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
 					$component['content']['name'] = $usedcomponent;
@@ -613,7 +624,6 @@ class FORM extends API {
 		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-
 				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
@@ -638,7 +648,7 @@ class FORM extends API {
 					$hasindentifier = false;
 					foreach($this->_payload->content as $component){
 						// get latest approved by name
-						$latestcomponent = $this->latestApprovedName('form_component-get-by-name', $component);
+						$latestcomponent = $this->latestApprovedName('form_component_get_by_name', $component);
 						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
 					}
 					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
@@ -654,7 +664,7 @@ class FORM extends API {
 				
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
 				// get latest approved by name
-				$exists = $this->latestApprovedName('form_form-get-by-name', $this->_payload->name);
+				$exists = $this->latestApprovedName('form_form_get_by_name', $this->_payload->name);
 				if ($exists && $exists['content'] == implode(',', $this->_payload->content)) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
 						'values' => [
@@ -662,7 +672,8 @@ class FORM extends API {
 							':context' => $this->_payload->context,
 							':hidden' => intval($this->_payload->hidden),
 							':regulatory_context' => implode(',', $regulatory_context),
-							':id' => $exists['id']
+							':id' => $exists['id'],
+							':permitted_export' => $this->_payload->permitted_export ? : 0
 						]
 					])) $this->response([
 							'status' => [
@@ -683,7 +694,8 @@ class FORM extends API {
 						':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
 						':author' => $_SESSION['user']['name'],
 						':content' => implode(',', $this->_payload->content),
-						':regulatory_context' => implode(',', $regulatory_context)
+						':regulatory_context' => implode(',', $regulatory_context),
+						':permitted_export' => $this->_payload->permitted_export ? : 0
 					]
 				])) {
 						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => $this->_payload->name]);
@@ -867,7 +879,7 @@ class FORM extends API {
 					else {
 						foreach(explode(',', $approve['content']) as $component){
 							// get latest approved by name
-							$cmpnnt = $this->latestApprovedName('form_component-get-by-name', $component);
+							$cmpnnt = $this->latestApprovedName('form_component_get_by_name', $component);
 							if ($cmpnnt) {
 								if (!PERMISSION::fullyapproved('formapproval', $cmpnnt['approval'])){
 									$alert .= LANG::GET('assemble.approve_form_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';

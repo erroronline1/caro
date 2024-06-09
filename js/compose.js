@@ -251,7 +251,8 @@ export const compose_helper = {
 			context = document.getElementById("ComponentContext").value,
 			approve = document.getElementById("ComponentApprove").value,
 			regulatory_context = document.getElementById("ComponentRegulatoryContext").value,
-			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
+			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
+			permitted_export = document.getElementById("ComponentPermittedExport") ? document.getElementById("ComponentPermittedExport").checked : false;
 		let content = [];
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
@@ -265,6 +266,7 @@ export const compose_helper = {
 				hidden: hidden,
 				approve: approve,
 				regulatory_context: regulatory_context,
+				permitted_export: permitted_export
 			};
 		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), "error");
 		return null;
@@ -1131,7 +1133,8 @@ export class Compose extends Assemble {
 			prefilled = Boolean(this.currentElement.value),
 			hidden = Boolean(this.currentElement.hidden),
 			approve = this.currentElement.approve,
-			regulatory_context = this.currentElement.regulatory_context;
+			regulatory_context = this.currentElement.regulatory_context,
+			permitted_export = this.currentElement.permitted_export;
 		this.currentElement = {
 			type: "textinput",
 			hint: this.currentElement.hint,
@@ -1169,6 +1172,15 @@ export class Compose extends Assemble {
 				content: context.content,
 			};
 			result = result.concat(...this.select());
+		}
+		if (permitted_export){
+			permitted_export.content[Object.keys(permitted_export.content)[0]]['id'] = "ComponentPermittedExport";
+			this.currentElement = {
+				type: "checkbox",
+				hint: permitted_export.hint,
+				content: permitted_export.content
+			};
+			result = result.concat(...this.checkbox());
 		}
 		if (regulatory_context) {
 			this.currentElement = {

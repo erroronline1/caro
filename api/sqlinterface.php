@@ -381,12 +381,12 @@ class SQLQUERY {
 
 
 		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, approval, regulatory_context) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context)"
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export)"
 		],
 		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context WHERE id = :id"
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export WHERE id = :id"
 		],
 		'form_put_approve' => [
 			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",
@@ -404,7 +404,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
 		],
-		'form_form-get_by_name' => [
+		'form_form_get_by_name' => [
 			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
 			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
 		],

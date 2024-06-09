@@ -39,6 +39,7 @@ $queries = [
 				"	`hidden` tinyint NOT NULL," .
 				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`permitted_export` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -218,7 +219,8 @@ $queries = [
 				"	content varchar(MAX) NOT NULL," .
 				"	hidden tinyint NOT NULL," .
 				"	approval varchar(MAX) NULL DEFAULT NULL," .
-				"	regulatory_context varchar(MAX) NULL DEFAULT NULL" .
+				"	regulatory_context varchar(MAX) NULL DEFAULT NULL," .
+				"	permitted_export tinyint NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .

@@ -37,7 +37,6 @@
 
 
 # development
-* error response on empty timesheet exports
 * incorporation on same article_no
 * token & order-pin encrypted
 * idle logout
@@ -89,7 +88,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Form components and forms need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
     * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
     * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
-    * Forms can be exported blank by defined authorized users to limit distribution of outdated versions.
+    * Forms can be exported blank by defined authorized users to limit distribution of outdated versions. Authorized form creators can decide for general permission though.
     * External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting.
     * also see [Forms](#forms), [Files](#files)
 * ISO 13485 4.2.5 Record control
@@ -382,7 +381,7 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record. Authorized form creators can decide for general permission though.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -454,6 +453,7 @@ graph TD;
     idimport-->recorddb2[(record database)];
     recorddb2-->selectbyid[retrieve all with identifier];
     selectbyid-->|render last appended data|inputdata;
+    displayform-->|permission to export|exportform[export fillable pdf]
 
     print-.->idimport;
 
@@ -813,6 +813,9 @@ language = "en" ; en, de, etc. according to available language.xx.ini files
 
 ; timezone for calendar handling
 timezone = "Europe/Berlin"
+
+; address for application and security issues
+issue_mail = "dev@erroronline.one" 
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
