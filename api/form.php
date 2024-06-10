@@ -82,7 +82,7 @@ class FORM extends API {
 
 		// prepare unit list for approval
 		$approve = [
-			'hint' => LANG::GET('assemble.compose_component_approve_hint'),
+			'hint' => LANG::GET('assemble.compose_component_approve_hint', [':roles' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formapproval', true)))]),
 			'name' => LANG::GET('assemble.compose_component_approve'),
 			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
 		];
@@ -480,7 +480,7 @@ class FORM extends API {
 
 		// prepare unit list for approval
 		$approve = [
-			'hint' => LANG::GET('assemble.compose_component_approve_hint'),
+			'hint' => LANG::GET('assemble.compose_component_approve_hint', [':roles' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formapproval', true)))]),
 			'name' => LANG::GET('assemble.compose_component_approve'),
 			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
 		];
