@@ -29,7 +29,7 @@ class CALENDAR extends API {
 	 * responds with events or empty message
 	 */
 	public function search(){
-		if (!$this->_requestedId) $this->calendar();
+		if (!$this->_requestedId) $this->schedule();
 		$result = ['body' => ['content' => [
 			[
 				[
