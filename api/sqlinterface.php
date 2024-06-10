@@ -41,9 +41,10 @@ class SQLQUERY {
 		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
 			foreach ($parameters['replacements'] as $key => $value){
 				$list = explode(',', $value);
-				if (count($list) > 2){
+				if (count($list) > 1){
 					foreach ($list as $index => $value2){
-						if (gettype($value2) === 'string' && !in_array($value2, ['NULL', 'CURRENT_TIMESTAMP'])) $list[$index] = $_pdo->quote($value2);
+						if (strval(intval($value)) === $value) $list[$index] = intval($value);
+						elseif (gettype($value2) === 'string' && !in_array($value2, ['NULL', 'CURRENT_TIMESTAMP'])) $list[$index] = $_pdo->quote($value2);
 					}
 					$value = implode(',', $list);
 				}
