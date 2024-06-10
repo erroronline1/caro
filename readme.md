@@ -44,7 +44,6 @@
 * cache encrypted (https://medium.com/@godwin.owonamg5/asymmetric-encryption-encrypt-with-javascript-and-decrypt-with-php-8d3fbbe60806)
 * permission to message user groups
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years
-* mdr_reusable_timespan defined for vendors with limited products
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -1013,14 +1012,21 @@ You can as well define all products as trading goods and set to 0 conditionally 
 [Content](#content)
 
 ## API documentation
+All endpoint queries are returned as json and processed by ./js/api.js. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in. 
 
-get ./api/api.php/application/language
-post ./api/api.php/application/login
-get ./api/api.php/application/menu
-get ./api/api.php/application/start
+GET ./api/api.php/application/language
+> Retrieves an object with language chunks, procesed by ./js/language.js
+POST ./api/api.php/application/login
+> Returns user image and app settings on valid session, login form otherwise
+GET ./api/api.php/application/menu
+> Returns the application menu preprocessed regarding permissions
+GET ./api/api.php/application/start
+> Returns the landing page with overwiew and manual
 
-get ./api/api.php/audit/checks/{type}
+GET ./api/api.php/audit/checks/{type}
+> Returns selection of available checks, given type the result of the selected type
 get ./api/api.php/audit/export/{type}
+> Returns a download link to a temporary file based on type
 
 get ./api/api.php/calendar/schedule
 get ./api/api.php/calendar/schedule/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
