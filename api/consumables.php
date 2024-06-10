@@ -854,6 +854,20 @@ class CONSUMABLES extends API {
 							'type' => 'text',
 							'description' => LANG::GET('consumables.edit_vendor_pricelist_validity'),
 							'content' => $vendor['pricelist']['validity']
+						],
+						[
+							'type' => 'numberinput',
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
+								'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? : INI['limits']['mdr14_sample_interval']
+							]
+						],
+						[
+							'type' => 'numberinput',
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
+								'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? : INI['limits']['mdr14_sample_reusable']
+							]
 						]
 					]]
 				);
