@@ -618,6 +618,8 @@ class CONSUMABLES extends API {
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
+				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval')) ? : INI['limits']['mdr14_sample_interval'];
+				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval_reusable')) ? : INI['limits']['mdr14_sample_reusable'];
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
@@ -859,14 +861,14 @@ class CONSUMABLES extends API {
 							'type' => 'numberinput',
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
-								'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? : INI['limits']['mdr14_sample_interval']
+								'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : INI['limits']['mdr14_sample_interval']
 							]
 						],
 						[
 							'type' => 'numberinput',
 							'attributes' => [
 								'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
-								'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? : INI['limits']['mdr14_sample_reusable']
+								'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : INI['limits']['mdr14_sample_reusable']
 							]
 						]
 					]]
