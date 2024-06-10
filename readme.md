@@ -28,6 +28,9 @@
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [API documentation](#api-documentation)
+    * [Application endponts](#application-endpoints)
+    * [Audit endpoints](#audit-endpoints)
+    * [Calendar endpoints](#calendar-endpoints)
 * [Code design patterns](#code-design-patterns)
 * [CSV processor](#csv-processor)
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
@@ -1012,27 +1015,226 @@ You can as well define all products as trading goods and set to 0 conditionally 
 [Content](#content)
 
 ## API documentation
-All endpoint queries are returned as json and processed by ./js/api.js. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in. 
+All REST-api endpoint queries are returned as json routed by ./js/api.js and processed either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
+Response properties are *body*, *form* and *msg* most of the time.
 
-GET ./api/api.php/application/language
-> Retrieves an object with language chunks, procesed by ./js/language.js
-POST ./api/api.php/application/login
-> Returns user image and app settings on valid session, login form otherwise
-GET ./api/api.php/application/menu
-> Returns the application menu preprocessed regarding permissions
-GET ./api/api.php/application/start
-> Returns the landing page with overwiew and manual
+### Application endpoints
 
-GET ./api/api.php/audit/checks/{type}
-> Returns selection of available checks, given type the result of the selected type
-get ./api/api.php/audit/export/{type}
-> Returns a download link to a temporary file based on type
+> GET ./api/api.php/application/language
 
-get ./api/api.php/calendar/schedule
-get ./api/api.php/calendar/schedule/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
-post ./api/api.php/calendar/schedule
-put ./api/api.php/calendar/schedule/{id}
-delete ./api/api.php/calendar/schedule/{id}
+Retrieves an object with language chunks, processed by ./js/language.js
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+> POST ./api/api.php/application/login/{logout}
+
+Returns user image and app settings on valid session, login form otherwise.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {logout} | path parameter | optional | if added to endpoint active logout occurs |
+| payload | form data | optional | contains password for login
+
+Sample response
+```
+{"body":{"image":".\/fileserver\/users\/profilepic_error on line 1_error on line 1_token.png","app_settings":{"annualvacation":"2024-01-01 30","weeklyhours":"2024-01-01 39,5","initialovertime":false,"forceDesktop":"on","homeoffice":false,"primaryUnit":"prosthetics2"}}}
+```
+
+> GET ./api/api.php/application/menu
+
+Returns the application menu preprocessed regarding permissions.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"body":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'text')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
+```
+
+> GET ./api/api.php/application/start
+
+Returns the landing page with overview and manual.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+[Content](#content)
+
+### Audit endpoints
+
+> GET ./api/api.php/audit/checks/{type}
+
+Returns selection of available checks, given type the result of the selected type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | adds contents based on given type to response |
+
+Sample response
+```
+{"body":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userfiles"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+```
+
+> GET ./api/api.php/audit/export/{type}
+
+Returns a download link to a temporary file based on type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | defines the response, none if omitted |
+
+Sample response
+```
+{"body":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
+```
+
+[Content](#content)
+
+### Calendar endpoints
+
+> GET ./api/api.php/calendar/schedule/{date Y-m-d}/{date Y-m-d}
+
+Returns a calendar.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {date Y-m-d} | 1st path parameter | optional | returns the given month |
+| {date Y-m-d} | 2nd path parameter | optional | appends entries for given date and respective inputs to response |
+
+Sample response
+```
+{"body":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"searchinput","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
+```
+
+> GET ./api/api.php/calendar/search/{search}
+
+Returns scheduled events according to search phrase.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | optional | displays scheduled events according to search, calendar overview if omitted |
+
+Sample response
+```
+{"body":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"searchinput","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"text","attributes":{"data-type":"text"},"description":"test event","content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'schedule')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
+```
+
+> POST ./api/api.php/calendar/schedule
+
+Contributes scheduled events to the calendar.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | values for database |
+
+Sample response
+```
+{"status":{"id":"8","msg":"Event has been saved.","type":"success"}}
+```
+
+> PUT ./api/api.php/calendar/schedule/{id}
+
+Updates scheduled events.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | values for database |
+
+Sample response
+```
+{"status":{"id":"9","msg":"Event has been saved.","type":"success"}}
+```
+
+> PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
+
+Markes scheduled events as complete or revoke state.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+| {bool} | path parameter| required | true or false completed state |
+| {type} | path parameter | required | schedule or timesheet |
+
+Sample response
+```
+{"status":{"msg":"Event has been marked as completed.","type":"success"}}
+```
+
+> DELETE ./api/api.php/calendar/schedule/{id}
+
+Deletes scheduled events.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"status":{"msg":"Event has been deleted.","type":"success"}}
+```
+
+> GET ./api/api.php/calendar/timesheet/{date Y-m-d}/{date Y-m-d}
+
+Returns a calendar.
+
+Similar to schedules with slightly adapted inputs for time tracking.
+
+> POST ./api/api.php/calendar/timesheet
+
+Contributes scheduled events to the calendar
+
+Similar to schedules.
+
+> PUT ./api/api.php/calendar/timesheet/{id}
+
+Updates scheduled events
+
+Similar to schedules.
+
+> PUT ./api/api.php/calendar/timesheet/{id}/{bool}/{type}
+
+Markes scheduled events as complete or revoce state
+
+Similar to schedules.
+
+> DELETE ./api/api.php/calendar/timesheet/{id}
+
+Deletes scheduled events.
+
+Similar to schedules.
+
+> GET ./api/api.php/calendar/monthlyTimesheets/{date Y-m-d}
+
+Returns a download link to a temporary file based on date.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {date Y-m-d} | path parameter | required | defines the response, none if omitted |
+
+Sample response
+```
+{"body":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
+```
+
+[Content](#content)
 
 post ./api/api.php/csvfilter/rule
 get ./api/api.php/csvfilter/rule
