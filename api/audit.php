@@ -284,7 +284,7 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($forms); $i++){
 			foreach($forms[$i] as $item){
-				$summary['content'][$item['description']] = $item['content'];	
+				if ($item['type'] === 'text') $summary['content'][$item['description']] = $item['content'];	
 			}
 		}
 		$downloadfiles = [];
