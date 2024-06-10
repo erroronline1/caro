@@ -606,7 +606,7 @@ class FILE extends API {
 						[
 							[
 								'type' => 'datalist',
-								'content' => $datalist,
+								'content' => array_values(array_unique($datalist)),
 								'attributes' => [
 									'id' => 'bundles'
 								]

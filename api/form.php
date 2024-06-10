@@ -96,7 +96,7 @@ class FORM extends API {
 					[
 						[
 							'type' => 'datalist',
-							'content' => $componentdatalist,
+							'content' => array_values(array_unique($componentdatalist)),
 							'attributes' => [
 								'id' => 'components'
 							]
@@ -506,13 +506,13 @@ class FORM extends API {
 					[
 						[
 							'type' => 'datalist',
-							'content' => $formdatalist,
+							'content' => array_values(array_unique($formdatalist)),
 							'attributes' => [
 								'id' => 'forms'
 							]
 						], [
 							'type' => 'datalist',
-							'content' => $componentdatalist,
+							'content' => array_values(array_unique($componentdatalist)),
 							'attributes' => [
 								'id' => 'components'
 							]
@@ -1050,7 +1050,7 @@ class FORM extends API {
 							[
 								[
 									'type' => 'datalist',
-									'content' => $bundledatalist,
+									'content' => array_values(array_unique($bundledatalist)),
 									'attributes' => [
 										'id' => 'templates'
 									]

@@ -154,7 +154,7 @@ class RECORD extends API {
 				[
 					[
 						'type' => 'datalist',
-						'content' => $formdatalist,
+						'content' => array_values(array_unique($formdatalist)),
 						'attributes' => [
 							'id' => 'forms'
 						]
@@ -586,7 +586,7 @@ class RECORD extends API {
 			[
 				[
 					'type' => 'datalist',
-					'content' => $recorddatalist,
+					'content' => array_values(array_unique($recorddatalist)),
 					'attributes' => [
 						'id' => 'records'
 					]

@@ -526,12 +526,12 @@ class ORDER extends API {
 								json_encode([
 									[
 										['type' => 'datalist',
-										'content' => $datalist,
+										'content' => array_values(array_unique($datalist)),
 										'attributes' => [
 											'id' => 'vendors'
 										]],
 										['type' => 'datalist',
-										'content' => $datalist_unit,
+										'content' => array_values(array_unique($datalist_unit)),
 										'attributes' => [
 											'id' => 'units'
 										]],

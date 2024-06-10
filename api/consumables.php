@@ -730,7 +730,7 @@ class CONSUMABLES extends API {
 					[
 						[
 							'type' => 'datalist',
-							'content' => $datalist,
+							'content' => array_values(array_unique($datalist)),
 							'attributes' => [
 								'id' => 'vendors'
 							]
@@ -1152,13 +1152,13 @@ class CONSUMABLES extends API {
 					[
 						[
 							'type' => 'datalist',
-							'content' => $datalist,
+							'content' => array_values(array_unique($datalist)),
 							'attributes' => [
 								'id' => 'vendors'
 							]
 						], [
 							'type' => 'datalist',
-							'content' => $datalist_unit,
+							'content' => array_values(array_unique($datalist_unit)),
 							'attributes' => [
 								'id' => 'units'
 							]

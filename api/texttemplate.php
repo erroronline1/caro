@@ -140,13 +140,13 @@ class TEXTTEMPLATE extends API {
 							[
 								[
 									'type' => 'datalist',
-									'content' => $chunkdatalist,
+									'content' => array_values(array_unique($chunkdatalist)),
 									'attributes' => [
 										'id' => 'chunks'
 									]
 								], [
 									'type' => 'datalist',
-									'content' => $languagedatalist,
+									'content' => array_values(array_unique($languagedatalist)),
 									'attributes' => [
 										'id' => 'languages'
 									]
@@ -388,13 +388,13 @@ class TEXTTEMPLATE extends API {
 							[
 								[
 									'type' => 'datalist',
-									'content' => $templatedatalist,
+									'content' => array_values(array_unique($templatedatalist)),
 									'attributes' => [
 										'id' => 'templates'
 									]
 								], [
 									'type' => 'datalist',
-									'content' => $languagedatalist,
+									'content' => array_values(array_unique($languagedatalist)),
 									'attributes' => [
 										'id' => 'languages'
 									]

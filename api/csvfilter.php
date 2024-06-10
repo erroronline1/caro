@@ -125,7 +125,7 @@ class CSVFILTER extends API {
 							[
 								[
 									'type' => 'datalist',
-									'content' => $filterdatalist,
+									'content' => array_values(array_unique($filterdatalist)),
 									'attributes' => [
 										'id' => 'filters'
 									]
@@ -349,7 +349,7 @@ class CSVFILTER extends API {
 						[
 							[
 								'type' => 'datalist',
-								'content' => $filterdatalist,
+								'content' => array_values(array_unique($filterdatalist)),
 								'attributes' => [
 									'id' => 'filters'
 								]
