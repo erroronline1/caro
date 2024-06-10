@@ -37,6 +37,7 @@ class SQLQUERY {
 				else $parameters['values'][$key] = trim($value);
 			}
 		} else $parameters['values'] = [];
+//var_dump($query);
 		// replace tokens in query that can not be executed
 		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
 			foreach ($parameters['replacements'] as $key => $value){
@@ -290,7 +291,17 @@ class SQLQUERY {
 				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
 				. "prod.id NOT IN(select id from caro_consumables_products where ISNULL(checked, 0) != 0 AND DATEDIFF(day, checked, GETDATE()) < " . INI['limits']['mdr14_sample_reusable'] . ")"
 		],
-		'consumables_get_last_checked' => [
+	/*	'consumables_get_not_checked' => [
+			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
+				. "(IFNULL(prod.checked, " . (INI['limits']['mdr14_sample_interval'] + 1) . ") > " . INI['limits']['mdr14_sample_interval'] . " OR DATEDIFF(prod.checked, CURRENT_TIMESTAMP) > " . INI['limits']['mdr14_sample_interval'] . ") AND "
+				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(checked, CURRENT_TIMESTAMP) < " . INI['limits']['mdr14_sample_interval'] . ") AND "
+				. "prod.id NOT IN (select id from caro_consumables_products where IFNULL(checked, 0) != 0 AND DATEDIFF(checked, CURRENT_TIMESTAMP) < " . INI['limits']['mdr14_sample_reusable'] . ")",
+			'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
+				. "(ISNULL(prod.checked, ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . (INI['limits']['mdr14_sample_interval'] + 1) . ") + 1) > ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ") OR DATEDIFF(day, prod.checked, GETDATE()) > ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ")) AND "
+				. "prod.vendor_id NOT IN (SELECT vendor_id from caro_consumables_products WHERE DATEDIFF(day, checked, GETDATE()) < ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ")) AND "
+				. "prod.id NOT IN(select id from caro_consumables_products where ISNULL(checked, 0) != 0 AND DATEDIFF(day, checked, GETDATE()) < ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . "))"
+		],
+*/		'consumables_get_last_checked' => [
 			'mysql' => "SELECT prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 				. "(IFNULL(prod.checked, 100) != 100) ORDER BY prod.checked DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP(1) prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
