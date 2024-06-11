@@ -838,7 +838,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.body) {
-								api.update_header(title[request[1]]);
+								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								const body = new Assemble(data.body);
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();

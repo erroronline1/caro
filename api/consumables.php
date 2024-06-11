@@ -873,6 +873,7 @@ class CONSUMABLES extends API {
 						]
 					]]
 				);
+				if ($vendor['name']) $result['header'] = $vendor['name'];
 				$this->response($result);
 				break;
 		}
