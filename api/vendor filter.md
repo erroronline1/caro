@@ -499,11 +499,10 @@ delete . from headers
 ```
 
 ### ortho reha neuhof
-delete . from header
 ```json
 {
 	"filesetting": {
-		"columns": ["ArtNr", "Bezeichnung", "ME", "UDI-DI"]
+		"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
 	},
 	"modify": {
 		"add": {
@@ -513,7 +512,7 @@ delete . from header
 			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]]
 		],
 		"rewrite": [{
-			"article_no": ["ArtNr"],
+			"article_no": ["Art.Nr."],
 			"article_name": ["Bezeichnung"],
 			"article_unit": ["ME"],
 			"article_ean": ["UDI-DI"]
