@@ -1043,7 +1043,12 @@ class ORDER extends API {
 				}
 
 				// get unchecked articles for MDR §14 sample check
-				$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_checked');
+				$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
+				$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
+				$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
+					':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
+					':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
+				]]);
 
 				$statechange = [];
 				foreach(LANGUAGEFILE['order']['orderstate'] as $value){
