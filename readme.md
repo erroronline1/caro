@@ -31,6 +31,16 @@
     * [Application endponts](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
     * [Calendar endpoints](#calendar-endpoints)
+    * [CSV filter endpoints](#csv-filter-endpoints)
+    * [File endpoints](#file-endpoints)
+    * [Form endpoints](#form-endpoints)
+    * [Message endpoints](#message-endpoints)
+    * [Consumables endpoints](#consumables-endpoints)
+    * [Order endpoints](#order-endpoints)
+    * [Record endpoints](#record-endpoints)
+    * [Texttemplate endpoints](#texttemplate-endpoints)
+    * [Tool endpoints](#tool-endpoints)
+    * [User endpoints](#user-endpoints)
 * [Code design patterns](#code-design-patterns)
 * [CSV processor](#csv-processor)
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
@@ -1236,93 +1246,257 @@ Sample response
 
 [Content](#content)
 
-post ./api/api.php/csvfilter/rule
-get ./api/api.php/csvfilter/rule
-post ./api/api.php/csvfilter/filter
-get ./api/api.php/csvfilter/filter
+### CSV filter endpoints
 
-get ./api/api.php/file/filter/{directory}
-get ./api/api.php/file/files/{directory}
-post ./api/api.php/file/filemanager
-get ./api/api.php/file/filemanager/{directory}
-delete ./api/api.php/file/filemanager/{directory}/{file}
-post ./api/api.php/file/externalfilemanager
-put ./api/api.php/file/externalfilemanager/{id}/{int accessible}
-get ./api/api.php/file/externalfilemanager
-get ./api/api.php/file/bundle/{bundle}
-post ./api/api.php/file/bundlemanager
-get ./api/api.php/file/bundlemanager/{bundle}
-post ./api/api.php/file/sharepoint
-get ./api/api.php/file/sharepoint
+> GET ./api/api.php/csvfilter/filter/{id}
 
-get ./api/api.php/form/component_editor/{name|id}
-get ./api/api.php/form/form_editor/{name|id}
-get ./api/api.php/form/component/{name}
-post ./api/api.php/form/component
-delete ./api/api.php/form/component/{id}
-get ./api/api.php/form/approval/{id}
-put ./api/api.php/form/approval/{id}
-get ./api/api.php/form/form/{name}
-post ./api/api.php/form/form
-delete ./api/api.php/form/form/{id}
+Returns the input form for applying a filter.
 
-post ./api/api.php/message/message/{formdata}
-get ./api/api.php/message/register
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | if omitted only the selection list is returned |
 
-get ./api/api.php/consumables/vendor/{id|name}
-post ./api/api.php/consumables/vendor
-put ./api/api.php/consumables/vendor/{id}
-get ./api/api.php/consumables/product/{id}
-get ./api/api.php/consumables/product/{id|name}/search
-post ./api/api.php/consumables/product
-put ./api/api.php/consumables/product/{id}
-delete ./api/api.php/consumables/product/{id}
-post ./api/api.php/consumables/mdrsamplecheck
-get ./api/api.php/consumables/mdrsamplecheck
-delete ./api/api.php/consumables/mdrsamplecheck
-post ./api/api.php/consumables/incorporation
-get ./api/api.php/consumables/incorporation
-get ./api/api.php/consumables/pendingincorporations
-get ./api/api.php/order/prepared/{unit}
-get ./api/api.php/order/productsearch/{id|name}
-get ./api/api.php/order/order/{id}
-post ./api/api.php/order/order
-put ./api/api.php/order/order/{id}
-delete ./api/api.php/order/order/{id}
-get ./api/api.php/order/approved/
-put ./api/api.php/order/approved/{id}/{ordered|received|archived|disapproved}/{message}
-delete ./api/api.php/order/approved/{id}
-get ./api/api.php/order/filtered/{filter}
+Sample response
+```
+{"body":{"content":[[{"type":"datalist","content":["testfilter"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', 'filter', this.value)"},"content":{"...Select filter":{"value":"0"},"testfilter":{"value":3,"selected":true}}},{"type":"searchinput","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"}}],[{"type":"file","hint":"with a name like Export.+?\\.csv","attributes":{"name":"Select input file","required":true,"accept":".csv"}},{"type":"br"},{"type":"numberinput","attributes":{"name":"Month","value":"06","readonly":true}},....
+```
 
-post ./api/api.php/record/identifier
-get ./api/api.php/record/identifier
-get ./api/api.php/record/forms
-get ./api/api.php/record/form/{optional identifier}
-get ./api/api.php/record/formfilter
-get ./api/api.php/record/identifierfilter
-post ./api/api.php/record/record
-put ./api/api.php/record/close/{identifier}
-get ./api/api.php/record/import
-get ./api/api.php/record/records
-get ./api/api.php/records/export
+> POST ./api/api.php/csvfilter/filter/{id}
 
-post ./api/api.php/texttemplate/chunk
-get ./api/api.php/texttemplate/chunk
-post ./api/api.php/texttemplate/template
-get ./api/api.php/texttemplate/template
-get ./api/api.php/texttemplate/text opens form properly from menu
-get ./api/api.php/texttemplate/text/modal opens form within modal
+Returns a report from the CSV-filter and a download link to a temporary file with filtered data.
 
-get ./api/api.php/tool/code
-get ./api/api.php/tool/code/display?key=value
-get ./api/api.php/tool/scanner
-get ./api/api.php/tool/stlviewer
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | filter to apply |
+| payload | form data | required | files to process |
 
-get ./api/api.php/user/profile
-get ./api/api.php/user/user/{id|name}
-post ./api/api.php/user/user
-put ./api/api.php/user/user/{id}
-delete ./api/api.php/user/user/{id}
+Sample response
+```
+{"log":["[*] total rows: 46198","[*] applying filter: filter_by_expression nur an Personen geliefert......,"[*] remaining filtered: 104","[*] modifications done","[*] result - final rows: 104","[*] done! Nicht vergessen eMailadressen zu pr\u00fcfen und die neue Datei zu archivieren: "],"links":{"Download Einladungsfilter.csv":{"href":".\/fileserver\/tmp\/1718138675Einladungsfilter.csv","download":"Einladungsfilter.csv"}}}
+```
+
+> GET ./api/api.php/csvfilter/rule/{id}
+
+Returns the editing interface for filter presets.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | filter to be edited, new if omitted |
+
+Sample response
+```
+{"body":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"datalist","content":["test"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0"},"test":{"value":1,"selected":true}}},{"type":"searchinput","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"}}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":....
+```
+
+> POST ./api/api.php/csvfilter/rule
+
+Saves a filter preset.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | filter json and name to be stored |
+
+Sample response
+```
+{"status":{"name":"test","msg":"The filter named test has been saved.","type":"success"}}
+```
+
+[Content](#content)
+
+### File endpoints
+
+> GET ./api/api.php/file/filter/{directory}
+
+> GET ./api/api.php/file/files/{directory}
+
+> POST ./api/api.php/file/filemanager
+
+> GET ./api/api.php/file/filemanager/{directory}
+
+> DELETE ./api/api.php/file/filemanager/{directory}/{file}
+
+> POST ./api/api.php/file/externalfilemanager
+
+> PUT ./api/api.php/file/externalfilemanager/{id}/{int accessible}
+
+> GET ./api/api.php/file/externalfilemanager
+
+> GET ./api/api.php/file/bundle/{bundle}
+
+> POST ./api/api.php/file/bundlemanager
+
+> GET ./api/api.php/file/bundlemanager/{bundle}
+
+> POST ./api/api.php/file/sharepoint
+
+> GET ./api/api.php/file/sharepoint
+
+[Content](#content)
+
+### Form endpoints
+
+> GET ./api/api.php/form/component_editor/{name|id}
+
+> GET ./api/api.php/form/form_editor/{name|id}
+
+> GET ./api/api.php/form/component/{name}
+
+> POST ./api/api.php/form/component
+
+> DELETE ./api/api.php/form/component/{id}
+
+> GET ./api/api.php/form/approval/{id}
+
+> PUT ./api/api.php/form/approval/{id}
+
+> GET ./api/api.php/form/form/{name}
+
+> POST ./api/api.php/form/form
+
+> DELETE ./api/api.php/form/form/{id}
+
+[Content](#content)
+
+### Message endpoints
+
+
+> POST ./api/api.php/message/message/{formdata}
+
+> GET ./api/api.php/message/register
+
+[Content](#content)
+
+### Consumables endpoints
+
+
+> GET ./api/api.php/consumables/vendor/{id|name}
+
+> POST ./api/api.php/consumables/vendor
+
+> PUT ./api/api.php/consumables/vendor/{id}
+
+> GET ./api/api.php/consumables/product/{id}
+
+> GET ./api/api.php/consumables/product/{id|name}/search
+
+> POST ./api/api.php/consumables/product
+
+> PUT ./api/api.php/consumables/product/{id}
+
+> DELETE ./api/api.php/consumables/product/{id}
+
+> POST ./api/api.php/consumables/mdrsamplecheck
+
+> GET ./api/api.php/consumables/mdrsamplecheck
+
+> DELETE ./api/api.php/consumables/mdrsamplecheck
+
+> POST ./api/api.php/consumables/incorporation
+
+> GET ./api/api.php/consumables/incorporation
+
+> GET ./api/api.php/consumables/pendingincorporations
+
+[Content](#content)
+
+### Order endpoints
+
+
+> GET ./api/api.php/order/prepared/{unit}
+
+> GET ./api/api.php/order/productsearch/{id|name}
+
+> GET ./api/api.php/order/order/{id}
+
+> POST ./api/api.php/order/order
+
+> PUT ./api/api.php/order/order/{id}
+
+> DELETE ./api/api.php/order/order/{id}
+
+> GET ./api/api.php/order/approved/
+
+> PUT ./api/api.php/order/approved/{id}/{ordered|received|archived|disapproved}/{message}
+
+> DELETE ./api/api.php/order/approved/{id}
+
+> GET ./api/api.php/order/filtered/{filter}
+
+[Content](#content)
+
+### Record endpoints
+
+
+> POST ./api/api.php/record/identifier
+
+> GET ./api/api.php/record/identifier
+
+> GET ./api/api.php/record/forms
+
+> GET ./api/api.php/record/form/{optional identifier}
+
+> GET ./api/api.php/record/formfilter
+
+> GET ./api/api.php/record/identifierfilter
+
+> POST ./api/api.php/record/record
+
+> PUT ./api/api.php/record/close/{identifier}
+
+> GET ./api/api.php/record/import
+
+> GET ./api/api.php/record/records
+
+> GET ./api/api.php/records/export
+
+[Content](#content)
+
+### Texttemplate endpoints
+
+
+> POST ./api/api.php/texttemplate/chunk
+
+> GET ./api/api.php/texttemplate/chunk
+
+> POST ./api/api.php/texttemplate/template
+
+> GET ./api/api.php/texttemplate/template
+
+> GET ./api/api.php/texttemplate/text opens form properly from menu
+
+> GET ./api/api.php/texttemplate/text/modal opens form within modal
+
+[Content](#content)
+
+### Tool endpoints
+
+
+> GET ./api/api.php/tool/code
+
+> GET ./api/api.php/tool/code/display?key=value
+
+> GET ./api/api.php/tool/scanner
+
+> GET ./api/api.php/tool/stlviewer
+
+[Content](#content)
+
+### User endpoints
+
+
+> GET ./api/api.php/user/profile
+
+> GET ./api/api.php/user/user/{id|name}
+
+> POST ./api/api.php/user/user
+
+> PUT ./api/api.php/user/user/{id}
+
+> DELETE ./api/api.php/user/user/{id}
 
 [Content](#content)
 
