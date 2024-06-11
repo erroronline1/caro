@@ -499,7 +499,7 @@ class TEXTTEMPLATE extends API {
 					if ($template['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_template_hidden_hidden')]['checked'] = true;
 					array_push($return['body']['content'][1], $hidden);
 				}
-
+				if ($template['name']) $return['header'] = $template['name'];
 				$this->response($return);
 				break;
 		}

@@ -443,6 +443,7 @@ class PERMISSION {
 	 * @return bool|array
 	 */
 	public static function permissionFor($function = '', $returnvalues = false){
+		if (!array_key_exists('user', $_SESSION) || !array_key_exists('permissions', $_SESSION['user'])) return [];
 		if (array_key_exists($function, INI['permissions'])){
 			if (!$returnvalues) {
 				// limited functions don't include admin by default

@@ -97,7 +97,14 @@ class AUDIT extends API {
 	private function mdrsamplecheck(){
 		$content = $unchecked = $entries = [];
 		// get unchecked articles for MDR §14 sample check
-		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_checked')));
+		$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
+		$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
+		$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
+			':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
+			':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
+		]]);
+
+		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], $sampleCheck));
 		// display warning
 		if ($unchecked) $content[] = [
 			[

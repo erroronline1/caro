@@ -201,7 +201,7 @@ class CONSUMABLES extends API {
 	public function mdrsamplecheck(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get', [
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'values' => [
 						':ids' => intval($this->_requestedID)
 					]
@@ -873,6 +873,7 @@ class CONSUMABLES extends API {
 						]
 					]]
 				);
+				if ($vendor['name']) $result['header'] = $vendor['name'];
 				$this->response($result);
 				break;
 		}
@@ -926,7 +927,7 @@ class CONSUMABLES extends API {
 					$product['protected'] = 1;
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_consumables_post_productget_vendor', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', [
 					'values' => [
 						':vendor_id' => $product['vendor_id'],
 						':article_no' => $product['article_no'],
@@ -1056,13 +1057,13 @@ class CONSUMABLES extends API {
 						':vendor_id' => $product['vendor_id'],
 						':article_no' => $product['article_no'],
 						':article_name' => $product['article_name'],
-						':article_alias' => $product['article_alias'],
+						':article_alias' => $product['article_alias'] ? : '',
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
 						':active' => $product['active'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
-						':incorporated' => $product['incorporated']
+						':incorporated' => $product['incorporated'] ? : ''
 					]
 				])) $this->response([
 					'status' => [
@@ -1423,7 +1424,7 @@ class CONSUMABLES extends API {
 			]);
 			$product = $product ? $product[0] : ['id' => null];
 
-			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_pconsumables_delete_unprotected_productroduct', [
+			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_unprotected_product', [
 				'values' => [
 					':id' => $product['id']
 					]
