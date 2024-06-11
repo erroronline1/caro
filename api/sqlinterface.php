@@ -292,17 +292,17 @@ class SQLQUERY {
 				."AND prod.id NOT IN (:not_reusable)"
 		],
 		'consumables_get_valid_checked' => [
-			'mysql' => "SELECT prod.vendor_id AS vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
-				."DATEDIFF(IFNULL(prod.checked, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ") * -1) DAYS)), CURRENT_TIMESTAMP) "
-				."< IFNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ") ",
+			'mysql' => "SELECT prod.vendor_id AS vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
+				."AND DATEDIFF( IFNULL( prod.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . " ) DAY ) ), CURRENT_TIMESTAMP ) "
+				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . " )",
 			'sqlsrv' => "SELECT prod.vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
 				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
 				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ") "
 		],
 		'consumables_get_not_reusable_checked' => [
-			'mysql' => "SELECT prod.id AS id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
-				."DATEDIFF(IFNULL(prod.checked, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL IFNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . " DAY) * -1 - 1 DAYS)), CURRENT_TIMESTAMP) "
-				."< IFNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . ") ",
+			'mysql' => "SELECT prod.id AS id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
+				."AND DATEDIFF( IFNULL( prod.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . " ) + 1 DAY ) ), CURRENT_TIMESTAMP ) "
+				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . " )",
 			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
 				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
 				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . ") "
