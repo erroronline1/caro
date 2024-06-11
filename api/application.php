@@ -83,7 +83,7 @@ class APPLICATION extends API {
 			[
 				'type' => 'checkbox',
 				'content' => [
-					LANG::GET('application.terms_of_service_accepted') => []
+					LANG::GET('application.terms_of_service_accepted') => ['required' => true]
 				]
 			]
 		];
