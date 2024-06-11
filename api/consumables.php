@@ -1424,7 +1424,7 @@ class CONSUMABLES extends API {
 			]);
 			$product = $product ? $product[0] : ['id' => null];
 
-			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_pconsumables_delete_unprotected_productroduct', [
+			if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_unprotected_product', [
 				'values' => [
 					':id' => $product['id']
 					]
