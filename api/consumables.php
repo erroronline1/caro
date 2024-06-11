@@ -927,7 +927,7 @@ class CONSUMABLES extends API {
 					$product['protected'] = 1;
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_consumables_post_productget_vendor', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', [
 					'values' => [
 						':vendor_id' => $product['vendor_id'],
 						':article_no' => $product['article_no'],
@@ -1057,13 +1057,13 @@ class CONSUMABLES extends API {
 						':vendor_id' => $product['vendor_id'],
 						':article_no' => $product['article_no'],
 						':article_name' => $product['article_name'],
-						':article_alias' => $product['article_alias'],
+						':article_alias' => $product['article_alias'] ? : '',
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
 						':active' => $product['active'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
-						':incorporated' => $product['incorporated']
+						':incorporated' => $product['incorporated'] ? : ''
 					]
 				])) $this->response([
 					'status' => [
