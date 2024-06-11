@@ -201,7 +201,7 @@ class CONSUMABLES extends API {
 	public function mdrsamplecheck(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get', [
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'values' => [
 						':ids' => intval($this->_requestedID)
 					]
