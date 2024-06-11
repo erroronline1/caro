@@ -104,7 +104,7 @@ class MESSAGE extends API {
 						]
 					];
 					$result['body']['content'][] = $conversation_content;
-					if ($conversation['conversation_user'] !== 1 && $conversation_user['name']) {
+					if ($conversation['conversation_user'] !== '1' && $conversation_user['name']) {
 						$result['body']['content'][] = [
 							[
 								'type' => 'hiddeninput',
