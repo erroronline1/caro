@@ -57,6 +57,10 @@ class API {
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
 			}
+			else {
+				session_unset();
+				session_destroy();
+			}
 		}
 	}
 	
