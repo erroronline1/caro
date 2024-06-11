@@ -161,7 +161,7 @@ export const api = {
 						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
 						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
 					}
-					if (data.body.app_settings){
+					if (data.body.app_settings) {
 						for (const [key, value] of Object.entries(data.body.app_settings)) {
 							switch (key) {
 								case "forceDesktop":
@@ -447,7 +447,7 @@ export const api = {
 		request.splice(0, 0, "file");
 		let successFn = function (data) {
 				if (data.body) {
-					api.update_header(title[request[1]]);
+					api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 					const body = new Assemble(data.body);
 					document.getElementById("main").replaceChildren(body.initializeSection());
 					body.processAfterInsertion();
@@ -540,6 +540,7 @@ export const api = {
 				component_editor: LANG.GET("menu.forms_manage_components"),
 				form_editor: LANG.GET("menu.forms_manage_forms"),
 				approval: LANG.GET("menu.forms_manage_approval"),
+				bundle: LANG.GET("menu.forms_manage_bundles"),
 			},
 			composedComponent;
 		switch (method) {
@@ -559,7 +560,7 @@ export const api = {
 						compose_helper.componentSignature = 0;
 						successFn = function (data) {
 							if (data.body) {
-								api.update_header(title[request[1]]);
+								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								const body = new Compose(data.body);
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();
@@ -576,6 +577,7 @@ export const api = {
 					case "form":
 						api.update_header(title[request[1]]);
 						successFn = function (data) {
+							api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 							if (data.body) {
 								const body = new Assemble(data.body);
 								document.getElementById("main").replaceChildren(body.initializeSection());
@@ -589,7 +591,7 @@ export const api = {
 						compose_helper.componentSignature = 0;
 						successFn = function (data) {
 							if (data.body) {
-								api.update_header(title[request[1]]);
+								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								const body = new Compose(data.body);
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();
@@ -867,7 +869,7 @@ export const api = {
 				if (
 					["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])
 				) {
-					if (typeof request[4] === 'object') {
+					if (typeof request[4] === "object") {
 						payload = request[4];
 						delete request[4];
 					}
@@ -1114,7 +1116,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.body) {
-								api.update_header(title[request[1]]);
+								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								const body = new Assemble(data.body);
 								document.getElementById("main").replaceChildren(body.initializeSection());
 								body.processAfterInsertion();

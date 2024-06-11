@@ -581,13 +581,6 @@ class FILE extends API {
 				$options = ['...' => []];
 				$return = [];
 				
-				// prepare existing bundle lists
-				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
-				foreach($bundles as $row) {
-					$datalist[] = $row['name'];
-					$options[$row['name']] = [];
-				}
-		
 				$bundle = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get', [
 					'values' => [
 						':name' => $this->_requestedFolder
@@ -596,7 +589,14 @@ class FILE extends API {
 				$bundle = $bundle ? $bundle[0] : null;
 				if (!$bundle) $bundle = ['name' => '', 'content' => '', 'active' => null];
 				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['status'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
-		
+
+				// prepare existing bundle lists
+				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
+				foreach($bundles as $row) {
+					$datalist[] = $row['name'];
+					$options[$row['name']] = $bundle['name'] === $row['name'] ? ['selected' => true] : [];
+				}
+				
 				$return['body'] = [
 					'form' => [
 						'data-usecase' => 'file',
@@ -687,6 +687,7 @@ class FILE extends API {
 						]
 					]
 				];
+				if ($bundle['name']) $return['header'] = $bundle['name'];
 				$this->response($return);
 				break;
 		}

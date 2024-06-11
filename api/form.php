@@ -232,6 +232,7 @@ class FORM extends API {
 			];
 
 		if (array_key_exists('content', $component)) $return['body']['component'] = json_decode($component['content']);
+		if ($component['name']) $return['header'] = $component['name'];
 		$this->response($return);
 	}
 
@@ -488,7 +489,7 @@ class FORM extends API {
 			$approve['content'][$value] = [];
 		}
 		$regulatory_context = [];
-		$form['regulatory_context'] = explode(',', $form['regulatory_context']);
+		$form['regulatory_context'] = explode(',', $form['regulatory_context'] ? : '');
 		foreach(LANGUAGEFILE['regulatory'] as $key => $value){
 			$regulatory_context[$value] = ['value' => $key];
 			if (in_array($key, $form['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
@@ -617,6 +618,7 @@ class FORM extends API {
 				}
 			}
 		}
+		if ($form['name']) $return['header'] = $form['name'];
 		$this->response($return);
 	}
 
@@ -868,7 +870,7 @@ class FORM extends API {
 							':id' => $this->_requestedID
 						]
 					]);
-					$approve = $approve ? approve[0] : null;
+					$approve = $approve ? $approve[0] : null;
 					if (!$approve) $this->response([], 404);
 					foreach(PERMISSION::pending('formapproval', $approve['approval']) as $position){
 						$approvalposition[LANG::GET('permissions.' . $position)] = [];
@@ -907,6 +909,7 @@ class FORM extends API {
 						'action' => "javascript: api.form('put', 'approval', " . $this->_requestedID . ")",
 						'data-confirm' => true
 					];
+					if ($approve['name']) $return['header'] = $approve['name'];
 				}
 				$this->response($return);
 				break;
