@@ -204,7 +204,7 @@ class MESSAGE extends API {
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		$result = ['body' => ['content' => []]];
 		foreach($users as $user){
-			if ($user['id'] === 1) continue;
+			if ($user['id'] === '1') continue;
 			$mailto =  [
 				'href' => 'javascript:void(0)',
 				'data-type' => 'input',
