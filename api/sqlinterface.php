@@ -443,8 +443,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
 		'form_delete' => [
-			'mysql' => "DELETE FROM caro_form WHERE id = :id AND approval != ''",
-			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND approval != ''"
+			'mysql' => "DELETE FROM caro_form WHERE id = :id AND approval = ''",
+			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND approval = ''"
 		],
 
 
