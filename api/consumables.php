@@ -387,7 +387,7 @@ class CONSUMABLES extends API {
 				if ($product['trading_good']) array_push($incorporationform, ...$this->components('mdr_sample_check_form'));
 
 				// select all products from selected vendor
-				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products', [
+				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
 					'values' => [
 						':search' => $product['vendor_id']
 					]
