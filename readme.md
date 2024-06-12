@@ -144,7 +144,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Vendor and product editing is permitted by defined authorized users only.
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
 * ISO 13485 7.4.3 Verification of procured products
-    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set in setup.ini, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan.
+    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the setup.ini file.
     * Sample check information is to be enriched through a dedicated form with the respective context. All users can gather the required information and commit the check. 
     * Sample checks can be revoked by authorized users.
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
