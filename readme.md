@@ -1636,10 +1636,61 @@ Similar to components.
 
 ### Message endpoints
 
+> GET ./api/api.php/message/conversation/{user id}
 
-> POST ./api/api.php/message/message/{formdata}
+Returns conversations. Overview with the recent message per user if user id is omitted, or all messages of the conversation with the passed user id.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {user id} | path parameter | optional | int id of the opposite user of the conversation |
+
+Sample response
+```
+{ "body": { "content": [ [ { "type": "deletebutton", "attributes": { "value": "Delete conversation", "type": "button", "onpointerup": "new Dialog({type: 'confirm', header: 'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation': {value: true, class: 'reducedCTA'},}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', 1, 'inbox')})" } } ], [ { "type": "message", "content": { "img": "media/favicon/ios/256.png", "user": "CARO App", "text": "The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
+```
+
+> DELETE ./api/api.php/message/conversation/{user id}
+
+Delete all messages of the conversation with the passed user id.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {user id} | path parameter | required | int id of the opposite user of the conversation |
+
+Sample response
+```
+{ "status": { "msg": "Conversation successfully deleted", "redirect": false, "type": "success" } }
+```
+
+> POST ./api/api.php/message/message
+
+Store a message to the database. One for the sending user, another for the recipient.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | containing recipient and message |
+
+Sample response
+```
+{ "status": { "msg": "Message successfully sent", "redirect": false, "type": "success" } }
+```
 
 > GET ./api/api.php/message/register
+
+Returns all users eligible for message reception (not system user), grouped by units, permissions.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{ "body": { "content": [ [ [ { "type": "links", "description": "Unit Administration", "content": { "error on line 1": { "href": "javascript:void(0)", "data-type": "input", "onpointerup": "_client.message.newMessage('Message to error on line 1', 'error on line 1', '', {}, [])" } } } ], [ { "type": "links", "description": "Unit CAD", "content": { "error on line 1": { "href": ....
+```
 
 [Content](#content)
 
