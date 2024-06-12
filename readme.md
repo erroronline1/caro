@@ -1026,10 +1026,10 @@ You can as well define all products as trading goods and set to 0 conditionally 
 [Content](#content)
 
 ## API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and processed either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
+All REST-api endpoint queries are returned as json routed by ./js/api.js and processed primarily either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
 Response properties are *body*, *form*, *status* and *msg* most of the time.
 
-All form data for POST require the provided input fields as previously created from GET fetches that are regularily dependent on specific names.
+All form data for POST adn PUT require either the provided input fields as previously created from GET fetches or the JS _client-methods. Processing is regularily dependent on specific names.
 
 ### Application endpoints
 
@@ -1211,25 +1211,25 @@ Similar to schedules with slightly adapted inputs for time tracking.
 
 > POST ./api/api.php/calendar/timesheet
 
-Contributes scheduled events to the calendar
+Contributes timesheet entries to the calendar
 
 Similar to schedules.
 
 > PUT ./api/api.php/calendar/timesheet/{id}
 
-Updates scheduled events
+Updates timesheet entries
 
 Similar to schedules.
 
 > PUT ./api/api.php/calendar/timesheet/{id}/{bool}/{type}
 
-Markes scheduled events as complete or revoce state
+Markes timesheet entries as complete or revokes state
 
 Similar to schedules.
 
 > DELETE ./api/api.php/calendar/timesheet/{id}
 
-Deletes scheduled events.
+Deletes timesheet entries.
 
 Similar to schedules.
 
@@ -1499,7 +1499,7 @@ Sample response
 
 > POST ./api/api.php/file/sharepoint
 
-uploads a file to the open sharepoint folder.
+Uploads a file to the open sharepoint folder.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -1517,23 +1517,120 @@ Sample response
 
 > GET ./api/api.php/form/component_editor/{name|id}
 
+Returns content to create or modify form components. If path parameter is not int the latest approved component is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | optional | string or int |
+
+Sample response
+```
+{ "body": { "content": [ [ [ { "type": "datalist", "content": [ "adddocuments", "anamneseOrthetik", "anamneseProthetik", "fertigungsauftrag", "identifier", "produkteinführung", "Stichprobenprüfung", "TelefonEmailFoto", "versorgungsbegruendung" ], "attributes": { "id": "components" } }, { "type": "select", "attributes": { "name": "Edit existing latest approved component", "onchange": "api.form('get', 'component_editor', this.value)" }, ....
+```
+
 > GET ./api/api.php/form/form_editor/{name|id}
 
-> GET ./api/api.php/form/component/{name}
+Returns content to create or modify forms. If path parameter is not int the latest approved form is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | optional | string or int |
+
+Sample response
+```
+{ "body": { "content": [ [ [ { "type": "datalist", "content": [ "Anamnese Orthetik", "Anamnese Prothetik", "Kontakt", "produkteinführungsformular", "Stichprobenprüfung" ], "attributes": { "id": "forms" } }, { "type": "datalist", "content": [ "adddocuments", "anamneseOrthetik", "anamneseProthetik", "fertigungsauftrag", "identifier", "produkteinführung", "signature1", "signature2", "Stichprobenprüfung",....
+```
+
+> GET ./api/api.php/form/component/{name|id}
+
+Returns database content of selected component. If path parameter is not int the latest approved component is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | required | string or int |
+
+Sample response
+```
+{ "id": "25", "name": "fertigungsauftrag", "alias": "", "context": "component", "date": "2024-03-18 13:48:00", "author": "error on line 1", "content": { "content": [ [ { "attributes": { "name": "fertigungsauftrag", "required": true }, "type": "textarea", "texttemplates": true } ] ], "form": [] }, "hidden": "0", "approval": "{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-03 09:07\"},....
+```
 
 > POST ./api/api.php/form/component
 
+Stores a new component to the database or updates the *hidden*-setting.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | contents and setting for respective component |
+
+Sample response
+```
+{ "name": "adddocuments", "msg": "Component adddocuments has been saved", "reload": "component_editor", "type": "success" }
+```
+
 > DELETE ./api/api.php/form/component/{id}
+
+Deletes an unapproved form component.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | int id of unapproved component |
+
+Sample response
+```
+{ "status": { "msg": "Component deleted", "type": "success", "reload": "component_editor" } }
+```
 
 > GET ./api/api.php/form/approval/{id}
 
+Returns selection of components and forms pending approval, selected element if {id} is provided and unsatisfied approvals per role.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | int id of unapproved component |
+
+Sample response
+```
+{ "body": { "content": [ [ { "type": "select", "attributes": { "name": "Select component to approve", "onchange": "api.form('get', 'approval', this.value)" }, "content": { "signature1": { "value": "43", "selected": true }, "signature2": { "value": "44" } } }, { "type": "select", "attributes": { "name": "Select form to approve", "onchange": "api.form('get', 'approval', this.value)" }, "content": { "testform": { "value": "51" } } } ],....
+```
+
 > PUT ./api/api.php/form/approval/{id}
 
-> GET ./api/api.php/form/form/{name}
+Updates approvals for forms and components.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | int id of unapproved component |
+| payload | form data | optional | approval checkboxes |
+
+Sample response
+```
+{ "status": { "msg": "Approval saved.<br />This element can now be used.", "type": "success", "reload": "approval" } }
+```
+
+> GET ./api/api.php/form/form/{name|id}
+
+Returns database content of selected form. If path parameter is not int the latest approved form is returned.
+
+Similar to components.
 
 > POST ./api/api.php/form/form
 
+Stores a new form to the database or updates the following uncritical settings: *alias*, *context*, *hidden*, *regulatory_context*, *permitted_export*
+
+Similar to components.
+
 > DELETE ./api/api.php/form/form/{id}
+
+Deletes an unapproved form.
+
+Similar to components.
 
 [Content](#content)
 
