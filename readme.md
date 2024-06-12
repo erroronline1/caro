@@ -50,6 +50,7 @@
 
 
 # development
+* revise external document availability strategy
 * incorporation on same article_no
 * token & order-pin encrypted
 * idle logout
@@ -1026,7 +1027,9 @@ You can as well define all products as trading goods and set to 0 conditionally 
 
 ## API documentation
 All REST-api endpoint queries are returned as json routed by ./js/api.js and processed either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
-Response properties are *body*, *form* and *msg* most of the time.
+Response properties are *body*, *form*, *status* and *msg* most of the time.
+
+All form data for POST require the provided input fields as previously created from GET fetches that are regularily dependent on specific names.
 
 ### Application endpoints
 
@@ -1309,31 +1312,204 @@ Sample response
 
 ### File endpoints
 
-> GET ./api/api.php/file/filter/{directory}
+> GET ./api/api.php/file/filter/{directory}/{query}
+
+Returns a list of paths that have a similarity to query.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {directory} | path parameter | optional | specified sharepoint dir, user dir, other documents if null |
+| {query} | path parameter | optional | search string, returns all files if null |
+
+Sample response
+```
+{"status":{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}}
+```
 
 > GET ./api/api.php/file/files/{directory}
 
-> POST ./api/api.php/file/filemanager
+Returns files to display, grouped by directories as provided including external documents.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {directory} | path parameter | optional | specified dir, all if null |
+
+Sample response
+```
+{"status":{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}}
+```
 
 > GET ./api/api.php/file/filemanager/{directory}
 
+Returns folders or files to display, interface elements to create new directories, upload and delete files. 
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {directory} | path parameter | optional | specified dir, directory manager and access if left |
+
+Sample response
+```
+{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'filemanager')" }, "content": [ [ { "type": "links", "description": "Folder created on 2024-01-31 15:14", "content": { "test": { "href": "javascript:api.file('get', 'filemanager', 'test')" } } }, { "type": "deletebutton", "attributes": { "value": "Delete folder and all of its content", "type": "button", "onpointerup": "new Dialog({type:....
+```
+
+> POST ./api/api.php/file/filemanager
+
+Creates Directories or stores files to a destination.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | including new folder name or destination folder and file(s) |
+
+Sample response
+```
+{ "status": { "msg": "Upload has been completed", "redirect": [ "filemanager", "test" ], "type": "success" } }
+```
+
 > DELETE ./api/api.php/file/filemanager/{directory}/{file}
 
-> POST ./api/api.php/file/externalfilemanager
+Deletes folders and their content, files if file is specified.
 
-> PUT ./api/api.php/file/externalfilemanager/{id}/{int accessible}
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {directory} | path parameter | required | directory to delete |
+| {file} | path parameter | optional | file to delete from specified directory |
+
+Sample response
+```
+{ "status": { "msg": "test3 has been permanently deleted", "redirect": [ "filemanager", null ], "type": "success" } }
+```
 
 > GET ./api/api.php/file/externalfilemanager
 
-> GET ./api/api.php/file/bundle/{bundle}
+Returns external document files and setting inputs.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'externalfilemanager')" }, "content": [ [ { "type": "filterinput", "attributes": { "name": "Filter by file name", "onkeypress": "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}", "onblur": "api.file('get', 'filter', 'null', this.value); return false;", "id": "filefilter" } } ], [ { "type": "links", "description": "Introduced 2024-05-11 23:32, retired 2024-05-11 23:322 by error on line 1",....
+```
+
+> POST ./api/api.php/file/externalfilemanager
+
+Stores provided files to the defined folder, creates a database entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | files to provide |
+
+Sample response
+```
+{ "status": { "msg": "Upload has been completed", "type": "success" } }
+```
+
+> PUT ./api/api.php/file/externalfilemanager/{id}/{value}
+
+Updates the database entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id to update |
+| {value} | path parameter | required | int accessible / comma separated selected regulatory contexts |
+
+Sample response
+```
+{ "status": { "msg": "Regulatory context has been updated", "type": "success" } }
+```
+
+> GET ./api/api.php/file/bundlefilter/{query}
+
+Returns a list of bundle ids whose name have a similarity to query.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {query} | path parameter | optional | search string, returns all ids if null |
+
+Sample response
+```
+{"status":{"data":["9"]}}
+```
+
+> GET ./api/api.php/file/bundle
+
+Returns lists of file paths grouped by bundle names.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{ "body": { "content": [ [ { "type": "filterinput", "attributes": { "name": "Filter by bundle name", "onkeypress": "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}", "onblur": "api.file('get', 'bundlefilter', this.value); return false;", "id": "filesearch" } } ], [ { "type": "links", "description": "einkauf", "content": { "einkauf.png": { "href": "./fileserver/documents/test2/....
+```
 
 > POST ./api/api.php/file/bundlemanager
 
+Creates a database entry for a new bundle or updates active state.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | including selected file paths, bundle name, active state |
+
+Sample response
+```
+{ "status": { "name": "external", "msg": "Bundle external has been saved", "type": "success" } }
+```
+
 > GET ./api/api.php/file/bundlemanager/{bundle}
+
+Returns a form to define a new bundle or revise bundle if provided.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {bundle} | path parameter | optional | if provided current setting are selected |
+
+Sample response
+```
+{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'bundlemanager')" }, "content": [ [ { "type": "datalist", "content": [ "einkauf", "external", "test" ], "attributes": { "id": "bundles" } }, { "type": "select", "attributes": { "name": "Edit existing bundle", "onchange": "api.file('get', 'bundlemanager', this.value)" }, "content": { "...": [], "einkauf": [], "external": [], "test": { "selected": true } } },....
+```
+
+> GET ./api/api.php/file/sharepoint
+
+Returns a list of current available files and an upload form.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'sharepoint')" }, "content": [ [ { "type": "filterinput", "attributes": { "name": "Filter by file name", "onkeypress": "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}", "onblur": "api.file('get', 'filter', 'sharepoint', this.value); return false;", "id": "filefilter" } } ], [ { "type": "links", "content":....
+```
 
 > POST ./api/api.php/file/sharepoint
 
-> GET ./api/api.php/file/sharepoint
+uploads a file to the open sharepoint folder.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | true | file(s) to share |
+
+Sample response
+```
+{ "status": { "msg": "Upload has been completed", "redirect": [ "sharepoint" ], "type": "success" } }
+```
 
 [Content](#content)
 
