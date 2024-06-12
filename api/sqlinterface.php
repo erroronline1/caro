@@ -285,15 +285,15 @@ class SQLQUERY {
 		],
 		'consumables_get_eligible_sample_check' => [ // must be splitted with the following two queries for sql performance reasons
 			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-			."AND prod.vendor_id NOT IN (:valid_checked) "
-			."AND prod.id NOT IN (:not_reusable)",
-		'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
+				."AND prod.vendor_id NOT IN (:valid_checked) "
+				."AND prod.id NOT IN (:not_reusable)",
+			'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
 				."AND prod.vendor_id NOT IN (:valid_checked) "
 				."AND prod.id NOT IN (:not_reusable)"
 		],
 		'consumables_get_valid_checked' => [
 			'mysql' => "SELECT prod.vendor_id AS vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND DATEDIFF( IFNULL( prod.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . " ) DAY ) ), CURRENT_TIMESTAMP ) "
+				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . " ) DAY ) ) ) "
 				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . " )",
 			'sqlsrv' => "SELECT prod.vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
 				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['limits']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
@@ -301,7 +301,7 @@ class SQLQUERY {
 		],
 		'consumables_get_not_reusable_checked' => [
 			'mysql' => "SELECT prod.id AS id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND DATEDIFF( IFNULL( prod.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . " ) + 1 DAY ) ), CURRENT_TIMESTAMP ) "
+				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
 				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . " )",
 			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
 				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['limits']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
@@ -322,11 +322,11 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) = :search AND prod.vendor_id = dist.id"
 		],
 		'consumables_delete_all_unprotected_products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND IFNULL(checked, 0) = 0 AND incorporated = '' AND protected = 0",
 			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND ISNULL(checked, CAST('2079-06-06' AS SMALLDATETIME) ) = CAST('2079-06-06' AS SMALLDATETIME) AND incorporated = '' AND protected = 0"
 		],
 		'consumables_delete_unprotected_product' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked = NULL AND incorporated = '' AND protected = 0",
+			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND IFNULL(checked, 0) = 0 AND incorporated = '' AND protected = 0",
 			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND ISNULL(checked, CAST('2079-06-06' AS SMALLDATETIME) ) = CAST('2079-06-06' AS SMALLDATETIME) AND incorporated = '' AND protected = 0"
 		],
 
