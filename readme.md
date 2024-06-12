@@ -1352,7 +1352,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'filemanager')" }, "content": [ [ { "type": "links", "description": "Folder created on 2024-01-31 15:14", "content": { "test": { "href": "javascript:api.file('get', 'filemanager', 'test')" } } }, { "type": "deletebutton", "attributes": { "value": "Delete folder and all of its content", "type": "button", "onpointerup": "new Dialog({type:....
+{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','filemanager')"},"content":[[{"type":"links","description":"Folder created on 2024-01-31 15:14","content":{"test":{"href":"javascript:api.file('get','filemanager','test')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","type":"button","onpointerup":"new Dialog({type:....
 ```
 
 > POST ./api/api.php/file/filemanager
@@ -1366,7 +1366,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Upload has been completed", "redirect": [ "filemanager", "test" ], "type": "success" } }
+{"status":{"msg":"Upload has been completed","redirect":["filemanager","test"],"type":"success"}}
 ```
 
 > DELETE ./api/api.php/file/filemanager/{directory}/{file}
@@ -1381,7 +1381,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "test3 has been permanently deleted", "redirect": [ "filemanager", null ], "type": "success" } }
+{"status":{"msg":"test3 has been permanently deleted","redirect":["filemanager", null ],"type":"success"}}
 ```
 
 > GET ./api/api.php/file/externalfilemanager
@@ -1395,7 +1395,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'externalfilemanager')" }, "content": [ [ { "type": "filterinput", "attributes": { "name": "Filter by file name", "onkeypress": "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}", "onblur": "api.file('get', 'filter', 'null', this.value); return false;", "id": "filefilter" } } ], [ { "type": "links", "description": "Introduced 2024-05-11 23:32, retired 2024-05-11 23:322 by error on line 1",....
+{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','externalfilemanager')"},"content":[[{"type":"filterinput","attributes":{"name":"Filter by file name","onkeypress":"if (event.key ==='Enter'){api.file('get','filter','null', this.value); return false;}","onblur":"api.file('get','filter','null', this.value); return false;","id":"filefilter"}}],[{"type":"links","description":"Introduced 2024-05-11 23:32, retired 2024-05-11 23:322 by error on line 1",....
 ```
 
 > POST ./api/api.php/file/externalfilemanager
@@ -1409,7 +1409,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Upload has been completed", "type": "success" } }
+{"status":{"msg":"Upload has been completed","type":"success"}}
 ```
 
 > PUT ./api/api.php/file/externalfilemanager/{id}/{value}
@@ -1424,7 +1424,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Regulatory context has been updated", "type": "success" } }
+{"status":{"msg":"Regulatory context has been updated","type":"success"}}
 ```
 
 > GET ./api/api.php/file/bundlefilter/{query}
@@ -1452,7 +1452,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "content": [ [ { "type": "filterinput", "attributes": { "name": "Filter by bundle name", "onkeypress": "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}", "onblur": "api.file('get', 'bundlefilter', this.value); return false;", "id": "filesearch" } } ], [ { "type": "links", "description": "einkauf", "content": { "einkauf.png": { "href": "./fileserver/documents/test2/....
+{"body":{"content":[[{"type":"filterinput","attributes":{"name":"Filter by bundle name","onkeypress":"if (event.key ==='Enter'){api.file('get','bundlefilter', this.value); return false;}","onblur":"api.file('get','bundlefilter', this.value); return false;","id":"filesearch"}}],[{"type":"links","description":"einkauf","content":{"einkauf.png":{"href":"./fileserver/documents/test2/....
 ```
 
 > POST ./api/api.php/file/bundlemanager
@@ -1466,7 +1466,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "name": "external", "msg": "Bundle external has been saved", "type": "success" } }
+{"status":{"name":"external","msg":"Bundle external has been saved","type":"success"}}
 ```
 
 > GET ./api/api.php/file/bundlemanager/{bundle}
@@ -1480,7 +1480,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'bundlemanager')" }, "content": [ [ { "type": "datalist", "content": [ "einkauf", "external", "test" ], "attributes": { "id": "bundles" } }, { "type": "select", "attributes": { "name": "Edit existing bundle", "onchange": "api.file('get', 'bundlemanager', this.value)" }, "content": { "...": [], "einkauf": [], "external": [], "test": { "selected": true } } },....
+{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','bundlemanager')"},"content":[[{"type":"datalist","content":["einkauf","external","test"],"attributes":{"id":"bundles"}},{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get','bundlemanager', this.value)"},"content":{"...":[],"einkauf":[],"external":[],"test":{"selected": true }}},....
 ```
 
 > GET ./api/api.php/file/sharepoint
@@ -1494,7 +1494,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "form": { "data-usecase": "file", "action": "javascript:api.file('post', 'sharepoint')" }, "content": [ [ { "type": "filterinput", "attributes": { "name": "Filter by file name", "onkeypress": "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}", "onblur": "api.file('get', 'filter', 'sharepoint', this.value); return false;", "id": "filefilter" } } ], [ { "type": "links", "content":....
+{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','sharepoint')"},"content":[[{"type":"filterinput","attributes":{"name":"Filter by file name","onkeypress":"if (event.key ==='Enter'){api.file('get','filter','sharepoint', this.value); return false;}","onblur":"api.file('get','filter','sharepoint', this.value); return false;","id":"filefilter"}}],[{"type":"links","content":....
 ```
 
 > POST ./api/api.php/file/sharepoint
@@ -1508,7 +1508,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Upload has been completed", "redirect": [ "sharepoint" ], "type": "success" } }
+{"status":{"msg":"Upload has been completed","redirect":["sharepoint"],"type":"success"}}
 ```
 
 [Content](#content)
@@ -1526,22 +1526,14 @@ Parameters
 
 Sample response
 ```
-{ "body": { "content": [ [ [ { "type": "datalist", "content": [ "adddocuments", "anamneseOrthetik", "anamneseProthetik", "fertigungsauftrag", "identifier", "produkteinführung", "Stichprobenprüfung", "TelefonEmailFoto", "versorgungsbegruendung" ], "attributes": { "id": "components" } }, { "type": "select", "attributes": { "name": "Edit existing latest approved component", "onchange": "api.form('get', 'component_editor', this.value)" }, ....
+{"body":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
 ```
 
 > GET ./api/api.php/form/form_editor/{name|id}
 
 Returns content to create or modify forms. If path parameter is not int the latest approved form is returned.
 
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name/id} | path parameter | optional | string or int |
-
-Sample response
-```
-{ "body": { "content": [ [ [ { "type": "datalist", "content": [ "Anamnese Orthetik", "Anamnese Prothetik", "Kontakt", "produkteinführungsformular", "Stichprobenprüfung" ], "attributes": { "id": "forms" } }, { "type": "datalist", "content": [ "adddocuments", "anamneseOrthetik", "anamneseProthetik", "fertigungsauftrag", "identifier", "produkteinführung", "signature1", "signature2", "Stichprobenprüfung",....
-```
+Sililar to component_editor.
 
 > GET ./api/api.php/form/component/{name|id}
 
@@ -1554,7 +1546,7 @@ Parameters
 
 Sample response
 ```
-{ "id": "25", "name": "fertigungsauftrag", "alias": "", "context": "component", "date": "2024-03-18 13:48:00", "author": "error on line 1", "content": { "content": [ [ { "attributes": { "name": "fertigungsauftrag", "required": true }, "type": "textarea", "texttemplates": true } ] ], "form": [] }, "hidden": "0", "approval": "{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-03 09:07\"},....
+{"id":"25","name":"fertigungsauftrag","alias":"","context":"component","date":"2024-03-18 13:48:00","author":"error on line 1","content":{"content":[[{"attributes":{"name":"fertigungsauftrag","required": true },"type":"textarea","texttemplates": true }]],"form":[]},"hidden":"0","approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-03 09:07\"},....
 ```
 
 > POST ./api/api.php/form/component
@@ -1568,7 +1560,7 @@ Parameters
 
 Sample response
 ```
-{ "name": "adddocuments", "msg": "Component adddocuments has been saved", "reload": "component_editor", "type": "success" }
+{"name":"adddocuments","msg":"Component adddocuments has been saved","reload":"component_editor","type":"success"}
 ```
 
 > DELETE ./api/api.php/form/component/{id}
@@ -1582,7 +1574,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Component deleted", "type": "success", "reload": "component_editor" } }
+{"status":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
 ```
 
 > GET ./api/api.php/form/approval/{id}
@@ -1596,7 +1588,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "content": [ [ { "type": "select", "attributes": { "name": "Select component to approve", "onchange": "api.form('get', 'approval', this.value)" }, "content": { "signature1": { "value": "43", "selected": true }, "signature2": { "value": "44" } } }, { "type": "select", "attributes": { "name": "Select form to approve", "onchange": "api.form('get', 'approval', this.value)" }, "content": { "testform": { "value": "51" } } } ],....
+{"body":{"content":[[{"type":"select","attributes":{"name":"Select component to approve","onchange":"api.form('get','approval', this.value)"},"content":{"signature1":{"value":"43","selected": true },"signature2":{"value":"44"}}},{"type":"select","attributes":{"name":"Select form to approve","onchange":"api.form('get','approval', this.value)"},"content":{"testform":{"value":"51"}}}],....
 ```
 
 > PUT ./api/api.php/form/approval/{id}
@@ -1611,7 +1603,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Approval saved.<br />This element can now be used.", "type": "success", "reload": "approval" } }
+{"status":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"}}
 ```
 
 > GET ./api/api.php/form/form/{name|id}
@@ -1647,7 +1639,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "content": [ [ { "type": "deletebutton", "attributes": { "value": "Delete conversation", "type": "button", "onpointerup": "new Dialog({type: 'confirm', header: 'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation': {value: true, class: 'reducedCTA'},}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', 1, 'inbox')})" } } ], [ { "type": "message", "content": { "img": "media/favicon/ios/256.png", "user": "CARO App", "text": "The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
+{"body":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","type":"button","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/ios/256.png","user":"CARO App","text":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
 ```
 
 > DELETE ./api/api.php/message/conversation/{user id}
@@ -1661,7 +1653,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Conversation successfully deleted", "redirect": false, "type": "success" } }
+{"status":{"msg":"Conversation successfully deleted","redirect": false,"type":"success"}}
 ```
 
 > POST ./api/api.php/message/message
@@ -1675,7 +1667,7 @@ Parameters
 
 Sample response
 ```
-{ "status": { "msg": "Message successfully sent", "redirect": false, "type": "success" } }
+{"status":{"msg":"Message successfully sent","redirect": false,"type":"success"}}
 ```
 
 > GET ./api/api.php/message/register
@@ -1689,7 +1681,7 @@ Parameters
 
 Sample response
 ```
-{ "body": { "content": [ [ [ { "type": "links", "description": "Unit Administration", "content": { "error on line 1": { "href": "javascript:void(0)", "data-type": "input", "onpointerup": "_client.message.newMessage('Message to error on line 1', 'error on line 1', '', {}, [])" } } } ], [ { "type": "links", "description": "Unit CAD", "content": { "error on line 1": { "href": ....
+{"body":{"content":[[[{"type":"links","description":"Unit Administration","content":{"error on line 1":{"href":"javascript:void(0)","data-type":"input","onpointerup":"_client.message.newMessage('Message to error on line 1','error on line 1','',{},[])"}}}],[{"type":"links","description":"Unit CAD","content":{"error on line 1":{"href":....
 ```
 
 [Content](#content)
@@ -1697,33 +1689,150 @@ Sample response
 ### Consumables endpoints
 
 
-> GET ./api/api.php/consumables/vendor/{id|name}
+> GET ./api/api.php/consumables/vendor/{name|id}
+
+Returns content to create or modify vendor. If path parameter is provided, the form is prefilled according to database entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | optional | existing vendors name (string) or database id (int) |
+
+Sample response
+```
+{"body":{"content":[[{"type":"datalist","content":["Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":[],"Otto Bock":{"selected":true}}},{"type":"searchinput","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"}}],[{"type":"textinput","attributes":{"name":"Name","required":true,"value":"Otto Bock"}},{"type":"textarea","attributes":{"name":"Info","value":"&lt;&gt;","rows":8}},{"type":"radio","attributes":{"name":"vendor active"},"content":{"active and available":{"checked":true},"inactive, delete products":[]}}],....
+```
 
 > POST ./api/api.php/consumables/vendor
 
+Stores new vendor data.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | information, files, etc |
+
+Sample response
+```
+
+{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+```
+
 > PUT ./api/api.php/consumables/vendor/{id}
+
+Updates vendor data.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+| payload | form data | required | information, files, etc |
+
+Sample response
+```
+{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+```
 
 > GET ./api/api.php/consumables/product/{id}
 
-> GET ./api/api.php/consumables/product/{id|name}/search
+Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
+
+Similar to vendor.
 
 > POST ./api/api.php/consumables/product
 
+Stores new product data.
+
+Similar to vendor.
+
 > PUT ./api/api.php/consumables/product/{id}
+
+Updates product data.
+
+Similar to vendor.
 
 > DELETE ./api/api.php/consumables/product/{id}
 
-> POST ./api/api.php/consumables/mdrsamplecheck
+Deletes a product if permitted.
 
-> GET ./api/api.php/consumables/mdrsamplecheck
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"status":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
+```
+
+> GET ./api/api.php/consumables/mdrsamplecheck/{id}
+
+Returns the current form for a sample check.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+
+Sample response
+```
+{"body":{"content":[[{"type":"text","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
+```
+
+> POST ./api/api.php/consumables/mdrsamplecheck/{id}
+
+Stores the sample check to records, mark product as checked, system message to defined users.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+| payload | form data | required | check notes |
+
+Sample response
+```
+{"status":{"msg":"Sample check has been saved","type":"success"}}
+```
 
 > DELETE ./api/api.php/consumables/mdrsamplecheck
 
+Deletes the sample check from records, unmark product as checked.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+
+Sample response
+```
+{"status":{"msg":"Sample check has been revoked","type":"success"}}
+```
+
 > POST ./api/api.php/consumables/incorporation
+
+Returns the current form for an incorporation.
+
+Similar to mdrsamplecheck
 
 > GET ./api/api.php/consumables/incorporation
 
+Stores the incorporation to product and selected similar, system message to defined users.
+
+Similar to mdrsamplecheck.
+
 > GET ./api/api.php/consumables/pendingincorporations
+
+Returns a list of links to products with pending incorporations.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"body":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
+```
 
 [Content](#content)
 
