@@ -362,8 +362,7 @@ class FORM extends API {
 					]
 				]);
 				$component = $component ? $component[0] : null;
-				if (!component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
-				
+				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
 				// recursively check for identifier
 				function deleteImages($element){
 					foreach($element as $sub){
