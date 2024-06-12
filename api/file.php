@@ -169,8 +169,8 @@ class FILE extends API {
 					]
 				];
 
-				$result['body']['content'][] = [];
 				if (!$this->_requestedFolder){
+					$result['body']['content'][] = [];
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
 						$content=[];
@@ -338,8 +338,8 @@ class FILE extends API {
 					$insertions = [];
 					foreach($files as $file){
 						$insertions[] = [
-							':author' => $this->_pdo->quote($_SESSION['user']['name']),
-							':path' => $this->_pdo->quote($file)
+							':author' => $_SESSION['user']['name'],
+							':path' => $file
 						];
 					}
 					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
