@@ -51,6 +51,9 @@
 
 
 # development
+* revise records access without identifier ./api/api.php/record/record/
+* revise records access closed (sqlquery?)
+
 * incorporation on same article_no
 * token & order-pin encrypted
 * idle logout
@@ -2024,26 +2027,163 @@ Sample response
 
 ### Record endpoints
 
+> GET ./api/api.php/record/identifier
+
+Returns a form to create an identifier label sheet.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |   |
+
+Sample response
+```
+{"body": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'identifier')"},"content": [[{"type": "text","description": "Create an identifier that will connect database entries. A current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet."},{"type": "scanner","hint": "e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended.","attributes": {"name": "Identifying data","maxlength": 128}}]]}}
+```
 
 > POST ./api/api.php/record/identifier
 
-> GET ./api/api.php/record/identifier
+Returns a download link to a temporary file with identifier label sheet.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | identifier to be converted to a qr-code |
+
+Sample response
+```
+{"body": [{"type": "links","description": "Open the link, print the identifiers and use them where applicable.","content": {"Identifying data": {"href": "./fileserver/tmp/test202406131600.pdf"}}}]}
+```
+
+> GET ./api/api.php/record/records
+
+Returns current active records grouped by record type and organizational units.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |   |
+
+Sample response
+```
+{"body": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filterinput","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
+```
+
+> GET ./api/api.php/record/recordfilter/{search}
+
+Returns ids of available records whose identifier matches {search}.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string |
+
+Sample response
+```
+{"status": {"data": ["5","7"],"filter": "some"}}
+```
 
 > GET ./api/api.php/record/forms
 
-> GET ./api/api.php/record/form/{optional identifier}
+Returns available approved forms grouped by record type.
 
-> GET ./api/api.php/record/formfilter
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |   |
 
-> GET ./api/api.php/record/identifierfilter
+Sample response
+```
+{"body": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filterinput","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}","onblur": "api.record('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
+```
+
+> GET ./api/api.php/record/formfilter/{search}
+
+Returns ids of available approved forms matching {search}.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string |
+
+Sample response
+```
+{"status": {"data": ["26"]}}
+```
+
+> GET ./api/api.php/record/form/{name}/{identifier}
+
+Returns latest available approved form by {name}. Prefills identifier field if pased.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name} | path parameter | required | form name |
+| {identifier} | path parameter | optional | identifier for records |
+
+Sample response
+```
+{"title": "Kontakt","body": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hiddeninput","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hiddeninput","attributes": {"name": "form_name","value": "Kontakt"}},....
+```
+
+> GET ./api/api.php/record/matchbundles/{bundle}/{identifier}
+
+Returns links to forms that are not considered at least once for the selected bundle and identifier.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {bundle} | path parameter | required | bundle name |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"body": [{"type": "links","description": "Some forms seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'form', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'form', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
+```
+
+> GET ./api/api.php/record/record/{identifier}
+
+Returns links to forms that are not considered at least once for the selected bundle and identifier.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"body": [{"type": "links","description": "Some forms seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'form', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'form', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
+```
 
 > POST ./api/api.php/record/record
 
+Stores record to database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | according to form |
+
+Sample response
+```
+{"status": {"msg": "The record has been saved.","type": "success"}}
+```
+
 > PUT ./api/api.php/record/close/{identifier}
 
-> GET ./api/api.php/record/import
+Marks all database entries with passed identifier as closed.
 
-> GET ./api/api.php/record/records
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"status": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
+```
+
+> GET ./api/api.php/record/import
 
 > GET ./api/api.php/records/export
 
