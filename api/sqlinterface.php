@@ -309,9 +309,9 @@ class SQLQUERY {
 		],
 		'consumables_get_last_checked' => [
 			'mysql' => "SELECT prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
-				. "(IFNULL(prod.checked, 100) != 100) ORDER BY prod.checked DESC LIMIT 1",
+				. "prod.checked IS NOT NULL ORDER BY prod.checked DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP(1) prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
-			. "(ISNULL(prod.checked, 100) != 100) ORDER BY prod.checked"
+				. "pred.checked IS NOT NULL ORDER BY prod.checked"
 		],
 		'consumables_get_product_units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
@@ -322,12 +322,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) = :search AND prod.vendor_id = dist.id"
 		],
 		'consumables_delete_all_unprotected_products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND IFNULL(checked, 0) = 0 AND incorporated = '' AND protected = 0",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND ISNULL(checked, CAST('2079-06-06' AS SMALLDATETIME) ) = CAST('2079-06-06' AS SMALLDATETIME) AND incorporated = '' AND protected = 0"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0"
 		],
 		'consumables_delete_unprotected_product' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND IFNULL(checked, 0) = 0 AND incorporated = '' AND protected = 0",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND ISNULL(checked, CAST('2079-06-06' AS SMALLDATETIME) ) = CAST('2079-06-06' AS SMALLDATETIME) AND incorporated = '' AND protected = 0"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0"
 		],
 
 
@@ -376,16 +376,16 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"
 		],
 		'file_external_documents_get_active' => [
-			'mysql' => "SELECT * FROM caro_file_external_documents WHERE IFNULL(retired, 'null') = 'null' ORDER BY path ASC",
-			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE ISNULL(retired, CAST('1900-01-01 00:00:00' AS SMALLDATETIME) ) = '1900-01-01 00:00:00' OR retired = '1900-01-01 00:00:00' ORDER BY path ASC"
+			'mysql' => "SELECT * FROM caro_file_external_documents WHERE retired IS NULL ORDER BY path ASC",
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE retired IS NULL ORDER BY path ASC"
 		],
 		'file_external_documents_retire' => [
-			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP() WHERE id = :id",
+			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'file_external_documents_unretire' => [
 			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CAST('1900-01-01 00:00:00' AS SMALLDATETIME) WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id"
 		],
 		'file_external_documents_context' => [
 			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
@@ -565,8 +565,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
 		],
 		'order_get_approved_unprocessed' => [
-			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE IFNULL(ordered, 100) = 100",
-			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ISNULL(ordered, 100) = 100",
+			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
+			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 		],
 
 
