@@ -2240,18 +2240,60 @@ Sample response
 
 ### Texttemplate endpoints
 
+> GET ./api/api.php/texttemplate/chunk/{id}
+
+Returns a form to add or edit a text chunk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id for chunk |
+
+Sample response
+```
+{"body":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', 'chunk')"},"content":[[[{"type":"datalist","content":["eins","text"],"attributes":{"id":"chunks"}},{"type":"datalist","content":["de"],"attributes":{"id":"languages"}},{"type":"select","attributes":{"name":"Edit latest chunk","onchange":"api.texttemplate('get', 'chunk', this.value)"},"content":{"...New chunk":{"value":"0"},"Administration Text eins (de)":{"value":3,"selected":true},"Administration Replacement text (de)":{"value":2}}},{"type":"searchinput","attributes":{"name":"Search name","list":"chunks","onkeypress":"if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"}}],....
+```
 
 > POST ./api/api.php/texttemplate/chunk
 
-> GET ./api/api.php/texttemplate/chunk
+Stores a text chunk. If only the *hidden attribute changes, the entry will be updated. 
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required |  |
+
+Sample response
+```
+{"status":{"name":"eins","msg":"The chunk named eins has been saved.","type":"success"}}
+```
+
+> GET ./api/api.php/texttemplate/template/{id}
+
+Returns a form to add or edit a text template
+
+Similar to chunk.
 
 > POST ./api/api.php/texttemplate/template
 
-> GET ./api/api.php/texttemplate/template
+Stores a text template.
 
-> GET ./api/api.php/texttemplate/text opens form properly from menu
+Similar to chunk.
 
-> GET ./api/api.php/texttemplate/text/modal opens form within modal
+> GET ./api/api.php/texttemplate/text/{id}/{modal}
+
+Returns a full page form opens form with selection of text recommendations, content if id is added.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id for chunk or false |
+| {modal} | path parameter | optional | alters response to be loadable withon modal |
+
+Sample response
+```
+{"body":{"content":[[[{"type":"select","attributes":{"name":"Select text recommendation for Administration","onchange":"api.texttemplate('get', 'text', this.value)"},"content":{"...":{"value":"0"},"text (de)":{"value":4,"selected":true}}}]],[{"type":"radio","attributes":{"name":"Adressee \/ subject","id":"genus"},"content":{"Child female":{"value":0,"data-loss":"prevent"},"Child male":{"value":1,"data-loss":"prevent"},"Child genderless":{"value":2,"data-loss":"prevent"},"Adult female":{"value":3,"data-loss":"prevent"},"Adult male":{"value":4,"data-loss":"prevent"},"Adult genderless":{"value":5,"data-loss":"prevent"},"Informal you":{"value":6,"data-loss":"prevent"},"Formal you":{"value":7,"data-loss":"prevent"}}},....
+```
 
 [Content](#content)
 
