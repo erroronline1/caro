@@ -51,9 +51,6 @@
 
 
 # development
-* revise records access without identifier ./api/api.php/record/record/
-* revise records access closed (sqlquery?)
-
 * incorporation on same article_no
 * token & order-pin encrypted
 * idle logout
@@ -2143,7 +2140,7 @@ Sample response
 
 > GET ./api/api.php/record/record/{identifier}
 
-Returns links to forms that are not considered at least once for the selected bundle and identifier.
+Returns all database entries for identifier grouped by forms.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2152,7 +2149,7 @@ Parameters
 
 Sample response
 ```
-{"body": [{"type": "links","description": "Some forms seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'form', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'form', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
+{"body":{"content":[[{"type":"text","description":"Identifying data","content":"testpatient2"}],[{"type":"text","description":"Form identify yourself version 2024-06-13 21:54:47"},{"type":"text","description":"text input","content":"yxcv (error on line 1 on 2024-06-13 22:05:48)\n"},{"type":"button","attributes":{"value":"Export records from this form only","onpointerup":"api.record('get', 'formexport', 'testpatient2', 'Form identify yourself version 2024-06-13 21:54:47')"}}],....
 ```
 
 > POST ./api/api.php/record/record
@@ -2183,9 +2180,61 @@ Sample response
 {"status": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
 ```
 
-> GET ./api/api.php/record/import
+> GET ./api/api.php/record/import/{identifier}
 
-> GET ./api/api.php/records/export
+Returns the most recent data for the given identifier.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"status":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_input":"qwer"},"type":"success"}}
+```
+
+> GET ./api/api.php/records/exportform/{id}
+
+Returns a download link to a temporary file with the selected form as blank pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id for form |
+
+Sample response
+```
+{"body":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
+```
+
+> GET ./api/api.php/records/fullexport/{identifier}
+
+Returns a download link to a temporary file with all records as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"body":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
+```
+
+> GET ./api/api.php/records/simplifiedexport/{identifier}
+
+Returns a download link to a temporary file with the most recent records as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id for form |
+
+Sample response
+```
+{"body":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+```
 
 [Content](#content)
 
