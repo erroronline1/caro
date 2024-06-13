@@ -50,7 +50,6 @@
 
 
 # development
-* revise external document availability strategy
 * incorporation on same article_no
 * token & order-pin encrypted
 * idle logout
@@ -1026,10 +1025,10 @@ You can as well define all products as trading goods and set to 0 conditionally 
 [Content](#content)
 
 ## API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and processed primarily either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
+All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
 Response properties are *body*, *form*, *status* and *msg* most of the time.
 
-All form data for POST adn PUT require either the provided input fields as previously created from GET fetches or the JS _client-methods. Processing is regularily dependent on specific names.
+All form data for POST and PUT require either the provided input fields as previously created from GET fetches or the JS _client-methods. Processing is regularily dependent on specific names.
 
 ### Application endpoints
 
@@ -1688,7 +1687,6 @@ Sample response
 
 ### Consumables endpoints
 
-
 > GET ./api/api.php/consumables/vendor/{name|id}
 
 Returns content to create or modify vendor. If path parameter is provided, the form is prefilled according to database entry.
@@ -1837,7 +1835,6 @@ Sample response
 [Content](#content)
 
 ### Order endpoints
-
 
 > GET ./api/api.php/order/prepared/{unit}
 
@@ -2236,6 +2233,9 @@ A generic sample:
 ## Statement on technical guidelines on data security
 This software aims to match as much relevant aspects of security measures as reasonable and possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
 
+#### Encryption statement
+> **Unfortunately there is no reasonable way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files would be spread. Long term data availability (up to 30 years) for staff is critical. Data safety measures have to depend on unreachability for the network from outside. Frontend and backend are supposed to run within a closed network.**
+
 ### Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
 
@@ -2264,6 +2264,7 @@ This software aims to match as much relevant aspects of security measures as rea
     > User login and permissions have been mandatory from the early stages on.
 * O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
 * O.Arch_4 In Backups gespeicherte sensiblen Daten MÜSSEN gemäß dem aktuellen Stand der Technik verschlüsselt sein. Dies schließt das Persistieren sensibler Daten durch den Browser, etwa in dessen Cache, mit ein.
+    > [Encryption statement](#encryption-statement)
 * O.Arch_5 Nutzt die Web-Anwendung Drittanbieter-Software, MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommen, deren zu nutzenden Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellen. Die Anwendung MUSS diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
     > [List of third party software](#ressources)
 * O.Arch_6 Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden.
@@ -2463,9 +2464,9 @@ This software aims to match as much relevant aspects of security measures as rea
     > User login and permissions have been mandatory from the early stages on.
 * O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
 * O.Arch_4 In Backups gespeicherte sensible Daten MÜSSEN gemäß dem Stand der Technik verschlüsselt sein.
-    > The operator of the infrastructure is responsible for fulfilling these requirements.
+    > [Encryption statement](#encryption-statement), if the operator of the infrastructure is able to encrypt backups, they are responsible.
 * O.Arch_5 Sicherheitsfunktionen MÜSSEN immer auf allen Außenschnittstellen und APIEndpunkten implementiert werden.
-    > User matching and permission handling happend with every api request.
+    > User matching and permission handling happens with every api request.
 * O.Arch_6 Nutzt das Hintergrundsystem Drittanbieter-Software (etwa für Datenbanken, Authentifizierung oder Logging), MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommt, deren zu nutzende Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellt. Das Hintergrundsystem MUSS diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 * O.Arch_7 Das Hintergrundsystem MUSS alle Anfragen der Anwendung über eine vollständig dokumentierte API entgegennehmen. Es DARF KEINE nicht dokumentierten Zugriffsmöglichkeiten enthalten.
@@ -2567,7 +2568,7 @@ This software aims to match as much relevant aspects of security measures as rea
     > Permission settings are an integral part of the application.
 * O.Auth_15 Alle einem Nutzer oder einer Sitzung zugeordneten Identifier MÜSSEN mit einem Zufallszahlengenerator gemäß O.Rand_1 erzeugt werden und eine geeignete Länge aufweisen.
 * O.Auth_16 Das Hintergrundsystem MUSS es dem Nutzer ermöglichen ein oder alle zuvor ausgestellten Authentifizierungstoken bzw. Session-Identifier ungültig zu machen.
-    > Sessions will allways be destroyed on logout.
+    > Sessions will allways be destroyed on logout or invalid login tokens (due to updates).
 * O.Auth_17 Wird eine Anwendungssitzung beendet, MUSS das Hintergrundsystem den Authentifizierungstoken bzw. Session-Identifier sicher löschen. Dies gilt sowohl für das aktive Beenden durch den Benutzer (log-out), als auch für das automatische Beenden durch die Anwendung (vgl. O.Auth_9 und O.Auth_10).
     > Sessions will allways be destroyed on logout.
 * O.Auth_18 Session-Identifier MÜSSEN als sensible Daten geschützt werden.
@@ -2592,7 +2593,7 @@ This software aims to match as much relevant aspects of security measures as rea
 
 #### 3.1.7 Prüfaspekt (7): Datensicherheit 
 * O.Data_1 Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder entschlüsselt werden können.
-    > **There is no way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files would be spread. Long term data availability for staff is critical. Data safety measures have to depend on unreachability for the local network from outside.**
+    > [Encryption statement](#encryption-statement)
 * O.Data_2 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus im Hintergrundsystem gehalten werden.
 * O.Data_3 Das Hintergrundsystem MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen.
     > Only active and intentional user input is processed and stored.
