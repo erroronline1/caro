@@ -35,6 +35,7 @@ class RECORD extends API {
 			]
 		]);
 		foreach ($elements as $element){
+			if (in_array($element['context'], ['bundle'])) return $element;
 			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
 		}
 		return false;
@@ -200,8 +201,8 @@ class RECORD extends API {
 			'content' => []
 			]];
 
-			$calendar = new CALENDARUTILITY($this->_pdo);
-			function setidentifier($element, $identify, $calendar){
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		function setidentifier($element, $identify, $calendar){
 			$content = [];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
@@ -293,7 +294,6 @@ class RECORD extends API {
 			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
 			if ($row['hidden'] && ($key = array_search($row['name'], $necessaryforms)) !== false) unset($necessaryforms[$key]);
 		}
-
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [
 				':identifier' => $this->_passedIdentify
@@ -314,7 +314,7 @@ class RECORD extends API {
 					'content' => $forms
 			]
 		];
-		else  $return['body'] =[
+		else $return['body'] =[
 			[
 					'type' => 'text',
 					'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
@@ -545,6 +545,7 @@ class RECORD extends API {
 			$this->response($result);		
 		}
 		$recorddatalist = $contexts = [];
+//var_dump($data);
 
 		// sort records to user units, others and these that can not be assigned due to deleted user ids
 		$unassigned = [];
@@ -560,7 +561,7 @@ class RECORD extends API {
 			}
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-			if ($row['closed'] || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+			if ($row['closed'] === '1' || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
 				$contexts[$row['context']][$targets[$target]][$row['identifier']]['style'] = 'display:none';
 				$contexts[$row['context']][$targets[$target]][$row['identifier']]['data-filtered_max'] = $row['id'];
 			}
