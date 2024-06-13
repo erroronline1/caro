@@ -273,10 +273,10 @@ class ORDER extends API {
 
 		$filtered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_filter', [
 			'values' => [
-				':orderfilter' => $this->_pdo->quote($this->_requestedID)
+				':orderfilter' => $this->_requestedID
 			],
 			'replacements' => [
-				':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units)),
+				':organizational_unit' => implode(",", $units),
 			]
 		]);
 		$matches = [];
@@ -756,7 +756,7 @@ class ORDER extends API {
 					]
 				]);
 				$order = $order ? $order[0] : null;
-				if (!order) $this->response([], 404);
+				if (!$order) $this->response([], 404);
 				$order = json_decode($order['order_data'], true);
 				if (array_key_exists('attachments', $order)){
 					$files = explode(',', $order['attachments']);
@@ -796,6 +796,7 @@ class ORDER extends API {
 				]
 			]);
 			$order = $order ? $order[0] : null;
+			if (!$order) $this->response(['status' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
 			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 			if (in_array($this->_subMethod, ['ordered', 'received', 'archived'])){
 					switch ($this->_subMethod){
@@ -1057,7 +1058,7 @@ class ORDER extends API {
 
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_unit', [
 					'replacements' => [
-						':organizational_unit' => implode(",", array_map(Fn($unit) => $this->_pdo->quote($unit), $units))
+						':organizational_unit' => implode(",", $units)
 					]
 				]);
 				foreach($order as $row) {

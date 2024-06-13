@@ -287,8 +287,8 @@ class CONSUMABLES extends API {
 
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
 					'values' => [
-						':article_no' => $this->_pdo->quote($article_no),
-						':vendor' => $this->_pdo->quote($vendor)
+						':article_no' => $article_no,
+						':vendor' => $vendor
 					]
 				]);
 				// set check to null
@@ -360,7 +360,7 @@ class CONSUMABLES extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
 					'replacements' => [
 						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)]),
-						':incorporated' => $this->_pdo->quote(json_encode($approve))
+						':incorporated' => json_encode($approve)
 					]
 				])) $this->response([
 					'status' => [
@@ -1044,7 +1044,7 @@ class CONSUMABLES extends API {
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 							'replacements' => [
 								':field' => 'incorporated',
-								':value' => $this->_pdo->quote($product['incorporated']),
+								':value' => $product['incorporated'],
 								':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
 							]
 						]);
