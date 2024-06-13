@@ -40,7 +40,7 @@ class SQLQUERY {
 //var_dump($query);
 		// replace tokens in query that can not be executed
 		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
-			foreach ($parameters['replacements'] as $key => $value){
+			foreach ($parameters['replacements'] as $key => &$value){
 				$list = explode(',', $value);
 				if (count($list) > 1){
 					foreach ($list as $index => $value2){
@@ -53,8 +53,9 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
+//var_dump($query);
 		$statement = $_pdo->prepare($query);
-		//var_dump($query, $parameters['values']);
+//var_dump($query, $parameters['values']);
 
 		if (!$statement->execute($parameters['values'])) return false;
 		if (str_starts_with($query, 'SELECT')) return $statement->fetchAll();
