@@ -31,11 +31,12 @@
     * [Application endponts](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
     * [Calendar endpoints](#calendar-endpoints)
+    * [Consumables endpoints](#consumables-endpoints)
     * [CSV filter endpoints](#csv-filter-endpoints)
     * [File endpoints](#file-endpoints)
     * [Form endpoints](#form-endpoints)
     * [Message endpoints](#message-endpoints)
-    * [Consumables endpoints](#consumables-endpoints)
+    * [Notification endpoints](#notification-endpoints)
     * [Order endpoints](#order-endpoints)
     * [Record endpoints](#record-endpoints)
     * [Texttemplate endpoints](#texttemplate-endpoints)
@@ -1248,6 +1249,155 @@ Sample response
 
 [Content](#content)
 
+### Consumables endpoints
+
+> GET ./api/api.php/consumables/vendor/{name|id}
+
+Returns content to create or modify vendor. If path parameter is provided, the form is prefilled according to database entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | optional | existing vendors name (string) or database id (int) |
+
+Sample response
+```
+{"body":{"content":[[{"type":"datalist","content":["Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":[],"Otto Bock":{"selected":true}}},{"type":"searchinput","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"}}],[{"type":"textinput","attributes":{"name":"Name","required":true,"value":"Otto Bock"}},{"type":"textarea","attributes":{"name":"Info","value":"&lt;&gt;","rows":8}},{"type":"radio","attributes":{"name":"vendor active"},"content":{"active and available":{"checked":true},"inactive, delete products":[]}}],....
+```
+
+> POST ./api/api.php/consumables/vendor
+
+Stores new vendor data.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | information, files, etc |
+
+Sample response
+```
+
+{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+```
+
+> PUT ./api/api.php/consumables/vendor/{id}
+
+Updates vendor data.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+| payload | form data | required | information, files, etc |
+
+Sample response
+```
+{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+```
+
+> GET ./api/api.php/consumables/product/{id}
+
+Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
+
+Similar to vendor.
+
+> POST ./api/api.php/consumables/product
+
+Stores new product data.
+
+Similar to vendor.
+
+> PUT ./api/api.php/consumables/product/{id}
+
+Updates product data.
+
+Similar to vendor.
+
+> DELETE ./api/api.php/consumables/product/{id}
+
+Deletes a product if permitted.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"status":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
+```
+
+> GET ./api/api.php/consumables/mdrsamplecheck/{id}
+
+Returns the current form for a sample check.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+
+Sample response
+```
+{"body":{"content":[[{"type":"text","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
+```
+
+> POST ./api/api.php/consumables/mdrsamplecheck/{id}
+
+Stores the sample check to records, mark product as checked, system message to defined users.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+| payload | form data | required | check notes |
+
+Sample response
+```
+{"status":{"msg":"Sample check has been saved","type":"success"}}
+```
+
+> DELETE ./api/api.php/consumables/mdrsamplecheck
+
+Deletes the sample check from records, unmark product as checked.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+
+Sample response
+```
+{"status":{"msg":"Sample check has been revoked","type":"success"}}
+```
+
+> POST ./api/api.php/consumables/incorporation
+
+Returns the current form for an incorporation.
+
+Similar to mdrsamplecheck
+
+> GET ./api/api.php/consumables/incorporation
+
+Stores the incorporation to product and selected similar, system message to defined users.
+
+Similar to mdrsamplecheck.
+
+> GET ./api/api.php/consumables/pendingincorporations
+
+Returns a list of links to products with pending incorporations.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"body":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
+```
+
+[Content](#content)
+
 ### CSV filter endpoints
 
 > GET ./api/api.php/csvfilter/filter/{id}
@@ -1685,142 +1835,11 @@ Sample response
 
 [Content](#content)
 
-### Consumables endpoints
+### Notification endpoints
 
-> GET ./api/api.php/consumables/vendor/{name|id}
+> GET ./api/api.php/notification/notifs
 
-Returns content to create or modify vendor. If path parameter is provided, the form is prefilled according to database entry.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name/id} | path parameter | optional | existing vendors name (string) or database id (int) |
-
-Sample response
-```
-{"body":{"content":[[{"type":"datalist","content":["Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":[],"Otto Bock":{"selected":true}}},{"type":"searchinput","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"}}],[{"type":"textinput","attributes":{"name":"Name","required":true,"value":"Otto Bock"}},{"type":"textarea","attributes":{"name":"Info","value":"&lt;&gt;","rows":8}},{"type":"radio","attributes":{"name":"vendor active"},"content":{"active and available":{"checked":true},"inactive, delete products":[]}}],....
-```
-
-> POST ./api/api.php/consumables/vendor
-
-Stores new vendor data.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | information, files, etc |
-
-Sample response
-```
-
-{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
-```
-
-> PUT ./api/api.php/consumables/vendor/{id}
-
-Updates vendor data.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
-| payload | form data | required | information, files, etc |
-
-Sample response
-```
-{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
-```
-
-> GET ./api/api.php/consumables/product/{id}
-
-Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
-
-Similar to vendor.
-
-> POST ./api/api.php/consumables/product
-
-Stores new product data.
-
-Similar to vendor.
-
-> PUT ./api/api.php/consumables/product/{id}
-
-Updates product data.
-
-Similar to vendor.
-
-> DELETE ./api/api.php/consumables/product/{id}
-
-Deletes a product if permitted.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
-
-Sample response
-```
-{"status":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
-```
-
-> GET ./api/api.php/consumables/mdrsamplecheck/{id}
-
-Returns the current form for a sample check.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | product database id |
-
-Sample response
-```
-{"body":{"content":[[{"type":"text","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
-```
-
-> POST ./api/api.php/consumables/mdrsamplecheck/{id}
-
-Stores the sample check to records, mark product as checked, system message to defined users.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | product database id |
-| payload | form data | required | check notes |
-
-Sample response
-```
-{"status":{"msg":"Sample check has been saved","type":"success"}}
-```
-
-> DELETE ./api/api.php/consumables/mdrsamplecheck
-
-Deletes the sample check from records, unmark product as checked.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | product database id |
-
-Sample response
-```
-{"status":{"msg":"Sample check has been revoked","type":"success"}}
-```
-
-> POST ./api/api.php/consumables/incorporation
-
-Returns the current form for an incorporation.
-
-Similar to mdrsamplecheck
-
-> GET ./api/api.php/consumables/incorporation
-
-Stores the incorporation to product and selected similar, system message to defined users.
-
-Similar to mdrsamplecheck.
-
-> GET ./api/api.php/consumables/pendingincorporations
-
-Returns a list of links to products with pending incorporations.
+Returns notifications on number of 	*calendar_uncompletedevents*, *consumables_pendingincorporation*, *form_approval*, *order_unprocessed*, *message_unnotified*, *message_unseen* to display on menu, checks for systems expiry dates, contributes to calendar and alerts eligible users.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -1829,32 +1848,177 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
+{"calendar_uncompletedevents": 2,"consumables_pendingincorporation": 13,"form_approval": 2,"order_unprocessed": "5","message_unnotified": "0","message_unseen": "1"}
 ```
 
 [Content](#content)
 
 ### Order endpoints
 
-> GET ./api/api.php/order/prepared/{unit}
-
-> GET ./api/api.php/order/productsearch/{id|name}
-
 > GET ./api/api.php/order/order/{id}
+
+Returns an order form, prefilled if valid id for a prepared order is provided.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | prepared order database id (int) |
+
+Sample response
+```
+{"body": {"form": {"data-usecase": "purchase","action": "javascript:api.purchase('post', 'order')"},"content": [[{"type": "scanner","destination": "productsearch"},{"type": "select","content": {"... all vendors": {"value": "21_4_5_15_16_17_6_7_31_30_33_22_8_32_23_34_9_18_2_3_10_12_11_29_19_13_14_20_24_1_25_26_27_28"},"Basko": {"value": "21"},"Caroli": {"value": "4"},"Feet Control": {"value": "5"},....
+```
 
 > POST ./api/api.php/order/order
 
+Stores order to database. If payload contains order authorization credentials each item is stored to approved orders, the whole order stored to prepared orders otherwise.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | ordered products, order info, sometimes authorization |
+
+Sample response
+```
+{"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}
+```
+
 > PUT ./api/api.php/order/order/{id}
+
+Updates order in database. If payload contains order authorization credentials each item is stored to approved orders, the whole order stored to prepared orders otherwise.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | prepared order database id (int) |
+| payload | form data | required | ordered products, order info, sometimes authorization |
+
+Sample response
+```
+{"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}
+```
 
 > DELETE ./api/api.php/order/order/{id}
 
+Deletes a prepared order.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | prepared order database id (int) |
+
+Sample response
+```
+{"status": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+```
+
+> GET ./api/api.php/order/prepared/{unit}
+
+Lists prepared orders of users selected primary unit if {unit} is omitted.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {unit} | path parameter | optional | organizational unit key (string) |
+
+Sample response
+```
+{"body": {"content": [[{"type": "radio","attributes": {"name": "Organizational unit"},"content": {"Administration": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'admin')"},"Office/Purchase": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'office')"},....
+```
+
+> PUT ./api/api.php/order/prepared
+
+Converts prepared orders to approved if order authorization credentials are part of payload.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | optional | containing prepared order ids and order authorization |
+
+Sample response
+```
+{"status": {"id": false,"msg": "Approved order can now be processed by the purchase department.","type": "success"}}
+```
+
+> GET ./api/api.php/order/productsearch/{vendor_id}/{search}/{_borrowedModule}
+
+Returns products matching {search} to be inserted into orders. If {_borrowedModule} is set to *editconsumables* the returned elements events lead to consumables editing.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {vendor_id} | path parameter | required | vendor id in database, _-separated list for all |
+| {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
+| {_borrowedModule} | path parameter | optional | altered events for produc management |
+
+Sample response
+```
+{"body": {"content": [[[{"type": "text","description": "Add article from 1 matches"},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "text","description": "Incorporation pending","content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
+```
+
 > GET ./api/api.php/order/approved/
 
-> PUT ./api/api.php/order/approved/{id}/{ordered|received|archived|disapproved}/{message}
+Returns aprovved orders by product.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"body": {"content": [[{"type": "radio","attributes": {"name": "Filter"},"content": {"Unprocessed": {"checked": true,"onchange": "_client.order.filter()"},"Order processed": {"onchange": "_client.order.filter(\"ordered\")"},"Received in full": {"onchange": "_client.order.filter(\"received\")"},"Archived": {"onchange": "_client.order.filter(\"archived\")"}}},{"type": "searchinput","attributes": {"name": "Or filter by term","onkeypress": "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",....
+```
+
+> PUT ./api/api.php/order/approved/{id}/{update}/{state}
+
+Updates approved order (states, appending information, etc.) or transfer to prepared order revoking order authorization.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | order item database id (int) |
+| {update} | path parameter | required | ordered, received, archived, addinformation, disapproved, cancellation, return |
+| {state} | path parameter | optional | true, false |
+| payload | form data | optional | messages |
+
+* *ordered*, *received*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
+* *addinformation* appends payload to order info, alerts ordering unit on matching special words (order state changes)
+* *disapproved* transfers to prepared orders, payload message to ordering unit
+* *cancellation*, *return* convert to unprocessed order setting the respective database flag
+
+Sample response
+```
+{"status": {"msg": "Information has been added set","type": "info"}}
+```
 
 > DELETE ./api/api.php/order/approved/{id}
 
-> GET ./api/api.php/order/filtered/{filter}
+Returns approved orders by product.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | approved order database id (int) |
+
+Sample response
+```
+{"status": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+```
+
+> GET ./api/api.php/order/filter/{search}
+
+Returns order ids whose contents match {search}.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string  |
+
+Sample response
+```
+{"status": {"data": ["89","90"]}}
+```
 
 [Content](#content)
 
