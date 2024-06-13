@@ -343,6 +343,10 @@ class RECORD extends API {
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 				}
+				if (!$identifier) {
+					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$identifier = $form_name . ' ' . $date->format('Y-m-d H:i');
+				}
 
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
@@ -515,7 +519,7 @@ class RECORD extends API {
 	public function import(){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [
-				':identifier' => UTILTY::propertySet($this->_payload, 'IDENTIFY_BY_')
+				':identifier' => UTILITY::propertySet($this->_payload, 'IDENTIFY_BY_')
 			]
 		]);
 		if ($data) {
@@ -534,7 +538,6 @@ class RECORD extends API {
 				'msg' => LANG::GET('record.record_import_error'),
 				'type' => 'error'
 			]]);
-
 	}
 
 	public function records(){
@@ -545,7 +548,6 @@ class RECORD extends API {
 			$this->response($result);		
 		}
 		$recorddatalist = $contexts = [];
-//var_dump($data);
 
 		// sort records to user units, others and these that can not be assigned due to deleted user ids
 		$unassigned = [];
@@ -561,7 +563,7 @@ class RECORD extends API {
 			}
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-			if ($row['closed'] === '1' || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+			if ($row['closed'] == 1 /*no type comparison*/ || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
 				$contexts[$row['context']][$targets[$target]][$row['identifier']]['style'] = 'display:none';
 				$contexts[$row['context']][$targets[$target]][$row['identifier']]['data-filtered_max'] = $row['id'];
 			}
