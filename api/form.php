@@ -631,28 +631,28 @@ class FORM extends API {
 				}
 
 				// recursively check for identifier
-				function check4identifier($element){
-					$hasindentifier = false;
+				function check4identifier($element, $hasidentifier = false){
+					if ($hasidentifier) return true;
 					foreach($element as $sub){
 						if (array_is_list($sub)){
-							$hasindentifier = check4identifier($sub);
+							$hasidentifier = check4identifier($sub, $hasidentifier);
 						} else {
-							if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasindentifier = true;
+							if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasidentifier = true;
 						}
 					}
-					return $hasindentifier;
+					return $hasidentifier;
 				}
 				// check for identifier if context makes it mandatory
 				// do this in advance of updating in case of selecting such a context
 				$this->_payload->context = substr($this->_payload->context, -2) === ' *' ? substr($this->_payload->context, 0, -2) : $this->_payload->context; // unset marking
 				if (in_array($this->_payload->context, array_keys(LANGUAGEFILE['formcontext']['identify']))){
-					$hasindentifier = false;
+					$hasidentifier = false;
 					foreach($this->_payload->content as $component){
 						// get latest approved by name
 						$latestcomponent = $this->latestApprovedName('form_component_get_by_name', $component);
-						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasindentifier = true;
+						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasidentifier = true;
 					}
-					if (!$hasindentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
+					if (!$hasidentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
 				}
 				// convert values to keys for regulatory_context
 				$regulatory_context = [];
