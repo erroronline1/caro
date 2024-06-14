@@ -2364,16 +2364,90 @@ Sample response if no files are available
 
 ### User endpoints
 
-
 > GET ./api/api.php/user/profile
+
+Returns the logged in users system information and custom settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"content": [[{"type": "text","description": "Your data within CARO","content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
+```
+
+> POST ./api/api.php/user/profile
+
+Stores custom settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | user image, application settings |
+
+Sample response
+```
+{"status": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+```
 
 > GET ./api/api.php/user/user/{id|name}
 
+Returns a form for adding a new user, prefilled settings if id or name is provided.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id|name} | path parameter | optional | string name or int id |
+
+Sample response
+```
+{"body": {"content": [[{"type": "datalist","content": ["armprothetik","CARO App","error on line 1","testuser"],"attributes": {"id": "users"}},{"type": "select","attributes": {"name": "Edit existing user","onchange": "api.user('get', 'user', this.value)"},"content": {"...New user": [],"armprothetik": [],"CARO App": [],"error on line 1": {"selected": true},"testuser": []}},{"type": "searchinput","attributes": {"name": "Search by name","list": "users","onkeypress": "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"}}],....
+```
+
 > POST ./api/api.php/user/user
+
+Stores a new user.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | user image, application settings |
+
+Sample response
+```
+{"status": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+```
 
 > PUT ./api/api.php/user/user/{id}
 
+Updates user settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | user id |
+| payload | form data | required | user image, application settings |
+
+Sample response
+```
+{"status": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+```
+
 > DELETE ./api/api.php/user/user/{id}
+
+Deletes a user from database including assigned messages and calendar events.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | user id |
+
+Sample response
+```
+{"status": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
+```
 
 [Content](#content)
 
