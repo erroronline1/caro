@@ -15,23 +15,25 @@ class MESSAGE extends API {
 	public function message(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				// get recipient id
-				$recipient = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
-						':id' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))
+				// get recipient ids
+				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'replacements' => [
+						':id' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
 					]
 				]);
-				$recipient = $recipient ? $recipient[0]: null;
-				if (!$recipient) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]), 'type' => 'error']], 400);
-				if ($recipient['id'] < 2) $this->response(['status' => ['msg' => LANG::GET('message.forbidden'), 'type' => 'error']], 403);
-				
-				if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
-					'values' => [
-						'from_user' => $_SESSION['user']['id'],
-						'to_user' => $recipient['id'],
-						'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]))
-					]
-				])) $this->response([
+				if (!$recipients) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]), 'type' => 'error']]);
+				$success = 0;
+				foreach ($recipients as $recipient){
+					if ($recipient['id'] < 2) continue;
+					if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
+						'values' => [
+							'from_user' => $_SESSION['user']['id'],
+							'to_user' => $recipient['id'],
+							'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]))
+						]
+					])) $success++;
+				}
+				if ($success === count($recipients)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_success'),
 						'redirect' => false,
@@ -39,7 +41,7 @@ class MESSAGE extends API {
 					]]);
 				else $this->response([
 					'status' => [
-						'msg' => LANG::GET('message.send_failure'),
+						'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
 						'redirect' => false,
 						'type' => 'error'
 					]]);
@@ -68,7 +70,7 @@ class MESSAGE extends API {
 					]);
 					$conversation_content = [];
 					$conversation_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-						'values' => [
+						'replacements' => [
 							':id' => $this->_conversation
 						]
 					]);
@@ -204,7 +206,7 @@ class MESSAGE extends API {
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		$result = ['body' => ['content' => []]];
 		foreach($users as $user){
-			if ($user['id'] === '1') continue;
+			if ($user['id'] == 1) continue;
 			$mailto =  [
 				'href' => 'javascript:void(0)',
 				'data-type' => 'input',

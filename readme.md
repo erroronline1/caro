@@ -51,9 +51,6 @@
 
 
 # development
-* incorporation on same article_no
-* permission to message user groups
-* data deletion in accordance to dsgvo, eg. recommend deletion after x years
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -66,14 +63,16 @@
 * vendor evaluation
 
 #### application considerations
+* data deletion in accordance to dsgvo, eg. recommend deletion after x years
 * user selectable color themes?
 * risk management?
+* append username and time to record requests?
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
 
 #### records considerations
-* linked files on separate external path
+* linked files on separate external path, input type convert to link
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 
@@ -314,7 +313,7 @@ graph TD;
 [Content](#content)
 
 ### Conversations
-This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
+This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
 
@@ -2112,7 +2111,7 @@ Store a message to the database. One for the sending user, another for the recip
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | containing recipient and message |
+| payload | form data | required | containing recipient(s) and message |
 
 Sample response
 ```
