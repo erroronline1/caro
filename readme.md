@@ -2282,13 +2282,13 @@ Similar to chunk.
 
 > GET ./api/api.php/texttemplate/text/{id}/{modal}
 
-Returns a full page form opens form with selection of text recommendations, content if id is added.
+Returns a form with selection of text recommendations, content if {id} is added. Formats for modal if passed literally.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {id} | path parameter | optional | database id for chunk or false |
-| {modal} | path parameter | optional | alters response to be loadable withon modal |
+| {modal} | path parameter | optional | "modal" literally alters response to be loadable within modal |
 
 Sample response
 ```
@@ -2299,14 +2299,66 @@ Sample response
 
 ### Tool endpoints
 
+> GET ./api/api.php/tool/code/{type}
 
-> GET ./api/api.php/tool/code
+Returns a form with selection of code creators.
 
-> GET ./api/api.php/tool/code/display?key=value
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | supported code type (qrcode_text, qrcode_appointment, barcode_code128, barcode_ean13) |
+
+Sample response
+```
+{"body": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
+```
+
+> POST ./api/api.php/tool/code/{type}
+
+Returns a form with selection of code creators, prefilled with passed data from payload and an option to download a client-generated image.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | supported code type (qrcode_text, qrcode_appointment, barcode_code128, barcode_ean13) |
+| payload | form data | required | defined fields from previus GET fetch |
+
+Sample response
+```
+{"body": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
+```
 
 > GET ./api/api.php/tool/scanner
 
+Returns a generic full page form to scan a 2D-code.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"body": {"content": [[{"type": "scanner","description": "2D-scanner","destination": "tool_scanner"},{"type": "textarea","attributes": {"name": "Result","rows": 8,"readonly": true,"id": "tool_scanner"}}]]}}
+```
+
 > GET ./api/api.php/tool/stlviewer
+
+Returns a selection of available stl files (files, sharepoint) and canvas to display these.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"body": {"content": [[{"type": "select","attributes": {"name": "Select file to view","onchange": "_client.tool.initStlViewer('../' + this.value)"},"content": {"...": {"value": "null"},"../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl": {"value": "../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl"}}},{"type": "stlviewer"}]]}}
+```
+Sample response if no files are available
+```
+{"body": {"content": [[{"type": "nocontent","content": "Currently there are no files, everything is tidied up :)"}]]}}
+```
 
 [Content](#content)
 
