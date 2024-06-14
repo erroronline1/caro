@@ -229,7 +229,7 @@ class FILE extends API {
 				}
 				else {
 					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
-					if ($this->_requestedFolder === 'users') {
+					elseif ($this->_requestedFolder === 'users') {
 						$files = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 						$files = array_filter($files, fn($file) => substr(pathinfo($file)['filename'], 0, 10) !== 'profilepic');
 					}
