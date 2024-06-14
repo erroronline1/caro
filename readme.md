@@ -1022,10 +1022,10 @@ You can as well define all products as trading goods and set to 0 conditionally 
 [Content](#content)
 
 ## API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by Assemble or Toast. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
+All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class or Toast-class. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
 Response properties are *body*, *form*, *status* and *msg* most of the time.
 
-All form data for POST and PUT require either the provided input fields as previously created from GET fetches or the JS _client-methods. Processing is regularily dependent on specific names.
+All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS compose_helper-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
 ### Application endpoints
 
