@@ -225,7 +225,7 @@ class AUDIT extends API {
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
 			if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
-				if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+				if (array_key_exists('vendor_label', $decoded_order_data) && (array_key_exists($tocheck, $unincorporated) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label'])){
 					$article = $decoded_order_data['ordernumber_label'] . $decoded_order_data['vendor_label'];
 					if (!in_array($article, $orderedunincorporated)) $orderedunincorporated[] = $article;
 				}
