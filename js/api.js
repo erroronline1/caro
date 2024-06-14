@@ -143,7 +143,7 @@ export const api = {
 
 				successFn = async function (data) {
 					await api.application("get", "menu");
-					if (data.body.form) {
+					if (data.body && data.body.form) {
 						const body = new Assemble(data.body);
 						document.getElementById("main").replaceChildren(body.initializeSection());
 						body.processAfterInsertion();
@@ -156,20 +156,20 @@ export const api = {
 						);
 						return;
 					}
-					if (data.body.image) {
+					window._user = data.status;
+					if (_user.image) {
 						const firstLabel = document.querySelector("[data-for=userMenuApplication]>label");
-						firstLabel.style.backgroundImage = "url('" + data.body.image + "')";
+						firstLabel.style.backgroundImage = "url('" + _user.image + "')";
 						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
 					}
-					if (data.body.app_settings) {
-						for (const [key, value] of Object.entries(data.body.app_settings)) {
+					if (_user.app_settings) {
+						for (const [key, value] of Object.entries(_user.app_settings)) {
 							switch (key) {
 								case "forceDesktop":
 									if (value) {
 										let stylesheet = document.styleSheets[0].cssRules;
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)")
-												stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
 										}
 									}
 									break;
@@ -757,8 +757,7 @@ export const api = {
 		get order/filtered/{filter}
 		*/
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations"].includes(request[0]))
-			request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -866,9 +865,7 @@ export const api = {
 				}
 				break;
 			case "put":
-				if (
-					["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])
-				) {
+				if (["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
 					if (typeof request[4] === "object") {
 						payload = request[4];
 						delete request[4];
@@ -959,13 +956,8 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]"),
 									exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									if (data.status.filter === undefined || data.status.filter == "some")
-										element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
-									else
-										element.style.display =
-											data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element)
-												? "block"
-												: "none";
+									if (data.status.filter === undefined || data.status.filter == "some") element.style.display = data.status.data.includes(element.dataset.filtered) ? "block" : "none";
+									else element.style.display = data.status.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
 								}
 							}
 						};
@@ -992,13 +984,10 @@ export const api = {
 											}
 										} else if (input.type === "radio") {
 											// nest to avoid overriding values of other radio elements
-											input.checked =
-												Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
+											input.checked = Object.keys(data.status.data).includes(inputname) && data.status.data[inputname] === input.value;
 										} else if (input.type === "checkbox") {
 											groupname = input.dataset.grouped.replaceAll(" ", "_");
-											input.checked =
-												Object.keys(data.status.data).includes(groupname) &&
-												data.status.data[groupname].split(", ").includes(input.name);
+											input.checked = Object.keys(data.status.data).includes(groupname) && data.status.data[groupname].split(", ").includes(input.name);
 										} else {
 											if (Object.keys(data.status.data).includes(inputname)) input.value = data.status.data[inputname];
 										}
