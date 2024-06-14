@@ -27,6 +27,8 @@
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
+* [Code design patterns](#code-design-patterns)
+* [CSV processor](#csv-processor)
 * [API documentation](#api-documentation)
     * [Application endponts](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
@@ -42,8 +44,6 @@
     * [Texttemplate endpoints](#texttemplate-endpoints)
     * [Tool endpoints](#tool-endpoints)
     * [User endpoints](#user-endpoints)
-* [Code design patterns](#code-design-patterns)
-* [CSV processor](#csv-processor)
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
     * [Web Application](#web-application)
     * [Backend](#backend)
@@ -270,7 +270,7 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
     * **full access**
     * can approve as all eligible permission groups
     * can export all timesheets
-    * default user CARO App has this permission. Use it to implement new users. Change default token immidiately and store it in a safe place!
+    * default user CARO App has this permission. Use it to implement new users. Change default token immediately and store it in a safe place!
     * assign only to trusted staff members, preferably administative members
 
 Users can have multiple assigned organizational units and permissions.
@@ -333,7 +333,7 @@ To avoid unneccesary or repetitive poetry and support a consistent linguistic st
 * Informal you - "buddy"
 * Formal you - "your honor" (this is the german model part where there is more than just "you")
 
-Such a replacement may be named addressee. If a generic text chunk contains :applicationee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+Such a replacement may be named addressee. If a generic text chunk contains :addressee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
 
@@ -384,13 +384,13 @@ Several other pieces of software claim to handle your documents and speak of ver
 
 To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by defined authorized users to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
-An approvement request is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in in the respective assigned role/permission. 
+An approvement request is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. 
 
 Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record. Authorized form creators can decide for general permission though.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form).
 
 ![form composer screenshot](assets/forms.png)
 
@@ -439,7 +439,7 @@ The identifier is always a QR-code with additional readable content that will ap
 
 Checking for completeness of form bundles can be applied on display of a record summary.
 
-Records can be marked as closed to disappear from the records overwiew and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword, name or identifier. On contributing the closed state is revoked by default.
+Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default.
 
 ![record screenshot](assets/records.png)
 
@@ -490,7 +490,7 @@ Defined authorized users can provide files for everyone to access. Also all user
 
 Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
 
-This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity) and have to be used by everyone, without permission to export too.
+This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion; register external documents for the same reason.*
 
 External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
@@ -507,7 +507,7 @@ As scheduling is supposed to help you with operational planning (e.g. daily assi
 
 Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
 
-Scheduling and its events are not part of the records per se as any action is supposed to have its own timed [record](#records).
+Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records).
 
 Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only.
 
@@ -749,7 +749,7 @@ Sample checks are added to the records. Defined authorized users can revoke the 
 ### Tools
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
 
-Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defines authorized users.
+Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
 The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
 * incoporated articles
@@ -771,6 +771,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * Network access for endpoints and a browser
     * Desktop pcs
     * Mobile devices
+    * at best [no deletion of browser data](#network-connection-handling) (chache, indexedDB) on closing.
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
 Tested server environments:
@@ -794,9 +795,9 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
 * php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 900 (15min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
-    * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 2 minutes on SQL Server
-    * pricelist import @ 660k rows currently takes about 4 minutes to import and process on Uniform Server, 10 minutes on SQL Server
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
+    * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
+    * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * php.ini enable extensions:
     * gd
@@ -810,7 +811,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
 * Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
-* Change system users default token immidiately and store it in a safe place!
+* Change system users default token immediately and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ### Runtime variables
@@ -857,6 +858,7 @@ names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whi
 names[] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
+names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[] = "IDENTIFY_BY_" ; special substrings |-separated
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
 
@@ -1018,6 +1020,306 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 *modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default.
 
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
+
+[Content](#content)
+
+## Code design patterns
+For static code analysis
+
+### Frontend design
+All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
+
+A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
+
+DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
+
+_client-object handles module specific recurring tasks of form preparations (./js/utility.js)
+
+### Backend design
+There is a UTILITY class handling
+* parsing of requests
+* file handling within permitted directories
+* image processing
+Using these methods for fitting usecases is mandatory. (./api/utility.php)
+
+There is a PERMISSION class handling
+* permissions as set within setup.ini
+* full approval check
+* pending approval check
+Using these methods is mandatory. (./api/utility.php) Deviations are allowed only in extending access to *admin* or limiting access for
+* *supervisors* having access to assigned organizational unit content only
+* *groups* not having access to recording
+
+There is a SQLQUERY class handling
+* database connections
+* query preparation
+* masking user input (avoiding injections)
+* support of chunkifying queries for improved performance
+Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/sqlinterface.php)
+
+All requests have to be executed through the api ensuring
+* responses for logged in users only
+* reaching only intended endpoints
+Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
+
+Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
+
+[Content](#content)
+
+## CSV processor
+The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
+
+Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
+
+Description of options:
+
+	"postProcessing": Optional string as hint what to do with the result file
+	"filesetting":
+		"source": File to process, SELF or a named array (the other filesettings don't matter then)
+		"headerrowindex": Offset for title row
+		"dialect": Settings according to php fgetcsv
+		"columns": list/array of column names to process and export to destination
+		"encoding": Comma separated string of possible character encoding of sourcefile
+
+	"filter": List/array of objects/dicts
+		"apply": "filter_by_expression"
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"match":
+			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
+			"any": At least one expression has to be matched, it's either "all" or "any"
+
+		"apply": "filter_by_monthdiff"
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"date": Filter by identifier and date diff in months
+			"identifier": Column name with recurring values, e.g. customer id
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"threshold": Integer for months,
+			"bias": < less than, > greater than threshold
+
+		"apply": "filter_by_duplicates",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+			"orderby": List/array of column names whose values concatenate for comparison
+			"descending": Boolean,
+			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
+			"amount": Integer > 0
+
+		"apply": "filter_by_comparison_file",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
+			"filesetting": Same structure as base. if source == "SELF" the origin file will be processed
+			"filter": Same structure as base
+			"modify": Same structure as base
+			"match":
+				"all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
+				"any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
+		"transfer": Add a new column with comparison value
+
+		"apply": "filter_by_monthinterval",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"interval": Discard by not matching interval in months, optional offset from initial column value
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"interval": Integer for months,
+			"offset": Optional offset in months
+
+		"apply": "filter_by_rand",
+		"comment": Description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
+			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
+			"amount": Integer > 0
+
+	"modify": Modifies the result
+		"add": Adds a column with the set value. if the name is already in use this will be replaced!
+			   If property is an array with number values and arithmetic operators it will try to calculate
+			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
+		"replace": Replaces regex matches with the given value either at a specified field or in all
+				   according to index 0 being a column name or none/null
+				   If more than one replacement are provided new lines with altered column values will be added to the result
+				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
+		"remove": Remove columns from result, may have been used solely for filtering
+		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
+				   Original columns will be omitted, nested within a list to make sure to order as given
+		"translate": Column values to be translated according to specified translation object
+		"conditional": changes a columns value if regex matches on other columns, adds column by default with empty value
+
+	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+
+	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+
+	"translations" : Can replace e.g. numerical values with legible translations.
+					 This is an object/dict whose keys can be refered to from the modifier. 
+					 The dict keys are processed as regex for a possible broader use.
+
+A generic sample:
+
+```javascript
+{
+    "postProcessing": "some message, e.g. do not forget to check and archive",
+    "filesetting": {
+        "source": "Export.+?\\.csv",
+        "headerrowindex": 0,
+        "columns": [
+            "ORIGININDEX",
+            "SOMEDATE",
+            "CUSTOMERID",
+            "NAME",
+            "DEATH",
+            "AID",
+            "PRICE",
+            "DELIVERED",
+            "DEPARTMENT",
+            "SOMEFILTERCOLUMN"
+        ]
+    },
+    "filter": [
+        {
+            "apply": "filter_by_expression",
+            "comment": "keep if all general patterns match",
+            "keep": true,
+            "match": {
+                "all": {
+                    "DELIEVERED": "delivered",
+                    "NAME": ".+?"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if any general exclusions match",
+            "keep": false,
+            "match": {
+                "any": {
+                    "DEATH": ".+?",
+                    "NAME": "company|special someone",
+                    "AID": "repair|cancelling|special.*?names"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if value is below 400 unless pattern matches",
+            "keep": false,
+            "match": {
+                "all": {
+                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
+                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_monthdiff",
+            "comment": "discard by date diff in months, do not contact if last event within x months",
+            "keep": false,
+            "date": {
+                "column": "SOMEDATE",
+                "format": ["d", "m", "y"],
+                "threshold": 6,
+                "bias": "<"
+            }
+        },
+        {
+            "apply": "filter_by_duplicates",
+            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
+            "keep": true,
+            "duplicates": {
+                "orderby": ["ORIGININDEX"],
+                "descending": false,
+                "column": "CUSTOMERID",
+                "amount": 1
+            }
+        },
+        {
+            "apply": "filter_by_comparison_file",
+            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
+            "keep": false,
+            "filesetting": {
+                "source": "excemptions.*?.csv",
+                "headerrowindex": 0,
+                "columns": [
+                    "VORGANG"
+                ]
+            },
+            "filter": [],
+            "match": {
+                "all":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                },
+                "any":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                }
+            },
+            "transfer":{
+                "NEWPARENTCOLUMN": "COMPARECOLUMN"
+            }
+        },
+        {
+            "apply": "filter_by_monthinterval",
+            "comment": "discard by not matching interval in months, optional offset from initial column value",
+            "keep": false,
+            "interval": {
+                "column": "SOMEDATE",
+                "format": ["d", "m", "y"],
+                "interval": 6,
+                "offset": 0
+            }
+        },
+        {
+            "apply": "filter_by_rand",
+            "comment": "keep some random rows",
+            "keep": true,
+            "data": {
+                "columns": {
+                    "SOMEFILTERCOLUMN", "hasvalue"
+                },
+                "amount": 10
+            }
+        }
+    ],
+    "modify":{
+        "add":{
+            "NEWCOLUMNNAME": "string",
+            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
+        },
+        "replace":[
+            ["NAME", "regex", "replacement"],
+            [null, ";", ","]
+        ],
+        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
+        "rewrite":[
+            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
+        ],
+        "translate":{
+            "DEPARTMENT": "departments"
+        },
+        "conditional":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ]
+    },
+    "split":{
+        "DEPARTMENT": "(.*)",
+        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
+    },
+    "evaluate": {
+        "EMAIL": "^((?!@).)*$"
+    }
+	"translations":{
+		"departments":{
+			"1": "Central",
+			"2": "Department 1",
+			"3": "Department 2",
+			"4": "Office"
+		}
+	}
+}
+```
 
 [Content](#content)
 
@@ -2443,306 +2745,6 @@ Parameters
 Sample response
 ```
 {"status": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
-```
-
-[Content](#content)
-
-## Code design patterns
-For static code analysis
-### Frontend design
-All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
-
-A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
-
-DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
-
-_client-object handles module specific recurring tasks of form preparations (./js/utility.js)
-
-
-### Backend design
-There is a UTILITY class handling
-* parsing of requests
-* file handling within permitted directories
-* image processing
-Using these methods for fitting usecases is mandatory. (./api/utility.php)
-
-There is a PERMISSION class handling
-* permissions as set within setup.ini
-* full approval check
-* pending approval check
-Using these methods is mandatory. (./api/utility.php) Deviations are allowed only in extending access to *admin* or limiting access for
-* *supervisors* having access to assigned organizational unit content only
-* *groups* not having access to recording
-
-There is a SQLQUERY class handling
-* database connections
-* query preparation
-* masking user input (avoiding injections)
-* support of chunkifying queries for improved performance
-Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/sqlinterface.php)
-
-All requests have to be executed through the api ensuring
-* responses for logged in users only
-* reaching only intended endpoints
-Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
-
-Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
-
-[Content](#content)
-
-## CSV processor
-The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
-
-Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
-
-Description of options:
-
-	"postProcessing": Optional string as hint what to do with the result file
-	"filesetting":
-		"source": File to process, SELF or a named array (the other filesettings don't matter then)
-		"headerrowindex": Offset for title row
-		"dialect": Settings according to php fgetcsv
-		"columns": list/array of column names to process and export to destination
-		"encoding": Comma separated string of possible character encoding of sourcefile
-
-	"filter": List/array of objects/dicts
-		"apply": "filter_by_expression"
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"match":
-			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
-			"any": At least one expression has to be matched, it's either "all" or "any"
-
-		"apply": "filter_by_monthdiff"
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"date": Filter by identifier and date diff in months
-			"identifier": Column name with recurring values, e.g. customer id
-			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["d", "m", "y"],
-			"threshold": Integer for months,
-			"bias": < less than, > greater than threshold
-
-		"apply": "filter_by_duplicates",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-			"orderby": List/array of column names whose values concatenate for comparison
-			"descending": Boolean,
-			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
-			"amount": Integer > 0
-
-		"apply": "filter_by_comparison_file",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
-			"filesetting": Same structure as base. if source == "SELF" the origin file will be processed
-			"filter": Same structure as base
-			"modify": Same structure as base
-			"match":
-				"all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
-				"any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
-		"transfer": Add a new column with comparison value
-
-		"apply": "filter_by_monthinterval",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"interval": Discard by not matching interval in months, optional offset from initial column value
-			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["d", "m", "y"],
-			"interval": Integer for months,
-			"offset": Optional offset in months
-
-		"apply": "filter_by_rand",
-		"comment": Description, will be displayed
-		"keep": boolean if matches are kept or omitted
-		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
-			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
-			"amount": Integer > 0
-
-	"modify": Modifies the result
-		"add": Adds a column with the set value. if the name is already in use this will be replaced!
-			   If property is an array with number values and arithmetic operators it will try to calculate
-			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
-		"replace": Replaces regex matches with the given value either at a specified field or in all
-				   according to index 0 being a column name or none/null
-				   If more than one replacement are provided new lines with altered column values will be added to the result
-				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
-		"remove": Remove columns from result, may have been used solely for filtering
-		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
-				   Original columns will be omitted, nested within a list to make sure to order as given
-		"translate": Column values to be translated according to specified translation object
-		"conditional": changes a columns value if regex matches on other columns, adds column by default with empty value
-
-	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
-
-	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
-
-	"translations" : Can replace e.g. numerical values with legible translations.
-					 This is an object/dict whose keys can be refered to from the modifier. 
-					 The dict keys are processed as regex for a possible broader use.
-
-A generic sample:
-
-```javascript
-{
-    "postProcessing": "some message, e.g. do not forget to check and archive",
-    "filesetting": {
-        "source": "Export.+?\\.csv",
-        "headerrowindex": 0,
-        "columns": [
-            "ORIGININDEX",
-            "SOMEDATE",
-            "CUSTOMERID",
-            "NAME",
-            "DEATH",
-            "AID",
-            "PRICE",
-            "DELIVERED",
-            "DEPARTMENT",
-            "SOMEFILTERCOLUMN"
-        ]
-    },
-    "filter": [
-        {
-            "apply": "filter_by_expression",
-            "comment": "keep if all general patterns match",
-            "keep": true,
-            "match": {
-                "all": {
-                    "DELIEVERED": "delivered",
-                    "NAME": ".+?"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_expression",
-            "comment": "discard if any general exclusions match",
-            "keep": false,
-            "match": {
-                "any": {
-                    "DEATH": ".+?",
-                    "NAME": "company|special someone",
-                    "AID": "repair|cancelling|special.*?names"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_expression",
-            "comment": "discard if value is below 400 unless pattern matches",
-            "keep": false,
-            "match": {
-                "all": {
-                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
-                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_monthdiff",
-            "comment": "discard by date diff in months, do not contact if last event within x months",
-            "keep": false,
-            "date": {
-                "column": "SOMEDATE",
-                "format": ["d", "m", "y"],
-                "threshold": 6,
-                "bias": "<"
-            }
-        },
-        {
-            "apply": "filter_by_duplicates",
-            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
-            "keep": true,
-            "duplicates": {
-                "orderby": ["ORIGININDEX"],
-                "descending": false,
-                "column": "CUSTOMERID",
-                "amount": 1
-            }
-        },
-        {
-            "apply": "filter_by_comparison_file",
-            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
-            "keep": false,
-            "filesetting": {
-                "source": "excemptions.*?.csv",
-                "headerrowindex": 0,
-                "columns": [
-                    "VORGANG"
-                ]
-            },
-            "filter": [],
-            "match": {
-                "all":{
-                    "ORIGININDEX": "COMPAREFILEINDEX"
-                },
-                "any":{
-                    "ORIGININDEX": "COMPAREFILEINDEX"
-                }
-            },
-            "transfer":{
-                "NEWPARENTCOLUMN": "COMPARECOLUMN"
-            }
-        },
-        {
-            "apply": "filter_by_monthinterval",
-            "comment": "discard by not matching interval in months, optional offset from initial column value",
-            "keep": false,
-            "interval": {
-                "column": "SOMEDATE",
-                "format": ["d", "m", "y"],
-                "interval": 6,
-                "offset": 0
-            }
-        },
-        {
-            "apply": "filter_by_rand",
-            "comment": "keep some random rows",
-            "keep": true,
-            "data": {
-                "columns": {
-                    "SOMEFILTERCOLUMN", "hasvalue"
-                },
-                "amount": 10
-            }
-        }
-    ],
-    "modify":{
-        "add":{
-            "NEWCOLUMNNAME": "string",
-            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
-        },
-        "replace":[
-            ["NAME", "regex", "replacement"],
-            [null, ";", ","]
-        ],
-        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
-        "rewrite":[
-            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
-        ],
-        "translate":{
-            "DEPARTMENT": "departments"
-        },
-        "conditional":[
-            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
-        ]
-    },
-    "split":{
-        "DEPARTMENT": "(.*)",
-        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
-    },
-    "evaluate": {
-        "EMAIL": "^((?!@).)*$"
-    }
-	"translations":{
-		"departments":{
-			"1": "Central",
-			"2": "Department 1",
-			"3": "Department 2",
-			"4": "Office"
-		}
-	}
-}
 ```
 
 [Content](#content)
