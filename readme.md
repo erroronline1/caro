@@ -247,7 +247,7 @@ On registering a new user a default profile picture is generated. Custom set pic
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
-The application provides some options for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible. These can be set and modified within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
+The application provides a dedicated role management for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
 
 Some permissions/restrictions are default set though:
 
@@ -271,7 +271,7 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
     * can approve as all eligible permission groups
     * can export all timesheets
     * default user CARO App has this permission. Use it to implement new users. Change default token immediately and store it in a safe place!
-    * assign only to trusted staff members, preferably administative members
+    * assign only to trusted, preferably administative staff members
 
 Users can have multiple assigned organizational units and permissions.
 
@@ -516,6 +516,8 @@ This is supposed to ensure a transparent communication, data safety and collecti
 Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
 
 *Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution! On minor changes it is recommended to export the most recent timesheets and start tracking anew.*
+
+Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
@@ -771,7 +773,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * Network access for endpoints and a browser
     * Desktop pcs
     * Mobile devices
-    * at best [no deletion of browser data](#network-connection-handling) (chache, indexedDB) on closing.
+    * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
 Tested server environments:
@@ -948,7 +950,7 @@ products_per_slide = 6
 * The manual is intentionally editable to accomodate it to users comprehension.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
-    * [permission]
+    * [permission] (has no effect without consideration in role management within setup.ini)
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
@@ -1347,7 +1349,7 @@ Returns user image and app settings on valid session, login form otherwise.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {logout} | path parameter | optional | if added to endpoint active logout occurs |
+| {logout} | path parameter | optional | triggers active logout if added literally |
 | payload | form data | optional | contains password for login
 
 Sample response
