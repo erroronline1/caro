@@ -1170,8 +1170,13 @@ export const api = {
 		request.splice(0, 0, "tool");
 		let payload,
 			successFn = function (data) {
-				new Toast(data.status.msg, data.status.type);
-				api.user("get", request[1], data.status.id);
+				if (data.body) {
+					api.update_header(title[request[1]]);
+					const body = new Assemble(data.body);
+					document.getElementById("main").replaceChildren(body.initializeSection());
+					body.processAfterInsertion();
+				}
+				if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
 			},
 			title = {
 				code: LANG.GET("menu.tools_digital_codes"),
@@ -1180,20 +1185,9 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
-				successFn = function (data) {
-					if (data.body) {
-						api.update_header(title[request[1]]);
-						const body = new Assemble(data.body);
-						document.getElementById("main").replaceChildren(body.initializeSection());
-						body.processAfterInsertion();
-					}
-					if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-				};
-				if (request[3] === "display") {
-					payload = _.getInputs("[data-usecase=tool_create_code]");
-				}
 				break;
 			case "post":
+				payload = _.getInputs("[data-usecase=tool_create_code]", true);
 				break;
 			default:
 				return;
