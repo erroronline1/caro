@@ -370,7 +370,7 @@ class SQLQUERY {
 		],
 		'file_bundles_get_active' => [
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
-			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active=1 GROUP BY name) ORDER BY name"
+			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active = 1 GROUP BY name) ORDER BY name"
 		],
 		'file_external_documents_get' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
@@ -627,8 +627,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
-			'mysql' => "SELECT * FROM caro_user WHERE id = :id OR name = :id",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
+			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:id)",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:id) OR name IN (:id)"
 		],
 		'user_get_orderauth' => [
 			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",

@@ -18,7 +18,7 @@ class USER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
+					'replacements' => [
 						':id' => $_SESSION['user']['id']
 					]
 				]);
@@ -79,7 +79,7 @@ class USER extends API {
 				break;
 			case 'GET':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
+					'replacements' => [
 						':id' => $_SESSION['user']['id']
 					]
 				]);
@@ -307,7 +307,7 @@ class USER extends API {
 				$units = [];
 		
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
+					'replacements' => [
 						':id' => intval($this->_requestedID)
 					]
 				]);
@@ -424,8 +424,8 @@ class USER extends API {
 		
 				// select single user based on id or name
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
-						':id' => $this->_requestedID
+					'replacements' => [
+						':id' => $this->_requestedID ? : ''
 					]
 				]);
 				$user = $user ? $user[0] : null;
@@ -645,7 +645,7 @@ class USER extends API {
 			case 'DELETE':
 				// prefetch to return proper name after deletion
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
+					'replacements' => [
 						':id' => intval($this->_requestedID)
 					]
 				]);

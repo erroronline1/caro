@@ -524,7 +524,7 @@ class CALENDAR extends API {
 			case 'POST':
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
+					'replacements' => [
 						':id' => $affected_user_id
 					]
 				])) $affected_user = $affected_user[0];
@@ -571,7 +571,7 @@ class CALENDAR extends API {
 
 				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'values' => [
+					'replacements' => [
 						':id' => $affected_user_id
 					]
 				])) $affected_user = $affected_user[0];
