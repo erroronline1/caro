@@ -187,18 +187,20 @@ class TOOL extends API {
 		foreach ($files as $path){
 			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => $path];
 		}
-		$result['body'] = ['content' => [
-			[
-				['type' => 'select',
-				'attributes' => [
-					'name' => LANG::GET('tool.stl_viewer_select'),
-					'onchange' => "_client.tool.initStlViewer('../' + this.value)"
-				],
-				'content' => $options],
-				['type' => 'stlviewer',
+		if (count($options) > 1) {
+			$result['body'] = ['content' => [
+				[
+					['type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('tool.stl_viewer_select'),
+						'onchange' => "_client.tool.initStlViewer('../' + this.value)"
+					],
+					'content' => $options],
+					['type' => 'stlviewer',
+					]
 				]
-			]
-		]];
+			]];
+		} else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 		$this->response($result);
 	}
 }
