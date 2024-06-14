@@ -11,15 +11,21 @@
 * [Regulatory fulfillment suggestions](#regulatory-fulfillment-suggestions)
     * [Tips](#tips)
 * [Modules](#modules)
-    * [Users](#users)
-    * [Conversations](#conversations)
-    * [Text recommendations](#text-recommendations)
-    * [Forms](#forms)
+    * [Application](#application)
+        * [Users](#users)
+        * [Manual](#manual)
+    * [Communication](#communication)
+        * [Conversations](#conversations)
+        * [Register](#register)
+        * [Text recommendations](#text-recommendations)
     * [Records](#records)
+        * [Forms](#forms)
+        * [Records](#records-1)
     * [Calendar](#calendar)
     * [Files](#files)
-    * [Vendor and product management](#vendor-and-product-management)
-    * [Order](#order)
+    * [Purchase](#purchase)
+        * [Vendor and product management](#vendor-and-product-management)
+        * [Order](#order)
     * [Tools](#tools)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -50,7 +56,7 @@
 * [Ressources](#ressources)
 
 
-# development
+## development
 
 #### purchase considerations
 * order only assigned units selecteable?
@@ -77,14 +83,14 @@
 * material tracing within documentation
 
 
-## Aims
+# Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment; while technically being usable on any webserver this does not adhere to [data safety requirements](#technical-guidelines-on-sata-security) and is **not recommended**. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
 ![landing page screenshot](assets/landing%20page.png)
 
-### Intended ISO 13485 goals
+## Intended ISO 13485 goals
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
     * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
@@ -166,7 +172,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 
 [Content](#content)
 
-### Extras
+## Extras
 * Text recommendations
     * Default and adaptive [texts can be defined](#text-recommendations) to support a consistent company language.
 * Time tracking
@@ -178,21 +184,21 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 
 [Content](#content)
 
-### Necessary infrastructure 
+## Necessary infrastructure 
 You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
 
 Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. After all, administration can not demand going digital without providing a decent infrastructure. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well. 
 
 For technical details see [prerequisites](#prerequisites). 
 
-### What it is not
+## What it is not
 Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan. This module is for operational communication only, not for persistent documentation purpose.
 
-### Data integrity
+## Data integrity
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
@@ -201,7 +207,7 @@ Forms can contain a digital signature pad. Please note this is not legally docum
 
 [Content](#content)
 
-### Regulatory fulfillment suggestions
+## Regulatory fulfillment suggestions
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#tools).
 * Create forms describing required documentation of processes and assign a *Process or work instruction*-form-context and the fitting regulatory context.
     * ISO 13485 all chapters should be applicationed
@@ -230,7 +236,7 @@ Beside the apps architecture you will still have to set up your quality manageme
     * ISO 13485 7.6
     * MPBetreibV
 
-#### Tips
+### Tips
 * Use a calendar-button within surveillance forms to immediately set the next due date while handling the current documentation.
 * Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 * If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
@@ -239,7 +245,9 @@ Beside the apps architecture you will still have to set up your quality manageme
 
 [Content](#content)
 
-## Modules
+# Modules
+
+## Application
 
 ### Users
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default by the user themself. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and, for example, used as a laminated card.
@@ -312,12 +320,24 @@ graph TD;
 
 [Content](#content)
 
+### Manual
+
+Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others.
+
+## Communication
+
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
 
 ![conversation screenshot](assets/conversation.png)
+
+[Content](#content)
+
+### Register
+
+All registered users are listed and grouped by organizational units and permissions. Direct messaging is possible from here.
 
 [Content](#content)
 
@@ -378,6 +398,8 @@ graph TD;
 
 [Content](#content)
 
+## Records
+
 ### Forms
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
 
@@ -390,6 +412,8 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
 Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form).
+
+Forms can be managed to bundles so records can be reviewed for completeness.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -484,20 +508,7 @@ graph TD;
 
 [Content](#content)
 
-### Files
-Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
-
-Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
-
-This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion; register external documents for the same reason.*
-
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
-
-![files screenshot](assets/files.png)
-
-[Content](#content)
-
-### Calendar
+## Calendar
 Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
@@ -579,6 +590,21 @@ graph TD;
     for selected month"]
 ```
 [Content](#content)
+
+## Files
+Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
+
+Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
+
+This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion; register external documents for the same reason.*
+
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
+
+![files screenshot](assets/files.png)
+
+[Content](#content)
+
+## Purchase
 
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
@@ -747,7 +773,7 @@ Sample checks are added to the records. Defined authorized users can revoke the 
 
 [Content](#content)
 
-### Tools
+## Tools
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
@@ -764,7 +790,7 @@ The audit module gathers data from the application in regards of proofing lists 
 
 [Content](#content)
 
-## Prerequisites
+# Prerequisites
 * Server with
     * PHP >= 8.2
     * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted)
@@ -790,7 +816,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 
 [Content](#content)
 
-### Installation
+## Installation
 * php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers.
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
@@ -815,7 +841,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 * Change system users default token immediately and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
-### Runtime variables
+## Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
 
 ```
@@ -931,13 +957,13 @@ bundle_files_per_slide = 12
 products_per_slide = 6
 ```
 
-#### Useage notes and caveats
+## Useage notes and caveats
 
-##### Network connection handling
+### Network connection handling
 * The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
 * Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue.
 
-##### Miscellaneous
+### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
 * Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
@@ -945,7 +971,7 @@ products_per_slide = 6
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 
-#### Customisation
+## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
@@ -960,7 +986,7 @@ If you ever fiddle around with the sourcecode:
 
 [Content](#content)
 
-### Importing vendor pricelists
+## Importing vendor pricelists
 Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
 
 | Article Number | Article Name | EAN         | Sales Unit |
@@ -1017,17 +1043,17 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 ]
 ```
 
-#### Sample Check
+### Sample Check
 *modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default.
 
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
 
 [Content](#content)
 
-## Code design patterns
+# Code design patterns
 For static code analysis
 
-### Frontend design
+## Frontend design
 All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
 
 A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
@@ -1036,7 +1062,7 @@ DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the
 
 _client-object handles module specific recurring tasks of form preparations (./js/utility.js)
 
-### Backend design
+## Backend design
 There is a UTILITY class handling
 * parsing of requests
 * file handling within permitted directories
@@ -1067,7 +1093,7 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 
 [Content](#content)
 
-## CSV processor
+# CSV processor
 The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
 
 Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
@@ -1324,13 +1350,13 @@ A generic sample:
 
 [Content](#content)
 
-## API documentation
+# API documentation
 All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class or Toast-class. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
 Response properties are *body*, *form*, *status* and *msg* most of the time.
 
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS compose_helper-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
-### Application endpoints
+## Application endpoints
 
 > GET ./api/api.php/application/language
 
@@ -2750,16 +2776,16 @@ Sample response
 
 [Content](#content)
 
-## Statement on technical guidelines on data security
+# Statement on technical guidelines on data security
 This software aims to match as much relevant aspects of security measures as reasonable and possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
 
-#### Encryption statement
+### Encryption statement
 > **Unfortunately there is no reasonable way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for staff is critical. Data safety measures have to depend on unreachability for the network from outside. Frontend and backend are supposed to run within a closed network.**
 
-### Web Application
+## Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
 
-#### 3.1.1 Prüfaspekt (1): Anwendungszweck
+### 3.1.1 Prüfaspekt (1): Anwendungszweck
 * O.Purp_1 Der Hersteller MUSS die rechtmäßigen Zwecke der Web-Anwendung und die Verarbeitung von personenbezogenen Daten offenlegen (etwa in der Beschreibung der Nutzungsbedingungen der Web-Anwendung) und den Nutzer spätestens bei der erstmaligen Nutzung der Anwendung darüber informieren.
     > Terms of service have to be confirmed on login.
 * O.Purp_2 Die Web-Anwendung DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
@@ -2779,7 +2805,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Purp_9 Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer dies ist für den primären Zweck der Anwendung erforderlich.
     > Sensitive data is displayed only on intended and active user request.
 
-#### 3.1.2 Prüfaspekt (2): Architektur
+### 3.1.2 Prüfaspekt (2): Architektur
 * O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus‘ für die gesamte Web-Anwendung und das Hintergrundsystem sein.
     > User login and permissions have been mandatory from the early stages on.
 * O.Arch_2 Bereits in der Designphase von Web-Anwendung und Hintergrundsystem MUSS berücksichtigt werden, dass die Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur der Anwendung MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten.
@@ -2798,7 +2824,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Arch_9 Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und X-Frame-Options.
     > [Prerequisites](#prerequisites)
 
-#### 3.1.3 Prüfaspekt (3): Quellcode
+### 3.1.3 Prüfaspekt (3): Quellcode
 * O.Source_1 Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
     > Inputs are masked as strings by the backend by default.
 * O.Source_2 Die Anwendung MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen.
@@ -2822,7 +2848,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Source_11 Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten.
     > Sentitive data is always handled as PUT or POST. [API documendation](#api-documentation)
 
-#### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
+### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
 * O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen.
     > [List of third party software](#ressources)
 * O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die Veröffentlichung vorgesehenen Version verwendet werden. 
@@ -2840,14 +2866,14 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.TrdP_8 Drittanbieter-Software, die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
     > [List of third party software](#ressources)
 
-#### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
+### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
 * O.Cryp_1 Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
 * O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
 * O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen.
 * O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt werden. 
 * O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
 
-#### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
+### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
 * O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden einer Anwendungssitzung dokumentieren.
     > User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
 * O.Auth_2 Die Anwendung SOLL Authentisierungsmechanismen und Autorisierungsfunktionen separat realisieren. Sind für die Anwendung verschiedene Rollen notwendig, MUSS eine Autorisierung bei jedem Datenzugriff separat realisiert werden. 
@@ -2883,7 +2909,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Auth_17 Der Nutzer MUSS in den Nutzungsbedingungen der Web-Anwendung auf das Restrisiko hingewiesen werden, welches mit der Speicherung der Login-Credentials im WebBrowser oder auch einem anderen externen Programm für einen komfortableren Anmeldevorgang verbunden ist.
     > The input form for the login token is set to one-time-code and can not be stored.
 
-#### 3.1.6.1 Authentifizierung über Passwort
+### 3.1.6.1 Authentifizierung über Passwort
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
     > Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
 * O.Pass_2 Für die Einrichtung der Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
@@ -2895,7 +2921,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
     > The frontend does not store passwords.
 
-#### 3.1.7 Prüfaspekt (7): Datensicherheit
+### 3.1.7 Prüfaspekt (7): Datensicherheit
 * O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
     > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively.
 * O.Data_2 Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt.
@@ -2934,13 +2960,13 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
     > Only a session cookie is created, IndexedDB has same-origin pricible by default.
 
-#### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
+### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 > Not applicable, as there are no paid ressources.
 
-#### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
+### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
 > The operator of the infrastructure is responsible for fulfilling these requirements. Caro App [requires SSL](#prerequisites) consistently though.
 
-#### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
+### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
 * O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken aufklären.
     > The operator of the infrastructure is responsible for fulfilling this requirement.
 * O.Plat_2 Die Web-Anwendung DARF Berechtigungen, die für die Erfüllung ihres primären Zwecks nicht notwendig sind, NICHT einfordern.
@@ -2958,7 +2984,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Plat_8 Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch den Nutzer umsetzbar sind. 
     > Terms of service have to be confirmed on login.
 
-#### 3.1.11 Prüfaspekt (11): Resilienz
+### 3.1.11 Prüfaspekt (11): Resilienz
 * O.Resi_1 Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
     > Terms of service have to be confirmed on login.
 * O.Resi_2 Die Web-Anwendung MUSS über die Nutzungsbedingungen dem Nutzer darstellen, welche Risiken für die Daten des Nutzers bei einer Benutzung von Geräten, deren Betriebssystem in keinem vom Betriebssystemhersteller vorgesehenen Betriebszustand ist, bestehen. 
@@ -2966,10 +2992,10 @@ This software aims to match as much relevant aspects of security measures as rea
 
 [Content](#content)
 
-### Backend
+## Backend
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-3.pdf?__blob=publicationFile&v=9) for backends
 
-#### 3.1.1 Prüfaspekt (1): Anwendungszweck 
+### 3.1.1 Prüfaspekt (1): Anwendungszweck 
 * O.Purp_1 Das Hintergrundsystem DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
     > Only active and intentional user input is processed and stored.
 * O.Purp_2 Das Hintergrundsystem MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
@@ -2985,7 +3011,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Purp_7 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
     > [List of third party software](#ressources)
 
-#### 3.1.2 Prüfaspekt (2): Architektur 
+### 3.1.2 Prüfaspekt (2): Architektur 
 * O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für die gesamte Anwendung sein.
     > User login and permissions have been mandatory from the early stages on.
 * O.Arch_2 Bereits in der Designphase des Hintergrundsystems MUSS berücksichtigt werden, dass das Hintergrundsystem der Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur des Hintergrundsystems MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten. 
@@ -3010,7 +3036,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Arch_12 Das Hintergrundsystem MUSS die Anwendung über sicherheitsrelevante Updates informieren und nach einer Übergangsfrist (Grace Period) die Benutzung einer veralteten Anwendung unterbinden. 
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 
-#### 3.1.3 Prüfaspekt (3): Quellcode 
+### 3.1.3 Prüfaspekt (3): Quellcode 
 * O.Source_1 Das Hintergrundsystem MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
     > Inputs are masked as strings by the backend by default.
 * O.Source_2 Das Hintergrundsystem MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
@@ -3032,7 +3058,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Source_11 Für die Entwicklung des Hintergrundsystems SOLLEN Werkzeuge zur statischen Codeanalyse eingesetzt werden.
     > [Code design patterns](#code-design-patterns)
 
-#### 3.1.4 Prüfaspekt (4): Drittanbieter-Software 
+### 3.1.4 Prüfaspekt (4): Drittanbieter-Software 
 * O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen. 
     > [List of third party software](#ressources)
 * O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die Veröffentlichung vorgesehenen Version verwendet werden.
@@ -3054,7 +3080,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.TrdP_10 Schnittstellen zwischen Hintergrundsystemen des Herstellers und externen Diensten müssen gemäß O.Arch_5 geschützt werden. 
     > Data sharing does not occur.
 
-#### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung 
+### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung 
 * O.Cryp_1 Beim Einsatz von Verschlüsselung in der Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
 * O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
 * O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.
@@ -3064,11 +3090,11 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Cryp_7 Alle kryptographischen Operationen SOLLEN in einer vor Manipulation und Offenlegung geschützten Umgebung stattfinden.
 * O.Cryp_8 Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen DÜRFEN NICHT aufgebaut werden.
 
-#### 3.1.5.1 Zufallszahlen
+### 3.1.5.1 Zufallszahlen
 * O.Rand_1 Alle Zufallswerte MÜSSEN über einen starken kryptographischen Zufallszahlengenerator erzeugt werden, welcher mit ausreichend Entropie geseedet wurde (vgl. [TR02102-1]).
     > Random values for tokes are created by PHPs random_int() and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
 
-#### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
+### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
 * O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau (vgl. [TR03107-1]), zur Autorisierung (Rollenkonzept) und zum Beenden von Sitzungen dokumentieren. Das Konzept MUSS hierbei auch Kommunikationsverbindungen innerhalb eines Hintergrundsystem-Netzwerkes berücksichtigen.
     > User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
 * O.Auth_2 Das Hintergrundsystem MUSS für die Anbindung einer Anwendung eine geeignete Authentisierung unterstützen.
@@ -3112,7 +3138,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Auth_21 Authentisierungstoken MÜSSEN mit einem geeigneten Verfahren signiert werden (vgl. [TR02102-1]). Das Hintergrundsystem MUSS die Signatur des Authentisierungstokens prüfen. Dabei ist darauf zu achten, dass der Signaturtyp nicht none sein darf und das Hintergrundsystem Anfragen mit einem ungültigen oder abgelaufenen Authentifizierungstoken ablehnt.
     > This is not reasonable for the application used within a closed environment.
 
-#### 3.1.6.1 Authentifizierung über Passwort
+### 3.1.6.1 Authentifizierung über Passwort
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
     > Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
 * O.Pass_2 Für die Einrichtung einer Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
@@ -3124,7 +3150,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
     > As per the [encryption statement](#encryption-statement), sensitive data is not suitable for encryption in the described use case. It is not sensible to apply this to passwords for the risk of data breaches remains the same.
 
-#### 3.1.7 Prüfaspekt (7): Datensicherheit 
+### 3.1.7 Prüfaspekt (7): Datensicherheit 
 * O.Data_1 Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder entschlüsselt werden können.
     > [Encryption statement](#encryption-statement)
 * O.Data_2 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus im Hintergrundsystem gehalten werden.
@@ -3141,19 +3167,19 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Data_8 Um dem Missbrauch von sensiblen Daten nach einem Geräteverlust entgegenzuwirken, KANN die Anwendung einen Kill-Switch realisieren, d.h. ein absichtliches, sicheres Überschreiben von Nutzerdaten im Gerät auf Applikationsebene, ausgelöst durch das Hintergrundsystem. Der Hersteller MUSS die Auslösung des Kill-Switches durch den Anwender über das Hintergrundsystem durch erneute Authentifizierung vor missbräuchlicher Nutzung schützen.
     > This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access.
 
-#### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
+### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 > Not applicable, as there are no paid ressources.
 
-#### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation
+### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation
 > The operator of the infrastructure is responsible for fulfilling these requirements.
 
-#### 3.1.10 Prüfaspekt (10): Organisatorische Sicherheit 
+### 3.1.10 Prüfaspekt (10): Organisatorische Sicherheit 
 >The operator of the infrastructure is responsible for fulfilling these requirements.
 
 [Content](#content)
 
-## Ressources
-### External libraries
+# Ressources
+## External libraries
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
     * v2.3.8
@@ -3193,7 +3219,7 @@ This software aims to match as much relevant aspects of security measures as rea
 
 All libraries are embedded locally, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
-### Kudos on additional help on
+## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
 * [put request with multipart form data](https://stackoverflow.com/a/18678678)
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
