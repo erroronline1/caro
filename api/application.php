@@ -24,9 +24,11 @@ class APPLICATION extends API {
 	public function login(){
 		if (!$this->_requestedLogout){
 			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
-				$this->response(['body' => [
+				$this->response(['status' => [
 					'image' => $_SESSION['user']['image'],
-					'app_settings' => $_SESSION['user']['app_settings']
+					'app_settings' => $_SESSION['user']['app_settings'],
+					//'name' => $_SESSION['user']['name'],
+					//'id' =>  $_SESSION['user']['id']
 				]]);
 			}
 			// select single user based on token
@@ -40,9 +42,11 @@ class APPLICATION extends API {
 				$_SESSION['user'] = $result;
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
-				$this->response(['body' => [
+				$this->response(['status' => [
 					'image' => $_SESSION['user']['image'],
-					'app_settings' => $_SESSION['user']['app_settings']
+					'app_settings' => $_SESSION['user']['app_settings'],
+					//'name' => $_SESSION['user']['name'],
+					//'id' => $_SESSION['user']['id']
 				]]);
 			}
 		}
