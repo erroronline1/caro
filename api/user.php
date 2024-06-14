@@ -28,7 +28,16 @@ class USER extends API {
 
 				// convert image
 				// save and convert image
-				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_reset_photo'))) {
+					$tempPhoto = tmpfile();
+					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
+					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
+						'name' => 'defaultpic.png',
+						'type' => 'image/png',
+						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
+					];
+				}
+				if(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
@@ -129,14 +138,24 @@ class USER extends API {
 
 				if ($user['image']) $result['body']['content'][1]=[
 					[
-						['type' => 'image',
-						'description' => LANG::GET('user.edit_export_user_image'),
-						'attributes' => [
-							'name' => $user['name'] . '_pic',
-							'url' => $user['image']]
+						[
+							'type' => 'image',
+							'description' => LANG::GET('user.edit_export_user_image'),
+							'attributes' => [
+								'name' => $user['name'] . '_pic',
+								'url' => $user['image']
+							]
 						]
 					],
-					$result['body']['content'][1]
+					[
+						[
+							'type' => 'checkbox',
+							'content' => [
+								LANG::GET('user.edit_reset_photo') => []
+							]
+						]
+					],
+				$result['body']['content'][1]
 				];
 
 				$result['body']['content'][] = [
@@ -567,13 +586,15 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) $result['body']['content'][3]=[
+					if ($user['image']) $result['body']['content'][3] = [
 						[
-							['type' => 'image',
-							'description' => LANG::GET('user.edit_export_user_image'),
-							'attributes' => [
-								'name' => $user['name'] . '_pic',
-								'url' => $user['image']]
+							[
+								'type' => 'image',
+								'description' => LANG::GET('user.edit_export_user_image'),
+								'attributes' => [
+									'name' => $user['name'] . '_pic',
+									'url' => $user['image']
+								]
 							]
 						],
 						$result['body']['content'][3]

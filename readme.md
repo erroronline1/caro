@@ -243,7 +243,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 ## Modules
 
 ### Users
-On registering a new user a default profile picture is generated. Custom set pictures can not be deleted. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and, for example, used as a laminated card.
+On registering a new user a default profile picture is generated. Custom set pictures can be restored to default by the user themself. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and, for example, used as a laminated card.
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
