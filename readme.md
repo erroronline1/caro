@@ -69,7 +69,6 @@
 * vendor evaluation
 
 #### application considerations
-* searchable form content (general company record, process descriptions)
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years
 * user selectable color themes?
 * risk management?
@@ -2421,7 +2420,7 @@ Sample response
 
 > GET ./api/api.php/record/formfilter/{search}
 
-Returns ids of available approved forms matching {search}.
+Returns ids of available approved forms matching {search} by name or alias, or where the search string is found within the used components.
 
 Parameters
 | Name | Data Type | Required | Description |

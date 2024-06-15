@@ -105,6 +105,39 @@ class RECORD extends API {
 	public function formfilter(){
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = $matches = [];
+
+		function findInComponent($element, $search){
+			$found = false;
+			foreach($element as $subs){
+				if (!array_key_exists('type', $subs)){
+					$found = findInComponent($subs, $search);
+				}
+				else {
+					foreach (['description', 'content', 'hint'] as $property){
+						if (array_key_exists($property, $subs)){
+							if (is_array($subs[$property])){ // links, checkboxes,etc
+								foreach(array_keys($subs[$property]) as $key) {
+									similar_text($search, $key, $percent);
+									if ($percent >= INI['likeliness']['file_search_similarity']) {
+										return true;
+									}
+								}
+							}
+							else {
+								if (stristr($subs[$property], $search) !== false) return true;
+							}
+						}
+					}
+					if (array_key_exists('attributes', $subs)){
+						foreach (['name', 'value'] as $property){
+							if (array_key_exists($property, $subs['attributes']) && stristr($subs['attributes'][$property], $search) !== false) return true;
+						}
+					}
+				}
+			}
+			return $found;
+		};
+
 		foreach($fd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['id'], $matches) && !in_array($row['name'], $hidden)) {
@@ -112,12 +145,31 @@ class RECORD extends API {
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
 				foreach ($terms as $term){
 					similar_text($this->_requestedID, $term, $percent);
-					if (($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
+					if (($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
+						$matches[] = strval($row['id']);
+						continue;
+					}
+					foreach(explode(',', $row['regulatory_context']) as $context) {
+						if (stristr(LANG::GET('regulatory.' . $context), $this->_requestedID) !== false) {
+							$matches[] = strval($row['id']);
+							continue;	
+						}
+					}
+					foreach(explode(',', $row['content']) as $usedcomponent) {
+						$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
+						if ($component){
+							$component['content'] = json_decode($component['content'], true);
+							if (findInComponent($component['content']['content'], $this->_requestedID)) {
+								$matches[] = strval($row['id']);
+								break;
+							}
+						}
+					}
 				}
 			}
 		}
 		$this->response(['status' => [
-			'data' => $matches
+			'data' => array_values(array_unique($matches))
 		]]);
 	}
 
@@ -166,7 +218,8 @@ class RECORD extends API {
 							'list' => 'forms',
 							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}",
 							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
-							]
+						],
+						'hint' => LANG::GET('record.form_filter_hint')
 					]
 				]
 			]];
