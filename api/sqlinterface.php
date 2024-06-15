@@ -37,7 +37,6 @@ class SQLQUERY {
 				else $parameters['values'][$key] = trim($value);
 			}
 		} else $parameters['values'] = [];
-//var_dump($query);
 		// replace tokens in query that can not be executed
 		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
 			foreach ($parameters['replacements'] as $key => &$value){
@@ -53,12 +52,13 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
-//var_dump($query);
 		$statement = $_pdo->prepare($query);
-//var_dump($query, $parameters['values']);
 
 		if (!$statement->execute($parameters['values'])) return false;
-		if (str_starts_with($query, 'SELECT')) return $statement->fetchAll();
+		if (str_starts_with($query, 'SELECT')) {
+			//var_dump($statement->debugDumpParams());
+			return $statement->fetchAll();
+		}
 		return $statement->rowCount();
 	}
 
@@ -629,6 +629,10 @@ class SQLQUERY {
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:id)",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:id) OR name IN (:id)"
+		],
+		'user_get_cached' => [
+			'mysql' => "SELECT * FROM caro_user WHERE SHA2(CONCAT(SHA2(id, 256), :checksum), 256) = :hash",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE SELECT HASHBYTES('SHA2_256', CONCAT(HASHBYTES('SHA2_256', CONVERT(VARCHAR, id)), :checksum)) = :hash"
 		],
 		'user_get_orderauth' => [
 			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",

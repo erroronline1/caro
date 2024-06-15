@@ -11,8 +11,6 @@ addEventListener("message", async (message) => {
 	//do something with message.data
 	switch (message.data) {
 		case "getnotifications":
-			const response = {};
-
 			let notifs = await fetch("api/api.php/notification/notifs/", {
 				method: "GET",
 				cache: "no-cache",
@@ -99,8 +97,9 @@ self.addEventListener("fetch", (event) => {
 							},
 							body: entry.request,
 						})
-							.then(() => {
-								successfullyRequested.push(parseInt(key, 10));
+							.then((response) => {
+								// add cached request to deletion if response is successful, not if authorization fails
+								if (response.status === 200) successfullyRequested.push(parseInt(key, 10));
 							})
 							.catch((error) => {
 								console.log(error);

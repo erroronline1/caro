@@ -42,7 +42,7 @@ class API {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		// update user setting for each request
+		// check if a registered user with valid token is logged in
 		if (array_key_exists('user', $_SESSION)){
 			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
@@ -50,13 +50,31 @@ class API {
 				]
 			]);
 			if ($query){
-				$result = $query[0];
-				$_SESSION['user'] = $result;
-				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
-				$_SESSION['user']['units'] = explode(',', $result['units']);
-				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
-				$_SESSION['user']['image'] = './' . $result['image'];
-			}
+				// valid user IS logged in
+				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
+				if ($_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')){
+					unset ($this->_payload->_user_cache);
+					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
+						'values' => [
+							':checksum' => strlen(json_encode($this->_payload)),
+							':hash' => $_user_cache
+						]
+					]);
+				}
+				if ($query){
+					$result = $query[0];
+					//update user setting for each request
+					$_SESSION['user'] = $result;
+					$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
+					$_SESSION['user']['units'] = explode(',', $result['units']);
+					$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+					$_SESSION['user']['image'] = './' . $result['image'];
+				}
+				else {
+					session_unset();
+					session_destroy();
+				}
+				}
 			else {
 				session_unset();
 				session_destroy();

@@ -27,8 +27,7 @@ class APPLICATION extends API {
 				$this->response(['status' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
-					//'name' => $_SESSION['user']['name'],
-					//'id' =>  $_SESSION['user']['id']
+					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 				]]);
 			}
 			// select single user based on token
@@ -45,8 +44,7 @@ class APPLICATION extends API {
 				$this->response(['status' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
-					//'name' => $_SESSION['user']['name'],
-					//'id' => $_SESSION['user']['id']
+					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 				]]);
 			}
 		}

@@ -69,10 +69,10 @@
 * vendor evaluation
 
 #### application considerations
+* searchable form content (general company record, process descriptions)
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years
 * user selectable color themes?
 * risk management?
-* append username and time to record requests?
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -794,7 +794,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * Server with
     * PHP >= 8.2
     * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted)
-    * SSL (camera access for qr-scanner and serviceworkers don't work otherwise)
+    * SSL (camera access for qr-scanner, serviceworker and sha256 encryption don't work otherwise)
 * Network access for endpoints and a browser
     * Desktop pcs
     * Mobile devices
@@ -960,8 +960,8 @@ products_per_slide = 6
 ## Useage notes and caveats
 
 ### Network connection handling
-* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and executed once a successful GET request indicates reconnection to the server. This might lead to a delay but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* Cached post requests may insert the user name and entry date on processing. That is the logged in user on, and time of processing on the server side. If all goes wrong a different person seemed to have done the entry. This may be unfortunate but processing these data on the server side reduces payload, is supposed to enhance security and is considered more of a theoretical issue.
+* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
+* Cached POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records. Timestamps may vary depending on the server side processing though.
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.

@@ -56,6 +56,12 @@ export const api = {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
 		api.loadindicator(true);
+		if (window._user && window._user.cached_identity && ["post", "put"].includes(method) && payload instanceof FormData) {
+			const b = new Blob([JSON.stringify(Object.fromEntries(payload))], {
+				type: "application/json",
+			});
+			payload.append('_user_cache', await _.sha256(window._user.cached_identity + b.size.toString()));
+		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {
 				document.querySelector("header>div:first-of-type").style.display = data.status === 200 ? "none" : "block";
