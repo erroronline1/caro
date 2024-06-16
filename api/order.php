@@ -223,38 +223,55 @@ class ORDER extends API {
 						];
 					}
 					$slide = intval(count($matches[$article]) - 1);
-					if ($this->_borrowedModule == 'editconsumables') // consumables.php can make good use of this method!
-						$matches[$article][$slide][] = [
-							'type' => 'tile',
-							'attributes' => [
-								'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
-							],
-							'content' => [
-								['type' => 'text',
-								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
-							]
-						];
-					else {
-						$incorporationState = '';
-						if ($row['incorporated'] === '') $incorporationState = LANG::GET('order.incorporation_neccessary');
-						else {
-							$row['incorporated'] = json_decode($row['incorporated'], true);
-							if (array_key_exists('_denied', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
-							elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
-						}
-						$matches[$article][$slide][] = [
-							'type' => 'tile',
-							'attributes' => [
-								'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
-							],
-							'content' => [
-								['type' => 'text',
-								'description' => $incorporationState,
-								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
-							]
-						];
+					switch ($this->_borrowedModule){
+						case 'editconsumables': // consumables.php can make good use of this method!
+							$matches[$article][$slide][] = [
+								'type' => 'tile',
+								'attributes' => [
+									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
+								],
+								'content' => [
+									[
+										'type' => 'text',
+										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
+									]
+								]
+							];
+							break;
+						case 'productinformation': // consumables.php can make good use of this method!
+							$matches[$article][$slide][] = [
+								'type' => 'tile',
+								'attributes' => [
+									'onpointerup' => "api.purchase('get', 'productinformation', " . $row['id'] . ")",
+								],
+								'content' => [
+									[
+										'type' => 'text',
+										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
+									]
+								]
+							];
+							break;
+						default:
+							$incorporationState = '';
+							if ($row['incorporated'] === '') $incorporationState = LANG::GET('order.incorporation_neccessary');
+							else {
+								$row['incorporated'] = json_decode($row['incorporated'], true);
+								if (array_key_exists('_denied', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
+							}
+							$matches[$article][$slide][] = [
+								'type' => 'tile',
+								'attributes' => [
+									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+								],
+								'content' => [
+									['type' => 'text',
+									'description' => $incorporationState,
+									'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
+								]
+							];
 					}
-
 				}
 				if (!$matches[0]) $matches[0][] = [
 					['type' => 'text',

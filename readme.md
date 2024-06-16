@@ -69,7 +69,8 @@
 * vendor evaluation
 
 #### application considerations
-* data deletion in accordance to dsgvo, eg. recommend deletion after x years
+* data deletion in accordance to dsgvo, eg. recommend deletion after x years?
+* deployment process for application and database updates
 * user selectable color themes?
 * risk management?
 
@@ -885,6 +886,7 @@ names[] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
 names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
+names[] = "^_" ; names must not start with _
 names[] = "IDENTIFY_BY_" ; special substrings |-separated
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
 
@@ -902,8 +904,8 @@ csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-mdr14_sample_interval = 365 ; days until a new sample check is required
-mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed
+mdr14_sample_interval = 365 ; days until a new sample check is required as default value
+mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed as default value
 
 ; permissions based of and matching languages.xx.ini permissions
 ; dynamic handling for modules and methods
@@ -1720,6 +1722,34 @@ Sample response
 {"body":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
 ```
 
+> GET ./api/api.php/consumables/productinformation/{name}
+
+Returns content to display available information on vendors for all users. Without parameter only a selection and serach is displayed
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name} | path parameter | optional | existing vendor |
+
+Sample response
+```
+{"body":{"content":[[{"type":"datalist","content":["neuhof","Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Vendors","onchange":"api.purchase('get', 'vendorinformation', this.value)"},"content":{"...":[],"neuhof":{"selected":true},"Otto Bock":[]}},{"type":"searchinput","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendorinformation', this.value); return false;}"}}],[{"type":"text","description":"neuhof","content":" \n0 available products in database"},{"type":"radio","attributes":{"name":"Vendor active"},"content":{"active and available":{"checked":true,"disabled":"true"},"inactive, delete products":{"disabled":"true"}}}]]},"header":"neuhof"}
+```
+
+> GET ./api/api.php/consumables/productinformation/{id}
+
+Returns content to display available information on products for all users. Without parameter only the search is displayed.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | existing products database id (int) |
+
+Sample response
+```
+{"body":{"content":[[{"type":"datalist","content":["neuhof","Otto Bock"],"attributes":{"id":"vendors"}},{"type":"datalist","content":[],"attributes":{"id":"units"}},{"type":"scanner","destination":"productsearch"},{"type":"select","content":{"... all vendors":{"value":"2_1"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors"}},{"type":"searchinput","attributes":{"name":"Search product by article number or name","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'productinformation'); return false;}","id":"productsearch"}}],....
+```
+
 [Content](#content)
 
 ### CSV filter endpoints
@@ -2266,14 +2296,14 @@ Sample response
 
 > GET ./api/api.php/order/productsearch/{vendor_id}/{search}/{_borrowedModule}
 
-Returns products matching {search} to be inserted into orders. If {_borrowedModule} is set to *editconsumables* the returned elements events lead to consumables editing.
+Returns products matching {search} to be inserted into orders. If {_borrowedModule} is set to *editconsumables* the returned elements events lead to consumables editing, *productinformation* to consumables product information.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {vendor_id} | path parameter | required | vendor id in database, _-separated list for all |
 | {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
-| {_borrowedModule} | path parameter | optional | altered events for produc management |
+| {_borrowedModule} | path parameter | optional | altered events for product management |
 
 Sample response
 ```
@@ -2957,7 +2987,7 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Data_18 Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion abgeschaltet sein.
     > All inputs lack autocomplete by default.
 * O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
-    > Only a session cookie is created, IndexedDB has same-origin pricible by default.
+    > Only a session cookie is created, IndexedDB has same-origin principle by default.
 
 ### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 > Not applicable, as there are no paid ressources.
@@ -3230,3 +3260,5 @@ All libraries are embedded locally, do not request outside ressources and do not
 [Content](#content)
 
 (c) 2023-2024 error on line 1 (dev@erroronline.one)
+
+![dev](./media/dev.png)

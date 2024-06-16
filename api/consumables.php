@@ -710,9 +710,7 @@ class CONSUMABLES extends API {
 				foreach($vendorlist as $key => $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = [];
-					if ($row['name'] == 
-					$vendor['name']) 
-					$options[$row['name']]['selected'] = true;
+					if ($row['name'] == $vendor['name']) $options[$row['name']]['selected'] = true;
 				}
 				
 				$certificates = [];
@@ -877,6 +875,121 @@ class CONSUMABLES extends API {
 				$this->response($result);
 				break;
 		}
+	}
+
+	/**
+	 * public vendor information, display documents for everyone
+	 */
+	public function vendorinformation(){
+		$datalist = [];
+		$options = ['...' => (!$this->_requestedID) ? ['selected' => true] : []];
+		$result = [];
+		
+		// select single vendor based on id or name
+		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+			'values' => [
+				':id' => $this->_requestedID
+			]
+		]);
+		$vendor = $vendor ? $vendor[0] : null;
+		if (!$vendor) $vendor = [
+			'id' => null,
+			'name' => '',
+		];
+
+		if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' && !$vendor)
+			$result['status'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+
+		// prepare existing vendor lists
+		$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		foreach($vendorlist as $key => $row) {
+			$datalist[] = $row['name'];
+			$options[$row['name']] = [];
+			if ($row['name'] == $vendor['name']) $options[$row['name']]['selected'] = true;
+		}
+		
+		$result['body'] = ['content' => [
+			[
+				[
+					'type' => 'datalist',
+					'content' => array_values(array_unique($datalist)),
+					'attributes' => [
+						'id' => 'vendors'
+					]
+				], [
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('consumables.information_vendor'),
+						'onchange' => "api.purchase('get', 'vendorinformation', this.value)"
+					],
+					'content' => $options
+				], [
+					'type' => 'searchinput',
+					'attributes' => [
+						'name' => LANG::GET('consumables.edit_existing_vendors_search'),
+						'list' => 'vendors',
+						'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendorinformation', this.value); return false;}"
+					]
+				]
+			]]];
+			// display selected vendor
+			if ($vendor['id']) {
+				$vendor['certificate'] = json_decode($vendor['certificate'], true);
+				$isactive = $vendor['active'] ? ['checked' => true, 'disabled' => 'true'] : ['disabled' => 'true'];
+				$isinactive = !$vendor['active'] ? ['checked' => true, 'disabled' => 'true'] : ['disabled' => 'true'];
+				$certificates = [];
+				$documents = [];
+				$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
+				foreach($certfiles as $path){
+					$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
+				}
+				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
+				foreach($docfiles as $path){
+					$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
+				}
+				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+					'values' => [
+						':search' => $vendor['id']
+					]
+				]);
+				$available = 0;
+				foreach($products as $product){
+					if ($product['active']) $available++;
+				}
+		
+				$result['body']['content'][] = [
+					[
+						'type' => 'text',
+						'description' => $vendor['name'],
+						'content' => $vendor['info'] .
+							array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '' .
+							" \n" . LANG::GET('consumables.information_products_available', [':available' => $available])
+					],[
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('consumables.edit_vendor_active')
+						],
+						'content' => [
+							LANG::GET('consumables.edit_vendor_isactive') => $isactive,
+							LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
+						]
+					]
+				];
+				if ($certificates) $result['body']['content'][1][] = [
+						'type' => 'links',
+						'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
+						'content' => $certificates
+					];
+
+				if ($documents) $result['body']['content'][1] = [
+					'type' => 'links',
+					'description' => LANG::GET('consumables.edit_vendor_documents_download'),
+					'content' => $documents
+				];
+				$result['header'] = $vendor['name'];
+		}
+		$this->response($result);
 	}
 
 	/**
@@ -1074,7 +1187,7 @@ class CONSUMABLES extends API {
 				else $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'name' => LANG::GET('consumables.edit_product_not_saved'),
+						'msg' => LANG::GET('consumables.edit_product_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
@@ -1442,6 +1555,167 @@ class CONSUMABLES extends API {
 				]]);
 			break;
 		}
+	}
+
+	/**
+	 * public product information, display documents for everyone
+	 */
+	public function productinformation(){
+		$datalist = [];
+		$options = [LANG::GET('consumables.edit_product_vendor_select_default') => []];
+		$datalist_unit = [];
+		$result = [];
+		$vendors=[];
+
+		// select single product based on id or name
+		$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+			'values' => [
+				':ids' => intval($this->_requestedID)
+				]
+		]);
+		$product = $product ? $product[0] : null;
+
+		if (!$product) $product = [
+			'id' => null,
+			'vendor_id' => '',
+			'vendor_name' => '',
+			'vendor_immutable_fileserver' => '',
+			'article_no' => '',
+			'article_name' => '',
+			'article_alias' => '',
+			'article_unit' => '',
+			'article_ean' => '',
+			'active' => 1,
+			'protected' => 0,
+			'trading_good' => 0,
+			'incorporated' => '',
+		];
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+		$certificates = [];
+		$documents = [];
+		if ($product['id']) {
+			$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
+			foreach($docfiles as $path){
+				$file = pathinfo($path);
+				$article_no = explode('_', $file['filename'])[2];
+				similar_text($article_no, $product['article_no'], $percent);
+				if ($percent >= INI['likeliness']['consumables_article_no_similarity']) 
+					$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
+			}
+		}
+		$isactive = $product['active'] ? ['checked' => true, 'disabled' => true] : ['disabled' => true];
+		$isinactive = !$product['active'] ? ['checked' => true, 'disabled' => true] : ['disabled' => true];
+		
+		$tradinggood = [LANG::GET('consumables.edit_product_article_trading_good') => ['disabled' => true]];
+		if ($product['trading_good']) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['checked'] = true;
+
+		// prepare existing vendor lists
+		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+
+		$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
+
+		foreach($vendor as $key => $row) {
+			$datalist[] = $row['name'];
+			$options[$row['name']] = [];
+			if ($row['name'] === $product['vendor_name']) $options[$row['name']]['selected'] = true;
+			$vendors[$row['name']] = ['value' => $row['id']];
+		}
+
+		// display product information
+		$result['body'] = ['content' => [
+			[
+				[
+					'type' => 'datalist',
+					'content' => array_values(array_unique($datalist)),
+					'attributes' => [
+						'id' => 'vendors'
+					]
+				], [
+					'type' => 'datalist',
+					'content' => array_values(array_unique($datalist_unit)),
+					'attributes' => [
+						'id' => 'units'
+					]
+				], [
+					'type' => 'scanner',
+					'destination' => 'productsearch'
+				], [
+					'type' => 'select',
+					'content' => $vendors,
+					'attributes' => [
+						'id' => 'productsearchvendor',
+						'name' => LANG::GET('consumables.edit_product_filter_vendors')
+						]
+				], [
+					'type' => 'searchinput',
+					'attributes' => [
+						'name' => LANG::GET('consumables.edit_product_search'),
+						'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'productinformation'); return false;}",
+						'id' => 'productsearch'
+					]
+				]
+			], [
+				['type' => 'hr']
+			]
+		]];
+
+		if ($product['id']){
+			$result['body']['content'][] = [
+				[
+					'type' => 'text',
+					'description' => $product['article_no'] . ' ' . $product['article_name']. ($product['article_alias'] ? ' (' . $product['article_alias'] . ') ' : ' ') . $product['article_unit'],
+					'content' => $product['vendor_name']
+				],
+				[
+					'type' => 'br'
+				],
+				[
+					'type' => 'checkbox',
+					'content' => $tradinggood,
+				],
+				[
+					'type' => 'radio',
+					'attributes' => [
+						'name' => LANG::GET('consumables.edit_product_active')
+					],
+					'content' => [
+						LANG::GET('consumables.edit_product_isactive') => $isactive,
+						LANG::GET('consumables.edit_product_isinactive') => $isinactive
+					]
+				]
+			];
+			if ($product['incorporated'] !== '' ) {					
+				$product['incorporated'] = json_decode($product['incorporated'], true);
+				$incorporationState = '';
+				if (array_key_exists('_denied', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+				elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
+
+				$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
+				foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+					if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+				}
+				$result['body']['content'][2][] = [
+					'type' => 'text',
+					'description' => $incorporationState,
+					'content' => $incorporationInfo
+				];
+			}
+			else {
+				$result['body']['content'][2][] = [
+					'type' => 'text',
+					'description' => LANG::GET('consumables.edit_product_incorporated_not')
+				];
+			}
+			if ($documents) {
+				$result['body']['content'][2][] = [
+					'type' => 'links',
+					'description' => LANG::GET('consumables.edit_product_documents_download'),
+					'content' => $documents
+				];
+			}
+		}
+		$this->response($result);
 	}
 }
 ?>
