@@ -57,10 +57,15 @@ export const api = {
 		api.preventDataloss.stop();
 		api.loadindicator(true);
 		if (window._user && window._user.cached_identity && ["post", "put"].includes(method) && payload instanceof FormData) {
-			const b = new Blob([JSON.stringify(Object.fromEntries(payload))], {
+			let sanitizedpayload = Object.fromEntries(payload);
+			for (const[key, value] of Object.entries(sanitizedpayload)){
+				// remove file keys for being shifted to $_FILES within the stream
+				if (value instanceof File && value.size) delete sanitizedpayload[key];
+			}
+			const b = new Blob([JSON.stringify(sanitizedpayload)], {
 				type: "application/json",
 			});
-			payload.append('_user_cache', await _.sha256(window._user.cached_identity + b.size.toString()));
+			payload.append("_user_cache", await _.sha256(window._user.cached_identity + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {
@@ -763,7 +768,7 @@ export const api = {
 		get order/filtered/{filter}
 		*/
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -778,6 +783,8 @@ export const api = {
 				prepared: LANG.GET("menu.purchase_prepared_orders"),
 				approved: LANG.GET("menu.purchase_approved_orders"),
 				pendingincorporations: LANG.GET("menu.purchase_incorporated_pending"),
+				vendorinformation: LANG.GET("menu.purchase_vendor_information"),
+				productinformation: LANG.GET("menu.purchase_product_information"),
 			};
 		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {
@@ -794,7 +801,7 @@ export const api = {
 								body.processAfterInsertion();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							api.preventDataloss.monitor = true;
+							api.preventDataloss.monitor = request[4] === 'editconsumables';
 						};
 						break;
 					case "filter":
