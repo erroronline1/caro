@@ -51,12 +51,22 @@ class API {
 			]);
 			if ($query){
 				// valid user IS logged in
+				$result = $query[0];
+				//update user setting for each request
+				$_SESSION['user'] = $result;
+				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
+				$_SESSION['user']['units'] = explode(',', $result['units']);
+				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+				$_SESSION['user']['image'] = './' . $result['image'];
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
 				if ($_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')){
 					unset ($this->_payload->_user_cache);
+					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+						}, json_encode($this->_payload));
 					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
 						'values' => [
-							':checksum' => strlen(json_encode($this->_payload)),
+							':checksum' => strlen($payload),
 							':hash' => $_user_cache
 						]
 					]);
@@ -70,11 +80,8 @@ class API {
 					$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 					$_SESSION['user']['image'] = './' . $result['image'];
 				}
-				else {
-					session_unset();
-					session_destroy();
-				}
-				}
+				else $this->response([], 401);
+			}
 			else {
 				session_unset();
 				session_destroy();
