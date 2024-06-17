@@ -59,15 +59,13 @@ class API {
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
-				if (false && $_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')){
+				if ($_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')){
 					unset ($this->_payload->_user_cache);
 					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
 						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
 						}, json_encode($this->_payload));
-					$payload = str_replace(["\\r", '[[]]', '\/', '\\'], ['', '{}', '/', '\\\\'], $payload);
-
-						var_dump(strlen($payload), $payload);
-					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
+					$payload = preg_replace('/[\W_]/', '', preg_replace('/\\\\r|\\\\n|\\\\t/m', '', $payload));  // harmonized cross browser
+					$query2 = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
 						'values' => [
 							':checksum' => strlen($payload),
 							':hash' => $_user_cache

@@ -62,10 +62,11 @@ export const api = {
 				// remove file keys for being shifted to $_FILES within the stream
 				if (value instanceof File && value.size) delete sanitizedpayload[key];
 			}
-			const b = new Blob([JSON.stringify(sanitizedpayload)], {
+			sanitizedpayload = JSON.stringify(sanitizedpayload).replaceAll(/\\r|\\n|\\t/g, '').replaceAll(/[\W_]/g, ''); // harmonize cross browser
+			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
-			console.log(b.size, JSON.stringify(sanitizedpayload));
+			console.log(b.size, sanitizedpayload);
 			payload.append("_user_cache", await _.sha256(window._user.cached_identity + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
