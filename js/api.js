@@ -66,7 +66,6 @@ export const api = {
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
-			console.log(b.size, sanitizedpayload);
 			payload.append("_user_cache", await _.sha256(window._user.cached_identity + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
