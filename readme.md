@@ -2786,7 +2786,7 @@ Sample response
 This software aims to match as much relevant aspects of security measures as reasonable and possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
 
 ### Encryption statement
-> **Unfortunately there is no reasonable way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for staff is critical. Data safety measures have to depend on unreachability for the network from outside. Frontend and backend are supposed to run within a closed network.**
+> **Unfortunately there is no reasonable way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for staff is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures have to depend on unreachability for the network from outside. Frontend and backend are supposed to run within a closed network.**
 
 ## Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
