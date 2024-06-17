@@ -242,7 +242,7 @@ class ORDER extends API {
 							$matches[$article][$slide][] = [
 								'type' => 'tile',
 								'attributes' => [
-									'onpointerup' => "api.purchase('get', 'productinformation', " . $row['id'] . ")",
+									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
 								],
 								'content' => [
 									[

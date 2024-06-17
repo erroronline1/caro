@@ -1582,6 +1582,8 @@ Sample response
 
 Returns content to create or modify vendor. If path parameter is provided, the form is prefilled according to database entry.
 
+Returns available information on vendor if role has no permission to add and edit.
+
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
@@ -1625,6 +1627,9 @@ Sample response
 > GET ./api/api.php/consumables/product/{id}
 
 Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
+
+Returns available information on product if role has no permission to add and edit.
+
 
 Similar to vendor.
 
@@ -1721,34 +1726,6 @@ Parameters
 Sample response
 ```
 {"body":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
-```
-
-> GET ./api/api.php/consumables/productinformation/{name}
-
-Returns content to display available information on vendors for all users. Without parameter only a selection and serach is displayed
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name} | path parameter | optional | existing vendor |
-
-Sample response
-```
-{"body":{"content":[[{"type":"datalist","content":["neuhof","Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Vendors","onchange":"api.purchase('get', 'vendorinformation', this.value)"},"content":{"...":[],"neuhof":{"selected":true},"Otto Bock":[]}},{"type":"searchinput","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendorinformation', this.value); return false;}"}}],[{"type":"text","description":"neuhof","content":" \n0 available products in database"},{"type":"radio","attributes":{"name":"Vendor active"},"content":{"active and available":{"checked":true,"disabled":"true"},"inactive, delete products":{"disabled":"true"}}}]]},"header":"neuhof"}
-```
-
-> GET ./api/api.php/consumables/productinformation/{id}
-
-Returns content to display available information on products for all users. Without parameter only the search is displayed.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | existing products database id (int) |
-
-Sample response
-```
-{"body":{"content":[[{"type":"datalist","content":["neuhof","Otto Bock"],"attributes":{"id":"vendors"}},{"type":"datalist","content":[],"attributes":{"id":"units"}},{"type":"scanner","destination":"productsearch"},{"type":"select","content":{"... all vendors":{"value":"2_1"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors"}},{"type":"searchinput","attributes":{"name":"Search product by article number or name","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'productinformation'); return false;}","id":"productsearch"}}],....
 ```
 
 [Content](#content)

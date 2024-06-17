@@ -125,8 +125,8 @@ class APPLICATION extends API {
 				LANG::GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
 				LANG::GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
 				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
-				LANG::GET('menu.purchase_vendor_information') => ['onpointerup' => "api.purchase('get', 'vendorinformation')"],
-				LANG::GET('menu.purchase_product_information') => ['onpointerup' => "api.purchase('get', 'productinformation')"]
+				LANG::GET('menu.purchase_vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
+				LANG::GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"]
 			],
 			LANG::GET('menu.tools_header') => [
 				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
@@ -152,8 +152,6 @@ class APPLICATION extends API {
 			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 		}
 		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
-		if (PERMISSION::permissionFor('vendors')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_vendor')] = ['onpointerup' => "api.purchase('get', 'vendor')"];
-		if (PERMISSION::permissionFor('products')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_product')] = ['onpointerup' => "api.purchase('get', 'product')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('formapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
