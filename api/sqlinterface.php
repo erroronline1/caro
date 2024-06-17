@@ -632,7 +632,7 @@ class SQLQUERY {
 		],
 		'user_get_cached' => [
 			'mysql' => "SELECT * FROM caro_user WHERE SHA2(CONCAT(SHA2(id, 256), :checksum), 256) = :hash",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONVERT(VARCHAR, id)), 2), :checksum)), 2)) = :hash"
+			'sqlsrv' => "SELECT * FROM caro_user WHERE LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT(LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONVERT(VARCHAR, id)), 2)), :checksum)), 2)) = :hash"
 		],
 		'user_get_orderauth' => [
 			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",
