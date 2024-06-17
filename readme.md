@@ -69,6 +69,7 @@
 * vendor evaluation
 
 #### application considerations
+* address differences between firefox and chromium representations of stringified payload (\r, file arrays name[], etc)
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * deployment process for application and database updates
 * user selectable color themes?
