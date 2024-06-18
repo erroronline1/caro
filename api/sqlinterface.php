@@ -312,7 +312,7 @@ class SQLQUERY {
 			'mysql' => "SELECT prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
 				. "prod.checked IS NOT NULL ORDER BY prod.checked DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP(1) prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
-				. "pred.checked IS NOT NULL ORDER BY prod.checked"
+				. "prod.checked IS NOT NULL ORDER BY prod.checked"
 		],
 		'consumables_get_product_units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
