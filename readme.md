@@ -68,7 +68,6 @@
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* deployment process for application and database updates
 * user selectable color themes?
 * risk management?
 
@@ -1092,6 +1091,12 @@ All requests have to be executed through the api ensuring
 Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
 
 Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
+
+## Deployment process
+
+* For **installation** see [here](#installation).
+* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Code files are simply to be uploaded to the server to be available. 
+* The operator of the infrastructure is responsible for a sufficient **deletion / uninstallation** of the software, especially backend, database and backups.
 
 [Content](#content)
 
@@ -3057,7 +3062,8 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein.
     > Debugging is removed.
 * O.Source_7 Das Hintergrundsystem MUSS sicherstellen, dass alle sensiblen Daten unverzüglich nach der Erfüllung ihres Verarbeitungszwecks sicher gelöscht werden.
-* O.Source_8 Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, Aktualisierungen und Abschaltung des Hintergrundsystems etablieren, der sicherstellt, dass zu keinem Zeitpunkt die Veröffentlichung oder das Kompromittieren sensibler Daten möglich ist. 
+* O.Source_8 Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, Aktualisierungen und Abschaltung des Hintergrundsystems etablieren, der sicherstellt, dass zu keinem Zeitpunkt die Veröffentlichung oder das Kompromittieren sensibler Daten möglich ist.
+    > [Deployment process](#deployment-process)
 * O.Source_9 Der Hersteller SOLL automatische Tools zur Identifikation von Programmfehlern und Best-Practice Violations im Build Process verwenden. Jegliche Warnungen MÜSSEN von dem Hersteller vor dem Produktivbetrieb mitigiert werden.
     > [Code design patterns](#code-design-patterns)
 * O.Source_10 Für den Bau des Hintergrundsystem SOLLEN moderne Sicherheitsmechanismen, wie beispielsweise Obfuskation und Stack-Protection aktiviert werden.

@@ -93,6 +93,7 @@ $queries = [
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
 				"	`checked` datetime NULL DEFAULT NULL," .
 				"	`incorporated` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT ''," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -274,6 +275,7 @@ $queries = [
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
 				"	incorporated varchar(MAX) NOT NULL" .
+				"	info varchar(MAX) NULL DEFAULT ''" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
