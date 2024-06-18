@@ -64,7 +64,6 @@
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
 * vendor address, email, phone, customer id
-* vendor list
 * vendor mailto (certificates)
 * vendor evaluation
 
