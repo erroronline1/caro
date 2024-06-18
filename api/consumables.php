@@ -548,7 +548,7 @@ class CONSUMABLES extends API {
 	 public function vendor(){
 		// Y U NO DELETE? because of audit safety, that's why!
 		// dynamic vendor info fields with storage key and lang-property value
-		// only define once here and on output form (GET) for typing ?
+		// only define once here, audit.php and on output form (GET) for typing ?
 		$vendor_info = [
 			'infotext' => 'consumables.edit_vendor_info',
 			'mail' => 'consumables.edit_vendor_mail',
