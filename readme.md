@@ -835,7 +835,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
-* Run api/install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
+* Run api/_install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
 * Change system users default token immediately and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
@@ -1067,13 +1067,13 @@ There is a UTILITY class handling
 * parsing of requests
 * file handling within permitted directories
 * image processing
-Using these methods for fitting usecases is mandatory. (./api/utility.php)
+Using these methods for fitting usecases is mandatory. (./api/_utility.php)
 
 There is a PERMISSION class handling
 * permissions as set within setup.ini
 * full approval check
 * pending approval check
-Using these methods is mandatory. (./api/utility.php) Deviations are allowed only in extending access to *admin* or limiting access for
+Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin* or limiting access for
 * *supervisors* having access to assigned organizational unit content only
 * *groups* not having access to recording
 
@@ -1082,7 +1082,9 @@ There is a SQLQUERY class handling
 * query preparation
 * masking user input (avoiding injections)
 * support of chunkifying queries for improved performance
-Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/sqlinterface.php)
+Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
+
+Helper modules start with _, only endpoints do not.
 
 All requests have to be executed through the api ensuring
 * responses for logged in users only

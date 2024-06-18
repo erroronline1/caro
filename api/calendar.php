@@ -1,7 +1,7 @@
 <?php
 // scheduling, contributing to calendar
-require_once('./calendarutility.php');
-require_once('./pdf.php');
+require_once('./_calendarutility.php');
+require_once('./_pdf.php');
 
 class CALENDAR extends API {
 

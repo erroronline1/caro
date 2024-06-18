@@ -1,8 +1,8 @@
 <?php
 // add and export records
 // Y U NO DELETE? because of audit safety, that's why!
-require_once('./pdf.php');
-require_once('calendarutility.php');
+require_once('./_pdf.php');
+require_once('./_calendarutility.php');
 
 
 class RECORD extends API {

@@ -6,9 +6,9 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 define ('INI', parse_ini_file('setup.ini', true));
 define ('REQUEST', explode("/", substr(@utf8_encode($_SERVER['PATH_INFO']), 1)));
-include_once('sqlinterface.php');
-include_once('language.php');
-include_once('utility.php'); // general unities
+include_once('_sqlinterface.php');
+include_once('_language.php');
+include_once('_utility.php'); // general unities
 
 
 class API {
