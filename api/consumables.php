@@ -1044,8 +1044,10 @@ class CONSUMABLES extends API {
 					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')),
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
 					'protected' => 0,
-					'trading_good' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0
+					'trading_good' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0,
+					'info' => []
 				];
+				$product['info']['expiry_date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0;
 
 				// validate vendor
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
@@ -1074,6 +1076,7 @@ class CONSUMABLES extends API {
 						':active' => $product['active'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
+						':info' => json_encode($product['info'])
 					]
 				])) $this->response([
 					'status' => [
@@ -1099,6 +1102,7 @@ class CONSUMABLES extends API {
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				$product['info'] = json_decode($product['info'], true) ? : []; 
 
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
 				if (!PERMISSION::permissionFor('productslimited')){
@@ -1109,6 +1113,7 @@ class CONSUMABLES extends API {
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
 					$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
+					$product['info']['expiry_date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0;
 				}
 				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
 					if ($incorporation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.incorporation_state_approve'))){
@@ -1172,7 +1177,21 @@ class CONSUMABLES extends API {
 						]
 					]);
 				}
-
+				// apply expiry date to selected similar products
+/*				$batchtradinggood = UTILITY::propertySet($this->_payload, '_batchexpirydate');
+				if ($batchtradinggood){
+					$ids = explode(',', $batchtradinggood);
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => $product['trading_good'],
+						],
+						'replacements' => [
+							':field' => 'trading_good',
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+						]
+					]);
+				}
+*/
 				$_batchincorporation = UTILITY::propertySet($this->_payload, '_batchincorporation');
 				if (PERMISSION::permissionFor('incorporation')){
 					if ($_batchincorporation){
@@ -1199,7 +1218,8 @@ class CONSUMABLES extends API {
 						':active' => $product['active'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
-						':incorporated' => $product['incorporated'] ? : ''
+						':incorporated' => $product['incorporated'] ? : '',
+						':info' => json_encode($product['info'])
 					]
 				])) $this->response([
 					'status' => [
@@ -1244,20 +1264,21 @@ class CONSUMABLES extends API {
 					'protected' => 0,
 					'trading_good' => 0,
 					'incorporated' => '',
+					'info' => ''
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$certificates = [];
 				$documents = [];
-				if ($product['id']) {
-					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
-					foreach($docfiles as $path){
-						$file = pathinfo($path);
-						$article_no = explode('_', $file['filename'])[2];
-						similar_text($article_no, $product['article_no'], $percent);
-						if ($percent >= INI['likeliness']['consumables_article_no_similarity']) 
-							$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
-					}
+				$product['info'] = json_decode($product['info'], true) ? : [];
+
+				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
+				foreach($docfiles as $path){
+					$file = pathinfo($path);
+					$article_no = explode('_', $file['filename'])[2];
+					similar_text($article_no, $product['article_no'], $percent);
+					if ($percent >= INI['likeliness']['consumables_article_no_similarity']) 
+						$documents[$file['basename']] = ['target' => '_blank', 'href' => $path];
 				}
 				// select all products from selected vendor
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -1278,9 +1299,14 @@ class CONSUMABLES extends API {
 				$isinactive = !$product['active'] ? ['checked' => true] : [];
 				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = $this->selectSimilarDialog('_batchactive', $similarproducts, '1');
 				
-				$tradinggood = [LANG::GET('consumables.edit_product_article_trading_good') => []];
-				if ($product['trading_good']) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')] = ['checked' => true];
-				if ($similarproducts) $tradinggood[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchtradinggood', $similarproducts, '1');
+				$regulatoryoptions = [
+					LANG::GET('consumables.edit_product_article_trading_good') => ($product['trading_good']) ? ['checked' => true] : [],
+					LANG::GET('consumables.edit_product_expiry_date') => (array_key_exists('expiry_date', $product['info']) && $product['info']['expiry_date']) ? ['checked' => true] : []
+				];
+				if ($similarproducts) {
+					$regulatoryoptions[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchtradinggood', $similarproducts, '1');
+					$regulatoryoptions[LANG::GET('consumables.edit_product_expiry_date')]['onchange'] = $this->selectSimilarDialog('_batchexpirydate', $similarproducts, '1');
+				}
 
 				// prepare existing vendor lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
@@ -1340,7 +1366,10 @@ class CONSUMABLES extends API {
 					]];
 			
 					if ($product['id']){
-						$isactive['disabled'] = $isinactive['disabled'] = $tradinggood['disabled'] = true;
+						$isactive['disabled'] = $isinactive['disabled'] = true;
+						foreach($regulatoryoptions as &$option){
+							$option['disabled'] = true;
+						}
 
 						$result['body']['content'][] = [
 							[
@@ -1353,7 +1382,7 @@ class CONSUMABLES extends API {
 							],
 							[
 								'type' => 'checkbox',
-								'content' => $tradinggood,
+								'content' => $regulatoryoptions,
 							],
 							[
 								'type' => 'radio',
@@ -1515,13 +1544,13 @@ class CONSUMABLES extends API {
 					}
 
 					if (PERMISSION::permissionFor('products')){
-						array_push($result['body']['content'][2], [
+						$result['body']['content'][] = [
 							[
 								'type' => 'br'
 							],
 							[
 								'type' => 'checkbox',
-								'content' => $tradinggood,
+								'content' => $regulatoryoptions,
 								'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 							],
 							[
@@ -1530,8 +1559,15 @@ class CONSUMABLES extends API {
 									'id' => '_batchtradinggood',
 									'name' => '_batchtradinggood'
 								]
+								],
+							[
+								'type' => 'hiddeninput',
+								'attributes' => [
+									'id' => '_batchexpirydate',
+									'name' => '_batchexpirydate'
+								]
 							]
-						]);
+						];
 						$result['body']['content'][] = [
 							[
 								'type' => 'file',
@@ -1564,8 +1600,8 @@ class CONSUMABLES extends API {
 					}
 
 					if ($documents) {
-						if (array_key_exists(3, $result['body']['content']))
-							$result['body']['content'][3] = [
+						if (array_key_exists(4, $result['body']['content']))
+							$result['body']['content'][4] = [
 								[
 									[
 										'type' => 'links',
@@ -1573,7 +1609,7 @@ class CONSUMABLES extends API {
 										'content' => $documents
 									]
 								],
-								$result['body']['content'][3]
+								$result['body']['content'][4]
 							];
 						else $result['body']['content'][] = [
 							[
@@ -1596,7 +1632,7 @@ class CONSUMABLES extends API {
 							if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
 						}
 
-						array_push($result['body']['content'][2],
+						array_push($result['body']['content'][3],
 							[
 								'type' => 'text',
 								'description' => $incorporationState,
@@ -1610,7 +1646,7 @@ class CONSUMABLES extends API {
 							}
 							$incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')] = [];
 							if ($similarproducts) $incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
-							array_push($result['body']['content'][2], [
+							array_push($result['body']['content'][3], [
 									'type' => 'checkbox',
 									'description' => LANG::GET('order.incorporation_state_approve'),
 									'content' => $incorporation,
@@ -1626,7 +1662,7 @@ class CONSUMABLES extends API {
 						}
 					}
 					else {
-						$result['body']['content'][2][] = [
+						$result['body']['content'][3][] = [
 							'type' => 'text',
 							'description' => LANG::GET('consumables.edit_product_incorporated_not')
 						];
