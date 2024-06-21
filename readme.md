@@ -60,7 +60,6 @@
 ## development
 
 #### purchase considerations
-* finalize expiry date (pricelist import, batchupdate on json)
 * order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
