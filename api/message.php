@@ -39,22 +39,33 @@ class MESSAGE extends API {
 						':id' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
 					]
 				]);
-				if (!$recipients) $this->response(['status' => ['msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]), 'type' => 'error']]);
+				if (!$recipients) $this->response([
+					'status' => [
+						'msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]),
+						'type' => 'error'
+					]]);
 				$success = 0;
 				foreach ($recipients as $recipient){
 					if ($recipient['id'] < 2) continue;
+					$message = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]));
+					if (!$message) $this->response([
+						'status' => [
+							'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
+							'redirect' => false,
+							'type' => 'error'
+						]]);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
 						'values' => [
 							'from_user' => $_SESSION['user']['id'],
 							'to_user' => $recipient['id'],
-							'message' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]))
+							'message' => $message
 						]
 					])) $success++;
 				}
 				if ($success === count($recipients)) $this->response([
 					'status' => [
 						'msg' => LANG::GET('message.send_success'),
-						'redirect' => false,
+						'redirect' => 'conversation',
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -130,7 +141,7 @@ class MESSAGE extends API {
 								'type' => 'hiddeninput',
 								'attributes' => [
 									'name' => LANG::GET('message.to'),
-									'value' => $this->_conversation
+									'value' => $conversation_user['name']
 								]
 							],
 							[
