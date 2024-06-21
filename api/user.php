@@ -192,6 +192,7 @@ class USER extends API {
 						],
 						'content' => [
 							LANG::GET('user.settings_theme_light') => (!array_key_exists('theme', $user['app_settings']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
+							LANG::GET('user.settings_theme_aurora') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
 							LANG::GET('user.settings_theme_dark') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
 						]
 					], [
