@@ -814,7 +814,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 [Content](#content)
 
 ## Installation
-* php.ini memory_limit ~3072M for [processing of large CSV-files](#csv-processor), disable open_basedir at least for local IIS for file handlers.
+* php.ini memory_limit ~4096M for [processing of large CSV-files and pricelist imports](#csv-processor), disable open_basedir at least for local IIS for file handlers.
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
