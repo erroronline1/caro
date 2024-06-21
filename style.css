@@ -623,7 +623,7 @@ button:disabled {
 
 input:disabled,
 input:read-only {
-	color: var(--lighterforeground);
+	color: var(--disabled);
 	cursor: copy;
 }
 
