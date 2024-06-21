@@ -349,10 +349,10 @@ class CONSUMABLES extends API {
 	public function incorporation(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$batchincorporate = UTILITY::propertySet($this->_payload, '_batchincorporate');
+				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
 				$ids = [];
-				if ($batchincorporate){
-					$ids = explode(',', $batchincorporate);
+				if ($_batchupdate){
+					$ids = explode(',', $_batchupdate);
 				}
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'replacements' => [
@@ -425,14 +425,14 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => LANG::GET('order.incorporation_batch'),
-							'onpointerup' => $this->selectSimilarDialog('_batchincorporate', $similarproducts, '1', 'input2')
+							'onpointerup' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
 						]
 					];
 					$incorporationform[] = [
 						'type' => 'hiddeninput',
 						'attributes' => [
-							'id' => '_batchincorporate',
-							'name' => '_batchincorporate'
+							'id' => '_batchupdate',
+							'name' => '_batchupdate'
 						]
 					];	
 				}
@@ -1045,9 +1045,8 @@ class CONSUMABLES extends API {
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
 					'protected' => 0,
 					'trading_good' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0,
-					'info' => []
+					'expiry_date' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0
 				];
-				$product['info']['expiry_date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0;
 
 				// validate vendor
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
@@ -1076,7 +1075,7 @@ class CONSUMABLES extends API {
 						':active' => $product['active'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
-						':info' => json_encode($product['info'])
+						':expiry_date' => $product['expiry_date']
 					]
 				])) $this->response([
 					'status' => [
@@ -1102,7 +1101,6 @@ class CONSUMABLES extends API {
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
-				$product['info'] = json_decode($product['info'], true) ? : []; 
 
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
 				if (!PERMISSION::permissionFor('productslimited')){
@@ -1113,7 +1111,7 @@ class CONSUMABLES extends API {
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
 					$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
-					$product['info']['expiry_date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0;
+					$product['expiry_date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0;
 				}
 				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
 					if ($incorporation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.incorporation_state_approve'))){
@@ -1144,14 +1142,14 @@ class CONSUMABLES extends API {
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_product_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
+				if (PERMISSION::permissionFor('products') && array_key_exists(LANG::PROPERTY('consumables.edit_product_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_product_documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
 				// activate or deactivate selected similar products
 				$batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
-				if ($batchactive){
+				if (PERMISSION::permissionFor('products') && $batchactive){
 					$ids = explode(',', $batchactive);
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
@@ -1161,12 +1159,13 @@ class CONSUMABLES extends API {
 							':field' => 'active',
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
 						]
-						]);
+					]);
 				}
-				// apply trading good to selected similar products
-				$batchtradinggood = UTILITY::propertySet($this->_payload, '_batchtradinggood');
-				if ($batchtradinggood){
-					$ids = explode(',', $batchtradinggood);
+				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
+				if (PERMISSION::permissionFor('products') && $_batchupdate){
+					$ids = explode(',', $_batchupdate);
+
+					// apply trading good to selected similar products
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
 							':value' => $product['trading_good'],
@@ -1176,26 +1175,19 @@ class CONSUMABLES extends API {
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
 						]
 					]);
-				}
-				// apply expiry date to selected similar products
-/*				$batchtradinggood = UTILITY::propertySet($this->_payload, '_batchexpirydate');
-				if ($batchtradinggood){
-					$ids = explode(',', $batchtradinggood);
+
+					// apply expiry date to selected similar products
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
-							':value' => $product['trading_good'],
+							':value' => $product['expiry_date'],
 						],
 						'replacements' => [
-							':field' => 'trading_good',
+							':field' => 'expiry_date',
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
 						]
 					]);
-				}
-*/
-				$_batchincorporation = UTILITY::propertySet($this->_payload, '_batchincorporation');
-				if (PERMISSION::permissionFor('incorporation')){
-					if ($_batchincorporation){
-						$ids = explode(',', $_batchincorporation);
+
+					if (PERMISSION::permissionFor('incorporation')){
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 							'replacements' => [
 								':field' => 'incorporated',
@@ -1219,12 +1211,12 @@ class CONSUMABLES extends API {
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
 						':incorporated' => $product['incorporated'] ? : '',
-						':info' => json_encode($product['info'])
+						':expiry_date' => $product['expiry_date']
 					]
 				])) $this->response([
 					'status' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]) . ($batchactive || $batchtradinggood || $_batchincorporation ? '. ' . LANG::GET('consumables.edit_product_batch_saved'): ''),
+						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]) . ($batchactive || $_batchupdate ? '. ' . LANG::GET('consumables.edit_product_batch_saved'): ''),
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -1264,13 +1256,12 @@ class CONSUMABLES extends API {
 					'protected' => 0,
 					'trading_good' => 0,
 					'incorporated' => '',
-					'info' => ''
+					'expiry_date' => ''
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['status'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$certificates = [];
 				$documents = [];
-				$product['info'] = json_decode($product['info'], true) ? : [];
 
 				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
 				foreach($docfiles as $path){
@@ -1301,11 +1292,11 @@ class CONSUMABLES extends API {
 				
 				$regulatoryoptions = [
 					LANG::GET('consumables.edit_product_article_trading_good') => ($product['trading_good']) ? ['checked' => true] : [],
-					LANG::GET('consumables.edit_product_expiry_date') => (array_key_exists('expiry_date', $product['info']) && $product['info']['expiry_date']) ? ['checked' => true] : []
+					LANG::GET('consumables.edit_product_expiry_date') => $product['expiry_date'] ? ['checked' => true] : []
 				];
 				if ($similarproducts) {
-					$regulatoryoptions[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchtradinggood', $similarproducts, '1');
-					$regulatoryoptions[LANG::GET('consumables.edit_product_expiry_date')]['onchange'] = $this->selectSimilarDialog('_batchexpirydate', $similarproducts, '1');
+					$regulatoryoptions[LANG::GET('consumables.edit_product_article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+					$regulatoryoptions[LANG::GET('consumables.edit_product_expiry_date')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 				}
 
 				// prepare existing vendor lists
@@ -1551,22 +1542,14 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'checkbox',
 								'content' => $regulatoryoptions,
-								'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 							],
 							[
 								'type' => 'hiddeninput',
 								'attributes' => [
-									'id' => '_batchtradinggood',
-									'name' => '_batchtradinggood'
+									'id' => '_batchupdate',
+									'name' => '_batchupdate'
 								]
-								],
-							[
-								'type' => 'hiddeninput',
-								'attributes' => [
-									'id' => '_batchexpirydate',
-									'name' => '_batchexpirydate'
-								]
-							]
+							],
 						];
 						$result['body']['content'][] = [
 							[
@@ -1621,7 +1604,7 @@ class CONSUMABLES extends API {
 							]
 						];
 					}
-					if ($product['incorporated'] !== '' ) {					
+					if ($product['incorporated'] !== '') {					
 						$product['incorporated'] = json_decode($product['incorporated'], true);
 						$incorporationState = '';
 						if (array_key_exists('_denied', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
@@ -1642,21 +1625,15 @@ class CONSUMABLES extends API {
 							$incorporation = [];
 							foreach(PERMISSION::pending('incorporation', $product['incorporated']) as $position){
 								$incorporation[LANG::GET('permissions.' . $position)] = [];
-								if ($similarproducts) $incorporation[LANG::GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
+								if ($similarproducts) $incorporation[LANG::GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 							}
 							$incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')] = [];
-							if ($similarproducts) $incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
+							if ($similarproducts) $incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 							array_push($result['body']['content'][3], [
 									'type' => 'checkbox',
 									'description' => LANG::GET('order.incorporation_state_approve'),
 									'content' => $incorporation,
 									'hint' => LANG::GET('consumables.edit_product_similar_hint'),
-								], [
-									'type' => 'hiddeninput',
-									'attributes' => [
-										'name' => '_batchincorporation',
-										'id' => '_batchincorporation'
-									]
 								]
 							);
 						}
@@ -1664,7 +1641,8 @@ class CONSUMABLES extends API {
 					else {
 						$result['body']['content'][3][] = [
 							'type' => 'text',
-							'description' => LANG::GET('consumables.edit_product_incorporated_not')
+							'description' => LANG::GET('consumables.edit_product_incorporated_not'),
+							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 						];
 					}
 					if ($product['id'] && !$product['protected'] && !$product['article_alias'] && !$product['checked'] && !$product['incorporated'] && !PERMISSION::permissionFor('productslimited')) array_push($result['body']['content'],
