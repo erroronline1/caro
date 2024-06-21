@@ -16,28 +16,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
- :root {
-	--background: #d8dee9;
-	--foreground: rgb(46, 52, 64);
-	--lighterforeground: rgb(92, 97, 109);
-	--article: rgb(236, 239, 244);
-	--3d-border: rgba(255, 255, 255, 0.3);
-	--lightshadow: rgba(255, 255, 255, 0.9);
-	--lightershadow: rgba(255, 255, 255, 0.5);
-	--darkshadow: rgba(76, 86, 106, 0.3);
-	--frostgreen: rgb(143, 188, 187);
-	--red: rgb(191, 97, 106);
-	--orange: rgb(208, 135, 112);
-	--yellow: rgb(235, 203, 139);
-	--green: rgb(153, 179, 132);
-	--purple: rgb(180, 142, 173);
-	--cta: rgb(136, 192, 208);
-	--evenDiscreetButton: rgba(136, 192, 208, 0.2);
-	--cta_darker: rgb(80, 155, 176);
-	--cta_active: rgb(161, 227, 246);
-	--shadow: 2px 2px 6px rgba(76, 86, 106, 0.3);
-}
-
 * {
 	font-family: Tahoma, Geneva, Verdana, sans-serif;
 	box-sizing: border-box;
@@ -478,7 +456,7 @@ input[type="tel"],
 input[type="email"],
 textarea,
 select {
-	border: 1px solid var(--foreground);
+	border: 1px solid var(--inputborder);
 	border-radius: 0.2em;
 	padding: 0.75em;
 }
@@ -503,7 +481,7 @@ input[type="checkbox"] {
 	border-radius: 2em;
 	background-color: var(--article);
 	width: fit-content;
-	border: 1px solid var(--darkshadow);
+	border: 1px solid var(--inputborder);
 	vertical-align: middle;
 }
 
@@ -521,7 +499,7 @@ input[type="checkbox"] {
 	top: 0;
 	left: -0.75em;
 	padding: 0.1em 0.6em 0.9em 0.4em;
-	border: 1px solid var(--darkshadow);
+	border: 1px solid var(--inputborder);
 	border-radius: 50%;
 	color: transparent;
 }

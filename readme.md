@@ -69,7 +69,6 @@
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* user selectable color themes?
 * risk management?
 
 #### planning considerations

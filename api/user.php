@@ -66,6 +66,7 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_homeoffice'));
+				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_theme'));
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
 				}
@@ -81,7 +82,7 @@ class USER extends API {
 						':image' => $user['image'],
 						':app_settings' => json_encode($user['app_settings'])
 					]
-				])) $this->response([
+				]) !== false) $this->response([
 					'status' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
@@ -183,6 +184,15 @@ class USER extends API {
 						'content' => [
 							LANG::GET('user.settings_force_desktop') => [],
 							LANG::GET('user.settings_homeoffice') => [],
+						]
+					], [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('user.settings_theme')
+						],
+						'content' => [
+							LANG::GET('user.settings_theme_light') => (!array_key_exists('theme', $user['app_settings']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
+							LANG::GET('user.settings_theme_dark') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
 						]
 					], [
 						'type' => 'radio',

@@ -1,17 +1,17 @@
 /**
  * CARO - Cloud Assisted Records and Operations
  * Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -76,11 +76,13 @@ export const api = {
 		api.loadindicator(true);
 		if (window._user && window._user.cached_identity && ["post", "put"].includes(method) && payload instanceof FormData) {
 			let sanitizedpayload = Object.fromEntries(payload);
-			for (const[key, value] of Object.entries(sanitizedpayload)){
+			for (const [key, value] of Object.entries(sanitizedpayload)) {
 				// remove file keys for being shifted to $_FILES within the stream
 				if (value instanceof File && value.size) delete sanitizedpayload[key];
 			}
-			sanitizedpayload = JSON.stringify(sanitizedpayload).replaceAll(/\\r|\\n|\\t/g, '').replaceAll(/[\W_]/g, ''); // harmonize cross browser
+			sanitizedpayload = JSON.stringify(sanitizedpayload)
+				.replaceAll(/\\r|\\n|\\t/g, "")
+				.replaceAll(/[\W_]/g, ""); // harmonize cross browser
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
@@ -197,6 +199,17 @@ export const api = {
 										}
 									}
 									break;
+								case "theme":
+									if (value) {
+										document.getElementsByTagName("head")[0].removeChild(document.getElementById("csstheme"));
+										const link = document.createElement("link");
+										link.href = "./" + value + ".css";
+										link.type = "text/css";
+										link.rel = "stylesheet";
+										link.media = "screen";
+										link.id = "csstheme";
+										document.getElementsByTagName("head")[0].appendChild(link);
+									}
 							}
 						}
 					}
@@ -714,7 +727,7 @@ export const api = {
 								body.processAfterInsertion();
 							}
 							if (data.status !== undefined && data.status.msg !== undefined) new Toast(data.status.msg, data.status.type);
-							api.preventDataloss.monitor = request[4] === 'editconsumables';
+							api.preventDataloss.monitor = request[4] === "editconsumables";
 						};
 						break;
 					case "filter":

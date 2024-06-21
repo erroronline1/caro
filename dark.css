@@ -1,0 +1,40 @@
+/**
+ * CARO - Cloud Assisted Records and Operations
+ * Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+ :root {
+	--background: #2e3440;
+	--foreground: #e5e9f0;
+    --inputborder: #d8dee9;
+	--lighterforeground: rgb(92, 97, 109);
+	--article: #434c5e;
+	--3d-border: #4c566a;
+	--lightshadow: rgba(255, 255, 255, 0.1);
+	--lightershadow: rgba(255, 255, 255, 0.5);
+	--darkshadow: rgba(0, 0, 0, 0.4);
+	--frostgreen: rgb(143, 188, 187);
+	--red: rgb(191, 97, 106);
+	--orange: rgb(208, 135, 112);
+	--yellow: rgb(235, 203, 139);
+	--green: rgb(153, 179, 132);
+	--purple: rgb(180, 142, 173);
+	--cta: rgb(136, 192, 208);
+	--evenDiscreetButton: rgba(136, 192, 208, 0.2);
+	--cta_darker: rgb(80, 155, 176);
+	--cta_active: rgb(161, 227, 246);
+	--shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}

@@ -55,7 +55,7 @@
      id="layer1"
      transform="translate(-23.55228,-40.739082)">
     <rect
-       style="fill:#e5e9f0;fill-opacity:1;fill-rule:evenodd;stroke-width:7.99999;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1.70078;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:transparent;fill-opacity:0;fill-rule:evenodd;stroke-width:7.99999;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:1.70078;paint-order:fill markers stroke;stop-color:#000000"
        id="rect881"
        width="146.72435"
        height="77.022324"
