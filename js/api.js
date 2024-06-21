@@ -78,7 +78,9 @@ export const api = {
 			let sanitizedpayload = Object.fromEntries(payload);
 			for (const [key, value] of Object.entries(sanitizedpayload)) {
 				// remove file keys for being shifted to $_FILES within the stream
-				if (value instanceof File && value.size) delete sanitizedpayload[key];
+				if (value instanceof File && (method === "post" || (method === "put" && value.size))) {
+					delete sanitizedpayload[key];
+				}
 			}
 			sanitizedpayload = JSON.stringify(sanitizedpayload)
 				.replaceAll(/\\r|\\n|\\t/g, "")
