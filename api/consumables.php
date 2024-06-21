@@ -36,13 +36,15 @@ class CONSUMABLES extends API {
 		},
 		"modify": {
 			"add": {
-				"trading_good": "0"
+				"trading_good": "0",
+				"expiry_date": "0"
 			},
 			"replace":[
 				["EAN", "\\s+", ""]
 			],
 			"conditional": [
-				["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+				["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]],
+				["expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]]
 			],
 			"rewrite": [{
 				"article_no": ["Article Number"],
@@ -114,13 +116,14 @@ class CONSUMABLES extends API {
 
 			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_protected'),
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_pricelist_import'),
 				[
 					':id' => $remainder[$update]['id'],
 					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
 					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
 					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
 					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['trading_good']) : 0,
+					':expiry_date' => array_key_exists('expiry_date', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['expiry_date']) : 0,
 					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
 				]) . '; ');
 			}
@@ -136,7 +139,8 @@ class CONSUMABLES extends API {
 					':active' => 1,
 					':protected' => 0,
 					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? $pricelist->_list[1][$index]['trading_good'] : 0,
-					':incorporated' => ''
+					':incorporated' => '',
+					':expiry_date' => array_key_exists('expiry_date', $pricelist->_list[1][$index]) ? $this->_pdo->quote($pricelist->_list[1][$index]['expiry_date']) : 0,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));

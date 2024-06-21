@@ -1015,13 +1015,15 @@ while setting up a vendor an import rule must be defined like:
     },
     "modify": {
         "add": {
-            "trading_good": "0"
+            "trading_good": "0",
+            "expiry_date": "0"
         },
         "replace":[
             ["EAN", "\\s+", ""]
         ],
         "conditional": [
-            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]],
+            ["expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]]
         ],
         "rewrite": [{
             "article_no": ["Article Number"],
@@ -1044,10 +1046,10 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 ]
 ```
 
-### Sample Check
-*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default.
+### Sample check and expiry dates
+*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates.
 
-You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. 
+You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates.
 
 [Content](#content)
 

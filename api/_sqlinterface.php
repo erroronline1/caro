@@ -270,9 +270,9 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, expiry_date = :expiry_date WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, expiry_date = :expiry_date WHERE id = :id"
 		],
-		'consumables_put_product_protected' => [
-			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated WHERE id = :id"
+		'consumables_put_product_pricelist_import' => [
+			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, expiry_date = :expiry_date WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, expiry_date = :expiry_date WHERE id = :id"
 		],
 		'consumables_put_batch' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
