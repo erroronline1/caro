@@ -43,7 +43,7 @@ delete . from headers, replace specialchars
 	"modify": {
 		"add": {
 			"trading_good": "0",
-			"expiry_date": "0"
+			"has_expiry_date": "0"
 		},
 		"replace":[
 			["EAN GTIN", "\\s+", ""]
@@ -180,7 +180,7 @@ delete unreqired columns
 	"modify": {
 		"add": {
 			"trading_good": "1",
-			"expiry_date": "1"
+			"has_expiry_date": "1"
 		},
 		"rewrite": [{
 			"article_no": ["JUZO-Artikelnr"],
@@ -293,7 +293,7 @@ replace specialchars in header
 	"modify": {
 		"add": {
 			"trading_good": "1",
-			"expiry_date": "1"
+			"has_expiry_date": "1"
 		},
 		"rewrite": [{
 			"article_no": ["Artikel-Nr."],
@@ -552,11 +552,11 @@ join tables
 	"modify": {
 		"add": {
 			"trading_good": "0",
-			"expiry_date": "0"
+			"has_expiry_date": "0"
 		},
 		"conditional": [
 			["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
-			["expiry_date", "1", ["Material", "633s2"]]
+			["has_expiry_date", "1", ["Material", "633s2"]]
 		],
 		"rewrite": [{
 			"article_no": ["Material"],
@@ -772,7 +772,7 @@ delete . from headers, replace specialchars and whitespaces
 	"modify": {
 		"add": {
 			"trading_good": "1",
-			"expiry_date": "1"
+			"has_expiry_date": "1"
 		},
 		"rewrite": [{
 			"article_no": ["Bestell-Nr"],
