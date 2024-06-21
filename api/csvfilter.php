@@ -18,7 +18,7 @@
  */
 
 // add filters and filter csv-files
-include_once('./csvprocessor.php');
+include_once('./_csvprocessor.php');
 include_once("../libraries/xlsxwriter.class.php");
 
 class CSVFILTER extends API {
