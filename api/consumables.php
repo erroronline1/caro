@@ -42,8 +42,10 @@ class CONSUMABLES extends API {
 			"replace":[
 				["EAN", "\\s+", ""]
 			],
-			"conditional": [
-				["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]],
+			"conditional_and": [
+				["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+			],
+			"conditional_or": [
 				["has_expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]]
 			],
 			"rewrite": [{

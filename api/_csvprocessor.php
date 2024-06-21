@@ -103,7 +103,8 @@ filters and returns a named array according to setup.
 		"rewrite": adds newly named columns consisting of concatenated origin column values and separators.
 				   original columns will be omitted, nested within a list to make sure to order as given
 		"translate": column values to be translated according to specified translation object
-		"conditional": changes a columns value if regex matches on other columns, adds column by default with empty value
+		"conditional_and": changes a columns value if all regex matches on other columns, adds column by default with empty value
+		"conditional_or": changes a columns value if any regex matches on other columns, adds column by default with empty value
 
 	"split": split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
@@ -868,7 +869,7 @@ class Listprocessor {
 							$this->_list[$i] = $row;
 						}
 						break;
-					case 'conditional':
+					case 'conditional_and':
 						foreach ($this->_list as $i => $row){
 							if (!$row) continue;
 							if (!in_array($rule[0], $this->_setting['filesetting']['columns']))
@@ -882,7 +883,21 @@ class Listprocessor {
 							$this->_list[$i] = $row;
 						}
 						break;
-				}
+					case 'conditional_or':
+						foreach ($this->_list as $i => $row){
+							if (!$row) continue;
+							if (!in_array($rule[0], $this->_setting['filesetting']['columns']))
+								$this->_setting['filesetting']['columns'][] = $rule[0];
+							$matches = 0;
+							for ($condition = 2; $condition < count($rule); $condition++){
+								if (array_key_exists($rule[$condition][0], $row) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
+							}
+							if ($matches) $row[$rule[0]] = $rule[1];
+							else $row[$rule[0]] = strlen($row[$rule[0]]) ? $row[$rule[0]] : '';
+							$this->_list[$i] = $row;
+						}
+						break;
+					}
 			}
 		}
 	}

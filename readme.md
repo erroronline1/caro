@@ -1019,8 +1019,10 @@ while setting up a vendor an import rule must be defined like:
         "replace":[
             ["EAN", "\\s+", ""]
         ],
-        "conditional": [
-            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]],
+        "conditional_and": [
+            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+        ],
+        "conditional_or": [
             ["has_expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]]
         ],
         "rewrite": [{
@@ -1184,7 +1186,8 @@ Description of options:
 		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
 				   Original columns will be omitted, nested within a list to make sure to order as given
 		"translate": Column values to be translated according to specified translation object
-		"conditional": changes a columns value if regex matches on other columns, adds column by default with empty value
+		"conditional_and": changes a columns value if all regex matches on other columns, adds column by default with empty value
+		"conditional_or": changes a columns value if any regex matches on other columns, adds column by default with empty value
 
 	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
 
@@ -1335,9 +1338,13 @@ A generic sample:
         "translate":{
             "DEPARTMENT": "departments"
         },
-        "conditional":[
+        "conditional_and":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ],
+        "conditional_or":[
             ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
         ]
+
     },
     "split":{
         "DEPARTMENT": "(.*)",
