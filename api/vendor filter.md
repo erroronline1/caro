@@ -48,7 +48,7 @@ delete . from headers, replace specialchars
 		"replace":[
 			["EAN GTIN", "\\s+", ""]
 		],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Artikelname", "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."]]
 		],
 		"rewrite": [{
@@ -112,7 +112,7 @@ add name headers where empty, delete . from headers
 		"replace":[
 			["EANNummer", "\\s+", ""]
 		],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Bezeichnung", ".+schuh"]]
 		],
 		"rewrite": [{
@@ -143,7 +143,7 @@ delete . from headers, replace specialchars
 			"article_unit": ["Einheiten"],
 			"article_ean": [""]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["article_name", "socke|strumpf|ckchen|kniestr|shirt|body|hose"]]
 		]
 	}
@@ -353,7 +353,7 @@ add headers on line 7
 		"replace":[
 			["EANCODE", "\\s+", ""]
 		],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["NAME1", "aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|tübinger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"]]
 		],
 		"rewrite": [{
@@ -392,7 +392,7 @@ modify product description for:
 		"add": {
 			"trading_good": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["BEZEICHNUNG", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]]
 		],
 		"replace":[
@@ -494,7 +494,7 @@ delete . from headers
 			"article_unit": ["VME"],
 			"article_ean": [""]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "0", ["article_name", "Anti-Rutsch-Beschichtung"]]
 		]
 	}
@@ -509,10 +509,15 @@ delete . from headers
 	},
 	"modify": {
 		"add": {
-			"trading_good": "0"
+			"trading_good": "0",
+			"has_expiry_date": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]]
+		],
+		"replace":[
+			["Art.Nr.", "(501[BDKJ].+)(L)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5"]
+			["Art.Nr.", "(501[BDKJ].+)(R)", "R1", "R1-2", "R2", "R2-3", "R3", "R3-4", "R4", "R4-5", "R5"]
 		],
 		"rewrite": [{
 			"article_no": ["Art.Nr."],
@@ -554,9 +559,9 @@ join tables
 			"trading_good": "0",
 			"has_expiry_date": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
-			["has_expiry_date", "1", ["Material", "633s2"]]
+			["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|85h.+|636K.+"]]
 		],
 		"rewrite": [{
 			"article_no": ["Material"],
@@ -579,7 +584,7 @@ join tables
 		"add": {
 			"trading_good": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Materialkurztext", "^o|^ns|^av|schuh|^d\\d"]]
 		],
 		"rewrite": [{
@@ -611,7 +616,7 @@ replace specialchars in header
 			"article_unit": ["Menge"],
 			"article_ean": [""]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["article_name", "Lagerungsschiene|orthese|helm|headmaster"]]
 		]
 	}
@@ -630,7 +635,7 @@ add header on first line
 		"add": {
 			"trading_good": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["name", "Compression|Weste|Peronäusschiene|Stax|liner"]]
 		],
 		"rewrite": [{
@@ -661,7 +666,7 @@ delete last row
 			"article_unit": ["ME"],
 			"article_ean": ["EAN_GTIN"]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehstütze|achselstütze|toiletten|gehgestell|vierfuß|fischer"]]
 		]
 	}
@@ -724,7 +729,7 @@ delete last row
 		"add": {
 			"trading_good": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|stützschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]
 		],
 		"rewrite": [{
@@ -754,7 +759,7 @@ delete last row
 			"article_unit": ["Basiseinheit"],
 			"article_ean": [""]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["article_name", "einlage|schuh|orthese"]]
 		]
 	}
@@ -796,7 +801,7 @@ delete . from headers, replace specialchars and whitespaces
 		"add": {
 			"trading_good": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]]
 		],
 		"rewrite": [{
@@ -850,7 +855,7 @@ delete . from headers, replace specialchars and whitespaces
 			"article_unit": ["Verpackung1"],
 			"article_ean": [""]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["article_name", "WS-Bandage|Wirbelsäulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]]
 		]
 	}
@@ -891,7 +896,7 @@ delete . from headers, replace specialchars and whitespaces
 		"add": {
 			"trading_good": "0"
 		},
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["Beschreibung", "^bob|^daho|liner|philadelphia"]]
 		],
 		"rewrite": [{
@@ -922,7 +927,7 @@ delete . from headers, replace specialchars and whitespaces
 			"article_unit": [""],
 			"article_ean": ["EAN"]
 		}],
-		"conditional": [
+		"conditional_and": [
 			["trading_good", "1", ["article_name", "Arthrodesenkissen"]]
 		]
 	}
