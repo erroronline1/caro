@@ -153,12 +153,6 @@ export const api = {
 	 * @returns request
 	 */
 	application: async (method, ...request) => {
-		/*
-		get application/language
-		post application/login
-		get application/menu
-		get application/start
-		*/
 		request = [...request];
 		request.splice(0, 0, "application");
 		let successFn, payload;
@@ -268,10 +262,6 @@ export const api = {
 	 * @returns request
 	 */
 	audit: (method, ...request) => {
-		/*
-		get audit/checks/{type}
-		get audit/export/{type}
-		*/
 		request = [...request];
 		request.splice(0, 0, "audit");
 		let payload,
@@ -328,13 +318,6 @@ export const api = {
 	 * @returns request
 	 */
 	calendar: (method, ...request) => {
-		/*
-		get calendar/schedule
-		get calendar/schedule/{date Y-m-d}/{date Y-m-d} // where first optional date accesses a week or month, second optional the exact specified date
-		post calendar/schedule
-		put calendar/schedule/{id}
-		delete calendar/schedule/{id}
-		*/
 		request = [...request];
 		request.splice(0, 0, "calendar");
 		let payload,
@@ -396,13 +379,6 @@ export const api = {
 	 * @returns request
 	 */
 	csvfilter: (method, ...request) => {
-		/*
-		post csvfilter/rule
-		get csvfilter/rule
-
-		post csvfilter/filter
-		get csvfilter/filter
-		*/
 		request = [...request];
 		request.splice(0, 0, "csvfilter");
 		let payload,
@@ -452,27 +428,6 @@ export const api = {
 	 * @returns request
 	 */
 	file: async (method, ...request) => {
-		/*
-		get file/filter/{directory}
-
-		get file/files/{directory}
-
-		post file/filemanager
-		get file/filemanager/{directory}
-		delete file/filemanager/{directory}/{file}
-
-		post file/externalfilemanager
-		put file/externalfilemanager/{id}/{int accessible}
-		get file/externalfilemanager
-
-		get file/bundle/{bundle}
-
-		post file/bundlemanager
-		get file/bundlemanager/{bundle}
-
-		post file/sharepoint
-		get file/sharepoint
-		*/
 		request = [...request];
 		request.splice(0, 0, "file");
 		let successFn = function (data) {
@@ -544,24 +499,6 @@ export const api = {
 	 * @returns request
 	 */
 	form: (method, ...request) => {
-		/*
-		get form elements from database.
-		notice only the first requested form will appear. later duplicates will be ignored.
-
-		get form/component_editor/{name|id}
-		get form/form_editor/{name|id}
-
-		get form/component/{name}
-		post form/component
-		delete form/component/{id}
-
-		get form/approval/{id}
-		put form/approval/{id}
-
-		get form/form/{name}
-		post form/form
-		delete form/form/{id}
-		*/
 		request = [...request];
 		request.splice(0, 0, "form");
 		let successFn,
@@ -689,19 +626,6 @@ export const api = {
 	 * @returns request
 	 */
 	message: (method, ...request) => {
-		/*
-		get message/conversation/{conversation_user}
-		delete message/conversation/{conversation_user}
-
-		post message/message/{formdata}
-
-		get message/register
-
-		to initiate a new message with (hidden or visible inputs having both the same unique queryselector) prepared recipient and message using _.getinputs(queryselector)
-		call by api.message('get', 'message', '{queryselector}') 
-		results in get message/message?to=recipient&message=messagetext
-		alternatively prepare third parameter as formdata
-		*/
 		request = [...request];
 		request.splice(0, 0, "message");
 		let payload,
@@ -755,39 +679,8 @@ export const api = {
 	 * @returns request
 	 */
 	purchase: (method, ...request) => {
-		/*
-		get consumables/vendor/{id|name}
-		post consumables/vendor
-		put consumables/vendor/{id}
-
-		get consumables/product/{id}
-		get consumables/product/{id|name}/search
-		post consumables/product
-		put consumables/product/{id}
-		delete consumables/product/{id}
-
-		post consumables/mdrsamplecheck
-		get consumables/mdrsamplecheck
-		delete consumables/mdrsamplecheck
-		post consumables/incorporation
-		get consumables/incorporation
-		get consumables/pendingincorporations
-
-		get order/prepared/{unit}
-		get order/productsearch/{id|name}
-		get order/order/{id}
-		post order/order
-		put order/order/{id}
-		delete order/order/{id}
-
-		get order/approved/
-		put order/approved/{id}/{ordered|received|archived|disapproved}/{message}
-		delete order/approved/{id}
-
-		get order/filtered/{filter}
-		*/
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -804,6 +697,7 @@ export const api = {
 				pendingincorporations: LANG.GET("menu.purchase_incorporated_pending"),
 				vendorinformation: LANG.GET("menu.purchase_vendor_information"),
 				productinformation: LANG.GET("menu.purchase_product_information"),
+				products_with_expiry_dates: LANG.GET("menu.purchase_products_with_expiry_dates"),
 			};
 		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {
@@ -938,24 +832,6 @@ export const api = {
 	 * @returns request
 	 */
 	record: (method, ...request) => {
-		/*
-		post record/identifier
-		get record/identifier
-
-		get record/forms
-		get record/form/{optional identifier}
-
-		get record/formfilter
-		get record/identifierfilter
-
-		post record/record
-
-		put record/close/{identifier}
-
-		get record/import
-		get record/records
-		get records/export
-		*/
 		request = [...request];
 		request.splice(0, 0, "record");
 		let payload,
@@ -1098,16 +974,6 @@ export const api = {
 	 * @returns request
 	 */
 	texttemplate: (method, ...request) => {
-		/*
-		post texttemplate/chunk
-		get texttemplate/chunk
-
-		post texttemplate/template
-		get texttemplate/template
-
-		get texttemplate/text opens form properly from menu
-		get texttemplate/text/modal opens form within modal
-		*/
 		request = [...request];
 		request.splice(0, 0, "texttemplate");
 		let payload,
@@ -1179,14 +1045,6 @@ export const api = {
 	 * @returns request
 	 */
 	tool: (method, ...request) => {
-		/*
-		get tool/code
-		get tool/code/display?key=value
-
-		get tool/scanner
-		
-		get tool/stlviewer
-		*/
 		request = [...request];
 		request.splice(0, 0, "tool");
 		let payload,
@@ -1224,13 +1082,6 @@ export const api = {
 	 * @returns request
 	 */
 	user: (method, ...request) => {
-		/*
-		get user/profile
-		get user/user/{id|name}
-		post user/user
-		put user/user/{id}
-		delete user/user/{id}
-		*/
 		request = [...request];
 		request.splice(0, 0, "user");
 		let payload,
