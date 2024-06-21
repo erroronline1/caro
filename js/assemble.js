@@ -827,6 +827,7 @@ export class Assemble {
 			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
 		}
 		result.push(document.createElement("br"));
+		result = result.concat(this.hint());
 		return result;
 	}
 
