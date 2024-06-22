@@ -1053,6 +1053,8 @@ Other vendors may list products missing color variants appended to the article n
 ]
 ```
 
+You can, of course, decide to go the extra mile and apply any additional filter, e.g. to omit products you will not use anyway, speed up the import for next time by leaving out products that did not fit incorporation, etc.
+
 ### Sample check and expiry dates
 *modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates.
 
@@ -1232,7 +1234,7 @@ A generic sample:
             "keep": true,
             "match": {
                 "all": {
-                    "DELIEVERED": "delivered",
+                    "DELIVERED": "delivered",
                     "NAME": ".+?"
                 }
             }

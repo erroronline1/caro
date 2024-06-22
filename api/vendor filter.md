@@ -508,6 +508,18 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 	"filesetting": {
 		"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
 	},
+    "filter": [
+        {
+            "apply": "filter_by_expression",
+            "comment": "drop microcoating",
+            "keep": false,
+            "match": {
+                "all": {
+                    "Art.Nr.": "501[BDKJ].+C=.+"
+                }
+            }
+        }
+	],
 	"modify": {
 		"add": {
 			"trading_good": "0",
