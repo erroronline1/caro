@@ -248,6 +248,8 @@ Beside the apps architecture you will still have to set up your quality manageme
 
 ## Application
 
+![sample application menu](assets/application%20menu.png)
+
 ### Users
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default by the user themself. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and, for example, used as a laminated card.
 
@@ -325,6 +327,8 @@ Set up the manual according to your users comprehension. While editing single en
 
 ## Communication
 
+![sample communication menu](assets/communication%20menu.png)
+
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
@@ -398,6 +402,8 @@ graph TD;
 [Content](#content)
 
 ## Records
+
+![sample records menu](assets/records%20menu.png)
 
 ### Forms
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
@@ -508,6 +514,9 @@ graph TD;
 [Content](#content)
 
 ## Calendar
+
+![sample calendar menu](assets/calendar%20menu.png)
+
 Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
@@ -591,6 +600,9 @@ graph TD;
 [Content](#content)
 
 ## Files
+
+![sample files menu](assets/files%20menu.png)
+
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
 Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
@@ -605,8 +617,10 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 
 ## Purchase
 
+![sample purchase menu](assets/purchase%20menu.png)
+
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists, define filters for trading goods, or disable vendors and products. Importing pricelists and trading good filters make use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters, or disable vendors and products. Importing pricelists with filtering makes use of the [CSV processor](#csv-processor).
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -614,7 +628,7 @@ Defined authorized users (e.g. *purchase assistant*) can edit the alias definiti
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
 
-While editing products, one can edit the *trading good*-setting, revoke a possible *incorporated*-state and set the product *active and available* or *inactive*. On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
+While editing products, one can edit the *trading good*-setting, *has expiry date*-setting, revoke a possible *incorporated*-state and set the product *active and available* or *inactive*. On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
 
 ![vendor manager screenshot](assets/vendor%20manager.png)
 
@@ -773,6 +787,9 @@ Sample checks are added to the records. Defined authorized users can revoke the 
 [Content](#content)
 
 ## Tools
+
+![sample tools menu](assets/tools%20menu.png)
+
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
