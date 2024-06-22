@@ -502,6 +502,7 @@ delete . from headers
 ```
 
 ### ortho reha neuhof
+line end is mandatory on gloves particular article_no, otherwise the filter matches recursively and having a memory overflow.
 ```json
 {
 	"filesetting": {
@@ -516,8 +517,8 @@ delete . from headers
 			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]]
 		],
 		"replace":[
-			["Art.Nr.", "(501[BDKJ].+)(L)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5"],
-			["Art.Nr.", "(501[BDKJ].+)(R)", "R1", "R1-2", "R2", "R2-3", "R3", "R3-4", "R4", "R4-5", "R5"]
+			["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5"],
+			["Art.Nr.", "(501[BDKJ].+)(R$)", "R1", "R1-2", "R2", "R2-3", "R3", "R3-4", "R4", "R4-5", "R5"]
 		],
 		"rewrite": [{
 			"article_no": ["Art.Nr."],

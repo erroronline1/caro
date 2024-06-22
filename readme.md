@@ -1046,6 +1046,13 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 ]
 ```
 
+Other vendors may list products missing color variants appended to the article number. Make sure to include line end to the pattern to avoid recursive matching, endless appending to list and memory overflows.
+```js
+"replace":[
+    ["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5"]
+]
+```
+
 ### Sample check and expiry dates
 *modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates.
 
