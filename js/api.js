@@ -195,9 +195,14 @@ export const api = {
 							switch (key) {
 								case "forceDesktop":
 									if (value) {
-										let stylesheet = document.styleSheets[0].cssRules;
+										let stylesheet;
+										for (const [i ,sname] of Object.entries(document.styleSheets)){
+											if (!sname.href.includes("style.css")) continue;
+											stylesheet=document.styleSheets[i].cssRules;
+											break;
+										}
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") {stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";}
 										}
 									}
 									break;
