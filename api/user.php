@@ -223,7 +223,7 @@ class USER extends API {
 				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 				$userfiles = [];
 				foreach ($storedfiles as $file){
-					if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+					if (explode('_', pathinfo($file)['filename'])[0] == $user['id']) {
 						$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
 					}
 				}
@@ -690,7 +690,7 @@ class USER extends API {
 					$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 					$userfiles = [];
 					foreach ($storedfiles as $file){
-						if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+						if (explode('_', pathinfo($file)['filename'])[0] == $user['id']) {
 							$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
 						}
 					}
