@@ -997,10 +997,10 @@ products_per_slide = 6
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [permission] (has no effect without consideration in role management within setup.ini)
     * [units]
-    * [formcontext][anonymous]
-    * [regulatory]
     * [skilllevel]
     * [skillbyduty]
+    * [formcontext][anonymous]
+    * [regulatory]
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
