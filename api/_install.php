@@ -42,6 +42,7 @@ $queries = [
 				"	`orderauth` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`image` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`app_settings` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`skills` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -207,7 +208,7 @@ $queries = [
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '');",
+				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '', '');",
 				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
 			]
 		]
@@ -223,7 +224,8 @@ $queries = [
 				"	token varchar(MAX) NOT NULL," .
 				"	orderauth varchar(MAX) NOT NULL," .
 				"	image varchar(MAX) NOT NULL," .
-				"	app_settings varchar(MAX) NOT NULL" .
+				"	app_settings varchar(MAX) NOT NULL," .
+				"	skills varchar(MAX) NOT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .
@@ -388,7 +390,7 @@ $queries = [
 				");"
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '');",
+				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '', '');",
 				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
 			]
 		]

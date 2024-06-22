@@ -635,12 +635,12 @@ class SQLQUERY {
 
 
 		'user_post' => [
-			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings)",
-			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings)"
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills)",
+			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings, skills) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills)"
 		],
 		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings WHERE id = :id"
+			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills WHERE id = :id"
 		],
 		'user_get_datalist' => [
 			'mysql' => "SELECT id, name, orderauth, permissions, units, app_settings FROM caro_user ORDER BY name ASC",

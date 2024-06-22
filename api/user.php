@@ -80,7 +80,8 @@ class USER extends API {
 						':token' => $user['token'],
 						':orderauth' => $user['orderauth'],
 						':image' => $user['image'],
-						':app_settings' => json_encode($user['app_settings'])
+						':app_settings' => json_encode($user['app_settings']),
+						':skills' => $user['skills']
 					]
 				]) !== false) $this->response([
 					'status' => [
@@ -125,6 +126,17 @@ class USER extends API {
 				}
 				if(array_key_exists('primaryUnit', $user['app_settings'])) $primary_unit[LANG::GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
+				$user['skills'] = explode(',', $user['skills'] ?  : '');
+				$skillmatrix = '';
+				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					foreach ($skills as $skill => $skilldescription){
+						if ($skill === '_DESCRIPTION') continue;
+						foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
+							$skillmatrix .= in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? " \n" . LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ' ' . $leveldescription: '';
+						}
+					}
+				}
+
 				$result['body']=['content' => [
 						[
 							['type' => 'text',
@@ -137,7 +149,8 @@ class USER extends API {
 								(array_key_exists('weeklyhours', $user['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
 								(array_key_exists('_overtime', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
 								(array_key_exists('annualvacation', $user['app_settings']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
-								(array_key_exists('_leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '')
+								(array_key_exists('_leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
+								($skillmatrix ? " \n \n" . $skillmatrix : '')
 							]
 						],[
 							[
@@ -242,7 +255,8 @@ class USER extends API {
 					'token' => '',
 					'orderauth' => '',
 					'image' => '',
-					'app_settings' => []
+					'app_settings' => [],
+					'skills' => []
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
@@ -270,6 +284,14 @@ class USER extends API {
 				$weeklyhours = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
+
+				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					foreach ($skills as $skill => $skilldescription){
+						if ($level = UTILITY::propertySet($this->_payload, LANG::PROPERTY('skillbyduty.' . $duty . '._DESCRIPTION') . '_' . LANG::PROPERTY('skillbyduty.' . $duty . '.' . $skill))){
+							if ($level !== LANGUAGEFILE['skilllevel']['_none']) $user['skills'][] = $duty . '.' . $skill . '.' . array_search($level, LANGUAGEFILE['skilllevel']);
+						}
+					}
+				}
 
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
@@ -315,7 +337,8 @@ class USER extends API {
 						':token' => $user['token'],
 						':orderauth' => $user['orderauth'],
 						':image' => $user['image'],
-						':app_settings' => json_encode($user['app_settings'])
+						':app_settings' => json_encode($user['app_settings']),
+						':skills' => implode(',', $user['skills'])
 					]
 				])) $this->response([
 					'status' => [
@@ -373,6 +396,14 @@ class USER extends API {
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
 
+				$user['skills'] = [];
+				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					foreach ($skills as $skill => $skilldescription){
+						if ($level = UTILITY::propertySet($this->_payload, LANG::PROPERTY('skillbyduty.' . $duty . '._DESCRIPTION') . '_' . LANG::PROPERTY('skillbyduty.' . $duty . '.' . $skill))){
+							if ($level !== LANGUAGEFILE['skilllevel']['_none']) $user['skills'][] = $duty . '.' . $skill . '.' . array_search($level, LANGUAGEFILE['skilllevel']);
+						}
+					}
+				}
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_revoke')){
 					$user['orderauth'] = '';
@@ -423,9 +454,10 @@ class USER extends API {
 						':token' => $user['token'],
 						':orderauth' => $user['orderauth'],
 						':image' => $user['image'],
-						':app_settings' => json_encode($user['app_settings'])
+						':app_settings' => json_encode($user['app_settings']),
+						':skills' => implode(',', $user['skills'])
 					]
-				])) $this->response([
+				]) !== false) $this->response([
 					'status' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
@@ -466,7 +498,8 @@ class USER extends API {
 					'token' => '',
 					'orderauth' => '',
 					'image' => '',
-					'app_settings' => ''
+					'app_settings' => '',
+					'skills' => ''
 				];}
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
@@ -480,6 +513,29 @@ class USER extends API {
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+
+				$user['skills'] = explode(',', $user['skills'] ?  : '');
+				$skillmatrix = [];
+				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					$skillselection = [];
+					foreach ($skills as $skill => $skilldescription){
+						if ($skill === '_DESCRIPTION') continue;
+						$levels = [];
+						foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
+							$levels[$leveldescription] = in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? ['checked' => true] : [];
+						}
+						$skillselection[] = [
+							'type' => 'radio',
+							'attributes' => [
+								'name' => $skills['_DESCRIPTION'] . ' ' . $skilldescription
+							],
+							'content' => $levels
+						];
+					}
+					$skillmatrix[] = [
+						...$skillselection
+					];
+				}
 
 				$result['body']=['content' => [
 					[
@@ -589,7 +645,9 @@ class USER extends API {
 								LANG::GET('user.edit_order_authorization_revoke') => []
 							]
 						]
-					],[
+					],
+						$skillmatrix
+					,[
 						[
 							'type' => 'checkbox',
 							'description' => LANG::GET('user.edit_token'),
@@ -656,7 +714,7 @@ class USER extends API {
 						],
 						$result['body']['content'][5]
 					];
-					if ($user['token']) $result['body']['content'][6]=[
+					if ($user['token']) $result['body']['content'][7]=[
 						[
 							['type' => 'image',
 							'description' => LANG::GET('user.edit_export_qr_token'),
@@ -665,7 +723,7 @@ class USER extends API {
 							'qrcode' => $user['token']]
 							]
 						],
-						$result['body']['content'][6]
+						$result['body']['content'][7]
 					];
 
 				$this->response($result);
