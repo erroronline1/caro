@@ -132,7 +132,7 @@ class USER extends API {
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;
 						foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
-							$skillmatrix .= in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? " \n" . LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ' ' . $leveldescription: '';
+							$skillmatrix .= in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? " \n" . LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription: '';
 						}
 					}
 				}
@@ -150,7 +150,7 @@ class USER extends API {
 								(array_key_exists('_overtime', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
 								(array_key_exists('annualvacation', $user['app_settings']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
 								(array_key_exists('_leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
-								($skillmatrix ? " \n \n" . $skillmatrix : '')
+								($skillmatrix ? " \n" . $skillmatrix : '')
 							]
 						],[
 							[
