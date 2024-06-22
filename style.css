@@ -318,7 +318,7 @@ nav {
 	div[data-notification]::after,
 	button[data-notification]::after {
 		content: attr(data-notification);
-		color: var(--article);
+		color: var(--cta_active);
 		position: absolute;
 		margin-top: -3.5em;
 		margin-left: 1.25em;
@@ -981,25 +981,35 @@ dialog a:not([data-type])::before {
 }
 
 [data-type="text"]::before {
-	background-image: url("./media/info-circle.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/info-circle.svg");
+	mask-image: url("./media/info-circle.svg");
 }
 
 [data-type="textinput"]::before {
-	background-image: url("./media/pencil.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/pencil.svg");
+	mask-image: url("./media/pencil.svg");
 }
 
 [data-type="searchinput"]::before {
-	background-image: url("./media/search.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/search.svg");
+	mask-image: url("./media/search.svg");
 }
 
 [data-type="numberinput"]::before {
-	background-image: url("./media/hashtag.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/hashtag.svg");
+	mask-image: url("./media/hashtag.svg");
 }
 
 [data-type="dateinput"]::before,
 [data-type="calendar"]::before,
 [data-type="calendarbutton"]::before {
-	background-image: url("./media/calendar-alt.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/calendar-alt.svg");
+	mask-image: url("./media/calendar-alt.svg");
 }
 
 button[data-type="calendarbutton"]::before {
@@ -1010,22 +1020,32 @@ button[data-type="calendarbutton"]::before {
 }
 
 [data-type="timeinput"]::before {
-	background-image: url("./media/clock.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/clock.svg");
+	mask-image: url("./media/clock.svg");
 }
 
 [data-type="telinput"]::before {
-	background-image: url("./media/phone.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/phone.svg");
+	mask-image: url("./media/phone.svg");
 }
 [data-type="emailinput"]::before {
-	background-image: url("./media/at.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/at.svg");
+	mask-image: url("./media/at.svg");
 }
 
 [data-type="filterinput"]::before {
-	background-image: url("./media/filter.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/filter.svg");
+	mask-image: url("./media/filter.svg");
 }
 
 [data-type="file"]::before {
-	background-image: url("./media/upload.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/upload.svg");
+	mask-image: url("./media/upload.svg");
 }
 
 button[data-type="file"]::before {
@@ -1036,7 +1056,9 @@ button[data-type="file"]::before {
 }
 
 [data-type="photo"]::before {
-	background-image: url("./media/camera.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/camera.svg");
+	mask-image: url("./media/camera.svg");
 }
 
 button[data-type="photo"]::before {
@@ -1048,31 +1070,45 @@ button[data-type="photo"]::before {
 
 [data-type="select"]::before,
 [data-type="checkboxinput"]::before {
-	background-image: url("./media/list.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/list.svg");
+	mask-image: url("./media/list.svg");
 }
 
 [data-type="textarea"]::before {
-	background-image: url("./media/pencil.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/pencil.svg");
+	mask-image: url("./media/pencil.svg");
 }
 
 [data-type="checkbox"]::before {
-	background-image: url("./media/check-double.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/check-double.svg");
+	mask-image: url("./media/check-double.svg");
 }
 
 [data-type="radio"]::before {
-	background-image: url("./media/check.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/check.svg");
+	mask-image: url("./media/check.svg");
 }
 
 [data-type="links"]::before {
-	background-image: url("./media/link.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/link.svg");
+	mask-image: url("./media/link.svg");
 }
 
 [data-type="signature"]::before {
-	background-image: url("./media/signature.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/signature.svg");
+	mask-image: url("./media/signature.svg");
 }
 
 [data-type="scanner"]::before {
-	background-image: url("./media/qrcode.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/qrcode.svg");
+	mask-image: url("./media/qrcode.svg");
 }
 
 button[data-type="scanner"]::before {
@@ -1083,7 +1119,9 @@ button[data-type="scanner"]::before {
 }
 
 [data-type="identify"]::before {
-	background-image: url("./media/database.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/database.svg");
+	mask-image: url("./media/database.svg");
 }
 
 button[data-type="merge"]::before {
@@ -1095,7 +1133,9 @@ button[data-type="merge"]::before {
 
 [data-type="deletebutton"]::before,
 [data-type="trash"]::before {
-	background-image: url("./media/trash-alt.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/trash-alt.svg");
+	mask-image: url("./media/trash-alt.svg");
 }
 
 button[data-type="deletebutton"]::before,
@@ -1107,11 +1147,15 @@ button[data-type="trash"]::before {
 }
 
 [data-type="password"]::before {
-	background-image: url("./media/user-secret.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/user-secret.svg");
+	mask-image: url("./media/user-secret.svg");
 }
 
 [data-type="additem"]::before {
-	background-image: url("./media/plus.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/plus.svg");
+	mask-image: url("./media/plus.svg");
 }
 
 button[data-type="additem"]::before {
@@ -1130,7 +1174,9 @@ button[data-type="additem"]::before {
 
 [data-type="reset"]::before,
 [data-type="generateupdate"]::before {
-	background-image: url("./media/repeat-alt.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/repeat-alt.svg");
+	mask-image: url("./media/repeat-alt.svg");
 }
 
 button[data-type="reset"]::before,
@@ -1142,7 +1188,9 @@ button[data-type="generateupdate"]::before {
 }
 
 [data-type="image"]::before {
-	background-image: url("./media/image.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/image.svg");
+	mask-image: url("./media/image.svg");
 }
 
 button[data-type="image"]::before {
@@ -1153,7 +1201,9 @@ button[data-type="image"]::before {
 }
 
 [data-type="submitbutton"]::before {
-	background-image: url("./media/paper-plane.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/paper-plane.svg");
+	mask-image: url("./media/paper-plane.svg");
 }
 
 button[data-type="submitbutton"]::before {
@@ -1164,20 +1214,28 @@ button[data-type="submitbutton"]::before {
 }
 
 [data-type="cart"]::before {
-	background-image: url("./media/shopping-cart.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/shopping-cart.svg");
+	mask-image: url("./media/shopping-cart.svg");
 }
 
 [data-type="purchase"]::before {
-	background-image: url("./media/shopping-bag.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/shopping-bag.svg");
+	mask-image: url("./media/shopping-bag.svg");
 }
 
 [data-type="message"]::before {
-	background-image: url("./media/comment.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/comment.svg");
+	mask-image: url("./media/comment.svg");
 }
 
 [data-type="record"]::before,
 [data-type="formbutton"]::before {
-	background-image: url("./media/file-signature.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/file-signature.svg");
+	mask-image: url("./media/file-signature.svg");
 }
 button[data-type="formbutton"]::before {
 	background-image: none;
@@ -1187,5 +1245,7 @@ button[data-type="formbutton"]::before {
 }
 
 [data-type="alert"]::before {
-	background-image: url("./media/bell.svg");
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/bell.svg");
+	mask-image: url("./media/bell.svg");
 }
