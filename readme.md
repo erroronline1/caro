@@ -127,7 +127,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.
     * also see [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Tools](#tools)
 * ISO 13485 6.2 Human resources
-    * Users can be attached documents. Intended use case is attachment of qualification certificates. A list of these documents can be viewed within the audit module.
+    * Users can be assigned skills and attached documents. Intended use case for documents are qualification certificates. A list of these skills and documents can be viewed within the audit module.
     * also see [Users](#users), [Tools](#tools)
 * ISO 13485 7.4.1 Procurement process
     * Procurement is guided through the application. Vendors and products can be added into the database.
@@ -232,7 +232,8 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Create forms and assign a *MDR §14 Sample Check*- and/or *Product incorporation*-form-context and the fitting regulatory context.
     * ISO 13485 7.4, 7.4.3
 * Create forms and assign a *Equipment surveillance*-form-context and the fitting regulatory context.
-    * ISO 13485 7.6
+    * computer software and their version tracking on terminal devices may be seen as equipment as well.
+    * ISO 13485 4.1.6, 7.6
     * MPBetreibV
 
 ### Tips
@@ -296,7 +297,7 @@ graph TD;
     manage_users-->new_user[new user];
     manage_users-->edit_user[edit user];
     new_user-->user_settings["set name, authorization,
-    unit, photo, order auth pin,
+    unit, photo, order auth pin, skills
     login token, user documents"];
     edit_user-->user_settings;
     user_settings-->export_token[export token];
@@ -853,6 +854,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
+* [Customize](#customisation) your appropriate language-file (language.XX.ini)
 * Run api/_install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
 * Change system users default token immediately and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
@@ -997,6 +999,8 @@ products_per_slide = 6
     * [units]
     * [formcontext][anonymous]
     * [regulatory]
+    * [skilllevel]
+    * [skillbyduty]
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
@@ -1464,7 +1468,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userfiles"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+{"body":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
 > GET ./api/api.php/audit/export/{type}

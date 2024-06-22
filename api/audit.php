@@ -82,8 +82,8 @@ class AUDIT extends API {
 		$selecttypes[LANG::GET('audit.checks_type.forms')] = ['value' => 'forms'];
 		if ($this->_requestedType==='forms') $selecttypes[LANG::GET('audit.checks_type.forms')]['selected'] = true;
 		// user certificates
-		$selecttypes[LANG::GET('audit.checks_type.userfiles')] = ['value' => 'userfiles'];
-		if ($this->_requestedType==='userfiles') $selecttypes[LANG::GET('audit.checks_type.userfiles')]['selected'] = true;
+		$selecttypes[LANG::GET('audit.checks_type.userskills')] = ['value' => 'userskills'];
+		if ($this->_requestedType==='userskills') $selecttypes[LANG::GET('audit.checks_type.userskills')]['selected'] = true;
 		// vendor list
 		$selecttypes[LANG::GET('audit.checks_type.vendors')] = ['value' => 'vendors'];
 		if ($this->_requestedType==='vendors') $selecttypes[LANG::GET('audit.checks_type.vendors')]['selected'] = true;
@@ -330,21 +330,57 @@ class AUDIT extends API {
 		]);
 	}
 	/**
-	 * returns all users with file attachments to review e.g. certificates
+	 * returns all users with their skills and file attachments to review e.g. certificates
 	 */
-	private function userfiles(){
+	private function userskills(){
 		$content = [];
+		$unfulfilledskills = [];
+		foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+			foreach ($skills as $skill => $skilldescription){
+				if ($skill === '_DESCRIPTION') continue;
+				$unfulfilledskills[] = LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
+			}
+		}
 		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		foreach ($users as $user){
+			$user['skills'] = explode(',', $user['skills'] ?  : '');
+			$skillmatrix = '';
+			foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+				foreach ($skills as $skill => $skilldescription){
+					if ($skill === '_DESCRIPTION') continue;
+					foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
+						if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])){
+							$skillmatrix .=  " \n" . LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription;
+							unset($unfulfilledskills[array_search(LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription, $unfulfilledskills)]);
+						}
+					}
+				}
+			}
+			if ($skillmatrix){
+				$content[] = [
+					[
+						'type' => 'text',
+						'description' => $user['name'],
+						'content' => $skillmatrix
+					]
+				];
+			}
+
 			$userfiles = [];
 			foreach ($storedfiles as $file){
-				if (substr(pathinfo($file)['filename'], 0, strpos(pathinfo($file)['filename'], '_')) === $user['id']) {
+				if (explode('_', pathinfo($file)['filename'])[0] == $user['id']) {
 					$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
 				}
 			}
 			if ($userfiles) {
-				$content [] = [
+				if ($skillmatrix) $content[count($content) - 1][] = [
+					[
+						'type' => 'links',
+						'content' => $userfiles
+					]
+				];
+				else $content[] = [
 					[
 						'type' => 'links',
 						'description' => $user['name'],
@@ -352,6 +388,16 @@ class AUDIT extends API {
 					]
 				];
 			}
+		}
+		if ($unfulfilledskills){
+			$content = [
+				[
+					'type' => 'text',
+					'description' => LANG::GET('audit.userskills_warning_description'),
+					'content' => implode(', ', $unfulfilledskills)
+				],
+				...$content
+			];
 		}
 		return $content;
 	}
