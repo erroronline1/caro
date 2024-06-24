@@ -293,7 +293,7 @@ $queries = [
 				"	protected tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
-				"	incorporated varchar(MAX) NOT NULL" .
+				"	incorporated varchar(MAX) NOT NULL," .
 				"	has_expiry_date tinyint NULL DEFAULT NULL" .
 				");"
 				,
