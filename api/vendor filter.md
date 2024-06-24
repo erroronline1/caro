@@ -529,8 +529,8 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]]
 		],
 		"replace":[
-			["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5"],
-			["Art.Nr.", "(501[BDKJ].+)(R$)", "R1", "R1-2", "R2", "R2-3", "R3", "R3-4", "R4", "R4-5", "R5"]
+			["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5", "L5-6", "L6", "L6-7", "L7", "L7-8", "L8", "L8-9", "L9", "LC0", "LC0-C1", "LC1", "LC1-C2", "LC2", "LC2-C3", "LC3", "LC3-C4", "LC4", "LC4-C5", "LC5", "LA1", "LA1-A2", "LA2", "LA2-A3", "LA3", "LA3-A4", "LA4"],
+			["Art.Nr.", "(501[BDKJ].+)(R$)", "R1", "R1-2", "R2", "R2-3", "R3", "R3-4", "R4", "R4-5", "R5", "R5-6", "R6", "R6-7", "R7", "R7-8", "R8", "R8-9", "R9", "RC0", "RC0-C1", "RC1", "RC1-C2", "RC2", "RC2-C3", "RC3", "RC3-C4", "RC4", "RC4-C5", "RC5", "RA1", "RA1-A2", "RA2", "RA2-A3", "RA3", "RA3-A4", "RA4"]
 		],
 		"rewrite": [{
 			"article_no": ["Art.Nr."],
