@@ -129,6 +129,7 @@ class USER extends API {
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = '';
 				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					if ($duty === 'LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;
 						foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
@@ -286,6 +287,7 @@ class USER extends API {
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
 
 				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					if ($duty === 'LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
 						if ($level = UTILITY::propertySet($this->_payload, LANG::PROPERTY('skillbyduty.' . $duty . '._DESCRIPTION') . '_' . LANG::PROPERTY('skillbyduty.' . $duty . '.' . $skill))){
 							if ($level !== LANGUAGEFILE['skilllevel']['_none']) $user['skills'][] = $duty . '.' . $skill . '.' . array_search($level, LANGUAGEFILE['skilllevel']);
@@ -398,6 +400,7 @@ class USER extends API {
 
 				$user['skills'] = [];
 				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					if ($duty === 'LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
 						if ($level = UTILITY::propertySet($this->_payload, LANG::PROPERTY('skillbyduty.' . $duty . '._DESCRIPTION') . '_' . LANG::PROPERTY('skillbyduty.' . $duty . '.' . $skill))){
 							if ($level !== LANGUAGEFILE['skilllevel']['_none']) $user['skills'][] = $duty . '.' . $skill . '.' . array_search($level, LANGUAGEFILE['skilllevel']);
@@ -517,6 +520,7 @@ class USER extends API {
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = [];
 				foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+					if ($duty === 'LEVEL') continue;
 					$skillselection = [];
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;

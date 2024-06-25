@@ -336,6 +336,7 @@ class AUDIT extends API {
 		$content = [];
 		$unfulfilledskills = [];
 		foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+			if ($duty === 'LEVEL') continue;
 			foreach ($skills as $skill => $skilldescription){
 				if ($skill === '_DESCRIPTION') continue;
 				$unfulfilledskills[] = LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
@@ -347,6 +348,7 @@ class AUDIT extends API {
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			$skillmatrix = '';
 			foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+				if ($duty === 'LEVEL') continue;
 				foreach ($skills as $skill => $skilldescription){
 					if ($skill === '_DESCRIPTION') continue;
 					foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
