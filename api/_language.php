@@ -17,7 +17,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-define ('LANGUAGEFILE', parse_ini_file('language.' . INI['language'] . '.ini', true));
+$language = 'en';
+if (array_key_exists('language', $_SESSION['user']['app_settings'])) $language = $_SESSION['user']['app_settings']['language'];
+$file = file_exists('language.' . $language . '.ini') ? 'language.' . $language . '.ini' : 'language.' . INI['defaultlanguage'] . '.ini';
+
+define ('LANGUAGEFILE', parse_ini_file($file, true));
 
 class LANG {
 	/*

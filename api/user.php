@@ -66,6 +66,7 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_homeoffice'));
+				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_language')) ? : 'en';
 				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_theme'));
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
@@ -191,6 +192,11 @@ class USER extends API {
 				$result['body']['content'][1]
 				];
 
+				$languages = [];
+				foreach(glob('language.*.ini') as $file){
+					$lang = explode('.', $file);
+					$languages[$lang[1]] = (array_key_exists('language', $user['app_settings']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
+				}
 				$result['body']['content'][] = [
 					[
 						'type' => 'checkbox',
@@ -199,6 +205,12 @@ class USER extends API {
 							LANG::GET('user.settings_force_desktop') => [],
 							LANG::GET('user.settings_homeoffice') => [],
 						]
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('user.settings_language')
+						],
+						'content' => $languages
 					], [
 						'type' => 'radio',
 						'attributes' => [
