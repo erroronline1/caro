@@ -237,6 +237,7 @@ Beside the apps architecture you will still have to set up your quality manageme
     * MPBetreibV
 
 ### Tips
+* Records are stored with a timestamp of processing. If you want to document the actual date of recording or anticipate delayed documentation, add a manadatory date input to the respective forms.
 * Use a calendar-button within surveillance forms to immediately set the next due date while handling the current documentation.
 * Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 * If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
@@ -863,8 +864,8 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
 
 ```
-; application language
-language = "en" ; en, de, etc. according to available language.xx.ini files
+; default fallback application language
+defaultlanguage = "en" ; en, de, etc. according to available language.xx.ini files; user can customize within profile
 
 ; timezone for calendar handling
 timezone = "Europe/Berlin"
@@ -994,7 +995,7 @@ products_per_slide = 6
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.xx.ini-files or delete unused - user customization lists all available files automated. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [permission] (has no effect without consideration in role management within setup.ini)
     * [units]
     * [skilllevel]
