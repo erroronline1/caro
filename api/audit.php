@@ -24,7 +24,7 @@ class AUDIT extends API {
 	/**
 	 * in case you want to create a code from any values in any form add 
 	 * 'data-usecase' => 'tool_create_code'
-	 * to inputs attributes (hiddeninput if applicable)
+	 * to inputs attributes (hidden if applicable)
 	 */
 
 	// processed parameters for readability
@@ -126,7 +126,7 @@ class AUDIT extends API {
 		// display warning
 		if ($unchecked) $content[] = [
 			[
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => LANG::GET('audit.mdrsamplecheck_warning_description'),
 				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
 			]
@@ -149,7 +149,7 @@ class AUDIT extends API {
 		]);
 		foreach($checks as $row){
 			$entries[] = [
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => LANG::GET('audit.check_description', [
 					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
 					':date' => $row['date'],
@@ -252,7 +252,7 @@ class AUDIT extends API {
 		// display warning
 		if ($orderedunincorporated) $content[] = [
 			[
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => LANG::GET('audit.incorporation_warning_description'),
 				'content' => LANG::GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
 			]
@@ -281,7 +281,7 @@ class AUDIT extends API {
 				if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
 			}
 			$entries[] = [
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name'],
 				'content' => $incorporationInfo
 			];
@@ -309,7 +309,7 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($forms); $i++){
 			foreach($forms[$i] as $item){
-				if ($item['type'] === 'text') $summary['content'][$item['description']] = $item['content'];	
+				if ($item['type'] === 'textblock') $summary['content'][$item['description']] = $item['content'];	
 			}
 		}
 		$downloadfiles = [];
@@ -362,7 +362,7 @@ class AUDIT extends API {
 			if ($skillmatrix){
 				$content[] = [
 					[
-						'type' => 'text',
+						'type' => 'textblock',
 						'description' => $user['name'],
 						'content' => $skillmatrix
 					]
@@ -394,7 +394,7 @@ class AUDIT extends API {
 		if ($unfulfilledskills){
 			$content = [
 				[
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => LANG::GET('audit.userskills_warning_description'),
 					'content' => implode(', ', $unfulfilledskills)
 				],
@@ -430,7 +430,7 @@ class AUDIT extends API {
 
 		$formscontent = [
 			[
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => LANG::GET('audit.documents_in_use_documents'),
 				'content' => ''
 			]
@@ -468,7 +468,7 @@ class AUDIT extends API {
 			}
 
 			$formscontent[] = [
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
 				'content' => $entry . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
 			];
@@ -476,7 +476,7 @@ class AUDIT extends API {
 
 		$externalcontent = [
 			[
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => LANG::GET('audit.documents_in_use_external'),
 				'content' => ''
 			]
@@ -484,7 +484,7 @@ class AUDIT extends API {
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
 				$externalcontent[] = [
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => $file['path'],
 					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime($file['path']))])
 				];
@@ -493,7 +493,7 @@ class AUDIT extends API {
 
 		$bundlescontent = [
 			[
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => LANG::GET('audit.documents_in_use_bundles'),
 				'content' => ''
 			]
@@ -502,7 +502,7 @@ class AUDIT extends API {
 			$formslist = explode(',', $bundle['content'] ? : '');
 			natsort($formslist);
 			$bundlescontent[] = [
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']]),
 				'content' => implode("\n", $formslist)
 			];
@@ -604,7 +604,7 @@ class AUDIT extends API {
 				$certificate = json_decode($vendor['certificate'], true);
 				if ($certificate['validity']) $info .= LANG::GET('consumables.edit_vendor_certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				$vendorlist[] = [
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => $vendor['name'],
 					'content' => $info
 				];
@@ -643,7 +643,7 @@ class AUDIT extends API {
 		$vendors = $this->vendors();
 		$previous = ''; // given there's a text followed by links
 		foreach($vendors[1] as $item){
-			if ($item['type'] === 'text') {
+			if ($item['type'] === 'textblock') {
 				$summary['content'][$item['description']] = $item['content'];
 				$previous = $item['description'];
 			}
@@ -710,7 +710,7 @@ class AUDIT extends API {
 				'content' => $regulatory[$key]
 			];
 			else $issues[] = [
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => $issue,
 				'content' => LANG::GET('audit.regulatory_warning_content')
 			];

@@ -138,7 +138,7 @@ class MESSAGE extends API {
 					if ($conversation['conversation_user'] !== '1' && $conversation_user['name']) {
 						$result['body']['content'][] = [
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('message.to'),
 									'value' => $conversation_user['name']

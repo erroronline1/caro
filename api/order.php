@@ -145,10 +145,10 @@ class ORDER extends API {
 							}
 						}
 						array_push($result['body']['content'], [
-							['type' => 'text',
+							['type' => 'textblock',
 							'content' => $items,
 							],
-							['type' => 'text',
+							['type' => 'textblock',
 							'content' => $info,
 							],
 							['type' => 'checkbox',
@@ -171,7 +171,7 @@ class ORDER extends API {
 									['type' => 'links',
 									'description' => LANG::GET('order.attached_files'),
 									'content' => $files],
-									['type' => 'hiddeninput',
+									['type' => 'hidden',
 									'attributes' => [
 										'name' => 'existingattachments',
 										'value' => $processedOrderData['attachments']
@@ -190,7 +190,7 @@ class ORDER extends API {
 								]]
 							],
 							[
-								['type' => 'numberinput',
+								['type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('user.edit_order_authorization'),
 									'type' => 'password'
@@ -235,7 +235,7 @@ class ORDER extends API {
 					$article = intval(count($matches) - 1);
 					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
 						$matches[$article][] = [
-							['type' => 'text',
+							['type' => 'textblock',
 							'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
 							]
 						];
@@ -250,7 +250,7 @@ class ORDER extends API {
 								],
 								'content' => [
 									[
-										'type' => 'text',
+										'type' => 'textblock',
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
 									]
 								]
@@ -264,7 +264,7 @@ class ORDER extends API {
 								],
 								'content' => [
 									[
-										'type' => 'text',
+										'type' => 'textblock',
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
 									]
 								]
@@ -284,7 +284,7 @@ class ORDER extends API {
 									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
 								],
 								'content' => [
-									['type' => 'text',
+									['type' => 'textblock',
 									'description' => $incorporationState,
 									'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 								]
@@ -292,7 +292,7 @@ class ORDER extends API {
 					}
 				}
 				if (!$matches[0]) $matches[0][] = [
-					['type' => 'text',
+					['type' => 'textblock',
 					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
 					]
 				];
@@ -546,7 +546,7 @@ class ORDER extends API {
 							'name' => LANG::GET('consumables.edit_product_vendor_select')
 							]
 						],
-						['type' => 'searchinput',
+						['type' => 'search',
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_product_search'),
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
@@ -570,24 +570,24 @@ class ORDER extends API {
 										'attributes' => [
 											'id' => 'units'
 										]],
-										['type' => 'numberinput',
+										['type' => 'number',
 										'attributes' => [
 											'name' => LANG::GET('order.quantity_label'),
 										]],
-										['type' => 'textinput',
+										['type' => 'text',
 										'attributes' => [
 											'name' => LANG::GET('order.unit_label'),
 											'list' => 'units'
 										]],
-										['type' => 'textinput',
+										['type' => 'text',
 										'attributes' => [
 											'name' => LANG::GET('order.ordernumber_label')
 										]],
-										['type' => 'textinput',
+										['type' => 'text',
 										'attributes' => [
 											'name' => LANG::GET('order.productname_label')
 										]],
-										['type' => 'textinput',
+										['type' => 'text',
 										'attributes' => [
 											'name' => LANG::GET('order.vendor_label'),
 											'list' => 'vendors'
@@ -611,7 +611,7 @@ class ORDER extends API {
 						],
 						'content' => $organizational_units
 						],
-						['type' => 'textinput',
+						['type' => 'text',
 						'hint' => LANG::GET('order.commission_hint'),
 						'attributes' => [
 							'required' => true,
@@ -623,7 +623,7 @@ class ORDER extends API {
 						['type' => 'scanner',
 						'destination' => 'commission'
 						],
-						['type' => 'dateinput',
+						['type' => 'date',
 						'attributes' => [
 							'name' => LANG::GET('order.delivery_date'),
 							'value' => array_key_exists('delivery_date', $order) ? $order['delivery_date'] : ''
@@ -657,7 +657,7 @@ class ORDER extends API {
 							]]
 						],
 						[
-							['type' => 'numberinput',
+							['type' => 'number',
 							'attributes' => [
 								'name' => LANG::GET('user.edit_order_authorization'),
 								'type' => 'password'
@@ -667,7 +667,7 @@ class ORDER extends API {
 				]];
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
 					array_splice($result['body']['content'][2], 1, 0, [[
-							'type' => 'textinput',
+							'type' => 'text',
 							'hint' => LANG::GET('order.orderer_group_hint'),
 							'attributes' => [
 								'name' => LANG::GET('order.orderer_group_identify'),
@@ -688,7 +688,7 @@ class ORDER extends API {
 							['type' => 'links',
 							'description' => LANG::GET('order.attached_files'),
 							'content' => $files],
-							['type' => 'hiddeninput',
+							['type' => 'hidden',
 							'attributes' => [
 								'name' => 'existingattachments',
 								'value' => $order['attachments']
@@ -704,7 +704,7 @@ class ORDER extends API {
 						array_push($items,
 						[
 							[
-								'type' => 'numberinput',
+								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('order.quantity_label') . '[]',
 									'value' => UTILITY::propertySet((object) $order['items'][$i], 'quantity_label') ? : ' ',
@@ -715,7 +715,7 @@ class ORDER extends API {
 								]
 							],
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => LANG::GET('order.added_product', [
 									':unit' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : '',
 									':number' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : '',
@@ -724,35 +724,35 @@ class ORDER extends API {
 								])
 							],
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.unit_label') . '[]',
 									'value' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : ' '
 								]
 							],
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.ordernumber_label') . '[]',
 									'value' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : ' '
 								]
 							],
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.productname_label') . '[]',
 									'value' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : ' '
 								]
 							],
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.barcode_label') . '[]',
 									'value' => UTILITY::propertySet((object) $order['items'][$i], 'barcode_label') ?  : ' '
 								]
 							],
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.vendor_label') . '[]',
 									'value' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ' '
@@ -1045,7 +1045,7 @@ class ORDER extends API {
 							LANG::GET('order.received')=>['onchange' => '_client.order.filter("received")'],
 							LANG::GET('order.archived')=>['onchange' => '_client.order.filter("archived")'],
 						]],
-						['type' => 'searchinput',
+						['type' => 'search',
 						'attributes' => [
 							'name' => LANG::GET('order.order_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
@@ -1109,7 +1109,7 @@ class ORDER extends API {
 					];
 					
 					$content[]=
-						['type' => 'hiddeninput',
+						['type' => 'hidden',
 						'description' => 'filter',
 						'attributes' => ['data-filtered' => $row['id']]];
 
@@ -1131,7 +1131,7 @@ class ORDER extends API {
 
 					$copy = [
 						[
-							'type' => 'textinput',
+							'type' => 'text',
 							'attributes' => [
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
 								'name' => LANG::GET('order.ordernumber_label'),
@@ -1140,7 +1140,7 @@ class ORDER extends API {
 							]
 						],
 						[
-							'type' => 'textinput',
+							'type' => 'text',
 							'attributes' => [
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
 								'name' => LANG::GET('order.commission'),
@@ -1231,7 +1231,7 @@ class ORDER extends API {
 					];
 
 					$content[] = [
-						'type' => 'text',
+						'type' => 'textblock',
 						'content' => LANG::GET('order.ordertype.' . $row['ordertype']) . "\n" . $text,
 					];
 					if (str_contains($row['approval'], 'data:image/png')){
@@ -1355,7 +1355,7 @@ class ORDER extends API {
 							} else {
 								// simple groups are not allowed to make records
 								$content[] = [
-									'type' => 'text',
+									'type' => 'textblock',
 									'description' => LANG::GET('order.incorporation_neccessary_by_user')
 								];
 							}
@@ -1364,7 +1364,7 @@ class ORDER extends API {
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($incorporationdenied, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => LANG::GET('order.incorporation_denied')
 							];
 						}
@@ -1372,7 +1372,7 @@ class ORDER extends API {
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($pendingincorporation, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => LANG::GET('order.incorporation_pending')
 							];
 						}
@@ -1393,7 +1393,7 @@ class ORDER extends API {
 							} else {
 								// simple groups are not allowed to make records
 								$content[] = [
-									'type' => 'text',
+									'type' => 'textblock',
 									'description' => LANG::GET('order.sample_check_by_user')
 								];
 							}

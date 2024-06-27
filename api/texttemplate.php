@@ -176,7 +176,7 @@ class TEXTTEMPLATE extends API {
 									],
 									'content' => $options
 								], [
-									'type' => 'searchinput',
+									'type' => 'search',
 									'attributes' => [
 										'name' => LANG::GET('texttemplate.edit_chunk'),
 										'list' => 'chunks',
@@ -195,7 +195,7 @@ class TEXTTEMPLATE extends API {
 							]
 						], [
 							[
-								'type' => 'textinput',
+								'type' => 'text',
 								'hint' => LANG::GET('texttemplate.edit_chunk_name_hint'),
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_chunk_name'),
@@ -237,7 +237,7 @@ class TEXTTEMPLATE extends API {
 									'data-loss' => 'prevent'
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_chunk_language'),
 									'list' => 'languages',
@@ -424,7 +424,7 @@ class TEXTTEMPLATE extends API {
 									],
 									'content' => $options
 								], [
-									'type' => 'searchinput',
+									'type' => 'search',
 									'attributes' => [
 										'name' => LANG::GET('texttemplate.edit_template'),
 										'list' => 'templates',
@@ -443,7 +443,7 @@ class TEXTTEMPLATE extends API {
 							]
 						], [
 							[
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_template_name'),
 									'value' => $template['name'],
@@ -460,7 +460,7 @@ class TEXTTEMPLATE extends API {
 								],
 								'content' => $insertreplacement
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('texttemplate.edit_template_language'),
 									'list' => 'languages',
@@ -614,7 +614,7 @@ class TEXTTEMPLATE extends API {
 			// add input fields for undefined placeholders
 			foreach ($undefined as $placeholder) {
 				$inputs[] = [
-					'type' => 'textinput',
+					'type' => 'text',
 					'attributes' => [
 						'name' => LANG::GET('texttemplate.use_fill_placeholder') . ' ' . $placeholder,
 						'id' => preg_replace('/\W/', '', $placeholder),

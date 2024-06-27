@@ -102,7 +102,7 @@ class RECORD extends API {
 					'content'=>[
 						[
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => LANG::GET('record.create_identifier_info')
 							], [
 								'type' => 'scanner',
@@ -230,7 +230,7 @@ class RECORD extends API {
 							'id' => 'forms'
 						]
 					], [
-						'type' => 'filterinput',
+						'type' => 'filter',
 						'attributes' => [
 							'name' => LANG::GET('record.form_filter'),
 							'list' => 'forms',
@@ -287,7 +287,7 @@ class RECORD extends API {
 						$subs['attributes']['value'] = LANG::GET('calendar.event_new');
 						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
 					}
-					if (in_array($subs['type'], ['textarea', 'textinput', 'scanner', 'textinput', 'numberinput', 'dateinput', 'timeinput'])){
+					if (in_array($subs['type'], ['textarea', 'scanner', 'text', 'number', 'date', 'time'])){
 						$subs['attributes']['data-loss'] = 'prevent';
 					}
 					$content[] = $subs;
@@ -305,19 +305,19 @@ class RECORD extends API {
 		}
 		$context = [
 			[
-				'type' => 'hiddeninput',
+				'type' => 'hidden',
 				'attributes' => [
 					'name' => 'context',
 					'value' => $form['context']
 				]
 			], [
-				'type' => 'hiddeninput',
+				'type' => 'hidden',
 				'attributes' => [
 					'name' => 'form_name',
 					'value' => $form['name']
 				]
 			], [
-				'type' => 'hiddeninput',
+				'type' => 'hidden',
 				'attributes' => [
 					'name' => 'form_id',
 					'value' => $form['id']
@@ -340,7 +340,7 @@ class RECORD extends API {
 		else {
 			$return['body']['content'][]= [
 				[
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
 				]
 			];
@@ -387,7 +387,7 @@ class RECORD extends API {
 		];
 		else $return['body'] =[
 			[
-					'type' => 'text',
+					'type' => 'textblock',
 					'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
 			]
 		];
@@ -463,21 +463,21 @@ class RECORD extends API {
 				// summarize content
 				$content = $this->summarizeRecord();
 				$body[] = [[
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => LANG::GET('record.create_identifier'),
 					'content' => $this->_requestedID
 				]];
 				foreach($content['content'] as $form => $entries){
 					$body[] = [
 						[
-							'type' => 'text',
+							'type' => 'textblock',
 							'description' => $form
 						]
 					];
 					foreach($entries as $key => $value){
 						array_push($body[count($body) -1],
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => $key,
 								'content' => $value
 							]); 
@@ -669,7 +669,7 @@ class RECORD extends API {
 					'destination' => 'recordfilter',
 					'description' => LANG::GET('record.record_scan')
 				], [
-					'type' => 'filterinput',
+					'type' => 'filter',
 					'hint' => LANG::GET('record.record_filter_hint', [':max' => INI['limits']['max_records']]),
 					'attributes' => [
 						'id' => 'recordfilter',

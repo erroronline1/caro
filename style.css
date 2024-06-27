@@ -980,31 +980,31 @@ dialog a:not([data-type])::before {
 	mask-image: url("./media/arrow-right.svg");
 }
 
-[data-type="text"]::before {
+[data-type="textblock"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/info-circle.svg");
 	mask-image: url("./media/info-circle.svg");
 }
 
-[data-type="textinput"]::before {
+[data-type="text"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/pencil.svg");
 	mask-image: url("./media/pencil.svg");
 }
 
-[data-type="searchinput"]::before {
+[data-type="search"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/search.svg");
 	mask-image: url("./media/search.svg");
 }
 
-[data-type="numberinput"]::before {
+[data-type="number"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/hashtag.svg");
 	mask-image: url("./media/hashtag.svg");
 }
 
-[data-type="dateinput"]::before,
+[data-type="date"]::before,
 [data-type="calendar"]::before,
 [data-type="calendarbutton"]::before {
 	background-color: var(--foreground);
@@ -1019,24 +1019,24 @@ button[data-type="calendarbutton"]::before {
 	mask-image: url("./media/calendar-alt.svg");
 }
 
-[data-type="timeinput"]::before {
+[data-type="time"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/clock.svg");
 	mask-image: url("./media/clock.svg");
 }
 
-[data-type="telinput"]::before {
+[data-type="tel"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/phone.svg");
 	mask-image: url("./media/phone.svg");
 }
-[data-type="emailinput"]::before {
+[data-type="email"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/at.svg");
 	mask-image: url("./media/at.svg");
 }
 
-[data-type="filterinput"]::before {
+[data-type="filter"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/filter.svg");
 	mask-image: url("./media/filter.svg");
@@ -1069,7 +1069,7 @@ button[data-type="photo"]::before {
 }
 
 [data-type="select"]::before,
-[data-type="checkboxinput"]::before {
+[data-type="checkbox2text"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/list.svg");
 	mask-image: url("./media/list.svg");

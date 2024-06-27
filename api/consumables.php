@@ -277,7 +277,7 @@ class CONSUMABLES extends API {
 					'content' => [
 						[
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => implode(' ', [
 									$product['article_no'],
 									$product['article_name'],
@@ -435,7 +435,7 @@ class CONSUMABLES extends API {
 						]
 					];
 					$incorporationform[] = [
-						'type' => 'hiddeninput',
+						'type' => 'hidden',
 						'attributes' => [
 							'id' => '_batchupdate',
 							'name' => '_batchupdate'
@@ -446,7 +446,7 @@ class CONSUMABLES extends API {
 				$result['body'] = [
 					'content' => [
 						[
-							'type' => 'text',
+							'type' => 'textblock',
 							'description' => implode(' ', [
 								$product['article_no'] ? : '',
 								$product['article_name'] ? : '',
@@ -483,7 +483,7 @@ class CONSUMABLES extends API {
 							$article = intval(count($matches) - 1);
 							if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
 								$matches[$article][] = [
-									['type' => 'text',
+									['type' => 'textblock',
 									'description' => LANG::GET('order.incorporation_matching_previous'),
 									]
 								];
@@ -496,7 +496,7 @@ class CONSUMABLES extends API {
 								],
 								'content' => [
 									[
-										'type' => 'text',
+										'type' => 'textblock',
 										'content' => implode("\n", $check['content'])
 									]
 								]
@@ -509,7 +509,7 @@ class CONSUMABLES extends API {
 					array_push($result['body']['content'], ...$matches);
 					$result['body']['content'][] = [
 						[
-							'type' => 'textinput',
+							'type' => 'text',
 							'hint' => LANG::GET('order.incorporation_matching_previous_hint'),
 							'attributes' => [
 								'name' => LANG::GET('order.incorporation_matching_previous'),
@@ -779,7 +779,7 @@ class CONSUMABLES extends API {
 								],
 								'content' => $options
 							], [
-								'type' => 'searchinput',
+								'type' => 'search',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_existing_vendors_search'),
 									'list' => 'vendors',
@@ -801,7 +801,7 @@ class CONSUMABLES extends API {
 						}
 						$result['body']['content'][] = [
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => $vendor['name'],
 								'content' => implode(" \n", array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) .
 									(array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
@@ -849,7 +849,7 @@ class CONSUMABLES extends API {
 								],
 								'content' => $options
 							], [
-								'type' => 'searchinput',
+								'type' => 'search',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_existing_vendors_search'),
 									'list' => 'vendors',
@@ -858,7 +858,7 @@ class CONSUMABLES extends API {
 							]
 						], [
 							[
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_name'),
 									'required' => true,
@@ -873,35 +873,35 @@ class CONSUMABLES extends API {
 								],
 								'hint' => LANG::GET('consumables.edit_vendor_info_hint')
 							], [
-								'type' => 'emailinput',
+								'type' => 'email',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_mail'),
 									'value' => array_key_exists('mail', $vendor['info']) ? $vendor['info']['mail']: '',
 									'rows' => 8
 								]
 							], [
-								'type' => 'telinput',
+								'type' => 'tel',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_phone'),
 									'value' => array_key_exists('phone', $vendor['info']) ? $vendor['info']['phone']: '',
 									'rows' => 8
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_address'),
 									'value' => array_key_exists('address', $vendor['info']) ? $vendor['info']['address']: '',
 									'rows' => 8
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
 									'value' => array_key_exists('sales_representative', $vendor['info']) ? $vendor['info']['sales_representative']: '',
 									'rows' => 8
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_customer_id'),
 									'value' => array_key_exists('customer_id', $vendor['info']) ? $vendor['info']['customer_id']: '',
@@ -920,7 +920,7 @@ class CONSUMABLES extends API {
 						], [
 							[
 								[
-									'type' => 'dateinput',
+									'type' => 'date',
 									'attributes' => [
 										'name' => LANG::GET('consumables.edit_vendor_certificate_validity'),
 										'value' => $vendor['certificate']['validity'] ? : ''
@@ -994,19 +994,19 @@ class CONSUMABLES extends API {
 					if ($vendor['pricelist']['validity']) array_splice($result['body']['content'][4], 0, 0,
 						[[
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => LANG::GET('consumables.edit_vendor_pricelist_validity'),
 								'content' => $vendor['pricelist']['validity']
 							],
 							[
-								'type' => 'numberinput',
+								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
 									'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : INI['limits']['mdr14_sample_interval']
 								]
 							],
 							[
-								'type' => 'numberinput',
+								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
 									'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : INI['limits']['mdr14_sample_reusable']
@@ -1350,7 +1350,7 @@ class CONSUMABLES extends API {
 									'name' => LANG::GET('consumables.edit_product_filter_vendors')
 									]
 							], [
-								'type' => 'searchinput',
+								'type' => 'search',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_search'),
 									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'productinformation'); return false;}",
@@ -1370,7 +1370,7 @@ class CONSUMABLES extends API {
 
 						$result['body']['content'][] = [
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => $product['article_no'] . ' ' . $product['article_name']. ($product['article_alias'] ? ' (' . $product['article_alias'] . ') ' : ' ') . $product['article_unit'],
 								'content' => $product['vendor_name']
 							],
@@ -1403,14 +1403,14 @@ class CONSUMABLES extends API {
 								if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
 							}
 							$result['body']['content'][2][] = [
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => $incorporationState,
 								'content' => $incorporationInfo
 							];
 						}
 						else {
 							$result['body']['content'][2][] = [
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => LANG::GET('consumables.edit_product_incorporated_not')
 							];
 						}
@@ -1457,7 +1457,7 @@ class CONSUMABLES extends API {
 									'name' => LANG::GET('consumables.edit_product_filter_vendors')
 									]
 							], [
-								'type' => 'searchinput',
+								'type' => 'search',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_search'),
 									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'editconsumables'); return false;}",
@@ -1475,34 +1475,34 @@ class CONSUMABLES extends API {
 								],
 								'content' => $options
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_vendor'),
 									'list' => 'vendors',
 									'value' => $product['vendor_name'],
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_article_no'),
 									'required' => true,
 									'value' => $product['article_no'],
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_article_name'),
 									'required' => true,
 									'value' => $product['article_name'],
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_article_alias'),
 									'value' => $product['article_alias']
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_article_unit'),
 									'list' => 'units',
@@ -1510,7 +1510,7 @@ class CONSUMABLES extends API {
 									'value' => $product['article_unit'],
 								]
 							], [
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_product_article_ean'),
 									'value' => $product['article_ean'],
@@ -1551,7 +1551,7 @@ class CONSUMABLES extends API {
 								'hint' => LANG::GET('consumables.edit_product_may_affect_import_filter')
 							],
 							[
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'id' => '_batchupdate',
 									'name' => '_batchupdate'
@@ -1580,7 +1580,7 @@ class CONSUMABLES extends API {
 									LANG::GET('consumables.edit_product_isinactive') => $isinactive
 								]
 							], [
-								'type' => 'hiddeninput',
+								'type' => 'hidden',
 								'attributes' => [
 									'name' => '_batchactive',
 									'id' => '_batchactive'
@@ -1624,7 +1624,7 @@ class CONSUMABLES extends API {
 
 						array_push($result['body']['content'][3],
 							[
-								'type' => 'text',
+								'type' => 'textblock',
 								'description' => $incorporationState,
 								'content' => $incorporationInfo
 							]);
@@ -1647,7 +1647,7 @@ class CONSUMABLES extends API {
 					}
 					else {
 						$result['body']['content'][3][] = [
-							'type' => 'text',
+							'type' => 'textblock',
 							'description' => LANG::GET('consumables.edit_product_incorporated_not'),
 							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 						];
@@ -1749,7 +1749,7 @@ class CONSUMABLES extends API {
 					$productlist .= $product . "\n";
 				}
 				$result['body']['content'][1][] = [
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => $vendor,
 					'content' => $productlist
 				];

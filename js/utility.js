@@ -190,7 +190,7 @@ const _client = {
 
 			const body = [
 				{
-					type: "hiddeninput",
+					type: "hidden",
 					attributes: {
 						name: LANG.GET("message.to"),
 						value: recipient,
@@ -207,7 +207,7 @@ const _client = {
 			];
 			if (datalist.length) {
 				if (typeof datalist === "string") datalist = datalist.split(",");
-				body[0].type = "textinput";
+				body[0].type = "text";
 				body[0].attributes.list = "rcptlist";
 				body.push({
 					type: "datalist",
@@ -243,7 +243,7 @@ const _client = {
 					content: [
 						[
 							{
-								type: "numberinput",
+								type: "number",
 								attributes: {
 									name: LANG.GET("order.quantity_label") + "[]",
 									value: data[0],
@@ -254,7 +254,7 @@ const _client = {
 								},
 							},
 							{
-								type: "text",
+								type: "textblock",
 								description: LANG.GET("order.added_product", {
 									":unit": data[1],
 									":number": data[2],
@@ -263,35 +263,35 @@ const _client = {
 								}),
 							},
 							{
-								type: "hiddeninput",
+								type: "hidden",
 								attributes: {
 									name: LANG.GET("order.unit_label") + "[]",
 									value: data[1] ? data[1] : " ",
 								},
 							},
 							{
-								type: "hiddeninput",
+								type: "hidden",
 								attributes: {
 									name: LANG.GET("order.ordernumber_label") + "[]",
 									value: data[2],
 								},
 							},
 							{
-								type: "hiddeninput",
+								type: "hidden",
 								attributes: {
 									name: LANG.GET("order.productname_label") + "[]",
 									value: data[3],
 								},
 							},
 							{
-								type: "hiddeninput",
+								type: "hidden",
 								attributes: {
 									name: LANG.GET("order.barcode_label") + "[]",
 									value: data[4] ? data[4] : " ",
 								},
 							},
 							{
-								type: "hiddeninput",
+								type: "hidden",
 								attributes: {
 									name: LANG.GET("order.vendor_label") + "[]",
 									value: data[5],

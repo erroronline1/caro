@@ -22,7 +22,7 @@ class TOOL extends API {
 	/**
 	 * in case you want to create a code from any values in any form add 
 	 * 'data-usecase' => 'tool_create_code'
-	 * to inputs attributes (hiddeninput if applicable)
+	 * to inputs attributes (hidden if applicable)
 	 */
 
 	// processed parameters for readability
@@ -52,21 +52,21 @@ class TOOL extends API {
 			'qrcode_appointment' => ['name' => LANG::GET('tool.qrcode_appointment'),
 				'content'=> [
 					[
-						'type' => 'dateinput',
+						'type' => 'date',
 						'attributes' => [
 							'name' => LANG::GET('tool.qrcode_appointment_date'),
 							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_date')) ? : ''
 						]
 					],
 					[
-						'type' => 'timeinput',
+						'type' => 'time',
 						'attributes' => [
 							'name' => LANG::GET('tool.qrcode_appointment_time'),
 							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_time')) ? : ''
 						]
 					],
 					[
-						'type' => 'textinput',
+						'type' => 'text',
 						'hint' => LANG::GET('tool.qrcode_appointment_occasion_hint'),
 						'attributes' => [
 							'name' => LANG::GET('tool.qrcode_appointment_occasion'),
@@ -74,7 +74,7 @@ class TOOL extends API {
 						]
 					],
 					[
-						'type' => 'textinput',
+						'type' => 'text',
 						'hint' => LANG::GET('tool.qrcode_appointment_reminder_hint'),
 						'attributes' => [
 							'name' => LANG::GET('tool.qrcode_appointment_reminder'),
@@ -82,7 +82,7 @@ class TOOL extends API {
 						]
 					],
 					[
-						'type' => 'numberinput',
+						'type' => 'number',
 						'attributes' => [
 							'name' => LANG::GET('tool.qrcode_appointment_duration'),
 							'min' => 1,
@@ -104,7 +104,7 @@ class TOOL extends API {
 			'barcode_code128' => ['name' => LANG::GET('tool.barcode_code128'),
 				'content'=> [
 					[
-						'type' => 'textinput',
+						'type' => 'text',
 						'hint' => LANG::GET('tool.barcode_code128_hint'),
 						'attributes' => [
 							'name' => LANG::GET('tool.barcode_description'),
@@ -116,7 +116,7 @@ class TOOL extends API {
 			'barcode_ean13' => ['name' => LANG::GET('tool.barcode_ean13'),
 				'content'=> [
 					[
-						'type' => 'numberinput',
+						'type' => 'number',
 						'hint' => LANG::GET('tool.barcode_ean13_hint'),
 						'attributes' => [
 							'name' => LANG::GET('tool.barcode_description'),

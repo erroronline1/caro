@@ -93,7 +93,7 @@ class APPLICATION extends API {
 		];
 		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
-				'type' => 'text',
+				'type' => 'textblock',
 				'description' => $description,
 				'content' => strtr($content, $replacements)
 			]];
@@ -207,7 +207,7 @@ class APPLICATION extends API {
 				],
 				'content' => [
 					[
-						'type' => 'text',
+						'type' => 'textblock',
 						'content' => LANG::GET('application.overview_messages', [':number' => $unseen]),
 						'description' => LANG::GET('menu.message_conversations'),
 						'attributes' => [
@@ -229,7 +229,7 @@ class APPLICATION extends API {
 					],
 					'content' => [
 						[
-							'type' => 'text',
+							'type' => 'textblock',
 							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed]),
 							'description' => LANG::GET('menu.purchase_approved_orders'),
 							'attributes' => [
@@ -251,7 +251,7 @@ class APPLICATION extends API {
 				],
 				'content' => [
 					[
-						'type' => 'text',
+						'type' => 'textblock',
 						'content' => LANG::GET('application.overview_cases', [':number' => $number]),
 						'description' => LANG::GET('menu.record_header'),
 						'attributes' => [
@@ -272,7 +272,7 @@ class APPLICATION extends API {
 				],
 				'content' => [
 					[
-						'type' => 'text',
+						'type' => 'textblock',
 						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
 						'description' => LANG::GET('menu.forms_manage_approval'),
 						'attributes' => [
@@ -293,7 +293,7 @@ class APPLICATION extends API {
 				],
 				'content' => [
 					[
-						'type' => 'text',
+						'type' => 'textblock',
 						'content' => LANG::GET('consumables.approve_landing_page', [':number' => $unapproved]),
 						'description' => LANG::GET('menu.purchase_incorporated_pending'),
 						'attributes' => [
@@ -326,12 +326,12 @@ class APPLICATION extends API {
 			if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
 		if ($displayevents) $overview[] = [
-			'type' => 'text',
+			'type' => 'textblock',
 			'description' => LANG::GET('calendar.events_assigned_units'),
 			'content' => $displayevents
 		];
 		if ($displayabsentmates) $overview[] = [
-			'type' => 'text',
+			'type' => 'textblock',
 			'description' => LANG::GET('calendar.timesheet_irregular'),
 			'content' => $displayabsentmates
 		];
@@ -356,7 +356,7 @@ class APPLICATION extends API {
 		foreach ($query as $row){
 			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
 				[[
-					'type' => 'text',
+					'type' => 'textblock',
 					'description' => $row['title'],
 					'content' => $row['content']
 				]];
@@ -499,7 +499,7 @@ class APPLICATION extends API {
 							'onchange' => "api.application('get', 'manual', this.value)"
 						],
 						'content' => $options],
-						['type' => 'textinput',
+						['type' => 'text',
 						'attributes' => [
 							'name' => LANG::GET('application.edit_manual_title'),
 							'value' => $entry['title'],

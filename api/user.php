@@ -141,7 +141,7 @@ class USER extends API {
 
 				$result['body']=['content' => [
 						[
-							['type' => 'text',
+							['type' => 'textblock',
 							'description' => LANG::GET('user.display_user'),
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
@@ -571,7 +571,7 @@ class USER extends API {
 							'content' => $options
 						],
 						[
-							'type' => 'searchinput',
+							'type' => 'search',
 							'attributes' => [
 								'name' => LANG::GET('user.edit_existing_user'),
 								'list' => 'users',
@@ -580,7 +580,7 @@ class USER extends API {
 						]
 					],[
 						[
-							'type' => 'textinput',
+							'type' => 'text',
 							'attributes' => [
 								'name' => LANG::GET('user.edit_name'),
 								'required' => true,
@@ -602,7 +602,7 @@ class USER extends API {
 					],[
 						[
 							[
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_initial_overtime'),
 									'value' => array_key_exists('initialovertime', $user['app_settings']) ? $user['app_settings']['initialovertime'] : 0
@@ -644,7 +644,7 @@ class USER extends API {
 							],
 							'hint' => LANG::GET('user.edit_add_document_hint')
 						], [
-							'type' => 'textinput',
+							'type' => 'text',
 							'attributes' => [
 								'name' => LANG::GET('user.edit_add_document_rename')
 							],
@@ -721,7 +721,7 @@ class USER extends API {
 
 					if ($user['orderauth']) $result['body']['content'][5]=[
 						[
-							['type' => 'textinput',
+							['type' => 'text',
 							'attributes' => [
 								'name' => LANG::GET('user.edit_order_authorization_current'),
 								'value' => $user['orderauth']

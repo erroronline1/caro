@@ -186,7 +186,7 @@ class PDF{
 							} else { // text type
 								$pdf->MultiCell(133, 4, $value, 0, '', 0, 1, 63, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							}
-						else { // textinput, numberinput, etc
+						else { // text, number, etc
 							$height = 5;
 							$pdf->SetFontSize(0); // variable font size
 							$pdf->TextField($key, 133, $height, [], [], 63, $pdf->GetY() + 4);

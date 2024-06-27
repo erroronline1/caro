@@ -126,7 +126,7 @@ class FORM extends API {
 							],
 							'content' => $options
 						],[
-							'type' => 'searchinput',
+							'type' => 'search',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_forms'),
 								'list' => 'components',
@@ -145,7 +145,7 @@ class FORM extends API {
 					]
 				],[
 					[[
-						'type' => 'text',
+						'type' => 'textblock',
 						'description' => LANG::GET('assemble.edit_components_info_description'),
 						'content' => LANG::GET('assemble.edit_components_info_content')
 					]], [[
@@ -154,7 +154,7 @@ class FORM extends API {
 						'description' => LANG::GET('assemble.compose_scanner')
 					]], [[
 						'form' => true,
-						'type' => 'compose_text',
+						'type' => 'compose_textblock',
 						'description' => LANG::GET('assemble.compose_text')
 					]], [[
 						'form' => true,
@@ -162,28 +162,28 @@ class FORM extends API {
 						'description' => LANG::GET('assemble.compose_image')
 					]], [[
 						'form' => true,
-						'type' => 'compose_textinput',
-						'description' => LANG::GET('assemble.compose_textinput')
+						'type' => 'compose_text',
+						'description' => LANG::GET('assemble.compose_text')
 					]], [[
 						'form' => true,
 						'type' => 'compose_textarea',
 						'description' => LANG::GET('assemble.compose_textarea')
 					]], [[
 						'form' => true,
-						'type' => 'compose_numberinput',
-						'description' => LANG::GET('assemble.compose_numberinput')
+						'type' => 'compose_number',
+						'description' => LANG::GET('assemble.compose_number')
 					]], [[
 						'form' => true,
-						'type' => 'compose_dateinput',
-						'description' => LANG::GET('assemble.compose_dateinput')
+						'type' => 'compose_date',
+						'description' => LANG::GET('assemble.compose_date')
 					]], [[
 						'form' => true,
-						'type' => 'compose_telinput',
-						'description' => LANG::GET('assemble.compose_telinput')
+						'type' => 'compose_tel',
+						'description' => LANG::GET('assemble.compose_tel')
 					]], [[
 						'form' => true,
-						'type' => 'compose_emailinput',
-						'description' => LANG::GET('assemble.compose_emailinput')
+						'type' => 'compose_email',
+						'description' => LANG::GET('assemble.compose_email')
 						]], [[
 						'form' => true,
 						'type' => 'compose_links',
@@ -542,7 +542,7 @@ class FORM extends API {
 							],
 							'content' => $formoptions
 						], [
-							'type' => 'searchinput',
+							'type' => 'search',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_forms'),
 								'list' => 'forms',
@@ -561,9 +561,9 @@ class FORM extends API {
 					]
 				], [
 					[
-						"type" => "text",
-						"description" => LANG::GET('assemble.edit_forms_info_description'),
-						"content" => LANG::GET('assemble.edit_forms_info_content')
+						'type' => 'textblock',
+						'description' => LANG::GET('assemble.edit_forms_info_description'),
+						'content' => LANG::GET('assemble.edit_forms_info_content')
 					], [
 						'type' => 'select',
 						'attributes' => [
@@ -572,7 +572,7 @@ class FORM extends API {
 						],
 						'content' => $componentoptions
 					], [
-						'type' => 'searchinput',
+						'type' => 'search',
 						'attributes' => [
 							'name' => LANG::GET('assemble.edit_add_component'),
 							'list' => 'components',
@@ -1084,7 +1084,7 @@ class FORM extends API {
 									],
 									'content' => $options
 								], [
-									'type' => 'searchinput',
+									'type' => 'search',
 									'attributes' => [
 										'name' => LANG::GET('assemble.edit_existing_bundle'),
 										'list' => 'templates',
@@ -1103,7 +1103,7 @@ class FORM extends API {
 							]
 						], [
 							[
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('assemble.edit_bundle_name'),
 									'value' => $bundle['name'],

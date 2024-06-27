@@ -408,7 +408,7 @@ export const api = {
 					const dialog = {
 						type: "input",
 						body: [
-							{ type: "text", content: data.log.join("\n") },
+							{ type: "textblock", content: data.log.join("\n") },
 							{ type: "links", content: data.links },
 						],
 					};

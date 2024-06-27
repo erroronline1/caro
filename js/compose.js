@@ -188,7 +188,7 @@ export const compose_helper = {
 			content: [
 				[
 					{
-						type: "text",
+						type: "textblock",
 						description: key,
 						content: _client.texttemplate.data[key],
 					},
@@ -377,7 +377,7 @@ export const compose_helper = {
 			let texts = { content: [], keys: [] };
 			for (const key of paragraph) {
 				texts.content.push({
-					type: "text",
+					type: "textblock",
 					description: key,
 					content: _client.texttemplate.data[key],
 				});
@@ -770,13 +770,13 @@ export class Compose extends Assemble {
 	compose_text() {
 		let result = [];
 		this.currentElement = {
-			type: "text",
+			type: "textblock",
 			attributes: {
 				name: LANG.GET("assemble.compose_text_description"),
 				required: true,
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "textarea",
 			attributes: {
@@ -803,7 +803,7 @@ export class Compose extends Assemble {
 				name: LANG.GET("assemble.compose_image_description"),
 			},
 		};
-		result = result.concat(...this.textinput(), this.br());
+		result = result.concat(...this.text(), this.br());
 		this.currentElement = {
 			type: "photo",
 			attributes: {
@@ -830,14 +830,14 @@ export class Compose extends Assemble {
 				required: true,
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "text",
+			type: "textblock",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
 			content: {},
 		};
@@ -858,34 +858,34 @@ export class Compose extends Assemble {
 		result = result.concat(...this.button());
 		return result;
 	}
-	compose_textinput() {
+	compose_text() {
 		return this.compose_input({
-			type: "textinput",
-			description: LANG.GET("assemble.compose_textinput"),
+			type: "text",
+			description: LANG.GET("assemble.compose_text"),
 		});
 	}
-	compose_numberinput() {
+	compose_number() {
 		return this.compose_input({
-			type: "numberinput",
-			description: LANG.GET("assemble.compose_numberinput"),
+			type: "number",
+			description: LANG.GET("assemble.compose_number"),
 		});
 	}
-	compose_dateinput() {
+	compose_date() {
 		return this.compose_input({
-			type: "dateinput",
-			description: LANG.GET("assemble.compose_dateinput"),
+			type: "date",
+			description: LANG.GET("assemble.compose_date"),
 		});
 	}
-	compose_telinput() {
+	compose_tel() {
 		return this.compose_input({
-			type: "telinput",
-			description: LANG.GET("assemble.compose_telinput"),
+			type: "tel",
+			description: LANG.GET("assemble.compose_tel"),
 		});
 	}
-	compose_emailinput() {
+	compose_email() {
 		return this.compose_input({
-			type: "emailinput",
-			description: LANG.GET("assemble.compose_emailinput"),
+			type: "email",
+			description: LANG.GET("assemble.compose_email"),
 		});
 	}
 	compose_textarea() {
@@ -904,21 +904,21 @@ export class Compose extends Assemble {
 				required: true,
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "text",
+			type: "textblock",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "textinput",
+			type: "text",
 			attributes: {
 				name: LANG.GET("assemble.compose_multilist_add_item") + "[]",
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_multilist_add_item_button"),
@@ -982,14 +982,14 @@ export class Compose extends Assemble {
 				required: true,
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "text",
+			type: "textblock",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		if (type.required !== undefined) {
 			this.currentElement = {
 				content: {},
@@ -1059,7 +1059,7 @@ export class Compose extends Assemble {
 	compose_calendarbutton() {
 		let result = [this.br()];
 		this.currentElement = {
-			type: "text",
+			type: "textblock",
 			attributes: {
 				"data-type": "calendarbutton",
 			},
@@ -1083,7 +1083,7 @@ export class Compose extends Assemble {
 			options = {};
 
 		this.currentElement = {
-			type: "text",
+			type: "textblock",
 			attributes: {
 				"data-type": "formbutton",
 			},
@@ -1154,7 +1154,7 @@ export class Compose extends Assemble {
 			regulatory_context = this.currentElement.regulatory_context,
 			permitted_export = this.currentElement.permitted_export;
 		this.currentElement = {
-			type: "textinput",
+			type: "text",
 			hint: this.currentElement.hint,
 			attributes: {
 				id: "ComponentName",
@@ -1164,10 +1164,10 @@ export class Compose extends Assemble {
 				list: std.list,
 			},
 		};
-		result = result.concat(...this.textinput());
+		result = result.concat(...this.text());
 		if (alias) {
 			this.currentElement = {
-				type: "textinput",
+				type: "text",
 				hint: alias.hint || null,
 				attributes: {
 					id: "ComponentAlias",
@@ -1176,7 +1176,7 @@ export class Compose extends Assemble {
 					required: true,
 				},
 			};
-			result = result.concat(...this.textinput());
+			result = result.concat(...this.text());
 		}
 		if (context) {
 			this.currentElement = {
@@ -1208,7 +1208,7 @@ export class Compose extends Assemble {
 					id: "ComponentRegulatoryContext",
 				},
 			};
-			result = result.concat(...this.checkboxinput());
+			result = result.concat(...this.checkbox2text());
 		}
 		if (approve) {
 			this.currentElement = {

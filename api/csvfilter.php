@@ -155,7 +155,7 @@ class CSVFILTER extends API {
 									],
 									'content' => $options
 								], [
-									'type' => 'searchinput',
+									'type' => 'search',
 									'attributes' => [
 										'name' => LANG::GET('csvfilter.edit_filter'),
 										'list' => 'filters',
@@ -174,7 +174,7 @@ class CSVFILTER extends API {
 							]
 						], [
 							[
-								'type' => 'textinput',
+								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('csvfilter.edit_filter_name'),
 									'value' => $filter['name'],
@@ -379,7 +379,7 @@ class CSVFILTER extends API {
 								],
 								'content' => $options
 							], [
-								'type' => 'searchinput',
+								'type' => 'search',
 								'attributes' => [
 									'name' => LANG::GET('csvfilter.edit_filter'),
 									'list' => 'filters',
@@ -403,14 +403,14 @@ class CSVFILTER extends API {
 						], [
 							'type' => 'br'
 						], [
-							'type' => 'numberinput',
+							'type' => 'number',
 							'attributes' => [
 								'name' => LANG::GET('csvfilter.use_filter_month'),
 								'value' => date('m'),
 								'readonly' => true
 							]
 						], [
-							'type' => 'numberinput',
+							'type' => 'number',
 							'attributes' => [
 								'name' => LANG::GET('csvfilter.use_filter_year'),
 								'value' => date('Y'),

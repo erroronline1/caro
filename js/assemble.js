@@ -802,9 +802,9 @@ export class Assemble {
 		return name;
 	}
 
-	text() {
+	textblock() {
 		/* {
-			type: 'text',
+			type: 'textblock',
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
 			attributes: {
@@ -833,7 +833,7 @@ export class Assemble {
 
 	input(type) {
 		/*{
-			type: 'textinput',
+			type: 'text',
 			hint: 'please provide information about...',
 			numeration: anything resulting in true to prevent enumeration
 			attributes: {
@@ -856,7 +856,7 @@ export class Assemble {
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (type === "email") input.multiple = true;
 
-		if (type === "checkboxinput") {
+		if (type === "checkbox2text") {
 			input.type = "text";
 			const inputvalue = [];
 			for (const [key, value] of Object.entries(this.currentElement.content)) {
@@ -892,35 +892,35 @@ export class Assemble {
 		if (this.currentElement.attributes.hidden !== undefined) return input;
 		return [...this.icon(), input, label, ...this.hint()];
 	}
-	textinput() {
+	text() {
 		return this.input("text");
 	}
-	numberinput() {
+	number() {
 		return this.input("number");
 	}
-	dateinput() {
+	date() {
 		return this.input("date");
 	}
-	timeinput() {
+	time() {
 		return this.input("time");
 	}
-	searchinput() {
+	search() {
 		return this.input("search");
 	}
-	filterinput() {
+	filter() {
 		return this.input("search");
 	}
-	telinput() {
+	tel() {
 		return this.input("tel");
 	}
-	emailinput() {
+	email() {
 		return this.input("email");
 	}
-	checkboxinput() {
+	checkbox2text() {
 		// returns a text typed input with onpointerup modal with checkbox selection
 		// requires additional options property on this.currentElement containing an options object
 		// {'name':{value:str|int, checked: bool}}
-		return this.input("checkboxinput");
+		return this.input("checkbox2text");
 	}
 
 	button() {
@@ -966,9 +966,9 @@ export class Assemble {
 		return [this.br(), ...this.button()];
 	}
 
-	hiddeninput() {
+	hidden() {
 		/*{
-			type: 'hiddeninput',
+			type: 'hidden',
 			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				name: 'name',
@@ -1285,7 +1285,7 @@ export class Assemble {
 			data-filtered: any
 		}*/
 		let result = [...this.header()];
-		if (this.currentElement.attributes !== undefined) result.push(this.hiddeninput());
+		if (this.currentElement.attributes !== undefined) result.push(this.hidden());
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);

@@ -93,7 +93,7 @@ class FILE extends API {
 		'content' => [
 				[
 					[
-						'type' => 'filterinput',
+						'type' => 'filter',
 						'attributes' => [
 							'name' => LANG::GET('file.file_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
@@ -236,7 +236,7 @@ class FILE extends API {
 					);
 					$result['body']['content'][]=[
 						[
-							'type' => 'textinput',
+							'type' => 'text',
 							'attributes' => [
 								'name' => LANG::GET('file.manager_new_folder'),
 								'required' => true
@@ -255,7 +255,7 @@ class FILE extends API {
 					if ($files){
 						$result['body']['content'][]=[
 							[
-								'type' => 'filterinput',
+								'type' => 'filter',
 								'attributes' => [
 									'name' => LANG::GET('file.file_filter_label'),
 									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
@@ -305,7 +305,7 @@ class FILE extends API {
 					if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) unset ($result['body']['form']);
 					else $result['body']['content'][]=[
 						[
-							'type' => 'hiddeninput',
+							'type' => 'hidden',
 							'attributes' => [
 								'name' => 'destination',
 								'value' => $this->_requestedFolder
@@ -436,7 +436,7 @@ class FILE extends API {
 				if ($files){
 					$result['body']['content'][]=[
 						[
-							'type' => 'filterinput',
+							'type' => 'filter',
 							'attributes' => [
 								'name' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}",
@@ -484,7 +484,7 @@ class FILE extends API {
 									],
 								],
 								[
-									'type' => 'checkboxinput',
+									'type' => 'checkbox2text',
 									'content' => $regulatory_context,
 									'attributes' => [
 										'name' => LANG::GET('assemble.compose_form_regulatory_context'),
@@ -521,7 +521,7 @@ class FILE extends API {
 			'content' => [
 				[
 					[
-						'type' => 'filterinput',
+						'type' => 'filter',
 						'attributes' => [
 							'name' => LANG::GET('file.bundle_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
@@ -638,7 +638,7 @@ class FILE extends API {
 								'content' => $options
 							],
 							[
-								'type' => 'searchinput',
+								'type' => 'search',
 								'attributes' => [
 									'name' => LANG::GET('file.edit_existing_bundle'),
 									'list' => 'bundles',
@@ -688,7 +688,7 @@ class FILE extends API {
 				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
 				$return['body']['content'][] = [
 					[
-						'type' => 'textinput',
+						'type' => 'text',
 						'attributes'=>[
 							'name'=> LANG::GET('file.edit_save_bundle'),
 							'value' => $bundle['name']
@@ -761,7 +761,7 @@ class FILE extends API {
 				if ($display){
 					$result['body']['content'][]=[
 						[
-							'type' => 'filterinput',
+							'type' => 'filter',
 							'attributes' => [
 								'name' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",

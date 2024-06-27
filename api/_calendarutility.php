@@ -225,7 +225,7 @@ class CALENDARUTILITY {
 						]
 					],
 					[
-						'type' => 'dateinput',
+						'type' => 'date',
 						'attributes' => [
 							'name' => LANG::GET('calendar.event_date'),
 							'value' => $span_start->format('Y-m-d'),
@@ -233,7 +233,7 @@ class CALENDARUTILITY {
 						]
 					],
 					[
-						'type' => 'dateinput',
+						'type' => 'date',
 						'attributes' => [
 							'name' => LANG::GET('calendar.event_due'),
 							'value' => $span_end->format('Y-m-d'),
@@ -252,14 +252,14 @@ class CALENDARUTILITY {
 						'content' => $alert
 					],
 					[
-						'type' => 'hiddeninput',
+						'type' => 'hidden',
 						'attributes' => [
 							'name' => LANG::GET('calendar.event_type'),
 							'value' => $columns[':type']
 						]
 					],
 					[
-						'type' => 'hiddeninput',
+						'type' => 'hidden',
 						'attributes' => [
 							'name' => 'calendarEventId',
 							'value' => $columns[':id'],		
@@ -302,7 +302,7 @@ class CALENDARUTILITY {
 					];
 				} else {
 					$inputs[] = [
-						'type' => 'hiddeninput',
+						'type' => 'hidden',
 						'attributes' => [
 							'name' => LANG::GET('calendar.event_affected_user'),
 							'value' => $columns[':affected_user_id']
@@ -325,42 +325,42 @@ class CALENDARUTILITY {
 						],
 						'content' => $ptoselect
 					],[
-						'type' => 'dateinput',
+						'type' => 'date',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_start_date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
 					],[
-						'type' => 'timeinput',
+						'type' => 'time',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_start_time'),
 							'value' => $span_start->format('H:i'),
 							'required' => true
 						]
 					],[
-						'type' => 'dateinput',
+						'type' => 'date',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_end_date'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
 						],[
-							'type' => 'timeinput',
+							'type' => 'time',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_end_time'),
 								'value' => $span_end->format('H:i'),
 								'required' => true
 							]
 						],[
-							'type' => 'timeinput',
+							'type' => 'time',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_break_time'),
 								'value' => array_key_exists('break', $misc) ? $misc['break'] : '',
 								'required' => true
 							]
 						],[
-							'type' => 'textinput',
+							'type' => 'text',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_pto_note'),
 								'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
@@ -370,7 +370,7 @@ class CALENDARUTILITY {
 							'description' => LANG::GET('calendar.event_alert_description'),
 							'content' => $alert
 						],[
-							'type' => 'hiddeninput',
+							'type' => 'hidden',
 							'attributes' => [
 								'name' => 'calendarEventId',
 								'value' => $columns[':id']
@@ -380,7 +380,7 @@ class CALENDARUTILITY {
 				if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice'])
 					array_splice($inputs, 7, 0, [
 						[
-							'type' => 'timeinput',
+							'type' => 'time',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_homeoffice'),
 								'value' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
