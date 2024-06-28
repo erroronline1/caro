@@ -335,11 +335,11 @@ class AUDIT extends API {
 	private function userskills(){
 		$content = [];
 		$unfulfilledskills = [];
-		foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+		foreach (LANGUAGEFILE['skills'] as $duty => $skills){
 			if ($duty === 'LEVEL') continue;
 			foreach ($skills as $skill => $skilldescription){
 				if ($skill === '_DESCRIPTION') continue;
-				$unfulfilledskills[] = LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
+				$unfulfilledskills[] = LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
 			}
 		}
 		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
@@ -347,14 +347,14 @@ class AUDIT extends API {
 		foreach ($users as $user){
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			$skillmatrix = '';
-			foreach (LANGUAGEFILE['skillbyduty'] as $duty => $skills){
+			foreach (LANGUAGEFILE['skills'] as $duty => $skills){
 				if ($duty === 'LEVEL') continue;
 				foreach ($skills as $skill => $skilldescription){
 					if ($skill === '_DESCRIPTION') continue;
-					foreach(LANGUAGEFILE['skilllevel'] as $level => $leveldescription){
+					foreach(LANGUAGEFILE['skills']['LEVEL'] as $level => $leveldescription){
 						if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])){
-							$skillmatrix .=  " \n" . LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription;
-							unset($unfulfilledskills[array_search(LANG::GET('skillbyduty.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription, $unfulfilledskills)]);
+							$skillmatrix .=  " \n" . LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription;
+							unset($unfulfilledskills[array_search(LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription, $unfulfilledskills)]);
 						}
 					}
 				}
