@@ -81,6 +81,8 @@ export const api = {
 				if (value instanceof File && (method === "post" || (method === "put" && value.size))) {
 					delete sanitizedpayload[key];
 				}
+				// unset '0' values that are not recognized by backend
+				if (value == '0') sanitizedpayload[key] = '';
 			}
 			sanitizedpayload = JSON.stringify(sanitizedpayload)
 				.replaceAll(/\\r|\\n|\\t/g, "")
@@ -88,6 +90,7 @@ export const api = {
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
+			//console.log(sanitizedpayload, b.size);
 			payload.append("_user_cache", await _.sha256(window._user.cached_identity + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
