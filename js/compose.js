@@ -121,7 +121,7 @@ export const compose_helper = {
 						}
 					}
 				}
-			} else if (["text"].includes(element.type)) {
+			} else if (["textblock"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_text_description")) {
 					if (value) element.description = value;
 					else return;
@@ -767,7 +767,7 @@ export class Compose extends Assemble {
 		return assembledPanels;
 	}
 
-	compose_text() {
+	compose_textblock() {
 		let result = [];
 		this.currentElement = {
 			type: "textblock",
@@ -1066,7 +1066,7 @@ export class Compose extends Assemble {
 			description: LANG.GET("assemble.compose_calendarbutton"),
 			content: LANG.GET("assemble.compose_calendarbutton_not_working"),
 		};
-		result = result.concat(...this.text());
+		result = result.concat(...this.textblock());
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_calendarbutton"),
@@ -1089,7 +1089,7 @@ export class Compose extends Assemble {
 			},
 			description: LANG.GET("assemble.compose_link_form"),
 		};
-		result = result.concat(...this.text());
+		result = result.concat(...this.textblock());
 
 		this.currentElement = {
 			type: "select",
