@@ -578,7 +578,12 @@ button {
 	}
 }
 
-.rangedatalist{
+input[type="range"],
+.rangedatalist {
+	margin-left: 2em;
+}
+
+.rangedatalist {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
