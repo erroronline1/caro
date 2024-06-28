@@ -1,17 +1,17 @@
 /**
  * CARO - Cloud Assisted Records and Operations
  * Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -922,50 +922,6 @@ export class Assemble {
 		// {'name':{value:str|int, checked: bool}}
 		return this.input("checkbox2text");
 	}
-
-	button() {
-		/*{
-			type: 'button',
-			hint: 'this button does this or that'
-			attributes: {
-				value: 'this is displayed on the button',
-				onpointerdown: 'alert("hello")'
-			}
-		}*/
-		let button = document.createElement("button");
-		button.id = getNextElementID();
-		if (this.currentElement.attributes.value !== undefined) {
-			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
-			delete this.currentElement.attributes.value;
-		}
-		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
-		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
-		return [button, ...this.hint()];
-	}
-	deletebutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "deletebutton";
-		return this.button();
-	}
-	submitbutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "submitbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return this.button();
-	}
-	calendarbutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "calendarbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return [this.br(), ...this.button()];
-	}
-	formbutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "formbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return [this.br(), ...this.button()];
-	}
-
 	hidden() {
 		/*{
 			type: 'hidden',
@@ -983,19 +939,51 @@ export class Assemble {
 		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
 		return input;
 	}
-	datalist() {
-		let datalist = document.createElement("datalist");
-		let option;
-		datalist.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
-		this.currentElement.content.forEach((key) => {
-			option = document.createElement("option");
-			option.value = key;
-			datalist.appendChild(option);
-		});
-		return datalist;
+	checkbox(radio = null) {
+		/*{
+			type: 'checkbox', or 'radio'
+			description:'checkboxes',
+			numeration: anything resulting in true to prevent enumeration
+			content: {
+				'Checkbox 1': {
+					optional attributes
+				},
+				'Checkbox 2': {
+					optional attributes
+				}
+			},
+			hint: 'this selection is for...'
+		}*/
+		const result = [...this.header()],
+			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
+		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
+			let label = document.createElement("label"),
+				input = document.createElement("input");
+			input.id = getNextElementID();
+			if (radio) {
+				label.classList.add("radio");
+				input.type = "radio";
+				input.name = radioname;
+				input.value = checkbox;
+			} else {
+				label.classList.add("checkbox");
+				input.type = "checkbox";
+				input.dataset.grouped = this.currentElement.description;
+				input.name = this.names_numerator(checkbox);
+			}
+			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
+			input = this.apply_attributes(attributes, input);
+			label.htmlFor = input.id;
+			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
+			result.push(input);
+			result.push(label);
+		}
+		return [...result, ...this.hint(), document.createElement("br")];
 	}
-
+	radio() {
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		return this.checkbox("radioinstead");
+	}
 	file() {
 		/*{
 			type: 'file',
@@ -1050,75 +1038,17 @@ export class Assemble {
 		return [...this.header(), input, label, button, ...this.hint()];
 	}
 
-	photo() {
-		/*{
-			type: 'photo',
-			attributes: {
-				name: 'photo upload',
-				multiple: true|undefined
-			}
-			hint: 'this photo serves as...'
-		}*/
-		let input = document.createElement("input"),
-			button = document.createElement("button"),
-			img = document.createElement("img"),
-			resetbutton = document.createElement("button"),
-			addbutton = document.createElement("button"),
-			hint = [...this.hint()],
-			multiple;
-		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		if (this.currentElement.attributes.multiple) {
-			multiple = true;
-			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
-			// delete for input apply_attributes
-			delete this.currentElement.attributes.multiple;
-		}
-
-		function changeEvent() {
-			this.nextSibling.nextSibling.innerHTML = this.files.length
-				? Array.from(this.files)
-						.map((x) => x.name)
-						.join(", ") +
-				  " " +
-				  LANG.GET("assemble.photo_rechoose")
-				: LANG.GET("assemble.photo_choose");
-			if (this.files.length) this.nextSibling.src = URL.createObjectURL(this.files[0]);
-			else this.nextSibling.src = "";
-		}
-
-		input.type = "file";
-		input.id = getNextElementID();
-		input.accept = "image/jpeg, image/gif, image/png";
-		input.capture = true;
-		input.onchange = changeEvent;
-		input = this.apply_attributes(this.currentElement.attributes, input);
-		button.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
-		button.type = "button";
-		button.setAttribute("data-type", "photo");
-		button.classList.add("inlinebutton");
-		button.appendChild(document.createTextNode(LANG.GET("assemble.photo_choose")));
-
-		img.classList.add("photoupload");
-
-		resetbutton.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
-		resetbutton.appendChild(document.createTextNode(LANG.GET("assemble.reset")));
-		resetbutton.setAttribute("data-type", "reset");
-		resetbutton.classList.add("inlinebutton");
-		resetbutton.type = "button";
-
-		if (multiple) this.currentElement.attributes.multiple = true; // reapply after input apply_attributes
-		const photoElementClone = structuredClone(this.currentElement);
-		addbutton.onpointerup = function () {
-			new Assemble({
-				content: [[photoElementClone]],
-				composer: "photoOrScanner",
-			}).initializeSection(null, hint.length ? hint : resetbutton);
-		};
-		addbutton.setAttribute("data-type", "additem");
-		addbutton.classList.add("inlinebutton");
-		addbutton.type = "button";
-
-		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
+	datalist() {
+		let datalist = document.createElement("datalist");
+		let option;
+		datalist.id = getNextElementID();
+		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
+		this.currentElement.content.forEach((key) => {
+			option = document.createElement("option");
+			option.value = key;
+			datalist.appendChild(option);
+		});
+		return datalist;
 	}
 
 	select() {
@@ -1223,51 +1153,120 @@ export class Assemble {
 		return [...this.icon(), label, textarea, ...this.hint()];
 	}
 
-	checkbox(radio = null) {
+	button() {
 		/*{
-			type: 'checkbox', or 'radio'
-			description:'checkboxes',
-			numeration: anything resulting in true to prevent enumeration
-			content: {
-				'Checkbox 1': {
-					optional attributes
-				},
-				'Checkbox 2': {
-					optional attributes
-				}
-			},
-			hint: 'this selection is for...'
-		}*/
-		const result = [...this.header()],
-			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
-		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
-			let label = document.createElement("label"),
-				input = document.createElement("input");
-			input.id = getNextElementID();
-			if (radio) {
-				label.classList.add("radio");
-				input.type = "radio";
-				input.name = radioname;
-				input.value = checkbox;
-			} else {
-				label.classList.add("checkbox");
-				input.type = "checkbox";
-				input.dataset.grouped = this.currentElement.description;
-				input.name = this.names_numerator(checkbox);
+			type: 'button',
+			hint: 'this button does this or that'
+			attributes: {
+				value: 'this is displayed on the button',
+				onpointerdown: 'alert("hello")'
 			}
-			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
-			input = this.apply_attributes(attributes, input);
-			label.htmlFor = input.id;
-			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
-			result.push(input);
-			result.push(label);
+		}*/
+		let button = document.createElement("button");
+		button.id = getNextElementID();
+		if (this.currentElement.attributes.value !== undefined) {
+			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
+			delete this.currentElement.attributes.value;
 		}
-		return [...result, ...this.hint(), document.createElement("br")];
+		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
+		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
+		return [button, ...this.hint()];
 	}
-	radio() {
+	deletebutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "deletebutton";
+		return this.button();
+	}
+	submitbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "submitbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return this.button();
+	}
+	calendarbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "calendarbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return [this.br(), ...this.button()];
+	}
+	formbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "formbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return [this.br(), ...this.button()];
+	}
+
+	photo() {
+		/*{
+			type: 'photo',
+			attributes: {
+				name: 'photo upload',
+				multiple: true|undefined
+			}
+			hint: 'this photo serves as...'
+		}*/
+		let input = document.createElement("input"),
+			button = document.createElement("button"),
+			img = document.createElement("img"),
+			resetbutton = document.createElement("button"),
+			addbutton = document.createElement("button"),
+			hint = [...this.hint()],
+			multiple;
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		return this.checkbox("radioinstead");
+		if (this.currentElement.attributes.multiple) {
+			multiple = true;
+			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
+			// delete for input apply_attributes
+			delete this.currentElement.attributes.multiple;
+		}
+
+		function changeEvent() {
+			this.nextSibling.nextSibling.innerHTML = this.files.length
+				? Array.from(this.files)
+						.map((x) => x.name)
+						.join(", ") +
+				  " " +
+				  LANG.GET("assemble.photo_rechoose")
+				: LANG.GET("assemble.photo_choose");
+			if (this.files.length) this.nextSibling.src = URL.createObjectURL(this.files[0]);
+			else this.nextSibling.src = "";
+		}
+
+		input.type = "file";
+		input.id = getNextElementID();
+		input.accept = "image/jpeg, image/gif, image/png";
+		input.capture = true;
+		input.onchange = changeEvent;
+		input = this.apply_attributes(this.currentElement.attributes, input);
+		button.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
+		button.type = "button";
+		button.setAttribute("data-type", "photo");
+		button.classList.add("inlinebutton");
+		button.appendChild(document.createTextNode(LANG.GET("assemble.photo_choose")));
+
+		img.classList.add("photoupload");
+
+		resetbutton.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		resetbutton.appendChild(document.createTextNode(LANG.GET("assemble.reset")));
+		resetbutton.setAttribute("data-type", "reset");
+		resetbutton.classList.add("inlinebutton");
+		resetbutton.type = "button";
+
+		if (multiple) this.currentElement.attributes.multiple = true; // reapply after input apply_attributes
+		const photoElementClone = structuredClone(this.currentElement);
+		addbutton.onpointerup = function () {
+			new Assemble({
+				content: [[photoElementClone]],
+				composer: "photoOrScanner",
+			}).initializeSection(null, hint.length ? hint : resetbutton);
+		};
+		addbutton.setAttribute("data-type", "additem");
+		addbutton.classList.add("inlinebutton");
+		addbutton.type = "button";
+
+		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
 	}
+
 	links() {
 		/*{
 			type: 'links',
