@@ -1,17 +1,17 @@
 /**
  * CARO - Cloud Assisted Records and Operations
  * Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -147,6 +147,18 @@ export const compose_helper = {
 					input.name = "composedComponent_files[]";
 					input.files = sibling.files;
 					document.querySelector("[data-usecase=component_editor_form]").append(input);
+				}
+			} else if (["range"].includes(element.type)) {
+				if (elementName === LANG.GET("assemble.compose_simple_element")) {
+					if (value) element.attributes.name = value;
+					else return;
+				}
+				element.attributes.value = "0";
+				if (elementName === LANG.GET("assemble.compose_range_min")) element.attributes.min = Number(value);
+				if (elementName === LANG.GET("assemble.compose_range_max")) element.attributes.max = Number(value);
+				if (elementName === LANG.GET("assemble.compose_range_step")) {
+					value = value.replace(",", ".");
+					if ((typeof Number(value) === "number" && Number(value) < element.attributes.max) || value === "any") element.attributes.step = value;
 				}
 			} else {
 				// ...input
@@ -284,7 +296,7 @@ export const compose_helper = {
 				hidden: hidden,
 				approve: approve,
 				regulatory_context: regulatory_context,
-				permitted_export: permitted_export
+				permitted_export: permitted_export,
 			};
 		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), "error");
 		return null;
@@ -591,16 +603,15 @@ export const compose_helper = {
 								continue;
 							}
 						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_simple_element")) {
-								sibling.value = importable.attributes.name;
-							}
+							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
 						} else if (["text"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_text_description")) {
-								sibling.value = importable.description;
-							}
-							if (elementName === LANG.GET("assemble.compose_text_content")) {
-								if (importable.content) sibling.value = importable.content;
-							}
+							if (elementName === LANG.GET("assemble.compose_text_description")) sibling.value = importable.description;
+							if (elementName === LANG.GET("assemble.compose_text_content")) if (importable.content) sibling.value = importable.content;
+						} else if (["range"].includes(importable.type)) {
+							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
+							if (elementName === LANG.GET("assemble.compose_range_min")) sibling.value = importable.attributes.min;
+							if (elementName === LANG.GET("assemble.compose_range_max")) sibling.value = importable.attributes.max;
+							if (elementName === LANG.GET("assemble.compose_range_step")) sibling.value = importable.attributes.step;
 						} else {
 							// ...input
 							if (elementName === LANG.GET("assemble.compose_field_name")) {
@@ -893,6 +904,58 @@ export class Compose extends Assemble {
 			type: "textarea",
 			description: LANG.GET("assemble.compose_textarea"),
 		});
+	}
+
+	compose_range() {
+		let result = [];
+		this.currentElement = {
+			type: "range",
+			attributes: {
+				name: LANG.GET("assemble.compose_simple_element"),
+				required: true,
+			},
+		};
+		result = result.concat(...this.text());
+		this.currentElement = {
+			type: "textblock",
+			attributes: {
+				name: LANG.GET("assemble.compose_field_hint"),
+			},
+		};
+		result = result.concat(...this.text());
+		this.currentElement = {
+			type: "number",
+			attributes: {
+				name: LANG.GET("assemble.compose_range_min"),
+			},
+			hint: LANG.GET("assemble.compose_range_min_hint"),
+		};
+		result = result.concat(...this.number());
+		this.currentElement = {
+			type: "number",
+			attributes: {
+				name: LANG.GET("assemble.compose_range_max"),
+			},
+			hint: LANG.GET("assemble.compose_range_max_hint"),
+		};
+		result = result.concat(...this.number());
+		this.currentElement = {
+			type: "text",
+			attributes: {
+				name: LANG.GET("assemble.compose_range_step"),
+			},
+			hint: LANG.GET("assemble.compose_range_step_hint"),
+		};
+		result = result.concat(...this.text());
+
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET("assemble.compose_range"),
+				"data-type": "addblock",
+			},
+		};
+		result = result.concat(...this.button());
+		return result;
 	}
 
 	compose_multilist(type) {
@@ -1191,12 +1254,12 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.select());
 		}
-		if (permitted_export){
-			permitted_export.content[Object.keys(permitted_export.content)[0]]['id'] = "ComponentPermittedExport";
+		if (permitted_export) {
+			permitted_export.content[Object.keys(permitted_export.content)[0]]["id"] = "ComponentPermittedExport";
 			this.currentElement = {
 				type: "checkbox",
 				hint: permitted_export.hint,
-				content: permitted_export.content
+				content: permitted_export.content,
 			};
 			result = result.concat(...this.checkbox());
 		}
