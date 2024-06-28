@@ -549,20 +549,10 @@ class USER extends API {
 								'class' => 'rangedatalist'
 							]
 						];
-						$skilldatalist = [
-							'type' => 'datalist',
-							'content' => $skilldatalist,
-							'attributes' => [
-								'id' => 'skillmarkers'
-							]
-						];
 						continue;
 					}
 					foreach ($skills as $skill => $skilldescription){
-						if ($skill === '_DESCRIPTION') {
-							$skillselection[] = $skilldatalist;
-							continue;
-						}
+						if ($skill === '_DESCRIPTION') continue;
 						$userlevel = 0;
 						foreach(LANGUAGEFILE['skills']['LEVEL'] as $level => $leveldescription){
 							if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])) $userlevel = $level;
@@ -574,7 +564,7 @@ class USER extends API {
 								'min' => 0,
 								'max' => count(LANGUAGEFILE['skills']['LEVEL']) - 1,
 								'value' => strval($userlevel),
-								'list' => array_search($skill, array_keys($skills)) < 2 ? 'skillmarkerswithlabels' . $skilldatalistnum : 'skillmarkers'
+								'list' => array_search($skill, array_keys($skills)) < 2 ? 'skillmarkerswithlabels' . $skilldatalistnum : ''
 							],
 						];
 						if (array_search($skill, array_keys($skills)) < 2) $skillselection[] = $skilldatalistwithlabel;

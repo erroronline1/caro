@@ -1042,15 +1042,34 @@ export class Assemble {
 			type: 'range',
 			attributes: {
 				name: 'range',
+				min: 0,
+				max: 100,
+				step: 5
 			}
-			hint: 'from ... to ...'
+			hint: 'from 0 to 100 in 20 steps'
 		}*/
 		let input = document.createElement("input");
-		input.type = 'range';
+		input.type = "range";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		this.currentElement.description = this.currentElement.attributes.name
+		this.currentElement.description = this.currentElement.attributes.name;
 		input = this.apply_attributes(this.currentElement.attributes, input);
+		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
+			let datalist = document.createElement("datalist");
+			let option;
+			datalist.id = getNextElementID();
+			for (
+				let step = this.currentElement.attributes.min ? Number(this.currentElement.attributes.min) : 0;
+				step <= (this.currentElement.attributes.max ? Number(this.currentElement.attributes.max) : 100);
+				step += this.currentElement.attributes.step ? Number(this.currentElement.attributes.step) : 1
+			) {
+				option = document.createElement("option");
+				option.value = step;
+				datalist.appendChild(option);
+			}
+			input.setAttribute("list", datalist.id);
+			return [datalist, ...this.header(), input, ...this.hint()];
+		}
 		return [...this.header(), input, ...this.hint()];
 	}
 
@@ -1061,7 +1080,7 @@ export class Assemble {
 		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
 		this.currentElement.content.forEach((key) => {
 			option = document.createElement("option");
-			if (typeof key ==='string') option.value = key;
+			if (typeof key === "string") option.value = key;
 			else option = this.apply_attributes(key, option);
 			datalist.appendChild(option);
 		});
