@@ -406,7 +406,8 @@ input,
 textarea,
 select,
 canvas,
-.scanner {
+.scanner,
+.rangedatalist {
 	text-decoration: none;
 	border: none;
 	width: calc(100% - 2em);
@@ -577,6 +578,12 @@ button {
 	}
 }
 
+.rangedatalist{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	writing-mode: vertical-lr;
+}
 .modaloptgroup {
 	font-family: inherit;
 	text-align: center;
@@ -1046,6 +1053,12 @@ button[data-type="calendarbutton"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/upload.svg");
 	mask-image: url("./media/upload.svg");
+}
+
+[data-type="range"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/sliders-h.svg");
+	mask-image: url("./media/sliders-h.svg");
 }
 
 button[data-type="file"]::before {

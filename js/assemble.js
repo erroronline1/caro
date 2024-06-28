@@ -1037,6 +1037,22 @@ export class Assemble {
 		button.classList.add("inlinebutton");
 		return [...this.header(), input, label, button, ...this.hint()];
 	}
+	range() {
+		/*{
+			type: 'range',
+			attributes: {
+				name: 'range',
+			}
+			hint: 'from ... to ...'
+		}*/
+		let input = document.createElement("input");
+		input.type = 'range';
+		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		this.currentElement.description = this.currentElement.attributes.name
+		input = this.apply_attributes(this.currentElement.attributes, input);
+		return [...this.header(), input, ...this.hint()];
+	}
 
 	datalist() {
 		let datalist = document.createElement("datalist");
@@ -1045,7 +1061,8 @@ export class Assemble {
 		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
 		this.currentElement.content.forEach((key) => {
 			option = document.createElement("option");
-			option.value = key;
+			if (typeof key ==='string') option.value = key;
+			else option = this.apply_attributes(key, option);
 			datalist.appendChild(option);
 		});
 		return datalist;
