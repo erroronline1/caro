@@ -81,9 +81,12 @@ class AUDIT extends API {
 		// forms
 		$selecttypes[LANG::GET('audit.checks_type.forms')] = ['value' => 'forms'];
 		if ($this->_requestedType==='forms') $selecttypes[LANG::GET('audit.checks_type.forms')]['selected'] = true;
-		// user certificates
+		// user skills and certificates
 		$selecttypes[LANG::GET('audit.checks_type.userskills')] = ['value' => 'userskills'];
 		if ($this->_requestedType==='userskills') $selecttypes[LANG::GET('audit.checks_type.userskills')]['selected'] = true;
+		// skill fulfilment
+		$selecttypes[LANG::GET('audit.checks_type.skillfulfilment')] = ['value' => 'skillfulfilment'];
+		if ($this->_requestedType==='skillfulfilment') $selecttypes[LANG::GET('audit.checks_type.skillfulfilment')]['selected'] = true;
 		// vendor list
 		$selecttypes[LANG::GET('audit.checks_type.vendors')] = ['value' => 'vendors'];
 		if ($this->_requestedType==='vendors') $selecttypes[LANG::GET('audit.checks_type.vendors')]['selected'] = true;
@@ -329,6 +332,7 @@ class AUDIT extends API {
 			'body' => $body,
 		]);
 	}
+
 	/**
 	 * returns all users with their skills and file attachments to review e.g. certificates
 	 */
@@ -399,6 +403,39 @@ class AUDIT extends API {
 					'content' => implode(', ', $unfulfilledskills)
 				],
 				...$content
+			];
+		}
+		return $content;
+	}
+
+	/**
+	 * returns all skills and matching users
+	 */
+	private function skillfulfilment(){
+		$content = $allskills = [];
+		foreach (LANGUAGEFILE['skills'] as $duty => $skills){
+			if ($duty === 'LEVEL') continue;
+			foreach ($skills as $skill => $skilldescription){
+				if ($skill === '_DESCRIPTION') continue;
+				$allskills[$duty . '.' . $skill] = [];
+			}
+		}
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		foreach ($users as $user){
+			$user['skills'] = explode(',', $user['skills'] ?  : '');
+			foreach ($user['skills'] as $skill){
+				$allskills[substr($skill,0,strrpos($skill, '.'))][] = $user['name'];
+			}
+		}
+		foreach ($allskills as $skill => $users){
+			if (!$skill) continue;
+			$skill = explode('.', $skill);
+			$content[] = [
+				[
+					'type' => 'textblock',
+					'description' => LANG::GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . LANG::GET('skills.' . $skill[0] . '.' . $skill[1]),
+					'content' => $users ? implode(', ', $users) : LANG::GET('audit.skillfulfilment_warning')
+				]
 			];
 		}
 		return $content;
