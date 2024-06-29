@@ -1400,8 +1400,15 @@ A generic sample:
 [Content](#content)
 
 # API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class or Toast-class. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
-Response properties are *body*, *form*, *status* and *msg* most of the time.
+All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
+Response properties are
+* *render* (for assemble or toast)
+* *title* (dynamic page title updates)
+* *user* (user settings on login/reload)
+* *data* (filtered ids, record imports)
+* *response* (state messages, message type, affected ids, redirect path params, names)
+* *log* (csv-filter log)
+* *links* (csv-filter result file)
 
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS compose_helper-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
@@ -1428,7 +1435,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"image":".\/fileserver\/users\/profilepic_error on line 1_error on line 1_token.png","app_settings":{"annualvacation":"2024-01-01 30","weeklyhours":"2024-01-01 39,5","initialovertime":false,"forceDesktop":"on","homeoffice":false,"primaryUnit":"prosthetics2"}}}
+{"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_error on line 1_token.png","app_settings":{"annualvacation":"2024-01-01 30","weeklyhours":"2024-01-01 39,5","initialovertime":false,"forceDesktop":"on","homeoffice":false,"primaryUnit":"prosthetics2"}}}
 ```
 
 > GET ./api/api.php/application/menu
@@ -1442,7 +1449,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'text')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
+{"render":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'textblock')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
 ```
 
 > GET ./api/api.php/application/start
@@ -1469,7 +1476,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
 > GET ./api/api.php/audit/export/{type}
@@ -1483,7 +1490,7 @@ Parameters
 
 Sample response
 ```
-{"body":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
+{"render":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
 ```
 
 [Content](#content)
@@ -1502,7 +1509,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"searchinput","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
+{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
 ```
 
 > GET ./api/api.php/calendar/search/{search}
@@ -1516,7 +1523,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"searchinput","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"text","attributes":{"data-type":"text"},"description":"test event","content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'schedule')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
+{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textblock","attributes":{"data-type":"textblock"},"description":"test event","content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'schedule')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
 ```
 
 > POST ./api/api.php/calendar/schedule
@@ -1530,7 +1537,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"id":"8","msg":"Event has been saved.","type":"success"}}
+{"response":{"id":"8","msg":"Event has been saved.","type":"success"}}
 ```
 
 > PUT ./api/api.php/calendar/schedule/{id}
@@ -1544,7 +1551,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"id":"9","msg":"Event has been saved.","type":"success"}}
+{"response":{"id":"9","msg":"Event has been saved.","type":"success"}}
 ```
 
 > PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
@@ -1560,7 +1567,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Event has been marked as completed.","type":"success"}}
+{"response":{"msg":"Event has been marked as completed.","type":"success"}}
 ```
 
 > DELETE ./api/api.php/calendar/schedule/{id}
@@ -1574,7 +1581,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Event has been deleted.","type":"success"}}
+{"response":{"msg":"Event has been deleted.","type":"success"}}
 ```
 
 > GET ./api/api.php/calendar/timesheet/{date Y-m-d}/{date Y-m-d}
@@ -1618,7 +1625,7 @@ Parameters
 
 Sample response
 ```
-{"body":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
+{"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
 ```
 
 [Content](#content)
@@ -1638,7 +1645,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"datalist","content":["Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":[],"Otto Bock":{"selected":true}}},{"type":"searchinput","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"}}],[{"type":"textinput","attributes":{"name":"Name","required":true,"value":"Otto Bock"}},{"type":"textarea","attributes":{"name":"Info","value":"&lt;&gt;","rows":8}},{"type":"radio","attributes":{"name":"vendor active"},"content":{"active and available":{"checked":true},"inactive, delete products":[]}}],....
+{"render":{"content":[[{"type":"datalist","content":["Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":[],"Otto Bock":{"selected":true}}},{"type":"search","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"}}],[{"type":"text","attributes":{"name":"Name","required":true,"value":"Otto Bock"}},{"type":"textarea","attributes":{"name":"Info","value":"&lt;&gt;","rows":8}},{"type":"radio","attributes":{"name":"vendor active"},"content":{"active and available":{"checked":true},"inactive, delete products":[]}}],....
 ```
 
 > POST ./api/api.php/consumables/vendor
@@ -1653,7 +1660,7 @@ Parameters
 Sample response
 ```
 
-{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+{"response":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
 ```
 
 > PUT ./api/api.php/consumables/vendor/{id}
@@ -1668,7 +1675,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
+{"response":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
 ```
 
 > GET ./api/api.php/consumables/product/{id}
@@ -1703,7 +1710,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
+{"response":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
 ```
 
 > GET ./api/api.php/consumables/mdrsamplecheck/{id}
@@ -1717,7 +1724,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"text","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
+{"render":{"content":[[{"type":"textblock","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
 ```
 
 > POST ./api/api.php/consumables/mdrsamplecheck/{id}
@@ -1732,7 +1739,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Sample check has been saved","type":"success"}}
+{"response":{"msg":"Sample check has been saved","type":"success"}}
 ```
 
 > DELETE ./api/api.php/consumables/mdrsamplecheck
@@ -1746,7 +1753,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Sample check has been revoked","type":"success"}}
+{"response":{"msg":"Sample check has been revoked","type":"success"}}
 ```
 
 > POST ./api/api.php/consumables/incorporation
@@ -1772,7 +1779,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
+{"render":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
 ```
 
 > GET ./api/api.php/consumables/products_with_expiry_dates/{id}
@@ -1786,7 +1793,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"text","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
+{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
 ```
 
 [Content](#content)
@@ -1804,7 +1811,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"datalist","content":["testfilter"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', 'filter', this.value)"},"content":{"...Select filter":{"value":"0"},"testfilter":{"value":3,"selected":true}}},{"type":"searchinput","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"}}],[{"type":"file","hint":"with a name like Export.+?\\.csv","attributes":{"name":"Select input file","required":true,"accept":".csv"}},{"type":"br"},{"type":"numberinput","attributes":{"name":"Month","value":"06","readonly":true}},....
+{"render":{"content":[[{"type":"datalist","content":["testfilter"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', 'filter', this.value)"},"content":{"...Select filter":{"value":"0"},"testfilter":{"value":3,"selected":true}}},{"type":"search","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"}}],[{"type":"file","hint":"with a name like Export.+?\\.csv","attributes":{"name":"Select input file","required":true,"accept":".csv"}},{"type":"br"},{"type":"number","attributes":{"name":"Month","value":"06","readonly":true}},....
 ```
 
 > POST ./api/api.php/csvfilter/filter/{id}
@@ -1833,7 +1840,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"datalist","content":["test"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0"},"test":{"value":1,"selected":true}}},{"type":"searchinput","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"}}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":....
+{"render":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"datalist","content":["test"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0"},"test":{"value":1,"selected":true}}},{"type":"search","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"}}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":....
 ```
 
 > POST ./api/api.php/csvfilter/rule
@@ -1847,7 +1854,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"name":"test","msg":"The filter named test has been saved.","type":"success"}}
+{"response":{"name":"test","msg":"The filter named test has been saved.","type":"success"}}
 ```
 
 [Content](#content)
@@ -1866,7 +1873,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}}
+{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}
 ```
 
 > GET ./api/api.php/file/files/{directory}
@@ -1880,7 +1887,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}}
+{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}
 ```
 
 > GET ./api/api.php/file/filemanager/{directory}
@@ -1894,7 +1901,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','filemanager')"},"content":[[{"type":"links","description":"Folder created on 2024-01-31 15:14","content":{"test":{"href":"javascript:api.file('get','filemanager','test')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","type":"button","onpointerup":"new Dialog({type:....
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','filemanager')"},"content":[[{"type":"links","description":"Folder created on 2024-01-31 15:14","content":{"test":{"href":"javascript:api.file('get','filemanager','test')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","type":"button","onpointerup":"new Dialog({type:....
 ```
 
 > POST ./api/api.php/file/filemanager
@@ -1908,7 +1915,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Upload has been completed","redirect":["filemanager","test"],"type":"success"}}
+{"response":{"msg":"Upload has been completed","redirect":["filemanager","test"],"type":"success"}}
 ```
 
 > DELETE ./api/api.php/file/filemanager/{directory}/{file}
@@ -1923,7 +1930,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"test3 has been permanently deleted","redirect":["filemanager", null ],"type":"success"}}
+{"response":{"msg":"test3 has been permanently deleted","redirect":["filemanager", null ],"type":"success"}}
 ```
 
 > GET ./api/api.php/file/externalfilemanager
@@ -1937,7 +1944,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','externalfilemanager')"},"content":[[{"type":"filterinput","attributes":{"name":"Filter by file name","onkeypress":"if (event.key ==='Enter'){api.file('get','filter','null', this.value); return false;}","onblur":"api.file('get','filter','null', this.value); return false;","id":"filefilter"}}],[{"type":"links","description":"Introduced 2024-05-11 23:32, retired 2024-05-11 23:322 by error on line 1",....
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','externalfilemanager')"},"content":[[{"type":"filter","attributes":{"name":"Filter by file name","onkeypress":"if (event.key ==='Enter'){api.file('get','filter','null', this.value); return false;}","onblur":"api.file('get','filter','null', this.value); return false;","id":"filefilter"}}],[{"type":"links","description":"Introduced 2024-05-11 23:32, retired 2024-05-11 23:322 by error on line 1",....
 ```
 
 > POST ./api/api.php/file/externalfilemanager
@@ -1951,7 +1958,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Upload has been completed","type":"success"}}
+{"response":{"msg":"Upload has been completed","type":"success"}}
 ```
 
 > PUT ./api/api.php/file/externalfilemanager/{id}/{value}
@@ -1966,7 +1973,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Regulatory context has been updated","type":"success"}}
+{"response":{"msg":"Regulatory context has been updated","type":"success"}}
 ```
 
 > GET ./api/api.php/file/bundlefilter/{query}
@@ -1980,7 +1987,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"data":["9"]}}
+{"data":["9"]}
 ```
 
 > GET ./api/api.php/file/bundle
@@ -1994,7 +2001,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"filterinput","attributes":{"name":"Filter by bundle name","onkeypress":"if (event.key ==='Enter'){api.file('get','bundlefilter', this.value); return false;}","onblur":"api.file('get','bundlefilter', this.value); return false;","id":"filesearch"}}],[{"type":"links","description":"einkauf","content":{"einkauf.png":{"href":"./fileserver/documents/test2/....
+{"render":{"content":[[{"type":"filter","attributes":{"name":"Filter by bundle name","onkeypress":"if (event.key ==='Enter'){api.file('get','bundlefilter', this.value); return false;}","onblur":"api.file('get','bundlefilter', this.value); return false;","id":"filesearch"}}],[{"type":"links","description":"einkauf","content":{"einkauf.png":{"href":"./fileserver/documents/test2/....
 ```
 
 > POST ./api/api.php/file/bundlemanager
@@ -2008,7 +2015,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"name":"external","msg":"Bundle external has been saved","type":"success"}}
+{"response":{"name":"external","msg":"Bundle external has been saved","type":"success"}}
 ```
 
 > GET ./api/api.php/file/bundlemanager/{bundle}
@@ -2022,7 +2029,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','bundlemanager')"},"content":[[{"type":"datalist","content":["einkauf","external","test"],"attributes":{"id":"bundles"}},{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get','bundlemanager', this.value)"},"content":{"...":[],"einkauf":[],"external":[],"test":{"selected": true }}},....
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','bundlemanager')"},"content":[[{"type":"datalist","content":["einkauf","external","test"],"attributes":{"id":"bundles"}},{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get','bundlemanager', this.value)"},"content":{"...":[],"einkauf":[],"external":[],"test":{"selected": true }}},....
 ```
 
 > GET ./api/api.php/file/sharepoint
@@ -2036,7 +2043,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"form":{"data-usecase":"file","action":"javascript:api.file('post','sharepoint')"},"content":[[{"type":"filterinput","attributes":{"name":"Filter by file name","onkeypress":"if (event.key ==='Enter'){api.file('get','filter','sharepoint', this.value); return false;}","onblur":"api.file('get','filter','sharepoint', this.value); return false;","id":"filefilter"}}],[{"type":"links","content":....
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','sharepoint')"},"content":[[{"type":"filter","attributes":{"name":"Filter by file name","onkeypress":"if (event.key ==='Enter'){api.file('get','filter','sharepoint', this.value); return false;}","onblur":"api.file('get','filter','sharepoint', this.value); return false;","id":"filefilter"}}],[{"type":"links","content":....
 ```
 
 > POST ./api/api.php/file/sharepoint
@@ -2050,7 +2057,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Upload has been completed","redirect":["sharepoint"],"type":"success"}}
+{"response":{"msg":"Upload has been completed","redirect":["sharepoint"],"type":"success"}}
 ```
 
 [Content](#content)
@@ -2068,7 +2075,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
+{"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
 ```
 
 > GET ./api/api.php/form/form_editor/{name|id}
@@ -2088,7 +2095,7 @@ Parameters
 
 Sample response
 ```
-{"id":"25","name":"fertigungsauftrag","alias":"","context":"component","date":"2024-03-18 13:48:00","author":"error on line 1","content":{"content":[[{"attributes":{"name":"fertigungsauftrag","required": true },"type":"textarea","texttemplates": true }]],"form":[]},"hidden":"0","approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-03 09:07\"},....
+{"render":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","description":"incorporation","hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
 ```
 
 > POST ./api/api.php/form/component
@@ -2116,7 +2123,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
+{"response":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
 ```
 
 > GET ./api/api.php/form/approval/{id}
@@ -2130,7 +2137,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"select","attributes":{"name":"Select component to approve","onchange":"api.form('get','approval', this.value)"},"content":{"signature1":{"value":"43","selected": true },"signature2":{"value":"44"}}},{"type":"select","attributes":{"name":"Select form to approve","onchange":"api.form('get','approval', this.value)"},"content":{"testform":{"value":"51"}}}],....
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select component to approve","onchange":"api.form('get','approval', this.value)"},"content":{"signature1":{"value":"43","selected": true },"signature2":{"value":"44"}}},{"type":"select","attributes":{"name":"Select form to approve","onchange":"api.form('get','approval', this.value)"},"content":{"testform":{"value":"51"}}}],....
 ```
 
 > PUT ./api/api.php/form/approval/{id}
@@ -2145,7 +2152,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"}}
+{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"}}
 ```
 
 > GET ./api/api.php/form/form/{name|id}
@@ -2181,7 +2188,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","type":"button","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/ios/256.png","user":"CARO App","text":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
+{"render":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","type":"button","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/ios/256.png","user":"CARO App","textblock":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
 ```
 
 > DELETE ./api/api.php/message/conversation/{user id}
@@ -2195,7 +2202,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Conversation successfully deleted","redirect": false,"type":"success"}}
+{"response":{"msg":"Conversation successfully deleted","redirect": false,"type":"success"}}
 ```
 
 > POST ./api/api.php/message/message
@@ -2209,7 +2216,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Message successfully sent","redirect": false,"type":"success"}}
+{"response":{"msg":"Message successfully sent","redirect": false,"type":"success"}}
 ```
 
 > GET ./api/api.php/message/register
@@ -2223,7 +2230,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[[{"type":"links","description":"Unit Administration","content":{"error on line 1":{"href":"javascript:void(0)","data-type":"input","onpointerup":"_client.message.newMessage('Message to error on line 1','error on line 1','',{},[])"}}}],[{"type":"links","description":"Unit CAD","content":{"error on line 1":{"href":....
+{"render":{"content":[[[{"type":"links","description":"Unit Administration","content":{"error on line 1":{"href":"javascript:void(0)","data-type":"","onpointerup":"_client.message.newMessage('Message to error on line 1','error on line 1','',{},[])"}}}],[{"type":"links","description":"Unit CAD","content":{"error on line 1":{"href":....
 ```
 
 [Content](#content)
@@ -2259,7 +2266,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"form": {"data-usecase": "purchase","action": "javascript:api.purchase('post', 'order')"},"content": [[{"type": "scanner","destination": "productsearch"},{"type": "select","content": {"... all vendors": {"value": "21_4_5_15_16_17_6_7_31_30_33_22_8_32_23_34_9_18_2_3_10_12_11_29_19_13_14_20_24_1_25_26_27_28"},"Basko": {"value": "21"},"Caroli": {"value": "4"},"Feet Control": {"value": "5"},....
+{"render": {"form": {"data-usecase": "purchase","action": "javascript:api.purchase('post', 'order')"},"content": [[{"type": "scanner","destination": "productsearch"},{"type": "select","content": {"... all vendors": {"value": "21_4_5_15_16_17_6_7_31_30_33_22_8_32_23_34_9_18_2_3_10_12_11_29_19_13_14_20_24_1_25_26_27_28"},"Basko": {"value": "21"},"Caroli": {"value": "4"},"Feet Control": {"value": "5"},....
 ```
 
 > POST ./api/api.php/order/order
@@ -2273,7 +2280,7 @@ Parameters
 
 Sample response
 ```
-{"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}
+{"response": {"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}}
 ```
 
 > PUT ./api/api.php/order/order/{id}
@@ -2288,7 +2295,7 @@ Parameters
 
 Sample response
 ```
-{"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}
+{"response": {"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}}
 ```
 
 > DELETE ./api/api.php/order/order/{id}
@@ -2302,7 +2309,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
 ```
 
 > GET ./api/api.php/order/prepared/{unit}
@@ -2316,7 +2323,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "radio","attributes": {"name": "Organizational unit"},"content": {"Administration": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'admin')"},"Office/Purchase": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'office')"},....
+{"render": {"content": [[{"type": "radio","attributes": {"name": "Organizational unit"},"content": {"Administration": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'admin')"},"Office/Purchase": {"name": "Organizational_unit","onchange": "api.purchase('get', 'prepared', 'office')"},....
 ```
 
 > PUT ./api/api.php/order/prepared
@@ -2330,7 +2337,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"id": false,"msg": "Approved order can now be processed by the purchase department.","type": "success"}}
+{"response": {"id": false,"msg": "Approved order can now be processed by the purchase department.","type": "success"}}
 ```
 
 > GET ./api/api.php/order/productsearch/{vendor_id}/{search}/{_borrowedModule}
@@ -2346,7 +2353,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[[{"type": "text","description": "Add article from 1 matches"},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "text","description": "Incorporation pending","content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
+{"render": {"content": [[[{"type": "textblock","description": "Add article from 1 matches"},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "textblock","description": "Incorporation pending","content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
 ```
 
 > GET ./api/api.php/order/approved/
@@ -2360,7 +2367,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "radio","attributes": {"name": "Filter"},"content": {"Unprocessed": {"checked": true,"onchange": "_client.order.filter()"},"Order processed": {"onchange": "_client.order.filter(\"ordered\")"},"Received in full": {"onchange": "_client.order.filter(\"received\")"},"Archived": {"onchange": "_client.order.filter(\"archived\")"}}},{"type": "searchinput","attributes": {"name": "Or filter by term","onkeypress": "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",....
+{"render": {"content": [[{"type": "radio","attributes": {"name": "Filter"},"content": {"Unprocessed": {"checked": true,"onchange": "_client.order.filter()"},"Order processed": {"onchange": "_client.order.filter(\"ordered\")"},"Received in full": {"onchange": "_client.order.filter(\"received\")"},"Archived": {"onchange": "_client.order.filter(\"archived\")"}}},{"type": "search","attributes": {"name": "Or filter by term","onkeypress": "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",....
 ```
 
 > PUT ./api/api.php/order/approved/{id}/{update}/{state}
@@ -2382,7 +2389,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"msg": "Information has been added set","type": "info"}}
+{"response": {"msg": "Information has been added set","type": "info"}}
 ```
 
 > DELETE ./api/api.php/order/approved/{id}
@@ -2396,7 +2403,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
 ```
 
 > GET ./api/api.php/order/filter/{search}
@@ -2410,7 +2417,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"data": ["89","90"]}}
+{"data": ["89","90"]}
 ```
 
 [Content](#content)
@@ -2428,7 +2435,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'identifier')"},"content": [[{"type": "text","description": "Create an identifier that will connect database entries. A current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet."},{"type": "scanner","hint": "e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended.","attributes": {"name": "Identifying data","maxlength": 128}}]]}}
+{"render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'identifier')"},"content": [[{"type": "textblock","description": "Create an identifier that will connect database entries. A current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet."},{"type": "scanner","hint": "e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended.","attributes": {"name": "Identifying data","maxlength": 128}}]]}}
 ```
 
 > POST ./api/api.php/record/identifier
@@ -2442,7 +2449,7 @@ Parameters
 
 Sample response
 ```
-{"body": [{"type": "links","description": "Open the link, print the identifiers and use them where applicable.","content": {"Identifying data": {"href": "./fileserver/tmp/test202406131600.pdf"}}}]}
+{"render": [{"type": "links","description": "Open the link, print the identifiers and use them where applicable.","content": {"Identifying data": {"href": "./fileserver/tmp/test202406131600.pdf"}}}]}
 ```
 
 > GET ./api/api.php/record/records
@@ -2456,7 +2463,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filterinput","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
+{"render": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filter","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
 ```
 
 > GET ./api/api.php/record/recordfilter/{search}
@@ -2470,7 +2477,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"data": ["5","7"],"filter": "some"}}
+{"data": ["5","7"]}
 ```
 
 > GET ./api/api.php/record/forms
@@ -2484,7 +2491,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filterinput","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}","onblur": "api.record('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
+{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filter","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}","onblur": "api.record('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
 ```
 
 > GET ./api/api.php/record/formfilter/{search}
@@ -2498,7 +2505,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"data": ["26"]}}
+{"response": {"data": ["26"]}}
 ```
 
 > GET ./api/api.php/record/form/{name}/{identifier}
@@ -2513,7 +2520,7 @@ Parameters
 
 Sample response
 ```
-{"title": "Kontakt","body": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hiddeninput","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hiddeninput","attributes": {"name": "form_name","value": "Kontakt"}},....
+{"title": "Kontakt","render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hidden","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hidden","attributes": {"name": "form_name","value": "Kontakt"}},....
 ```
 
 > GET ./api/api.php/record/matchbundles/{bundle}/{identifier}
@@ -2528,7 +2535,7 @@ Parameters
 
 Sample response
 ```
-{"body": [{"type": "links","description": "Some forms seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'form', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'form', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
+{"render": [{"type": "links","description": "Some forms seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'form', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'form', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
 ```
 
 > GET ./api/api.php/record/record/{identifier}
@@ -2542,7 +2549,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[{"type":"text","description":"Identifying data","content":"testpatient2"}],[{"type":"text","description":"Form identify yourself version 2024-06-13 21:54:47"},{"type":"text","description":"text input","content":"yxcv (error on line 1 on 2024-06-13 22:05:48)\n"},{"type":"button","attributes":{"value":"Export records from this form only","onpointerup":"api.record('get', 'formexport', 'testpatient2', 'Form identify yourself version 2024-06-13 21:54:47')"}}],....
+{"render":{"content":[[{"type":"textblock","description":"Identifying data","content":"testpatient2"}],[{"type":"textblock","description":"Form identify yourself version 2024-06-13 21:54:47"},{"type":"textblock","description":"text ","content":"yxcv (error on line 1 on 2024-06-13 22:05:48)\n"},{"type":"button","attributes":{"value":"Export records from this form only","onpointerup":"api.record('get', 'formexport', 'testpatient2', 'Form identify yourself version 2024-06-13 21:54:47')"}}],....
 ```
 
 > POST ./api/api.php/record/record
@@ -2556,7 +2563,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"msg": "The record has been saved.","type": "success"}}
+{"response": {"msg": "The record has been saved.","type": "success"}}
 ```
 
 > PUT ./api/api.php/record/close/{identifier}
@@ -2570,7 +2577,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
+{"response": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
 ```
 
 > GET ./api/api.php/record/import/{identifier}
@@ -2584,7 +2591,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_input":"qwer"},"type":"success"}}
+{"response":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_":"qwer"},"type":"success"}}
 ```
 
 > GET ./api/api.php/records/exportform/{id}
@@ -2598,7 +2605,7 @@ Parameters
 
 Sample response
 ```
-{"body":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
+{"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
 ```
 
 > GET ./api/api.php/records/fullexport/{identifier}
@@ -2612,7 +2619,7 @@ Parameters
 
 Sample response
 ```
-{"body":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
+{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
 ```
 
 > GET ./api/api.php/records/simplifiedexport/{identifier}
@@ -2626,7 +2633,7 @@ Parameters
 
 Sample response
 ```
-{"body":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
 ```
 
 [Content](#content)
@@ -2644,7 +2651,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', 'chunk')"},"content":[[[{"type":"datalist","content":["eins","text"],"attributes":{"id":"chunks"}},{"type":"datalist","content":["de"],"attributes":{"id":"languages"}},{"type":"select","attributes":{"name":"Edit latest chunk","onchange":"api.texttemplate('get', 'chunk', this.value)"},"content":{"...New chunk":{"value":"0"},"Administration Text eins (de)":{"value":3,"selected":true},"Administration Replacement text (de)":{"value":2}}},{"type":"searchinput","attributes":{"name":"Search name","list":"chunks","onkeypress":"if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"}}],....
+{"render":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', 'chunk')"},"content":[[[{"type":"datalist","content":["eins","textblock"],"attributes":{"id":"chunks"}},{"type":"datalist","content":["de"],"attributes":{"id":"languages"}},{"type":"select","attributes":{"name":"Edit latest chunk","onchange":"api.texttemplate('get', 'chunk', this.value)"},"content":{"...New chunk":{"value":"0"},"Administration Text eins (de)":{"value":3,"selected":true},"Administration Replacement text (de)":{"value":2}}},{"type":"search","attributes":{"name":"Search name","list":"chunks","onkeypress":"if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"}}],....
 ```
 
 > POST ./api/api.php/texttemplate/chunk
@@ -2658,7 +2665,7 @@ Parameters
 
 Sample response
 ```
-{"status":{"name":"eins","msg":"The chunk named eins has been saved.","type":"success"}}
+{"response":{"name":"eins","msg":"The chunk named eins has been saved.","type":"success"}}
 ```
 
 > GET ./api/api.php/texttemplate/template/{id}
@@ -2685,7 +2692,7 @@ Parameters
 
 Sample response
 ```
-{"body":{"content":[[[{"type":"select","attributes":{"name":"Select text recommendation for Administration","onchange":"api.texttemplate('get', 'text', this.value)"},"content":{"...":{"value":"0"},"text (de)":{"value":4,"selected":true}}}]],[{"type":"radio","attributes":{"name":"Adressee \/ subject","id":"genus"},"content":{"Child female":{"value":0,"data-loss":"prevent"},"Child male":{"value":1,"data-loss":"prevent"},"Child genderless":{"value":2,"data-loss":"prevent"},"Adult female":{"value":3,"data-loss":"prevent"},"Adult male":{"value":4,"data-loss":"prevent"},"Adult genderless":{"value":5,"data-loss":"prevent"},"Informal you":{"value":6,"data-loss":"prevent"},"Formal you":{"value":7,"data-loss":"prevent"}}},....
+{"render":{"content":[[[{"type":"select","attributes":{"name":"Select text recommendation for Administration","onchange":"api.texttemplate('get', 'textblock', this.value)"},"content":{"...":{"value":"0"},"text (de)":{"value":4,"selected":true}}}]],[{"type":"radio","attributes":{"name":"Adressee \/ subject","id":"genus"},"content":{"Child female":{"value":0,"data-loss":"prevent"},"Child male":{"value":1,"data-loss":"prevent"},"Child genderless":{"value":2,"data-loss":"prevent"},"Adult female":{"value":3,"data-loss":"prevent"},"Adult male":{"value":4,"data-loss":"prevent"},"Adult genderless":{"value":5,"data-loss":"prevent"},"Informal you":{"value":6,"data-loss":"prevent"},"Formal you":{"value":7,"data-loss":"prevent"}}},....
 ```
 
 [Content](#content)
@@ -2703,7 +2710,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
+{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
 ```
 
 > POST ./api/api.php/tool/code/{type}
@@ -2718,7 +2725,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
+{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
 ```
 
 > GET ./api/api.php/tool/scanner
@@ -2732,7 +2739,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "scanner","description": "2D-scanner","destination": "tool_scanner"},{"type": "textarea","attributes": {"name": "Result","rows": 8,"readonly": true,"id": "tool_scanner"}}]]}}
+{"render": {"content": [[{"type": "scanner","description": "2D-scanner","destination": "tool_scanner"},{"type": "textarea","attributes": {"name": "Result","rows": 8,"readonly": true,"id": "tool_scanner"}}]]}}
 ```
 
 > GET ./api/api.php/tool/stlviewer
@@ -2746,11 +2753,11 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "select","attributes": {"name": "Select file to view","onchange": "_client.tool.initStlViewer('../' + this.value)"},"content": {"...": {"value": "null"},"../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl": {"value": "../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl"}}},{"type": "stlviewer"}]]}}
+{"render": {"content": [[{"type": "select","attributes": {"name": "Select file to view","onchange": "_client.tool.initStlViewer('../' + this.value)"},"content": {"...": {"value": "null"},"../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl": {"value": "../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl"}}},{"type": "stlviewer"}]]}}
 ```
 Sample response if no files are available
 ```
-{"body": {"content": [[{"type": "nocontent","content": "Currently there are no files, everything is tidied up :)"}]]}}
+{"render": {"content": [[{"type": "nocontent","content": "Currently there are no files, everything is tidied up :)"}]]}}
 ```
 
 [Content](#content)
@@ -2768,7 +2775,7 @@ Parameters
 
 Sample response
 ```
-{"content": [[{"type": "text","description": "Your data within CARO","content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
+{"content": [[{"type": "textblock","description": "Your data within CARO","content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
 ```
 
 > POST ./api/api.php/user/profile
@@ -2782,7 +2789,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
 ```
 
 > GET ./api/api.php/user/user/{id|name}
@@ -2796,7 +2803,7 @@ Parameters
 
 Sample response
 ```
-{"body": {"content": [[{"type": "datalist","content": ["armprothetik","CARO App","error on line 1","testuser"],"attributes": {"id": "users"}},{"type": "select","attributes": {"name": "Edit existing user","onchange": "api.user('get', 'user', this.value)"},"content": {"...New user": [],"armprothetik": [],"CARO App": [],"error on line 1": {"selected": true},"testuser": []}},{"type": "searchinput","attributes": {"name": "Search by name","list": "users","onkeypress": "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"}}],....
+{"render": {"content": [[{"type": "datalist","content": ["armprothetik","CARO App","error on line 1","testuser"],"attributes": {"id": "users"}},{"type": "select","attributes": {"name": "Edit existing user","onchange": "api.user('get', 'user', this.value)"},"content": {"...New user": [],"armprothetik": [],"CARO App": [],"error on line 1": {"selected": true},"testuser": []}},{"type": "search","attributes": {"name": "Search by name","list": "users","onkeypress": "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"}}],....
 ```
 
 > POST ./api/api.php/user/user
@@ -2810,7 +2817,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
 ```
 
 > PUT ./api/api.php/user/user/{id}
@@ -2825,7 +2832,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
 ```
 
 > DELETE ./api/api.php/user/user/{id}
@@ -2839,7 +2846,7 @@ Parameters
 
 Sample response
 ```
-{"status": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
+{"response": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
 ```
 
 [Content](#content)
