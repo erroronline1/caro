@@ -1081,14 +1081,13 @@ class ORDER extends API {
 							LANG::GET('order.received')=>['onchange' => '_client.order.filter("received")'],
 							LANG::GET('order.archived')=>['onchange' => '_client.order.filter("archived")'],
 						]],
-						['type' => 'search',
+						['type' => 'filtered',
 						'attributes' => [
 							'name' => LANG::GET('order.order_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
 							'onblur' => "api.purchase('get', 'filter', this.value); return false;",
 							'id' => 'productsearch'
-						]],
-						['type' => 'filter']
+						]]
 					]
 				]]];
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders

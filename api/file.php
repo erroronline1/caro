@@ -93,7 +93,7 @@ class FILE extends API {
 		'content' => [
 				[
 					[
-						'type' => 'filter',
+						'type' => 'filtered',
 						'attributes' => [
 							'name' => LANG::GET('file.file_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
@@ -255,7 +255,7 @@ class FILE extends API {
 					if ($files){
 						$result['render']['content'][] = [
 							[
-								'type' => 'filter',
+								'type' => 'filtered',
 								'attributes' => [
 									'name' => LANG::GET('file.file_filter_label'),
 									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
@@ -436,7 +436,7 @@ class FILE extends API {
 				if ($files){
 					$result['render']['content'][] = [
 						[
-							'type' => 'filter',
+							'type' => 'filtered',
 							'attributes' => [
 								'name' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}",
@@ -521,7 +521,7 @@ class FILE extends API {
 			'content' => [
 				[
 					[
-						'type' => 'filter',
+						'type' => 'filtered',
 						'attributes' => [
 							'name' => LANG::GET('file.bundle_filter_label'),
 							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
@@ -760,7 +760,7 @@ class FILE extends API {
 				if ($display){
 					$result['render']['content'][] = [
 						[
-							'type' => 'filter',
+							'type' => 'filtered',
 							'attributes' => [
 								'name' => LANG::GET('file.file_filter_label'),
 								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",

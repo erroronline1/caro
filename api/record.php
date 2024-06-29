@@ -229,7 +229,7 @@ class RECORD extends API {
 							'id' => 'forms'
 						]
 					], [
-						'type' => 'filter',
+						'type' => 'filtered',
 						'attributes' => [
 							'name' => LANG::GET('record.form_filter'),
 							'list' => 'forms',
@@ -668,7 +668,7 @@ class RECORD extends API {
 					'destination' => 'recordfilter',
 					'description' => LANG::GET('record.record_scan')
 				], [
-					'type' => 'filter',
+					'type' => 'filtered',
 					'hint' => LANG::GET('record.record_filter_hint', [':max' => INI['limits']['max_records']]),
 					'attributes' => [
 						'id' => 'recordfilter',

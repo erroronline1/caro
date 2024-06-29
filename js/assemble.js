@@ -907,7 +907,7 @@ export class Assemble {
 	search() {
 		return this.input("search");
 	}
-	filter() {
+	filtered() { // filter appears to be reserved
 		return this.input("search");
 	}
 	tel() {

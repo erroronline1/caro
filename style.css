@@ -1048,7 +1048,7 @@ button[data-type="calendarbutton"]::before {
 	mask-image: url("./media/at.svg");
 }
 
-[data-type="filter"]::before {
+[data-type="filtered"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/filter.svg");
 	mask-image: url("./media/filter.svg");
