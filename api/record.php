@@ -85,16 +85,16 @@ class RECORD extends API {
 						]
 					];
 					$this->response([
-						'body' => $body
+						'render' => $body
 					]);
 				}
-				else $this->response(['status' => [
+				else $this->response(['response' => [
 					'msg' => LANG::GET('record.create_identifier_error'),
 					'type' => 'error'
 				]]);
 				break;
 			case 'GET':
-				$result=['body'=>
+				$result=['render' =>
 				[
 					'form' => [
 						'data-usecase' => 'record',
@@ -186,22 +186,21 @@ class RECORD extends API {
 				}
 			}
 		}
-		$this->response(['status' => [
+		$this->response([
 			'data' => array_values(array_unique($matches))
-		]]);
+		]);
 	}
 
 	public function recordfilter(){
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
-		$matches = [];
+		$matches = $all = [];
 		foreach($records as $row) {
 			similar_text($this->_requestedID, $row['identifier'], $percent);
 			if (($percent >= INI['likeliness']['records_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
 		}
-		$this->response(['status' => [
-			'data' => $matches,
-			'filter' => !$this->_requestedID ? 'all': 'some'
-		]]);
+		$this->response([
+			'data' => $this->_requestedID ? $matches : array_map(Fn($row) => strval($row['id']), $records)
+		]);
 	}
 
 	public function forms(){
@@ -220,7 +219,7 @@ class RECORD extends API {
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
 			}
 		}
-		$return['body'] = [
+		$return['render'] = [
 			'content' => [
 				[
 					[
@@ -249,7 +248,7 @@ class RECORD extends API {
 					break;
 				}
 			}
-			$return['body']['content'][] = 					[
+			$return['render']['content'][] = 					[
 				'type' => 'links',
 				'description' => $contexttranslation,
 				'content' => $list
@@ -262,15 +261,15 @@ class RECORD extends API {
 	public function form(){
 		// prepare existing forms lists
 		$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
-		if (!$form || $form['hidden']) $this->response(['status' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$form || $form['hidden']) $this->response(['response' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
-		$return = ['title'=> $form['name'], 'body' => [
+		$return = ['title'=> $form['name'], 'render' => [
 			'form' => [
 				'data-usecase' => 'record',
 				'action' => "javascript:api.record('post', 'record')",
 				'data-confirm' => true],
 			'content' => []
-			]];
+		]];
 
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		function setidentifier($element, $identify, $calendar){
@@ -300,7 +299,7 @@ class RECORD extends API {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			if ($component){
 				$component['content'] = json_decode($component['content'], true);
-				array_push($return['body']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
+				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
 			}
 		}
 		$context = [
@@ -325,7 +324,7 @@ class RECORD extends API {
 			]
 		];
 		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
-			$return['body']['content'][]= [
+			$return['render']['content'][] = [
 				[
 					'type' => 'button',
 					'hint' => LANG::GET('record.form_export_hint'),
@@ -338,15 +337,15 @@ class RECORD extends API {
 			];
 		}
 		else {
-			$return['body']['content'][]= [
+			$return['render']['content'][] = [
 				[
 					'type' => 'textblock',
 					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
 				]
 			];
 		}
-		if (array_key_exists('type', $return['body']['content'][0][0])) array_push($return['body']['content'][0], ...$context);
-		else array_push($return['body']['content'][0][0], ...$context);
+		if (array_key_exists('type', $return['render']['content'][0][0])) array_push($return['render']['content'][0], ...$context);
+		else array_push($return['render']['content'][0][0], ...$context);
 		$this->response($return);
 	}
 
@@ -378,17 +377,17 @@ class RECORD extends API {
 			$forms[$needed] = ['href' => "javascript:api.record('get', 'form', '" . $needed . "', '" . $this->_passedIdentify . "')"];
 		}
 
-		if ($forms) $return['body'] = [
+		if ($forms) $return['render'] = [
 			[
-					'type' => 'links',
-					'description' => LANG::GET('record.record_append_missing_form'),
-					'content' => $forms
+				'type' => 'links',
+				'description' => LANG::GET('record.record_append_missing_form'),
+				'content' => $forms
 			]
 		];
-		else $return['body'] =[
+		else $return['render'] =[
 			[
-					'type' => 'textblock',
-					'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
+				'type' => 'textblock',
+				'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
 			]
 		];
 		$this->response($return);
@@ -446,18 +445,18 @@ class RECORD extends API {
 						':content' => json_encode($this->_payload)
 					]
 				])) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('record.record_saved'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('record.record_error'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
-				$return = ['body' =>[]];
+				$return = ['render' => []];
 				$body = [];
 				$closed = false;
 				// summarize content
@@ -510,10 +509,10 @@ class RECORD extends API {
 							'value' => LANG::GET('record.record_form_export'),
 							'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')"
 						]
-						]);
+					]);
 				}
 		
-				$return['body']['content'] = $body;
+				$return['render']['content'] = $body;
 
 				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
 					// simple groups are not allowed to append to form
@@ -529,7 +528,7 @@ class RECORD extends API {
 						}
 					}
 
-					$return['body']['content'][] = [
+					$return['render']['content'][] = [
 						[
 							'type' => 'select',
 							'attributes' => [
@@ -553,11 +552,11 @@ class RECORD extends API {
 						]
 					];
 					if (PERMISSION::permissionFor('recordsclosing') && !$content['closed']){
-						array_unshift($return['body']['content'][count($return['body']['content']) - 1], [
+						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
 							'type' => 'button',
 							'attributes' => [
 								'value' => LANG::GET('record.record_mark_as_closed'),
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ."', 'body': '" . LANG::GET('record.record_mark_as_closed_info') . "', 'options':{".
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ."', render: '" . LANG::GET('record.record_mark_as_closed_info') . "', options:{".
 									"'" . LANG::GET('general.cancel_button') . "': false,".
 									"'" . LANG::GET('record.record_mark_as_closed') . "': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "')}})"
@@ -580,11 +579,10 @@ class RECORD extends API {
 			]
 		]);
 		$this->response([
-			'status' => [
+			'response' => [
 				'msg' => LANG::GET('record.record_mark_as_closed_info'),
 				'type' => 'success'
 			]]);
-
 	}
 
 	public function import(){
@@ -598,24 +596,25 @@ class RECORD extends API {
 			foreach($data as $row)
 				foreach(json_decode($row['content'], true) as $key => $value) $result[$key] = $value;
 			$this->response([
-			'status' => [
-				'msg' => LANG::GET('record.record_import_success'),
 				'data' => $result,
-				'type' => 'success'
-			]]);
+				'response' => [
+					'msg' => LANG::GET('record.record_import_success'),
+					'type' => 'success'
+				]
+			]);
 		}
 		else $this->response([
-			'status' => [
+			'response' => [
 				'msg' => LANG::GET('record.record_import_error'),
 				'type' => 'error'
 			]]);
 	}
 
 	public function records(){
-		$return = ['body' => ['content' => []]];
+		$return = ['render' => ['content' => []]];
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		if (!$data) {
-			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
+			$result['render']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
 			$this->response($result);		
 		}
 		$recorddatalist = $contexts = [];
@@ -698,7 +697,7 @@ class RECORD extends API {
 		}
 		array_push($content, ...$contextrows);
 
-		$result['body']['content'] = $content;
+		$result['render']['content'] = $content;
 		$this->response($result);		
 	}
 
@@ -730,7 +729,7 @@ class RECORD extends API {
 			]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 
@@ -806,7 +805,7 @@ class RECORD extends API {
 			'href' => PDF::formsPDF($summary)
 		];
 		$this->response([
-			'body' => [
+			'render' => [
 				[
 					'type' => 'links',
 					'description' =>  LANG::GET('record.form_export_proceed'),

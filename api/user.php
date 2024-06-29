@@ -85,13 +85,13 @@ class USER extends API {
 						':skills' => $user['skills']
 					]
 				]) !== false) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_not_saved'),
 						'type' => 'error'
@@ -139,7 +139,7 @@ class USER extends API {
 					}
 				}
 
-				$result['body']=['content' => [
+				$result['render'] = ['content' => [
 						[
 							['type' => 'textblock',
 							'description' => LANG::GET('user.display_user'),
@@ -170,7 +170,7 @@ class USER extends API {
 					]
 				];
 
-				if ($user['image']) $result['body']['content'][1]=[
+				if ($user['image']) $result['render']['content'][1] = [
 					[
 						[
 							'type' => 'image',
@@ -189,7 +189,7 @@ class USER extends API {
 							]
 						]
 					],
-				$result['body']['content'][1]
+				$result['render']['content'][1]
 				];
 
 				$languages = [];
@@ -197,7 +197,7 @@ class USER extends API {
 					$lang = explode('.', $file);
 					$languages[$lang[1]] = (array_key_exists('language', $user['app_settings']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
 				}
-				$result['body']['content'][] = [
+				$result['render']['content'][] = [
 					[
 						'type' => 'checkbox',
 						'description' => LANG::GET('user.settings'),
@@ -230,8 +230,8 @@ class USER extends API {
 						'content' => $primary_unit
 					]
 				];
-				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
-				if (array_key_exists('homeoffice', $user['app_settings']) && $user['app_settings']['homeoffice']) $result['body']['content'][count($result['body']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
+				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
+				if (array_key_exists('homeoffice', $user['app_settings']) && $user['app_settings']['homeoffice']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
 
 				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 				$userfiles = [];
@@ -241,7 +241,7 @@ class USER extends API {
 					}
 				}
 				if ($userfiles) {
-					array_push($result['body']['content'][0], 
+					array_push($result['render']['content'][0], 
 					['type' => 'br'],
 					[
 						'type' => 'links',
@@ -273,7 +273,7 @@ class USER extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -355,13 +355,13 @@ class USER extends API {
 						':skills' => implode(',', $user['skills'])
 					]
 				])) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => false,
 						'msg' => LANG::GET('user.edit_user_not_saved'),
 						'type' => 'error'
@@ -385,7 +385,7 @@ class USER extends API {
 				$user['name'] = UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name'));
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 				
 				// chain checked permission levels
@@ -473,13 +473,13 @@ class USER extends API {
 						':skills' => implode(',', $user['skills'])
 					]
 				]) !== false) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_not_saved'),
 						'type' => 'error'
@@ -516,7 +516,7 @@ class USER extends API {
 					'app_settings' => '',
 					'skills' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['status'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['response'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// display form for adding a new user with ini related permissions
 				$permissions = [];
@@ -574,7 +574,7 @@ class USER extends API {
 					];
 				}
 
-				$result['body']=['content' => [
+				$result['render'] = ['content' => [
 					[
 						[
 							'type' => 'datalist',
@@ -697,7 +697,7 @@ class USER extends API {
 							'attributes' => [
 								'value' => LANG::GET('user.edit_delete_button'),
 								'type' => 'button', // apparently defaults to submit otherwise
-								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', 'options':{".
+								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', options:{".
 									"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
 									"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
@@ -710,7 +710,7 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) $result['body']['content'][3] = [
+					if ($user['image']) $result['render']['content'][3] = [
 						[
 							[
 								'type' => 'image',
@@ -721,7 +721,7 @@ class USER extends API {
 								]
 							]
 						],
-						$result['body']['content'][3]
+						$result['render']['content'][3]
 					];
 
 					$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
@@ -732,7 +732,7 @@ class USER extends API {
 						}
 					}
 					if ($userfiles) {
-						array_push($result['body']['content'][4], 
+						array_push($result['render']['content'][4], 
 						['type' => 'br'],
 						[
 							'type' => 'links',
@@ -740,27 +740,29 @@ class USER extends API {
 						]);
 					}
 
-					if ($user['orderauth']) $result['body']['content'][5]=[
+					if ($user['orderauth']) $result['render']['content'][5]=[
 						[
-							['type' => 'text',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_order_authorization_current'),
-								'value' => $user['orderauth']
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('user.edit_order_authorization_current'),
+									'value' => $user['orderauth']
 								]
 							]
 						],
-						$result['body']['content'][5]
+						$result['render']['content'][5]
 					];
-					if ($user['token']) $result['body']['content'][7]=[
+					if ($user['token']) $result['render']['content'][7]=[
 						[
-							['type' => 'image',
-							'description' => LANG::GET('user.edit_export_qr_token'),
-							'attributes' => [
-							'name' => $user['name'] . '_token',
-							'qrcode' => $user['token']]
+							[
+								'type' => 'image',
+								'description' => LANG::GET('user.edit_export_qr_token'),
+								'attributes' => [
+								'name' => $user['name'] . '_token',
+								'qrcode' => $user['token']]
 							]
 						],
-						$result['body']['content'][7]
+						$result['render']['content'][7]
 					];
 
 				$this->response($result);
@@ -782,13 +784,13 @@ class USER extends API {
 						':id' => $user['id']
 					]
 				])) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('user.edit_user_deleted', [':name' => $user['name']]),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('user.edit_user_not_deleted', [':name' => $user['name']]),
 						'id' => $user['id'],
 						'type' => 'error'

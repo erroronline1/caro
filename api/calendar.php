@@ -48,7 +48,7 @@ class CALENDAR extends API {
 	 */
 	public function search(){
 		if (!$this->_requestedId) $this->schedule();
-		$result = ['body' => ['content' => [
+		$result = ['render' => ['content' => [
 			[
 				[
 					'type' => 'scanner',
@@ -74,7 +74,7 @@ class CALENDAR extends API {
 			]
 		];
 		if ($dbevents) $events = $this->scheduledEvents($dbevents, $calendar);
-		$result['body']['content'][] = $events;
+		$result['render']['content'][] = $events;
 		$this->response($result);
 	}
 
@@ -102,12 +102,12 @@ class CALENDAR extends API {
 
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
-			'status' => [
+			'response' => [
 				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
 				'type' => 'success'
 			]]);
 		else $this->response([
-			'status' => [
+			'response' => [
 				'msg' => LANG::GET('calendar.event_not_found'),
 				'type' => 'error'
 			]]);
@@ -224,20 +224,20 @@ class CALENDAR extends API {
 					':closed' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
-				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['status' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':span_end']){
 					$due = new DateTime($event[':span_start'], new DateTimeZone(INI['timezone']));
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
 				if ($newid = $calendar->post($event)) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $newid,
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => false,
 						'msg' => LANG::GET('calendar.event_error'),
 						'type' => 'error'
@@ -257,14 +257,14 @@ class CALENDAR extends API {
 					':closed' => '',
 					':alert' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_alert')) ? 1 : 0
 				];
-				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['status' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':span_end']){
 					$due = new DateTime($event[':span_start'], new DateTimeZone(INI['timezone']));
 					$due->modify('+' . INI['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
 				if ($calendar->put($event)) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $event[':id'],
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
@@ -276,13 +276,13 @@ class CALENDAR extends API {
 					unset($event[':id']);
 					$event[':type'] = 'schedule';
 					if ($newid = $calendar->post($event)) $this->response([
-						'status' => [
+						'response' => [
 							'id' => $newid,
 							'msg' => LANG::GET('calendar.event_success'),
 							'type' => 'success'
 						]]);
 					else $this->response([
-						'status' => [
+						'response' => [
 							'id' => false,
 							'msg' => LANG::GET('calendar.event_error'),
 							'type' => 'error'
@@ -290,14 +290,14 @@ class CALENDAR extends API {
 					}
 				break;
 			case 'GET':
-				$result = ['body' => ['content' => []]];
+				$result = ['render' => ['content' => []]];
 				$month = $calendar->render('month', 'schedule', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousmonth->modify('-1 month');
 				$nextmonth = clone $calendar->_days[6];
 				$nextmonth->modify('+1 month');
 
-				$result['body']['content'][] = [
+				$result['render']['content'][] = [
 					[
 						'type' => 'scanner',
 						'destination' => 'recordfilter',
@@ -312,7 +312,7 @@ class CALENDAR extends API {
 							]
 					]
 				];
-				$result['body']['content'][] = [
+				$result['render']['content'][] = [
 					[
 						'type' => 'calendar',
 						'description' => $month['header'],
@@ -369,7 +369,7 @@ class CALENDAR extends API {
 					];
 
 					if ($thisDaysEvents) array_push($events, ...$this->scheduledEvents($thisDaysEvents, $calendar));
-					$result['body']['content'][] = $events;
+					$result['render']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
 					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
@@ -389,7 +389,7 @@ class CALENDAR extends API {
 								]
 							];
 							array_push($events, ...$this->scheduledEvents($pastEvents, $calendar));
-							$result['body']['content'][] = $events;	
+							$result['render']['content'][] = $events;	
 						}
 					}
 				}
@@ -397,12 +397,12 @@ class CALENDAR extends API {
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
 				if ($calendar->delete($this->_requestedId)) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('calendar.event_not_found'),
 						'type' => 'error'
 					]]);
@@ -568,15 +568,15 @@ class CALENDAR extends API {
 					$misc['homeoffice'] = $homeoffice;
 				}
 				$event[':misc'] = json_encode($misc);
-				if (!($event[':span_start'] && $event[':span_end'] && ((array_key_exists('break', $misc) && $misc['break']) || $event[':subject']))) $this->response(['status' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':span_end'] && ((array_key_exists('break', $misc) && $misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
 				if ($newid = $calendar->post($event)) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $newid,
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => false,
 						'msg' => LANG::GET('calendar.event_error'),
 						'type' => 'error'
@@ -616,9 +616,9 @@ class CALENDAR extends API {
 				}
 
 				$event[':misc'] = json_encode($misc);
-				if (!($event[':span_start'] && $event[':span_end'] && ((array_key_exists('break', $misc) && $misc['break']) || $event[':subject']))) $this->response(['status' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':span_end'] && ((array_key_exists('break', $misc) && $misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
 				if ($calendar->put($event)) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $event[':id'],
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
@@ -630,13 +630,13 @@ class CALENDAR extends API {
 					unset($event[':id']);
 					$event[':type'] = 'timesheet';
 					if ($newid = $calendar->post($event)) $this->response([
-						'status' => [
+						'response' => [
 							'id' => $newid,
 							'msg' => LANG::GET('calendar.event_success'),
 							'type' => 'success'
 						]]);
 					else $this->response([
-						'status' => [
+						'response' => [
 							'id' => false,
 							'msg' => LANG::GET('calendar.event_error'),
 							'type' => 'error'
@@ -644,14 +644,14 @@ class CALENDAR extends API {
 					}
 				break;
 			case 'GET':
-				$result = ['body' => ['content' => []]];
+				$result = ['render' => ['content' => []]];
 				$month = $calendar->render('month', 'timesheet', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousmonth->modify('-1 month');
 				$nextmonth = clone $calendar->_days[6];
 				$nextmonth->modify('+1 month');
 
-				$result['body']['content'][] = [
+				$result['render']['content'][] = [
 					[
 						'type' => 'calendar',
 						'description' => $month['header'],
@@ -737,7 +737,7 @@ class CALENDAR extends API {
 						]
 					];
 
-					$result['body']['content'][] = $events;
+					$result['render']['content'][] = $events;
 
 					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['timezone']));
 					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
@@ -757,7 +757,7 @@ class CALENDAR extends API {
 								]
 							];
 							array_push($events, ...$this->scheduledEvents($pastEvents, $calendar));
-							$result['body']['content'][] = $events;	
+							$result['render']['content'][] = $events;	
 						}
 					}
 				}
@@ -768,12 +768,12 @@ class CALENDAR extends API {
 				) $this->response([], 401);
 
 				if ($calendar->delete($this->_requestedId)) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('calendar.event_not_found'),
 						'type' => 'error'
 					]]);
@@ -928,7 +928,7 @@ class CALENDAR extends API {
 			]]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 

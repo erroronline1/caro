@@ -133,18 +133,20 @@ class TOOL extends API {
 			if ($this->_requestedType === $type) $options[$properties['name']]['selected'] = true;
 		}
 
-		$result['body'] = ['form' => [
+		$result['render'] = ['form' => [
 			'data-usecase' => 'tool_create_code',
 			'action' => "javascript:api.tool('post', 'code', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "')"
 		],
 		'content' => [
 			[
-				['type' => 'select',
-				'attributes' => [
-					'name' => LANG::GET('tool.code_select_type'),
-					'onchange' => "api.tool('get', 'code', this.value)"
+				[
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('tool.code_select_type'),
+						'onchange' => "api.tool('get', 'code', this.value)"
+					],
+					'content' => $options
 				],
-				'content' => $options],
 				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content'],
 			]
 		]];
@@ -152,23 +154,27 @@ class TOOL extends API {
 		if ($this->_requestedType){
 			if ($types[$this->_requestedType]['code']){
 				if (in_array($this->_requestedType, ['qrcode_text', 'qrcode_appointment'])){
-					$result['body']['content'][] = [
-						['type' => 'image',
-						'description' => LANG::GET('tool.code_created'),
-						'attributes' =>[
-							'name' => $types[$this->_requestedType]['name'],
-							'qrcode' => $types[$this->_requestedType]['code']
-						]]
+					$result['render']['content'][] = [
+						[
+							'type' => 'image',
+							'description' => LANG::GET('tool.code_created'),
+							'attributes' =>[
+								'name' => $types[$this->_requestedType]['name'],
+								'qrcode' => $types[$this->_requestedType]['code']
+							]
+						]
 					];	
 				}
 				else { // barcode
-					$result['body']['content'][] = [
-						['type' => 'image',
-						'description' => LANG::GET('tool.code_created'),
-						'attributes' => [
-							'name' => $types[$this->_requestedType]['name'],
-							'barcode' => ['value' => $types[$this->_requestedType]['code'], 'format' => strtoupper(substr(stristr($this->_requestedType, '_'), 1))]
-						]]
+					$result['render']['content'][] = [
+						[
+							'type' => 'image',
+							'description' => LANG::GET('tool.code_created'),
+							'attributes' => [
+								'name' => $types[$this->_requestedType]['name'],
+								'barcode' => ['value' => $types[$this->_requestedType]['code'], 'format' => strtoupper(substr(stristr($this->_requestedType, '_'), 1))]
+							]
+						]
 					];	
 				}
 			}
@@ -177,19 +183,21 @@ class TOOL extends API {
 	}
 
 	public function scanner(){
-		$result['body'] = ['content' => [
+		$result['render'] = ['content' => [
 			[
-				['type' => 'scanner',
-				'description' => LANG::GET('menu.tools_scanner'),
-				'destination' => 'tool_scanner'
-				],
-				['type' => 'textarea',
-				'attributes' =>[
-					'name' => LANG::GET('tool.scanner_result'),
-					'rows' => 8,
-					'readonly' => true,
-					'id' => 'tool_scanner'
-				]]
+				[
+					'type' => 'scanner',
+					'description' => LANG::GET('menu.tools_scanner'),
+					'destination' => 'tool_scanner'
+				], [
+					'type' => 'textarea',
+					'attributes' =>[
+						'name' => LANG::GET('tool.scanner_result'),
+						'rows' => 8,
+						'readonly' => true,
+						'id' => 'tool_scanner'
+					]
+				]
 			]
 		]];
 		$this->response($result);
@@ -206,19 +214,21 @@ class TOOL extends API {
 			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => $path];
 		}
 		if (count($options) > 1) {
-			$result['body'] = ['content' => [
+			$result['render'] = ['content' => [
 				[
-					['type' => 'select',
-					'attributes' => [
-						'name' => LANG::GET('tool.stl_viewer_select'),
-						'onchange' => "_client.tool.initStlViewer('../' + this.value)"
-					],
-					'content' => $options],
-					['type' => 'stlviewer',
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('tool.stl_viewer_select'),
+							'onchange' => "_client.tool.initStlViewer('../' + this.value)"
+						],
+						'content' => $options
+					], [
+						'type' => 'stlviewer',
 					]
 				]
 			]];
-		} else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+		} else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 		$this->response($result);
 	}
 }

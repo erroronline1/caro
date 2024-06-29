@@ -42,7 +42,7 @@ class APPLICATION extends API {
 	public function login(){
 		if (!$this->_requestedLogout){
 			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
-				$this->response(['status' => [
+				$this->response(['user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
@@ -59,7 +59,7 @@ class APPLICATION extends API {
 				$_SESSION['user'] = $result;
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
-				$this->response(['status' => [
+				$this->response(['user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
@@ -68,7 +68,7 @@ class APPLICATION extends API {
 		}
 		session_unset();
 		session_destroy();
-		$response = ['body' =>
+		$response = ['render' =>
 			[
 				'form' => [
 					'action' => "javascript:api.application('post','login')",
@@ -98,8 +98,8 @@ class APPLICATION extends API {
 				'content' => strtr($content, $replacements)
 			]];
 		}
-		$response['body']['content'][] = $tos;
-		$response['body']['content'][] = [
+		$response['render']['content'][] = $tos;
+		$response['render']['content'][] = [
 			[
 				'type' => 'checkbox',
 				'content' => [
@@ -177,14 +177,14 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
 		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
 
-		$this->response(['body' => $menu, 'user' => $_SESSION['user']['name']]);
+		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
 	}
 
 	/**
 	 * respond with LANGUAGEFILE as transfer to js frontend
 	 */
     public function language(){
-		$this->response(['body' => LANG::GETALL()]);
+		$this->response(['data' => LANG::GETALL()]);
 	}
 
 	/**
@@ -192,7 +192,7 @@ class APPLICATION extends API {
 	 */
 	public function start(){
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$result = ['user' => $_SESSION['user']['name'], 'body' => ['content' => []]];
+		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
 		$tiles = [];
 
 		$notifications = new NOTIFICATION;
@@ -304,7 +304,7 @@ class APPLICATION extends API {
 			];
 		}
 		
-		if (count($tiles)) $result['body']['content'][] = $tiles;
+		if (count($tiles)) $result['render']['content'][] = $tiles;
 
 		// calendar scheduled events
 		$overview = [];
@@ -348,7 +348,7 @@ class APPLICATION extends API {
 			'content' => $uncompleted
 		];
 
-		if ($overview) $result['body']['content'][] = $overview;
+		if ($overview) $result['render']['content'][] = $overview;
 
 		// manual
 		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
@@ -361,7 +361,7 @@ class APPLICATION extends API {
 					'content' => $row['content']
 				]];
 		}
-		if ($topics) $result['body']['content'][] = $topics;
+		if ($topics) $result['render']['content'][] = $topics;
 		$this->response($result);
 	}
 
@@ -375,7 +375,7 @@ class APPLICATION extends API {
 		if (!PERMISSION::permissionFor('appmanual')) $this->response([], 401);
 		$result = [
 			'user' => $_SESSION['user']['name'],
-			'body' => ['content' => []]
+			'render' => ['content' => []]
 		];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -387,7 +387,7 @@ class APPLICATION extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -407,13 +407,13 @@ class APPLICATION extends API {
 				]);
 		
 				if ($query) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
 						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => false,
 						'name' => LANG::GET('application.edit_manual_not_saved'),
 						'type' => 'error'
@@ -428,7 +428,7 @@ class APPLICATION extends API {
 				];
 		
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['status' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -448,13 +448,13 @@ class APPLICATION extends API {
 					]
 				]);
 				if ($query) $this->response([
-					'status' => [
+					'response' => [
 						'id' => $this->_requestedManual,
 						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'id' => false,
 						'name' => LANG::GET('application.edit_manual_not_saved'),
 						'type' => 'error'
@@ -475,7 +475,7 @@ class APPLICATION extends API {
 				];
 				else $entry = $query[0];
 
-				$result['body']['form'] = [
+				$result['render']['form'] = [
 					'data-usecase' => 'manual',
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
@@ -491,7 +491,7 @@ class APPLICATION extends API {
 					$permissions[$description] = in_array($level, explode(',', $entry['permissions'])) ? ['checked' => true] : [];
 				}
 
-				$result['body']['content'] = [
+				$result['render']['content'] = [
 					[
 						['type' => 'select',
 						'attributes' => [
@@ -519,7 +519,7 @@ class APPLICATION extends API {
 						]
 					]
 				];
-				if ($entry['id']) $result['body']['content'][] = [
+				if ($entry['id']) $result['render']['content'][] = [
 						['type' => 'deletebutton',
 						'attributes' => [
 							'value' => LANG::GET('application.edit_manual_delete'),
@@ -537,13 +537,13 @@ class APPLICATION extends API {
 					]
 				]);
 				if ($query) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('application.edit_manual_deleted'),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('application.edit_manual_error'),
 						'id' => $this->_requestedManual,
 						'type' => 'error'

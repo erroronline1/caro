@@ -51,7 +51,7 @@ class CSVFILTER extends API {
 				if (!trim($filter[':name']) || !trim($filter[':content'])) $this->response([], 400);
 
 				// ensure valid json for filters
-				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['status' => ['msg' => LANG::GET('csvfilter.edit_filter_content_hint'), 'type' => 'error']]);
+				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['response' => ['msg' => LANG::GET('csvfilter.edit_filter_content_hint'), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
@@ -67,7 +67,7 @@ class CSVFILTER extends API {
 							':id' => $exists['id']
 						]
 					])) $this->response([
-						'status' => [
+						'response' => [
 							'name' => $filter[':name'],
 							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
 							'type' => 'success'
@@ -75,19 +75,19 @@ class CSVFILTER extends API {
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
 					'values' => $filter
 				])) $this->response([
-						'status' => [
+						'response' => [
 							'name' => $filter[':name'],
 							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
 							'type' => 'success'
 						]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('csvfilter.edit_filter_not_saved'),
 						'type' => 'error'
@@ -119,7 +119,7 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
@@ -134,7 +134,7 @@ class CSVFILTER extends API {
 					$alloptions[$row['name']. ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 
-				$return['body'] = [
+				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'csvfilter',
 						'action' => "javascript:api.csvfilter('post', 'rule')"],
@@ -209,7 +209,7 @@ class CSVFILTER extends API {
 						'hint' => LANG::GET('csvfilter.edit_filter_hidden_hint')
 					];
 					if ($filter['hidden']) $hidden['content'][LANG::GET('csvfilter.edit_filter_hidden_hidden')]['checked'] = true;
-					array_push($return['body']['content'][1], $hidden);
+					array_push($return['render']['content'][1], $hidden);
 				}
 				$this->response($return);
 				break;
@@ -232,7 +232,7 @@ class CSVFILTER extends API {
 				$filter = $filter ? $filter[0] : null;
 
 				if (!$filter) $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('csvfilter.error_filter_not_found'),
 						'type' => 'error'
@@ -241,7 +241,7 @@ class CSVFILTER extends API {
 
 				$inputfile = array_key_exists(LANG::PROPERTY('csvfilter.use_filter_input_file'), $_FILES) ? $_FILES[LANG::PROPERTY('csvfilter.use_filter_input_file')]['tmp_name'] : null;
 				if (!$inputfile) $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('csvfilter.use_filter_no_input_file'),
 						'type' => 'error'
@@ -255,7 +255,7 @@ class CSVFILTER extends API {
 					if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
 						$comparefile = array_key_exists(LANG::PROPERTY('csvfilter.use_filter_compare_file'), $_FILES) && array_key_exists($comparefileindex, $_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]['tmp_name']) ? $_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]['tmp_name'][$comparefileindex] : null;
 						if (!$comparefile) $this->response([
-							'status' => [
+							'response' => [
 								'name' => false,
 								'msg' => LANG::GET('csvfilter.use_filter_no_compare_file', [':name' => $filtertype['filesetting']['source']]),
 								'type' => 'error'
@@ -349,7 +349,7 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('csvfilter.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('csvfilter.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
@@ -362,7 +362,7 @@ class CSVFILTER extends API {
 					}
 				}
 
-				$return['body'] = [
+				$return['render'] = [
 					'content' => [
 						[
 							[
@@ -429,8 +429,8 @@ class CSVFILTER extends API {
 							]
 						]);
 					}
-					array_push($return['body']['content'], $additionalform);
-					$return['body']['form'] = [
+					array_push($return['render']['content'], $additionalform);
+					$return['render']['form'] = [
 						'data-usecase' => 'csvfilter',
 						'action' => "javascript:api.csvfilter('post', 'filter', " . $filter['id'] . ")"
 					];

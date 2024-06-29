@@ -111,7 +111,7 @@ export const assemble_helper = {
 export class Dialog {
 	/**
 	 *
-	 * @param {type: str, icon: str, header: str, body: str|array, options:{displayText: value str|bool|{value, class}}} options
+	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
 	 * @returns promise, prepared answer on resolve according to type
 	 *
 	 * new Dialog({options}).then(response => {
@@ -122,7 +122,7 @@ export class Dialog {
 	 *
 	 * options with boolean values true|false as well as 'true'|'false' return selected booleans not strings. other strings will be returned as such.
 	 *
-	 * new Dialog({type:'alert', header:'acknowledge this!', body:'infotext'})
+	 * new Dialog({type:'alert', header:'acknowledge this!', render:'infotext'})
 	 *
 	 * new Dialog({type:'confirm', header:'confirm this', options:{'abort': false, 'yes, i agree': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
 	 *  	if (confirmation) huzzah());
@@ -133,7 +133,7 @@ export class Dialog {
 	 * multiple articles and sections are NOT supported due to simplified query selector
 	 * THIS IS FOR SIMPLE INPUTS ONLY
 	 *
-	 * new Dialog({type:'input', header:'fill out assembled form', 'body': [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}}).then(response => {
+	 * new Dialog({type:'input', header:'fill out assembled form', render: [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}}).then(response => {
 	 *  	if (Object.keys(response)) console.log('these are the results of the form:', response);
 	 * 	});
 	 *
@@ -142,7 +142,7 @@ export class Dialog {
 		this.type = options.type || null;
 		this.icon = options.icon || null;
 		this.header = options.header || null;
-		this.body = options.body || null;
+		this.render = options.render || null;
 		this.options = options.options || {};
 		this.scannerElements = {};
 		this.assemble = null;
@@ -156,8 +156,8 @@ export class Dialog {
 				this.type = "input";
 			}
 			if (this.type === "input") {
-				if (this.body.content === undefined) this.body = { content: this.body };
-				this.assemble = new Assemble(this.body);
+				if (this.render.content === undefined) this.render = { content: this.render };
+				this.assemble = new Assemble(this.render);
 			}
 			dialog = document.getElementById(modal);
 
@@ -172,7 +172,7 @@ export class Dialog {
 			img.src = "./media/times.svg";
 			img.onpointerup = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" + modal + "').close()");
 			form.append(img);
-			if (this.header || this.body || this.icon) {
+			if (this.header || this.render || this.icon) {
 				const header = document.createElement("header");
 				if (this.icon) {
 					const icon = document.createElement("img");
@@ -184,8 +184,8 @@ export class Dialog {
 					h3.append(document.createTextNode(this.header));
 					header.append(h3);
 				}
-				if (this.body && this.body.constructor.name === "String") {
-					for (const line of this.body.split(/\r\n|\n/)) {
+				if (this.render && this.render.constructor.name === "String") {
+					for (const line of this.render.split(/\r\n|\n/)) {
 						header.append(document.createTextNode(line));
 						header.append(document.createElement("br"));
 					}
@@ -866,7 +866,7 @@ export class Assemble {
 			input.onpointerup = new Function(
 				"new Dialog({type: 'input', header: '" +
 					this.currentElement.attributes.name.replace(/\[\]/g, "") +
-					"', body:" +
+					"', render:" +
 					JSON.stringify([
 						[
 							{

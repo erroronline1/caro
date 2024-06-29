@@ -66,7 +66,7 @@ class AUDIT extends API {
 	 * calls $this->_requestedType method if set
 	 */
 	public function checks(){
-		$result['body'] = ['content' => []];
+		$result['render'] = ['content' => []];
 		$selecttypes = [];
 		
 		// checks
@@ -94,7 +94,7 @@ class AUDIT extends API {
 		$selecttypes[LANG::GET('audit.checks_type.regulatory')] = ['value' => 'regulatory'];
 		if ($this->_requestedType==='regulatory') $selecttypes[LANG::GET('audit.checks_type.regulatory')]['selected'] = true;
 
-		$result['body']['content'][] = [
+		$result['render']['content'][] = [
 			[
 				'type' => 'select',
 				'content' => $selecttypes,
@@ -106,7 +106,7 @@ class AUDIT extends API {
 		];
 
 		if ($this->_requestedType) {
-			if ($append = $this->{$this->_requestedType}()) array_push($result['body']['content'] , ...$append);
+			if ($append = $this->{$this->_requestedType}()) array_push($result['render']['content'] , ...$append);
 		}
 		$this->response($result);
 	}
@@ -218,7 +218,7 @@ class AUDIT extends API {
 			]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 
@@ -329,7 +329,7 @@ class AUDIT extends API {
 			]]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 
@@ -598,7 +598,7 @@ class AUDIT extends API {
 			]]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 
@@ -700,7 +700,7 @@ class AUDIT extends API {
 			]]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 
@@ -790,7 +790,7 @@ class AUDIT extends API {
 			]]
 		);
 		$this->response([
-			'body' => $body,
+			'render' => $body,
 		]);
 	}
 }

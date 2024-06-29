@@ -82,7 +82,7 @@ class ORDER extends API {
 				if(!count($order_data['items'])) $this->response([], 406);
 				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 
-				if ($result['status']['msg'] === LANG::GET('order.saved')){
+				if ($result['response']['msg'] === LANG::GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => implode(",", array_map(Fn($id) => intval($id), $approvedIDs))
@@ -104,7 +104,7 @@ class ORDER extends API {
 						array_push($organizational_orders, $row);
 					}
 				}
-				$result = ['body' => ['content' => []]];
+				$result = ['render' => ['content' => []]];
 				if ($_SESSION['user']['orderauth']){
 					$organizational_units=[];
 					foreach(LANGUAGEFILE['units'] as $unit => $description){
@@ -113,7 +113,7 @@ class ORDER extends API {
 					}
 					if (!$this->_requestedID && array_key_exists('primaryUnit', $_SESSION['user']['app_settings'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
 					elseif($this->_requestedID) $organizational_units[LANG::GET('units.' . $this->_requestedID)]['checked'] = true;
-					$result['body']['content'][] = [
+					$result['render']['content'][] = [
 						['type' => 'radio',
 						'attributes' => [
 							'name' => LANG::GET('order.organizational_unit')
@@ -144,21 +144,25 @@ class ORDER extends API {
 								$info .= LANG::GET('order.' . $key) . ': ' . $value . "\n";
 							}
 						}
-						array_push($result['body']['content'], [
-							['type' => 'textblock',
-							'content' => $items,
-							],
-							['type' => 'textblock',
-							'content' => $info,
-							],
-							['type' => 'checkbox',
-							'content' => [LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]]
-							],
-							['type' => 'button',
-							'attributes' =>[
-								'value' => LANG::GET('order.edit_prepared_order'),
+						array_push($result['render']['content'], [
+							[
+								'type' => 'textblock',
+								'content' => $items,
+							],[
+								'type' => 'textblock',
+								'content' => $info,
+							], [
+								'type' => 'checkbox',
+								'content' => [
+									LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]
+								]
+							], [
 								'type' => 'button',
-								'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"]
+								'attributes' =>[
+									'value' => LANG::GET('order.edit_prepared_order'),
+									'type' => 'button',
+									'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"
+								]
 							]
 						]);
 						if (array_key_exists('attachments', $processedOrderData)){
@@ -166,41 +170,47 @@ class ORDER extends API {
 							foreach(explode(',', $processedOrderData['attachments']) as $file){
 								$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
 							}
-							array_splice($result['body']['content'][count($result['body']['content']) - 1], 2, 0, [
+							array_splice($result['render']['content'][count($result['render']['content']) - 1], 2, 0, [
 								[
-									['type' => 'links',
-									'description' => LANG::GET('order.attached_files'),
-									'content' => $files],
-									['type' => 'hidden',
-									'attributes' => [
-										'name' => 'existingattachments',
-										'value' => $processedOrderData['attachments']
-									]],
+									[
+										'type' => 'links',
+										'description' => LANG::GET('order.attached_files'),
+										'content' => $files
+									], [
+										'type' => 'hidden',
+										'attributes' => [
+											'name' => 'existingattachments',
+											'value' => $processedOrderData['attachments']
+										]
+									],
 									['type' => 'br']
 								]
 							]);		
 						}
 					}
 					if ($_SESSION['user']['orderauth'] && count($organizational_orders)) {
-						array_push($result['body']['content'], [
+						array_push($result['render']['content'], [
 							[
-								['type' => 'signature',
-								'attributes' => [
-									'name' => LANG::GET('order.add_approval_signature')
-								]]
-							],
-							[
-								['type' => 'number',
-								'attributes' => [
-									'name' => LANG::GET('user.edit_order_authorization'),
-									'type' => 'password'
-								]]
+								[
+									'type' => 'signature',
+									'attributes' => [
+										'name' => LANG::GET('order.add_approval_signature')
+									]
+								]
+							], [
+								[
+									'type' => 'number',
+									'attributes' => [
+										'name' => LANG::GET('user.edit_order_authorization'),
+										'type' => 'password'
+									]
+								]
 							]
 						]);
-						$result['body']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
+						$result['render']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
 					}
 				}
-				else $result['body']['content'][] = $this->noContentAvailable(LANG::GET('order.no_orders'))[0];
+				else $result['render']['content'][] = $this->noContentAvailable(LANG::GET('order.no_orders'))[0];
 				break;
 		}
 		$this->response($result);
@@ -210,9 +220,9 @@ class ORDER extends API {
 		// order to be taken into account in utility.js _client.order.addProduct() method and this->order() method as well!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
-				$result = ['body'=>[]];
+				$result = ['render' => []];
 				if (!$this->_subMethod) {
-					$result['body']['content'] = [];
+					$result['render']['content'] = [];
 					break;
 				}
 
@@ -296,7 +306,7 @@ class ORDER extends API {
 					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
 					]
 				];
-				$result['body']['content'] = $matches;
+				$result['render']['content'] = $matches;
 				break;
 			}
 		$this->response($result);
@@ -318,9 +328,9 @@ class ORDER extends API {
 		foreach ($filtered as $row){
 			$matches[] = strval($row['id']);
 		}
-		$this->response(['status' => [
+		$this->response( [
 			'data' => $matches
-		]]);
+		]);
 	}
 
 	private function processOrderForm(){
@@ -419,7 +429,7 @@ class ORDER extends API {
 		}
 		if (SQLQUERY::EXECUTE($this->_pdo, $query)) {
 			$result=[
-			'status' => [
+			'response' => [
 				'id' => false,
 				'msg' => LANG::GET('order.saved'),
 				'type' => 'success'
@@ -427,7 +437,7 @@ class ORDER extends API {
 			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
 		}
 		else $result=[
-			'status' => [
+			'response' => [
 				'id' => false,
 				'msg' => LANG::GET('order.failed_save'),
 				'type' => 'error'
@@ -447,7 +457,7 @@ class ORDER extends API {
 						]
 					]);
 					$result = [
-						'status' => [
+						'response' => [
 							'id' => $this->_pdo->lastInsertId(),
 							'msg' => LANG::GET('order.saved_to_prepared'),
 							'type' => 'info'
@@ -468,7 +478,7 @@ class ORDER extends API {
 						]
 					]);
 					$result = [
-						'status' => [
+						'response' => [
 							'id' => $this->_requestedID,
 							'msg' => LANG::GET('order.saved_to_prepared'),
 							'type' => 'info'
@@ -478,7 +488,7 @@ class ORDER extends API {
 				
 				$result = $this->postApprovedOrder($processedOrderData);
 
-				if ($result['status']['msg'] === LANG::GET('order.saved')){
+				if ($result['response']['msg'] === LANG::GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replace' => [
 							':id' => intval($this->_requestedID)
@@ -530,71 +540,82 @@ class ORDER extends API {
 					elseif (array_key_exists('primaryUnit', $_SESSION['user']['app_settings'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
 				}
 
-				$result['body'] = ['form'=>[
+				$result['render'] = ['form' => [
 					'data-usecase'=> 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
 				],
 				'content' => [
 					[
-						['type' => 'scanner',
-						'destination' => 'productsearch'
-						],
-						['type' => 'select',
-						'content' => $vendors,
-						'attributes' => [
-							'id' => 'productsearchvendor',
-							'name' => LANG::GET('consumables.edit_product_vendor_select')
+						[
+							'type' => 'scanner',
+							'destination' => 'productsearch'
+						], [
+							'type' => 'select',
+							'content' => $vendors,
+							'attributes' => [
+								'id' => 'productsearchvendor',
+								'name' => LANG::GET('consumables.edit_product_vendor_select')
 							]
-						],
-						['type' => 'search',
-						'attributes' => [
-							'name' => LANG::GET('consumables.edit_product_search'),
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
-							'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
-							'id' => 'productsearch'
-						]],
-						['type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('order.add_manually'),
+						], [
+							'type' => 'search',
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_product_search'),
+									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
+								'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
+								'id' => 'productsearch'
+							]
+						], [
 							'type' => 'button',
-							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_manually') ."', body: JSON.parse('".
-								json_encode([
-									[
-										['type' => 'datalist',
-										'content' => array_values(array_unique($datalist)),
-										'attributes' => [
-											'id' => 'vendors'
-										]],
-										['type' => 'datalist',
-										'content' => array_values(array_unique($datalist_unit)),
-										'attributes' => [
-											'id' => 'units'
-										]],
-										['type' => 'number',
-										'attributes' => [
-											'name' => LANG::GET('order.quantity_label'),
-										]],
-										['type' => 'text',
-										'attributes' => [
-											'name' => LANG::GET('order.unit_label'),
-											'list' => 'units'
-										]],
-										['type' => 'text',
-										'attributes' => [
-											'name' => LANG::GET('order.ordernumber_label')
-										]],
-										['type' => 'text',
-										'attributes' => [
-											'name' => LANG::GET('order.productname_label')
-										]],
-										['type' => 'text',
-										'attributes' => [
-											'name' => LANG::GET('order.vendor_label'),
-											'list' => 'vendors'
-										]]
+							'attributes' => [
+								'value' => LANG::GET('order.add_manually'),
+								'type' => 'button',
+								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_manually') ."', render: JSON.parse('".
+									json_encode([
+										[
+											[
+												'type' => 'datalist',
+											'content' => array_values(array_unique($datalist)),
+											'attributes' => [
+												'id' => 'vendors'
+											]
+										], [
+											'type' => 'datalist',
+											'content' => array_values(array_unique($datalist_unit)),
+											'attributes' => [
+												'id' => 'units'
+											]
+										], 
+										[
+											'type' => 'number',
+											'attributes' => [
+												'name' => LANG::GET('order.quantity_label'),
+											]
+										], [
+											'type' => 'text',
+											'attributes' => [
+												'name' => LANG::GET('order.unit_label'),
+												'list' => 'units'
+											]
+										], [
+											'type' => 'text',
+											'attributes' => [
+												'name' => LANG::GET('order.ordernumber_label')
+											]
+										], [
+											'type' => 'text',
+											'attributes' => [
+												'name' => LANG::GET('order.productname_label')
+											]
+										], [
+											'type' => 'text',
+											'attributes' => [
+												'name' => LANG::GET('order.vendor_label'),
+												'list' => 'vendors'
+											]
+										]
 									]
 								])
-								."'), 'options':{".
+								."'), options:{".
 									"'".LANG::GET('order.add_manually_confirm')."': true,".
 									"'".LANG::GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
 								"}}).then(response => {if (Object.keys(response).length) {".
@@ -605,68 +626,80 @@ class ORDER extends API {
 					],[
 						['type' => 'hr']
 					],[
-						['type' => 'radio',
-						'attributes' => [
-							'name' => LANG::GET('order.organizational_unit')
-						],
-						'content' => $organizational_units
-						],
-						['type' => 'text',
-						'hint' => LANG::GET('order.commission_hint'),
-						'attributes' => [
-							'required' => true,
-							'name' => LANG::GET('order.commission'),
-							'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
-							'data-loss' => 'prevent',
-							'id' => 'commission'
-						]],
-						['type' => 'scanner',
-						'destination' => 'commission'
-						],
-						['type' => 'date',
-						'attributes' => [
-							'name' => LANG::GET('order.delivery_date'),
-							'value' => array_key_exists('delivery_date', $order) ? $order['delivery_date'] : ''
-						]],
-						['type' => 'textarea',
-						'attributes' => [
-							'name' => LANG::GET('order.additional_info'),
-							'value' => array_key_exists('additional_info', $order) ? $order['additional_info'] : '',
-							'data-loss' => 'prevent'
-						]]
+						[
+							'type' => 'radio',
+							'attributes' => [
+								'name' => LANG::GET('order.organizational_unit')
+							],
+							'content' => $organizational_units
+						], [
+							'type' => 'text',
+							'hint' => LANG::GET('order.commission_hint'),
+							'attributes' => [
+								'required' => true,
+								'name' => LANG::GET('order.commission'),
+								'value' => array_key_exists('commission', $order) ? $order['commission'] : '',
+								'data-loss' => 'prevent',
+								'id' => 'commission'
+							]
+						], [
+							'type' => 'scanner',
+							'destination' => 'commission'
+						], [
+							'type' => 'date',
+							'attributes' => [
+								'name' => LANG::GET('order.delivery_date'),
+								'value' => array_key_exists('delivery_date', $order) ? $order['delivery_date'] : ''
+							]
+						], [
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => LANG::GET('order.additional_info'),
+								'value' => array_key_exists('additional_info', $order) ? $order['additional_info'] : '',
+								'data-loss' => 'prevent'
+							]
+						]
 					],[
 						[
-							['type' => 'file',
-							'attributes' => [
-								'name' => LANG::GET('order.attach_file'),
-								'multiple' => true
-							]]
+							[
+								'type' => 'file',
+								'attributes' => [
+									'name' => LANG::GET('order.attach_file'),
+									'multiple' => true
+								]
+							]
 						],[
-							['type' => 'photo',
-							'attributes' => [
-								'name' => LANG::GET('order.attach_photo'),
-								'multiple' => true
-							]]
+							[
+								'type' => 'photo',
+								'attributes' => [
+									'name' => LANG::GET('order.attach_photo'),
+									'multiple' => true
+								]
+							]
 						]
 					],
 					[
 						[
-							['type' => 'signature',
-							'attributes' => [
-								'name' => LANG::GET('order.add_approval_signature')
-							]]
+							[
+								'type' => 'signature',
+								'attributes' => [
+									'name' => LANG::GET('order.add_approval_signature')
+								]
+							]
 						],
 						[
-							['type' => 'number',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_order_authorization'),
-								'type' => 'password'
-							]]
+							[
+								'type' => 'number',
+								'attributes' => [
+									'name' => LANG::GET('user.edit_order_authorization'),
+									'type' => 'password'
+								]
+							]
 						]
 					],
 				]];
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
-					array_splice($result['body']['content'][2], 1, 0, [[
+					array_splice($result['render']['content'][2], 1, 0, [[
 							'type' => 'text',
 							'hint' => LANG::GET('order.orderer_group_hint'),
 							'attributes' => [
@@ -683,16 +716,19 @@ class ORDER extends API {
 					foreach(explode(',', $order['attachments']) as $file){
 						$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
 					}
-					array_splice($result['body']['content'], 4, 0, [
+					array_splice($result['render']['content'], 4, 0, [
 						[
-							['type' => 'links',
-							'description' => LANG::GET('order.attached_files'),
-							'content' => $files],
-							['type' => 'hidden',
-							'attributes' => [
-								'name' => 'existingattachments',
-								'value' => $order['attachments']
-							]]
+							[
+								'type' => 'links',
+								'description' => LANG::GET('order.attached_files'),
+								'content' => $files
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => 'existingattachments',
+									'value' => $order['attachments']
+								]
+							]
 						]
 					]);
 				}
@@ -767,14 +803,14 @@ class ORDER extends API {
 							]
 						]);
 					}
-					array_splice($result['body']['content'], 2, 0, $items);
+					array_splice($result['render']['content'], 2, 0, $items);
 				}
-				if ($this->_requestedID) array_push($result['body']['content'], [
+				if ($this->_requestedID) array_push($result['render']['content'], [
 					['type' => 'deletebutton',
 					'attributes' => [
 						'value' => LANG::GET('order.delete_prepared_order'),
 						'type' => 'button', // apparently defaults to submit otherwise
-						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', 'options':{".
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
 							"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
 							"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 							"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
@@ -805,14 +841,14 @@ class ORDER extends API {
 					]
 				])) {
 					$result=[
-					'status' => [
+					'response' => [
 						'id' => false,
 						'msg' => LANG::GET('order.deleted'),
 						'type' => 'success'
 					]];
 				}
 				else $result=[
-					'status' => [
+					'response' => [
 						'id' => $this->_requestedID,
 						'msg' => LANG::GET('order.failed_delete'),
 						'type' => 'error'
@@ -831,7 +867,7 @@ class ORDER extends API {
 				]
 			]);
 			$order = $order ? $order[0] : null;
-			if (!$order) $this->response(['status' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
+			if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
 			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 			if (in_array($this->_subMethod, ['ordered', 'received', 'archived'])){
 					switch ($this->_subMethod){
@@ -839,14 +875,14 @@ class ORDER extends API {
 							if ($order['ordertype'] === 'cancellation'){
 								if ($this->delete_approved_order($order)) {
 									$result = [
-									'status' => [
+									'response' => [
 										'id' => false,
 										'msg' => LANG::GET('order.deleted'),
 										'type' => 'success'
 									]];
 								}
 								else $result = [
-									'status' => [
+									'response' => [
 										'id' => $this->_requestedID,
 										'msg' => LANG::GET('order.failed_delete'),
 										'type' => 'error'
@@ -1000,7 +1036,7 @@ class ORDER extends API {
 								]
 							])) {
 								$result = [
-								'status' => [
+								'response' => [
 									'id' => false,
 									'msg' => LANG::GET('order.saved'),
 									'type' => 'success'
@@ -1008,7 +1044,7 @@ class ORDER extends API {
 								$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));
 							}
 							else $result = [
-								'status' => [
+								'response' => [
 									'id' => false,
 									'msg' => LANG::GET('order.failed_save'),
 									'type' => 'error'
@@ -1017,7 +1053,7 @@ class ORDER extends API {
 					}
 				}
 				$result = isset($result) ? $result: [
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('order.ora_set', [':type' => LANG::GET('order.' . $this->_subMethod)]),
 						'type' => 'info'
 					]];
@@ -1033,7 +1069,7 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				$result = ['body' => ['content' => [
+				$result = ['render' => ['content' => [
 					[
 						['type' => 'radio',
 						'attributes' => [
@@ -1177,14 +1213,15 @@ class ORDER extends API {
 					}
 					if (!($row['ordered'] || $row['received']) && $row['ordertype'] === 'order') $status[LANG::GET('order.disapprove')]=[
 						'data_disapproved' => 'false',
-						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', body:JSON.parse('" . 
+						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', render:JSON.parse('" . 
 							json_encode(
 								[
-									['type' => 'textarea',
-									'attributes' => [
-										'name' => LANG::GET('message.message')
-									],
-									'hint' => LANG::GET('order.disapprove_message', [':unit' => LANG::GET('units.' . $row['organizational_unit'])])
+									[
+										'type' => 'textarea',
+										'attributes' => [
+											'name' => LANG::GET('message.message')
+										],
+										'hint' => LANG::GET('order.disapprove_message', [':unit' => LANG::GET('units.' . $row['organizational_unit'])])
 									]
 								]
 							 ) . "'), " .
@@ -1193,16 +1230,17 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')]=[
+					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')] = [
 						'data_cancellation' => 'false',
-						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', body:JSON.parse('" . 
+						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', render:JSON.parse('" . 
 							json_encode(
 								[
-									['type' => 'textarea',
-									'attributes' => [
-										'name' => LANG::GET('message.message')
-									],
-									'hint' => LANG::GET('order.cancellation_message')
+									[
+										'type' => 'textarea',
+										'attributes' => [
+											'name' => LANG::GET('message.message')
+										],
+										'hint' => LANG::GET('order.cancellation_message')
 									]
 								]
 							 ) . "'), " .
@@ -1211,16 +1249,17 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['received'] && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')]=[
+					if ($row['received'] && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')] = [
 						'data_return' => 'false',
-						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', body:JSON.parse('" . 
+						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', render:JSON.parse('" . 
 							json_encode(
 								[
-									['type' => 'textarea',
-									'attributes' => [
-										'name' => LANG::GET('message.message')
-									],
-									'hint' => LANG::GET('order.return_message')
+									[
+										'type' => 'textarea',
+										'attributes' => [
+											'name' => LANG::GET('message.message')
+										],
+										'hint' => LANG::GET('order.return_message')
 									]
 								]
 							 ) . "'), " .
@@ -1287,7 +1326,7 @@ class ORDER extends API {
 						'attributes' => [
 							'value' => LANG::GET('order.add_information'),
 							'type' => 'button',
-							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', body: JSON.parse('" . 
+							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', render: JSON.parse('" . 
 								json_encode(
 									[
 										[
@@ -1321,7 +1360,7 @@ class ORDER extends API {
 							'content' => $statechange,
 							'attributes' => [
 								'name' => LANG::GET('order.orderstate_description'),
-								'onchange' => "new Dialog({type: 'input', header: LANG.GET('order.orderstate_description') + ' ' + this.value, body: JSON.parse('" . 
+								'onchange' => "new Dialog({type: 'input', header: LANG.GET('order.orderstate_description') + ' ' + this.value, render: JSON.parse('" . 
 									json_encode(
 										[
 											[
@@ -1419,7 +1458,7 @@ class ORDER extends API {
 							'type' => 'br' // to clear after floating delete button
 						];
 					}
-					array_push($result['body']['content'], $content);
+					array_push($result['render']['content'], $content);
 				}
 				break;
 			case 'DELETE':
@@ -1432,14 +1471,14 @@ class ORDER extends API {
 				
 				if ($row && $this->delete_approved_order($row)) {
 					$result = [
-					'status' => [
+					'response' => [
 						'id' => false,
 						'msg' => LANG::GET('order.deleted'),
 						'type' => 'success'
 					]];
 				}
 				else $result = [
-					'status' => [
+					'response' => [
 						'id' => $this->_requestedID,
 						'msg' => LANG::GET('order.failed_delete'),
 						'type' => 'error'

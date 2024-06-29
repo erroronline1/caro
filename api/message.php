@@ -40,7 +40,7 @@ class MESSAGE extends API {
 					]
 				]);
 				if (!$recipients) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]),
 						'type' => 'error'
 					]]);
@@ -49,7 +49,7 @@ class MESSAGE extends API {
 					if ($recipient['id'] < 2) continue;
 					$message = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]));
 					if (!$message) $this->response([
-						'status' => [
+						'response' => [
 							'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
 							'redirect' => false,
 							'type' => 'error'
@@ -63,13 +63,13 @@ class MESSAGE extends API {
 					])) $success++;
 				}
 				if ($success === count($recipients)) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('message.send_success'),
 						'redirect' => 'conversation',
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
 						'redirect' => false,
 						'type' => 'error'
@@ -82,7 +82,7 @@ class MESSAGE extends API {
 	public function conversation(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
-				$result = ['body'=>['content'=> []]];
+				$result = ['render' => ['content' => []]];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $key => $row) {
@@ -121,7 +121,7 @@ class MESSAGE extends API {
 							]
 						];
 					}
-					$result['body']['content'][] = [
+					$result['render']['content'][] = [
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
@@ -134,9 +134,9 @@ class MESSAGE extends API {
 							]
 						]
 					];
-					$result['body']['content'][] = $conversation_content;
+					$result['render']['content'][] = $conversation_content;
 					if ($conversation['conversation_user'] !== '1' && $conversation_user['name']) {
-						$result['body']['content'][] = [
+						$result['render']['content'][] = [
 							[
 								'type' => 'hidden',
 								'attributes' => [
@@ -152,14 +152,14 @@ class MESSAGE extends API {
 								'hint' => LANG::GET('message.forward_hint')
 							]
 						];
-						$result['body']['form'] = [
+						$result['render']['form'] = [
 							'data-usecase' => 'message',
 							'action' => "javascript:api.message('post', 'message', '_')"
 						];
 					}
 				}
 				else {
-					$result['body']['content'][] = [
+					$result['render']['content'][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -187,7 +187,7 @@ class MESSAGE extends API {
 							$unseen = $unseen ? intval($unseen[0]['unseen']) : 0;
 
 							$conversation['message'] = preg_replace('/\n|\r/', ' ', $conversation['message']);
-							$result['body']['content'][] = [
+							$result['render']['content'][] = [
 								[
 									'type' => 'message',
 									'content' => [
@@ -203,7 +203,7 @@ class MESSAGE extends API {
 								]
 							];
 						}
-					} else $result['body']['content'][] = $this->noContentAvailable(LANG::GET('message.no_messages'))[0];
+					} else $result['render']['content'][] = $this->noContentAvailable(LANG::GET('message.no_messages'))[0];
 				}
 				break;
 			case 'DELETE':
@@ -213,13 +213,13 @@ class MESSAGE extends API {
 						':user' => $_SESSION['user']['id']
 					]
 				])) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('message.delete_success'),
 						'redirect' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('message.delete_failure'),
 						'redirect' => false,
 						'type' => 'error'
@@ -233,7 +233,7 @@ class MESSAGE extends API {
 		// prepare existing users lists
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
-		$result = ['body' => ['content' => []]];
+		$result = ['render' => ['content' => []]];
 		foreach($users as $user){
 			if ($user['id'] == 1) continue;
 			$mailto =  [
@@ -259,7 +259,7 @@ class MESSAGE extends API {
 		foreach($groups as $group => $content){
 			ksort($content);
 			if ($group === 'name'){
-				$result['body']['content'][] = [
+				$result['render']['content'][] = [
 					[
 						'type' => 'links',
 						'description' => LANG::GET('message.register_users'),
@@ -267,7 +267,7 @@ class MESSAGE extends API {
 					]
 				];
 			} elseif ($group === 'orderauth'){
-				$result['body']['content'][] = [
+				$result['render']['content'][] = [
 					[
 						'type' => 'links',
 						'description' => LANG::GET('message.register_orderauth'),
@@ -286,7 +286,7 @@ class MESSAGE extends API {
 						]
 					];
 				}
-				$result['body']['content'][] = $panel;
+				$result['render']['content'][] = $panel;
 			}
 		}
 		$this->response($result);

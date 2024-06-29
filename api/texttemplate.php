@@ -48,7 +48,7 @@ class TEXTTEMPLATE extends API {
 
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 				preg_match("/[^\w\d]/m", $chunk[':name'], $matches);
-				if ($matches) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
+				if ($matches) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
@@ -65,7 +65,7 @@ class TEXTTEMPLATE extends API {
 							':unit' => $chunk[':unit']
 						]
 					])) $this->response([
-							'status' => [
+							'response' => [
 								'name' => $chunk[':name'],
 								'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
 								'type' => 'success'
@@ -75,13 +75,13 @@ class TEXTTEMPLATE extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
 					'values' => $chunk
 				])) $this->response([
-						'status' => [
-							'name' => $chunk[':name'],
-							'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
-							'type' => 'success'
-						]]);
+					'response' => [
+						'name' => $chunk[':name'],
+						'msg' => LANG::GET('texttemplate.edit_chunk_saved', [':name' => $chunk[':name']]),
+						'type' => 'success'
+					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('texttemplate.edit_chunk_not_saved'),
 						'type' => 'error'
@@ -118,7 +118,7 @@ class TEXTTEMPLATE extends API {
 					'language' => '',
 					'type' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('texttemplate.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing chunks lists
 				$chunks = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
@@ -149,7 +149,7 @@ class TEXTTEMPLATE extends API {
 					if ($chunk['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
 
-				$return['body'] = [
+				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'texttemplate',
 						'action' => "javascript:api.texttemplate('post', 'chunk')"],
@@ -255,8 +255,8 @@ class TEXTTEMPLATE extends API {
 						]
 					]
 				];
-				if ($chunk['type'] === 'text') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_types.text')]['selected'] = true;
-				if ($chunk['type'] === 'replacement') $return['body']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_types.replacement')]['selected'] = true;
+				if ($chunk['type'] === 'text') $return['render']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_types.text')]['selected'] = true;
+				if ($chunk['type'] === 'replacement') $return['render']['content'][1][1]['content'][LANG::GET('texttemplate.edit_chunk_types.replacement')]['selected'] = true;
 				if ($chunk['id']){
 
 					$hidden = [
@@ -272,7 +272,7 @@ class TEXTTEMPLATE extends API {
 					];
 					if ($chunk['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_chunk_hidden_hidden')]['checked'] = true;
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . LANG::GET('texttemplate.edit_chunk_dependencies', [':templates' => implode(', ', $dependedtemplates)]);
-					array_push($return['body']['content'][1], $hidden);
+					array_push($return['render']['content'][1], $hidden);
 				}
 				$this->response($return);
 				break;
@@ -310,7 +310,7 @@ class TEXTTEMPLATE extends API {
 							'unit' => $template[':unit']
 						]
 					])) $this->response([
-						'status' => [
+						'response' => [
 							'name' => $template[':name'],
 							'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
 							'type' => 'success'
@@ -318,18 +318,18 @@ class TEXTTEMPLATE extends API {
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]), 'type' => 'error']]);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
 					'values' => $template])) $this->response([
-					'status' => [
+					'response' => [
 						'name' => $template[':name'],
 						'msg' => LANG::GET('texttemplate.edit_template_saved', [':name' => $template[':name']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('texttemplate.edit_template_not_saved'),
 						'type' => 'error'
@@ -366,7 +366,7 @@ class TEXTTEMPLATE extends API {
 					'language' => '',
 					'type' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
@@ -400,7 +400,7 @@ class TEXTTEMPLATE extends API {
 
 				$return['data'] = $chunks;
 				$return['selected'] = $template['content'] ? json_decode($template['content'], true): [];
-				$return['body'] = [
+				$return['render'] = [
 					'content' => [
 						[
 							[
@@ -515,7 +515,7 @@ class TEXTTEMPLATE extends API {
 						'hint' => LANG::GET('texttemplate.edit_template_hidden_hint')
 					];
 					if ($template['hidden']) $hidden['content'][LANG::GET('texttemplate.edit_template_hidden_hidden')]['checked'] = true;
-					array_push($return['body']['content'][1], $hidden);
+					array_push($return['render']['content'][1], $hidden);
 				}
 				if ($template['name']) $return['header'] = $template['name'];
 				$this->response($return);
@@ -537,12 +537,12 @@ class TEXTTEMPLATE extends API {
 			'name' => '',
 		];
 
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing templates lists
 		$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 		if (!$templates) {
-			$result['body']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
+			$result['render']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
 			$this->response($result);		
 		}
 
@@ -566,10 +566,10 @@ class TEXTTEMPLATE extends API {
 				}
 			}
 		}
-		$return['body'] = ['content' => [[]]];
+		$return['render'] = ['content' => [[]]];
 
 		foreach ($options as $unit => $templates) {
-			$return['body']['content'][0][] = [
+			$return['render']['content'][0][] = [
 				[
 					'type' => 'select',
 					'attributes' => [
@@ -644,9 +644,9 @@ class TEXTTEMPLATE extends API {
 				],
 				'hint' => LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
 			];
-			$return['body']['content'][] = $inputs;
+			$return['render']['content'][] = $inputs;
 
-			$return['body']['content'][]=[
+			$return['render']['content'][] = [
 				[
 					'type' => 'textarea',
 					'attributes' => [

@@ -64,9 +64,9 @@ class FILE extends API {
 			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
 			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
 		}
-		$this->response(['status' => [
+		$this->response([
 			'data' => $matches
-		]]);
+		]);
 	}
 
 	/**
@@ -80,16 +80,16 @@ class FILE extends API {
 			similar_text($this->_requestedFolder, $row['name'], $percent);
 			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = strval($row['id']);
 		}
-		$this->response(['status' => [
+		$this->response([
 			'data' => $matches
-		]]);
+		]);
 	}
 
 	/**
 	 * responds with content of available files for restricted uploads and external documents
 	 */
 	public function files(){
-		$result['body'] = [
+		$result['render'] = [
 		'content' => [
 				[
 					[
@@ -123,7 +123,7 @@ class FILE extends API {
 					$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
 					$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
-				$result['body']['content'][]=
+				$result['render']['content'][]=
 				[
 					[
 						'type' => 'links',
@@ -133,7 +133,7 @@ class FILE extends API {
 				];
 			}
 		}
-		else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+		else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 		$this->response($result);
 	}
 
@@ -152,11 +152,11 @@ class FILE extends API {
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, LANG::PROPERTY('file.manager_new_folder')));
 				if ($new_folder){
 					foreach(INI['forbidden']['names'] as $pattern){
-						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['status' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
+						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['response' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 					}
 					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
 					UTILITY::storeUploadedFiles([], $new_folder);
-					$this->response(['status' => [
+					$this->response(['response' => [
 						'msg' => LANG::GET('file.manager_new_folder_created', [':name' => $new_folder]),
 						'redirect' => ['filemanager'],
 						'type' => 'success'
@@ -165,19 +165,19 @@ class FILE extends API {
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
 				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name'] && $destination) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('files_documents', [':category' => $destination]));
-					$this->response(['status' => [
+					$this->response(['response' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['filemanager', $destination],
 						'type' => 'success'
 					]]);
 				}
-				$this->response(['status' => [
+				$this->response(['response' => [
 					'msg' => LANG::GET('file.manager_error'),
 					'type' => 'error'
 				]]);
 		break;
 			case 'GET':
-				$result=['body'=>
+				$result = ['render'=>
 					[
 						'form' => [
 							'data-usecase' => 'file',
@@ -188,13 +188,13 @@ class FILE extends API {
 				];
 
 				if (!$this->_requestedFolder){
-					$result['body']['content'][] = [];
+					$result['render']['content'][] = [];
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
 						$content=[];
 						foreach ($folders as $folder){
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
-							array_push($result['body']['content'][0],
+							array_push($result['render']['content'][0],
 								[
 									'type' => 'links',
 									'description' => LANG::GET('file.manager_folder_header', [':date' => date('Y-m-d H:i', filemtime($folder))]),
@@ -207,7 +207,7 @@ class FILE extends API {
 									'attributes' => [
 										'value' => LANG::GET('file.manager_delete_folder'),
 										'type' => 'button',
-										'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $foldername]) ."', 'options':{".
+										'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
 											"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
 											"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
 											"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $foldername . "')})"
@@ -216,7 +216,7 @@ class FILE extends API {
 							);
 						}
 					}
-					array_push($result['body']['content'][0],
+					array_push($result['render']['content'][0],
 						[
 							'type' => 'links',
 							'description' => LANG::GET('menu.files_sharepoint'),
@@ -225,7 +225,7 @@ class FILE extends API {
 							]
 						]
 					);
-					array_push($result['body']['content'][0],
+					array_push($result['render']['content'][0],
 						[
 							'type' => 'links',
 							'description' => LANG::GET('menu.application_user_manager'),
@@ -234,7 +234,7 @@ class FILE extends API {
 							]
 						]
 					);
-					$result['body']['content'][]=[
+					$result['render']['content'][] = [
 						[
 							'type' => 'text',
 							'attributes' => [
@@ -253,7 +253,7 @@ class FILE extends API {
 					}
 					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
-						$result['body']['content'][]=[
+						$result['render']['content'][] = [
 							[
 								'type' => 'filter',
 								'attributes' => [
@@ -264,11 +264,11 @@ class FILE extends API {
 								]
 							]
 						];
-						$result['body']['content'][] = [];
+						$result['render']['content'][] = [];
 						foreach ($files as $file){
 							if ($file) {
 								$file = ['path' => substr($file, 1), 'name' => pathinfo($file)['basename']];
-								array_push($result['body']['content'][1],
+								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
 										'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
@@ -291,7 +291,7 @@ class FILE extends API {
 											'value' => LANG::GET('file.manager_delete_file'),
 											'type' => 'button',
 											'data-filtered' => $file['path'],
-											'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', 'options':{".
+											'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('file.manager_delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
 												"'".LANG::GET('file.manager_delete_file_confirmation_cancel')."': false,".
 												"'".LANG::GET('file.manager_delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
 												"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"
@@ -301,9 +301,9 @@ class FILE extends API {
 							}
 						}
 					}
-					else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-					if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) unset ($result['body']['form']);
-					else $result['body']['content'][]=[
+					else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+					if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) unset ($result['render']['form']);
+					else $result['render']['content'][] = [
 						[
 							'type' => 'hidden',
 							'attributes' => [
@@ -327,12 +327,12 @@ class FILE extends API {
 			case 'DELETE':
 				if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) $success = UTILITY::delete(UTILITY::directory($this->_requestedFolder) . '/' . $this->_requestedFile);
 				else $success = UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
-				if ($success) $this->response(['status' => [
+				if ($success) $this->response(['response' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
 					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null],
 					'type' => 'success'
 				]]);
-				else $this->response(['status' => [
+				else $this->response(['response' => [
 					'msg' => LANG::GET('file.manager_error'),
 					'type' => 'error'
 				]]);
@@ -372,12 +372,12 @@ class FILE extends API {
 						}
 					}
 					if ($success){		
-						$this->response(['status' => [
+						$this->response(['response' => [
 							'msg' => LANG::GET('file.manager_new_file_created'),
 							'type' => 'success'
 						]]);
 					}
-					$this->response(['status' => [
+					$this->response(['response' => [
 						'msg' => LANG::GET('file.manager_error'),
 						'type' => 'error'
 					]]);
@@ -415,17 +415,17 @@ class FILE extends API {
 				}
 				if (SQLQUERY::EXECUTE($this->_pdo, $prepare, [
 					'values' => $tokens
-				])) $this->response(['status' => [
+				])) $this->response(['response' => [
 						'msg' => $response,
 						'type' => 'success'
 					]]);
-				else $this->response(['status' => [
+				else $this->response(['response' => [
 					'msg' => LANG::GET('file.manager_error'),
 					'type' => 'error'
 				]]);
 				break;
 			case 'GET':
-				$result=['body'=>
+				$result = ['render'=>
 				['form' => [
 					'data-usecase' => 'file',
 					'action' => "javascript:api.file('post', 'externalfilemanager')"],
@@ -434,7 +434,7 @@ class FILE extends API {
 
 				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
 				if ($files){
-					$result['body']['content'][]=[
+					$result['render']['content'][] = [
 						[
 							'type' => 'filter',
 							'attributes' => [
@@ -445,7 +445,7 @@ class FILE extends API {
 							]
 						]
 					];
-					$result['body']['content'][] = [];
+					$result['render']['content'][] = [];
 					foreach ($files as $file){
 						if ($file) {
 							$file['name'] = pathinfo($file['path'])['basename'];
@@ -456,7 +456,7 @@ class FILE extends API {
 								$regulatory_context[$value] = ['value' => $key];
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
-							array_push($result['body']['content'][1],
+							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
 									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':date2' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
@@ -496,8 +496,8 @@ class FILE extends API {
 						}
 					}
 				}
-				else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-				$result['body']['content'][]=[
+				else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+				$result['render']['content'][] = [
 					[
 						'type' => 'file',
 						'attributes' => [
@@ -517,7 +517,7 @@ class FILE extends API {
 	 * responds with content of available file bundles
 	 */
 	public function bundle(){
-		$result['body'] = [
+		$result['render'] = [
 			'content' => [
 				[
 					[
@@ -539,8 +539,7 @@ class FILE extends API {
 				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
 			];
 			}
-			$result['body']['content'][]=
-			[
+			$result['render']['content'][] = [
 				[
 					'type' => 'links',
 					'description' => $row['name'],
@@ -582,13 +581,13 @@ class FILE extends API {
 					':active' => $isactive
 					]
 				])) $this->response([
-						'status' => [
+						'response' => [
 							'name' => $name,
 							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name]),
 							'type' => 'success'
 						]]);
 					else $this->response([
-						'status' => [
+						'response' => [
 							'name' => false,
 							'msg' => LANG::GET('file.edit_bundle_not_saved'),
 							'type' => 'error'
@@ -606,7 +605,7 @@ class FILE extends API {
 				]);
 				$bundle = $bundle ? $bundle[0] : null;
 				if (!$bundle) $bundle = ['name' => '', 'content' => '', 'active' => null];
-				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['status'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
+				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['response'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
 
 				// prepare existing bundle lists
 				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
@@ -615,7 +614,7 @@ class FILE extends API {
 					$options[$row['name']] = $bundle['name'] === $row['name'] ? ['selected' => true] : [];
 				}
 				
-				$return['body'] = [
+				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'file',
 						'action' => "javascript:api.file('post', 'bundlemanager')"
@@ -682,11 +681,11 @@ class FILE extends API {
 					}
 				}
 				foreach ($matches as $folder) {
-					$return['body']['content'][] = $folder;
+					$return['render']['content'][] = $folder;
 				}
 				$isactive = $bundle['active'] ? ['checked' => true] : [];
 				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
-				$return['body']['content'][] = [
+				$return['render']['content'][] = [
 					[
 						'type' => 'text',
 						'attributes'=>[
@@ -700,8 +699,8 @@ class FILE extends API {
 							'name' => LANG::GET('file.edit_bundle_active')
 						],
 						'content'=>[
-							LANG::GET('file.edit_active_bundle')=>$isactive,
-							LANG::GET('file.edit_inactive_bundle')=>$isinactive,
+							LANG::GET('file.edit_active_bundle') => $isactive,
+							LANG::GET('file.edit_inactive_bundle') => $isinactive,
 						]
 					]
 				];
@@ -722,23 +721,23 @@ class FILE extends API {
 			case 'POST':
 				if (array_key_exists(LANG::PROPERTY('file.sharepoint_upload_header'), $_FILES) && $_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.sharepoint_upload_header')], UTILITY::directory('sharepoint'), [$_SESSION['user']['name']]);
-					$this->response(['status' => [
+					$this->response(['response' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
 						'redirect' => ['sharepoint'],
 						'type' => 'success'
 					]]);
 				}
-				$this->response(['status' => [
+				$this->response(['response' => [
 					'msg' => LANG::GET('file.manager_error'),
 					'type' => 'error'
 				]]);
 		break;
 			case 'GET':
-				$result=['body'=>
-				[
-					'form' => [
-						'data-usecase' => 'file',
-						'action' => "javascript:api.file('post', 'sharepoint')"],
+				$result = ['render' => [
+						'form' => [
+							'data-usecase' => 'file',
+							'action' => "javascript:api.file('post', 'sharepoint')"
+						],
 						'content'=>[]
 					]
 				];
@@ -759,7 +758,7 @@ class FILE extends API {
 					}
 				}
 				if ($display){
-					$result['body']['content'][]=[
+					$result['render']['content'][] = [
 						[
 							'type' => 'filter',
 							'attributes' => [
@@ -770,15 +769,15 @@ class FILE extends API {
 							]
 						]
 					];
-					$result['body']['content'][] = [
+					$result['render']['content'][] = [
 						[
 							'type' => 'links',
 							'content' => $display
 						]
 					];
 				}
-				else $result['body']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-				$result['body']['content'][]=[
+				else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+				$result['render']['content'][] = [
 					[
 						'type' => 'file',
 						'attributes' => [

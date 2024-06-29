@@ -70,7 +70,7 @@ class FORM extends API {
 		} else {
 			if (!$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID)) $component = ['id' => '', 'name' =>''];
 		}
-		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing component lists
 		$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
@@ -108,7 +108,7 @@ class FORM extends API {
 			$approve['content'][$value] = [];
 		}
 
-		$return['body'] = [
+		$return['render'] = [
 			'content' => [
 				[
 					[
@@ -243,7 +243,7 @@ class FORM extends API {
 			]
 		];
 		if ($component['name'] && !PERMISSION::fullyapproved('formapproval', $row['approval']))
-			$return['body']['content'][count($return['body']['content']) - 2][] = [
+			$return['render']['content'][count($return['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
@@ -253,7 +253,7 @@ class FORM extends API {
 				]
 			];
 
-		if (array_key_exists('content', $component)) $return['body']['component'] = json_decode($component['content']);
+		if (array_key_exists('content', $component)) $return['render']['component'] = json_decode($component['content']);
 		if ($component['name']) $return['header'] = $component['name'];
 		$this->response($return);
 	}
@@ -284,17 +284,17 @@ class FORM extends API {
 							':permitted_export' => NULL
 						]
 					])) $this->response([
-							'status' => [
+							'response' => [
 								'name' => $component_name,
 								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
 								'type' => 'success'
 							]]);	
 				}
 
-				if (!($component_approve = array_search($component_approve, LANGUAGEFILE['units']))) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
+				if (!($component_approve = array_search($component_approve, LANGUAGEFILE['units']))) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 				}
 				// recursively replace images with actual $_FILES content according to content nesting
 				if (array_key_exists('composedComponent_files', $_FILES)){
@@ -345,7 +345,7 @@ class FORM extends API {
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
 						}
 						$this->response([
-						'status' => [
+						'response' => [
 							'name' => $component_name,
 							'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
 							'reload' => 'component_editor',
@@ -353,7 +353,7 @@ class FORM extends API {
 						]]);
 				}
 				else $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('assemble.edit_component_not_saved'),
 						'type' => 'error'
@@ -373,9 +373,9 @@ class FORM extends API {
 				}
 				if ($component){
 					$component['content'] = json_decode($component['content']);
-					$this->response(['body' => $component, 'name' => $component['name']]);
+					$this->response(['render' => $component]);
 				}
-				$this->response(['status' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+				$this->response(['response' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 				break;
 			case 'DELETE':
 				$component = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
@@ -384,7 +384,7 @@ class FORM extends API {
 					]
 				]);
 				$component = $component ? $component[0] : null;
-				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
+				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
 				// recursively check for identifier
 				function deleteImages($element){
 					foreach($element as $sub){
@@ -401,7 +401,7 @@ class FORM extends API {
 					'values' => [
 						':id' => $this->_requestedID
 					]
-				])) $this->response(['status' => [
+				])) $this->response(['response' => [
 					'msg' => LANG::GET('assemble.edit_component_delete_success'),
 					'type' => 'success',
 					'reload' => 'component_editor'
@@ -438,7 +438,7 @@ class FORM extends API {
 			'regulatory_context' => '',
 			'permitted_export' => null
 		];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing forms lists
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
@@ -522,7 +522,7 @@ class FORM extends API {
 			]
 		];
 
-		$return['body'] = [
+		$return['render'] = [
 			'content' => [
 				[
 					[
@@ -615,7 +615,7 @@ class FORM extends API {
 			]
 		];
 		if ($form['name'] && (!PERMISSION::fullyapproved('formapproval', $form['approval'])))
-			$return['body']['content'][count($return['body']['content']) - 2][] = [
+			$return['render']['content'][count($return['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
@@ -627,7 +627,7 @@ class FORM extends API {
 
 		// add used components to response
 		if (array_key_exists('content', $form)) {
-			$return['body']['components'] = [];
+			$return['render']['components'] = [];
 			foreach(explode(',', $form['content']) as $usedcomponent) {
 				// get latest approved by name
 				$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
@@ -635,7 +635,7 @@ class FORM extends API {
 					$component['content'] = json_decode($component['content'], true);
 					$component['content']['name'] = $usedcomponent;
 					$component['content']['hidden'] = boolval(intval($component['hidden']));
-					$return['body']['components'][] = $component['content'];
+					$return['render']['components'][] = $component['content'];
 				}
 			}
 		}
@@ -647,9 +647,9 @@ class FORM extends API {
 		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!$this->_payload->context) $this->response(['status' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
+				if (!$this->_payload->context) $this->response(['response' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 				}
 
 				// recursively check for identifier
@@ -674,7 +674,7 @@ class FORM extends API {
 						$latestcomponent = $this->latestApprovedName('form_component_get_by_name', $component);
 						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasidentifier = true;
 					}
-					if (!$hasidentifier) $this->response(['status' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
+					if (!$hasidentifier) $this->response(['response' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
 				}
 				// convert values to keys for regulatory_context
 				$regulatory_context = [];
@@ -699,7 +699,7 @@ class FORM extends API {
 							':permitted_export' => $this->_payload->permitted_export ? : 0
 						]
 					])) $this->response([
-							'status' => [
+							'response' => [
 								'name' => $this->_payload->name,
 								'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
 								'type' => 'success'
@@ -707,7 +707,7 @@ class FORM extends API {
 				}
 
 				// if not updated check if approve is set, not earlier
-				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
+				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
 				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
@@ -727,7 +727,7 @@ class FORM extends API {
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
 						}
 						$this->response([
-						'status' => [
+						'response' => [
 							'name' => $this->_payload->name,
 							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
 							'reload' => 'form_editor',
@@ -735,7 +735,7 @@ class FORM extends API {
 						]]);
 				}
 				else $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('assemble.edit_form_not_saved'),
 						'type' => 'error'
@@ -748,13 +748,13 @@ class FORM extends API {
 					]
 				]);
 				$component = $component ? $component[0] : null;
-				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['status' => ['msg' => LANG::GET('assemble.edit_form_delete_failure'), 'type' => 'error']]);
+				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_delete_failure'), 'type' => 'error']]);
 				
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_delete', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
-				])) $this->response(['status' => [
+				])) $this->response(['response' => [
 					'msg' => LANG::GET('assemble.edit_form_delete_success'),
 					'type' => 'success',
 					'reload' => 'form_editor',
@@ -769,7 +769,7 @@ class FORM extends API {
 			case 'PUT':
 				$approveas = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.approve_as_select'));
 				if (!$approveas) $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('assemble.approve_not_saved'),
 						'type' => 'error'
 					]]);
@@ -800,13 +800,13 @@ class FORM extends API {
 						':approval' => json_encode($approve['approval']) ? : ''
 					]
 				])) $this->response([
-						'status' => [
+						'response' => [
 							'msg' => LANG::GET('assemble.approve_saved') . "<br />". (PERMISSION::fullyapproved('formapproval', $approve['approval']) ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
 							'type' => 'success',
 							'reload' => 'approval',
 							]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'msg' => LANG::GET('assemble.approve_not_saved'),
 						'type' => 'error'
 					]]);
@@ -818,7 +818,7 @@ class FORM extends API {
 				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
 				$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 				$unapproved = ['forms' => [], 'components' => []];
-				$return = ['body'=> ['content' => [[]]]]; // default first nesting
+				$return = ['render'=> ['content' => [[]]]]; // default first nesting
 				$hidden = [];
 				foreach(array_merge($components, $forms) as $element){
 					if ($element['context'] === 'bundle') continue;
@@ -843,7 +843,7 @@ class FORM extends API {
 					}
 				}
 
-				if ($componentselection) $return['body']['content'][0][] = [
+				if ($componentselection) $return['render']['content'][0][] = [
 					'type' => 'select',
 					'attributes' => [
 						'name' => LANG::GET('assemble.approve_component_select'),
@@ -851,7 +851,7 @@ class FORM extends API {
 					],
 					'content' => $componentselection
 				];
-				if ($formselection) $return['body']['content'][0][] =
+				if ($formselection) $return['render']['content'][0][] =
 				[
 					'type' => 'select',
 					'attributes' => [
@@ -860,12 +860,12 @@ class FORM extends API {
 					],
 					'content' => $formselection
 				];
-				if ($componentselection || $formselection) $return['body']['content'][] = [
+				if ($componentselection || $formselection) $return['render']['content'][] = [
 					[
 						'type' => 'hr'
 					]
 				];
-				else $this->response(['body' => ['content' => $this->noContentAvailable(LANG::GET('assemble.approve_no_approvals'))]]);
+				else $this->response(['render' => ['content' => $this->noContentAvailable(LANG::GET('assemble.approve_no_approvals'))]]);
 
 				if ($this->_requestedID){
 					$alert = '';
@@ -897,7 +897,7 @@ class FORM extends API {
 						$approvalposition[LANG::GET('permissions.' . $position)] = [];
 					}
 					if ($approve['context'] === 'component'){
-						array_push($return['body']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
+						array_push($return['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
 					}
 					else {
 						foreach(explode(',', $approve['content']) as $component){
@@ -907,12 +907,12 @@ class FORM extends API {
 								if (!PERMISSION::fullyapproved('formapproval', $cmpnnt['approval'])){
 									$alert .= LANG::GET('assemble.approve_form_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
 								}
-								array_push($return['body']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
+								array_push($return['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
 							}
 						}
-						if ($alert) $return['status'] = ['msg' => $alert, 'type' => 'info'];
+						if ($alert) $return['response'] = ['msg' => $alert, 'type' => 'info'];
 					}
-					array_push($return['body']['content'], 
+					array_push($return['render']['content'], 
 						[
 							[
 								'type' => 'hr'
@@ -925,7 +925,7 @@ class FORM extends API {
 							]
 						]
 					);
-					$return['body']['form'] = [
+					$return['render']['form'] = [
 						'data-usecase' => 'approval',
 						'action' => "javascript: api.form('put', 'approval', " . $this->_requestedID . ")",
 						'data-confirm' => true
@@ -978,7 +978,7 @@ class FORM extends API {
 							':permitted_export' => null
 						]
 					])) $this->response([
-						'status' => [
+						'response' => [
 							'name' => $bundle[':name'],
 							'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']]),
 							'type' => 'success'
@@ -986,19 +986,19 @@ class FORM extends API {
 				}
 
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['status' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
 					'values' => $bundle
 				])) $this->response([
-						'status' => [
+						'response' => [
 							'name' => $bundle[':name'],
 							'msg' => LANG::GET('assemble.edit_bundle_saved', [':name' => $bundle[':name']]),
 							'type' => 'success'
 						]]);
 				else $this->response([
-					'status' => [
+					'response' => [
 						'name' => false,
 						'msg' => LANG::GET('assemble.edit_bundle_not_saved'),
 						'type' => 'error'
@@ -1041,7 +1041,7 @@ class FORM extends API {
 					'content' => '',
 					'hidden' => 0
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['status'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing bundle lists
 				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
@@ -1067,7 +1067,7 @@ class FORM extends API {
 					}
 				}
 
-				$return['body'] = [
+				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'bundle',
 						'action' => "javascript:api.form('post', 'bundle')"],
@@ -1139,7 +1139,7 @@ class FORM extends API {
 					]
 				];
 				if ($bundle['id']){
-					$hidden=[
+					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
 							'name' => LANG::GET('assemble.edit_bundle_hidden')
@@ -1151,7 +1151,7 @@ class FORM extends API {
 						'hint' => LANG::GET('assemble.edit_bundle_hidden_hint')
 					];
 					if ($bundle['hidden']) $hidden['content'][LANG::GET('assemble.edit_bundle_hidden_hidden')]['checked'] = true;
-					array_push($return['body']['content'][1], $hidden);
+					array_push($return['render']['content'][1], $hidden);
 				}
 
 				$this->response($return);
