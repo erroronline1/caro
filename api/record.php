@@ -424,11 +424,16 @@ class RECORD extends API {
 					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . date('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
+								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[$i], INI['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+
 								if (array_key_exists($fileinput, $attachments)) $attachments[$fileinput][]= substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
 							}
 						}
-						else $attachments[$fileinput] = [substr($uploaded[0], 1)];
+						else {
+							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[0], INI['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+							$attachments[$fileinput] = [substr($uploaded[0], 1)];
+						}
 					}
 				}
 				foreach($attachments as $input => $files){
