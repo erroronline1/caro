@@ -293,9 +293,9 @@ class CALENDAR extends API {
 				$result = ['render' => ['content' => []]];
 				$month = $calendar->render('month', 'schedule', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
-				$previousmonth->modify('-1 month');
+				$previousmonth->modify('-1 month')->modify('last day of this month');
 				$nextmonth = clone $calendar->_days[6];
-				$nextmonth->modify('+1 month');
+				$nextmonth->modify('+1 month')->modify('first day of this month');
 
 				$result['render']['content'][] = [
 					[
@@ -324,7 +324,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => 'previous',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'schedule', ' " . $previousmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'schedule', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')"
 						]
 					],
 					[
@@ -332,11 +332,14 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => 'next',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'schedule', ' " . $nextmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'schedule', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')"
 						]
 					],
 				];
-
+				if (!$this->_requestedDate){
+					$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$this->_requestedDate = $today->format('Y-m-d');
+				}
 				if ($this->_requestedDate){
 					$columns = [
 						':type' => 'schedule',
@@ -647,9 +650,9 @@ class CALENDAR extends API {
 				$result = ['render' => ['content' => []]];
 				$month = $calendar->render('month', 'timesheet', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
-				$previousmonth->modify('-1 month');
+				$previousmonth->modify('-1 month')->modify('last day of this month');
 				$nextmonth = clone $calendar->_days[6];
-				$nextmonth->modify('+1 month');
+				$nextmonth->modify('+1 month')->modify('first day of this month');
 
 				$result['render']['content'][] = [
 					[
@@ -663,7 +666,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => 'previous',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'timesheet', ' " . $previousmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')"
 						]
 					],
 					[
@@ -671,10 +674,14 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => 'next',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'timesheet', ' " . $nextmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')"
 						]
 					],
 				];
+				if (!$this->_requestedDate){
+					$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$this->_requestedDate = $today->format('Y-m-d');
+				}
 
 				if ($this->_requestedDate){
 					$columns = [
