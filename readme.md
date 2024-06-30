@@ -70,6 +70,7 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
+* https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
