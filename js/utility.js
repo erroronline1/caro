@@ -1,17 +1,17 @@
 /**
  * CARO - Cloud Assisted Records and Operations
  * Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -30,7 +30,7 @@ const _serviceWorker = {
 					}, 300000);
 				}
 				navigator.serviceWorker.addEventListener("message", (message) => {
-					this.onMessage(message.data);
+					this.onMessage(message);
 				});
 			});
 		} else throw new Error("No Service Worker support!");
@@ -62,7 +62,13 @@ const _serviceWorker = {
 			element.disabled = true;
 		}
 	},
-	onMessage: function (data) {
+	onMessage: function (message) {
+		const data = message.data;
+		if (!Object.keys(data).length) {
+			document.querySelector("header>div:nth-of-type(2)").style.display = "block";
+			return;
+		}
+		document.querySelector("header>div:nth-of-type(2)").style.display = "none";
 		if ("message_unnotified" in data) {
 			if (parseInt(data.message_unnotified, 10)) {
 				let body =
@@ -86,25 +92,17 @@ const _serviceWorker = {
 			let order_unprocessed = 0,
 				consumables_pendingincorporation = 0;
 			if ("order_unprocessed" in data) {
-				notif = document.querySelector(
-					"[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]"
-				);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 				order_unprocessed = data.order_unprocessed;
 			}
 			if ("consumables_pendingincorporation" in data) {
-				notif = document.querySelector(
-					"[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]"
-				);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 				consumables_pendingincorporation = data.consumables_pendingincorporation;
 			}
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-			if (notif)
-				notif.setAttribute(
-					"data-notification",
-					parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)
-				);
+			if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 		}
 		if ("calendar_uncompletedevents" in data) {
 			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
@@ -121,29 +119,28 @@ const _serviceWorker = {
 	},
 };
 const _client = {
-	application : {
+	application: {
 		clearMenu: (event) => {
 			const inputs = document.getElementsByName("userMenu");
 			for (const input of inputs) {
 				input.checked = false;
 			}
 		},
-		dialogToFormdata : (dialogData) => {
+		dialogToFormdata: (dialogData) => {
 			if (!Object.keys.length) return false;
 			formdata = new FormData();
 			for (const [key, value] of Object.entries(dialogData)) {
 				formdata.append(key, value);
 			}
 			return formdata;
-		}
+		},
 	},
 	calendar: {
 		createFormData: (data) => {
 			window.calendarFormData = new FormData();
 			units = [];
 			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit")
-					units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+				if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
 			if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));

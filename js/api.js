@@ -82,7 +82,7 @@ export const api = {
 					delete sanitizedpayload[key];
 				}
 				// unset '0' values that are not recognized by backend
-				if (value == '0') sanitizedpayload[key] = '';
+				if (value == "0") sanitizedpayload[key] = "";
 			}
 			sanitizedpayload = JSON.stringify(sanitizedpayload)
 				.replaceAll(/\\r|\\n|\\t/g, "")
@@ -95,7 +95,7 @@ export const api = {
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {
-				document.querySelector("header>div:first-of-type").style.display = data.status === 200 ? "none" : "block";
+				document.querySelector("header>div:nth-of-type(1)").style.display = data.status === 200 ? "none" : "block";
 				if (data.status === 203) new Toast(LANG.GET("general.service_worker_get_cache_fallback"), "info");
 				if (data.status === 207) {
 					new Toast(LANG.GET("general.service_worker_post_cache_fallback"), "info");
@@ -199,13 +199,15 @@ export const api = {
 								case "forceDesktop":
 									if (value) {
 										let stylesheet;
-										for (const [i ,sname] of Object.entries(document.styleSheets)){
+										for (const [i, sname] of Object.entries(document.styleSheets)) {
 											if (!sname.href.includes("style.css")) continue;
-											stylesheet=document.styleSheets[i].cssRules;
+											stylesheet = document.styleSheets[i].cssRules;
 											break;
 										}
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") {stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";}
+											if (stylesheet[i].conditionText === "only screen and (min-width: 64em)") {
+												stylesheet[i].media.mediaText = "only screen and (min-width: 4em)";
+											}
 										}
 									}
 									break;
