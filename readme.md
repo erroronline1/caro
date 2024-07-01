@@ -71,6 +71,7 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
+* records default prefilled date and time input before submit button, if blank insert server time for record timestamp
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
