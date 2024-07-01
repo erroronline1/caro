@@ -73,9 +73,11 @@ class API {
 			]);
 			if ($query){
 				// valid user IS logged in
-				$_SESSION['lastrequest'] = time();
-				$result = $query[0];
+				// renew session timeout except for defined requests
+				if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
+
 				//update user setting for each request
+				$result = $query[0];
 				$_SESSION['user'] = $result;
 				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
 				$_SESSION['user']['units'] = explode(',', $result['units']);
