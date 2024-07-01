@@ -671,7 +671,7 @@ export const api = {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
-						if (request[2]) window.scrollTo(0, document.render.scrollHeight);
+						if (request[2]) window.scrollTo(0, document.body.scrollHeight);
 					}
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					if (request[1] === "inbox" && _serviceWorker.worker)
