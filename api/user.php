@@ -37,7 +37,8 @@ class USER extends API {
 			case 'PUT':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => $_SESSION['user']['id']
+						':id' => $_SESSION['user']['id'],
+						':name' => $_SESSION['user']['name']
 					]
 				]);
 				$user = $user ? $user[0] : null;
@@ -101,7 +102,8 @@ class USER extends API {
 			case 'GET':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => $_SESSION['user']['id']
+						':id' => $_SESSION['user']['id'],
+						':name' => $_SESSION['user']['name']
 					]
 				]);
 				$user = $user ? $user[0] : null;
@@ -374,7 +376,8 @@ class USER extends API {
 		
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => intval($this->_requestedID)
+						':id' => intval($this->_requestedID),
+						':name' => strval($this->_requestedID)
 					]
 				]);
 				$user = $user ? $user[0] : null;
@@ -501,7 +504,8 @@ class USER extends API {
 				// select single user based on id or name
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => $this->_requestedID ? : ''
+						':id' => intval($this->_requestedID) ? : '',
+						':name' => strval($this->_requestedID) ? : ''
 					]
 				]);
 				$user = $user ? $user[0] : null;
@@ -772,7 +776,8 @@ class USER extends API {
 				// prefetch to return proper name after deletion
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => intval($this->_requestedID)
+						':id' => intval($this->_requestedID),
+						':name' => strval($this->_requestedID)
 					]
 				]);
 				$user = $user[0];

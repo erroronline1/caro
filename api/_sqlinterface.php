@@ -647,8 +647,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, app_settings, skills FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
-			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:id)",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:id) OR name IN (:id)"
+			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:name)",
+			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:id) OR name IN (:name)"
 		],
 		'user_get_cached' => [
 			'mysql' => "SELECT * FROM caro_user WHERE SHA2(CONCAT(SHA2(id, 256), :checksum), 256) = :hash",

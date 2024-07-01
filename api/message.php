@@ -36,7 +36,8 @@ class MESSAGE extends API {
 				// get recipient ids
 				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
+						':id' => '',
+						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
 					]
 				]);
 				if (!$recipients) $this->response([
@@ -100,7 +101,8 @@ class MESSAGE extends API {
 					$conversation_content = [];
 					$conversation_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 						'replacements' => [
-							':id' => $this->_conversation
+							':id' => $this->_conversation,
+							':name' => ''
 						]
 					]);
 					$conversation_user = $conversation_user ? $conversation_user[0] : null;
