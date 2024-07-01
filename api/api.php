@@ -60,6 +60,10 @@ class API {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
+		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > INI['limits']['idle_logout'])){
+			session_unset();
+			session_destroy();
+		}
 		// check if a registered user with valid token is logged in
 		if (array_key_exists('user', $_SESSION)){
 			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
@@ -69,6 +73,7 @@ class API {
 			]);
 			if ($query){
 				// valid user IS logged in
+				$_SESSION['lastrequest'] = time();
 				$result = $query[0];
 				//update user setting for each request
 				$_SESSION['user'] = $result;

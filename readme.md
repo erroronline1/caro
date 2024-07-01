@@ -846,6 +846,7 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
+* php.ini session.gc_maxlifetime according to [setup.ini[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
     * gd
     * gettext
@@ -924,9 +925,14 @@ records_search_similarity = 20 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
+idle_logout = 10800 ; seconds after which a session expires without intermittend request, keep long fittings in mind
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 mdr14_sample_interval = 365 ; days until a new sample check is required as default value
 mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed as default value
+user_image = 256 ; max pixels on longer side
+order_approvalsignature_image = 2048 ; max pixels on longer side
+form_image = 2048 ; max pixels on longer side
+record_image = 2048 ; max pixels on longer side
 
 ; permissions based of and matching languages.xx.ini permissions
 ; dynamic handling for modules and methods
@@ -2965,11 +2971,11 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Auth_7 Die Anwendung MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
     > This is not reasonable for the application used within a closed environment and on shared devices.
 * O.Auth_8 Wurde die Anwendung unterbrochen (in den Hintergrundbetrieb versetzt), MUSS nach Ablauf einer angemessenen Frist (Grace Period) eine erneute Authentisierung durchgeführt werden.
-    > This is not reasonable for the application used within a closed environment and on shared devices. Treatment measures may take a while, auto log out risks data loss if not sent.
+    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
 * O.Auth_9 Die Anwendung MUSS nach einer angemessenen Zeit in der sie nicht aktiv verwendet wurde (idle time) eine erneute Authentisierung fordern. 
-    > This is not reasonable for the application used within a closed environment and on shared devices. Treatment measures may take a while, auto log out risks data loss if not sent.
+    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
 * O.Auth_10 Die Anwendung MUSS nach einer angemessenen Zeit in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung zur Reaktivierung der Serversitzung fordern. 
-    > This is not reasonable for the application used within a closed environment and on shared devices. Treatment measures may take a while, auto log out risks data loss if not sent.
+    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
 * O.Auth_11 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
     > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
 * O.Auth_12 Die Anwendung MUSS für die Anbindung eines Hintergrundsystems eine dem Stand der Technik entsprechende Authentifizierung verwenden.
@@ -3191,9 +3197,9 @@ This software aims to match as much relevant aspects of security measures as rea
 * O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
     > This is not reasonable for the application used within a closed environment and on shared devices.
 * O.Auth_10 Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute Authentisierung fordern.
-    > This is not reasonable for the application used within a closed environment and on shared devices. Treatment measures may take a while, auto log out risks data loss if not sent.
+    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
 * O.Auth_11 Das Hintergrundsystem MUSS für die Anwendungssitzung nach einer angemessenen Zeit, in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung fordern. 
-    > This is not reasonable for the application used within a closed environment and on shared devices. Treatment measures may take a while, auto log out risks data loss if not sent.
+    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
 * O.Auth_12 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
     > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
 * O.Auth_13 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
