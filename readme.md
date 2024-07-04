@@ -66,6 +66,7 @@
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
 * vendor evaluation
+* skin contact (filter?) display neccessity for batch number within orders
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -73,6 +74,7 @@
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
 * records default prefilled date and time input before submit button, if blank insert server time for record timestamp
 * user certificates expiry (database like external files)
+* user training documentation
 * imdrf annexes import for prrc
 
 #### planning considerations
