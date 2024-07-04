@@ -264,13 +264,10 @@ class RECORD extends API {
 		if (!$form || $form['hidden']) $this->response(['response' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $form['name'], 'render' => [
-			'form' => [
-				'data-usecase' => 'record',
-				'action' => "javascript:api.record('post', 'record')",
-				'data-confirm' => true],
 			'content' => []
 		]];
 
+		// prefill identify if passed, prepare calendar button if part of the form
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		function setidentifier($element, $identify, $calendar){
 			$content = [];
@@ -294,7 +291,6 @@ class RECORD extends API {
 			}
 			return $content;
 		};
-
 		foreach(explode(',', $form['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			if ($component){
@@ -302,6 +298,25 @@ class RECORD extends API {
 				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
 			}
 		}
+
+		// check if a submit button is applicable
+		function saveable($element){
+			$saveable = false;
+			foreach($element as $subs){
+				if (!array_key_exists('type', $subs)){
+					if ($saveable = saveable($subs)) return true;
+				}
+				else {
+					if (!in_array($subs['type'], ['textblock', 'image', 'links', 'hidden', 'button'])) return true;
+				}
+			}
+			return $saveable;
+		}
+		if (saveable($return['render']['content'])) $return['render']['form'] = [
+			'data-usecase' => 'record',
+			'action' => "javascript:api.record('post', 'record')",
+			'data-confirm' => true];
+
 		$context = [
 			[
 				'type' => 'hidden',
