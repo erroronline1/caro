@@ -848,7 +848,7 @@ export class Assemble {
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
 		label = document.createElement("label");
 		label.htmlFor = input.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label");
 

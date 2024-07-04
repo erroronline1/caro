@@ -593,8 +593,8 @@ class SQLQUERY {
 
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)",
-			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content) VALUES (:context, :form_name, :form_id, :identifier, CURRENT_TIMESTAMP, :author, :author_id, :content)"
+			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, :entry_timestamp, :author, :author_id, :content)",
+			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content)"
 		],
 		'records_import' => [
 			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",

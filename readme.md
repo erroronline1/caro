@@ -72,7 +72,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
-* records default prefilled date and time input before submit button, if blank insert server time for record timestamp
 * user certificates expiry (database like external files)
 * user training documentation (certificates without upload?)
 * imdrf annexes import for prrc
@@ -994,7 +993,7 @@ products_per_slide = 6
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* Cached POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records. Timestamps may vary depending on the server side processing though.
+* Cached POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records.
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.

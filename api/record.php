@@ -338,6 +338,27 @@ class RECORD extends API {
 				]
 			]
 		];
+
+		if (isset($return['render']['form'])) {
+			$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+			$return['render']['content'][] = [
+				[
+					'type' => 'date',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_date'),
+						'value' => $now->format('Y-m-d'),
+						'required' => true
+					]
+				], [
+					'type' => 'time',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_time'),
+						'value' => $now->format('H:i'),
+						'required' => true
+					]
+				]
+			];
+		}
 		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
 			$return['render']['content'][] = [
 				[
@@ -417,6 +438,15 @@ class RECORD extends API {
 				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
 				if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
 				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
+				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
+				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
+
+				$entry_timestamp = $entry_date . ' ' . $entry_time . ':00';
+				if (strlen($entry_timestamp) > 19) { // yyyy-mm-dd hh:ii
+					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$entry_timestamp = $date->format('Y-m-d H:i:s');
+				}
+
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
@@ -429,8 +459,7 @@ class RECORD extends API {
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 				}
 				if (!$identifier) {
-					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
-					$identifier = $form_name . ' ' . $date->format('Y-m-d H:i');
+					$identifier = $form_name . ' ' . $entry_timestamp;
 				}
 
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
@@ -462,7 +491,8 @@ class RECORD extends API {
 						':identifier' => $identifier,
 						':author' => $_SESSION['user']['name'],
 						':author_id' => $_SESSION['user']['id'],
-						':content' => json_encode($this->_payload)
+						':content' => json_encode($this->_payload),
+						':entry_timestamp' => $entry_timestamp
 					]
 				])) $this->response([
 					'response' => [
