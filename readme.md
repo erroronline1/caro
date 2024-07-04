@@ -74,7 +74,7 @@
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
 * records default prefilled date and time input before submit button, if blank insert server time for record timestamp
 * user certificates expiry (database like external files)
-* user training documentation
+* user training documentation (certificates without upload?)
 * imdrf annexes import for prrc
 
 #### planning considerations
