@@ -592,6 +592,10 @@ button {
 	}
 }
 
+input[type="range"]{
+	accent-color:var(--green);
+}
+
 input[type="range"],
 .rangedatalist {
 	margin-left: 2em;
