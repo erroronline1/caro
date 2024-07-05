@@ -635,7 +635,14 @@ Defined authorized users (e.g. *purchase assistant*) can edit the alias definiti
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
 
-While editing products, one can edit the *trading good*-setting, *has expiry date*-setting, revoke a possible *incorporated*-state and set the product *active and available* or *inactive*. On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
+While editing products, one can edit the
+* *trading good*-setting,
+* *has expiry date*-setting,
+* *special attention*-setting (meaning being defined within languagefile),
+* revoke a possible *incorporated*-state and
+* set the product *active and available* or *inactive*.
+
+On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
 
 ![vendor manager screenshot](assets/vendor%20manager.png)
 
