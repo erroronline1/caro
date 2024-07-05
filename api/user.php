@@ -624,7 +624,26 @@ class USER extends API {
 							'content' => $units,
 							'hint' => LANG::GET('user.edit_units_hint')
 						]
-					],[
+					], [
+						[
+							'type' => 'photo',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_take_photo')
+							],
+							'hint' => LANG::GET('user.edit_take_photo_hint')
+						],
+					], [
+						[
+							'type' => 'radio',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_order_authorization')
+							],
+							'content' => [
+								LANG::GET('user.edit_order_authorization_generate') => [],
+								LANG::GET('user.edit_order_authorization_revoke') => []
+							]
+						]
+					], [
 						[
 							[
 								'type' => 'text',
@@ -652,16 +671,7 @@ class USER extends API {
 								'hint' => LANG::GET('user.settings_annual_vacation_hint')
 							]
 						]
-					],
-					[
-						[
-							'type' => 'photo',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_take_photo')
-							],
-							'hint' => LANG::GET('user.edit_take_photo_hint')
-						],
-					],[
+					], [
 						[
 							'type' => 'file',
 							'attributes' => [
@@ -675,20 +685,9 @@ class USER extends API {
 							],
 							'hint' => LANG::GET('user.edit_add_document_rename_hint')
 						]
-					],[
-						[
-							'type' => 'radio',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_order_authorization')
-							],
-							'content' => [
-								LANG::GET('user.edit_order_authorization_generate') => [],
-								LANG::GET('user.edit_order_authorization_revoke') => []
-							]
-						]
 					],
-						$skillmatrix
-					,[
+					$skillmatrix,
+					[
 						[
 							'type' => 'checkbox',
 							'description' => LANG::GET('user.edit_token'),
@@ -714,7 +713,7 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) $result['render']['content'][3] = [
+					if ($user['image']) $result['render']['content'][2] = [
 						[
 							[
 								'type' => 'image',
@@ -722,6 +721,19 @@ class USER extends API {
 								'attributes' => [
 									'name' => $user['name'] . '_pic',
 									'url' => $user['image']
+								]
+							]
+						],
+						$result['render']['content'][2]
+					];
+
+					if ($user['orderauth']) $result['render']['content'][3]=[
+						[
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('user.edit_order_authorization_current'),
+									'value' => $user['orderauth']
 								]
 							]
 						],
@@ -736,7 +748,7 @@ class USER extends API {
 						}
 					}
 					if ($userfiles) {
-						array_push($result['render']['content'][4], 
+						array_push($result['render']['content'][5], 
 						['type' => 'br'],
 						[
 							'type' => 'links',
@@ -744,18 +756,6 @@ class USER extends API {
 						]);
 					}
 
-					if ($user['orderauth']) $result['render']['content'][5]=[
-						[
-							[
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('user.edit_order_authorization_current'),
-									'value' => $user['orderauth']
-								]
-							]
-						],
-						$result['render']['content'][5]
-					];
 					if ($user['token']) $result['render']['content'][7]=[
 						[
 							[
