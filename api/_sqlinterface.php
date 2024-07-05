@@ -45,33 +45,48 @@ class SQLQUERY {
 		// retrive query matching sql driver, else process raw query
 		if (array_key_exists($query, self::QUERIES)) $query = self::QUERIES[$query][INI['sql'][INI['sql']['use']]['driver']];
 		
-		// substitute NULL values and mask/sanitize values
+		// substitute NULL values, int values and mask/sanitize values
 		if (array_key_exists('values', $parameters) && $parameters['values']){
 			foreach ($parameters['values'] as $key => $value){
 				if ($value === null || $value === false) {
 					$query = strtr($query, [$key => 'NULL']);
 					unset($parameters['values'][$key]);
 				}
+				/*else if (strval(intval($value)) === $value) {
+					$query = strtr($query, [$key => intval($value)]);
+					unset($parameters['values'][$key]);
+				}
+				else if (strval(floatval($value)) === $value) {
+					$query = strtr($query, [$key => floatval($value)]);
+					unset($parameters['values'][$key]);
+				}*/
 				else $parameters['values'][$key] = trim($value);
 			}
 		} else $parameters['values'] = [];
+
 		// replace tokens in query that can not be executed
 		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
-			foreach ($parameters['replacements'] as $key => &$value){
-				$list = explode(',', $value);
-				if (count($list) > 1){
+			foreach ($parameters['replacements'] as $key => $value){
+				$list = [];
+				if (json_decode($value, true) === null) $list = explode(',', $value); // can't explode csv if json
+				if (count($list) > 1){ // handle lists
 					foreach ($list as $index => $value2){
-						if (strval(intval($value)) === $value) $list[$index] = intval($value);
-						elseif (gettype($value2) === 'string' && !in_array($value2, ['NULL', 'CURRENT_TIMESTAMP'])) $list[$index] = $_pdo->quote($value2);
+						if (strval(intval($value2)) === $value2) $list[$index] = intval($value2); // handle int
+						else if (strval(floatval($value2)) === $value2) $parameters['replacements'][$key] = floatval($value2); // handle float
+						elseif (gettype($value2) === 'string' && !in_array($value2, ['NULL', 'CURRENT_TIMESTAMP'])) $list[$index] = $_pdo->quote($value2); // handle string
 					}
-					$value = implode(',', $list);
+					$parameters['replacements'][$key] = implode(',', $list);
 				}
-				else if (gettype($value) === 'string' && !in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) $parameters['replacements'][$key] = $_pdo->quote($value);
+				else if (strval(intval($value)) === $value) $parameters['replacements'][$key] = intval($value); // handle int
+				else if (strval(floatval($value)) === $value) $parameters['replacements'][$key] = floatval($value); // handle float
+				else if (in_array($key, [':field'])) $parameters['replacements'][$key] = $value; // some replacements involve column names that must not be quoted
+				else if (gettype($value) === 'string' && !in_array($value, ['NULL', 'CURRENT_TIMESTAMP'])) $parameters['replacements'][$key] = $_pdo->quote($value); // handle string
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
 		$statement = $_pdo->prepare($query);
 
+		//var_dump($query);
 		//$statement->execute($parameters['values']);
 		//var_dump($statement->debugDumpParams());
 		if (!$statement->execute($parameters['values'])) return false;
