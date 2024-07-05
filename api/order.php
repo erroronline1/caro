@@ -1281,6 +1281,9 @@ class ORDER extends API {
 							$content[] = [
 								'type' => 'textblock',
 								'description' => LANG::GET('consumables.edit_product_special_attention'),
+								'attributes' => [
+									'class' => 'orange'
+								]
 							];		
 						}}
 
