@@ -1178,38 +1178,17 @@ class CONSUMABLES extends API {
 				if (PERMISSION::permissionFor('products') && $_batchupdate){
 					$ids = explode(',', $_batchupdate);
 
-					// apply trading good to selected similar products
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
-							':value' => $product['trading_good'],
-						],
-						'replacements' => [
-							':field' => 'trading_good',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
-						]
-					]);
-
-					// apply expiry date to selected similar products
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
-							':value' => $product['has_expiry_date'],
-						],
-						'replacements' => [
-							':field' => 'has_expiry_date',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
-						]
-					]);
-
-					// apply expiry date to selected similar products
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
-						'values' => [
-							':value' => $product['special_attention'],
-						],
-						'replacements' => [
-							':field' => 'special_attention',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
-						]
-					]);
+					foreach(['trading_good', 'has_expiry_date', 'special_attention'] as $field){ // apply setting to selected similar products
+						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+							'values' => [
+								':value' => $product[$field],
+							],
+							'replacements' => [
+								':field' => $field,
+								':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+							]
+						]);	
+					}
 
 					if (PERMISSION::permissionFor('incorporation')){
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
