@@ -112,6 +112,7 @@ $queries = [
 				"	`checked` datetime NULL DEFAULT NULL," .
 				"	`incorporated` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`has_expiry_date` tinyint NULL DEFAULT NULL," .
+				"	`special_attention` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -294,7 +295,8 @@ $queries = [
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
 				"	incorporated varchar(MAX) NOT NULL," .
-				"	has_expiry_date tinyint NULL DEFAULT NULL" .
+				"	has_expiry_date tinyint NULL DEFAULT NULL," .
+				"	special_attention tinyint NULL DEFAULT NULL," .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .

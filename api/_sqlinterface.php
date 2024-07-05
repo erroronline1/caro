@@ -265,16 +265,16 @@ class SQLQUERY {
 		],
 
 		'consumables_post_product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention)"
 		],
 		'consumables_put_product' => [
-			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id"
 		],
 		'consumables_put_product_pricelist_import' => [
-			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id"
 		],
 		'consumables_put_batch' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
@@ -292,9 +292,9 @@ class SQLQUERY {
 			'mysql' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id IN (:ids) AND prod.vendor_id = dist.id",
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) IN (:ids) AND prod.vendor_id = dist.id"
 		],
-		'consumables_get_products_incorporation' => [
-			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id"
+		'consumables_get_products_incorporation_attention' => [
+			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id"
 		],
 		'consumables_get_product_search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id",

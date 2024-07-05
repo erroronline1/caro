@@ -1094,11 +1094,13 @@ class ORDER extends API {
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
 				// get unincorporated
-				$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation');
+				$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
 				$unincorporated = [];
 				$incorporationdenied = [];
 				$pendingincorporation = [];
+				$special_attention = [];
 				foreach($allproducts as $product) {
+					if ($product['special_attention']) $special_attention[] = ['id' => $product['id'], 'article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
 					if ($product['incorporated'] === '') {
 						$unincorporated[] = ['id' => $product['id'], 'article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
 						continue;
@@ -1272,6 +1274,16 @@ class ORDER extends API {
 						'type' => 'textblock',
 						'content' => LANG::GET('order.ordertype.' . $row['ordertype']) . "\n" . $text,
 					];
+
+					// inform if special attention is required
+					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($special_attention, 'article_no'))) !== false){
+						if (array_key_exists('vendor_label', $decoded_order_data) && $special_attention[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+							$content[] = [
+								'type' => 'textblock',
+								'description' => LANG::GET('consumables.edit_product_special_attention'),
+							];		
+						}}
+
 					if (str_contains($row['approval'], 'data:image/png')){
 						$content[]=[
 							'type' => 'image',

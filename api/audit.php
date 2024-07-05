@@ -229,7 +229,7 @@ class AUDIT extends API {
 	private function incorporation(){
 		$content = $orderedunincorporated = $entries = $incorporated = [];
 		// get unincorporated articles from approved orders
-		$unincorporated = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation');
+		$unincorporated = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
 		foreach($unincorporated as $id => $row){
 			if (!$row['incorporated']) continue;
 			$row['incorporated'] = json_decode($row['incorporated'], true);

@@ -66,7 +66,6 @@
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
 * vendor evaluation
-* skin contact (filter?) display neccessity for batch number within orders
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -1049,7 +1048,8 @@ while setting up a vendor an import rule must be defined like:
     "modify": {
         "add": {
             "trading_good": "0",
-            "has_expiry_date": "0"
+            "has_expiry_date": "0",
+            "special_attention": "0"
         },
         "replace":[
             ["EAN", "\\s+", ""]
@@ -1058,7 +1058,8 @@ while setting up a vendor an import rule must be defined like:
             ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
         ],
         "conditional_or": [
-            ["has_expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]]
+            ["has_expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]],
+            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT"]]
         ],
         "rewrite": [{
             "article_no": ["Article Number"],
@@ -1090,10 +1091,12 @@ Other vendors may list products missing color variants appended to the article n
 
 You can, of course, decide to go the extra mile and apply any additional filter, e.g. to omit products you will not use anyway, speed up the import for next time by leaving out products that did not fit incorporation, etc.
 
-### Sample check and expiry dates
-*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates.
+### Sample check, expiry dates and special attention
+*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
 
-You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates.
+You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates and required special attention.
+
+*special_attention* will be displayed within approved orders and is intended to inform about required batch number allocation for products with skin contact by default. This can be customized to anything within the language file.
 
 [Content](#content)
 
