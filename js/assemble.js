@@ -811,22 +811,24 @@ export class Assemble {
 				attribute: value // applies to header
 			}
 		}*/
-		let result = [];
+		let result = [],
+			p;
 		if (this.currentElement.description) {
 			result = result.concat(this.header());
 		}
 		if (this.currentElement.content) {
 			const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+			p = document.createElement("p");
 			for (const part of content) {
 				if (!part[1].length) continue;
-				result.push(document.createTextNode(part[1]));
-				result.push(document.createElement("br"));
+				p.append(document.createTextNode(part[1]));
+				p.append(document.createElement("br"));
 			}
+			result.push(p);
 		}
 		if (this.currentElement.attributes !== undefined) {
 			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
 		}
-		result.push(document.createElement("br"));
 		result = result.concat(this.hint());
 		return result;
 	}
@@ -907,7 +909,8 @@ export class Assemble {
 	search() {
 		return this.input("search");
 	}
-	filtered() { // filter appears to be reserved
+	filtered() {
+		// filter appears to be reserved
 		return this.input("search");
 	}
 	tel() {

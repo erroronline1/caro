@@ -592,8 +592,8 @@ button {
 	}
 }
 
-input[type="range"]{
-	accent-color:var(--green);
+input[type="range"] {
+	accent-color: var(--green);
 }
 
 input[type="range"],
@@ -637,7 +637,8 @@ input[type="range"],
 	background-color: var(--evenDiscreetButton);
 }
 
-article > button {
+article > button,
+p {
 	margin-left: 1.75em;
 	width: calc(100% - 2em);
 }
@@ -907,20 +908,20 @@ br {
 
 /*************************** decorators ******************************/
 
-.red{
-	color: var(--red)
+.red {
+	color: var(--red);
 }
 
-.orange{
-	color: var(--orange)
+.orange {
+	color: var(--orange);
 }
 
-.yellow{
-	color: var(--yellow)
+.yellow {
+	color: var(--yellow);
 }
 
-.green{
-	color: var(--green)
+.green {
+	color: var(--green);
 }
 
 hr {
