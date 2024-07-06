@@ -885,6 +885,14 @@ class USER extends API {
 				$user = $user[0];
 				if ($user['id'] < 2) $this->response([], 401);
 				if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
+				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+					'replacements' => [
+						':ids' => $user['id'] ? : 0
+					]
+				]);
+				foreach ($trainings as $row){
+					UTILITY::delete('.' . $row['file']);
+				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
 					'values' => [
