@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// add, edit and delete users
+// add, edit and delete files
 class FILE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
@@ -50,7 +50,6 @@ class FILE extends API {
 	 */
 	public function filter(){
 		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
-		if ($this->_requestedFolder && $this->_requestedFolder == 'users') $files = UTILITY::listFiles(UTILITY::directory('users') ,'asc');
 		else {
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			$files = [];
@@ -225,15 +224,6 @@ class FILE extends API {
 							]
 						]
 					);
-					array_push($result['render']['content'][0],
-						[
-							'type' => 'links',
-							'description' => LANG::GET('menu.application_user_manager'),
-							'content' => [
-								LANG::GET('menu.application_user_manager') => ['href' => "javascript:api.file('get', 'filemanager', 'users')"]
-							]
-						]
-					);
 					$result['render']['content'][] = [
 						[
 							'type' => 'text',
@@ -247,10 +237,6 @@ class FILE extends API {
 				}
 				else {
 					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
-					elseif ($this->_requestedFolder === 'users') {
-						$files = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
-						$files = array_filter($files, fn($file) => substr(pathinfo($file)['filename'], 0, 10) !== 'profilepic');
-					}
 					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						$result['render']['content'][] = [
@@ -302,7 +288,7 @@ class FILE extends API {
 						}
 					}
 					else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-					if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) unset ($result['render']['form']);
+					if (in_array($this->_requestedFolder, ['sharepoint'])) unset ($result['render']['form']);
 					else $result['render']['content'][] = [
 						[
 							'type' => 'hidden',
@@ -325,7 +311,7 @@ class FILE extends API {
 				$this->response($result);
 				break;
 			case 'DELETE':
-				if (in_array($this->_requestedFolder, ['sharepoint', 'users'])) $success = UTILITY::delete(UTILITY::directory($this->_requestedFolder) . '/' . $this->_requestedFile);
+				if (in_array($this->_requestedFolder, ['sharepoint'])) $success = UTILITY::delete(UTILITY::directory($this->_requestedFolder) . '/' . $this->_requestedFile);
 				else $success = UTILITY::delete(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) . ($this->_requestedFile ? '/' . $this->_requestedFile : ''));
 				if ($success) $this->response(['response' => [
 					'msg' => LANG::GET('file.manager_deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
