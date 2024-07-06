@@ -891,7 +891,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					UTILITY::delete('.' . $row['file']);
+					if ($row['file']) UTILITY::delete('.' . $row['file']);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
