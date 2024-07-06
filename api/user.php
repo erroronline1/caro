@@ -241,11 +241,22 @@ class USER extends API {
 						':ids' => $user['id'] ? : 0
 					]
 				]);
+				$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 				foreach ($trainings as $row){
+					$attributes = [];
+					if ($row['expires']){
+						$expire = new DateTime($row['expires'], new DateTimeZone(INI['timezone']));
+						if ($expire < $today) $attributes = ['class' => 'red'];
+						else {
+							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
+							if ($expire < $today) $attributes = ['class' => 'orange'];
+						}
+					}
 					$result['render']['content'][0][] = [
 						'type' => 'textblock',
 						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
-						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires']
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'attributes' => $attributes
 					];
 					if ($row['file']) $result['render']['content'][0][] = [
 						'type' => 'links',
@@ -356,8 +367,6 @@ class USER extends API {
 					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
 						$training[':file'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
-					var_dump($training[':file']);
-					die();
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
 					]);
@@ -488,8 +497,6 @@ class USER extends API {
 					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
 						$training[':file'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
-					var_dump($training[':file']);
-					die();
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
 					]);
@@ -620,11 +627,22 @@ class USER extends API {
 						':ids' => $user['id'] ? : 0
 					]
 				]);
+				$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 				foreach ($trainings as $row){
+					$attributes = [];
+					if ($row['expires']){
+						$expire = new DateTime($row['expires'], new DateTimeZone(INI['timezone']));
+						if ($expire < $today) $attributes = ['class' => 'red'];
+						else {
+							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
+							if ($expire < $today) $attributes = ['class' => 'orange'];
+						}
+					}
 					$skillmatrix[0][] = [
 						'type' => 'textblock',
 						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
-						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires']
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'attributes' => $attributes
 					];
 					if ($row['file']) $skillmatrix[0][] = [
 						'type' => 'links',
