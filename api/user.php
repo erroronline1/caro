@@ -172,27 +172,27 @@ class USER extends API {
 					]
 				];
 
-				if ($user['image']) $result['render']['content'][1] = [
-					[
+				if ($user['image']) {
+					$result['render']['content'][1] = [
 						[
-							'type' => 'image',
-							'description' => LANG::GET('user.edit_export_user_image'),
-							'attributes' => [
-								'name' => $user['name'] . '_pic',
-								'url' => $user['image']
+							[
+								'type' => 'image',
+								'description' => LANG::GET('user.edit_export_user_image'),
+								'attributes' => [
+									'name' => $user['name'] . '_pic',
+									'url' => $user['image']
+								]
 							]
+						],
+						$result['render']['content'][1]
+					];
+					$result['render']['content'][1][1][] = [
+						'type' => 'checkbox',
+						'content' => [
+							LANG::GET('user.edit_reset_photo') => []
 						]
-					],
-					[
-						[
-							'type' => 'checkbox',
-							'content' => [
-								LANG::GET('user.edit_reset_photo') => []
-							]
-						]
-					],
-				$result['render']['content'][1]
-				];
+					];
+				}
 
 				$languages = [];
 				foreach(glob('language.*.ini') as $file){
@@ -442,7 +442,7 @@ class USER extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// save and convert image or create default
-				if (!(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) {
+				if ((!(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
 					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
@@ -713,19 +713,27 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
-					if ($user['image']) $result['render']['content'][2] = [
-						[
+					if ($user['image']) {
+								$result['render']['content'][2] = [
 							[
-								'type' => 'image',
-								'description' => LANG::GET('user.edit_export_user_image'),
-								'attributes' => [
-									'name' => $user['name'] . '_pic',
-									'url' => $user['image']
+								[
+									'type' => 'image',
+									'description' => LANG::GET('user.edit_export_user_image'),
+									'attributes' => [
+										'name' => $user['name'] . '_pic',
+										'url' => $user['image']
+									]
 								]
+							],
+							$result['render']['content'][2]
+						];
+						$result['render']['content'][2][1][] = [
+							'type' => 'checkbox',
+							'content' => [
+								LANG::GET('user.edit_reset_photo') => []
 							]
-						],
-						$result['render']['content'][2]
-					];
+						];
+					}
 
 					if ($user['orderauth']) $result['render']['content'][3]=[
 						[
