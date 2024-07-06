@@ -334,10 +334,19 @@ class AUDIT extends API {
 	}
 
 	/**
-	 * returns all users with their skills and file attachments to review e.g. certificates
+	 * returns all users with their skills and trainings
 	 */
 	private function userskills(){
-		$content = [];
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'exportuserskills')"
+				]
+			]
+		];
 		$unfulfilledskills = [];
 		foreach (LANGUAGEFILE['skills'] as $duty => $skills){
 			if ($duty === 'LEVEL') continue;
@@ -451,6 +460,50 @@ class AUDIT extends API {
 			];
 		}
 		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for user skills and trainings
+	 * processes the result of $this->userskills() and translates the body object into more simple strings
+	 */
+	public function exportuserskills(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userskills') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.userskills'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$skills = $this->userskills();
+
+		for($i = 1; $i < count($skills); $i++){
+			foreach($skills[$i] as $item){
+				if ($item['type'] === 'textblock') {
+					$summary['content'][$item['description']] = $item['content'];
+					$previous = $item['description'];
+				}
+				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
+				}
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
 	}
 
 	/**

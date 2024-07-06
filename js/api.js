@@ -314,6 +314,7 @@ export const api = {
 					case "exportvendors":
 					case "exportregulatory":
 					case "exportincorporation":
+					case "exportuserskills":
 						break;
 					default:
 						successFn = function (data) {

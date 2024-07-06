@@ -132,7 +132,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Within user management trainings, expiry dates, experience points and documents can be added.
     * Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).
     * An overview of trainings and skill settings can be viewed within the audit module.
-    * Skills and trainings can be deleted by authorized users though.
+    * Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.
     * also see [Users](#users), [Tools](#tools)
 * ISO 13485 7.4.1 Procurement process
     * Procurement is guided through the application. Vendors and products can be added into the database.
@@ -813,7 +813,8 @@ The audit module gathers data from the application in regards of proofing lists 
 * incoporated articles
 * MDR §14 sample checks
 * current documents in use including external documents
-* user certificates
+* user skills and trainings
+* skill fulfilment
 * vendor list
 * regulatory issues
 
