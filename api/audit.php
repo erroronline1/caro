@@ -110,6 +110,24 @@ class AUDIT extends API {
 		}
 		$this->response($result);
 	}
+
+	/**
+	 * main entry point for exports
+	 * calls export . $this->_requestedType method
+	 */
+
+	public function export(){
+		$static = [
+			'incorporation',
+			'forms',
+			'userskills',
+			'skillfulfilment',
+			'vendors',
+			'regulatory',
+		];
+		if (in_array($this->_requestedType, $static)) $this->{'export' . $this->_requestedType}();
+		else $this->exportchecks();
+	}
 	
 	/**
 	 * returns all sample checks from the caro_checks database in descending chronological order
@@ -140,7 +158,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportchecks', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -181,7 +199,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for requested check
 	 * if check type within caro_checks database
 	 */
-	public function exportchecks(){
+	private function exportchecks(){
 		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
 			'values' => [
 				':type' => $this->_requestedType
@@ -266,7 +284,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportincorporation', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -297,7 +315,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for forms and form bundles
 	 * processes the result of $this->forms() and translates the body object into more simple strings
 	 */
-	public function exportincorporation(){
+	private function exportincorporation(){
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -343,7 +361,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportuserskills')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -466,7 +484,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for user skills and trainings
 	 * processes the result of $this->userskills() and translates the body object into more simple strings
 	 */
-	public function exportuserskills(){
+	private function exportuserskills(){
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userskills') . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -616,7 +634,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportforms', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -631,7 +649,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for forms and form bundles
 	 * processes the result of $this->forms() and translates the body object into more simple strings
 	 */
-	public function exportforms(){
+	private function exportforms(){
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -689,7 +707,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportvendors')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -731,7 +749,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for the vendor list
 	 * processes the result of $this->vendors() and translates the body object into more simple strings
 	 */
-	public function exportvendors(){
+	private function exportvendors(){
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.vendors') . '_' . date('Y-m-d H:i')),
 			'identifier' => null,
@@ -772,7 +790,7 @@ class AUDIT extends API {
 	/**
 	 * returns regulatory items according to language.xx.ini and matches current assigned forms
 	 */
-	public function regulatory(){
+	private function regulatory(){
 		$content = $issues = [];
 		// prepare existing forms lists
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
@@ -801,7 +819,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'exportregulatory')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
 				]
 			]
 		];
@@ -825,7 +843,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for the regulatory issue result
 	 * processes the result of $this->regulatory() and translates the body object into more simple strings
 	 */
-	public function exportregulatory(){
+	private function exportregulatory(){
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.regulatory') . '_' . date('Y-m-d H:i')),
 			'identifier' => null,

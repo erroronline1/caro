@@ -309,12 +309,7 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "exportchecks":
-					case "exportforms":
-					case "exportvendors":
-					case "exportregulatory":
-					case "exportincorporation":
-					case "exportuserskills":
+					case "export":
 						break;
 					default:
 						successFn = function (data) {
