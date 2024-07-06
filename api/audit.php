@@ -348,7 +348,15 @@ class AUDIT extends API {
 		}
 		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		$trainings = $trainings ? array_values($trainings) : [];
+		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		foreach ($users as $user){
+			if ($user['id'] < 2) continue;
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			$skillmatrix = '';
 			foreach (LANGUAGEFILE['skills'] as $duty => $skills){
@@ -357,20 +365,46 @@ class AUDIT extends API {
 					if ($skill === '_DESCRIPTION') continue;
 					foreach(LANGUAGEFILE['skills']['LEVEL'] as $level => $leveldescription){
 						if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])){
-							$skillmatrix .=  " \n" . LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription;
+							$skillmatrix .=  LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription . " \n";
 							unset($unfulfilledskills[array_search(LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription, $unfulfilledskills)]);
 						}
 					}
 				}
 			}
-			if ($skillmatrix){
-				$content[] = [
-					[
+			$content[] = [
+				[
+					'type' => 'textblock',
+					'description' => $user['name'],
+					'content' => $skillmatrix
+				]
+			];
+			$user_id = $user['id'];
+			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
+				return $row['user_id'] === $user_id;
+			})){
+				foreach ($usertrainings as $row){
+					$attributes = [];
+					if ($row['expires']){
+						$expire = new DateTime($row['expires'], new DateTimeZone(INI['timezone']));
+						if ($expire < $today) $attributes = ['class' => 'red'];
+						else {
+							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
+							if ($expire < $today) $attributes = ['class' => 'orange'];
+						}
+					}
+					$content[count($content) - 1][] = [
 						'type' => 'textblock',
-						'description' => $user['name'],
-						'content' => $skillmatrix
-					]
-				];
+						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'attributes' => $attributes
+					];
+					if ($row['file']) $content[count($content) - 1][] = [
+						'type' => 'links',
+						'content' => [
+							$row['file'] => ['href' => $row['file']]
+						]
+					];
+				}	
 			}
 
 			$userfiles = [];
