@@ -71,8 +71,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
-* user certificates expiry (database like external files)
-* user training documentation (certificates without upload?)
 * imdrf annexes import for prrc
 
 #### planning considerations
