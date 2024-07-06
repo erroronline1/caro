@@ -130,7 +130,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * also see [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Tools](#tools)
 * ISO 13485 6.2 Human resources
     * Within user management trainings, expiry dates, experience points and documents can be added.
-    * Users can be assigned skills and applicable levels according to the indended [skill list](#customisation).
+    * Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).
     * An overview of trainings and skill settings can be viewed within the audit module.
     * Skills and trainings can be deleted by authorized users though.
     * also see [Users](#users), [Tools](#tools)
@@ -167,7 +167,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
         * records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.
         * a list of current documents in use (forms and their components)
-        * user files (e.g. certificates)
+        * user skills and trainings (with expiries highlighted)
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
         * fulfilment of regulatory issues considered by forms
     * also see [Tools](#tools)
@@ -259,7 +259,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 ![sample application menu](assets/application%20menu.png)
 
 ### Users
-On registering a new user a default profile picture is generated. Custom set pictures can be restored to default by the user themself. Adding files is granted to defined authorized users only, to make sure certificates are acknowledged. A generated order authorization pin can be used to approve orders. The generated access token can be exported and, for example, used as a laminated card.
+On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
@@ -304,7 +304,7 @@ graph TD;
     manage_users-->new_user[new user];
     manage_users-->edit_user[edit user];
     new_user-->user_settings["set name, authorization,
-    unit, photo, order auth pin, skills
+    unit, photo, order auth pin, skills, trainings,
     login token, user documents"];
     edit_user-->user_settings;
     user_settings-->export_token[export token];
