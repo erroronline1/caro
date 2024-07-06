@@ -78,7 +78,8 @@ export const api = {
 			let sanitizedpayload = Object.fromEntries(payload);
 			for (const [key, value] of Object.entries(sanitizedpayload)) {
 				// remove file keys for being shifted to $_FILES within the stream
-				if (value instanceof File && (method === "post" || (method === "put" && value.size))) {
+				// and quick sanitation of arrays; can't be handled by this object
+				if (value instanceof File && (method === "post" || (method === "put" && value.size)) || key.endsWith('[]')) {
 					delete sanitizedpayload[key];
 				}
 				// unset '0' values that are not recognized by backend
@@ -90,7 +91,7 @@ export const api = {
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
-			//console.log(sanitizedpayload, b.size);
+			//console.log(payload, sanitizedpayload, b.size);
 			payload.append("_user_cache", await _.sha256(window._user.cached_identity + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)

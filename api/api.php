@@ -89,9 +89,14 @@ class API {
 					&& $_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')
 				){
 					unset ($this->_payload->_user_cache);
+					// sanitize arrays from payload as checksum can't handle these from client side
+					$payload = json_decode(json_encode($this->_payload), true);
+					foreach ($payload as $key => $value){
+						if ($value && gettype($value) === 'array') unset($payload[$key]);
+					}
 					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
 						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-						}, json_encode($this->_payload));
+						}, json_encode($payload) );
 					$payload = preg_replace('/[\W_]/', '', preg_replace('/\\\\r|\\\\n|\\\\t/', '', $payload));  // harmonized cross browser
 					//var_dump(strlen($payload), $payload);
 					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
