@@ -72,6 +72,7 @@
 * risk management?
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
 * imdrf annexes import for prrc
+* tidy audit vendor list with documents
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
