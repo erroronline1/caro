@@ -46,6 +46,17 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
+				"CREATE TABLE IF NOT EXISTS `caro_user_training` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`user_id` int NOT NULL," .
+				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` date NOT NULL," .
+				"	`expires` date NULL," .
+				"	`experience_points` int NULL," .
+				"	`file` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				,
 				"CREATE TABLE IF NOT EXISTS `caro_form` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -227,6 +238,17 @@ $queries = [
 				"	image varchar(MAX) NOT NULL," .
 				"	app_settings varchar(MAX) NOT NULL," .
 				"	skills varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'dbo.caro_usertraining', N'U') IS NULL " .
+				"CREATE TABLE caro_user (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	user_id varchar(MAX) NOT NULL," .
+				"	name varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	expires smalldatetime NULL," .
+				"	experience_points int NULL," .
+				"	file varchar(MAX) NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .

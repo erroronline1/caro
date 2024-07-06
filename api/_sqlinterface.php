@@ -612,8 +612,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content)"
 		],
 		'records_import' => [
-			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
-			'sqlsrv' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records inner join caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
+			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
+			'sqlsrv' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
 		'records_identifiers' => [
 			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MIN(IFNULL(r.closed, 0)) AS closed, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
@@ -674,10 +674,24 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_user WHERE orderauth = :orderauth"
 		],
 		'user_delete' => [
-			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id; DELETE FROM caro_calendar WHERE affected_user_id = :id",
-			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id; DELETE FROM caro_calendar WHERE affected_user_id = :id"
+			'mysql' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id; DELETE FROM caro_calendar WHERE affected_user_id = :id; DELETE FROM caro_user_training WHERE user_id = :id",
+			'sqlsrv' => "DELETE FROM caro_user WHERE id = :id; DELETE FROM caro_messages WHERE user_id = :id; DELETE FROM caro_calendar WHERE affected_user_id = :id; DELETE FROM caro_user_training WHERE user_id = :id"
 		],
 
+
+
+		'user_training_post' => [
+			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file)",
+			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file) VALUES ( :user_id, :name, CONVERT(SMALLDATETIME, :date, 23), CONVERT(SMALLDATETIME, :expires, 23), :experience_points, :file)"
+		],
+		'user_training_get_user' => [
+			'mysql' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids)",
+			'sqlsrv' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids)"
+		],
+		'user_training_delete' => [
+			'mysql' => "DELETE FROM caro_user_training WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_user_training WHERE id = :id"
+		],
 	];
 }
 ?>

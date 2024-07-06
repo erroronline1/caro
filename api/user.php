@@ -235,20 +235,24 @@ class USER extends API {
 				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
 				if (array_key_exists('homeoffice', $user['app_settings']) && $user['app_settings']['homeoffice']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
 
-				$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
-				$userfiles = [];
-				foreach ($storedfiles as $file){
-					if (explode('_', pathinfo($file)['filename'])[0] == $user['id']) {
-						$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
-					}
-				}
-				if ($userfiles) {
-					array_push($result['render']['content'][0], 
-					['type' => 'br'],
-					[
+
+				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+					'replacements' => [
+						':ids' => $user['id'] ? : 0
+					]
+				]);
+				foreach ($trainings as $row){
+					$result['render']['content'][0][] = [
+						'type' => 'textblock',
+						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires']
+					];
+					if ($row['file']) $result['render']['content'][0][] = [
 						'type' => 'links',
-						'content' => $userfiles
-					]);
+						'content' => [
+							$row['file'] => ['href' => $row['file']]
+						]
+					];
 				}
 
 				$this->response($result);
@@ -340,9 +344,23 @@ class USER extends API {
 				UTILITY::resizeImage($user['image'], INI['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
-				// add user documents
-				if (array_key_exists(LANG::PROPERTY('user.edit_add_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_document')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name'] . '_' . date('YmdHis')], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
+				// add user training
+				$training = [];
+				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
+					$training[':user_id'] = $user['id'];
+					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
+					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
+					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
+					$training[':file'] = '';
+					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+						$training[':file'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+					}
+					var_dump($training[':file']);
+					die();
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+						'values' => $training
+					]);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
@@ -458,11 +476,43 @@ class USER extends API {
 					$user['image'] = substr($user['image'], 3);
 				}
 
-				// add user documents
-				if (array_key_exists(LANG::PROPERTY('user.edit_add_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_document')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name'] . '_' . date('YmdHis')], [UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_document_rename'))]);
+				// add user training
+				$training = [];
+				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
+					$training[':user_id'] = $user['id'];
+					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
+					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
+					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
+					$training[':file'] = '';
+					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+						$training[':file'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+					}
+					var_dump($training[':file']);
+					die();
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+						'values' => $training
+					]);
 				}
-		
+				// delete checked user trainings
+				if ($delete_training = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_delete_training'))){
+					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+						'replacements' => [
+							':ids' => $user['id'] ? : 0
+						]
+					]);
+					foreach ($trainings as $row){
+						if (in_array($row['id'], $delete_training)){
+							if ($row['file']) UTILITY::delete(['.' . $row['file']]);
+							SQLQUERY::EXECUTE($this->_pdo, 'user_training_delete', [
+								'values' => [
+									':id' => $row['id']
+								]
+							]);
+						}
+					}
+				}
+
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
 					'values' => [
 						':id' => $user['id'],
@@ -534,9 +584,64 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
+				$skillmatrix = [
+					[
+						[
+							'type' => 'text',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_training')
+							],
+						], [
+							'type' => 'date',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_training_date')
+							],
+						], [
+							'type' => 'date',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_training_expires')
+							],
+						], [
+							'type' => 'number',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_training_experience_points')
+							],
+						], [
+							'type' => 'file',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_add_training_document')
+							],
+							'hint' => LANG::GET('user.edit_add_training_hint')
+						]
+					]
+				];
+				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+					'replacements' => [
+						':ids' => $user['id'] ? : 0
+					]
+				]);
+				foreach ($trainings as $row){
+					$skillmatrix[0][] = [
+						'type' => 'textblock',
+						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires']
+					];
+					if ($row['file']) $skillmatrix[0][] = [
+						'type' => 'links',
+						'content' => [
+							$row['file'] => ['href' => $row['file']]
+						]
+					];
+					$skillmatrix[0][] = [
+						'type' => 'checkbox',
+						'content' => [
+							LANG::GET('user.edit_delete_training') . '[]' => ['value' => $row['id']]
+						]
+					];
+				}
+
 				$skilldatalistwithlabel = $skilldatalist = [];
 				$skilldatalistnum = 0;
-				$skillmatrix = [];
 				foreach (LANGUAGEFILE['skills'] as $duty => $skills){
 					$skillselection = [];
 					if ($duty === 'LEVEL') {
@@ -671,20 +776,6 @@ class USER extends API {
 								'hint' => LANG::GET('user.settings_annual_vacation_hint')
 							]
 						]
-					], [
-						[
-							'type' => 'file',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_add_document')
-							],
-							'hint' => LANG::GET('user.edit_add_document_hint')
-						], [
-							'type' => 'text',
-							'attributes' => [
-								'name' => LANG::GET('user.edit_add_document_rename')
-							],
-							'hint' => LANG::GET('user.edit_add_document_rename_hint')
-						]
 					],
 					$skillmatrix,
 					[
@@ -741,30 +832,15 @@ class USER extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('user.edit_order_authorization_current'),
-									'value' => $user['orderauth']
+									'value' => $user['orderauth'],
+									'readonly' => true
 								]
 							]
 						],
 						$result['render']['content'][3]
 					];
 
-					$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
-					$userfiles = [];
-					foreach ($storedfiles as $file){
-						if (explode('_', pathinfo($file)['filename'])[0] == $user['id']) {
-							$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
-						}
-					}
-					if ($userfiles) {
-						array_push($result['render']['content'][5], 
-						['type' => 'br'],
-						[
-							'type' => 'links',
-							'content' => $userfiles
-						]);
-					}
-
-					if ($user['token']) $result['render']['content'][7]=[
+					if ($user['token']) $result['render']['content'][6]=[
 						[
 							[
 								'type' => 'image',
@@ -774,7 +850,7 @@ class USER extends API {
 								'qrcode' => $user['token']]
 							]
 						],
-						$result['render']['content'][7]
+						$result['render']['content'][6]
 					];
 
 				$this->response($result);

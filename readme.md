@@ -131,7 +131,10 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.
     * also see [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Tools](#tools)
 * ISO 13485 6.2 Human resources
-    * Users can be assigned skills and attached documents. Intended use case for documents are qualification certificates. A list of these skills and documents can be viewed within the audit module.
+    * Within user management trainings, expiry dates, experience points and documents can be added.
+    * Users can be assigned skills and applicable levels according to the indended [skill list](#customisation).
+    * An overview of trainings and skill settings can be viewed within the audit module.
+    * Skills and trainings can be deleted by authorized users though.
     * also see [Users](#users), [Tools](#tools)
 * ISO 13485 7.4.1 Procurement process
     * Procurement is guided through the application. Vendors and products can be added into the database.
@@ -1016,9 +1019,9 @@ products_per_slide = 6
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.xx.ini-files or delete unused - user customization lists all available files automated. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [permission] (has no effect without consideration in role management within setup.ini)
     * [units]
-    * [skills]
+    * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
     * [formcontext][anonymous]
-    * [regulatory]
+    * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
