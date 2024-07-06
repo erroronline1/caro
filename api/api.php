@@ -60,7 +60,7 @@ class API {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > INI['limits']['idle_logout'])){
+		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > INI['lifespan']['idle'])){
 			session_unset();
 			session_destroy();
 		}
