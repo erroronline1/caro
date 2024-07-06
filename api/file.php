@@ -459,7 +459,7 @@ class FILE extends API {
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
-									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':date2' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
+									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
 									'content' => [
 										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 									],
