@@ -406,28 +406,6 @@ class AUDIT extends API {
 					];
 				}	
 			}
-
-			$userfiles = [];
-			foreach ($storedfiles as $file){
-				if (explode('_', pathinfo($file)['filename'])[0] == $user['id']) {
-					$userfiles[pathinfo($file)['basename']] = ['href' => substr($file, 1)];
-				}
-			}
-			if ($userfiles) {
-				if ($skillmatrix) $content[count($content) - 1][] = [
-					[
-						'type' => 'links',
-						'content' => $userfiles
-					]
-				];
-				else $content[] = [
-					[
-						'type' => 'links',
-						'description' => $user['name'],
-						'content' => $userfiles
-					]
-				];
-			}
 		}
 		if ($unfulfilledskills){
 			$content = [
