@@ -404,7 +404,7 @@ class USER extends API {
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => intval($this->_requestedID),
-						':name' => strval($this->_requestedID)
+						':name' => ''
 					]
 				]);
 				$user = $user ? $user[0] : null;
@@ -879,7 +879,7 @@ class USER extends API {
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => intval($this->_requestedID),
-						':name' => strval($this->_requestedID)
+						':name' => ''
 					]
 				]);
 				$user = $user[0];
