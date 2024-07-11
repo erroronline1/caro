@@ -258,10 +258,10 @@ class USER extends API {
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
-					if ($row['file']) $result['render']['content'][0][] = [
+					if ($row['file_path']) $result['render']['content'][0][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file'] => ['href' => $row['file']]
+							$row['file_path'] => ['href' => $row['file_path']]
 						]
 					];
 				}
@@ -363,9 +363,9 @@ class USER extends API {
 					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
-					$training[':file'] = '';
+					$training[':file_path'] = '';
 					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
-						$training[':file'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
@@ -493,9 +493,9 @@ class USER extends API {
 					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
-					$training[':file'] = '';
+					$training[':file_path'] = '';
 					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
-						$training[':file'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
@@ -510,7 +510,7 @@ class USER extends API {
 					]);
 					foreach ($trainings as $row){
 						if (in_array($row['id'], $delete_training)){
-							if ($row['file']) UTILITY::delete(['.' . $row['file']]);
+							if ($row['file_path']) UTILITY::delete(['.' . $row['file_path']]);
 							SQLQUERY::EXECUTE($this->_pdo, 'user_training_delete', [
 								'values' => [
 									':id' => $row['id']
@@ -644,10 +644,10 @@ class USER extends API {
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
-					if ($row['file']) $skillmatrix[0][] = [
+					if ($row['file_path']) $skillmatrix[0][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file'] => ['href' => $row['file']]
+							$row['file_path'] => ['href' => $row['file_path']]
 						]
 					];
 					$skillmatrix[0][] = [
@@ -891,7 +891,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					if ($row['file']) UTILITY::delete('.' . $row['file']);
+					if ($row['file_path']) UTILITY::delete('.' . $row['file_path']);
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [

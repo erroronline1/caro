@@ -425,10 +425,10 @@ class AUDIT extends API {
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
-					if ($row['file']) $content[count($content) - 1][] = [
+					if ($row['file_path']) $content[count($content) - 1][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file'] => ['href' => $row['file']]
+							$row['file_path'] => ['href' => $row['file_path']]
 						]
 					];
 				}	
