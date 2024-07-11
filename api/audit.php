@@ -75,24 +75,18 @@ class AUDIT extends API {
 			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
 			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 		}
-		// incorporated products
-		$selecttypes[LANG::GET('audit.checks_type.incorporation')] = ['value' => 'incorporation'];
-		if ($this->_requestedType==='incorporation') $selecttypes[LANG::GET('audit.checks_type.incorporation')]['selected'] = true;
-		// forms
-		$selecttypes[LANG::GET('audit.checks_type.forms')] = ['value' => 'forms'];
-		if ($this->_requestedType==='forms') $selecttypes[LANG::GET('audit.checks_type.forms')]['selected'] = true;
-		// user skills and certificates
-		$selecttypes[LANG::GET('audit.checks_type.userskills')] = ['value' => 'userskills'];
-		if ($this->_requestedType==='userskills') $selecttypes[LANG::GET('audit.checks_type.userskills')]['selected'] = true;
-		// skill fulfilment
-		$selecttypes[LANG::GET('audit.checks_type.skillfulfilment')] = ['value' => 'skillfulfilment'];
-		if ($this->_requestedType==='skillfulfilment') $selecttypes[LANG::GET('audit.checks_type.skillfulfilment')]['selected'] = true;
-		// vendor list
-		$selecttypes[LANG::GET('audit.checks_type.vendors')] = ['value' => 'vendors'];
-		if ($this->_requestedType==='vendors') $selecttypes[LANG::GET('audit.checks_type.vendors')]['selected'] = true;
-		// regulatory issues
-		$selecttypes[LANG::GET('audit.checks_type.regulatory')] = ['value' => 'regulatory'];
-		if ($this->_requestedType==='regulatory') $selecttypes[LANG::GET('audit.checks_type.regulatory')]['selected'] = true;
+		foreach([
+			'incorporation', // incorporated products
+			'forms', // forms and components
+			'userskills', // user skills and certificates
+			'skillfulfilment', // skill fulfilment
+			'userexperience', // experience points per user and year
+			'vendors', // vendor list
+			'regulatory', // regulatory issues
+			] as $category){
+				$selecttypes[LANG::GET('audit.checks_type.' . $category)] = ['value' => $category];
+				if ($this->_requestedType === $category) $selecttypes[LANG::GET('audit.checks_type.' . $category)]['selected'] = true;
+		}
 
 		$result['render']['content'][] = [
 			[
@@ -373,7 +367,6 @@ class AUDIT extends API {
 				$unfulfilledskills[] = LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
 			}
 		}
-		$storedfiles = UTILITY::listFiles(UTILITY::directory('users'), 'asc');
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 			'replacements' => [
@@ -522,6 +515,64 @@ class AUDIT extends API {
 		$this->response([
 			'render' => $body,
 		]);
+	}
+
+	/**
+	 * returns all user experience points by year
+	 */
+	private function userexperience(){
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		$trainings = $trainings ? array_values($trainings) : [];
+		foreach ($users as $user){ // ordered by name
+			if ($user['id'] < 2) continue;
+			$user_id = $user['id'];
+			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
+				return $row['user_id'] === $user_id;
+			})){
+				$years = [];
+				foreach ($usertrainings as $row){
+					$year = substr($row['date'], 0, 4);
+					if ($row['experience_points']){
+						if (!array_key_exists($year, $years)) $years[$year] = ['xp' => 0, 'paths' => []];
+						$years[$year]['xp'] += $row['experience_points'];
+						if ($row['file_path']) $years[$year]['paths'][$row['file_path']] = ['href' => $row['file_path']];
+					}
+				}
+				if ($years){
+					$usercontent = [[
+						'type' => 'textblock',
+						'description' => $user['name'],
+					]];
+					foreach($years as $year => $summary){
+						$usercontent[] = [
+							'type' => 'links',
+							'description' => LANG::GET('audit.experience_points', [':number' => $summary['xp'], ':year' => $year]),
+							'content' => $summary['paths']
+						];
+					}
+					if ($usercontent) $content = [
+						...$content,
+						$usercontent
+					];
+				}
+			}
+		}
+		return $content;
 	}
 
 	/**
