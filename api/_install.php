@@ -33,6 +33,168 @@ $queries = [
 	'install' => [
 		'mysql' => [
 			'tables' => [
+				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`span_start` datetime NOT NULL," .
+				"	`span_end` datetime NOT NULL," .
+				"	`author_id` int NOT NULL," .
+				"	`affected_user_id` int NOT NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`misc` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`alert` tinyint NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_checks` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_consumables_approved_orders` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`organizational_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`approval` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`approved` datetime NOT NULL," .
+				"	`ordered` datetime NULL DEFAULT NULL," .
+				"	`received` datetime NULL DEFAULT NULL," .
+				"	`archived` datetime NULL DEFAULT NULL," .
+				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_consumables_prepared_orders` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_consumables_products` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`vendor_id` int NOT NULL," .
+				"	`article_no` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`article_name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`active` tinyint NULL DEFAULT NULL," .
+				"	`protected` tinyint NULL DEFAULT NULL," .
+				"	`trading_good` tinyint NULL DEFAULT NULL," .
+				"	`checked` datetime NULL DEFAULT NULL," .
+				"	`incorporated` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`has_expiry_date` tinyint NULL DEFAULT NULL," .
+				"	`special_attention` tinyint NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_consumables_vendors` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`active` tinyint(1) NOT NULL," .
+				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`info` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`certificate` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`pricelist` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_csvfilter` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not text COLLATE utf8mb4_unicode_ci to avoid messing up any almost comprehensible structure
+				"   `hidden` tinyint NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_file_bundles` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`active` tinyint NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`retired` datetime NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_form` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`hidden` tinyint NOT NULL," .
+				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`permitted_export` tinyint NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_manual` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`title` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_messages` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`user_id` int NOT NULL," .
+				"	`conversation_user` int NOT NULL," .
+				"	`sender` int NOT NULL," .
+				"	`message` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`timestamp` datetime NOT NULL," .
+				"	`notified` tinyint NULL DEFAULT NULL," .
+				"	`seen` tinyint NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_records` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`form_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`form_id` int NOT NULL," .
+				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`author_id` int NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`closed` tinyint NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
+				"CREATE TABLE IF NOT EXISTS `caro_texttemplates` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`language` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"   `hidden` tinyint NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
 				"CREATE TABLE IF NOT EXISTS `caro_user` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -57,167 +219,6 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
-				"CREATE TABLE IF NOT EXISTS `caro_form` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`hidden` tinyint NOT NULL," .
-				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`permitted_export` tinyint NULL DEFAULT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_records` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`form_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`form_id` int NOT NULL," .
-				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`author_id` int NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`closed` tinyint NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_consumables_vendors` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`active` tinyint(1) NOT NULL," .
-				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`info` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`certificate` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`pricelist` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_messages` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`user_id` int NOT NULL," .
-				"	`conversation_user` int NOT NULL," .
-				"	`sender` int NOT NULL," .
-				"	`message` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`timestamp` datetime NOT NULL," .
-				"	`notified` tinyint NULL DEFAULT NULL," .
-				"	`seen` tinyint NULL DEFAULT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_consumables_products` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`vendor_id` int NOT NULL," .
-				"	`article_no` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`active` tinyint NULL DEFAULT NULL," .
-				"	`protected` tinyint NULL DEFAULT NULL," .
-				"	`trading_good` tinyint NULL DEFAULT NULL," .
-				"	`checked` datetime NULL DEFAULT NULL," .
-				"	`incorporated` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`has_expiry_date` tinyint NULL DEFAULT NULL," .
-				"	`special_attention` tinyint NULL DEFAULT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_consumables_prepared_orders` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_consumables_approved_orders` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`organizational_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`approval` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`approved` datetime NOT NULL," .
-				"	`ordered` datetime NULL DEFAULT NULL," .
-				"	`received` datetime NULL DEFAULT NULL," .
-				"	`archived` datetime NULL DEFAULT NULL," .
-				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_file_bundles` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`active` tinyint NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`retired` datetime NULL DEFAULT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_manual` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`title` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_texttemplates` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`language` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"   `hidden` tinyint NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_csvfilter` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not text COLLATE utf8mb4_unicode_ci to avoid messing up any almost comprehensible structure
-				"   `hidden` tinyint NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_checks` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
-				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`span_start` datetime NOT NULL," .
-				"	`span_end` datetime NOT NULL," .
-				"	`author_id` int NOT NULL," .
-				"	`affected_user_id` int NOT NULL," .
-				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`misc` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`closed` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`alert` tinyint NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '', '');",
@@ -227,6 +228,168 @@ $queries = [
 		,
 		'sqlsrv' => [
 			'tables' => [
+				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
+				"CREATE TABLE caro_calendar (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	type varchar(MAX) NOT NULL," .
+				"	span_start smalldatetime NOT NULL," .
+				"	span_end smalldatetime NOT NULL," .
+				"	author_id int NOT NULL," .
+				"	affected_user_id int NOT NULL," .
+				"	organizational_unit varchar(MAX) NOT NULL," .
+				"	subject varchar(MAX) NOT NULL," .
+				"	misc varchar(MAX) NOT NULL," .
+				"	closed varchar(MAX) NOT NULL," .
+				"	alert tinyint NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_checks', N'U') IS NULL " .
+				"CREATE TABLE caro_checks (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	type varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_approved_orders (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	order_data varchar(MAX) NOT NULL," .
+				"	organizational_unit varchar(MAX) NOT NULL," .
+				"	approval varchar(MAX) NOT NULL," .
+				"	approved smalldatetime NOT NULL," .
+				"	ordered smalldatetime NULL DEFAULT NULL," .
+				"	received smalldatetime NULL DEFAULT NULL," .
+				"	archived smalldatetime NULL DEFAULT NULL," .
+				"	ordertype varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_prepared_orders (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	order_data varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_consumables_products', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_products (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	vendor_id int NOT NULL," .
+				"	article_no varchar(MAX) NOT NULL," .
+				"	article_name varchar(MAX) NOT NULL," .
+				"	article_alias varchar(MAX) NOT NULL," .
+				"	article_unit varchar(MAX) NOT NULL," .
+				"	article_ean varchar(MAX) NOT NULL," .
+				"	active tinyint NULL DEFAULT NULL," .
+				"	protected tinyint NULL DEFAULT NULL," .
+				"	trading_good tinyint NULL DEFAULT NULL," .
+				"	checked smalldatetime NULL DEFAULT NULL," .
+				"	incorporated varchar(MAX) NOT NULL," .
+				"	has_expiry_date tinyint NULL DEFAULT NULL," .
+				"	special_attention tinyint NULL DEFAULT NULL," .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_vendors (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	active tinyint NOT NULL," .
+				"	name varchar(MAX) NOT NULL," .
+				"	info varchar(MAX) NOT NULL," .
+				"	certificate varchar(MAX) NOT NULL," .
+				"	pricelist varchar(MAX) NOT NULL," .
+				"	immutable_fileserver varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
+				"CREATE TABLE caro_csvfilter (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	name varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	hidden tinyint NOT NULL" .
+				");" 
+				,
+				"IF OBJECT_ID(N'caro_file_bundles', N'U') IS NULL " .
+				"CREATE TABLE caro_file_bundles (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	name varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	active tinyint NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
+				"CREATE TABLE caro_file_external_documents (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	path varchar(MAX) NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	regulatory_context varchar(MAX) NOT NULL," .
+				"	retired smalldatetime NULL DEFAULT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .
+				"CREATE TABLE caro_form (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	name varchar(MAX) NOT NULL," .
+				"	alias varchar(MAX) NOT NULL," .
+				"	context varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	hidden tinyint NOT NULL," .
+				"	approval varchar(MAX) NULL DEFAULT NULL," .
+				"	regulatory_context varchar(MAX) NULL DEFAULT NULL," .
+				"	permitted_export tinyint NULL DEFAULT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
+				"CREATE TABLE caro_manual (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	title varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	permissions varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .
+				"CREATE TABLE caro_messages (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	user_id int NOT NULL," .
+				"	conversation_user int NOT NULL," .
+				"	sender int NOT NULL," .
+				"	message varchar(MAX) NOT NULL," .
+				"	timestamp smalldatetime NOT NULL," .
+				"	notified tinyint NULL DEFAULT NULL," .
+				"	seen tinyint NULL DEFAULT NULL," .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
+				"CREATE TABLE caro_records (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	context varchar(MAX) NOT NULL," .
+				"	form_name varchar(MAX) NOT NULL," .
+				"	form_id int NOT NULL," .
+				"	identifier varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	author_id int NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	closed tinyint NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
+				"CREATE TABLE caro_texttemplates (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	name varchar(MAX) NOT NULL," .
+				"	unit varchar(MAX) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	language varchar(MAX) NOT NULL," .
+				"	type varchar(MAX) NOT NULL," .
+				"	hidden tinyint NOT NULL" .
+				");" 
+				,
 				"IF OBJECT_ID(N'dbo.caro_user', N'U') IS NULL " .
 				"CREATE TABLE caro_user (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -251,167 +414,6 @@ $queries = [
 				"	file_path varchar(MAX) NULL" .
 				");"
 				,
-				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .
-				"CREATE TABLE caro_form (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
-				"	alias varchar(MAX) NOT NULL," .
-				"	context varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL," .
-				"	approval varchar(MAX) NULL DEFAULT NULL," .
-				"	regulatory_context varchar(MAX) NULL DEFAULT NULL," .
-				"	permitted_export tinyint NULL DEFAULT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
-				"CREATE TABLE caro_records (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	context varchar(MAX) NOT NULL," .
-				"	form_name varchar(MAX) NOT NULL," .
-				"	form_id int NOT NULL," .
-				"	identifier varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	author_id int NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	closed tinyint NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
-				"CREATE TABLE caro_consumables_vendors (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	active tinyint NOT NULL," .
-				"	name varchar(MAX) NOT NULL," .
-				"	info varchar(MAX) NOT NULL," .
-				"	certificate varchar(MAX) NOT NULL," .
-				"	pricelist varchar(MAX) NOT NULL," .
-				"	immutable_fileserver varchar(MAX) NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .
-				"CREATE TABLE caro_messages (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	user_id int NOT NULL," .
-				"	conversation_user int NOT NULL," .
-				"	sender int NOT NULL," .
-				"	message varchar(MAX) NOT NULL," .
-				"	timestamp smalldatetime NOT NULL," .
-				"	notified tinyint NULL DEFAULT NULL," .
-				"	seen tinyint NULL DEFAULT NULL," .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_consumables_products', N'U') IS NULL " .
-				"CREATE TABLE caro_consumables_products (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	vendor_id int NOT NULL," .
-				"	article_no varchar(MAX) NOT NULL," .
-				"	article_name varchar(MAX) NOT NULL," .
-				"	article_alias varchar(MAX) NOT NULL," .
-				"	article_unit varchar(MAX) NOT NULL," .
-				"	article_ean varchar(MAX) NOT NULL," .
-				"	active tinyint NULL DEFAULT NULL," .
-				"	protected tinyint NULL DEFAULT NULL," .
-				"	trading_good tinyint NULL DEFAULT NULL," .
-				"	checked smalldatetime NULL DEFAULT NULL," .
-				"	incorporated varchar(MAX) NOT NULL," .
-				"	has_expiry_date tinyint NULL DEFAULT NULL," .
-				"	special_attention tinyint NULL DEFAULT NULL," .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
-				"CREATE TABLE caro_consumables_prepared_orders (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	order_data varchar(MAX) NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .
-				"CREATE TABLE caro_consumables_approved_orders (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	order_data varchar(MAX) NOT NULL," .
-				"	organizational_unit varchar(MAX) NOT NULL," .
-				"	approval varchar(MAX) NOT NULL," .
-				"	approved smalldatetime NOT NULL," .
-				"	ordered smalldatetime NULL DEFAULT NULL," .
-				"	received smalldatetime NULL DEFAULT NULL," .
-				"	archived smalldatetime NULL DEFAULT NULL," .
-				"	ordertype varchar(MAX) NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_file_bundles', N'U') IS NULL " .
-				"CREATE TABLE caro_file_bundles (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	active tinyint NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
-				"CREATE TABLE caro_file_external_documents (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	path varchar(MAX) NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	regulatory_context varchar(MAX) NOT NULL," .
-				"	retired smalldatetime NULL DEFAULT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
-				"CREATE TABLE caro_manual (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	title varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	permissions varchar(MAX) NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
-				"CREATE TABLE caro_texttemplates (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
-				"	unit varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	language varchar(MAX) NOT NULL," .
-				"	type varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL" .
-				");" 
-				,
-				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
-				"CREATE TABLE caro_csvfilter (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL" .
-				");" 
-				,
-				"IF OBJECT_ID(N'caro_checks', N'U') IS NULL " .
-				"CREATE TABLE caro_checks (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	type varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL" .
-				");"
-				,
-				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
-				"CREATE TABLE caro_calendar (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	type varchar(MAX) NOT NULL," .
-				"	span_start smalldatetime NOT NULL," .
-				"	span_end smalldatetime NOT NULL," .
-				"	author_id int NOT NULL," .
-				"	affected_user_id int NOT NULL," .
-				"	organizational_unit varchar(MAX) NOT NULL," .
-				"	subject varchar(MAX) NOT NULL," .
-				"	misc varchar(MAX) NOT NULL," .
-				"	closed varchar(MAX) NOT NULL," .
-				"	alert tinyint NULL" .
-				");"
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '1234', '43210', 'media/favicon/ios/256.png', '', '');",
