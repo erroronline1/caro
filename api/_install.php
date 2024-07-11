@@ -53,7 +53,7 @@ $queries = [
 				"	`date` date NOT NULL," .
 				"	`expires` date NULL," .
 				"	`experience_points` int NULL," .
-				"	`file` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`file_path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -240,15 +240,15 @@ $queries = [
 				"	skills varchar(MAX) NOT NULL" .
 				");"
 				,
-				"IF OBJECT_ID(N'dbo.caro_usertraining', N'U') IS NULL " .
-				"CREATE TABLE caro_user (" .
+				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .
+				"CREATE TABLE caro_user_training (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	user_id varchar(MAX) NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	expires smalldatetime NULL," .
 				"	experience_points int NULL," .
-				"	file varchar(MAX) NULL" .
+				"	file_path varchar(MAX) NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .
