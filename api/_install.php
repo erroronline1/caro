@@ -245,8 +245,8 @@ $queries = [
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	user_id varchar(MAX) NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	expires smalldatetime NULL," .
+				"	date date NOT NULL," .
+				"	expires date NULL," .
 				"	experience_points int NULL," .
 				"	file_path varchar(MAX) NULL" .
 				");"

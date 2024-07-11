@@ -86,7 +86,7 @@ class SQLQUERY {
 		}
 		$statement = $_pdo->prepare($query);
 
-		//var_dump($query);
+		//var_dump($query, $parameters);
 		//$statement->execute($parameters['values']);
 		//var_dump($statement->debugDumpParams());
 		if (!$statement->execute($parameters['values'])) return false;
@@ -681,8 +681,8 @@ class SQLQUERY {
 
 
 		'user_training_post' => [
-			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file)",
-			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file) VALUES ( :user_id, :name, CONVERT(SMALLDATETIME, :date, 23), CONVERT(SMALLDATETIME, :expires, 23), :experience_points, :file)"
+			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file_path)",
+			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file_path) VALUES ( :user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path)"
 		],
 		'user_training_get_user' => [
 			'mysql' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids)",
