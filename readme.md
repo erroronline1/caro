@@ -75,6 +75,7 @@
 * tidy audit vendor list with documents
 * display and calculate experience points (certificates)
 * unittests (frontend)
+* medical device consultant
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
