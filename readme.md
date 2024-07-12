@@ -71,7 +71,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
-* imdrf annexes import for prrc
 * unittests (frontend)
 
 #### planning considerations
@@ -255,6 +254,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 * If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
 * Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.
+* Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities. 
 
 ![sample form screenshot](assets/sample%20form.png)
 
