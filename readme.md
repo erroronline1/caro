@@ -1827,6 +1827,20 @@ Sample response
 {"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
 ```
 
+> GET ./api/api.php/consumables/products_with_special_attention/{id}
+
+Returns a list of products grouped by vendor that have been flagged as needing special attention.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | vendor id to filter |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
+```
+
 [Content](#content)
 
 ### CSV filter endpoints
