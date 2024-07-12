@@ -116,6 +116,7 @@ class AUDIT extends API {
 			'forms',
 			'userskills',
 			'skillfulfilment',
+			'userexperience',
 			'vendors',
 			'regulatory',
 		];
@@ -497,7 +498,7 @@ class AUDIT extends API {
 					$previous = $item['description'];
 				}
 				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
-				}
+			}
 		}
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
@@ -550,7 +551,7 @@ class AUDIT extends API {
 					if ($row['experience_points']){
 						if (!array_key_exists($year, $years)) $years[$year] = ['xp' => 0, 'paths' => []];
 						$years[$year]['xp'] += $row['experience_points'];
-						if ($row['file_path']) $years[$year]['paths'][$row['file_path']] = ['href' => $row['file_path']];
+						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . $row['date']] = ['href' => $row['file_path']];
 					}
 				}
 				if ($years){
@@ -573,6 +574,52 @@ class AUDIT extends API {
 			}
 		}
 		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for forms and form bundles
+	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 */
+	private function exportuserexperience(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userexperience') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.userexperience'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$experience = $this->userexperience();
+
+		for($i = 1; $i < count($experience); $i++){
+			foreach($experience[$i] as $item){
+				if ($item['type'] === 'textblock') {
+					$previous = $item['description'];
+				}
+				if ($item['type'] === 'links') {
+					$summary['content'][$previous] = $item['description'];
+					$summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
+				}
+			}
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
 	}
 
 	/**

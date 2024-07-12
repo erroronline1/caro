@@ -73,7 +73,6 @@
 * https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
 * imdrf annexes import for prrc
 * tidy audit vendor list with documents
-* display and calculate experience points (certificates)
 * unittests (frontend)
 * medical device consultant
 
