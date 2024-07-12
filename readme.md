@@ -74,6 +74,7 @@
 * imdrf annexes import for prrc
 * tidy audit vendor list with documents
 * display and calculate experience points (certificates)
+* unittests (frontend)
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
