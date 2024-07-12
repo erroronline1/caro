@@ -814,6 +814,7 @@ class AUDIT extends API {
 			if ($vendor['active']) {
 				if ($vendor['info']) {
 					$vendor['info'] = json_decode($vendor['info'], true) ? : [];
+					$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
 					$info .= implode(" \n", array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
 				}
 				$pricelist = json_decode($vendor['pricelist'], true);

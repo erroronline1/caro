@@ -72,7 +72,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
 * imdrf annexes import for prrc
-* tidy audit vendor list with documents
 * unittests (frontend)
 
 #### planning considerations
@@ -179,7 +178,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ## Integrated regulatory support
 * MPDG §83
     * medical device consultants are defined by the respective permission flag and listed as such within the register.
-     
+
 
 [Content](#content)
 
