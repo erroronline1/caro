@@ -436,6 +436,9 @@ canvas,
 textarea {
 	min-height: 13em;
 }
+textarea[rows]{
+	min-height: initial;
+}
 
 .scanner * {
 	overflow: hidden;
