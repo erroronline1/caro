@@ -4,6 +4,7 @@
 ## Content
 * [Aims](#aims)
     * [Intended ISO 13485 goals](#intended-iso-13485-goals)
+    * [Integrated regulatory support](#integrated-regulatory-support)
     * [Extras](#extras)
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
@@ -70,11 +71,9 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management?
-* https://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes
 * imdrf annexes import for prrc
 * tidy audit vendor list with documents
 * unittests (frontend)
-* medical device consultant
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -174,6 +173,13 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
         * fulfilment of regulatory issues considered by forms
     * also see [Tools](#tools)
+
+[Content](#content)
+
+## Integrated regulatory support
+* MPDG §83
+    * medical device consultants are defined by the respective permission flag and listed as such within the register.
+     
 
 [Content](#content)
 
