@@ -702,7 +702,7 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates", "products_with_special_attention"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -720,6 +720,7 @@ export const api = {
 				vendorinformation: LANG.GET("menu.purchase_vendor_information"),
 				productinformation: LANG.GET("menu.purchase_product_information"),
 				products_with_expiry_dates: LANG.GET("menu.purchase_products_with_expiry_dates"),
+				products_with_special_attention: LANG.GET("menu.purchase_products_with_special_attention"),
 			};
 		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {

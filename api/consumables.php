@@ -1758,5 +1758,59 @@ class CONSUMABLES extends API {
 		}
 		$this->response($result);
 	}
+
+	/**
+	 * list products flagged as needing special attention
+	 */
+	public function products_with_special_attention(){
+		// prepare existing vendor lists
+		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+
+		$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => '0'];
+
+		foreach($vendor as $row) {
+			$vendors[$row['name']] = ['value' => $row['id']];
+			if (intval($row['id']) === intval($this->_requestedID)) $vendors[$row['name']]['selected'] = true;
+		}
+
+		$result['render'] = ['content' => [
+			[
+				[
+					'type' => 'select',
+					'content' => $vendors,
+					'attributes' => [
+						'id' => 'productsearchvendor',
+						'name' => LANG::GET('consumables.edit_product_filter_vendors'),
+						'onchange' => "api.purchase('get', 'products_with_special_attention', this.value)"
+					]
+				]
+			]
+		]];
+		// get products of selected vendors
+		$ids = $this->_requestedID && $this->_requestedID != 0 ? intval($this->_requestedID) : implode(',', array_map(fn($r) => intval($r['id']), $vendor));
+		$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+			'replacements' => [
+				':ids' => $ids,
+			]
+		]);
+		$special_attention = [];
+		foreach($vendorproducts as $row){
+			if ($row['special_attention']) {
+				if (!array_key_exists($row['vendor_name'], $special_attention)) $special_attention[$row['vendor_name']] = [];
+				$special_attention[$row['vendor_name']][$row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : '')] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
+			}
+		}
+		if ($special_attention){
+			$result['render']['content'][] = [];
+			foreach($special_attention as $vendor => $products){
+				$result['render']['content'][1][] = [
+					'type' => 'links',
+					'description' => $vendor,
+					'content' => $products
+				];
+			}
+		}
+		$this->response($result);
+	}
 }
 ?>
