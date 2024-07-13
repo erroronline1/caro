@@ -22,6 +22,7 @@
     * [Records](#records)
         * [Forms](#forms)
         * [Records](#records-1)
+        * [Risk management](#risk-management)
     * [Calendar](#calendar)
     * [Files](#files)
     * [Purchase](#purchase)
@@ -70,7 +71,11 @@
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* risk management -> api documentation, audit display and export, displaying acceptance level
+* risk management
+    * api documentation
+    * audit display and export
+    * displaying acceptance level
+    * add last editor (db column)
 * unittests (frontend)
 
 #### planning considerations
@@ -92,6 +97,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ## Intended ISO 13485 goals
 * ISO 13485 4.1.2 Risk based approach
     * The application has a risk management module to consider, evaluate and handle risks.
+    * also see [Risk management](#risk-management)
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
     * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
@@ -179,9 +185,12 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ## Integrated regulatory support
 * MPDG §83
     * medical device consultants are defined by the respective permission flag and listed as such within the register.
+    * also see [Users](#users)
 * ISO 14971 Risk management for medical devices
     * The application has a risk management module to consider, evaluate and handle risks.
     * Items of appedix E are prepared for use by default.
+    * also see [Risk management](#risk-management)
+
 
 [Content](#content)
 
@@ -530,6 +539,15 @@ graph TD;
     appenddata-->forms;
     missing-->|no|nonemissing(status message);
 ```
+
+[Content](#content)
+
+### Risk management
+The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals.
+
+You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures.
+
+Entries are not persistent but can be exported if desired.
 
 [Content](#content)
 
