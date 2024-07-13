@@ -626,6 +626,29 @@ class SQLQUERY {
 
 
 
+		'risk_post' => [
+			'mysql' => "INSERT INTO caro_risks (id, process, risk, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder) VALUES (NULL, :process, :risk, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder)",
+			'sqlsrv' => "INSERT INTO caro_risks (process, risk, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder) VALUES (:process, :risk, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder)"
+		],
+		'risk_put' => [
+			'mysql' => "UPDATE caro_risks SET process = :process, risk = :risk, cause = :cause, effect = :effect, probability = :probability, damage = :damage, measure = :measure, measure_probability = :measure_probability, measure_damage = :measure_damage, risk_benefit = :risk_benefit, measure_remainder = :measure_remainder WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_risks SET process = :process, risk = :risk, cause = :cause, effect = :effect, probability = :probability, damage = :damage, measure = :measure, measure_probability = :measure_probability, measure_damage = :measure_damage, risk_benefit = :risk_benefit, measure_remainder = :measure_remainder WHERE id = :id"
+		],
+		'risk_datalist' => [
+			'mysql' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect",
+			'sqlsrv' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect"
+		],
+		'risk_get' => [
+			'mysql' => "SELECT * FROM caro_risks WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_risks WHERE id = :id"
+		],
+		'risk_delete' => [
+			'mysql' => "DELETE FROM caro_risks WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_risks WHERE id = :id"
+		],
+
+
+
 		'texttemplate_post' => [
 			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, language, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
 			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, language, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"

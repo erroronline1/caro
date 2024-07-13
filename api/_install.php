@@ -182,6 +182,22 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
+				"CREATE TABLE IF NOT EXISTS `caro_risks` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`process` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`risk` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`cause` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`effect` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`probability` int NOT NULL," .
+				"	`damage` int NOT NULL," .
+				"	`measure` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`measure_probability` int NOT NULL," .
+				"	`measure_damage` int NOT NULL," .
+				"	`risk_benefit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`measure_remainder` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
 				"CREATE TABLE IF NOT EXISTS `caro_texttemplates` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -375,6 +391,22 @@ $queries = [
 				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed tinyint NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
+				"CREATE TABLE caro_risks (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	process varchar(MAX) NOT NULL," .
+				"	risk varchar(MAX) NOT NULL," .
+				"	cause varchar(MAX) NOT NULL," .
+				"	effect varchar(MAX) NOT NULL," .
+				"	probability int NOT NULL," .
+				"	damage int NOT NULL," .
+				"	measure varchar(MAX) NOT NULL," .
+				"	measure_probability int NOT NULL," .
+				"	measure_damage int NOT NULL," .
+				"	risk_benefit varchar(MAX) NOT NULL," .
+				"	measure_remainder varchar(MAX) NOT NULL," .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .

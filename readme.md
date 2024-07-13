@@ -90,6 +90,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ![landing page screenshot](assets/landing%20page.png)
 
 ## Intended ISO 13485 goals
+* ISO 13485 4.1.2 Risk based approach
+    * The application has a risk management module to consider, evaluate and handle risks.
 * ISO 13485 4.2.3 Medical device file
     * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
     * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
@@ -177,7 +179,9 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ## Integrated regulatory support
 * MPDG §83
     * medical device consultants are defined by the respective permission flag and listed as such within the register.
-
+* ISO 14971 Risk management for medical devices
+    * The application has a risk management module to consider, evaluate and handle risks.
+    * Items of appedix E are prepared for use by default.
 
 [Content](#content)
 

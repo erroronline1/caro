@@ -155,6 +155,8 @@ class APPLICATION extends API {
 			],
 		];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
+		// make sure risk management comes after forms 
+		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && array_key_exists('weeklyhours', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'])
 			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
 

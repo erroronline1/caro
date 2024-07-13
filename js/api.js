@@ -987,6 +987,51 @@ export const api = {
 	},
 
 	/**
+	 * risk management
+	 * displays form to edit risks or overview, according to permissions 
+	 *
+	 * @param {string} method get|post
+	 * @param  {array} request api method
+	 * @returns request
+	 */
+	risk: (method, ...request) => {
+		request = [...request];
+		request.splice(0, 0, "risk");
+		let payload,
+			successFn = function (data) {
+				new Toast(data.response.msg, data.response.type);
+			},
+			title = {
+				risk: LANG.GET("menu.risk_management"),
+			};
+		switch (method) {
+			case "get":
+				switch (request[3]) {
+					default:
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							api.preventDataloss.start();
+						};
+				}
+				break;
+			case "post":
+			case "put":
+				switch (request[1]) {
+					default:
+						payload = _.getInputs("[data-usecase=risk]", true);
+				}
+				break;
+		}
+		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+	},
+
+	/**
 	 * manages text templates
 	 * displays text template frontend either as body or within a modal
 	 *
