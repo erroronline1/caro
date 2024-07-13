@@ -70,7 +70,7 @@
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* risk management?
+* risk management -> api documentation, audit display and export, displaying acceptance level
 * unittests (frontend)
 
 #### planning considerations
