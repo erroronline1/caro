@@ -545,6 +545,8 @@ You are supposed to track a cause and effect, recognize a probability and damage
 
 Entries are not persistent but can be exported if desired through the [audit module](#tools). Available entries store and display the user name and date of the last edit. 
 
+![risk screenshot](assets/risks.png)
+
 [Content](#content)
 
 ## Calendar
