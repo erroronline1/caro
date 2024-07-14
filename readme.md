@@ -75,7 +75,6 @@
     * api documentation
     * audit display and export
     * displaying acceptance level
-    * add last editor (db column)
 * unittests (frontend)
 
 #### planning considerations

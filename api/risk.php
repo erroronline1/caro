@@ -35,6 +35,7 @@ class RISK extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
+				$date = new DateTime('now', new DateTimeZone(INI['timezone']));
 				$risk = [
 					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
 					':risk' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk')),
@@ -46,7 +47,8 @@ class RISK extends API {
 					':measure_probability' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_probability'))),
 					':measure_damage' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_damage'))),
 					':risk_benefit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk_benefit')),
-					':measure_remainder' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_remainder')) ? : ''
+					':measure_remainder' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_remainder')) ? : '',
+					':last_edit' => json_encode(['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d H:i')])
 				];
 				foreach($risk as $key => $value){
 					if ($key === ':measure_remainder') continue;
@@ -69,6 +71,7 @@ class RISK extends API {
 				break;
 			case 'PUT':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
+				$date = new DateTime('now', new DateTimeZone(INI['timezone']));
 				$risk = [
 					':id' => intval($this->_requestedID),
 					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
@@ -81,7 +84,8 @@ class RISK extends API {
 					':measure_probability' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_probability'))),
 					':measure_damage' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_damage'))),
 					':risk_benefit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk_benefit')),
-					':measure_remainder' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_remainder')) ? : ''
+					':measure_remainder' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_remainder')) ? : '',
+					':last_edit' => json_encode(['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d H:i')])
 				];
 				foreach($risk as $key => $value){
 					if ($key === ':measure_remainder') continue;
@@ -131,7 +135,8 @@ class RISK extends API {
 					'measure_probability' => 1,
 					'measure_damage' => 1,
 					'risk_benefit' => '',
-					'measure_remainder' => ''
+					'measure_remainder' => '',
+					'last_edit' => ''
 				];
 				$probabilities = $measure_probabilities = $damages = $measure_damages = [];
 				foreach(LANGUAGEFILE['risk']['probabilities'] as $index => $description){
@@ -142,6 +147,7 @@ class RISK extends API {
 					$damages[$description] = $risk['damage'] == $index + 1 ? ['value' => $index + 1, 'checked' => true] : ['value' => $index + 1];
 					$measure_damages[$description] = $risk['measure_damage'] == $index + 1 ? ['value' => $index + 1, 'checked' => true] : ['value' => $index + 1];
 				}
+				$last_edit = json_decode($risk['last_edit'], true);
 
 				$selection = [];
 				foreach ($select as $key => $values){
@@ -255,7 +261,8 @@ class RISK extends API {
 							'name' => LANG::GET('risk.measure_remainder'),
 							'value' => $risk['measure_remainder'],
 							'rows' => 4
-						]
+						],
+						'hint' => (isset($last_edit['user'])) ? LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): ''
 					], [
 						'type' => 'deletebutton',
 						'attributes' => [

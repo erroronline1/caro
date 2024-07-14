@@ -195,6 +195,7 @@ $queries = [
 				"	`measure_damage` int NOT NULL," .
 				"	`risk_benefit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`measure_remainder` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`last_edit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -407,6 +408,7 @@ $queries = [
 				"	measure_damage int NOT NULL," .
 				"	risk_benefit varchar(MAX) NOT NULL," .
 				"	measure_remainder varchar(MAX) NOT NULL," .
+				"	last_edit varchar(MAX) NOT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .

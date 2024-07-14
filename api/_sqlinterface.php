@@ -627,12 +627,12 @@ class SQLQUERY {
 
 
 		'risk_post' => [
-			'mysql' => "INSERT INTO caro_risks (id, process, risk, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder) VALUES (NULL, :process, :risk, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder)",
-			'sqlsrv' => "INSERT INTO caro_risks (process, risk, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder) VALUES (:process, :risk, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder)"
+			'mysql' => "INSERT INTO caro_risks (id, process, risk, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, last_edit) VALUES (NULL, :process, :risk, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :last_edit)",
+			'sqlsrv' => "INSERT INTO caro_risks (process, risk, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, last_edit) VALUES (:process, :risk, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :last_edit)"
 		],
 		'risk_put' => [
-			'mysql' => "UPDATE caro_risks SET process = :process, risk = :risk, cause = :cause, effect = :effect, probability = :probability, damage = :damage, measure = :measure, measure_probability = :measure_probability, measure_damage = :measure_damage, risk_benefit = :risk_benefit, measure_remainder = :measure_remainder WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_risks SET process = :process, risk = :risk, cause = :cause, effect = :effect, probability = :probability, damage = :damage, measure = :measure, measure_probability = :measure_probability, measure_damage = :measure_damage, risk_benefit = :risk_benefit, measure_remainder = :measure_remainder WHERE id = :id"
+			'mysql' => "UPDATE caro_risks SET process = :process, risk = :risk, cause = :cause, effect = :effect, probability = :probability, damage = :damage, measure = :measure, measure_probability = :measure_probability, measure_damage = :measure_damage, risk_benefit = :risk_benefit, measure_remainder = :measure_remainder, last_edit = :last_edit WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_risks SET process = :process, risk = :risk, cause = :cause, effect = :effect, probability = :probability, damage = :damage, measure = :measure, measure_probability = :measure_probability, measure_damage = :measure_damage, risk_benefit = :risk_benefit, measure_remainder = :measure_remainder, last_edit = :last_edit WHERE id = :id"
 		],
 		'risk_datalist' => [
 			'mysql' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect",
