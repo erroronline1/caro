@@ -96,7 +96,7 @@ class RISK extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => LANG::GET('risk.risk_saved'),
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => intval($this->_requestedID),
 						'type' => 'success'
 					]]);
 				else $this->response([
