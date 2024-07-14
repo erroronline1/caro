@@ -72,8 +72,6 @@
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* risk management
-    * audit display and export
 * unittests (frontend)
 
 #### planning considerations
@@ -545,7 +543,7 @@ The risk management supports describing risks according to ISO 14971 and in acco
 
 You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold ad defined within [setup.ini](#runtime-variables).
 
-Entries are not persistent but can be exported if desired. Current entries store and display the user name and date of the last edit. 
+Entries are not persistent but can be exported if desired through the [audit module](#tools). Available entries store and display the user name and date of the last edit. 
 
 [Content](#content)
 
@@ -845,6 +843,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * skill fulfilment
 * vendor list
 * regulatory issues
+* risks
 
 ![audit screenshot](assets/audit.png)
 

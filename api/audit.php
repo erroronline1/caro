@@ -83,6 +83,7 @@ class AUDIT extends API {
 			'userexperience', // experience points per user and year
 			'vendors', // vendor list
 			'regulatory', // regulatory issues
+			'risks', // risks
 			] as $category){
 				$selecttypes[LANG::GET('audit.checks_type.' . $category)] = ['value' => $category];
 				if ($this->_requestedType === $category) $selecttypes[LANG::GET('audit.checks_type.' . $category)]['selected'] = true;
@@ -119,6 +120,7 @@ class AUDIT extends API {
 			'userexperience',
 			'vendors',
 			'regulatory',
+			'risks'
 		];
 		if (in_array($this->_requestedType, $static)) $this->{'export' . $this->_requestedType}();
 		else $this->exportchecks();
@@ -956,6 +958,94 @@ class AUDIT extends API {
 		$issues = $this->regulatory();
 		foreach($issues[1] as $item){
 			$summary['content'][$item['description']] = $item['content'];	
+		}
+
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 * returns risks
+	 */
+	private function risks(){
+		$content = $issues = [];
+		// prepare existing risks lists
+		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		$process = '';
+		$issues = [];
+		foreach($risks as $risk){
+			if ($risk['process'] !== $process) $issues[] = [[
+				'type' => 'textblock',
+				'description' => $risk['process'],
+			]];
+			$process = $risk['process'];
+			$last_edit = json_decode($risk['last_edit'], true);
+			$issues[count($issues)-1][] = [
+				'type' => 'textblock',
+				'description' => $risk['risk'] .
+				" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause'],
+				'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
+				" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+				" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+				" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
+				" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+				" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
+				" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
+				(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
+			];
+		}
+		array_push($content, ...$issues);
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for risks
+	 * processes the result of $this->risks() and translates the body object into more simple strings
+	 */
+	private function exportrisks(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.risks') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.risks'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$issues = $this->risks();
+		foreach($issues as $process){
+			foreach($process as $risk){
+				//var_dump($risk);
+				if ($risk['type'] === 'textblock') $summary['content'][$risk['description']] = isset($risk['content']) ? $risk['content'] : ' ';	
+			}
 		}
 
 		$downloadfiles = [];
