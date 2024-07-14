@@ -49,6 +49,7 @@
     * [Notification endpoints](#notification-endpoints)
     * [Order endpoints](#order-endpoints)
     * [Record endpoints](#record-endpoints)
+    * [Risk endpoints](#risk-endpoints)
     * [Texttemplate endpoints](#texttemplate-endpoints)
     * [Tool endpoints](#tool-endpoints)
     * [User endpoints](#user-endpoints)
@@ -72,7 +73,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * risk management
-    * api documentation
     * audit display and export
 * unittests (frontend)
 
@@ -543,9 +543,9 @@ graph TD;
 ### Risk management
 The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals.
 
-You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures.
+You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold ad defined within [setup.ini](#runtime-variables).
 
-Entries are not persistent but can be exported if desired.
+Entries are not persistent but can be exported if desired. Current entries store and display the user name and date of the last edit. 
 
 [Content](#content)
 
@@ -956,6 +956,10 @@ names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|contex
 sharepoint =  48 ; HOURS, after these files will be deleted
 tmp =  24 ; HOURS, after these files will be deleted
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+idle = 1440 ; SECONDS after which a session expires without intermittend request
+training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews
+mdr14_sample_interval = 365 ; DAYS until a new sample check is required as default value
+mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
 
 ; probability factor for similarity of texts in percent
 [likeliness]
@@ -965,14 +969,12 @@ records_search_similarity = 20 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
-idle_logout = 10800 ; seconds after which a session expires without intermittend request, keep long fittings in mind
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-mdr14_sample_interval = 365 ; days until a new sample check is required as default value
-mdr14_sample_reusable = 1825 ; days until a new sample check on the same product is allowed as default value
 user_image = 256 ; max pixels on longer side
 order_approvalsignature_image = 2048 ; max pixels on longer side
 form_image = 2048 ; max pixels on longer side
 record_image = 2048 ; max pixels on longer side
+risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
 
 ; permissions based of and matching languages.xx.ini permissions
 ; dynamic handling for modules and methods
@@ -1002,6 +1004,7 @@ orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products 
 recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
+riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
 users = "ceo, qmo" ; add and edit application users
 vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
@@ -2700,6 +2703,68 @@ Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
 ```
+
+[Content](#content)
+
+### Risk endpoints
+
+> GET ./api/api.php/risk/risk/{id}
+
+Returns a form to add or edit a text chunk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id for risk |
+
+Sample response
+```
+{"render":{"content":[[[{"type":"select","attributes":{"name":"General","onchange":"api.risk('get', 'risk', this.value)"},"content":{"1 Gef\u00e4hrdungen durch Energien und beitragende Faktoren 1.1 Elektrizit\u00e4t: shock":{"value":2}}}],[{"type":"select","attributes":{"name":"Upper extremity prosthetics","onchange":"api.risk('get', 'risk', this.value)"},"content":{"pinch: lack of training":{"value":3}}}]],[{"type":"datalist","content":["General","Lower extemity prosthetics","Upper extremity prosthetics","Lower extremity orthotics","Upper extremity orthotics","Insoles","Trunk orthotics","Foam beddings","Aids"],"attributes":{"id":"processes"}},{"type":"datalist","content":["1 Gef\u00e4hrdungen durch Energien und beitragende Faktoren 1.1 Elektrizit\u00e4t",....
+```
+
+> POST ./api/api.php/risk/risk
+
+Stores a risk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required |  |
+
+Sample response
+```
+{"response":{"msg":"The edited risk has been saved","id":2,"type":"success"}}
+```
+
+> PUT ./api/api.php/risk/risk/{id}
+
+Updates a risk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id for risk |
+| payload | form data | required |  |
+
+Sample response
+```
+{"response":{"msg":"The edited risk has been saved","id":2,"type":"success"}}
+```
+
+> DELETE ./api/api.php/risk/risk
+
+Deletes a risk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id for risk |
+
+Sample response
+```
+{"response":{"msg":"The risk entry has been deleted","id":false,"type":"success"}}
+```
+
 
 [Content](#content)
 
