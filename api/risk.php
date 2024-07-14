@@ -129,23 +129,23 @@ class RISK extends API {
 					'risk' => '',
 					'cause' => '',
 					'effect' => '',
-					'probability' => 1,
-					'damage' => 1,
+					'probability' => count(LANGUAGEFILE['risk']['probabilities']),
+					'damage' => count(LANGUAGEFILE['risk']['damages']),
 					'measure' => '',
-					'measure_probability' => 1,
-					'measure_damage' => 1,
+					'measure_probability' => count(LANGUAGEFILE['risk']['probabilities']),
+					'measure_damage' => count(LANGUAGEFILE['risk']['damages']),
 					'risk_benefit' => '',
 					'measure_remainder' => '',
 					'last_edit' => ''
 				];
 				$probabilities = $measure_probabilities = $damages = $measure_damages = [];
 				foreach(LANGUAGEFILE['risk']['probabilities'] as $index => $description){
-					$probabilities[$description] = $risk['probability'] == $index + 1 ? ['value' => $index + 1, 'checked' => true] : ['value' => $index + 1];
-					$measure_probabilities[$description] = $risk['measure_probability'] == $index + 1 ? ['value' => $index + 1, 'checked' => true] : ['value' => $index + 1];
+					$probabilities[$description] = $risk['probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
+					$measure_probabilities[$description] = $risk['measure_probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 				}
 				foreach(LANGUAGEFILE['risk']['damages'] as $index => $description){
-					$damages[$description] = $risk['damage'] == $index + 1 ? ['value' => $index + 1, 'checked' => true] : ['value' => $index + 1];
-					$measure_damages[$description] = $risk['measure_damage'] == $index + 1 ? ['value' => $index + 1, 'checked' => true] : ['value' => $index + 1];
+					$damages[$description] = $risk['damage'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
+					$measure_damages[$description] = $risk['measure_damage'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 				}
 				$last_edit = json_decode($risk['last_edit'], true);
 
@@ -224,6 +224,12 @@ class RISK extends API {
 						],
 						'content' => $damages
 					], [
+						'type' => 'textblock',
+						'description' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below'),
+						'attributes' => [
+							'class' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
+						]
+					], [
 						'type' => 'textarea',
 						'attributes' => [
 							'name' => LANG::GET('risk.measure'),
@@ -245,6 +251,12 @@ class RISK extends API {
 							'name' => LANG::GET('risk.measure_damage')
 						],
 						'content' => $measure_damages
+					], [
+						'type' => 'textblock',
+						'description' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below'),
+						'attributes' => [
+							'class' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
+						]
 					], [
 						'type' => 'textarea',
 						'attributes' => [

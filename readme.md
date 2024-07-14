@@ -74,7 +74,6 @@
 * risk management
     * api documentation
     * audit display and export
-    * displaying acceptance level
 * unittests (frontend)
 
 #### planning considerations
