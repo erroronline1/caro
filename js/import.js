@@ -35,4 +35,8 @@ window.compose_helper = compose_helper;
 import { LANG } from "../js/language.js";
 window.LANG = LANG;
 
+import {rendertest} from "../js/unittests.js";
+window.rendertest = rendertest;
+
+
 api.application("post", "login");
