@@ -69,6 +69,11 @@
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
 * vendor evaluation
+    * order statistics db
+    * tracking orders, full receivals, returns with cause 
+    * full receivals, order date time difference 
+    * shortened for reduced data, quicker than tracking within products or long term order storage 
+    * deleteable for custom terms (not within checks db)
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
