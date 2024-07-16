@@ -1062,6 +1062,7 @@ products_per_slide = 6
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
+* See available frontend render options importing unittest.js and calling `rendertest('forms')` or `rendertest('app')` from the console.
 
 [Content](#content)
 
