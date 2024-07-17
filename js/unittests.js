@@ -170,8 +170,16 @@ export function rendertest(element) {
 						content: "...to inform users about important things",
 					},
 					{ type: "file", attributes: { name: "Add an upload for files" }, hint: "You can opt for multiple file selection" },
-					{ type: "photo", attributes: { name: "Contribute photos right from your camera" }, hint: "Desktop opens another file dialog though" },
-					{ type: "signature", attributes: { name: "Add a signature pad" }, hint: "Unfortunately this is not certified, so keep a good measure" },
+					{
+						type: "photo",
+						attributes: { name: "Contribute photos right from your camera" },
+						hint: "Desktop opens another file dialog though",
+					},
+					{
+						type: "signature",
+						attributes: { name: "Add a signature pad" },
+						hint: "Unfortunately this is not certified, so keep a good measure",
+					},
 				],
 				[
 					{
@@ -183,11 +191,18 @@ export function rendertest(element) {
 					},
 					{
 						type: "textarea",
-						attributes: { name: "A multiline text input field", value: "The button opens the templates where you can assemble your text, copy and paste it here" },
+						attributes: {
+							name: "A multiline text input field",
+							value: "The button opens the templates where you can assemble your text, copy and paste it here",
+						},
 						texttemplates: true,
 						hint: "With optional access to predefined text templates",
 					},
-					{ type: "number", attributes: { name: "A number input" }, hint: "By the way: all fields can be optional set to be required, so storing the form is possible with provided input only!" },
+					{
+						type: "number",
+						attributes: { name: "A number input" },
+						hint: "By the way: all fields can be optional set to be required, so storing the form is possible with provided input only!",
+					},
 					{ type: "date", attributes: { name: "A date field makes input easy with the host systems date selection" } },
 					{ type: "tel", attributes: { name: "The phone number field displays a keypad on mobile" } },
 					{ type: "email", attributes: { name: "An email field does it similar" } },
@@ -205,7 +220,11 @@ export function rendertest(element) {
 					},
 				],
 				[
-					{ type: "range", attributes: { min: 0, max: 10, value: 3, name: "An easy slider" }, hint: "You can define steps as well" },
+					{
+						type: "range",
+						attributes: { min: 0, max: 10, value: 3, name: "An easy slider" },
+						hint: "You can define steps as well",
+					},
 					{
 						type: "checkbox",
 						description: "Select from multiple options at a glance",
@@ -249,24 +268,37 @@ export function rendertest(element) {
 						attributes: {
 							name: "Time input",
 						},
-						hint: "Easy selection with hosts time picker, if available",
+						hint: "Easy selection with hosts time picker, if available. As seen in timesheets.",
 					},
 					{
 						type: "search",
 						attributes: { name: "Search input" },
-						hint: "Search keyboard and looking glass icon",
+						hint: "Search keyboard and looking glass icon. As seen in new orders.",
 					},
-					{ type: "filtered", attributes: { name: "Filter input" }, hint: "Search keyboard and funnel icon" },
+					{
+						type: "filtered",
+						attributes: { name: "Filter input" },
+						hint: "Search keyboard and funnel icon. As seen in record summaries.",
+					},
 					{
 						type: "checkbox2text",
 						attributes: { name: "Selected modal checkboxes are chained comma separated, onblur" },
-						hint: "Makes selections comprehensible while providing a single payload object",
+						hint: "Makes selections comprehensible while providing a single payload object. As seen in form manager.",
 						content: { One: { value: "1" }, Two: { value: 2 }, Three: { value: "Three" } },
 					},
 					{ type: "range", attributes: { name: "Range with datalist", list: "range_datalist", min: 0, max: 4, value: 2 } },
-					{ type: "datalist", attributes: { id: "range_datalist", class: "rangedatalist" }, content: [{ label: "A" }, { label: "range" }, { label: "with" }, { label: "a" }, { label: "datalist" }] },
+					{
+						type: "datalist",
+						attributes: { id: "range_datalist", class: "rangedatalist" },
+						content: [{ label: "A" }, { label: "range" }, { label: "with" }, { label: "a" }, { label: "datalist" }],
+						hint: "As seen in user manager.",
+					},
 					{ type: "datalist", attributes: { id: "text_datalist" }, content: ["A", "textinput", "with", "a", "datalist"] },
-					{ type: "text", attributes: { name: "Text input with datalist", list: "text_datalist" } },
+					{
+						type: "text",
+						attributes: { name: "Text input with datalist", list: "text_datalist" },
+						hint: "As seen in new conversation.",
+					},
 				],
 				[
 					{
@@ -288,12 +320,39 @@ export function rendertest(element) {
 					},
 				],
 				[
-					{ type: "tile", content: [{ type: "textblock", description: "Textblock on a tile", content: "This is a third width" }] },
-					{ type: "tile", content: [{ type: "text", attributes: { name: "Any element is possible" }, hint: "Not necessarily sensible though." }] },
+					{
+						type: "tile",
+						content: [
+							{
+								type: "textblock",
+								description: "Textblock on a tile",
+								content: "This is a third width. As seen on landing page.",
+							},
+						],
+					},
+					{
+						type: "tile",
+						content: [
+							{ type: "text", attributes: { name: "Any element is possible" }, hint: "Not necessarily sensible though." },
+						],
+					},
 				],
 				[
-					[{ type: "textblock", description: "Sliding panels are possible as well", content: "Just try not to distract or obfuscate. Mobile view is just swiping, desktop view has supporting buttons." }],
-					[{ type: "textblock", description: "It's just another layer of nesting", content: "All options above are valid" }],
+					[
+						{
+							type: "textblock",
+							description: "Sliding panels are possible as well",
+							content:
+								"Just try not to distract or obfuscate. Mobile view is just swiping, desktop view has supporting buttons.",
+						},
+					],
+					[
+						{
+							type: "textblock",
+							description: "It's just another layer of nesting",
+							content: "All options above are valid. As seen in user manager",
+						},
+					],
 				],
 			],
 		},
