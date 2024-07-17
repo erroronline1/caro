@@ -217,7 +217,7 @@ const _client = {
 			new Dialog({
 				type: "input",
 				header: dialogheader,
-				body: body,
+				render: body,
 				options: options,
 			}).then((response) => {
 				if (response[LANG.GET("message.message")]) {
