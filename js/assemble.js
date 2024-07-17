@@ -1158,6 +1158,7 @@ export class Assemble {
 			hint: 'enter a lot of text',
 			texttemplates: true or undefined to add a button opening text templates within a modal
 			numeration: anything resulting in true to prevent enumeration
+			editor: anything resulting in true to add line numbers
 			attributes: {
 				name:'somename'
 				rows:8,
@@ -1166,6 +1167,7 @@ export class Assemble {
 		}*/
 		let textarea = document.createElement("textarea"),
 			label;
+		const hint = this.hint();
 		textarea.id = getNextElementID();
 		textarea.autocomplete = "off";
 		if (this.currentElement.attributes.name !== undefined) {
@@ -1177,9 +1179,7 @@ export class Assemble {
 		}
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
-
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
-			const preservedHint = this.hint();
 			this.currentElement.attributes = {
 				value: LANG.GET("menu.texttemplate_texts"),
 				type: "button",
@@ -1187,9 +1187,29 @@ export class Assemble {
 				class: "floatright",
 			};
 			delete this.currentElement.hint;
-			return [...this.icon(), label, textarea, ...preservedHint, ...this.button(), this.br()];
 		}
-		return [...this.icon(), label, textarea, ...this.hint()];
+		if (this.currentElement.editor) {
+			let div = document.createElement("div"),
+				linenumber = document.createElement("div");
+			linenumber.id = getNextElementID();
+			div.classList.add("editor");
+			linenumber.classList.add("line-numbers");
+			linenumber.append(document.createElement("span"));
+			div.append(linenumber, textarea);
+			textarea.addEventListener("keyup", (event) => {
+				const numberOfLines = event.target.value.split("\n").length;
+				document.getElementById(linenumber.id).innerHTML = Array(numberOfLines).fill("<span></span>").join("");
+			});
+			div.append(document.createElement('br'));
+			textarea = div;
+		}
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), this.br()];
+		return [...this.icon(), label, textarea, ...hint];
+	}
+
+	code() {
+		this.currentElement.editor = true;
+		return this.textarea();
 	}
 
 	button() {

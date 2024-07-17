@@ -182,7 +182,7 @@ class CSVFILTER extends API {
 									'data-loss' => 'prevent'
 								]
 							], [
-								'type' => 'textarea',
+								'type' => 'code',
 								'hint' => LANG::GET('csvfilter.edit_filter_content_hint'),
 								'attributes' => [
 									'name' => LANG::GET('csvfilter.edit_filter_content'),

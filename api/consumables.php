@@ -949,12 +949,11 @@ class CONSUMABLES extends API {
 						], [
 							[
 								[
-									'type' => 'textarea',
+									'type' => 'code',
 									'attributes' => [
 										'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
 										'value' => $vendor['pricelist']['filter'] ? : '',
-										'placeholder' => $this->filtersample,
-										'rows' => 8
+										'placeholder' => $this->filtersample
 									]
 								]
 							]

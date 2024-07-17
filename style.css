@@ -421,7 +421,8 @@ textarea,
 select,
 canvas,
 .scanner,
-.rangedatalist {
+.rangedatalist,
+.editor {
 	text-decoration: none;
 	border: none;
 	width: calc(100% - 2em);
@@ -436,7 +437,7 @@ canvas,
 textarea {
 	min-height: 13em;
 }
-textarea[rows]{
+textarea[rows] {
 	min-height: initial;
 }
 
@@ -472,7 +473,8 @@ input[type="time"],
 input[type="tel"],
 input[type="email"],
 textarea,
-select {
+select,
+.editor {
 	border: 1px solid var(--inputborder);
 	border-radius: 0.2em;
 	padding: 0.75em;
@@ -553,7 +555,7 @@ select + label.input-label {
 	position: relative;
 	pointer-events: none;
 	font-size: 0.75em;
-	top: -5em;
+	top: -4.75em;
 	margin: 0 0 0 3.7em;
 	padding: 0 0.5em;
 	opacity: 1;
@@ -566,13 +568,57 @@ select + label.input-label {
 	font-size: 0.75em;
 	top: -1.25em;
 	margin: 0 0 0 1.7em;
-	padding: 0 0.25em;
+	padding: 0 0.5em;
 	opacity: 1;
 	background-color: var(--article);
 
 	& + textarea {
 		margin-left: 1.75em;
 		margin-top: -1.5em;
+	}
+	& + .editor {
+		margin-left: 1.75em;
+		margin-top: -1.5em;
+	}
+}
+
+.editor {
+	display: inline-flex;
+	gap: 10px;
+	font-family: monospace;
+	line-height: 1.5em;
+	height: 20em;
+	overflow: auto;
+
+	& > textarea {
+		font-family: monospace;
+		line-height: inherit;
+		overflow-y: hidden;
+		white-space: pre;
+		padding: 0;
+		border: 0;
+		margin: 0;
+		min-width: 500px;
+		outline: none;
+		resize: none;
+		height: 9999px;
+	}
+
+	.line-numbers {
+		width: 20px;
+		text-align: right;
+		height: 9999px;
+		margin-top: 0.1em;
+	}
+
+	.line-numbers span {
+		counter-increment: linenumber;
+	}
+
+	.line-numbers span::before {
+		content: counter(linenumber);
+		display: block;
+		color: var(--disabled);
 	}
 }
 
@@ -725,6 +771,9 @@ article > span[data-type] {
 	margin: -1em 0 0 2.3em;
 	font-size: 0.75em;
 	clear: both;
+}
+.editor+.hint{
+	margin: 1em 0 0 2.3em;
 }
 
 .textarea-hint,
@@ -1040,6 +1089,12 @@ dialog a:not([data-type])::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/pencil.svg");
 	mask-image: url("./media/pencil.svg");
+}
+
+[data-type="code"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/brackets-curly.svg");
+	mask-image: url("./media/brackets-curly.svg");
 }
 
 [data-type="search"]::before {

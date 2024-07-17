@@ -299,6 +299,16 @@ export function rendertest(element) {
 						attributes: { name: "Text input with datalist", list: "text_datalist" },
 						hint: "As seen in new conversation.",
 					},
+					{
+						type: "code",
+						attributes: { name: "Text input with linenumbers"},
+						hint:"As seen in vendor management",
+					},
+					{
+						type: "textarea",
+						attributes: { name: "Text input without linenumbers", rows:3},
+						hint:"As comparison",
+					},
 				],
 				[
 					{
