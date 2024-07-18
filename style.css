@@ -583,12 +583,13 @@ select + label.input-label {
 }
 
 .editor {
-	display: inline-flex;
+	display: flex;
 	gap: 10px;
 	font-family: monospace;
 	line-height: 1.5em;
-	height: 20em;
+	height: 15em;
 	overflow: auto;
+	padding:.75em;
 
 	& > textarea {
 		font-family: monospace;
@@ -608,7 +609,7 @@ select + label.input-label {
 		width: 20px;
 		text-align: right;
 		height: 9999px;
-		margin-top: 0.1em;
+		line-height: inherit;
 	}
 
 	.line-numbers span {
