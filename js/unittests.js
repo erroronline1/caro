@@ -282,7 +282,7 @@ export function rendertest(element) {
 					},
 					{
 						type: "checkbox2text",
-						attributes: { name: "Selected modal checkboxes are chained comma separated, onblur" },
+						attributes: { name: "Selected modal checkbox names are chained comma separated, onblur" },
 						hint: "Makes selections comprehensible while providing a single payload object. As seen in form manager.",
 						content: { One: { value: "1" }, Two: { value: 2 }, Three: { value: "Three" } },
 					},
@@ -302,7 +302,7 @@ export function rendertest(element) {
 					{
 						type: "code",
 						attributes: { name: "Text input with linenumbers"},
-						hint:"As seen in vendor management",
+						hint:"As seen in CSV filter management",
 					},
 					{
 						type: "textarea",
@@ -317,7 +317,7 @@ export function rendertest(element) {
 							value: "A generic button",
 							type: "button",
 						},
-						hint: "Buttons can have hint too!",
+						hint: "Buttons can have hints too!",
 					},
 					{
 						type: "deletebutton",
