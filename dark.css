@@ -37,6 +37,8 @@
 	--cta_darker: rgb(80, 155, 176);
 	--cta_active: rgb(161, 227, 246);
 	--shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+	--notif: #e5e9f0;
+	--menu: rgba(46, 52, 64, 0.9);
 }
 
 body {

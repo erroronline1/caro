@@ -332,7 +332,7 @@ nav {
 	div[data-notification]::after,
 	button[data-notification]::after {
 		content: attr(data-notification);
-		color: var(--cta_active);
+		color: var(--notif);
 		position: absolute;
 		margin-top: -3.5em;
 		margin-left: 1.25em;
@@ -379,8 +379,8 @@ nav {
 	}
 
 	div.options {
-		background-color: var(--lightshadow);
 		backdrop-filter: blur(10px);
+		background-color: var(--menu);
 		z-index: 100;
 		position: fixed;
 		bottom: 4em;
