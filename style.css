@@ -572,10 +572,7 @@ select + label.input-label {
 	opacity: 1;
 	background-color: var(--article);
 
-	& + textarea {
-		margin-left: 1.75em;
-		margin-top: -1.5em;
-	}
+	& + textarea,
 	& + .editor {
 		margin-left: 1.75em;
 		margin-top: -1.5em;
