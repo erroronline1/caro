@@ -74,6 +74,8 @@
     * full receivals, order date time difference 
     * shortened for reduced data, quicker than tracking within products or long term order storage 
     * deleteable for custom terms (not within checks db)
+    * export options pdf, csv, xlsx
+* ordertype distinguishable icon
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -745,7 +747,7 @@ Orders may have to be approved; pending approvals sum up and can be batch approv
 Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
 
 Information can be added anytime.
-Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one.
+Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processiong orders flags as received simultaneously - this does not track refunds intentionally to reduce load on purchase staff.
 All actions offer to append a message.
 
 ![orders screenshot](assets/orders.png)
