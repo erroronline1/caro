@@ -490,12 +490,14 @@ input[type="checkbox"] {
 	display: inline;
 	width: 0;
 	height: 0;
+	margin:0;
+	padding:0;
 }
 
 .radio,
 .checkbox {
 	display: inline-block;
-	margin: 0.5em;
+	margin: .5em -.5em .5em 1.5em;
 	padding: 0.5em 1em;
 	border-radius: 2em;
 	background-color: var(--article);
@@ -758,6 +760,11 @@ article > header {
 	text-align: left;
 	display: block;
 }
+[data-type="order"],
+[data-type="cancellation"],
+[data-type="return"] {
+	display: inline-block;
+}
 
 article > span[data-type] {
 	padding: 0;
@@ -879,6 +886,7 @@ article > article {
 
 .imagecanvas,
 .photoupload {
+	shape-outside: margin-box;
 	display: block;
 	margin-bottom: 0;
 	float: right;
@@ -1328,10 +1336,21 @@ button[data-type="submitbutton"]::before {
 	mask-image: url("./media/shopping-cart.svg");
 }
 
-[data-type="purchase"]::before {
+[data-type="purchase"]::before,
+[data-type="order"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/shopping-bag.svg");
 	mask-image: url("./media/shopping-bag.svg");
+}
+[data-type="cancellation"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/times.svg");
+	mask-image: url("./media/times.svg");
+}
+[data-type="return"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/undo.svg");
+	mask-image: url("./media/undo.svg");
 }
 
 [data-type="message"]::before {

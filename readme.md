@@ -75,7 +75,6 @@
     * shortened for reduced data, quicker than tracking within products or long term order storage 
     * deleteable for custom terms (not within checks db)
     * export options pdf, csv, xlsx
-* ordertype distinguishable icon
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?

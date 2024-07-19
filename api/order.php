@@ -1137,13 +1137,6 @@ class ORDER extends API {
 					$content = [];
 					$text = "\n";
 					$decoded_order_data = json_decode($row['order_data'], true);
-					if (array_key_exists('barcode_label', $decoded_order_data) && strlen($decoded_order_data['barcode_label'])) $content[] = [
-						'type' => 'image',
-						'attributes' => [
-							'barcode' => ['value' => $decoded_order_data['barcode_label']],
-							'imageonly' => ['width' => '15em', 'height' => '6em']
-							]
-					];
 					
 					$content[]=
 						['type' => 'hidden',
@@ -1270,10 +1263,31 @@ class ORDER extends API {
 							"} else this.checked = false;});"
 					];
 
+					if (array_key_exists('barcode_label', $decoded_order_data) && strlen($decoded_order_data['barcode_label'])) $content[] = [
+						'type' => 'image',
+						'attributes' => [
+							'barcode' => ['value' => $decoded_order_data['barcode_label']],
+							'imageonly' => ['width' => '15em', 'height' => '6em']
+							]
+					];
 					$content[] = [
 						'type' => 'textblock',
-						'content' => LANG::GET('order.ordertype.' . $row['ordertype']) . "\n" . $text,
+						'description' => LANG::GET('order.ordertype.' . $row['ordertype']),
+						'content' => $text,
+						'attributes' => [
+							'data-type' => $row['ordertype']
+						]
 					];
+
+					if (str_contains($row['approval'], 'data:image/png')){
+						$content[]=[
+							'type' => 'image',
+							'attributes' => [
+								'imageonly' => ['width' => '15em', 'height' => '6em', 'margin-top' => '-3em'],
+								'name' => LANG::GET('order.approval_image'),
+								'url' => $row['approval']],
+						];
+					}
 
 					// inform if special attention is required
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($special_attention, 'article_no'))) !== false){
@@ -1287,15 +1301,6 @@ class ORDER extends API {
 							];		
 						}}
 
-					if (str_contains($row['approval'], 'data:image/png')){
-						$content[]=[
-							'type' => 'image',
-							'attributes' => [
-								'imageonly' => ['width' => '10em', 'height' => '6em', 'margin-top' => '-4em'],
-								'name' => LANG::GET('order.approval_image'),
-								'url' => $row['approval']],
-						];
-					}
 
 					$messagepayload=[];
 					foreach (['quantity'=> 'quantity_label',
