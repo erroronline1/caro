@@ -800,6 +800,7 @@ graph TD;
     mark-->|processed|order_type{order type};
     order_type-->|order|auto_delete[auto delete after X days];
     order_type-->|return|auto_delete;
+    order_type-->|service|auto_delete;
     order_type-->|cancellation|order_deleted(order deleted)
     mark-->|retrieved|auto_delete;
     mark-->|archived|delete[delete manually];
