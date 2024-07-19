@@ -58,7 +58,7 @@ class ORDER extends API {
 				if (!$approval) $this->response([], 401);
 				if (!$approvedIDs) $this->response([], 406);
 
-				$order_data=['items'=>[]];
+				$order_data = ['items' => []];
 
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 				$index=0;
@@ -140,6 +140,7 @@ class ORDER extends API {
 							} else {
 								if ($key==='attachments') continue;
 								if ($key==='organizational_unit') $value = LANG::GET('units.' . $value);
+								if ($key==='order_type') $value = LANG::GET('order.ordertype.' . $value);
 
 								$info .= LANG::GET('order.' . $key) . ': ' . $value . "\n";
 							}
@@ -424,7 +425,7 @@ class ORDER extends API {
 				':order_data' => $this->_pdo->quote(json_encode($order_data2, JSON_UNESCAPED_SLASHES)),
 				':organizational_unit' => $this->_pdo->quote($processedOrderData['order_data']['organizational_unit']),
 				':approval' => $this->_pdo->quote($processedOrderData['approval']),
-				':ordertype' => $this->_pdo->quote('order')
+				':ordertype' => $this->_pdo->quote($processedOrderData['order_data']['order_type'])
 			]) . '; ';
 		}
 		if (SQLQUERY::EXECUTE($this->_pdo, $query)) {
@@ -489,6 +490,10 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder($processedOrderData);
 
 				if ($result['response']['msg'] === LANG::GET('order.saved')){
+/*var_dump(strtr(SQLQUERY::PREPARE('order_delete_prepared_orders'),[
+	':id' => intval($this->_requestedID)
+]));*/
+
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replace' => [
 							':id' => intval($this->_requestedID)
@@ -528,16 +533,23 @@ class ORDER extends API {
 						'organizational_unit' => '',
 						'commission' => '',
 						'delivery_date' => '',
+						'order_type' => '',
 						'items' => false
 					];
 				} else {
 					$order = json_decode($order['order_data'], true);
 				}
-				$organizational_units=[];
+				$organizational_units = [];
 				foreach(LANGUAGEFILE['units'] as $unit => $description){
 					$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'required' => true];
 					if (array_key_exists('organizational_unit', $order) && in_array($unit, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
 					elseif (array_key_exists('primaryUnit', $_SESSION['user']['app_settings'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
+				}
+
+				$order_type = [];
+				foreach(LANGUAGEFILE['order']['ordertype'] as $key => $description){
+					$order_type[$description] = ['value' => $key];
+					if (array_key_exists('order_type', $order) && $order['order_type'] == $key) $order_type[$description]['selected'] = true;
 				}
 
 				$result['render'] = ['form' => [
@@ -645,6 +657,12 @@ class ORDER extends API {
 						], [
 							'type' => 'scanner',
 							'destination' => 'commission'
+						], [
+							'type' => 'select',
+							'content' => $order_type,
+							'attributes' => [
+								'name' => LANG::GET('order.order_type')
+							]
 						], [
 							'type' => 'date',
 							'attributes' => [
@@ -927,6 +945,7 @@ class ORDER extends API {
 						'commission' => null,
 						'orderer' => null,
 						'delivery_date' => null,
+						'order_type' => null,
 						'attachments' => null
 					];
 					// fill possible keys
@@ -1205,7 +1224,7 @@ class ORDER extends API {
 								break;
 						}
 					}
-					if (!($row['ordered'] || $row['received']) && $row['ordertype'] === 'order') $status[LANG::GET('order.disapprove')]=[
+					if (!($row['ordered'] || $row['received']) && in_array($row['ordertype'], ['order', 'service'])) $status[LANG::GET('order.disapprove')]=[
 						'data_disapproved' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', render:JSON.parse('" . 
 							json_encode(

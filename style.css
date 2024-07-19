@@ -1141,6 +1141,7 @@ button[data-type="calendarbutton"]::before {
 	-webkit-mask-image: url("./media/phone.svg");
 	mask-image: url("./media/phone.svg");
 }
+
 [data-type="email"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/at.svg");
@@ -1351,6 +1352,11 @@ button[data-type="submitbutton"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/undo.svg");
 	mask-image: url("./media/undo.svg");
+}
+[data-type="service"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/heartbeat.svg");
+	mask-image: url("./media/heartbeat.svg");
 }
 
 [data-type="message"]::before {

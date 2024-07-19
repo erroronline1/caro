@@ -75,6 +75,7 @@
     * shortened for reduced data, quicker than tracking within products or long term order storage 
     * deleteable for custom terms (not within checks db)
     * export options pdf, csv, xlsx
+* look after sql error on authorizing orders while deleting prepared
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
