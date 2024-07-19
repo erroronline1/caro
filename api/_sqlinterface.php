@@ -84,9 +84,9 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
+		//var_dump($query);
 		$statement = $_pdo->prepare($query);
 
-		//var_dump($query, $parameters);
 		//$statement->execute($parameters['values']);
 		//var_dump($statement->debugDumpParams());
 		if (!$statement->execute($parameters['values'])) return false;

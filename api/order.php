@@ -490,12 +490,8 @@ class ORDER extends API {
 				$result = $this->postApprovedOrder($processedOrderData);
 
 				if ($result['response']['msg'] === LANG::GET('order.saved')){
-/*var_dump(strtr(SQLQUERY::PREPARE('order_delete_prepared_orders'),[
-	':id' => intval($this->_requestedID)
-]));*/
-
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
-						'replace' => [
+						'replacements' => [
 							':id' => intval($this->_requestedID)
 						]
 					]);
@@ -854,7 +850,7 @@ class ORDER extends API {
 
 				// delete prepared order
 				if (SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
-					'values' => [
+					'replacements' => [
 						':id' => intval($this->_requestedID)
 					]
 				])) {
