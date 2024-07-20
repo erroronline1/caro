@@ -607,6 +607,29 @@ class SQLQUERY {
 
 
 
+		'order_post_order_statistics' => [
+			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, received, ordertype) VALUES (:order_id, :order_data, :ordered, :received, :ordertype)",
+			'sqlsrv' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype)"
+		],
+		'order_put_order_statistics' => [
+			'mysql' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = :received WHERE order_id = :order_id",
+			'sqlsrv' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = CONVERT(SMALLDATETIME, :received, 120) WHERE order_id = :order_id"
+		],
+		'order_get_order_statistics' => [
+			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",
+			'sqlsrv' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id"
+		],
+		'order_delete_order_statistics' => [
+			'mysql' => "DELETE FROM caro_consumables_order_statistics WHERE order_id = :order_id",
+			'sqlsrv' => "DELETE FROM caro_consumables_order_statistics WHERE order_id = :order_id"
+		],
+		'order_truncate_order_statistics' => [
+			'mysql' => "TRUNCATE caro_consumables_order_statistics",
+			'sqlsrv' => "TRUNCATE TABLE caro_consumables_order_statistics"
+		],
+
+
+
 		'records_post' => [
 			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content) VALUES (NULL, :context, :form_name, :form_id, :identifier, :entry_timestamp, :author, :author_id, :content)",
 			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content)"

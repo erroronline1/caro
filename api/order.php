@@ -446,6 +446,60 @@ class ORDER extends API {
 		return $result;
 	}
 
+	/**
+	 * post to order statistics once an order is processed
+	 * reduces order data and updates received state
+	 * deletes entry if processed state is revoked
+	 */
+	private function orderStatistics($order_id, $delete = false){
+		if (!$order_id) return;
+		if ($delete) {
+			SQLQUERY::EXECUTE($this->_pdo, 'order_delete_order_statistics', [
+				'values' => [
+					':order_id' => intval($order_id)
+				]
+			]);
+			return;
+		}
+		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
+			'values' => [
+				':id' => intval($order_id)
+			]
+		]);
+		$order = $order ? $order[0] : null;
+		if (!$order) return;
+		
+		// minimize order data
+		$order['order_data'] = json_decode($order['order_data'], true);
+		foreach($order['order_data'] as $key => $value){
+			if (!in_array($key, [
+				'quantity_label',
+				'unit_label',
+				'ordernumber_label',
+				'productname_label',
+				'vendor_label',
+				'additional_info'])) unset($order['order_data'][$key]);
+		}
+		$order['order_data'] = json_encode($order['order_data']);
+		
+		// update or insert order statistics
+		if (SQLQUERY::EXECUTE($this->_pdo, 'order_put_order_statistics', [
+				'values' => [
+					':order_data' => $order['order_data'],
+					':received' => $order['received'] ? : '2079-06-06 23:59:59',
+					':order_id' => intval($order_id)
+				]
+			]) === false) SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+				'values' => [
+					':order_id' => intval($order_id),
+					':order_data' => $order['order_data'],
+					':ordered' => $order['ordered'],
+					':received' => $order['received'] ? : '2079-06-06 23:59:59',
+					':ordertype' => $order['ordertype']
+				]
+			]);
+	}
+
 	public function order(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1072,6 +1126,9 @@ class ORDER extends API {
 						'msg' => LANG::GET('order.ora_set', [':type' => LANG::GET('order.' . $this->_subMethod)]),
 						'type' => 'info'
 					]];
+
+				$this->orderStatistics($this->_requestedID, ($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved');
+
 				break;
 			case 'GET':
 				// delete old received unarchived orders

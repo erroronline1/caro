@@ -70,6 +70,15 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
+				"CREATE TABLE IF NOT EXISTS `caro_consumables_order_statistics` (" .
+				"	`order_id` int NOT NULL," .
+				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`ordered` datetime NULL DEFAULT NULL," .
+				"	`received` datetime NULL DEFAULT NULL," .
+				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`order_id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				,
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_prepared_orders` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -279,6 +288,16 @@ $queries = [
 				"	ordered smalldatetime NULL DEFAULT NULL," .
 				"	received smalldatetime NULL DEFAULT NULL," .
 				"	archived smalldatetime NULL DEFAULT NULL," .
+				"	ordertype varchar(MAX) NOT NULL" .
+				");"
+				,
+				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
+				"CREATE TABLE caro_consumables_order_statistics (" .
+				"	id int NOT NULL IDENTITY PRIMARY KEY," .
+				"	order_id int NOT NULL," .
+				"	order_data varchar(MAX) NOT NULL," .
+				"	ordered smalldatetime NULL DEFAULT NULL," .
+				"	received smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(MAX) NOT NULL" .
 				");"
 				,
