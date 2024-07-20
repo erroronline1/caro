@@ -583,7 +583,7 @@ class ORDER extends API {
 						'organizational_unit' => '',
 						'commission' => '',
 						'delivery_date' => '',
-						'order_type' => '',
+						'order_type' => 'order',
 						'items' => false
 					];
 				} else {
