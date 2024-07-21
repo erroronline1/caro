@@ -487,9 +487,10 @@ class ORDER extends API {
 				'values' => [
 					':order_data' => $order['order_data'],
 					':received' => $order['received'] ? : '2079-06-06 23:59:59',
+					':ordertype' => $order['ordertype'],
 					':order_id' => intval($order_id)
 				]
-			]) === false) SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+			]) == false) SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
 				'values' => [
 					':order_id' => intval($order_id),
 					':order_data' => $order['order_data'],
@@ -941,6 +942,7 @@ class ORDER extends API {
 					switch ($this->_subMethod){
 						case 'ordered':
 							if ($order['ordertype'] === 'cancellation'){
+								$this->orderStatistics($this->_requestedID);
 								if ($this->delete_approved_order($order)) {
 									$result = [
 									'response' => [
@@ -955,6 +957,7 @@ class ORDER extends API {
 										'msg' => LANG::GET('order.failed_delete'),
 										'type' => 'error'
 									]];
+								$this->response($result);
 							}
 							elseif ($order['ordertype'] === 'return') {
 								SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_received', [
@@ -1104,9 +1107,10 @@ class ORDER extends API {
 								':ordertype' => 'return'
 								]
 							])) {
+								$this->_requestedID = $this->pdo->lastInsertId();
 								$result = [
 								'response' => [
-									'id' => false,
+									'id' => $this->_requestedID,
 									'msg' => LANG::GET('order.saved'),
 									'type' => 'success'
 								]];
