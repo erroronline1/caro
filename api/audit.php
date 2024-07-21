@@ -970,9 +970,10 @@ class AUDIT extends API {
 			$deliverytime = '';
 			if ($order['received']){
 				$datetimezone = new DateTimeZone(INI['timezone']);
+				$now = new DateTime('now', $datetimezone);
 				$ordered = new DateTime($order['ordered'], $datetimezone);
 				$received = new DateTime($order['received'], $datetimezone);
-				$deliverytime = intval($ordered->diff($received)->format('%a'));
+				if ($received < $now) $deliverytime = intval($ordered->diff($received)->format('%a'));
 			}
 
 			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = LANG::GET('audit.order_statistics_undefined_vendor');

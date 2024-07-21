@@ -68,7 +68,6 @@
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
-* order_statistics : handle updating received null value (sqlsrv) instead of default future date?
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -1555,7 +1554,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+{"response":{"msg":"Order statistics have been deleted.","type":"success"}}
 ```
 
 > GET ./api/api.php/audit/export/{type}
