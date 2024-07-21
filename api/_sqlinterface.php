@@ -612,8 +612,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype)"
 		],
 		'order_put_order_statistics' => [
-			'mysql' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = :received WHERE order_id = :order_id",
-			'sqlsrv' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = CONVERT(SMALLDATETIME, :received, 120) WHERE order_id = :order_id"
+			'mysql' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = :received, ordertype = :ordertype WHERE order_id = :order_id",
+			'sqlsrv' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype WHERE order_id = :order_id"
 		],
 		'order_get_order_statistics' => [
 			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",
