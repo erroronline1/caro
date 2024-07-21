@@ -68,13 +68,7 @@
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
-* vendor evaluation
-    * order statistics db
-    * tracking orders, full receivals, returns with cause 
-    * full receivals, order date time difference 
-    * shortened for reduced data, quicker than tracking within products or long term order storage 
-    * deleteable for custom terms (not within checks db)
-    * export options pdf, csv, xlsx
+* order_statistics : handle updating received null value (sqlsrv) instead of default future date?
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -155,7 +149,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * any document to the product has been provided
         * an alias has been modified
     * Vendor and product editing is permitted by defined authorized users only.
-    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
+    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
+    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the setup.ini file.
     * Sample check information is to be enriched through a dedicated form with the respective context. All users can gather the required information and commit the check. 
@@ -181,6 +176,10 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
         * fulfilment of regulatory issues considered by forms
     * also see [Tools](#tools)
+* ISO 13485 8.4 Data analysis
+    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpeted though.
+    * [Order](#order), [Tools](#tools)
+
 
 [Content](#content)
 
@@ -749,6 +748,8 @@ Information can be added anytime.
 Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processiong orders flags as received simultaneously - this does not track refunds intentionally to reduce load on purchase staff.
 All actions offer to append a message.
 
+Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation. 
+
 ![orders screenshot](assets/orders.png)
 
 ```mermaid
@@ -851,6 +852,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * user skills and trainings
 * skill fulfilment
 * vendor list
+* order statistics
 * regulatory issues
 * risks
 
@@ -1531,6 +1533,20 @@ Parameters
 > GET ./api/api.php/audit/checks/{type}
 
 Returns selection of available checks, given type the result of the selected type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | adds contents based on given type to response |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+```
+
+> DELETE ./api/api.php/audit/checks/{type}
+
+Deletes records. Currently implemented for order statistics only.
 
 Parameters
 | Name | Data Type | Required | Description |
