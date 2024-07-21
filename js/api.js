@@ -326,8 +326,6 @@ export const api = {
 			case "post":
 				payload = _.getInputs("[data-usecase=audit]", true);
 				break;
-			default:
-				return;
 		}
 		api.send(method, request, successFn, null, payload, method === "post");
 	},

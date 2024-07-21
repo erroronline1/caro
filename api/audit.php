@@ -17,8 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// audit overview and export
+ // audit overview and export
 require_once('./_pdf.php');
+include_once("../libraries/xlsxwriter.class.php");
 
 class AUDIT extends API {
 	/**
@@ -66,44 +67,55 @@ class AUDIT extends API {
 	 * calls $this->_requestedType method if set
 	 */
 	public function checks(){
-		$result['render'] = ['content' => []];
-		$selecttypes = [];
-		
-		// checks
-		$types = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_types');
-		foreach($types as $type){
-			$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
-			if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
-		}
-		foreach([
-			'incorporation', // incorporated products
-			'forms', // forms and components
-			'userskills', // user skills and certificates
-			'skillfulfilment', // skill fulfilment
-			'userexperience', // experience points per user and year
-			'vendors', // vendor list
-			'regulatory', // regulatory issues
-			'risks', // risks
-			] as $category){
-				$selecttypes[LANG::GET('audit.checks_type.' . $category)] = ['value' => $category];
-				if ($this->_requestedType === $category) $selecttypes[LANG::GET('audit.checks_type.' . $category)]['selected'] = true;
-		}
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'GET':
+				$result['render'] = ['content' => []];
+				$selecttypes = [];
+				
+				// checks
+				$types = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_types');
+				foreach($types as $type){
+					$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
+					if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
+				}
+				foreach([
+					'incorporation', // incorporated products
+					'forms', // forms and components
+					'userskills', // user skills and certificates
+					'skillfulfilment', // skill fulfilment
+					'userexperience', // experience points per user and year
+					'vendors', // vendor list
+					'orderstatistics', // order statistics
+					'regulatory', // regulatory issues
+					'risks', // risks
+					] as $category){
+						$selecttypes[LANG::GET('audit.checks_type.' . $category)] = ['value' => $category];
+						if ($this->_requestedType === $category) $selecttypes[LANG::GET('audit.checks_type.' . $category)]['selected'] = true;
+				}
 
-		$result['render']['content'][] = [
-			[
-				'type' => 'select',
-				'content' => $selecttypes,
-				'attributes' => [
-					'name' => LANG::GET('audit.checks_select_type'),
-					'onchange' => "api.audit('get', 'checks', this.value)"
-				]
-			]
-		];
+				$result['render']['content'][] = [
+					[
+						'type' => 'select',
+						'content' => $selecttypes,
+						'attributes' => [
+							'name' => LANG::GET('audit.checks_select_type'),
+							'onchange' => "api.audit('get', 'checks', this.value)"
+						]
+					]
+				];
 
-		if ($this->_requestedType) {
-			if ($append = $this->{$this->_requestedType}()) array_push($result['render']['content'] , ...$append);
+				if ($this->_requestedType) {
+					if ($append = $this->{$this->_requestedType}()) array_push($result['render']['content'] , ...$append);
+				}
+				$this->response($result);
+				break;
+			case 'DELETE':
+				$permitted = [
+					'orderstatistics'
+				];
+				if (in_array($this->_requestedType, $permitted)) $this->{'delete' . $this->_requestedType}();
+				break;
 		}
-		$this->response($result);
 	}
 
 	/**
@@ -119,6 +131,7 @@ class AUDIT extends API {
 			'skillfulfilment',
 			'userexperience',
 			'vendors',
+			'orderstatistics',
 			'regulatory',
 			'risks'
 		];
@@ -885,6 +898,137 @@ class AUDIT extends API {
 		);
 		$this->response([
 			'render' => $body,
+		]);
+	}
+
+	/**
+	 * returns export and delete options for order statistics
+	 */
+	private function orderstatistics(){
+		$content = [];
+
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+		$content[] = [
+			[
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.orderstatistics_number', [':number' => count($orders)]),
+				'content' => count($orders) ? LANG::GET('audit.orderstatistics_info') : ''
+			]
+		];
+
+		if (count($orders)){
+			// add export button
+			$content[] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'value' => LANG::GET('audit.record_export_xlsx'),
+						'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					]
+				]
+			];
+			$content[] = [
+				[
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => LANG::GET('audit.orderstatistics_truncate'),
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('audit.orderstatistics_truncate') ."', options:{".
+						"'".LANG::GET('general.cancel_button')."': false,".
+						"'".LANG::GET('audit.orderstatistics_truncate_confirm')."': {value: true, class: 'reducedCTA'},".
+						"}}).then(confirmation => {if (confirmation) api.audit('delete', 'checks', '" . $this->_requestedType . "');})",
+					]
+				]
+			];
+		}
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for the order statistics
+	 * export is an xlsx file with orders grouped by vendor sheets
+	 */
+	private function exportorderstatistics(){
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+
+		$columns = [
+			'vendor_label' => LANG::GET('order.vendor_label'),
+			'ordertype' => LANG::GET('order.order_type'),
+			'quantity_label' => LANG::GET('order.quantity_label'),
+			'unit_label' => LANG::GET('order.unit_label'),
+			'ordernumber_label' => LANG::GET('order.ordernumber_label'),
+			'productname_label' => LANG::GET('order.productname_label'),
+			'additional_info' => LANG::GET('order.additional_info'),
+			'ordered' => LANG::GET('order.ordered'),
+			'received' => LANG::GET('order.received'),
+			'deliverytime' => LANG::GET('audit.order_statistics_delivery_time_column')
+		];
+
+		// prepare result as subsets of vendors
+		$vendor_orders = [];
+		foreach($orders as $order){
+			$order['order_data'] = json_decode($order['order_data'], true);
+			$deliverytime = '';
+			if ($order['received']){
+				$datetimezone = new DateTimeZone(INI['timezone']);
+				$ordered = new DateTime($order['ordered'], $datetimezone);
+				$received = new DateTime($order['received'], $datetimezone);
+				$deliverytime = intval($ordered->diff($received)->format('%a'));
+			}
+
+			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = LANG::GET('audit.order_statistics_undefined_vendor');
+			if (!isset($vendor_orders[$order['order_data']['vendor_label']])) $vendor_orders[$order['order_data']['vendor_label']] = [];
+
+			$vendor_orders[$order['order_data']['vendor_label']][] = [
+				isset($order['order_data']['vendor_label']) ? $order['order_data']['vendor_label'] : '',
+				LANG::GET('order.ordertype.' . $order['ordertype']),
+				isset($order['order_data']['quantity_label']) ? $order['order_data']['quantity_label'] : '',
+				isset($order['order_data']['unit_label']) ? $order['order_data']['unit_label'] : '',
+				isset($order['order_data']['ordernumber_label']) ? $order['order_data']['ordernumber_label'] : '',
+				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
+				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
+				$order['ordered'],
+				$order['received'],
+				$deliverytime
+			];
+		}
+		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.orderstatistics') . '_' . date('Y-m-d H:i')) . '.xlsx';
+		$writer = new XLSXWriter();
+		$writer->setAuthor($_SESSION['user']['name']); 
+
+		foreach($vendor_orders as $vendor => $orders){
+			$writer->writeSheetRow($vendor, array_values($columns));
+			foreach ($orders as $line)
+				$writer->writeSheetRow($vendor, $line, $row_options = array('height' => 30,'wrap_text' => true));
+		}
+
+		$writer->writeToFile($tempFile);
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => substr($tempFile, 1),
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' => LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 * truncated the respective database
+	 */
+	private function deleteorderstatistics(){
+		SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
+		$this->response([
+			'response' => [
+				'msg' => LANG::GET('audit.orderstatistics_truncate_success'),
+				'type' => 'success'
+			]
 		]);
 	}
 
