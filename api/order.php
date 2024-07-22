@@ -1453,6 +1453,7 @@ class ORDER extends API {
 						$content[] = [
 							'type' => 'select',
 							'content' => $statechange,
+							'numeration' => '0',
 							'attributes' => [
 								'name' => LANG::GET('order.orderstate_description'),
 								'onchange' => "new Dialog({type: 'input', header: LANG.GET('order.orderstate_description') + ' ' + this.value, render: JSON.parse('" . 
