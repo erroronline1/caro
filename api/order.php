@@ -486,7 +486,7 @@ class ORDER extends API {
 		if (SQLQUERY::EXECUTE($this->_pdo, 'order_put_order_statistics', [
 				'values' => [
 					':order_data' => $order['order_data'],
-					':received' => $order['received'] ? : '2079-06-06 23:59:59',
+					':received' => $order['received'] ? : '2079-06-06 23:59:00',
 					':ordertype' => $order['ordertype'],
 					':order_id' => intval($order_id)
 				]
@@ -495,7 +495,7 @@ class ORDER extends API {
 					':order_id' => intval($order_id),
 					':order_data' => $order['order_data'],
 					':ordered' => $order['ordered'],
-					':received' => $order['received'] ? : '2079-06-06 23:59:59',
+					':received' => $order['received'] ? : '2079-06-06 23:59:00',
 					':ordertype' => $order['ordertype']
 				]
 			]);
