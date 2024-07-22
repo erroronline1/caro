@@ -988,7 +988,7 @@ class AUDIT extends API {
 				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
 				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
 				$order['ordered'],
-				$order['received'],
+				$order['received'] && $received < $now ? $order['received'] : '',
 				$deliverytime
 			];
 		}
