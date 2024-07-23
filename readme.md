@@ -72,6 +72,7 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
+* incidents, errors, complaints - acknowledgement permission, statistics
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
