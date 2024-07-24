@@ -283,25 +283,6 @@ export class Dialog {
 		}
 		return buttons;
 	}
-	select() {
-		const buttons = document.createElement("div");
-		let button, firststring, optgroup;
-		for (const [option, value] of Object.entries(this.options)) {
-			if (Object.entries(this.options).length > 12 && firststring !== option.substring(0, 1)) {
-				firststring = option.substring(0, 1);
-				optgroup = document.createElement("h3");
-				optgroup.classList.add("modaloptgroup");
-				optgroup.append(document.createTextNode(firststring));
-				buttons.append(optgroup);
-			}
-			button = document.createElement("button");
-			button.classList.add("discreetButton");
-			button.append(document.createTextNode(option));
-			button.value = value;
-			buttons.append(button);
-		}
-		return [buttons];
-	}
 	input() {
 		let result = [...this.assemble.initializeSection(null, null, "iCanHasNodes")];
 		if (Object.keys(this.options).length) result = result.concat(this.confirm());
@@ -326,6 +307,25 @@ export class Dialog {
 			button: button,
 		};
 		return [div, input, button];
+	}
+	select() {
+		const buttons = document.createElement("div");
+		let button, firststring, optgroup;
+		for (const [option, value] of Object.entries(this.options)) {
+			if (Object.entries(this.options).length > 12 && firststring !== option.substring(0, 1)) {
+				firststring = option.substring(0, 1);
+				optgroup = document.createElement("h3");
+				optgroup.classList.add("modaloptgroup");
+				optgroup.append(document.createTextNode(firststring));
+				buttons.append(optgroup);
+			}
+			button = document.createElement("button");
+			button.classList.add("discreetButton");
+			button.append(document.createTextNode(option));
+			button.value = value;
+			buttons.append(button);
+		}
+		return [buttons];
 	}
 }
 
@@ -700,6 +700,14 @@ export class Assemble {
 		} else new Toast(LANG.GET("general.missing_form_data"), "error");
 	}
 
+	/**
+	 *
+	 *   ___ ___ _____ _____ ___ ___
+	 *  |  _| . |     |     | . |   |
+	 *  |___|___|_|_|_|_|_|_|___|_|_|
+	 *
+	 */
+
 	initialize_SignaturePad() {
 		signaturecanvas = document.getElementById("signaturecanvas");
 		window.signaturePad = new SignaturePad(signaturecanvas, {
@@ -802,34 +810,322 @@ export class Assemble {
 		return name;
 	}
 
-	textblock() {
-		/* {
-			type: 'textblock',
-			description: 'very informative',
-			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+	/**
+	 *         _   _         _
+	 *   _ _ _|_|_| |___ ___| |_ ___
+	 *  | | | | | . | . | -_|  _|_ -|
+	 *  |_____|_|___|_  |___|_| |___|
+	 *              |___|
+	 *
+	 */
+
+	br() {
+		return document.createElement("br");
+	}
+
+	button() {
+		/*{
+			type: 'button',
+			hint: 'this button does this or that'
 			attributes: {
-				attribute: value // applies to header
+				value: 'this is displayed on the button',
+				onpointerdown: 'alert("hello")'
 			}
 		}*/
-		let result = [],
-			p;
-		if (this.currentElement.description) {
-			result = result.concat(this.header());
+		let button = document.createElement("button");
+		button.id = getNextElementID();
+		if (this.currentElement.attributes.value !== undefined) {
+			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
+			delete this.currentElement.attributes.value;
 		}
-		if (this.currentElement.content) {
-			const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
-			p = document.createElement("p");
-			for (const part of content) {
-				if (!part[1].length) continue;
-				p.append(document.createTextNode(part[1]));
-				p.append(document.createElement("br"));
+		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
+		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
+		return [button, ...this.hint()];
+	}
+
+	calendar() {
+		/*{
+			type: 'calendar',
+			content: [
+				null,
+				{
+					date: 'Y-m-d',
+					display: 'whatever text, weekday, day, number of appointments
+				}, ...
+			],
+			api: schedule|timesheet
+		} */
+		let cal = [],
+			daytile,
+			apicall = this.currentElement.api;
+		for (const day of this.currentElement.content) {
+			daytile = document.createElement("div");
+			daytile.classList = "day";
+			if (day !== null) {
+				daytile.classList.add("displayDay");
+				let display = day.display.split("\n");
+				for (const line of display) {
+					daytile.append(document.createTextNode(line));
+					daytile.append(document.createElement("br"));
+				}
+				daytile.onpointerup = function () {
+					api.calendar("get", apicall, day.date, day.date);
+				};
+				if (day.today) daytile.classList.add("today");
+				if (day.selected) daytile.classList.add("selected");
+				if (day.holiday) daytile.classList.add("holiday");
 			}
-			result.push(p);
+			cal.push(daytile);
 		}
-		if (this.currentElement.attributes !== undefined) {
-			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
+		return [...this.header(), ...cal];
+	}
+
+	calendarbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "calendarbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return [this.br(), ...this.button()];
+	}
+
+	cart() {
+		// empty method but neccessary for styling reasons (icon)
+	}
+
+	checkbox(radio = null) {
+		/*{
+			type: 'checkbox', or 'radio'
+			description:'checkboxes',
+			numeration: anything resulting in true to prevent enumeration
+			content: {
+				'Checkbox 1': {
+					optional attributes
+				},
+				'Checkbox 2': {
+					optional attributes
+				}
+			},
+			hint: 'this selection is for...'
+		}*/
+		const result = [...this.header()],
+			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
+		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
+			let label = document.createElement("label"),
+				input = document.createElement("input");
+			input.id = getNextElementID();
+			if (radio) {
+				label.classList.add("radio");
+				input.type = "radio";
+				input.name = radioname;
+				input.value = checkbox;
+			} else {
+				label.classList.add("checkbox");
+				input.type = "checkbox";
+				input.dataset.grouped = this.currentElement.description;
+				input.name = this.names_numerator(checkbox);
+			}
+			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
+			input = this.apply_attributes(attributes, input);
+			label.htmlFor = input.id;
+			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
+			result.push(input);
+			result.push(label);
 		}
-		result = result.concat(this.hint());
+		return [...result, ...this.hint(), document.createElement("br")];
+	}
+
+	checkbox2text() {
+		// returns a text typed input with onpointerup modal with checkbox selection
+		// requires additional options property on this.currentElement containing an options object
+		// {'name':{value:str|int, checked: bool}}
+		return this.input("checkbox2text");
+	}
+
+	code() {
+		this.currentElement.editor = true;
+		return this.textarea();
+	}
+
+	datalist() {
+		let datalist = document.createElement("datalist");
+		let option;
+		datalist.id = getNextElementID();
+		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
+		this.currentElement.content.forEach((key) => {
+			option = document.createElement("option");
+			if (typeof key === "string") option.value = key;
+			else option = this.apply_attributes(key, option);
+			datalist.appendChild(option);
+		});
+		return datalist;
+	}
+
+	date() {
+		return this.input("date");
+	}
+
+	deletebutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "deletebutton";
+		return this.button();
+	}
+
+	email() {
+		return this.input("email");
+	}
+
+	file() {
+		/*{
+			type: 'file',
+			attributes: {
+				name: 'file upload',
+				multiple: true
+			}
+			hint: 'this file serves as...'
+		}*/
+		let input = document.createElement("input"),
+			label = document.createElement("button"),
+			button = document.createElement("button");
+		input.type = "file";
+		input.id = getNextElementID();
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		if (this.currentElement.attributes.multiple) {
+			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
+		}
+
+		input = this.apply_attributes(this.currentElement.attributes, input);
+		if (this.currentElement.attributes.multiple !== undefined)
+			input.onchange = function () {
+				this.nextSibling.innerHTML = this.files.length
+					? Array.from(this.files)
+							.map((x) => x.name)
+							.join(", ") +
+					  " " +
+					  LANG.GET("assemble.files_rechoose")
+					: LANG.GET("assemble.files_choose");
+			};
+		else
+			input.onchange = function () {
+				this.nextSibling.innerHTML = this.files.length
+					? Array.from(this.files)
+							.map((x) => x.name)
+							.join(", ") +
+					  " " +
+					  LANG.GET("assemble.file_rechoose")
+					: LANG.GET("assemble.file_choose");
+			};
+		label.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
+		label.type = "button";
+		label.setAttribute("data-type", "file");
+		label.classList.add("inlinebutton");
+		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
+
+		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		button.appendChild(document.createTextNode("Reset"));
+		button.type = "button";
+		button.setAttribute("data-type", "reset");
+		button.classList.add("inlinebutton");
+		return [...this.header(), input, label, button, ...this.hint()];
+	}
+
+	filtered() {
+		// filter appears to be reserved
+		return this.input("search");
+	}
+
+	formbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "formbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return [this.br(), ...this.button()];
+	}
+
+	hidden() {
+		/*{
+			type: 'hidden',
+			numeration: anything resulting in true to prevent enumeration
+			attributes: {
+				name: 'name',
+				value: '3.14'}
+			}
+		}*/
+		let input = document.createElement("input");
+		input.type = "hidden";
+		input.id = getNextElementID();
+		input.value = this.currentElement.value;
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
+		return input;
+	}
+
+	hr() {
+		return document.createElement("hr");
+	}
+
+	identify() {
+		this.currentElement.attributes.name = "IDENTIFY_BY_" + this.currentElement.attributes.name;
+		return this.scanner();
+	}
+
+	image() {
+		/*{
+			type: 'image',
+			description:'export image' (e.g.),
+			attributes:{
+				name: 'exportname', // atypical use of generic attributes on this one
+				qrcode: 'e.g. token', // for display of a qrcode with this value
+				barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
+				url: 'base64 encoded string || url' // for display of an image
+				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
+			}
+		} */
+		let result = [];
+		const canvas = document.createElement("canvas");
+		let disabled = true;
+		canvas.id = getNextElementID();
+		canvas.classList.add("imagecanvas");
+		if (typeof this.currentElement.attributes.imageonly === "object") {
+			for (const [key, value] of Object.entries(this.currentElement.attributes.imageonly)) {
+				canvas.style[key] = value;
+			}
+		} else result = result.concat(this.header());
+
+		canvas.width = canvas.height = 1024;
+		if (this.currentElement.attributes.qrcode) {
+			this.imageQrCode.push({
+				id: canvas.id,
+				content: this.currentElement.attributes.qrcode,
+			});
+			disabled = false;
+		}
+		if (this.currentElement.attributes.barcode) {
+			this.imageBarCode.push({
+				id: canvas.id,
+				content: this.currentElement.attributes.barcode,
+			});
+			disabled = false;
+		}
+		if (this.currentElement.attributes.url) {
+			this.imageUrl.push({
+				id: canvas.id,
+				content: this.currentElement.attributes.url,
+			});
+			disabled = false;
+		}
+
+		result.push(canvas);
+
+		if (!this.currentElement.attributes.imageonly) {
+			//this tile does not process attributes, therefore they can be reassigned
+			this.currentElement.attributes = {
+				value: this.currentElement.description,
+				type: "button",
+				class: "inlinebutton",
+				"data-type": this.currentElement.type,
+				onpointerup: 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")',
+			};
+			if (disabled) this.currentElement.attributes.disabled = true;
+			result = result.concat(this.button());
+		}
 		return result;
 	}
 
@@ -894,365 +1190,102 @@ export class Assemble {
 		if (this.currentElement.attributes.hidden !== undefined) return input;
 		return [...this.icon(), input, label, ...this.hint()];
 	}
-	text() {
-		return this.input("text");
+
+	links() {
+		/*{
+			type: 'links',
+			description:'links',
+			content: {
+				'Link 1': {
+					href: '#'
+				},
+				'Link 2': {
+					href: '#',
+					onpointerdown: 'alert(\'hello\')'
+				}
+			},
+			hint: 'these links serve the purpose of...'
+			data-filtered: any
+		}*/
+		let result = [...this.header()];
+		if (this.currentElement.attributes !== undefined) result.push(this.hidden());
+		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
+			let a = document.createElement("a");
+			a = this.apply_attributes(attributes, a);
+			if (!a.href) a.href = link;
+			if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
+			a.appendChild(document.createTextNode(link));
+			result.push(a);
+		}
+		return [...result, ...this.hint()];
 	}
+
+	message() {
+		/*{
+			type: 'message',
+			content: {
+				img: str profile-picture url,
+				user: str name
+				text: str well... text,
+				date: str timestamp,
+				unseen: null|int
+			},
+			attributes:{
+				onpointerup
+				class: right, conversation, 
+			}
+		} */
+		let message, icondiv, icon, p, date, unseen;
+		message = document.createElement("div");
+
+		if (this.currentElement.content.img != undefined) {
+			icondiv = document.createElement("div");
+			icondiv.classList.add("image");
+			icon = document.createElement("img");
+			icon.src = this.currentElement.content.img;
+			icondiv.append(icon);
+			message.append(icondiv);
+		}
+		p = document.createElement("p");
+		p.append(document.createTextNode(this.currentElement.content.user));
+		message.append(p);
+
+		p = document.createElement("p");
+		date = document.createElement("small");
+		date.append(document.createTextNode(this.currentElement.content.date));
+		p.append(date);
+		message.append(p);
+
+		let display = this.currentElement.content.text.split(/\r|\n/);
+		for (const line of display) {
+			p = document.createElement("p");
+			p.append(document.createTextNode(line));
+			message.append(p);
+		}
+
+		if (this.currentElement.content.unseen != undefined && this.currentElement.content.unseen) {
+			unseen = document.createElement("div");
+			unseen.append(document.createTextNode(this.currentElement.content.unseen));
+			message.append(unseen);
+		}
+		if (this.currentElement.attributes !== undefined) message = this.apply_attributes(this.currentElement.attributes, message);
+		message.classList.add("message");
+		if (this.currentElement.dirright != undefined && this.currentElement.dirright) message.classList.add("right");
+
+		return [message];
+	}
+
+	nocontent() {
+		const img = document.createElement("div");
+		const span = document.createElement("span");
+		span.append(document.createTextNode(this.currentElement.content));
+		img.classList.add("nocontent");
+		span.classList.add("nocontent");
+		return [img, span];
+	}
+
 	number() {
 		return this.input("number");
-	}
-	date() {
-		return this.input("date");
-	}
-	time() {
-		return this.input("time");
-	}
-	search() {
-		return this.input("search");
-	}
-	filtered() {
-		// filter appears to be reserved
-		return this.input("search");
-	}
-	tel() {
-		return this.input("tel");
-	}
-	email() {
-		return this.input("email");
-	}
-	checkbox2text() {
-		// returns a text typed input with onpointerup modal with checkbox selection
-		// requires additional options property on this.currentElement containing an options object
-		// {'name':{value:str|int, checked: bool}}
-		return this.input("checkbox2text");
-	}
-	hidden() {
-		/*{
-			type: 'hidden',
-			numeration: anything resulting in true to prevent enumeration
-			attributes: {
-				name: 'name',
-				value: '3.14'}
-			}
-		}*/
-		let input = document.createElement("input");
-		input.type = "hidden";
-		input.id = getNextElementID();
-		input.value = this.currentElement.value;
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
-		return input;
-	}
-	checkbox(radio = null) {
-		/*{
-			type: 'checkbox', or 'radio'
-			description:'checkboxes',
-			numeration: anything resulting in true to prevent enumeration
-			content: {
-				'Checkbox 1': {
-					optional attributes
-				},
-				'Checkbox 2': {
-					optional attributes
-				}
-			},
-			hint: 'this selection is for...'
-		}*/
-		const result = [...this.header()],
-			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
-		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
-			let label = document.createElement("label"),
-				input = document.createElement("input");
-			input.id = getNextElementID();
-			if (radio) {
-				label.classList.add("radio");
-				input.type = "radio";
-				input.name = radioname;
-				input.value = checkbox;
-			} else {
-				label.classList.add("checkbox");
-				input.type = "checkbox";
-				input.dataset.grouped = this.currentElement.description;
-				input.name = this.names_numerator(checkbox);
-			}
-			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
-			input = this.apply_attributes(attributes, input);
-			label.htmlFor = input.id;
-			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
-			result.push(input);
-			result.push(label);
-		}
-		return [...result, ...this.hint(), document.createElement("br")];
-	}
-	radio() {
-		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		return this.checkbox("radioinstead");
-	}
-	file() {
-		/*{
-			type: 'file',
-			attributes: {
-				name: 'file upload',
-				multiple: true
-			}
-			hint: 'this file serves as...'
-		}*/
-		let input = document.createElement("input"),
-			label = document.createElement("button"),
-			button = document.createElement("button");
-		input.type = "file";
-		input.id = getNextElementID();
-		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		if (this.currentElement.attributes.multiple) {
-			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
-		}
-
-		input = this.apply_attributes(this.currentElement.attributes, input);
-		if (this.currentElement.attributes.multiple !== undefined)
-			input.onchange = function () {
-				this.nextSibling.innerHTML = this.files.length
-					? Array.from(this.files)
-							.map((x) => x.name)
-							.join(", ") +
-					  " " +
-					  LANG.GET("assemble.files_rechoose")
-					: LANG.GET("assemble.files_choose");
-			};
-		else
-			input.onchange = function () {
-				this.nextSibling.innerHTML = this.files.length
-					? Array.from(this.files)
-							.map((x) => x.name)
-							.join(", ") +
-					  " " +
-					  LANG.GET("assemble.file_rechoose")
-					: LANG.GET("assemble.file_choose");
-			};
-		label.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
-		label.type = "button";
-		label.setAttribute("data-type", "file");
-		label.classList.add("inlinebutton");
-		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
-
-		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
-		button.appendChild(document.createTextNode("Reset"));
-		button.type = "button";
-		button.setAttribute("data-type", "reset");
-		button.classList.add("inlinebutton");
-		return [...this.header(), input, label, button, ...this.hint()];
-	}
-	range() {
-		/*{
-			type: 'range',
-			attributes: {
-				name: 'range',
-				min: 0,
-				max: 100,
-				step: 5
-			}
-			hint: 'from 0 to 100 in 20 steps'
-		}*/
-		let input = document.createElement("input");
-		input.type = "range";
-		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		this.currentElement.description = this.currentElement.attributes.name;
-		input = this.apply_attributes(this.currentElement.attributes, input);
-		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
-			let datalist = document.createElement("datalist");
-			let option;
-			datalist.id = getNextElementID();
-			for (
-				let step = this.currentElement.attributes.min ? Number(this.currentElement.attributes.min) : 0;
-				step <= (this.currentElement.attributes.max ? Number(this.currentElement.attributes.max) : 100);
-				step += this.currentElement.attributes.step ? Number(this.currentElement.attributes.step) : 1
-			) {
-				option = document.createElement("option");
-				option.value = step;
-				datalist.appendChild(option);
-			}
-			input.setAttribute("list", datalist.id);
-			return [datalist, ...this.header(), input, ...this.hint()];
-		}
-		return [...this.header(), input, ...this.hint()];
-	}
-
-	datalist() {
-		let datalist = document.createElement("datalist");
-		let option;
-		datalist.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
-		this.currentElement.content.forEach((key) => {
-			option = document.createElement("option");
-			if (typeof key === "string") option.value = key;
-			else option = this.apply_attributes(key, option);
-			datalist.appendChild(option);
-		});
-		return datalist;
-	}
-
-	select() {
-		/*{
-			type: 'select',
-			hint: 'this is a list',
-			numeration: anything resulting in true to prevent enumeration
-			content: {
-				'entry one': {
-					value: '1'
-				},
-				'entry two': {
-					value: '2',
-					selected: true
-				}
-			}
-			attributes: {
-				name: 'variable name'
-			},
-		}*/
-		const groups = {};
-		let select = document.createElement("select"),
-			label,
-			selectModal = {};
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		select.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
-
-		for (const [key, element] of Object.entries(this.currentElement.content)) {
-			if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
-			else groups[key[0]].push([key, element]);
-			selectModal[key] = element.value || key;
-		}
-		for (const [group, elements] of Object.entries(groups)) {
-			let optgroup = document.createElement("optgroup");
-			optgroup.label = group;
-			for (const element of Object.entries(elements)) {
-				let option = document.createElement("option");
-				option = this.apply_attributes(element[1][1], option);
-				option.appendChild(document.createTextNode(element[1][0]));
-				optgroup.appendChild(option);
-			}
-			select.appendChild(optgroup);
-		}
-		label = document.createElement("label");
-		label.htmlFor = select.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
-		label.classList.add("input-label");
-		select.addEventListener("pointerdown", (e) => {
-			e.preventDefault();
-			if (!e.target.disabled)
-				new Dialog({
-					type: "select",
-					header: select.title,
-					options: selectModal,
-				}).then((response) => {
-					e.target.value = response;
-					e.target.dispatchEvent(new Event("change"));
-				});
-		});
-		return [...this.icon(), select, label, ...this.hint()];
-	}
-
-	textarea() {
-		/*{
-			type: 'textarea',
-			hint: 'enter a lot of text',
-			texttemplates: true or undefined to add a button opening text templates within a modal
-			numeration: anything resulting in true to prevent enumeration
-			editor: anything resulting in true to add line numbers
-			attributes: {
-				name:'somename'
-				rows:8,
-				value:'values can be passed with this pseudo attribute'
-			}
-		}*/
-		let textarea = document.createElement("textarea"),
-			label;
-		const hint = this.hint();
-		textarea.id = getNextElementID();
-		textarea.autocomplete = "off";
-		if (this.currentElement.attributes.name !== undefined) {
-			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-			label = document.createElement("label");
-			label.htmlFor = textarea.id;
-			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
-			label.classList.add("textarea-label");
-		}
-		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
-		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
-		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
-			this.currentElement.attributes = {
-				value: LANG.GET("menu.texttemplate_texts"),
-				type: "button",
-				onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')",
-				class: "floatright",
-			};
-			delete this.currentElement.hint;
-		}
-		if (this.currentElement.editor) {
-			let div = document.createElement("div"),
-				linenumber = document.createElement("div");
-			linenumber.id = getNextElementID();
-			div.classList.add("editor");
-			linenumber.classList.add("line-numbers");
-			linenumber.append(document.createElement("span"));
-			div.append(linenumber, textarea);
-			textarea.addEventListener("keyup", (event) => {
-				const numberOfLines = event.target.value.split("\n").length;
-				document.getElementById(linenumber.id).innerHTML = Array(numberOfLines).fill("<span></span>").join("");
-			});
-			div.append(document.createElement('br'));
-			textarea = div;
-		}
-		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), this.br()];
-		return [...this.icon(), label, textarea, ...hint];
-	}
-
-	code() {
-		this.currentElement.editor = true;
-		return this.textarea();
-	}
-
-	button() {
-		/*{
-			type: 'button',
-			hint: 'this button does this or that'
-			attributes: {
-				value: 'this is displayed on the button',
-				onpointerdown: 'alert("hello")'
-			}
-		}*/
-		let button = document.createElement("button");
-		button.id = getNextElementID();
-		if (this.currentElement.attributes.value !== undefined) {
-			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
-			delete this.currentElement.attributes.value;
-		}
-		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
-		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
-		return [button, ...this.hint()];
-	}
-	deletebutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "deletebutton";
-		return this.button();
-	}
-	submitbutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "submitbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return this.button();
-	}
-	calendarbutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "calendarbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return [this.br(), ...this.button()];
-	}
-	formbutton() {
-		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "formbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return [this.br(), ...this.button()];
 	}
 
 	photo() {
@@ -1326,64 +1359,111 @@ export class Assemble {
 		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
 	}
 
-	links() {
+	radio() {
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		return this.checkbox("radioinstead");
+	}
+	
+	range() {
 		/*{
-			type: 'links',
-			description:'links',
-			content: {
-				'Link 1': {
-					href: '#'
-				},
-				'Link 2': {
-					href: '#',
-					onpointerdown: 'alert(\'hello\')'
-				}
-			},
-			hint: 'these links serve the purpose of...'
-			data-filtered: any
+			type: 'range',
+			attributes: {
+				name: 'range',
+				min: 0,
+				max: 100,
+				step: 5
+			}
+			hint: 'from 0 to 100 in 20 steps'
 		}*/
-		let result = [...this.header()];
-		if (this.currentElement.attributes !== undefined) result.push(this.hidden());
-		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
-			let a = document.createElement("a");
-			a = this.apply_attributes(attributes, a);
-			if (!a.href) a.href = link;
-			if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
-			a.appendChild(document.createTextNode(link));
-			result.push(a);
+		let input = document.createElement("input");
+		input.type = "range";
+		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		this.currentElement.description = this.currentElement.attributes.name;
+		input = this.apply_attributes(this.currentElement.attributes, input);
+		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
+			let datalist = document.createElement("datalist");
+			let option;
+			datalist.id = getNextElementID();
+			for (
+				let step = this.currentElement.attributes.min ? Number(this.currentElement.attributes.min) : 0;
+				step <= (this.currentElement.attributes.max ? Number(this.currentElement.attributes.max) : 100);
+				step += this.currentElement.attributes.step ? Number(this.currentElement.attributes.step) : 1
+			) {
+				option = document.createElement("option");
+				option.value = step;
+				datalist.appendChild(option);
+			}
+			input.setAttribute("list", datalist.id);
+			return [datalist, ...this.header(), input, ...this.hint()];
 		}
-		return [...result, ...this.hint()];
+		return [...this.header(), input, ...this.hint()];
 	}
 
-	signature() {
+	search() {
+		return this.input("search");
+	}
+
+	select() {
 		/*{
-			type: 'signature',
+			type: 'select',
+			hint: 'this is a list',
+			numeration: anything resulting in true to prevent enumeration
+			content: {
+				'entry one': {
+					value: '1'
+				},
+				'entry two': {
+					value: '2',
+					selected: true
+				}
+			}
 			attributes: {
-				name: 'signature',
-				required: optional boolean
+				name: 'variable name'
 			},
-			hint: 'this signature is for...'
-		} */
-		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		let result = [...this.header()];
-		const canvas = document.createElement("canvas");
-		canvas.id = "signaturecanvas";
-		if (this.currentElement.attributes.required) canvas.setAttribute("data-required", "required");
-		result.push(canvas);
-		const input = document.createElement("input");
-		input.type = "file";
-		input.id = "SIGNATURE";
-		input.name = this.currentElement.attributes.name;
-		input.hidden = true;
-		result.push(input);
-		this.currentElement.attributes = {
-			value: LANG.GET("assemble.clear_signature"),
-			type: "button",
-			onpointerup: "signaturePad.clear()",
-		};
-		result = result.concat(this.deletebutton()); // hint will be added here as well
-		this.signaturePad = true;
-		return result;
+		}*/
+		const groups = {};
+		let select = document.createElement("select"),
+			label,
+			selectModal = {};
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		select.id = getNextElementID();
+		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
+
+		for (const [key, element] of Object.entries(this.currentElement.content)) {
+			if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
+			else groups[key[0]].push([key, element]);
+			selectModal[key] = element.value || key;
+		}
+		for (const [group, elements] of Object.entries(groups)) {
+			let optgroup = document.createElement("optgroup");
+			optgroup.label = group;
+			for (const element of Object.entries(elements)) {
+				let option = document.createElement("option");
+				option = this.apply_attributes(element[1][1], option);
+				option.appendChild(document.createTextNode(element[1][0]));
+				optgroup.appendChild(option);
+			}
+			select.appendChild(optgroup);
+		}
+		label = document.createElement("label");
+		label.htmlFor = select.id;
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+		label.classList.add("input-label");
+		select.addEventListener("pointerdown", (e) => {
+			e.preventDefault();
+			if (!e.target.disabled)
+				new Dialog({
+					type: "select",
+					header: select.title,
+					options: selectModal,
+				}).then((response) => {
+					e.target.value = response;
+					e.target.dispatchEvent(new Event("change"));
+				});
+		});
+		return [...this.icon(), select, label, ...this.hint()];
 	}
 
 	scanner() {
@@ -1464,71 +1544,146 @@ export class Assemble {
 		return result;
 	}
 
-	identify() {
-		this.currentElement.attributes.name = "IDENTIFY_BY_" + this.currentElement.attributes.name;
-		return this.scanner();
+	signature() {
+		/*{
+			type: 'signature',
+			attributes: {
+				name: 'signature',
+				required: optional boolean
+			},
+			hint: 'this signature is for...'
+		} */
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		let result = [...this.header()];
+		const canvas = document.createElement("canvas");
+		canvas.id = "signaturecanvas";
+		if (this.currentElement.attributes.required) canvas.setAttribute("data-required", "required");
+		result.push(canvas);
+		const input = document.createElement("input");
+		input.type = "file";
+		input.id = "SIGNATURE";
+		input.name = this.currentElement.attributes.name;
+		input.hidden = true;
+		result.push(input);
+		this.currentElement.attributes = {
+			value: LANG.GET("assemble.clear_signature"),
+			type: "button",
+			onpointerup: "signaturePad.clear()",
+		};
+		result = result.concat(this.deletebutton()); // hint will be added here as well
+		this.signaturePad = true;
+		return result;
 	}
 
-	image() {
+	stlviewer() {
 		/*{
-			type: 'image',
-			description:'export image' (e.g.),
-			attributes:{
-				name: 'exportname', // atypical use of generic attributes on this one
-				qrcode: 'e.g. token', // for display of a qrcode with this value
-				barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
-				url: 'base64 encoded string || url' // for display of an image
-				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
-			}
+			type: 'stlviewer',
+			description:'viewstl' (e.g.),
 		} */
-		let result = [];
-		const canvas = document.createElement("canvas");
-		let disabled = true;
-		canvas.id = getNextElementID();
-		canvas.classList.add("imagecanvas");
-		if (typeof this.currentElement.attributes.imageonly === "object") {
-			for (const [key, value] of Object.entries(this.currentElement.attributes.imageonly)) {
-				canvas.style[key] = value;
+		const div = document.createElement("div");
+		div.id = "stlviewer_canvas";
+		div.classList = "stlviewer";
+		return div;
+	}
+
+	submitbutton() {
+		// to style it properly by adding data-type to article container
+		this.currentElement.attributes["data-type"] = "submitbutton";
+		this.currentElement.attributes.type = "button"; // avoid submitting twice
+		return this.button();
+	}
+
+	tel() {
+		return this.input("tel");
+	}
+
+	text() {
+		return this.input("text");
+	}
+
+	textarea() {
+		/*{
+			type: 'textarea',
+			hint: 'enter a lot of text',
+			texttemplates: true or undefined to add a button opening text templates within a modal
+			numeration: anything resulting in true to prevent enumeration
+			editor: anything resulting in true to add line numbers
+			attributes: {
+				name:'somename'
+				rows:8,
+				value:'values can be passed with this pseudo attribute'
 			}
-		} else result = result.concat(this.header());
-
-		canvas.width = canvas.height = 1024;
-		if (this.currentElement.attributes.qrcode) {
-			this.imageQrCode.push({
-				id: canvas.id,
-				content: this.currentElement.attributes.qrcode,
-			});
-			disabled = false;
+		}*/
+		let textarea = document.createElement("textarea"),
+			label;
+		const hint = this.hint();
+		textarea.id = getNextElementID();
+		textarea.autocomplete = "off";
+		if (this.currentElement.attributes.name !== undefined) {
+			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+			label = document.createElement("label");
+			label.htmlFor = textarea.id;
+			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+			label.classList.add("textarea-label");
 		}
-		if (this.currentElement.attributes.barcode) {
-			this.imageBarCode.push({
-				id: canvas.id,
-				content: this.currentElement.attributes.barcode,
-			});
-			disabled = false;
-		}
-		if (this.currentElement.attributes.url) {
-			this.imageUrl.push({
-				id: canvas.id,
-				content: this.currentElement.attributes.url,
-			});
-			disabled = false;
-		}
-
-		result.push(canvas);
-
-		if (!this.currentElement.attributes.imageonly) {
-			//this tile does not process attributes, therefore they can be reassigned
+		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
-				value: this.currentElement.description,
+				value: LANG.GET("menu.texttemplate_texts"),
 				type: "button",
-				class: "inlinebutton",
-				"data-type": this.currentElement.type,
-				onpointerup: 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")',
+				onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')",
+				class: "floatright",
 			};
-			if (disabled) this.currentElement.attributes.disabled = true;
-			result = result.concat(this.button());
+			delete this.currentElement.hint;
 		}
+		if (this.currentElement.editor) {
+			let div = document.createElement("div"),
+				linenumber = document.createElement("div");
+			linenumber.id = getNextElementID();
+			div.classList.add("editor");
+			linenumber.classList.add("line-numbers");
+			linenumber.append(document.createElement("span"));
+			div.append(linenumber, textarea);
+			textarea.addEventListener("keyup", (event) => {
+				const numberOfLines = event.target.value.split("\n").length;
+				document.getElementById(linenumber.id).innerHTML = Array(numberOfLines).fill("<span></span>").join("");
+			});
+			div.append(document.createElement('br'));
+			textarea = div;
+		}
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), this.br()];
+		return [...this.icon(), label, textarea, ...hint];
+	}
+
+	textblock() {
+		/* {
+			type: 'textblock',
+			description: 'very informative',
+			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+			attributes: {
+				attribute: value // applies to header
+			}
+		}*/
+		let result = [],
+			p;
+		if (this.currentElement.description) {
+			result = result.concat(this.header());
+		}
+		if (this.currentElement.content) {
+			const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+			p = document.createElement("p");
+			for (const part of content) {
+				if (!part[1].length) continue;
+				p.append(document.createTextNode(part[1]));
+				p.append(document.createElement("br"));
+			}
+			result.push(p);
+		}
+		if (this.currentElement.attributes !== undefined) {
+			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
+		}
+		result = result.concat(this.hint());
 		return result;
 	}
 
@@ -1547,24 +1702,8 @@ export class Assemble {
 		return [article];
 	}
 
-	stlviewer() {
-		/*{
-			type: 'stlviewer',
-			description:'viewstl' (e.g.),
-		} */
-		const div = document.createElement("div");
-		div.id = "stlviewer_canvas";
-		div.classList = "stlviewer";
-		return div;
-	}
-
-	nocontent() {
-		const img = document.createElement("div");
-		const span = document.createElement("span");
-		span.append(document.createTextNode(this.currentElement.content));
-		img.classList.add("nocontent");
-		span.classList.add("nocontent");
-		return [img, span];
+	time() {
+		return this.input("time");
 	}
 
 	trash() {
@@ -1572,115 +1711,4 @@ export class Assemble {
 		return [...this.icon(), document.createTextNode(this.currentElement.description)];
 	}
 
-	hr() {
-		return document.createElement("hr");
-	}
-
-	br() {
-		return document.createElement("br");
-	}
-
-	cart() {
-		// empty method but neccessary for styling reasons (icon)
-	}
-
-	message() {
-		// empty method but neccessary for styling reasons (icon)
-	}
-
-	filter() {
-		// empty method but neccessary for styling reasons (icon)
-	}
-
-	calendar() {
-		/*{
-			type: 'calendar',
-			content: [
-				null,
-				{
-					date: 'Y-m-d',
-					display: 'whatever text, weekday, day, number of appointments
-				}, ...
-			],
-			api: schedule|timesheet
-		} */
-		let cal = [],
-			daytile,
-			apicall = this.currentElement.api;
-		for (const day of this.currentElement.content) {
-			daytile = document.createElement("div");
-			daytile.classList = "day";
-			if (day !== null) {
-				daytile.classList.add("displayDay");
-				let display = day.display.split("\n");
-				for (const line of display) {
-					daytile.append(document.createTextNode(line));
-					daytile.append(document.createElement("br"));
-				}
-				daytile.onpointerup = function () {
-					api.calendar("get", apicall, day.date, day.date);
-				};
-				if (day.today) daytile.classList.add("today");
-				if (day.selected) daytile.classList.add("selected");
-				if (day.holiday) daytile.classList.add("holiday");
-			}
-			cal.push(daytile);
-		}
-		return [...this.header(), ...cal];
-	}
-
-	message() {
-		/*{
-			type: 'message',
-			content: {
-				img: str profile-picture url,
-				user: str name
-				text: str well... text,
-				date: str timestamp,
-				unseen: null|int
-			},
-			attributes:{
-				onpointerup
-				class: right, conversation, 
-			}
-		} */
-		let message, icondiv, icon, p, date, unseen;
-		message = document.createElement("div");
-
-		if (this.currentElement.content.img != undefined) {
-			icondiv = document.createElement("div");
-			icondiv.classList.add("image");
-			icon = document.createElement("img");
-			icon.src = this.currentElement.content.img;
-			icondiv.append(icon);
-			message.append(icondiv);
-		}
-		p = document.createElement("p");
-		p.append(document.createTextNode(this.currentElement.content.user));
-		message.append(p);
-
-		p = document.createElement("p");
-		date = document.createElement("small");
-		date.append(document.createTextNode(this.currentElement.content.date));
-		p.append(date);
-		message.append(p);
-
-		let display = this.currentElement.content.text.split(/\r|\n/);
-		for (const line of display) {
-			p = document.createElement("p");
-			p.append(document.createTextNode(line));
-			message.append(p);
-		}
-
-		if (this.currentElement.content.unseen != undefined && this.currentElement.content.unseen) {
-			unseen = document.createElement("div");
-			unseen.append(document.createTextNode(this.currentElement.content.unseen));
-			message.append(unseen);
-		}
-		if (this.currentElement.attributes !== undefined) message = this.apply_attributes(this.currentElement.attributes, message);
-		message.classList.add("message");
-		if (this.currentElement.dirright != undefined && this.currentElement.dirright) message.classList.add("right");
-
-		return [message];
-	}
 }
