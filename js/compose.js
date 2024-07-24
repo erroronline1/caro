@@ -1407,7 +1407,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textblock",
 			attributes: {
-				name: LANG.GET("assemble.compose_text_description"),
+				name: LANG.GET("assemble.compose_textblock_description"),
 				required: true,
 			},
 		};
@@ -1415,14 +1415,14 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textarea",
 			attributes: {
-				name: LANG.GET("assemble.compose_text_content"),
+				name: LANG.GET("assemble.compose_textblock_content"),
 				rows: 5,
 			},
 		};
 		result = result.concat(...this.textarea());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_text"),
+				value: LANG.GET("assemble.compose_textblock"),
 				"data-type": "addblock",
 			},
 		};

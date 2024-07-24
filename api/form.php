@@ -155,7 +155,7 @@ class FORM extends API {
 					]], [[
 						'form' => true,
 						'type' => 'compose_textblock',
-						'description' => LANG::GET('assemble.compose_text')
+						'description' => LANG::GET('assemble.compose_textblock')
 					]], [[
 						'form' => true,
 						'type' => 'compose_image',
@@ -187,7 +187,7 @@ class FORM extends API {
 					]], [[
 						'form' => true,
 						'type' => 'compose_range',
-						'description' => LANG::GET('assemble.compose_email')
+						'description' => LANG::GET('assemble.compose_range')
 					]], [[
 						'form' => true,
 						'type' => 'compose_links',
