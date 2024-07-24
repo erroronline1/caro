@@ -21,6 +21,12 @@ import { compose_helper } from "./compose.js";
 
 export const api = {
 	/**
+	 *                           _     _     _       _
+	 *   ___ ___ ___ _ _ ___ ___| |_ _| |___| |_ ___| |___ ___ ___
+	 *  | . |  _| -_| | | -_|   |  _| . | .'|  _| .'| | . |_ -|_ -|
+	 *  |  _|_| |___|\_/|___|_|_|_| |___|__,|_| |__,|_|___|___|___|
+	 *  |_|
+	 *
 	 * tracks GET queries and alerts if a changed form is about to get left
 	 */
 	preventDataloss: {
@@ -61,6 +67,11 @@ export const api = {
 		},
 	},
 	/**
+	 *                 _
+	 *   ___ ___ ___ _| |
+	 *  |_ -| -_|   | . |
+	 *  |___|___|_|_|___|
+	 *
 	 * handles prepared requests
 	 * @param {string} method get|put|post|delete
 	 * @param {array} request url parameters to pass to api
@@ -113,6 +124,11 @@ export const api = {
 		api.loadindicator(false);
 	},
 	/**
+	 *   _           _ _       _ _         _
+	 *  | |___ ___ _| |_|___ _| |_|___ ___| |_ ___ ___
+	 *  | | . | .'| . | |   | . | |  _| .'|  _| . |  _|
+	 *  |_|___|__,|___|_|_|_|___|_|___|__,|_| |___|_|
+	 *
 	 * ui feedback on accuring requests that are expected to take longer
 	 * @param {any} toggle initiates inidicator, undefined|null|false disables all
 	 * @returns none
@@ -137,7 +153,14 @@ export const api = {
 		}, 300);
 	},
 	loadindicatorTimeout: [],
+
 	/**
+	 *             _     _       _             _
+	 *   _ _ ___ _| |___| |_ ___| |_ ___ ___ _| |___ ___
+	 *  | | | . | . | .'|  _| -_|   | -_| .'| . | -_|  _|
+	 *  |___|  _|___|__,|_| |___|_|_|___|__,|___|___|_|
+	 *      |_|
+	 * 
 	 * sets the documents header and is supposed to scroll to top
 	 * @param {string} string content
 	 */
@@ -150,6 +173,12 @@ export const api = {
 	},
 
 	/**
+	 *               _ _         _   _
+	 *   ___ ___ ___| |_|___ ___| |_|_|___ ___
+	 *  | .'| . | . | | |  _| .'|  _| | . |   |
+	 *  |__,|  _|  _|_|_|___|__,|_| |_|___|_|_|
+	 *      |_| |_|
+	 * 
 	 * imports serverside defined languagefile
 	 * handles user login/logout
 	 * loads application menu
@@ -281,6 +310,11 @@ export const api = {
 	},
 
 	/**
+	 *             _ _ _
+	 *   ___ _ _ _| |_| |_
+	 *  | .'| | | . | |  _|
+	 *  |__,|___|___|_|_|
+	 *
 	 * displays audit contents
 	 *
 	 * @param {string} method get|post|put|delete
@@ -331,6 +365,11 @@ export const api = {
 	},
 
 	/**
+	 *           _           _
+	 *   ___ ___| |___ ___ _| |___ ___
+	 *  |  _| .'| | -_|   | . | .'|  _|
+	 *  |___|__,|_|___|_|_|___|__,|_|
+	 *
 	 * planning and editing calendar entries
 	 *
 	 * @param {string} method get|post|put|delete
@@ -392,6 +431,11 @@ export const api = {
 	},
 
 	/**
+	 *               ___ _ _ _
+	 *   ___ ___ _ _|  _|_| | |_ ___ ___
+	 *  |  _|_ -| | |  _| | |  _| -_|  _|
+	 *  |___|___|\_/|_| |_|_|_| |___|_|
+	 *
 	 * loads, executes and manages csv filters
 	 *
 	 * @param {string} method get|post
@@ -441,6 +485,11 @@ export const api = {
 	},
 
 	/**
+	 *   ___ _ _
+	 *  |  _|_| |___
+	 *  |  _| | | -_|
+	 *  |_| |_|_|___|
+	 *
 	 * displays and manages provided files, either administrative managed or open sharepoint
 	 *
 	 * @param {string} method get|post|delete
@@ -512,6 +561,11 @@ export const api = {
 	},
 
 	/**
+	 *   ___
+	 *  |  _|___ ___ _____
+	 *  |  _| . |  _|     |
+	 *  |_| |___|_| |_|_|_|
+	 *
 	 * form component and form management with creation, editing and approval
 	 *
 	 * @param {string} method get|post|put|delete
@@ -639,6 +693,11 @@ export const api = {
 	},
 
 	/**
+	 *
+	 *   _____ ___ ___ ___ ___ ___ ___
+	 *  |     | -_|_ -|_ -| .'| . | -_|
+	 *  |_|_|_|___|___|___|__,|_  |___|
+	 *                        |___|
 	 * handles internal messenger
 	 *
 	 * @param {string} method get|post|delete
@@ -691,6 +750,11 @@ export const api = {
 	},
 
 	/**
+	 *                   _
+	 *   ___ _ _ ___ ___| |_ ___ ___ ___
+	 *  | . | | |  _|  _|   | .'|_ -| -_|
+	 *  |  _|___|_| |___|_|_|__,|___|___|
+	 *  |_|
 	 * handles vendor and product management
 	 * handles orders
 	 *
@@ -845,6 +909,11 @@ export const api = {
 	},
 
 	/**
+	 *                         _
+	 *   ___ ___ ___ ___ ___ _| |
+	 *  |  _| -_|  _| . |  _| . |
+	 *  |_| |___|___|___|_| |___|
+	 *
 	 * handles records, displays record lists
 	 * imports data from other records
 	 *
@@ -985,6 +1054,11 @@ export const api = {
 	},
 
 	/**
+	 *       _     _
+	 *   ___|_|___| |_
+	 *  |  _| |_ -| '_|
+	 *  |_| |_|___|_,_|
+	 *
 	 * risk management
 	 * displays form to edit risks or overview, according to permissions 
 	 *
@@ -1030,6 +1104,11 @@ export const api = {
 	},
 
 	/**
+	 *   _           _   _                 _     _
+	 *  | |_ ___ _ _| |_| |_ ___ _____ ___| |___| |_ ___
+	 *  |  _| -_|_'_|  _|  _| -_|     | . | | .'|  _| -_|
+	 *  |_| |___|_,_|_| |_| |___|_|_|_|  _|_|__,|_| |___|
+	 *                                |_|
 	 * manages text templates
 	 * displays text template frontend either as body or within a modal
 	 *
@@ -1100,6 +1179,11 @@ export const api = {
 	},
 
 	/**
+	 *   _           _
+	 *  | |_ ___ ___| |
+	 *  |  _| . | . | |
+	 *  |_| |___|___|_|
+	 *
 	 * displays 2d code form and result passed by get query
 	 * displays a generic 2d scanner
 	 * displays stl viewer for files managed by filemanager and open sharepoint
@@ -1139,6 +1223,11 @@ export const api = {
 	},
 
 	/**
+	 *
+	 *   _ _ ___ ___ ___
+	 *  | | |_ -| -_|  _|
+	 *  |___|___|___|_|
+	 *
 	 * user manager and display of profile
 	 *
 	 * @param {string} method get|post|put|delete
