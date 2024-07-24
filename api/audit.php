@@ -482,7 +482,8 @@ class AUDIT extends API {
 				[
 					'type' => 'textblock',
 					'description' => LANG::GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . LANG::GET('skills.' . $skill[0] . '.' . $skill[1]),
-					'content' => $users ? implode(', ', $users) : LANG::GET('audit.skillfulfilment_warning')
+					'content' => $users ? implode(', ', $users) : LANG::GET('audit.skillfulfilment_warning'),
+					'attributes' => $users ? [] : ['class' => 'red']
 				]
 			];
 		}
@@ -592,8 +593,8 @@ class AUDIT extends API {
 	}
 
 	/**
-	 * creates and returns a download link to the export file for forms and form bundles
-	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 * creates and returns a download link to the export file for users experience points
+	 * processes the result of $this->userexperience() and translates the body object into more simple strings
 	 */
 	private function exportuserexperience(){
 		$summary = [
@@ -719,7 +720,7 @@ class AUDIT extends API {
 				$externalcontent[] = [
 					'type' => 'textblock',
 					'description' => $file['path'],
-					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':date' => date('Y-m-d H:i', filemtime($file['path']))])
+					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime($file['path']))])
 				];
 			}
 		}
@@ -1078,7 +1079,10 @@ class AUDIT extends API {
 			else $issues[] = [
 				'type' => 'textblock',
 				'description' => $issue,
-				'content' => LANG::GET('audit.regulatory_warning_content')
+				'content' => LANG::GET('audit.regulatory_warning_content'),
+				'attributes' => [
+					'class' => 'red'
+				]
 			];
 		}
 		$content[] = $issues;
