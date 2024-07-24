@@ -314,7 +314,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.render) {
-								api.update_header(title[request[1]]);
+								api.update_header(title[request[1]] + (request[2] ? (" - " + LANG.GET("audit.checks_type." + request[2])) : ""));
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
