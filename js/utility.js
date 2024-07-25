@@ -19,49 +19,6 @@
 const _serviceWorker = {
 	worker: null,
 	permission: null,
-	register: async function () {
-		if ("serviceWorker" in navigator) {
-			this.worker = await navigator.serviceWorker.register("./service-worker.js");
-			this.permission = await window.Notification.requestPermission();
-			navigator.serviceWorker.ready.then((registration) => {
-				if (registration) {
-					setInterval(() => {
-						_serviceWorker.postMessage("getnotifications");
-					}, 300000);
-				}
-				navigator.serviceWorker.addEventListener("message", (message) => {
-					this.onMessage(message);
-				});
-			});
-		} else throw new Error("No Service Worker support!");
-	},
-	requestNotificationPermission: async function () {
-		const permission = await window.Notification.requestPermission();
-		// value of permission can be 'granted', 'default', 'denied'
-		// granted: user has accepted the request
-		// default: user has dismissed the notification permission popup by clicking on x
-		// denied: user has denied the request.
-		if (permission !== "granted") {
-			throw new Error("Permission not granted for Notification");
-		}
-	},
-	showLocalNotification: function (title, body) {
-		const options = {
-			body: body,
-			icon: "./media/favicon/android/android-launchericon-192-192.png",
-			// here you can add more properties like icon, image, vibrate, etc.
-		};
-		if (this.worker.active) this.worker.showNotification(title, options);
-	},
-	postMessage: function (message) {
-		this.worker.active.postMessage(message);
-	},
-	onPostCache: function () {
-		const buttons = document.querySelectorAll("[type=submit]");
-		for (const element of buttons) {
-			element.disabled = true;
-		}
-	},
 	onMessage: function (message) {
 		const data = message.data;
 		if (!Object.keys(data).length) {
@@ -117,7 +74,51 @@ const _serviceWorker = {
 			if (notif) notif.setAttribute("data-notification", data.form_approval);
 		}
 	},
+	onPostCache: function () {
+		const buttons = document.querySelectorAll("[type=submit]");
+		for (const element of buttons) {
+			element.disabled = true;
+		}
+	},
+	postMessage: function (message) {
+		this.worker.active.postMessage(message);
+	},
+	register: async function () {
+		if ("serviceWorker" in navigator) {
+			this.worker = await navigator.serviceWorker.register("./service-worker.js");
+			this.permission = await window.Notification.requestPermission();
+			navigator.serviceWorker.ready.then((registration) => {
+				if (registration) {
+					setInterval(() => {
+						_serviceWorker.postMessage("getnotifications");
+					}, 300000);
+				}
+				navigator.serviceWorker.addEventListener("message", (message) => {
+					this.onMessage(message);
+				});
+			});
+		} else throw new Error("No Service Worker support!");
+	},
+	requestNotificationPermission: async function () {
+		const permission = await window.Notification.requestPermission();
+		// value of permission can be 'granted', 'default', 'denied'
+		// granted: user has accepted the request
+		// default: user has dismissed the notification permission popup by clicking on x
+		// denied: user has denied the request.
+		if (permission !== "granted") {
+			throw new Error("Permission not granted for Notification");
+		}
+	},
+	showLocalNotification: function (title, body) {
+		const options = {
+			body: body,
+			icon: "./media/favicon/android/android-launchericon-192-192.png",
+			// here you can add more properties like icon, image, vibrate, etc.
+		};
+		if (this.worker.active) this.worker.showNotification(title, options);
+	},
 };
+
 const _client = {
 	application: {
 		clearMenu: (event) => {
@@ -306,14 +307,6 @@ const _client = {
 				};
 			new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
 		},
-		toClipboard: (node) => {
-			if (node.constructor.name === "HTMLInputElement") {
-				node.select();
-				node.setSelectionRange(0, 99999); // For mobile devices
-				navigator.clipboard.writeText(node.value);
-			} else navigator.clipboard.writeText(node); // passed string
-			new Toast(LANG.GET("general.copied_to_clipboard"), "info");
-		},
 		filter: (type = undefined) => {
 			document.querySelectorAll("[data-ordered]").forEach((article) => {
 				article.parentNode.style.display = "none";
@@ -347,19 +340,6 @@ const _client = {
 				if (article) article.style.display = "block";
 			});
 		},
-		performSampleCheck(formdata, productid) {
-			const check = [];
-			for (const [key, value] of Object.entries(formdata)) {
-				if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
-			}
-			if (check.length) {
-				const result = check.join("\n");
-				formdata = new FormData();
-				formdata.append("content", result);
-				api.purchase("post", "mdrsamplecheck", productid, formdata);
-			} else new Toast(LANG.GET("order.sample_check_failure"), "error");
-		},
 		performIncorporation(formdata, productid) {
 			const check = [],
 				submit = new FormData();
@@ -375,6 +355,27 @@ const _client = {
 				submit.append("content", result);
 				api.purchase("post", "incorporation", productid, submit);
 			} else new Toast(LANG.GET("order.incorporation_failure"), "error");
+		},
+		performSampleCheck(formdata, productid) {
+			const check = [];
+			for (const [key, value] of Object.entries(formdata)) {
+				if (value && value !== "on") check.push(key + ": " + value);
+				else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
+			}
+			if (check.length) {
+				const result = check.join("\n");
+				formdata = new FormData();
+				formdata.append("content", result);
+				api.purchase("post", "mdrsamplecheck", productid, formdata);
+			} else new Toast(LANG.GET("order.sample_check_failure"), "error");
+		},
+		toClipboard: (node) => {
+			if (node.constructor.name === "HTMLInputElement") {
+				node.select();
+				node.setSelectionRange(0, 99999); // For mobile devices
+				navigator.clipboard.writeText(node.value);
+			} else navigator.clipboard.writeText(node); // passed string
+			new Toast(LANG.GET("general.copied_to_clipboard"), "info");
 		},
 	},
 	texttemplate: {
