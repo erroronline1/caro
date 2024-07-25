@@ -24,6 +24,128 @@ define("UTILITY_IMAGE_RESOURCE", 0x4);
 class UTILITY {
 
 	/**
+	 * trim input data
+	 */
+	public static function cleanInputs($data){
+		$clean_input = [];
+		if(is_array($data)){
+			foreach($data as $k => $v){
+				$clean_input[$k] = self::cleanInputs($v);
+			}
+		} else {
+			if ($data) $clean_input = trim($data);
+		}
+		return $clean_input;
+	}
+
+	/**
+	 * deletes files and folders recursively unregarding of content!
+	 * 
+	 * @param string|array $paths 
+	 * 
+	 * @return bool about success
+	 */
+	public static function delete($paths = []){
+		$result = false;
+		$allowed = false;
+		if (gettype($paths) === 'string') $paths=[$paths];
+		foreach ($paths as $path) {
+			foreach (array_keys(INI['fileserver']) as $fileserver){
+				if (stristr($path, self::directory($fileserver))) $allowed = true;
+			}
+			if (!$allowed) return false;
+			if (is_file($path)){
+				$result = unlink($path);
+			}
+			elseif (is_dir($path)){
+				foreach(scandir($path) as $subdir){
+					if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
+					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
+				}
+				$result = rmdir($path);
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * returns folders defined in setup.ini
+	 * 
+	 * @param string $request key
+	 * @param array $replace optional named array with replacements
+	 * 
+	 * @return string directory
+	 */
+	public static function directory($request, $replace = []){
+		if (!array_key_exists($request, INI['fileserver'])){
+			return '../fileserver';
+		}
+		$patterns = [];
+		$replacements = [];
+		if ($replace){
+			foreach($replace as $pattern => $replacement){
+				$patterns[] = '/' . $pattern . '/';
+				$replacements[] = $replacement;
+			}
+		}
+		else {
+			$patterns[] = '/\/:\w{1,}/';
+			$replacements[] = '';
+		}
+		return '../' . preg_replace($patterns, $replacements, INI['fileserver'][$request]);
+	}
+
+	/**
+	 * scans a directory and returns contained subdirectories
+	 * 
+	 * @param string $folder folder to scan
+	 * @param string $order asc|desc by default
+	 * 
+	 * @return array file list 
+	 */
+	public static function listDirectories($folder, $order = 'desc'){
+		$result=[];
+		if (!file_exists($folder)) return $result;
+		switch ($order){
+			case 'desc':
+				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+				break;
+			case 'asc':
+				$dir = scandir($folder);
+				break;
+		}
+		foreach($dir as $i => $file){
+			if (is_dir($folder . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $folder . '/' . $file;
+		}
+		return $result;
+	}
+
+	/**
+	 * scans a directory and returns contained files
+	 * 
+	 * @param string $folder folder to scan
+	 * @param string $order asc|desc by default
+	 * 
+	 * @return array file list 
+	 */
+	public static function listFiles($folder, $order = 'desc'){
+		$result=[];
+		if (!file_exists($folder)) return $result;
+		switch ($order){
+			case 'desc':
+				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
+				break;
+			case 'asc':
+				$dir = scandir($folder);
+				break;
+		}
+		foreach($dir as $i => $file){
+			if (is_file($folder . '/' . $file)) $result[] = $folder . '/' . $file;
+		}
+		return $result;
+	}
+
+	/**
 	 * prepares passed request parameters, mimics post data for put method
 	 * 
 	 * @return object with request parameters and their value
@@ -145,16 +267,16 @@ class UTILITY {
 		return (object) $payload;
 	}		
 	
-	public static function cleanInputs($data){
-		$clean_input = [];
-		if(is_array($data)){
-			foreach($data as $k => $v){
-				$clean_input[$k] = self::cleanInputs($v);
-			}
-		} else {
-			if ($data) $clean_input = trim($data);
-		}
-		return $clean_input;
+	/**
+	 * shorthand checking for a set property
+	 * 
+	 * @param object $object to look within
+	 * @param string $property to look for
+	 * 
+	 * @return string|bool property value or false
+	 */
+	public static function propertySet($object, $property){
+		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
 	}
 
 	/**
@@ -249,18 +371,6 @@ class UTILITY {
 	}
 
 	/**
-	 * shorthand checking for a set property
-	 * 
-	 * @param object $object to look within
-	 * @param string $property to look for
-	 * 
-	 * @return string|bool property value or false
-	 */
-	public static function propertySet($object, $property){
-		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
-	}
-
-	/**
 	 * moves uploaded files to folder according to input name, adds possible prefix
 	 * 
 	 * @param array $name mandatory array of input names
@@ -315,113 +425,6 @@ class UTILITY {
 	}
 
 	/**
-	 * deletes files and folders recursively unregarding of content!
-	 * 
-	 * @param string|array $paths 
-	 * 
-	 * @return bool about success
-	 */
-	public static function delete($paths = []){
-		$result = false;
-		$allowed = false;
-		if (gettype($paths) === 'string') $paths=[$paths];
-		foreach ($paths as $path) {
-			foreach (array_keys(INI['fileserver']) as $fileserver){
-				if (stristr($path, self::directory($fileserver))) $allowed = true;
-			}
-			if (!$allowed) return false;
-			if (is_file($path)){
-				$result = unlink($path);
-			}
-			elseif (is_dir($path)){
-				foreach(scandir($path) as $subdir){
-					if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
-					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
-				}
-				$result = rmdir($path);
-			}
-		}
-		return $result;
-	}
-
-	/**
-	 * scans a directory and returns contained files
-	 * 
-	 * @param string $folder folder to scan
-	 * @param string $order asc|desc by default
-	 * 
-	 * @return array file list 
-	 */
-	public static function listFiles($folder, $order = 'desc'){
-		$result=[];
-		if (!file_exists($folder)) return $result;
-		switch ($order){
-			case 'desc':
-				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
-				break;
-			case 'asc':
-				$dir = scandir($folder);
-				break;
-		}
-		foreach($dir as $i => $file){
-			if (is_file($folder . '/' . $file)) $result[] = $folder . '/' . $file;
-		}
-		return $result;
-	}
-
-	/**
-	 * scans a directory and returns contained subdirectories
-	 * 
-	 * @param string $folder folder to scan
-	 * @param string $order asc|desc by default
-	 * 
-	 * @return array file list 
-	 */
-	public static function listDirectories($folder, $order = 'desc'){
-		$result=[];
-		if (!file_exists($folder)) return $result;
-		switch ($order){
-			case 'desc':
-				$dir = scandir($folder, SCANDIR_SORT_DESCENDING);
-				break;
-			case 'asc':
-				$dir = scandir($folder);
-				break;
-		}
-		foreach($dir as $i => $file){
-			if (is_dir($folder . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $folder . '/' . $file;
-		}
-		return $result;
-	}
-
-	/**
-	 * returns folders defined in setup.ini
-	 * 
-	 * @param string $request key
-	 * @param array $replace optional named array with replacements
-	 * 
-	 * @return string directory
-	 */
-	public static function directory($request, $replace = []){
-		if (!array_key_exists($request, INI['fileserver'])){
-			return '../fileserver';
-		}
-		$patterns = [];
-		$replacements = [];
-		if ($replace){
-			foreach($replace as $pattern => $replacement){
-				$patterns[] = '/' . $pattern . '/';
-				$replacements[] = $replacement;
-			}
-		}
-		else {
-			$patterns[] = '/\/:\w{1,}/';
-			$replacements[] = '';
-		}
-		return '../' . preg_replace($patterns, $replacements, INI['fileserver'][$request]);
-	}
-
-	/**
 	 * prepares a folder according to setup.ini and deletes files if lifespan is set
 	 * 
 	 * @param string $dir one of the fileserver keys
@@ -454,6 +457,22 @@ class UTILITY {
 class PERMISSION {
 
 	/**
+	 * check whether an approvalcolumn has been fully approved according to function
+	 * @param string $function as defined within setup.ini
+	 * @param string|array $approvalcolumn 'approval'-column
+	 * @return bool
+	 * 
+	 */
+	public static function fullyapproved($function = '', $approvalcolumn = ''){
+		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
+		$approved = true;
+		foreach(self::permissionFor($function, true) as $permission){
+			if (!array_key_exists($permission, $approvalcolumn)) $approved = false;
+		}
+		return $approved;
+	}
+
+	/**
 	 * returns a boolean if user is authorized for requested app-function, array of permissions if $returnvalues argument is true
 	 * @param string $function as defined within setup.ini
 	 * @param bool $returnvalues
@@ -470,22 +489,6 @@ class PERMISSION {
 			return preg_split('/\W+/', INI['permissions'][$function]);
 		}
 		var_dump('permission ' . $function . ' not found in setup.ini file');
-	}
-
-	/**
-	 * check whether an approvalcolumn has been fully approved according to function
-	 * @param string $function as defined within setup.ini
-	 * @param string|array $approvalcolumn 'approval'-column
-	 * @return bool
-	 * 
-	 */
-	public static function fullyapproved($function = '', $approvalcolumn = ''){
-		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
-		$approved = true;
-		foreach(self::permissionFor($function, true) as $permission){
-			if (!array_key_exists($permission, $approvalcolumn)) $approved = false;
-		}
-		return $approved;
 	}
 
 	/**
