@@ -35,6 +35,11 @@ class FILE extends API {
 	}
 
 	/**
+	 *           _   _                 _                   _ ___ _ _
+	 *   ___ ___| |_|_|_ _ ___ ___ _ _| |_ ___ ___ ___ ___| |  _|_| |___ ___
+	 *  | .'|  _|  _| | | | -_| -_|_'_|  _| -_|  _|   | .'| |  _| | | -_|_ -|
+	 *  |__,|___|_| |_|\_/|___|___|_,_|_| |___|_| |_|_|__,|_|_| |_|_|___|___|
+	 *
 	 * returns paths to documents that are available according to database
 	 * @return array filepaths
 	 */
@@ -45,30 +50,56 @@ class FILE extends API {
 	}
 
 	/**
-	 * filters files according to request string and passed folder if applicable
-	 * responds with paths matching request
+	 *   _             _ _
+	 *  | |_ _ _ ___ _| | |___
+	 *  | . | | |   | . | | -_|
+	 *  |___|___|_|_|___|_|___|
+	 *
+	 * responds with content of available file bundles
 	 */
-	public function filter(){
-		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
-		else {
-			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-			$files = [];
-			foreach ($folders as $folder) {
-				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+	public function bundle(){
+		$result['render'] = [
+			'content' => [
+				[
+					[
+						'type' => 'filtered',
+						'attributes' => [
+							'name' => LANG::GET('file.bundle_filter_label'),
+							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
+							'onblur' => "api.file('get', 'bundlefilter', this.value); return false;",
+							'id' => 'filesearch'
+						]
+					]
+				]
+			]
+		];
+		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
+		foreach($bundles as $row) {
+			$list=[];
+			foreach (json_decode($row['content'], true) as $file => $path){
+				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
+			];
 			}
-			$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
+			$result['render']['content'][] = [
+				[
+					'type' => 'links',
+					'description' => $row['name'],
+					'content' => $list,
+					'attributes' => [
+						'data-filtered' => $row['id']
+					]
+				]
+			];
 		}
-		$matches = [];
-		foreach ($files as $file){
-			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
-			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
-		}
-		$this->response([
-			'data' => $matches
-		]);
+		$this->response($result);
 	}
 
 	/**
+	 *   _             _ _     ___ _ _ _
+	 *  | |_ _ _ ___ _| | |___|  _|_| | |_ ___ ___
+	 *  | . | | |   | . | | -_|  _| | |  _| -_|  _|
+	 *  |___|___|_|_|___|_|___|_| |_|_|_| |___|_|
+	 *
 	 * filters file bundles according to request string
 	 * responds with bundle ids matching request
 	 */
@@ -85,58 +116,351 @@ class FILE extends API {
 	}
 
 	/**
-	 * responds with content of available files for restricted uploads and external documents
+	 *   _             _ _
+	 *  | |_ _ _ ___ _| | |___ _____ ___ ___ ___ ___ ___ ___
+	 *  | . | | |   | . | | -_|     | .'|   | .'| . | -_|  _|
+	 *  |___|___|_|_|___|_|___|_|_|_|__,|_|_|__,|_  |___|_|
+	 *                                          |___|
+	 * get responds with form to select and save file bundles
+	 * post responds with success state of saving
+	 * 
+	 * no delete nor put for audit safety
 	 */
-	public function files(){
-		$result['render'] = [
-		'content' => [
-				[
+	public function bundlemanager(){
+		if (!PERMISSION::permissionFor('filebundles')) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$unset = LANG::PROPERTY('file.edit_existing_bundle_select');
+				unset ($this->_payload->$unset);
+				$unset = LANG::PROPERTY('file.edit_existing_bundle');
+				unset ($this->_payload->$unset);
+				$save_name = LANG::PROPERTY('file.edit_save_bundle');
+				$name = $this->_payload->$save_name;
+				unset ($this->_payload->$save_name);
+				$active = LANG::PROPERTY('file.edit_bundle_active');
+				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
+				unset ($this->_payload->$active);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_post', [
+					'values' => [
+					':name' => $name,
+					':content' => json_encode($this->_payload),
+					':active' => $isactive
+					]
+				])) $this->response([
+						'response' => [
+							'name' => $name,
+							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name]),
+							'type' => 'success'
+						]]);
+					else $this->response([
+						'response' => [
+							'name' => false,
+							'msg' => LANG::GET('file.edit_bundle_not_saved'),
+							'type' => 'error'
+						]]);
+				break;
+			case 'GET':
+				$datalist = [];
+				$options = ['...' => []];
+				$return = [];
+				
+				$bundle = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get', [
+					'values' => [
+						':name' => $this->_requestedFolder
+					]
+				]);
+				$bundle = $bundle ? $bundle[0] : null;
+				if (!$bundle) $bundle = ['name' => '', 'content' => '', 'active' => null];
+				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['response'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
+
+				// prepare existing bundle lists
+				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
+				foreach($bundles as $row) {
+					$datalist[] = $row['name'];
+					$options[$row['name']] = $bundle['name'] === $row['name'] ? ['selected' => true] : [];
+				}
+				
+				$return['render'] = [
+					'form' => [
+						'data-usecase' => 'file',
+						'action' => "javascript:api.file('post', 'bundlemanager')"
+					],
+					'content' => [
+						[
+							[
+								'type' => 'datalist',
+								'content' => array_values(array_unique($datalist)),
+								'attributes' => [
+									'id' => 'bundles'
+								]
+							],
+							[
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('file.edit_existing_bundle_select'),
+									'onchange' => "api.file('get', 'bundlemanager', this.value)"
+								],
+								'content' => $options
+							],
+							[
+								'type' => 'search',
+								'attributes' => [
+									'name' => LANG::GET('file.edit_existing_bundle'),
+									'list' => 'bundles',
+									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
+								]
+							]
+						]]];
+
+				$files = [];
+				$bundle['content']= json_decode($bundle['content'], true);
+				$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+				foreach ($folders as $folder) {
+					$files[$folder] = UTILITY::listFiles($folder ,'asc');
+				}
+				if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
+				$filePerSlide = 0;
+				$matches = [];
+				$currentfolder = '';
+				foreach ($files as $folder => $content){
+					foreach ($content as $file){
+						$pathinfo = pathinfo($file);
+						$file = ['path' => substr($file, 1), 'file' => $pathinfo['basename'], 'folder' => $pathinfo['dirname']];
+						if ($currentfolder != $file['folder']) {
+							$matches[] = [];
+							$currentfolder = $file['folder'];
+							$filePerSlide = 0;
+						}
+						$article = intval(count($matches) - 1);
+						if (empty($filePerSlide++ % INI['splitresults']['bundle_files_per_slide'])){
+							$matches[$article][] = [
+								[
+									'type' => 'checkbox',
+									'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+									'content' => []
+								]
+							];
+						}
+						$slide = intval(count($matches[$article]) - 1);
+						$matches[$article][$slide][0]['content'][$file['file']] = ['value' => $file['path']];
+						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$article][$slide][0]['content'][$file['file']]['checked'] = true;
+					}
+				}
+				foreach ($matches as $folder) {
+					$return['render']['content'][] = $folder;
+				}
+				$isactive = $bundle['active'] ? ['checked' => true] : [];
+				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
+				$return['render']['content'][] = [
 					[
-						'type' => 'filtered',
+						'type' => 'text',
+						'attributes'=>[
+							'name'=> LANG::GET('file.edit_save_bundle'),
+							'value' => $bundle['name']
+						]
+					],
+					[
+						'type' => 'radio',
 						'attributes' => [
-							'name' => LANG::GET('file.file_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
-							'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
-							'id' => 'filesearch'
+							'name' => LANG::GET('file.edit_bundle_active')
+						],
+						'content'=>[
+							LANG::GET('file.edit_active_bundle') => $isactive,
+							LANG::GET('file.edit_inactive_bundle') => $isinactive,
 						]
 					]
-				]
-			]
-		];
-		$files = [];
-		if ($this->_requestedFolder && $this->_requestedFolder != 'null') {
-			$folder = UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]);
-			$files[$folder] = UTILITY::listFiles($folder ,'asc');
+				];
+				if ($bundle['name']) $return['header'] = $bundle['name'];
+				$this->response($return);
+				break;
 		}
-		else {
-			if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
-			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-			foreach ($folders as $folder) {
-				$files[$folder] = UTILITY::listFiles($folder ,'asc');
-			}
-		}
-		if ($files){
-			foreach ($files as $folder => $content){
-				$matches = [];
-				foreach ($content as $file){
-					$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
-					$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
+	}
+	
+	/**
+	 *           _                   _ ___ _ _
+	 *   ___ _ _| |_ ___ ___ ___ ___| |  _|_| |___ _____ ___ ___ ___ ___ ___ ___
+	 *  | -_|_'_|  _| -_|  _|   | .'| |  _| | | -_|     | .'|   | .'| . | -_|  _|
+	 *  |___|_,_|_| |___|_| |_|_|__,|_|_| |_|_|___|_|_|_|__,|_|_|__,|_  |___|_|
+	 *                                                              |___|
+	 * get responds with content of available files for external documents
+	 * post responds with success state of upload
+	 * put responds with success state of either setting availability or regulatory context
+	 * 
+	 * no delete for audit safety
+	 */
+	public function externalfilemanager(){
+		if (!PERMISSION::permissionFor('externaldocuments')) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name']) {
+					$files = UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('external_documents'));
+					$insertions = [];
+					foreach($files as $file){
+						$insertions[] = [
+							':author' => $_SESSION['user']['name'],
+							':path' => $file
+						];
+					}
+					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
+					foreach ($sqlchunks as $chunk){
+						$success = false;
+						try {
+							if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $success = true;
+						}
+						catch (Exception $e) {
+							echo $e, $chunk;
+							die();
+						}
+					}
+					if ($success){		
+						$this->response(['response' => [
+							'msg' => LANG::GET('file.manager_new_file_created'),
+							'type' => 'success'
+						]]);
+					}
+					$this->response(['response' => [
+						'msg' => LANG::GET('file.manager_error'),
+						'type' => 'error'
+					]]);
 				}
-				$result['render']['content'][]=
-				[
+				break;
+			case 'PUT':
+				 switch ($this->_accessible){
+					case '0':
+						$prepare = 'file_external_documents_retire';
+						$tokens = [
+							':author' => $_SESSION['user']['name'],
+							':id' => $this->_requestedId
+						];
+						$response = LANG::GET('file.external_file_retired_success');
+						break;
+					case '1':
+						$prepare = 'file_external_documents_unretire';
+						$tokens = [
+							':author' => $_SESSION['user']['name'],
+							':id' => $this->_requestedId
+						];
+						$response = LANG::GET('file.external_file_available_success');
+						break;
+					default:
+						$regulatory_context = [];
+						foreach(explode(', ', $this->_accessible) as $context){
+							$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
+						}
+						$prepare = 'file_external_documents_context';
+						$tokens = [
+							':regulatory_context' => implode(',', $regulatory_context),
+							':id' => $this->_requestedId
+						];
+						$response = LANG::GET('file.external_file_regulatory_context');
+				}
+				if (SQLQUERY::EXECUTE($this->_pdo, $prepare, [
+					'values' => $tokens
+				])) $this->response(['response' => [
+						'msg' => $response,
+						'type' => 'success'
+					]]);
+				else $this->response(['response' => [
+					'msg' => LANG::GET('file.manager_error'),
+					'type' => 'error'
+				]]);
+				break;
+			case 'GET':
+				$result = ['render'=>
+				['form' => [
+					'data-usecase' => 'file',
+					'action' => "javascript:api.file('post', 'externalfilemanager')"],
+					'content'=>[]
+				]];
+
+				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
+				if ($files){
+					$result['render']['content'][] = [
+						[
+							'type' => 'filtered',
+							'attributes' => [
+								'name' => LANG::GET('file.file_filter_label'),
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}",
+								'onblur' => "api.file('get', 'filter', 'null', this.value); return false;",
+								'id' => 'filefilter'
+							]
+						]
+					];
+					$result['render']['content'][] = [];
+					foreach ($files as $file){
+						if ($file) {
+							$file['name'] = pathinfo($file['path'])['basename'];
+							$file['path'] = substr($file['path'], 1);
+							$regulatory_context = [];
+							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
+							foreach(LANGUAGEFILE['regulatory'] as $key => $value){
+								$regulatory_context[$value] = ['value' => $key];
+								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
+							}
+							array_push($result['render']['content'][1],
+								[
+									'type' => 'links',
+									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
+									'content' => [
+										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
+									],
+									'data-filtered' => $file['path']
+								],
+								[
+									'type' => 'button',
+									'attributes' => [
+										'value' => LANG::GET('file.manager_copy_path'),
+										'type' => 'button',
+										'onpointerup' => "_client.order.toClipboard('" . $file['path'] . "')",
+										'class' => 'inlinebutton',
+										'data-filtered' => $file['path']
+									]
+								],
+								[
+									'type' => 'checkbox',
+									'content' => [
+										LANG::GET('file.external_file_available') => ($file['retired']
+										? ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
+										: ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
+									],
+								],
+								[
+									'type' => 'checkbox2text',
+									'content' => $regulatory_context,
+									'attributes' => [
+										'name' => LANG::GET('assemble.compose_form_regulatory_context'),
+										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
+										'data-filtered' => $file['path']
+									],
+								]
+							);
+						}
+					}
+				}
+				else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+				$result['render']['content'][] = [
 					[
-						'type' => 'links',
-						'description' => LANG::GET('file.file_list', [':folder' => pathinfo($folder)['filename']]),
-						'content' => $matches
+						'type' => 'file',
+						'attributes' => [
+							'name' => LANG::GET('file.manager_new_file'),
+							'multiple' => true,
+							'required' => true
+						],
+						'hint' => LANG::GET('file.external_file_hint')
 					]
 				];
-			}
+				$this->response($result);
+				break;
 		}
-		else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-		$this->response($result);
 	}
-
+	
 	/**
+	 *   ___ _ _
+	 *  |  _|_| |___ _____ ___ ___ ___ ___ ___ ___
+	 *  |  _| | | -_|     | .'|   | .'| . | -_|  _|
+	 *  |_| |_|_|___|_|_|_|__,|_|_|__,|_  |___|_|
+	 *                                |___|
 	 * get responds with content of available folders or files for restricted uploads
 	 * post responds with success state of upload
 	 * delete responds with success state of deletion
@@ -327,376 +651,97 @@ class FILE extends API {
 	}
 
 	/**
-	 * get responds with content of available files for external documents
-	 * post responds with success state of upload
-	 * put responds with success state of either setting availability or regulatory context
-	 * 
-	 * no delete for audit safety
+	 *   ___ _ _
+	 *  |  _|_| |___ ___
+	 *  |  _| | | -_|_ -|
+	 *  |_| |_|_|___|___|
+	 *
+	 * responds with content of available files for restricted uploads and external documents
 	 */
-	public function externalfilemanager(){
-		if (!PERMISSION::permissionFor('externaldocuments')) $this->response([], 401);
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name']) {
-					$files = UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('external_documents'));
-					$insertions = [];
-					foreach($files as $file){
-						$insertions[] = [
-							':author' => $_SESSION['user']['name'],
-							':path' => $file
-						];
-					}
-					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
-					foreach ($sqlchunks as $chunk){
-						$success = false;
-						try {
-							if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $success = true;
-						}
-						catch (Exception $e) {
-							echo $e, $chunk;
-							die();
-						}
-					}
-					if ($success){		
-						$this->response(['response' => [
-							'msg' => LANG::GET('file.manager_new_file_created'),
-							'type' => 'success'
-						]]);
-					}
-					$this->response(['response' => [
-						'msg' => LANG::GET('file.manager_error'),
-						'type' => 'error'
-					]]);
-				}
-				break;
-			case 'PUT':
-				 switch ($this->_accessible){
-					case '0':
-						$prepare = 'file_external_documents_retire';
-						$tokens = [
-							':author' => $_SESSION['user']['name'],
-							':id' => $this->_requestedId
-						];
-						$response = LANG::GET('file.external_file_retired_success');
-						break;
-					case '1':
-						$prepare = 'file_external_documents_unretire';
-						$tokens = [
-							':author' => $_SESSION['user']['name'],
-							':id' => $this->_requestedId
-						];
-						$response = LANG::GET('file.external_file_available_success');
-						break;
-					default:
-						$regulatory_context = [];
-						foreach(explode(', ', $this->_accessible) as $context){
-							$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
-						}
-						$prepare = 'file_external_documents_context';
-						$tokens = [
-							':regulatory_context' => implode(',', $regulatory_context),
-							':id' => $this->_requestedId
-						];
-						$response = LANG::GET('file.external_file_regulatory_context');
-				}
-				if (SQLQUERY::EXECUTE($this->_pdo, $prepare, [
-					'values' => $tokens
-				])) $this->response(['response' => [
-						'msg' => $response,
-						'type' => 'success'
-					]]);
-				else $this->response(['response' => [
-					'msg' => LANG::GET('file.manager_error'),
-					'type' => 'error'
-				]]);
-				break;
-			case 'GET':
-				$result = ['render'=>
-				['form' => [
-					'data-usecase' => 'file',
-					'action' => "javascript:api.file('post', 'externalfilemanager')"],
-					'content'=>[]
-				]];
-
-				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
-				if ($files){
-					$result['render']['content'][] = [
-						[
-							'type' => 'filtered',
-							'attributes' => [
-								'name' => LANG::GET('file.file_filter_label'),
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}",
-								'onblur' => "api.file('get', 'filter', 'null', this.value); return false;",
-								'id' => 'filefilter'
-							]
-						]
-					];
-					$result['render']['content'][] = [];
-					foreach ($files as $file){
-						if ($file) {
-							$file['name'] = pathinfo($file['path'])['basename'];
-							$file['path'] = substr($file['path'], 1);
-							$regulatory_context = [];
-							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
-							foreach(LANGUAGEFILE['regulatory'] as $key => $value){
-								$regulatory_context[$value] = ['value' => $key];
-								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
-							}
-							array_push($result['render']['content'][1],
-								[
-									'type' => 'links',
-									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
-									'content' => [
-										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
-									],
-									'data-filtered' => $file['path']
-								],
-								[
-									'type' => 'button',
-									'attributes' => [
-										'value' => LANG::GET('file.manager_copy_path'),
-										'type' => 'button',
-										'onpointerup' => "_client.order.toClipboard('" . $file['path'] . "')",
-										'class' => 'inlinebutton',
-										'data-filtered' => $file['path']
-									]
-								],
-								[
-									'type' => 'checkbox',
-									'content' => [
-										LANG::GET('file.external_file_available') => ($file['retired']
-										? ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
-										: ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
-									],
-								],
-								[
-									'type' => 'checkbox2text',
-									'content' => $regulatory_context,
-									'attributes' => [
-										'name' => LANG::GET('assemble.compose_form_regulatory_context'),
-										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
-										'data-filtered' => $file['path']
-									],
-								]
-							);
-						}
-					}
-				}
-				else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
-				$result['render']['content'][] = [
-					[
-						'type' => 'file',
-						'attributes' => [
-							'name' => LANG::GET('file.manager_new_file'),
-							'multiple' => true,
-							'required' => true
-						],
-						'hint' => LANG::GET('file.external_file_hint')
-					]
-				];
-				$this->response($result);
-				break;
-		}
-	}
-
-	/**
-	 * responds with content of available file bundles
-	 */
-	public function bundle(){
+	public function files(){
 		$result['render'] = [
-			'content' => [
+		'content' => [
 				[
 					[
 						'type' => 'filtered',
 						'attributes' => [
-							'name' => LANG::GET('file.bundle_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
-							'onblur' => "api.file('get', 'bundlefilter', this.value); return false;",
+							'name' => LANG::GET('file.file_filter_label'),
+							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
+							'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
 							'id' => 'filesearch'
 						]
 					]
 				]
 			]
 		];
-		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
-		foreach($bundles as $row) {
-			$list=[];
-			foreach (json_decode($row['content'], true) as $file => $path){
-				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
-			];
-			}
-			$result['render']['content'][] = [
-				[
-					'type' => 'links',
-					'description' => $row['name'],
-					'content' => $list,
-					'attributes' => [
-						'data-filtered' => $row['id']
-					]
-				]
-			];
+		$files = [];
+		if ($this->_requestedFolder && $this->_requestedFolder != 'null') {
+			$folder = UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]);
+			$files[$folder] = UTILITY::listFiles($folder ,'asc');
 		}
-		$this->response($result);
-	}
-
-	/**
-	 * get responds with form to select and save file bundles
-	 * post responds with success state of saving
-	 * 
-	 * no delete nor put for audit safety
-	 */
-	public function bundlemanager(){
-		if (!PERMISSION::permissionFor('filebundles')) $this->response([], 401);
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				$unset = LANG::PROPERTY('file.edit_existing_bundle_select');
-				unset ($this->_payload->$unset);
-				$unset = LANG::PROPERTY('file.edit_existing_bundle');
-				unset ($this->_payload->$unset);
-				$save_name = LANG::PROPERTY('file.edit_save_bundle');
-				$name = $this->_payload->$save_name;
-				unset ($this->_payload->$save_name);
-				$active = LANG::PROPERTY('file.edit_bundle_active');
-				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
-				unset ($this->_payload->$active);
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_post', [
-					'values' => [
-					':name' => $name,
-					':content' => json_encode($this->_payload),
-					':active' => $isactive
-					]
-				])) $this->response([
-						'response' => [
-							'name' => $name,
-							'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name]),
-							'type' => 'success'
-						]]);
-					else $this->response([
-						'response' => [
-							'name' => false,
-							'msg' => LANG::GET('file.edit_bundle_not_saved'),
-							'type' => 'error'
-						]]);
-				break;
-			case 'GET':
-				$datalist = [];
-				$options = ['...' => []];
-				$return = [];
-				
-				$bundle = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get', [
-					'values' => [
-						':name' => $this->_requestedFolder
-					]
-				]);
-				$bundle = $bundle ? $bundle[0] : null;
-				if (!$bundle) $bundle = ['name' => '', 'content' => '', 'active' => null];
-				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['response'] = ['msg' => LANG::GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
-
-				// prepare existing bundle lists
-				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
-				foreach($bundles as $row) {
-					$datalist[] = $row['name'];
-					$options[$row['name']] = $bundle['name'] === $row['name'] ? ['selected' => true] : [];
-				}
-				
-				$return['render'] = [
-					'form' => [
-						'data-usecase' => 'file',
-						'action' => "javascript:api.file('post', 'bundlemanager')"
-					],
-					'content' => [
-						[
-							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'bundles'
-								]
-							],
-							[
-								'type' => 'select',
-								'attributes' => [
-									'name' => LANG::GET('file.edit_existing_bundle_select'),
-									'onchange' => "api.file('get', 'bundlemanager', this.value)"
-								],
-								'content' => $options
-							],
-							[
-								'type' => 'search',
-								'attributes' => [
-									'name' => LANG::GET('file.edit_existing_bundle'),
-									'list' => 'bundles',
-									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
-								]
-							]
-						]]];
-
-				$files = [];
-				$bundle['content']= json_decode($bundle['content'], true);
-				$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-				foreach ($folders as $folder) {
-					$files[$folder] = UTILITY::listFiles($folder ,'asc');
-				}
-				if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
-				$filePerSlide = 0;
+		else {
+			if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
+			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+			foreach ($folders as $folder) {
+				$files[$folder] = UTILITY::listFiles($folder ,'asc');
+			}
+		}
+		if ($files){
+			foreach ($files as $folder => $content){
 				$matches = [];
-				$currentfolder = '';
-				foreach ($files as $folder => $content){
-					foreach ($content as $file){
-						$pathinfo = pathinfo($file);
-						$file = ['path' => substr($file, 1), 'file' => $pathinfo['basename'], 'folder' => $pathinfo['dirname']];
-						if ($currentfolder != $file['folder']) {
-							$matches[] = [];
-							$currentfolder = $file['folder'];
-							$filePerSlide = 0;
-						}
-						$article = intval(count($matches) - 1);
-						if (empty($filePerSlide++ % INI['splitresults']['bundle_files_per_slide'])){
-							$matches[$article][] = [
-								[
-									'type' => 'checkbox',
-									'description' => LANG::GET('file.file_list', [':folder' => $folder]),
-									'content' => []
-								]
-							];
-						}
-						$slide = intval(count($matches[$article]) - 1);
-						$matches[$article][$slide][0]['content'][$file['file']] = ['value' => $file['path']];
-						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$article][$slide][0]['content'][$file['file']]['checked'] = true;
-					}
+				foreach ($content as $file){
+					$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
+					$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
-				foreach ($matches as $folder) {
-					$return['render']['content'][] = $folder;
-				}
-				$isactive = $bundle['active'] ? ['checked' => true] : [];
-				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
-				$return['render']['content'][] = [
+				$result['render']['content'][]=
+				[
 					[
-						'type' => 'text',
-						'attributes'=>[
-							'name'=> LANG::GET('file.edit_save_bundle'),
-							'value' => $bundle['name']
-						]
-					],
-					[
-						'type' => 'radio',
-						'attributes' => [
-							'name' => LANG::GET('file.edit_bundle_active')
-						],
-						'content'=>[
-							LANG::GET('file.edit_active_bundle') => $isactive,
-							LANG::GET('file.edit_inactive_bundle') => $isinactive,
-						]
+						'type' => 'links',
+						'description' => LANG::GET('file.file_list', [':folder' => pathinfo($folder)['filename']]),
+						'content' => $matches
 					]
 				];
-				if ($bundle['name']) $return['header'] = $bundle['name'];
-				$this->response($return);
-				break;
+			}
 		}
+		else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+		$this->response($result);
+	}
+	
+	/**
+	 *   ___ _ _ _
+	 *  |  _|_| | |_ ___ ___
+	 *  |  _| | |  _| -_|  _|
+	 *  |_| |_|_|_| |___|_|
+	 *
+	 * filters files according to request string and passed folder if applicable
+	 * responds with paths matching request
+	 */
+	public function filter(){
+		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
+		else {
+			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+			$files = [];
+			foreach ($folders as $folder) {
+				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+			}
+			$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
+		}
+		$matches = [];
+		foreach ($files as $file){
+			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
+			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
+		}
+		$this->response([
+			'data' => $matches
+		]);
 	}
 
 	/**
+	 *       _                       _     _
+	 *   ___| |_ ___ ___ ___ ___ ___|_|___| |_
+	 *  |_ -|   | .'|  _| -_| . | . | |   |  _|
+	 *  |___|_|_|__,|_| |___|  _|___|_|_|_|_|
+	 *                      |_|
 	 * get responds with content of available files, clears overdue files according to defined lifespan
 	 * post responds with success state of saving
 	 * 

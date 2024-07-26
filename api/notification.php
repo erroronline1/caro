@@ -32,6 +32,13 @@ class NOTIFICATION extends API {
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 	}
 
+	/**
+	 *           _   _ ___
+	 *   ___ ___| |_|_|  _|___
+	 *  |   | . |  _| |  _|_ -|
+	 *  |_|_|___|_| |_|_| |___|
+	 *
+	 */
 	public function notifs(){
 		$result = [
 			'calendar_uncompletedevents' => $this->calendar(),
@@ -44,13 +51,18 @@ class NOTIFICATION extends API {
 		$this->response($result);
 	}
 
+	/**
+	 *           _           _
+	 *   ___ ___| |___ ___ _| |___ ___
+	 *  |  _| .'| | -_|   | . | .'|  _|
+	 *  |___|__,|_|___|_|_|___|__,|_|
+	 *
+	 * checks system processable expiry dates, adds calendar reminders if applicable
+	 * alerts a user group if selected
+	 * used by service worker
+	 */
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		/**
-		 * checks system processable expiry dates, adds calendar reminders if applicable
-		 * alerts a user group if selected
-		 * used by service worker
-		 */
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
 		$today->setTime(0, 0);
@@ -94,6 +106,11 @@ class NOTIFICATION extends API {
 	}
 
 	/**
+	 *                                 _   _
+	 *   ___ ___ ___ ___ _ _ _____ ___| |_| |___ ___
+	 *  |  _| . |   |_ -| | |     | .'| . | | -_|_ -|
+	 *  |___|___|_|_|___|___|_|_|_|__,|___|_|___|___|
+	 *
 	 * notify on pending incorporations
 	 */
 	public function consumables(){
@@ -111,6 +128,11 @@ class NOTIFICATION extends API {
 	}
 
 	/**
+	 *   ___
+	 *  |  _|___ ___ _____ ___
+	 *  |  _| . |  _|     |_ -|
+	 *  |_| |___|_| |_|_|_|___|
+	 *
 	 * alerts eligible users about forms and components having to be approved
 	 */
 	public function forms(){
@@ -130,6 +152,14 @@ class NOTIFICATION extends API {
 		return $unapproved;
 	}
 
+	/**
+	 *                                                 _   _ ___ _       _
+	 *   _____ ___ ___ ___ ___ ___ ___ _ _ ___ ___ ___| |_|_|  _|_|___ _| |
+	 *  |     | -_|_ -|_ -| .'| . | -_| | |   |   | . |  _| |  _| | -_| . |
+	 *  |_|_|_|___|___|___|__,|_  |___|___|_|_|_|_|___|_| |_|_| |_|___|___|
+	 *                        |___|
+	 * number of new messages that have not been notified of (system alert)
+	 */
 	public function messageunnotified(){
 		$unnotified = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unnotified', [
 			'values' => [
@@ -144,6 +174,15 @@ class NOTIFICATION extends API {
 			]);
 		return $unnotified;
 	}
+	
+	/**
+	 *
+	 *   _____ ___ ___ ___ ___ ___ ___ _ _ ___ ___ ___ ___ ___
+	 *  |     | -_|_ -|_ -| .'| . | -_| | |   |_ -| -_| -_|   |
+	 *  |_|_|_|___|___|___|__,|_  |___|___|_|_|___|___|___|_|_|
+	 *                        |___|
+	 * number of unseen messages
+	 */
 	public function messageunseen(){
 		$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen', [
 			'values' => [
@@ -154,6 +193,14 @@ class NOTIFICATION extends API {
 		return $unseen;
 	}
 
+	/**
+	 *             _
+	 *   ___ ___ _| |___ ___
+	 *  | . |  _| . | -_|  _|
+	 *  |___|_| |___|___|_|
+	 *
+	 * number of unprocessed orders
+	 */
 	public function order(){
 		$unprocessed = 0;
 		if (PERMISSION::permissionFor('orderprocessing')){
@@ -163,6 +210,14 @@ class NOTIFICATION extends API {
 		return $unprocessed;
 	}
 
+	/**
+	 *                         _
+	 *   ___ ___ ___ ___ ___ _| |___
+	 *  |  _| -_|  _| . |  _| . |_ -|
+	 *  |_| |___|___|___|_| |___|___|
+	 *
+	 * number of unclosed records for assigned units
+	 */
 	public function records(){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		$number = 0;

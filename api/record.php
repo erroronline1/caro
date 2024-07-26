@@ -39,225 +39,149 @@ class RECORD extends API {
 	}
 
 	/**
-	 * returns the latest approved form, component by name from query
-	 * @param string $query as defined within sqlinterface
-	 * @param string $name
-	 * @return array|bool either query row or false
+	 *       _
+	 *   ___| |___ ___ ___
+	 *  |  _| | . |_ -| -_|
+	 *  |___|_|___|___|___|
+	 *
 	 */
-	private function latestApprovedName($query = '', $name = ''){
-		// get latest approved by name
-		$element = [];
-		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
+	public function close(){
+		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
+		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
 			'values' => [
-				':name' => $name
+				':identifier' => $this->_requestedID
 			]
 		]);
-		foreach ($elements as $element){
-			if (in_array($element['context'], ['bundle'])) return $element;
-			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
-		}
-		return false;
+		$this->response([
+			'response' => [
+				'msg' => LANG::GET('record.record_mark_as_closed_info'),
+				'type' => 'success'
+			]]);
 	}
 
-	public function identifier(){
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'))) {
-					$possibledate = substr($content, -16);
-					try {
-						new DateTime($possibledate);
-					}
-					catch (Exception $e){
-						$now = new DateTime('now', new DateTimeZone(INI['timezone']));
-						$content .= ' ' . $now->format('Y-m-d H:i');
-					}
-				}
-				if ($content){
-					$downloadfiles = [];
-					$downloadfiles[LANG::GET('record.create_identifier')] = [
-						'href' => PDF::identifierPDF($content)
-					];
-					$body = [
-						[
-							'type' => 'links',
-							'description' => LANG::GET('record.create_identifier_proceed'),
-							'content' => $downloadfiles
-						]
-					];
-					$this->response([
-						'render' => $body
-					]);
-				}
-				else $this->response(['response' => [
-					'msg' => LANG::GET('record.create_identifier_error'),
-					'type' => 'error'
-				]]);
-				break;
-			case 'GET':
-				$result=['render' =>
-				[
-					'form' => [
-						'data-usecase' => 'record',
-						'action' => "javascript:api.record('post', 'identifier')"],
-					'content'=>[
-						[
-							[
-								'type' => 'textblock',
-								'description' => LANG::GET('record.create_identifier_info')
-							], [
-								'type' => 'scanner',
-								'hint' => LANG::GET('record.create_identifier_hint'),
-								'attributes' => [
-									'name' => LANG::GET('record.create_identifier'),
-									'maxlength' => 128
-								]
-							]
-						]
-					]
-				]];
-				$this->response($result);
-				break;
-		}
+	/**
+	 *                       _
+	 *   ___ _ _ ___ ___ ___| |_
+	 *  | -_|_'_| . | . |  _|  _|
+	 *  |___|_,_|  _|___|_| |_|
+	 *          |_|
+	 */
+	private function export($summarize = "full"){
+		$content = $this->summarizeRecord($summarize);
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::recordsPDF($content)
+		];
+
+		$body = [];
+		array_push($body, 
+			[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]
+		);
+		$this->response([
+			'render' => $body,
+		]);
 	}
 
-	public function formfilter(){
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = $matches = [];
+	/**
+	 *                       _   ___
+	 *   ___ _ _ ___ ___ ___| |_|  _|___ ___ _____
+	 *  | -_|_'_| . | . |  _|  _|  _| . |  _|     |
+	 *  |___|_,_|  _|___|_| |_| |_| |___|_| |_|_|_|
+	 *          |_|
+	 */
+	public function exportform(){
+		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+			'values' => [
+				':id' => $this->_requestedID
+			]
+		]);
+		$form = $form ? $form[0] : null;
+		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export']) $this->response([], 401);
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
+			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => $form['date']]),
+			'date' => LANG::GET('record.form_export_exported', [':date' => date('y-m-d H:i')])
+		];
 
-		function findInComponent($element, $search){
-			$found = false;
+		function printable($element){
+			// todo: enumerate names
+			$content = ['content' => [], 'images' => []];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
-					$found = findInComponent($subs, $search);
+					$subcontent = printable($subs);
+					$content['content'] = array_merge($content['content'], $subcontent['content']);
+					$content['images'] = array_merge($content['images'], $subcontent['images']);
 				}
 				else {
-					foreach (['description', 'content', 'hint'] as $property){
-						if (array_key_exists($property, $subs)){
-							if (is_array($subs[$property])){ // links, checkboxes,etc
-								foreach(array_keys($subs[$property]) as $key) {
-									similar_text($search, $key, $percent);
-									if ($percent >= INI['likeliness']['file_search_similarity']) {
-										return true;
-									}
-								}
-							}
-							else {
-								if (stristr($subs[$property], $search) !== false) return true;
-							}
+					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton'])) continue;
+					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
+						if ($subs['type'] ==='checkbox') $name = $subs['description'];
+						else $name = $subs['attributes']['name'];
+						$content['content'][$name] = [];
+						foreach($subs['content'] as $key => $v){
+							$content['content'][$name][] = $key;
 						}
 					}
-					if (array_key_exists('attributes', $subs)){
-						foreach (['name', 'value'] as $property){
-							if (array_key_exists($property, $subs['attributes']) && stristr($subs['attributes'][$property], $search) !== false) return true;
+					elseif ($subs['type']==='text'){
+						$content['content'][$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
+					}
+					elseif ($subs['type']==='textarea'){
+						$content['content'][$subs['attributes']['name']] = str_repeat(" \n", 2);
+					}
+					elseif ($subs['type']==='image'){
+						$content['content'][$subs['description']] = $subs['attributes']['url'];
+						$file = pathinfo($subs['attributes']['url']);
+						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+							$content['images'][] = $subs['attributes']['url'];
 						}
+					}
+					else {
+						$content['content'][$subs['attributes']['name']] = " ";
 					}
 				}
 			}
-			return $found;
+			return $content;
 		};
+		$componentscontent = [];
+		foreach(explode(',', $form['content']) as $usedcomponent) {
+			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
+			$component['content'] = json_decode($component['content'], true);
 
-		foreach($fd as $row) {
-			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['id'], $matches) && !in_array($row['name'], $hidden)) {
-				$terms = [$row['name']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
-				foreach ($terms as $term){
-					similar_text($this->_requestedID, $term, $percent);
-					if (($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
-						$matches[] = strval($row['id']);
-						continue;
-					}
-					foreach(explode(',', $row['regulatory_context']) as $context) {
-						if (stristr(LANG::GET('regulatory.' . $context), $this->_requestedID) !== false) {
-							$matches[] = strval($row['id']);
-							continue;	
-						}
-					}
-					foreach(explode(',', $row['content']) as $usedcomponent) {
-						$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
-						if ($component){
-							$component['content'] = json_decode($component['content'], true);
-							if (findInComponent($component['content']['content'], $this->_requestedID)) {
-								$matches[] = strval($row['id']);
-								break;
-							}
-						}
-					}
-				}
-			}
+			$printablecontent = printable($component['content']['content']);
+			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
+			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
 		}
+		$summary['content'] = [' ' => $summary['content']];
+		$summary['images'] = [' ' => $summary['images']];
+		$downloadfiles[LANG::GET('record.form_export')] = [
+			'href' => PDF::formsPDF($summary)
+		];
 		$this->response([
-			'data' => array_values(array_unique($matches))
-		]);
-	}
-
-	public function recordfilter(){
-		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
-		$matches = $all = [];
-		foreach($records as $row) {
-			similar_text($this->_requestedID, $row['identifier'], $percent);
-			if (($percent >= INI['likeliness']['records_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
-		}
-		$this->response([
-			'data' => $this->_requestedID ? $matches : array_map(Fn($row) => strval($row['id']), $records)
-		]);
-	}
-
-	public function forms(){
-		$formdatalist = $forms = [];
-		$return = [];
-
-		// prepare existing forms lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = [];
-		foreach($fd as $key => $row) {
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
-			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
-				$formdatalist[] = $row['name'];
-				$forms[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
-			}
-		}
-		$return['render'] = [
-			'content' => [
+			'render' => [
 				[
-					[
-						'type' => 'datalist',
-						'content' => array_values(array_unique($formdatalist)),
-						'attributes' => [
-							'id' => 'forms'
-						]
-					], [
-						'type' => 'filtered',
-						'attributes' => [
-							'name' => LANG::GET('record.form_filter'),
-							'list' => 'forms',
-							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}",
-							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
-						],
-						'hint' => LANG::GET('record.form_filter_hint')
-					]
+					'type' => 'links',
+					'description' =>  LANG::GET('record.form_export_proceed'),
+					'content' => $downloadfiles
 				]
-			]];
-		foreach ($forms as $context => $list){
-			$contexttranslation = '';
-			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
-				if (array_key_exists($context, $contexts)){
-					$contexttranslation = $contexts[$context];
-					break;
-				}
-			}
-			$return['render']['content'][] = 					[
-				'type' => 'links',
-				'description' => $contexttranslation,
-				'content' => $list
-			];
-
-		}
-		$this->response($return);
+			],
+		]);
 	}
-
+	
+	/**
+	 *   ___
+	 *  |  _|___ ___ _____
+	 *  |  _| . |  _|     |
+	 *  |_| |___|_| |_|_|_|
+	 *
+	 */
 	public function form(){
 		// prepare existing forms lists
 		$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
@@ -384,7 +308,240 @@ class RECORD extends API {
 		else array_push($return['render']['content'][0][0], ...$context);
 		$this->response($return);
 	}
+	
+	/**
+	 *   ___                                   _
+	 *  |  _|___ ___ _____ ___ _ _ ___ ___ ___| |_
+	 *  |  _| . |  _|     | -_|_'_| . | . |  _|  _|
+	 *  |_| |___|_| |_|_|_|___|_,_|  _|___|_| |_|
+	 *                            |_|
+	 */
+	public function formexport(){
+		$this->export('form');
+	}
+	
+	/**
+	 *   ___               ___ _ _ _
+	 *  |  _|___ ___ _____|  _|_| | |_ ___ ___
+	 *  |  _| . |  _|     |  _| | |  _| -_|  _|
+	 *  |_| |___|_| |_|_|_|_| |_|_|_| |___|_|
+	 *
+	 */
+	public function formfilter(){
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$hidden = $matches = [];
 
+		function findInComponent($element, $search){
+			$found = false;
+			foreach($element as $subs){
+				if (!array_key_exists('type', $subs)){
+					$found = findInComponent($subs, $search);
+				}
+				else {
+					foreach (['description', 'content', 'hint'] as $property){
+						if (array_key_exists($property, $subs)){
+							if (is_array($subs[$property])){ // links, checkboxes,etc
+								foreach(array_keys($subs[$property]) as $key) {
+									similar_text($search, $key, $percent);
+									if ($percent >= INI['likeliness']['file_search_similarity']) {
+										return true;
+									}
+								}
+							}
+							else {
+								if (stristr($subs[$property], $search) !== false) return true;
+							}
+						}
+					}
+					if (array_key_exists('attributes', $subs)){
+						foreach (['name', 'value'] as $property){
+							if (array_key_exists($property, $subs['attributes']) && stristr($subs['attributes'][$property], $search) !== false) return true;
+						}
+					}
+				}
+			}
+			return $found;
+		};
+
+		foreach($fd as $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['id'], $matches) && !in_array($row['name'], $hidden)) {
+				$terms = [$row['name']];
+				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
+				foreach ($terms as $term){
+					similar_text($this->_requestedID, $term, $percent);
+					if (($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
+						$matches[] = strval($row['id']);
+						continue;
+					}
+					foreach(explode(',', $row['regulatory_context']) as $context) {
+						if (stristr(LANG::GET('regulatory.' . $context), $this->_requestedID) !== false) {
+							$matches[] = strval($row['id']);
+							continue;	
+						}
+					}
+					foreach(explode(',', $row['content']) as $usedcomponent) {
+						$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
+						if ($component){
+							$component['content'] = json_decode($component['content'], true);
+							if (findInComponent($component['content']['content'], $this->_requestedID)) {
+								$matches[] = strval($row['id']);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		$this->response([
+			'data' => array_values(array_unique($matches))
+		]);
+	}
+	
+	/**
+	 *   ___     _ _                     _
+	 *  |  _|_ _| | |___ _ _ ___ ___ ___| |_
+	 *  |  _| | | | | -_|_'_| . | . |  _|  _|
+	 *  |_| |___|_|_|___|_,_|  _|___|_| |_|
+	 *                      |_|
+	 */
+	public function fullexport(){
+		$this->export('full');
+	}
+
+	/**
+	 *   _   _         _   _ ___ _
+	 *  |_|_| |___ ___| |_|_|  _|_|___ ___
+	 *  | | . | -_|   |  _| |  _| | -_|  _|
+	 *  |_|___|___|_|_|_| |_|_| |_|___|_|
+	 *
+	 */
+	public function identifier(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'))) {
+					$possibledate = substr($content, -16);
+					try {
+						new DateTime($possibledate);
+					}
+					catch (Exception $e){
+						$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+						$content .= ' ' . $now->format('Y-m-d H:i');
+					}
+				}
+				if ($content){
+					$downloadfiles = [];
+					$downloadfiles[LANG::GET('record.create_identifier')] = [
+						'href' => PDF::identifierPDF($content)
+					];
+					$body = [
+						[
+							'type' => 'links',
+							'description' => LANG::GET('record.create_identifier_proceed'),
+							'content' => $downloadfiles
+						]
+					];
+					$this->response([
+						'render' => $body
+					]);
+				}
+				else $this->response(['response' => [
+					'msg' => LANG::GET('record.create_identifier_error'),
+					'type' => 'error'
+				]]);
+				break;
+			case 'GET':
+				$result=['render' =>
+				[
+					'form' => [
+						'data-usecase' => 'record',
+						'action' => "javascript:api.record('post', 'identifier')"],
+					'content'=>[
+						[
+							[
+								'type' => 'textblock',
+								'description' => LANG::GET('record.create_identifier_info')
+							], [
+								'type' => 'scanner',
+								'hint' => LANG::GET('record.create_identifier_hint'),
+								'attributes' => [
+									'name' => LANG::GET('record.create_identifier'),
+									'maxlength' => 128
+								]
+							]
+						]
+					]
+				]];
+				$this->response($result);
+				break;
+		}
+	}
+	
+	/**
+	 *   _                   _
+	 *  |_|_____ ___ ___ ___| |_
+	 *  | |     | . | . |  _|  _|
+	 *  |_|_|_|_|  _|___|_| |_|
+	 *          |_|
+	 */
+	public function import(){
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
+			'values' => [
+				':identifier' => UTILITY::propertySet($this->_payload, 'IDENTIFY_BY_')
+			]
+		]);
+		if ($data) {
+			$result = [];
+			foreach($data as $row)
+				foreach(json_decode($row['content'], true) as $key => $value) $result[$key] = $value;
+			$this->response([
+				'data' => $result,
+				'response' => [
+					'msg' => LANG::GET('record.record_import_success'),
+					'type' => 'success'
+				]
+			]);
+		}
+		else $this->response([
+			'response' => [
+				'msg' => LANG::GET('record.record_import_error'),
+				'type' => 'error'
+			]]);
+	}
+	
+	/**
+	 *   _     _           _                                 _
+	 *  | |___| |_ ___ ___| |_ ___ ___ ___ ___ ___ _ _ ___ _| |___ ___ _____ ___
+	 *  | | .'|  _| -_|_ -|  _| .'| . | . |  _| . | | | -_| . |   | .'|     | -_|
+	 *  |_|__,|_| |___|___|_| |__,|  _|  _|_| |___|\_/|___|___|_|_|__,|_|_|_|___|
+	 *                            |_| |_|
+	 * returns the latest approved form, component by name from query
+	 * @param string $query as defined within sqlinterface
+	 * @param string $name
+	 * @return array|bool either query row or false
+	 */
+	private function latestApprovedName($query = '', $name = ''){
+		// get latest approved by name
+		$element = [];
+		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
+			'values' => [
+				':name' => $name
+			]
+		]);
+		foreach ($elements as $element){
+			if (in_array($element['context'], ['bundle'])) return $element;
+			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+		}
+		return false;
+	}
+
+	/**
+	 *             _       _   _             _ _
+	 *   _____ ___| |_ ___| |_| |_ _ _ ___ _| | |___ ___
+	 *  |     | .'|  _|  _|   | . | | |   | . | | -_|_ -|
+	 *  |_|_|_|__,|_| |___|_|_|___|___|_|_|___|_|___|___|
+	 *
+	 */
 	public function matchbundles(){
 		$forms = [];
 		$return = [];
@@ -429,6 +586,13 @@ class RECORD extends API {
 		$this->response($return);
 	}
 
+	/**
+	 *                         _
+	 *   ___ ___ ___ ___ ___ _| |
+	 *  |  _| -_|  _| . |  _| . |
+	 *  |_| |___|___|___|_| |___|
+	 *
+	 */
 	public function record(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -620,46 +784,88 @@ class RECORD extends API {
 				$this->response([], 401);
 		}
 	}
-
-	public function close(){
-		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
-		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
-			'values' => [
-				':identifier' => $this->_requestedID
-			]
-		]);
-		$this->response([
-			'response' => [
-				'msg' => LANG::GET('record.record_mark_as_closed_info'),
-				'type' => 'success'
-			]]);
-	}
-
-	public function import(){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
-			'values' => [
-				':identifier' => UTILITY::propertySet($this->_payload, 'IDENTIFY_BY_')
-			]
-		]);
-		if ($data) {
-			$result = [];
-			foreach($data as $row)
-				foreach(json_decode($row['content'], true) as $key => $value) $result[$key] = $value;
-			$this->response([
-				'data' => $result,
-				'response' => [
-					'msg' => LANG::GET('record.record_import_success'),
-					'type' => 'success'
-				]
-			]);
+	
+	/**
+	 *                         _ ___ _ _ _
+	 *   ___ ___ ___ ___ ___ _| |  _|_| | |_ ___ ___
+	 *  |  _| -_|  _| . |  _| . |  _| | |  _| -_|  _|
+	 *  |_| |___|___|___|_| |___|_| |_|_|_| |___|_|
+	 *
+	 */
+	public function recordfilter(){
+		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
+		$matches = $all = [];
+		foreach($records as $row) {
+			similar_text($this->_requestedID, $row['identifier'], $percent);
+			if (($percent >= INI['likeliness']['records_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
 		}
-		else $this->response([
-			'response' => [
-				'msg' => LANG::GET('record.record_import_error'),
-				'type' => 'error'
-			]]);
+		$this->response([
+			'data' => $this->_requestedID ? $matches : array_map(Fn($row) => strval($row['id']), $records)
+		]);
 	}
 
+	public function forms(){
+		$formdatalist = $forms = [];
+		$return = [];
+
+		// prepare existing forms lists
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$hidden = [];
+		foreach($fd as $key => $row) {
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
+			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
+				$formdatalist[] = $row['name'];
+				$forms[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
+				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
+			}
+		}
+		$return['render'] = [
+			'content' => [
+				[
+					[
+						'type' => 'datalist',
+						'content' => array_values(array_unique($formdatalist)),
+						'attributes' => [
+							'id' => 'forms'
+						]
+					], [
+						'type' => 'filtered',
+						'attributes' => [
+							'name' => LANG::GET('record.form_filter'),
+							'list' => 'forms',
+							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}",
+							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
+						],
+						'hint' => LANG::GET('record.form_filter_hint')
+					]
+				]
+			]];
+		foreach ($forms as $context => $list){
+			$contexttranslation = '';
+			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
+				if (array_key_exists($context, $contexts)){
+					$contexttranslation = $contexts[$context];
+					break;
+				}
+			}
+			$return['render']['content'][] = 					[
+				'type' => 'links',
+				'description' => $contexttranslation,
+				'content' => $list
+			];
+
+		}
+		$this->response($return);
+	}
+
+	/**
+	 *                         _
+	 *   ___ ___ ___ ___ ___ _| |___
+	 *  |  _| -_|  _| . |  _| . |_ -|
+	 *  |_| |___|___|___|_| |___|___|
+	 *
+	 */
 	public function records(){
 		$return = ['render' => ['content' => []]];
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
@@ -751,120 +957,24 @@ class RECORD extends API {
 		$this->response($result);		
 	}
 
-	public function fullexport(){
-		$this->export('full');
-	}
-
+	/**
+	 *       _           _ _ ___ _       _                     _
+	 *   ___|_|_____ ___| |_|  _|_|___ _| |___ _ _ ___ ___ ___| |_
+	 *  |_ -| |     | . | | |  _| | -_| . | -_|_'_| . | . |  _|  _|
+	 *  |___|_|_|_|_|  _|_|_|_| |_|___|___|___|_,_|  _|___|_| |_|
+	 *              |_|                           |_|
+	 */
 	public function simplifiedexport(){
 		$this->export('simplified');
 	}
 
-	public function formexport(){
-		$this->export('form');
-	}
-
-	private function export($summarize = "full"){
-		$content = $this->summarizeRecord($summarize);
-		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => PDF::recordsPDF($content)
-		];
-
-		$body = [];
-		array_push($body, 
-			[
-				'type' => 'links',
-				'description' =>  LANG::GET('record.record_export_proceed'),
-				'content' => $downloadfiles
-			]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	public function exportform(){
-		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
-			'values' => [
-				':id' => $this->_requestedID
-			]
-		]);
-		$form = $form ? $form[0] : null;
-		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export']) $this->response([], 401);
-		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
-			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => $form['date']]),
-			'date' => LANG::GET('record.form_export_exported', [':date' => date('y-m-d H:i')])
-		];
-
-		function printable($element){
-			// todo: enumerate names
-			$content = ['content' => [], 'images' => []];
-			foreach($element as $subs){
-				if (!array_key_exists('type', $subs)){
-					$subcontent = printable($subs);
-					$content['content'] = array_merge($content['content'], $subcontent['content']);
-					$content['images'] = array_merge($content['images'], $subcontent['images']);
-				}
-				else {
-					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton'])) continue;
-					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
-						if ($subs['type'] ==='checkbox') $name = $subs['description'];
-						else $name = $subs['attributes']['name'];
-						$content['content'][$name] = [];
-						foreach($subs['content'] as $key => $v){
-							$content['content'][$name][] = $key;
-						}
-					}
-					elseif ($subs['type']==='text'){
-						$content['content'][$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
-					}
-					elseif ($subs['type']==='textarea'){
-						$content['content'][$subs['attributes']['name']] = str_repeat(" \n", 2);
-					}
-					elseif ($subs['type']==='image'){
-						$content['content'][$subs['description']] = $subs['attributes']['url'];
-						$file = pathinfo($subs['attributes']['url']);
-						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-							$content['images'][] = $subs['attributes']['url'];
-						}
-					}
-					else {
-						$content['content'][$subs['attributes']['name']] = " ";
-					}
-				}
-			}
-			return $content;
-		};
-		$componentscontent = [];
-		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
-			$component['content'] = json_decode($component['content'], true);
-
-			$printablecontent = printable($component['content']['content']);
-			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
-			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
-		}
-		$summary['content'] = [' ' => $summary['content']];
-		$summary['images'] = [' ' => $summary['images']];
-		$downloadfiles[LANG::GET('record.form_export')] = [
-			'href' => PDF::formsPDF($summary)
-		];
-		$this->response([
-			'render' => [
-				[
-					'type' => 'links',
-					'description' =>  LANG::GET('record.form_export_proceed'),
-					'content' => $downloadfiles
-				]
-			],
-		]);
-	}
-
+	/**
+	 *                               _                               _
+	 *   ___ _ _ _____ _____ ___ ___|_|___ ___ ___ ___ ___ ___ ___ _| |
+	 *  |_ -| | |     |     | .'|  _| |- _| -_|  _| -_|  _| . |  _| . |
+	 *  |___|___|_|_|_|_|_|_|__,|_| |_|___|___|_| |___|___|___|_| |___|
+	 *
+	 */
 	private function summarizeRecord($type = 'full'){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [

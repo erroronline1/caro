@@ -32,6 +32,41 @@ class USER extends API {
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 *     _     ___         _ _       _
+	 *   _| |___|  _|___ _ _| | |_ ___|_|___
+	 *  | . | -_|  _| .'| | | |  _| . | |  _|
+	 *  |___|___|_| |__,|___|_|_| |  _|_|___|
+	 *                            |_|
+	 * create a default user profile picture from initials
+	 */
+	private function defaultPic($name){
+		$names = explode(' ', $name);
+		$initials = strtoupper(substr($names[0], 0, 1));
+		if (count($names) >1) $initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
+
+		$image = imagecreatetruecolor(256, 256);
+		$font_size = round(256 / 2);
+		$y = round(256 / 2 + $font_size / 2.4);
+		$x= round(256 / 2 - $font_size *.33 * strlen($initials));
+		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
+		imagefill($image, 0, 0, $background_color);
+		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
+		imagefttext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
+		ob_start();
+		imagepng($image);
+		$image = ob_get_contents();
+		ob_end_clean();
+		return $image;
+	}
+	
+	/**
+	 *               ___ _ _
+	 *   ___ ___ ___|  _|_| |___
+	 *  | . |  _| . |  _| | | -_|
+	 *  |  _|_| |___|_| |_|_|___|
+	 *  |_|
+	 */
 	public function profile(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
@@ -271,6 +306,13 @@ class USER extends API {
 		}
 	}
 
+	/**
+	 *
+	 *   _ _ ___ ___ ___
+	 *  | | |_ -| -_|  _|
+	 *  |___|___|___|_|
+	 *
+	 */
 	public function user(){
 		if (!PERMISSION::permissionFor('users')) $this->response([], 401);
 
@@ -912,26 +954,6 @@ class USER extends API {
 					]]);
 				break;
 		}
-	}
-
-	private function defaultPic($name){
-		$names = explode(' ', $name);
-		$initials = strtoupper(substr($names[0], 0, 1));
-		if (count($names) >1) $initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
-
-		$image = imagecreatetruecolor(256, 256);
-		$font_size = round(256 / 2);
-		$y = round(256 / 2 + $font_size / 2.4);
-		$x= round(256 / 2 - $font_size *.33 * strlen($initials));
-		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
-		imagefill($image, 0, 0, $background_color);
-		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
-		imagefttext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
-		ob_start();
-		imagepng($image);
-		$image = ob_get_contents();
-		ob_end_clean();
-		return $image;
 	}
 }
 ?>

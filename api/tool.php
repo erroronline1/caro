@@ -36,6 +36,13 @@ class TOOL extends API {
 		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 *             _
+	 *   ___ ___ _| |___
+	 *  |  _| . | . | -_|
+	 *  |___|___|___|___|
+	 *
+	 */
 	public function code(){
 		$types = [
 			'qrcode_text' => ['name' => LANG::GET('tool.qrcode_text'),
@@ -182,6 +189,13 @@ class TOOL extends API {
 		$this->response($result);
 	}
 
+	/**
+	 *
+	 *   ___ ___ ___ ___ ___ ___ ___
+	 *  |_ -|  _| .'|   |   | -_|  _|
+	 *  |___|___|__,|_|_|_|_|___|_|
+	 *
+	 */
 	public function scanner(){
 		$result['render'] = ['content' => [
 			[
@@ -203,6 +217,13 @@ class TOOL extends API {
 		$this->response($result);
 	}
 	
+	/**
+	 *       _   _     _
+	 *   ___| |_| |_ _|_|___ _ _ _ ___ ___
+	 *  |_ -|  _| | | | | -_| | | | -_|  _|
+	 *  |___|_| |_|\_/|_|___|_____|___|_|
+	 *
+	 */
 	public function stlviewer(){
 		$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
 		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');

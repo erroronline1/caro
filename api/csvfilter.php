@@ -34,189 +34,11 @@ class CSVFILTER extends API {
 	}
 
 	/**
-	 * gets and posts filter rules
-	 * no putting though for audit safety
-	 */
-	public function rule(){
-		if (!PERMISSION::permissionFor('csvrules')) $this->response([], 401);
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				$filter = [
-					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.edit_filter_name')),
-					':author' => $_SESSION['user']['name'],
-					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.edit_filter_content')),
-					':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.edit_filter_hidden')) === LANG::PROPERTY('csvfilter.edit_filter_hidden_hidden')? 1 : 0,
-				];
-
-				if (!trim($filter[':name']) || !trim($filter[':content'])) $this->response([], 400);
-
-				// ensure valid json for filters
-				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['response' => ['msg' => LANG::GET('csvfilter.edit_filter_content_hint'), 'type' => 'error']]);
-
-				// put hidden attribute if anything else remains the same
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
-					'values' => [
-						':name' => $filter[':name']
-					]
-				]);
-				$exists = $exists ? $exists[0] : null;
-				if ($exists && $exists['content'] === $filter[':content']) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_put', [
-						'values' => [
-							':hidden' => $filter[':hidden'],
-							':id' => $exists['id']
-						]
-					])) $this->response([
-						'response' => [
-							'name' => $filter[':name'],
-							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
-							'type' => 'success'
-						]]);	
-				}
-
-				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
-				}
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
-					'values' => $filter
-				])) $this->response([
-						'response' => [
-							'name' => $filter[':name'],
-							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
-							'type' => 'success'
-						]]);
-				else $this->response([
-					'response' => [
-						'name' => false,
-						'msg' => LANG::GET('csvfilter.edit_filter_not_saved'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'GET':
-				$filterdatalist = [];
-				$options = ['...' . LANG::GET('csvfilter.edit_filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$alloptions = ['...' . LANG::GET('csvfilter.edit_filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$return = [];
-
-				// get selected filter
-				if (intval($this->_requestedID)){
-					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
-					]);
-				} else {
-					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
-						'values' => [
-							':name' => $this->_requestedID
-						]
-					]);
-				}
-				$filter = $filter ? $filter[0] : null;
-				if (!$filter) $filter = [
-					'id' => '',
-					'name' => '',
-					'content' => ''
-				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
-		
-				// prepare existing filter lists
-				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
-				$hidden = [];
-				$dependedtemplates = [];
-				foreach($filters as $key => $row) {
-					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
-						$filterdatalist[] = $row['name'];
-						$options[$row['name'] ] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-					}
-					$alloptions[$row['name']. ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-				}
-
-				$return['render'] = [
-					'form' => [
-						'data-usecase' => 'csvfilter',
-						'action' => "javascript:api.csvfilter('post', 'rule')"],
-					'content' => [
-						[
-							[
-								[
-									'type' => 'datalist',
-									'content' => array_values(array_unique($filterdatalist)),
-									'attributes' => [
-										'id' => 'filters'
-									]
-								], [
-									'type' => 'select',
-									'attributes' => [
-										'name' => LANG::GET('csvfilter.edit_filter_select'),
-										'onchange' => "api.csvfilter('get', 'rule', this.value)"
-									],
-									'content' => $options
-								], [
-									'type' => 'search',
-									'attributes' => [
-										'name' => LANG::GET('csvfilter.edit_filter'),
-										'list' => 'filters',
-										'onkeypress' => "if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"
-									]
-								]
-							], [
-								[
-									'type' => 'select',
-									'attributes' => [
-										'name' => LANG::GET('csvfilter.edit_filter_all'),
-										'onchange' => "api.csvfilter('get', 'rule', this.value)"
-									],
-									'content' => $alloptions
-								]
-							]
-						], [
-							[
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('csvfilter.edit_filter_name'),
-									'value' => $filter['name'],
-									'required' => true,
-									'data-loss' => 'prevent'
-								]
-							], [
-								'type' => 'code',
-								'hint' => LANG::GET('csvfilter.edit_filter_content_hint'),
-								'attributes' => [
-									'name' => LANG::GET('csvfilter.edit_filter_content'),
-									'value' => $filter['content'],
-									'rows' => 16,
-									'id' => 'content',
-									'required' => true,
-									'data-loss' => 'prevent'
-								]
-							]
-						]
-					]
-				];
-				if ($filter['id']){
-					$hidden = [
-						'type' => 'radio',
-						'attributes' => [
-							'name' => LANG::GET('csvfilter.edit_filter_hidden')
-						],
-						'content' => [
-							LANG::GET('csvfilter.edit_filter_hidden_visible') => ['checked' => true],
-							LANG::GET('csvfilter.edit_filter_hidden_hidden') => []
-						],
-						'hint' => LANG::GET('csvfilter.edit_filter_hidden_hint')
-					];
-					if ($filter['hidden']) $hidden['content'][LANG::GET('csvfilter.edit_filter_hidden_hidden')]['checked'] = true;
-					array_push($return['render']['content'][1], $hidden);
-				}
-				$this->response($return);
-				break;
-		}					
-	}
-
-	/**
+	 *   ___ _ _ _
+	 *  |  _|_| | |_ ___ ___
+	 *  |  _| | |  _| -_|  _|
+	 *  |_| |_|_|_| |___|_|
+	 *
 	 * get responds with form to select and apply filter
 	 * post responds with a download link to the result file after processing
 	 */
@@ -439,6 +261,194 @@ class CSVFILTER extends API {
 				$this->response($return);
 				break;
 		}
+	}
+	
+	/**
+	 *           _
+	 *   ___ _ _| |___
+	 *  |  _| | | | -_|
+	 *  |_| |___|_|___|
+	 *
+	 * gets and posts filter rules
+	 * no putting though for audit safety
+	 */
+	public function rule(){
+		if (!PERMISSION::permissionFor('csvrules')) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$filter = [
+					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.edit_filter_name')),
+					':author' => $_SESSION['user']['name'],
+					':content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.edit_filter_content')),
+					':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('csvfilter.edit_filter_hidden')) === LANG::PROPERTY('csvfilter.edit_filter_hidden_hidden')? 1 : 0,
+				];
+
+				if (!trim($filter[':name']) || !trim($filter[':content'])) $this->response([], 400);
+
+				// ensure valid json for filters
+				if ($filter[':content'] && !json_decode($filter[':content'], true))  $this->response(['response' => ['msg' => LANG::GET('csvfilter.edit_filter_content_hint'), 'type' => 'error']]);
+
+				// put hidden attribute if anything else remains the same
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+					'values' => [
+						':name' => $filter[':name']
+					]
+				]);
+				$exists = $exists ? $exists[0] : null;
+				if ($exists && $exists['content'] === $filter[':content']) {
+					if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_put', [
+						'values' => [
+							':hidden' => $filter[':hidden'],
+							':id' => $exists['id']
+						]
+					])) $this->response([
+						'response' => [
+							'name' => $filter[':name'],
+							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
+							'type' => 'success'
+						]]);	
+				}
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
+				}
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
+					'values' => $filter
+				])) $this->response([
+						'response' => [
+							'name' => $filter[':name'],
+							'msg' => LANG::GET('csvfilter.edit_filter_saved', [':name' => $filter[':name']]),
+							'type' => 'success'
+						]]);
+				else $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => LANG::GET('csvfilter.edit_filter_not_saved'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				$filterdatalist = [];
+				$options = ['...' . LANG::GET('csvfilter.edit_filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$alloptions = ['...' . LANG::GET('csvfilter.edit_filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				$return = [];
+
+				// get selected filter
+				if (intval($this->_requestedID)){
+					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					]);
+				} else {
+					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_latest_by_name', [
+						'values' => [
+							':name' => $this->_requestedID
+						]
+					]);
+				}
+				$filter = $filter ? $filter[0] : null;
+				if (!$filter) $filter = [
+					'id' => '',
+					'name' => '',
+					'content' => ''
+				];
+				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('csvfilter.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		
+				// prepare existing filter lists
+				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
+				$hidden = [];
+				$dependedtemplates = [];
+				foreach($filters as $key => $row) {
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
+						$filterdatalist[] = $row['name'];
+						$options[$row['name'] ] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+					$alloptions[$row['name']. ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				}
+
+				$return['render'] = [
+					'form' => [
+						'data-usecase' => 'csvfilter',
+						'action' => "javascript:api.csvfilter('post', 'rule')"],
+					'content' => [
+						[
+							[
+								[
+									'type' => 'datalist',
+									'content' => array_values(array_unique($filterdatalist)),
+									'attributes' => [
+										'id' => 'filters'
+									]
+								], [
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('csvfilter.edit_filter_select'),
+										'onchange' => "api.csvfilter('get', 'rule', this.value)"
+									],
+									'content' => $options
+								], [
+									'type' => 'search',
+									'attributes' => [
+										'name' => LANG::GET('csvfilter.edit_filter'),
+										'list' => 'filters',
+										'onkeypress' => "if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"
+									]
+								]
+							], [
+								[
+									'type' => 'select',
+									'attributes' => [
+										'name' => LANG::GET('csvfilter.edit_filter_all'),
+										'onchange' => "api.csvfilter('get', 'rule', this.value)"
+									],
+									'content' => $alloptions
+								]
+							]
+						], [
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('csvfilter.edit_filter_name'),
+									'value' => $filter['name'],
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							], [
+								'type' => 'code',
+								'hint' => LANG::GET('csvfilter.edit_filter_content_hint'),
+								'attributes' => [
+									'name' => LANG::GET('csvfilter.edit_filter_content'),
+									'value' => $filter['content'],
+									'rows' => 16,
+									'id' => 'content',
+									'required' => true,
+									'data-loss' => 'prevent'
+								]
+							]
+						]
+					]
+				];
+				if ($filter['id']){
+					$hidden = [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => LANG::GET('csvfilter.edit_filter_hidden')
+						],
+						'content' => [
+							LANG::GET('csvfilter.edit_filter_hidden_visible') => ['checked' => true],
+							LANG::GET('csvfilter.edit_filter_hidden_hidden') => []
+						],
+						'hint' => LANG::GET('csvfilter.edit_filter_hidden_hint')
+					];
+					if ($filter['hidden']) $hidden['content'][LANG::GET('csvfilter.edit_filter_hidden_hidden')]['checked'] = true;
+					array_push($return['render']['content'][1], $hidden);
+				}
+				$this->response($return);
+				break;
+		}					
 	}
 }
 ?>

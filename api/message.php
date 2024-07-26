@@ -30,56 +30,13 @@ class MESSAGE extends API {
 		$this->_conversation = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
-	public function message(){
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				// get recipient ids
-				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => '',
-						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
-					]
-				]);
-				if (!$recipients) $this->response([
-					'response' => [
-						'msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]),
-						'type' => 'error'
-					]]);
-				$success = 0;
-				foreach ($recipients as $recipient){
-					if ($recipient['id'] < 2) continue;
-					$message = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]));
-					if (!$message) $this->response([
-						'response' => [
-							'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
-							'redirect' => false,
-							'type' => 'error'
-						]]);
-					if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
-						'values' => [
-							'from_user' => $_SESSION['user']['id'],
-							'to_user' => $recipient['id'],
-							'message' => $message
-						]
-					])) $success++;
-				}
-				if ($success === count($recipients)) $this->response([
-					'response' => [
-						'msg' => LANG::GET('message.send_success'),
-						'redirect' => 'conversation',
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
-						'redirect' => false,
-						'type' => 'error'
-					]]);
-				break;
-		}
-		$this->response($result);
-	}
-	
+	/**
+	 *                                   _   _
+	 *   ___ ___ ___ _ _ ___ ___ ___ ___| |_|_|___ ___
+	 *  |  _| . |   | | | -_|  _|_ -| .'|  _| | . |   |
+	 *  |___|___|_|_|\_/|___|_| |___|__,|_| |_|___|_|_|
+	 *
+	 */
 	public function conversation(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
@@ -230,7 +187,71 @@ class MESSAGE extends API {
 		}
 		$this->response($result);
 	}
-
+	
+	/**
+	 *
+	 *   _____ ___ ___ ___ ___ ___ ___
+	 *  |     | -_|_ -|_ -| .'| . | -_|
+	 *  |_|_|_|___|___|___|__,|_  |___|
+	 *                        |___|
+	 */
+	public function message(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				// get recipient ids
+				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'replacements' => [
+						':id' => '',
+						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
+					]
+				]);
+				if (!$recipients) $this->response([
+					'response' => [
+						'msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]),
+						'type' => 'error'
+					]]);
+				$success = 0;
+				foreach ($recipients as $recipient){
+					if ($recipient['id'] < 2) continue;
+					$message = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]));
+					if (!$message) $this->response([
+						'response' => [
+							'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
+							'redirect' => false,
+							'type' => 'error'
+						]]);
+					if (SQLQUERY::EXECUTE($this->_pdo, 'message_post_message', [
+						'values' => [
+							'from_user' => $_SESSION['user']['id'],
+							'to_user' => $recipient['id'],
+							'message' => $message
+						]
+					])) $success++;
+				}
+				if ($success === count($recipients)) $this->response([
+					'response' => [
+						'msg' => LANG::GET('message.send_success'),
+						'redirect' => 'conversation',
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
+						'redirect' => false,
+						'type' => 'error'
+					]]);
+				break;
+		}
+		$this->response($result);
+	}
+	
+	/**
+	 *               _     _
+	 *   ___ ___ ___|_|___| |_ ___ ___
+	 *  |  _| -_| . | |_ -|  _| -_|  _|
+	 *  |_| |___|_  |_|___|_| |___|_|
+	 *          |___|
+	 */
 	public function register(){
 		// prepare existing users lists
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');

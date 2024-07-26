@@ -43,25 +43,11 @@ class AUDIT extends API {
 	}
 
 	/**
-	 * returns the latest approved form, component by name from query
-	 * @param string $query as defined within sqlinterface
-	 * @param string $name
-	 * @return array|bool either query row or false
-	 */
-	private function latestApprovedName($query = '', $name = ''){
-		// get latest approved by name
-		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
-			'values' => [
-				':name' => $name
-			]
-		]);
-		foreach ($elements as $element){
-			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
-		}
-		return false;
-	}
-
-	/**
+	 *       _           _
+	 *   ___| |_ ___ ___| |_ ___
+	 *  |  _|   | -_|  _| '_|_ -|
+	 *  |___|_|_|___|___|_,_|___|
+	 *
 	 * main entry point for module
 	 * displays a selection of available options
 	 * calls $this->_requestedType method if set
@@ -119,10 +105,14 @@ class AUDIT extends API {
 	}
 
 	/**
+	 *                       _
+	 *   ___ _ _ ___ ___ ___| |_
+	 *  | -_|_'_| . | . |  _|  _|
+	 *  |___|_,_|  _|___|_| |_|
+	 *          |_|
 	 * main entry point for exports
 	 * calls export . $this->_requestedType method
 	 */
-
 	public function export(){
 		$static = [
 			'incorporation',
@@ -138,74 +128,13 @@ class AUDIT extends API {
 		if (in_array($this->_requestedType, $static)) $this->{'export' . $this->_requestedType}();
 		else $this->exportchecks();
 	}
-	
-	/**
-	 * returns all sample checks from the caro_checks database in descending chronological order
-	 * displays a warning if a vendor is overdue for sample check
-	 */
-	private function mdrsamplecheck(){
-		$content = $unchecked = $entries = [];
-		// get unchecked articles for MDR §14 sample check
-		$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
-		$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
-		$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
-			':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
-			':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
-		]]);
-
-		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], $sampleCheck));
-		// display warning
-		if ($unchecked) $content[] = [
-			[
-				'type' => 'textblock',
-				'description' => LANG::GET('audit.mdrsamplecheck_warning_description'),
-				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
-			]
-		];
-		// add export button
-		$content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-				]
-			]
-		];
-		// add check records
-		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
-			'values' => [
-				':type' => $this->_requestedType
-			]
-		]);
-		foreach($checks as $row){
-			$entries[] = [
-				'type' => 'textblock',
-				'description' => LANG::GET('audit.check_description', [
-					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
-					':date' => $row['date'],
-					':author' => $row['author']
-				]),
-				'content' => $row['content']
-			];
-			$entries[] = [
-				'type' => 'button',
-				'attributes' => [
-					'type' => 'button',
-					'value' => LANG::GET('audit.sample_check_revoke'),
-					'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('order.disapprove') . "', " .
-						"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('audit.sample_check_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
-						"if (response !== false) {" .
-						"api.purchase('delete', 'mdrsamplecheck', " . $row['id']. "); this.disabled=true" .
-						"}});"
-				]
-			];
-		}
-		if ($entries) $content[] = $entries;
-		return $content;
-	}
 
 	/**
+	 *                       _       _           _
+	 *   ___ _ _ ___ ___ ___| |_ ___| |_ ___ ___| |_ ___
+	 *  | -_|_'_| . | . |  _|  _|  _|   | -_|  _| '_|_ -|
+	 *  |___|_,_|  _|___|_| |_| |___|_|_|___|___|_,_|___|
+	 *          |_|
 	 * creates and returns a download link to the export file for requested check
 	 * if check type within caro_checks database
 	 */
@@ -250,7 +179,178 @@ class AUDIT extends API {
 		]);
 	}
 
-		/**
+	/**
+	 *   ___
+	 *  |  _|___ ___ _____ ___
+	 *  |  _| . |  _|     |_ -|
+	 *  |_| |___|_| |_|_|_|___|
+	 *
+	 * returns all current approved forms with their respective components and approvement notes in alphabetical order
+	 * also form bundles and available external documents
+	 */
+	private function forms(){
+		$content = [];
+
+		// get all current approved forms
+		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$hidden = $currentforms = [];
+		foreach($forms as $form){
+			if (!PERMISSION::fullyapproved('formapproval', $form['approval'])) continue;
+			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
+		}
+
+		// get all current bundles
+		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+		$hidden = $currentbundles = [];
+		foreach($bundles as &$bundle){
+			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
+		}
+
+		$formscontent = [
+			[
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.documents_in_use_documents'),
+				'content' => ''
+			]
+		];
+
+		// iterate over forms an their respective components
+		foreach($currentforms as $form){
+			$components = explode(',', $form['content'] ? : '');
+			$componentlist = [];
+			foreach($components as $component){
+				$cmpnnt = $this->latestApprovedName('form_component_get_by_name', $component);
+				if ($cmpnnt)
+					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
+					$entry = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
+					foreach($cmpnnt['approval'] as $position => $data){
+						$entry .= LANG::GET('audit.documents_in_use_approved', [
+							':permission' => LANG::GET('permissions.' . $position),
+							':name' => $data['name'],
+							':date' => $data['date'],
+						]) . "\n";
+					}
+					$componentlist[] = $entry;
+			}
+			$regulatory_context = [];
+			foreach(explode(',', $form['regulatory_context'] ? : '') as $context){
+				if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
+			}
+			$entry = '';
+			foreach($cmpnnt['approval'] as $position => $data){
+				$entry .= LANG::GET('audit.documents_in_use_approved', [
+					':permission' => LANG::GET('permissions.' . $position),
+					':name' => $data['name'],
+					':date' => $data['date'],
+				]) . "\n";
+			}
+
+			$formscontent[] = [
+				'type' => 'textblock',
+				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
+				'content' => $entry . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
+			];
+		}
+
+		$externalcontent = [
+			[
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.documents_in_use_external'),
+				'content' => ''
+			]
+		];
+		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
+			foreach ($files as $file){
+				$externalcontent[] = [
+					'type' => 'textblock',
+					'description' => $file['path'],
+					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime($file['path']))])
+				];
+			}
+		}
+
+		$bundlescontent = [
+			[
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.documents_in_use_bundles'),
+				'content' => ''
+			]
+		];
+		foreach($currentbundles as $bundle){
+			$formslist = explode(',', $bundle['content'] ? : '');
+			natsort($formslist);
+			$bundlescontent[] = [
+				'type' => 'textblock',
+				'description' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']]),
+				'content' => implode("\n", $formslist)
+			];
+		}
+
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		
+		$content[] = $formscontent;
+		$content[] = $externalcontent;
+		$content[] = $bundlescontent;
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for forms and form bundles
+	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 */
+	private function exportforms(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+			'date' => date('y-m-d H:i')
+		];
+
+		$forms = $this->forms();
+
+		for($i = 1; $i<count($forms); $i++){
+			foreach($forms[$i] as $item){
+				$summary['content'][$item['description']] = $item['content'];	
+			}
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 *   _                                 _   _
+	 *  |_|___ ___ ___ ___ ___ ___ ___ ___| |_|_|___ ___
+	 *  | |   |  _| . |  _| . | . |  _| .'|  _| | . |   |
+	 *  |_|_|_|___|___|_| |  _|___|_| |__,|_| |_|___|_|_|
+	 *                    |_|
 	 * returns all incorporation records from the products database in descending chronological order
 	 * displays a warning if products within approved orders require an incorporation
 	 */
@@ -320,7 +420,6 @@ class AUDIT extends API {
 		if ($entries) $content[] = $entries;
 		return $content;
 	}
-
 	/**
 	 * creates and returns a download link to the export file for forms and form bundles
 	 * processes the result of $this->forms() and translates the body object into more simple strings
@@ -362,6 +461,544 @@ class AUDIT extends API {
 	}
 
 	/**
+	 *   _     _           _                                 _
+	 *  | |___| |_ ___ ___| |_ ___ ___ ___ ___ ___ _ _ ___ _| |___ ___ _____ ___
+	 *  | | .'|  _| -_|_ -|  _| .'| . | . |  _| . | | | -_| . |   | .'|     | -_|
+	 *  |_|__,|_| |___|___|_| |__,|  _|  _|_| |___|\_/|___|___|_|_|__,|_|_|_|___|
+	 *                            |_| |_|
+	 * returns the latest approved form, component by name from query
+	 * @param string $query as defined within sqlinterface
+	 * @param string $name
+	 * @return array|bool either query row or false
+	 */
+	private function latestApprovedName($query = '', $name = ''){
+		// get latest approved by name
+		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
+			'values' => [
+				':name' => $name
+			]
+		]);
+		foreach ($elements as $element){
+			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+		}
+		return false;
+	}
+
+
+	/**
+	 *           _                       _         _           _
+	 *   _____ _| |___ ___ ___ _____ ___| |___ ___| |_ ___ ___| |_
+	 *  |     | . |  _|_ -| .'|     | . | | -_|  _|   | -_|  _| '_|
+	 *  |_|_|_|___|_| |___|__,|_|_|_|  _|_|___|___|_|_|___|___|_,_|
+	 *                              |_|
+	 * returns all sample checks from the caro_checks database in descending chronological order
+	 * displays a warning if a vendor is overdue for sample check
+	 */
+	private function mdrsamplecheck(){
+		$content = $unchecked = $entries = [];
+		// get unchecked articles for MDR §14 sample check
+		$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
+		$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
+		$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
+			':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
+			':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
+		]]);
+
+		$unchecked = array_unique(array_map(fn($r) => $r['vendor_name'], $sampleCheck));
+		// display warning
+		if ($unchecked) $content[] = [
+			[
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.mdrsamplecheck_warning_description'),
+				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
+			]
+		];
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		// add check records
+		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
+			'values' => [
+				':type' => $this->_requestedType
+			]
+		]);
+		foreach($checks as $row){
+			$entries[] = [
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.check_description', [
+					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+					':date' => $row['date'],
+					':author' => $row['author']
+				]),
+				'content' => $row['content']
+			];
+			$entries[] = [
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'value' => LANG::GET('audit.sample_check_revoke'),
+					'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('order.disapprove') . "', " .
+						"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('audit.sample_check_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
+						"if (response !== false) {" .
+						"api.purchase('delete', 'mdrsamplecheck', " . $row['id']. "); this.disabled=true" .
+						"}});"
+				]
+			];
+		}
+		if ($entries) $content[] = $entries;
+		return $content;
+	}
+
+	/**
+	 *             _             _       _   _     _   _
+	 *   ___ ___ _| |___ ___ ___| |_ ___| |_|_|___| |_|_|___ ___
+	 *  | . |  _| . | -_|  _|_ -|  _| .'|  _| |_ -|  _| |  _|_ -|
+	 *  |___|_| |___|___|_| |___|_| |__,|_| |_|___|_| |_|___|___|
+	 *
+	 * returns export and delete options for order statistics
+	 */
+	private function orderstatistics(){
+		$content = [];
+
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+		$content[] = [
+			[
+				'type' => 'textblock',
+				'description' => LANG::GET('audit.orderstatistics_number', [':number' => count($orders)]),
+				'content' => count($orders) ? LANG::GET('audit.orderstatistics_info') : ''
+			]
+		];
+
+		if (count($orders)){
+			// add export button
+			$content[] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'value' => LANG::GET('audit.record_export_xlsx'),
+						'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					]
+				]
+			];
+			$content[] = [
+				[
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => LANG::GET('audit.orderstatistics_truncate'),
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('audit.orderstatistics_truncate') ."', options:{".
+						"'".LANG::GET('general.cancel_button')."': false,".
+						"'".LANG::GET('audit.orderstatistics_truncate_confirm')."': {value: true, class: 'reducedCTA'},".
+						"}}).then(confirmation => {if (confirmation) api.audit('delete', 'checks', '" . $this->_requestedType . "');})",
+					]
+				]
+			];
+		}
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for the order statistics
+	 * export is an xlsx file with orders grouped by vendor sheets
+	 */
+	private function exportorderstatistics(){
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+
+		$columns = [
+			'vendor_label' => LANG::GET('order.vendor_label'),
+			'ordertype' => LANG::GET('order.order_type'),
+			'quantity_label' => LANG::GET('order.quantity_label'),
+			'unit_label' => LANG::GET('order.unit_label'),
+			'ordernumber_label' => LANG::GET('order.ordernumber_label'),
+			'productname_label' => LANG::GET('order.productname_label'),
+			'additional_info' => LANG::GET('order.additional_info'),
+			'ordered' => LANG::GET('order.ordered'),
+			'received' => LANG::GET('order.received'),
+			'deliverytime' => LANG::GET('audit.order_statistics_delivery_time_column')
+		];
+
+		// prepare result as subsets of vendors
+		$vendor_orders = [];
+		foreach($orders as $order){
+			$order['order_data'] = json_decode($order['order_data'], true);
+			$deliverytime = '';
+			if ($order['received']){
+				$datetimezone = new DateTimeZone(INI['timezone']);
+				$now = new DateTime('now', $datetimezone);
+				$ordered = new DateTime($order['ordered'], $datetimezone);
+				$received = new DateTime($order['received'], $datetimezone);
+				$deliverytime = intval($ordered->diff($received)->format('%a'));
+			}
+
+			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = LANG::GET('audit.order_statistics_undefined_vendor');
+			if (!isset($vendor_orders[$order['order_data']['vendor_label']])) $vendor_orders[$order['order_data']['vendor_label']] = [];
+
+			$vendor_orders[$order['order_data']['vendor_label']][] = [
+				isset($order['order_data']['vendor_label']) ? $order['order_data']['vendor_label'] : '',
+				LANG::GET('order.ordertype.' . $order['ordertype']),
+				isset($order['order_data']['quantity_label']) ? $order['order_data']['quantity_label'] : '',
+				isset($order['order_data']['unit_label']) ? $order['order_data']['unit_label'] : '',
+				isset($order['order_data']['ordernumber_label']) ? $order['order_data']['ordernumber_label'] : '',
+				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
+				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
+				$order['ordered'],
+				$order['received'],
+				$deliverytime
+			];
+		}
+		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.orderstatistics') . '_' . date('Y-m-d H:i')) . '.xlsx';
+		$writer = new XLSXWriter();
+		$writer->setAuthor($_SESSION['user']['name']); 
+
+		foreach($vendor_orders as $vendor => $orders){
+			$writer->writeSheetRow($vendor, array_values($columns));
+			foreach ($orders as $line)
+				$writer->writeSheetRow($vendor, $line, $row_options = array('height' => 30,'wrap_text' => true));
+		}
+
+		$writer->writeToFile($tempFile);
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => substr($tempFile, 1),
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' => LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 * truncates the respective database
+	 */
+	private function deleteorderstatistics(){
+		SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
+		$this->response([
+			'response' => [
+				'msg' => LANG::GET('audit.orderstatistics_truncate_success'),
+				'type' => 'success'
+			]
+		]);
+	}
+
+	/**
+	 *                   _     _
+	 *   ___ ___ ___ _ _| |___| |_ ___ ___ _ _
+	 *  |  _| -_| . | | | | .'|  _| . |  _| | |
+	 *  |_| |___|_  |___|_|__,|_| |___|_| |_  |
+	 *          |___|                     |___|
+	 * returns regulatory items according to language.xx.ini and matches current assigned forms
+	 */
+	private function regulatory(){
+		$content = $issues = [];
+		// prepare existing forms lists
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$hidden = $regulatory = [];
+		foreach($fd as $key => $row) {
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $hidden)) {
+				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
+					$regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')"];
+				}
+			}
+		}
+		// get active external documents
+		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
+			foreach ($files as $file){
+				foreach(explode(',', $file['regulatory_context']) as $context){
+					$regulatory[$context][$file['path'] . ' (' . date('Y-m-d H:i', filemtime($file['path'])) . ')'] = ['href' => substr($file['path'], 1)];
+				}
+			}
+		}
+
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		foreach(LANGUAGEFILE['regulatory'] as $key => $issue){
+			if (array_key_exists($key, $regulatory)) $issues[] = [
+				'type' => 'links',
+				'description' => $issue,
+				'content' => $regulatory[$key]
+			];
+			else $issues[] = [
+				'type' => 'textblock',
+				'description' => $issue,
+				'content' => LANG::GET('audit.regulatory_warning_content'),
+				'attributes' => [
+					'class' => 'red'
+				]
+			];
+		}
+		$content[] = $issues;
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for the regulatory issue result
+	 * processes the result of $this->regulatory() and translates the body object into more simple strings
+	 */
+	private function exportregulatory(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.regulatory') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.regulatory'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$issues = $this->regulatory();
+		foreach($issues[1] as $item){
+			$summary['content'][$item['description']] = $item['content'];	
+		}
+
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 *       _     _
+	 *   ___|_|___| |_ ___
+	 *  |  _| |_ -| '_|_ -|
+	 *  |_| |_|___|_,_|___|
+	 *
+	 * returns risks
+	 */
+	private function risks(){
+		$content = $issues = [];
+		// prepare existing risks lists
+		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		$process = '';
+		$issues = [];
+		foreach($risks as $risk){
+			if ($risk['process'] !== $process) $issues[] = [[
+				'type' => 'textblock',
+				'description' => $risk['process'],
+			]];
+			$process = $risk['process'];
+			$last_edit = json_decode($risk['last_edit'], true);
+			$issues[count($issues)-1][] = [
+				'type' => 'textblock',
+				'description' => $risk['risk'] .
+				" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause'],
+				'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
+				" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+				" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+				" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
+				" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+				" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
+				" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
+				(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
+			];
+		}
+		array_push($content, ...$issues);
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for risks
+	 * processes the result of $this->risks() and translates the body object into more simple strings
+	 */
+	private function exportrisks(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.risks') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.risks'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$issues = $this->risks();
+		foreach($issues as $process){
+			foreach($process as $risk){
+				//var_dump($risk);
+				if ($risk['type'] === 'textblock') $summary['content'][$risk['description']] = isset($risk['content']) ? $risk['content'] : ' ';	
+			}
+		}
+
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+	
+	/**
+	 *                                       _
+	 *   _ _ ___ ___ ___ ___ _ _ ___ ___ ___|_|___ ___ ___ ___
+	 *  | | |_ -| -_|  _| -_|_'_| . | -_|  _| | -_|   |  _| -_|
+	 *  |___|___|___|_| |___|_,_|  _|___|_| |_|___|_|_|___|___|
+	 *                          |_|
+	 * returns all user experience points by year
+	 */
+	private function userexperience(){
+		// add export button
+		$content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => LANG::GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+				]
+			]
+		];
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		$trainings = $trainings ? array_values($trainings) : [];
+		foreach ($users as $user){ // ordered by name
+			if ($user['id'] < 2) continue;
+			$user_id = $user['id'];
+			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
+				return $row['user_id'] === $user_id;
+			})){
+				$years = [];
+				foreach ($usertrainings as $row){
+					$year = substr($row['date'], 0, 4);
+					if ($row['experience_points']){
+						if (!array_key_exists($year, $years)) $years[$year] = ['xp' => 0, 'paths' => []];
+						$years[$year]['xp'] += $row['experience_points'];
+						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . $row['date']] = ['href' => $row['file_path']];
+					}
+				}
+				if ($years){
+					$usercontent = [[
+						'type' => 'textblock',
+						'description' => $user['name'],
+					]];
+					foreach($years as $year => $summary){
+						$usercontent[] = [
+							'type' => 'links',
+							'description' => LANG::GET('audit.experience_points', [':number' => $summary['xp'], ':year' => $year]),
+							'content' => $summary['paths']
+						];
+					}
+					if ($usercontent) $content = [
+						...$content,
+						$usercontent
+					];
+				}
+			}
+		}
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for users experience points
+	 * processes the result of $this->userexperience() and translates the body object into more simple strings
+	 */
+	private function exportuserexperience(){
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userexperience') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('audit.checks_type.userexperience'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$experience = $this->userexperience();
+
+		for($i = 1; $i < count($experience); $i++){
+			foreach($experience[$i] as $item){
+				if ($item['type'] === 'textblock') {
+					$previous = $item['description'];
+				}
+				if ($item['type'] === 'links') {
+					$summary['content'][$previous] = $item['description'];
+					$summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
+				}
+			}
+		}
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.record_summary')] = [
+			'href' => PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('record.record_export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 *                       _   _ _ _
+	 *   _ _ ___ ___ ___ ___| |_|_| | |___
+	 *  | | |_ -| -_|  _|_ -| '_| | | |_ -|
+	 *  |___|___|___|_| |___|_,_|_|_|_|___|
+	 *
 	 * returns all users with their skills and trainings
 	 */
 	private function userskills(){
@@ -535,271 +1172,11 @@ class AUDIT extends API {
 	}
 
 	/**
-	 * returns all user experience points by year
-	 */
-	private function userexperience(){
-		// add export button
-		$content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-				]
-			]
-		];
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
-		]);
-		$trainings = $trainings ? array_values($trainings) : [];
-		foreach ($users as $user){ // ordered by name
-			if ($user['id'] < 2) continue;
-			$user_id = $user['id'];
-			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
-				return $row['user_id'] === $user_id;
-			})){
-				$years = [];
-				foreach ($usertrainings as $row){
-					$year = substr($row['date'], 0, 4);
-					if ($row['experience_points']){
-						if (!array_key_exists($year, $years)) $years[$year] = ['xp' => 0, 'paths' => []];
-						$years[$year]['xp'] += $row['experience_points'];
-						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . $row['date']] = ['href' => $row['file_path']];
-					}
-				}
-				if ($years){
-					$usercontent = [[
-						'type' => 'textblock',
-						'description' => $user['name'],
-					]];
-					foreach($years as $year => $summary){
-						$usercontent[] = [
-							'type' => 'links',
-							'description' => LANG::GET('audit.experience_points', [':number' => $summary['xp'], ':year' => $year]),
-							'content' => $summary['paths']
-						];
-					}
-					if ($usercontent) $content = [
-						...$content,
-						$usercontent
-					];
-				}
-			}
-		}
-		return $content;
-	}
-
-	/**
-	 * creates and returns a download link to the export file for users experience points
-	 * processes the result of $this->userexperience() and translates the body object into more simple strings
-	 */
-	private function exportuserexperience(){
-		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userexperience') . '_' . date('Y-m-d H:i')),
-			'identifier' => null,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => LANG::GET('audit.checks_type.userexperience'),
-			'date' => date('y-m-d H:i')
-		];
-
-		$experience = $this->userexperience();
-
-		for($i = 1; $i < count($experience); $i++){
-			foreach($experience[$i] as $item){
-				if ($item['type'] === 'textblock') {
-					$previous = $item['description'];
-				}
-				if ($item['type'] === 'links') {
-					$summary['content'][$previous] = $item['description'];
-					$summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
-				}
-			}
-		}
-		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => PDF::auditPDF($summary)
-		];
-
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  LANG::GET('record.record_export_proceed'),
-				'content' => $downloadfiles
-			]]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	/**
-	 * returns all current approved forms with their respective components and approvement notes in alphabetical order
-	 * also form bundles and available external documents
-	 */
-	private function forms(){
-		$content = [];
-
-		// get all current approved forms
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = $currentforms = [];
-		foreach($forms as $form){
-			if (!PERMISSION::fullyapproved('formapproval', $form['approval'])) continue;
-			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
-		}
-
-		// get all current bundles
-		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
-		$hidden = $currentbundles = [];
-		foreach($bundles as &$bundle){
-			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
-		}
-
-		$formscontent = [
-			[
-				'type' => 'textblock',
-				'description' => LANG::GET('audit.documents_in_use_documents'),
-				'content' => ''
-			]
-		];
-
-		// iterate over forms an their respective components
-		foreach($currentforms as $form){
-			$components = explode(',', $form['content'] ? : '');
-			$componentlist = [];
-			foreach($components as $component){
-				$cmpnnt = $this->latestApprovedName('form_component_get_by_name', $component);
-				if ($cmpnnt)
-					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
-					$entry = $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
-					foreach($cmpnnt['approval'] as $position => $data){
-						$entry .= LANG::GET('audit.documents_in_use_approved', [
-							':permission' => LANG::GET('permissions.' . $position),
-							':name' => $data['name'],
-							':date' => $data['date'],
-						]) . "\n";
-					}
-					$componentlist[] = $entry;
-			}
-			$regulatory_context = [];
-			foreach(explode(',', $form['regulatory_context'] ? : '') as $context){
-				if (array_key_exists($context, LANGUAGEFILE['regulatory'])) $regulatory_context[] = LANGUAGEFILE['regulatory'][$context];
-			}
-			$entry = '';
-			foreach($cmpnnt['approval'] as $position => $data){
-				$entry .= LANG::GET('audit.documents_in_use_approved', [
-					':permission' => LANG::GET('permissions.' . $position),
-					':name' => $data['name'],
-					':date' => $data['date'],
-				]) . "\n";
-			}
-
-			$formscontent[] = [
-				'type' => 'textblock',
-				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
-				'content' => $entry . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
-			];
-		}
-
-		$externalcontent = [
-			[
-				'type' => 'textblock',
-				'description' => LANG::GET('audit.documents_in_use_external'),
-				'content' => ''
-			]
-		];
-		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
-			foreach ($files as $file){
-				$externalcontent[] = [
-					'type' => 'textblock',
-					'description' => $file['path'],
-					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime($file['path']))])
-				];
-			}
-		}
-
-		$bundlescontent = [
-			[
-				'type' => 'textblock',
-				'description' => LANG::GET('audit.documents_in_use_bundles'),
-				'content' => ''
-			]
-		];
-		foreach($currentbundles as $bundle){
-			$formslist = explode(',', $bundle['content'] ? : '');
-			natsort($formslist);
-			$bundlescontent[] = [
-				'type' => 'textblock',
-				'description' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']]),
-				'content' => implode("\n", $formslist)
-			];
-		}
-
-		// add export button
-		$content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-				]
-			]
-		];
-		
-		$content[] = $formscontent;
-		$content[] = $externalcontent;
-		$content[] = $bundlescontent;
-		return $content;
-	}
-
-	/**
-	 * creates and returns a download link to the export file for forms and form bundles
-	 * processes the result of $this->forms() and translates the body object into more simple strings
-	 */
-	private function exportforms(){
-		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . date('Y-m-d H:i')),
-			'identifier' => null,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => LANG::GET('audit.checks_type.' . $this->_requestedType),
-			'date' => date('y-m-d H:i')
-		];
-
-		$forms = $this->forms();
-
-		for($i = 1; $i<count($forms); $i++){
-			foreach($forms[$i] as $item){
-				$summary['content'][$item['description']] = $item['content'];	
-			}
-		}
-		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => PDF::auditPDF($summary)
-		];
-
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  LANG::GET('record.record_export_proceed'),
-				'content' => $downloadfiles
-			]]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	/**
+	 *                 _
+	 *   _ _ ___ ___ _| |___ ___ ___
+	 *  | | | -_|   | . | . |  _|_ -|
+	 *   \_/|___|_|_|___|___|_| |___|
+	 *
 	 * returns all current active vendors with stored info, most recent pricelist import, MDR sample check and certificate details in alphabetical order
 	 */
 	private function vendors(){
@@ -889,319 +1266,6 @@ class AUDIT extends API {
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  LANG::GET('record.record_export_proceed'),
-				'content' => $downloadfiles
-			]]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	/**
-	 * returns export and delete options for order statistics
-	 */
-	private function orderstatistics(){
-		$content = [];
-
-		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
-		$content[] = [
-			[
-				'type' => 'textblock',
-				'description' => LANG::GET('audit.orderstatistics_number', [':number' => count($orders)]),
-				'content' => count($orders) ? LANG::GET('audit.orderstatistics_info') : ''
-			]
-		];
-
-		if (count($orders)){
-			// add export button
-			$content[] = [
-				[
-					'type' => 'button',
-					'attributes' => [
-						'value' => LANG::GET('audit.record_export_xlsx'),
-						'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-					]
-				]
-			];
-			$content[] = [
-				[
-					'type' => 'deletebutton',
-					'attributes' => [
-						'value' => LANG::GET('audit.orderstatistics_truncate'),
-						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('audit.orderstatistics_truncate') ."', options:{".
-						"'".LANG::GET('general.cancel_button')."': false,".
-						"'".LANG::GET('audit.orderstatistics_truncate_confirm')."': {value: true, class: 'reducedCTA'},".
-						"}}).then(confirmation => {if (confirmation) api.audit('delete', 'checks', '" . $this->_requestedType . "');})",
-					]
-				]
-			];
-		}
-		return $content;
-	}
-
-	/**
-	 * creates and returns a download link to the export file for the order statistics
-	 * export is an xlsx file with orders grouped by vendor sheets
-	 */
-	private function exportorderstatistics(){
-		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
-
-		$columns = [
-			'vendor_label' => LANG::GET('order.vendor_label'),
-			'ordertype' => LANG::GET('order.order_type'),
-			'quantity_label' => LANG::GET('order.quantity_label'),
-			'unit_label' => LANG::GET('order.unit_label'),
-			'ordernumber_label' => LANG::GET('order.ordernumber_label'),
-			'productname_label' => LANG::GET('order.productname_label'),
-			'additional_info' => LANG::GET('order.additional_info'),
-			'ordered' => LANG::GET('order.ordered'),
-			'received' => LANG::GET('order.received'),
-			'deliverytime' => LANG::GET('audit.order_statistics_delivery_time_column')
-		];
-
-		// prepare result as subsets of vendors
-		$vendor_orders = [];
-		foreach($orders as $order){
-			$order['order_data'] = json_decode($order['order_data'], true);
-			$deliverytime = '';
-			if ($order['received']){
-				$datetimezone = new DateTimeZone(INI['timezone']);
-				$now = new DateTime('now', $datetimezone);
-				$ordered = new DateTime($order['ordered'], $datetimezone);
-				$received = new DateTime($order['received'], $datetimezone);
-				$deliverytime = intval($ordered->diff($received)->format('%a'));
-			}
-
-			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = LANG::GET('audit.order_statistics_undefined_vendor');
-			if (!isset($vendor_orders[$order['order_data']['vendor_label']])) $vendor_orders[$order['order_data']['vendor_label']] = [];
-
-			$vendor_orders[$order['order_data']['vendor_label']][] = [
-				isset($order['order_data']['vendor_label']) ? $order['order_data']['vendor_label'] : '',
-				LANG::GET('order.ordertype.' . $order['ordertype']),
-				isset($order['order_data']['quantity_label']) ? $order['order_data']['quantity_label'] : '',
-				isset($order['order_data']['unit_label']) ? $order['order_data']['unit_label'] : '',
-				isset($order['order_data']['ordernumber_label']) ? $order['order_data']['ordernumber_label'] : '',
-				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
-				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
-				$order['ordered'],
-				$order['received'],
-				$deliverytime
-			];
-		}
-		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.orderstatistics') . '_' . date('Y-m-d H:i')) . '.xlsx';
-		$writer = new XLSXWriter();
-		$writer->setAuthor($_SESSION['user']['name']); 
-
-		foreach($vendor_orders as $vendor => $orders){
-			$writer->writeSheetRow($vendor, array_values($columns));
-			foreach ($orders as $line)
-				$writer->writeSheetRow($vendor, $line, $row_options = array('height' => 30,'wrap_text' => true));
-		}
-
-		$writer->writeToFile($tempFile);
-		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => substr($tempFile, 1),
-		];
-
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' => LANG::GET('record.record_export_proceed'),
-				'content' => $downloadfiles
-			]]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	/**
-	 * truncated the respective database
-	 */
-	private function deleteorderstatistics(){
-		SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
-		$this->response([
-			'response' => [
-				'msg' => LANG::GET('audit.orderstatistics_truncate_success'),
-				'type' => 'success'
-			]
-		]);
-	}
-
-	/**
-	 * returns regulatory items according to language.xx.ini and matches current assigned forms
-	 */
-	private function regulatory(){
-		$content = $issues = [];
-		// prepare existing forms lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = $regulatory = [];
-		foreach($fd as $key => $row) {
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
-			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['name'], $hidden)) {
-				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
-					$regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')"];
-				}
-			}
-		}
-		// get active external documents
-		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
-			foreach ($files as $file){
-				foreach(explode(',', $file['regulatory_context']) as $context){
-					$regulatory[$context][$file['path'] . ' (' . date('Y-m-d H:i', filemtime($file['path'])) . ')'] = ['href' => substr($file['path'], 1)];
-				}
-			}
-		}
-
-		// add export button
-		$content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-				]
-			]
-		];
-		foreach(LANGUAGEFILE['regulatory'] as $key => $issue){
-			if (array_key_exists($key, $regulatory)) $issues[] = [
-				'type' => 'links',
-				'description' => $issue,
-				'content' => $regulatory[$key]
-			];
-			else $issues[] = [
-				'type' => 'textblock',
-				'description' => $issue,
-				'content' => LANG::GET('audit.regulatory_warning_content'),
-				'attributes' => [
-					'class' => 'red'
-				]
-			];
-		}
-		$content[] = $issues;
-		return $content;
-	}
-
-	/**
-	 * creates and returns a download link to the export file for the regulatory issue result
-	 * processes the result of $this->regulatory() and translates the body object into more simple strings
-	 */
-	private function exportregulatory(){
-		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.regulatory') . '_' . date('Y-m-d H:i')),
-			'identifier' => null,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => LANG::GET('audit.checks_type.regulatory'),
-			'date' => date('y-m-d H:i')
-		];
-
-		$issues = $this->regulatory();
-		foreach($issues[1] as $item){
-			$summary['content'][$item['description']] = $item['content'];	
-		}
-
-		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => PDF::auditPDF($summary)
-		];
-
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  LANG::GET('record.record_export_proceed'),
-				'content' => $downloadfiles
-			]]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	/**
-	 * returns risks
-	 */
-	private function risks(){
-		$content = $issues = [];
-		// prepare existing risks lists
-		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
-		// add export button
-		$content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
-				]
-			]
-		];
-		$process = '';
-		$issues = [];
-		foreach($risks as $risk){
-			if ($risk['process'] !== $process) $issues[] = [[
-				'type' => 'textblock',
-				'description' => $risk['process'],
-			]];
-			$process = $risk['process'];
-			$last_edit = json_decode($risk['last_edit'], true);
-			$issues[count($issues)-1][] = [
-				'type' => 'textblock',
-				'description' => $risk['risk'] .
-				" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause'],
-				'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
-				" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
-				" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-				" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
-				" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
-				" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
-				" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
-				" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
-				" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
-				(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
-			];
-		}
-		array_push($content, ...$issues);
-		return $content;
-	}
-
-	/**
-	 * creates and returns a download link to the export file for risks
-	 * processes the result of $this->risks() and translates the body object into more simple strings
-	 */
-	private function exportrisks(){
-		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.risks') . '_' . date('Y-m-d H:i')),
-			'identifier' => null,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => LANG::GET('audit.checks_type.risks'),
-			'date' => date('y-m-d H:i')
-		];
-
-		$issues = $this->risks();
-		foreach($issues as $process){
-			foreach($process as $risk){
-				//var_dump($risk);
-				if ($risk['type'] === 'textblock') $summary['content'][$risk['description']] = isset($risk['content']) ? $risk['content'] : ' ';	
-			}
-		}
-
-		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => PDF::auditPDF($summary)
-		];
-
 		$body = [];
 		array_push($body, 
 			[[

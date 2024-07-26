@@ -71,101 +71,11 @@ class CONSUMABLES extends API {
 	}
 
 	/**
-	 * imports pricelist according to set filter and populates product database
-	 * deletes all unprotected entries
-	 * updates all protected entries based on vendor name and order number
-	 * 
-	 * chunkifies requests to avoid overflow
-	 */
-	private function update_pricelist($file, $filter, $vendorID){
-		$filter = json_decode($filter, true);
-		$filter['filesetting']['source'] = $file;
-		$filter['filesetting']['encoding'] = INI['likeliness']['csvprocessor_source_encoding'];
-		if (!array_key_exists('headerrowindex', $filter['filesetting'])) $filter['filesetting']['headerrowindex'] = INI['csv']['headerrowindex'];
-		if (!array_key_exists('dialect', $filter['filesetting'])) $filter['filesetting']['dialect'] = INI['csv']['dialect'];
-		$pricelist = new Listprocessor($filter);
-		$sqlchunks = [];
-		$date = '';
-		try {
-			if (!array_key_exists(1, $pricelist->_list)) $this->response([
-				'response' => [
-					'msg' => implode("\n", $pricelist->_log),
-					'type' => 'error'
-				]]);
-		}
-		catch(Error $e){
-			$this->response([
-				'response' => [
-					'msg' => implode("\n", $pricelist->_log),
-					'type' => 'error'
-				]]);
-		}
-		if (count($pricelist->_list[1])){
-			// purge all unprotected products for a fresh data set
-			SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
-				'values' => [
-					':id' => $vendorID
-				]
-			]);
-			// retrieve left items
-			$remainder = [];
-			$remained = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-				'values' => [
-					':ids' => intval($vendorID)
-				]
-			]);
-			foreach($remained as $row) {
-				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated']];
-			}
-
-			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_pricelist_import'),
-				[
-					':id' => $remainder[$update]['id'],
-					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
-					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
-					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
-					':has_expiry_date' => array_key_exists('has_expiry_date', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
-					':special_attention' => array_key_exists('special_attention', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
-					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
-				]) . '; ');
-			}
-			$insertions = [];
-			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$insertions[]=[
-					':vendor_id' => $vendorID,
-					':article_no' => $pricelist->_list[1][$index]['article_no'],
-					':article_name' => $pricelist->_list[1][$index]['article_name'],
-					':article_alias' => '',
-					':article_unit' => $pricelist->_list[1][$index]['article_unit'],
-					':article_ean' => $pricelist->_list[1][$index]['article_ean'],
-					':active' => 1,
-					':protected' => 0,
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => '',
-					':has_expiry_date' => array_key_exists('has_expiry_date', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
-					':special_attention' => array_key_exists('special_attention', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
-				];
-			}
-			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
-
-			foreach ($sqlchunks as $chunk){
-				try {
-					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = date("d.m.Y");
-				}
-				catch (Exception $e) {
-					echo $e, $chunk;
-					die();
-				}
-			}
-			return $date;
-		}
-		return '';
-	}
-
-	/**
+	 *                                     _
+	 *   ___ ___ _____ ___ ___ ___ ___ ___| |_ ___
+	 *  |  _| . |     | . | . |   | -_|   |  _|_ -|
+	 *  |___|___|_|_|_|  _|___|_|_|___|_|_|_| |___|
+	 *                |_|
 	 * retrieves most recent approved form for
 	 * sample check or
 	 * incorporation
@@ -203,151 +113,11 @@ class CONSUMABLES extends API {
 	}
 
 	/**
-	 * returns a js dialog script as defined within assemble.js
-	 * @param string $target document elementId
-	 * @param array $similarproducts prepared named array for checkbox
-	 * @param string|array $substring start or [start, end]
-	 * @param string $type input|input2
-	 */
-	private function selectSimilarDialog($target = '', $similarproducts = [], $substring = '0', $type = 'input'){
-		if (gettype($substring) === 'array') $substring = implode(',', $substring);
-		return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
-			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
-			"new Dialog({type: '" . $type . "', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => INI['likeliness']['consumables_article_no_similarity']]) . 
-			"', render: [{type: 'checkbox', content: similarproducts}], options:{".
-			"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
-			"'".LANG::GET('consumables.edit_product_batch_confirm')."': {value: true, class: 'reducedCTA'}".
-			"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key=>{return key.substring(" . $substring . ")}).join(',') : '';})";
-	}
-
-	/**
-	 * returns the mdr sample check body response for modal
-	 * processes contents of the sample check and writes to the caro_checks database
-	 * 
-	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
-	 */
-	public function mdrsamplecheck(){
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
-				]);
-				$product = $product ? $product[0] : null;
-
-				if (!$product || !$this->_payload->content) $this->response([]);
-				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_post', [
-					'values' => [
-						':type' => 'mdrsamplecheck',
-						':author' => $_SESSION['user']['name'],
-						':content' => $content
-					]
-				])){
-					if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
-						'values' => [
-							':ids' => $product['id'],
-						],
-						'replacements' => [
-							':checked' => 'CURRENT_TIMESTAMP'
-						]
-					])) {
-						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)], LANG::GET('order.sample_check_alert') . $content);
-						$this->response([
-						'response' => [
-							'msg' => LANG::GET('order.sample_check_success'),
-							'type' => 'success'
-						]]);
-					}
-				}
-				$this->response([
-					'response' => [
-						'msg' => LANG::GET('order.sample_check_failure'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'GET':
-				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-					'values' => [
-						':ids' => intval($this->_requestedID)
-					]
-				]);
-				$product = $product ? $product[0] : null;
-				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
-
-				$result = ['render' => [
-					'content' => [
-						[
-							[
-								'type' => 'textblock',
-								'description' => implode(' ', [
-									$product['article_no'],
-									$product['article_name'],
-									$product['vendor_name']])
-							]
-						],
-						...$this->components('mdr_sample_check_form')
-					],
-					'options' => [
-						LANG::GET('order.sample_check_cancel') => false,
-						LANG::GET('order.sample_check_submit') => ['value' => true, 'class' => 'reducedCTA']
-					],
-					'productid' => $product['id']
-				]];
-				$this->response($result);
-				break;
-			case 'DELETE':
-				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
-				// get check
-				$check = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_by_id', [
-					'values' => [
-						':id' => intval($this->_requestedID)
-					]
-				]);
-				$check = $check ? $check[0] : null;
-
-				// get product(s)
-				$content = preg_split("/\n/", $check['content']);
-				$vendor = $content[0];
-				$article_no = $content[1];
-
-				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
-					'values' => [
-						':article_no' => $article_no,
-						':vendor' => $vendor
-					]
-				]);
-				// set check to null
-				SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
-					'values' => [
-						':checked' => 'NULL'
-					],
-					'replacements' => [
-						':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
-					]
-				]);
-				// delete check from check-db
-				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_delete', [
-					'values' => [
-						':id' => intval($this->_requestedID)
-					]
-				])) $this->response([
-					'response' => [
-						'msg' => LANG::GET('order.sample_check_revoked'),
-						'type' => 'success'
-					]]);
-				$this->response([
-					'response' => [
-						'msg' => LANG::GET('order.sample_check_failure'),
-						'type' => 'error'
-					]]);
-				break;
-		}
-	}
-
-	/**
+	 *   _                                 _   _
+	 *  |_|___ ___ ___ ___ ___ ___ ___ ___| |_|_|___ ___
+	 *  | |   |  _| . |  _| . | . |  _| .'|  _| | . |   |
+	 *  |_|_|_|___|___|_| |  _|___|_| |__,|_| |_|___|_|_|
+	 *                    |_|
 	 * returns the incorporation body response for modal
 	 * creates a list of possible identical products to refer to
 	 * 
@@ -538,6 +308,143 @@ class CONSUMABLES extends API {
 	}
 
 	/**
+	 *           _                       _         _           _
+	 *   _____ _| |___ ___ ___ _____ ___| |___ ___| |_ ___ ___| |_
+	 *  |     | . |  _|_ -| .'|     | . | | -_|  _|   | -_|  _| '_|
+	 *  |_|_|_|___|_| |___|__,|_|_|_|  _|_|___|___|_|_|___|___|_,_|
+	 *                              |_|
+	 * returns the mdr sample check body response for modal
+	 * processes contents of the sample check and writes to the caro_checks database
+	 * 
+	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
+	 */
+	public function mdrsamplecheck(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+					]
+				]);
+				$product = $product ? $product[0] : null;
+
+				if (!$product || !$this->_payload->content) $this->response([]);
+				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_post', [
+					'values' => [
+						':type' => 'mdrsamplecheck',
+						':author' => $_SESSION['user']['name'],
+						':content' => $content
+					]
+				])){
+					if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
+						'values' => [
+							':ids' => $product['id'],
+						],
+						'replacements' => [
+							':checked' => 'CURRENT_TIMESTAMP'
+						]
+					])) {
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)], LANG::GET('order.sample_check_alert') . $content);
+						$this->response([
+						'response' => [
+							'msg' => LANG::GET('order.sample_check_success'),
+							'type' => 'success'
+						]]);
+					}
+				}
+				$this->response([
+					'response' => [
+						'msg' => LANG::GET('order.sample_check_failure'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+					'values' => [
+						':ids' => intval($this->_requestedID)
+					]
+				]);
+				$product = $product ? $product[0] : null;
+				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+				$result = ['render' => [
+					'content' => [
+						[
+							[
+								'type' => 'textblock',
+								'description' => implode(' ', [
+									$product['article_no'],
+									$product['article_name'],
+									$product['vendor_name']])
+							]
+						],
+						...$this->components('mdr_sample_check_form')
+					],
+					'options' => [
+						LANG::GET('order.sample_check_cancel') => false,
+						LANG::GET('order.sample_check_submit') => ['value' => true, 'class' => 'reducedCTA']
+					],
+					'productid' => $product['id']
+				]];
+				$this->response($result);
+				break;
+			case 'DELETE':
+				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
+				// get check
+				$check = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_by_id', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				]);
+				$check = $check ? $check[0] : null;
+
+				// get product(s)
+				$content = preg_split("/\n/", $check['content']);
+				$vendor = $content[0];
+				$article_no = $content[1];
+
+				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+					'values' => [
+						':article_no' => $article_no,
+						':vendor' => $vendor
+					]
+				]);
+				// set check to null
+				SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
+					'values' => [
+						':checked' => 'NULL'
+					],
+					'replacements' => [
+						':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
+					]
+				]);
+				// delete check from check-db
+				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_delete', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => LANG::GET('order.sample_check_revoked'),
+						'type' => 'success'
+					]]);
+				$this->response([
+					'response' => [
+						'msg' => LANG::GET('order.sample_check_failure'),
+						'type' => 'error'
+					]]);
+				break;
+		}
+	}
+
+	/**
+	 *                 _ _         _                                 _   _
+	 *   ___ ___ ___ _| |_|___ ___|_|___ ___ ___ ___ ___ ___ ___ ___| |_|_|___ ___ ___
+	 *  | . | -_|   | . | |   | . | |   |  _| . |  _| . | . |  _| .'|  _| | . |   |_ -|
+	 *  |  _|___|_|_|___|_|_|_|_  |_|_|_|___|___|_| |  _|___|_| |__,|_| |_|___|_|_|___|
+	 *  |_|                   |___|                 |_|
 	 * display pending incorporations, links to product editing
 	 */
 	public function pendingincorporations(){
@@ -564,467 +471,11 @@ class CONSUMABLES extends API {
 	}
 
 	/**
-	 * vendor management
-	 * posts new vendors
-	 * updates (put) existing vendors
-	 * dispays form to choose and edit vendors
-	 * 
-	 * on disabling vendor all unprotected products will be deleted
-	 * 
-	 * $this->_payload as genuine form data
-	 */
-	 public function vendor(){
-		// Y U NO DELETE? because of audit safety, that's why!
-		// dynamic vendor info fields with storage key and lang-property value
-		// only define once here, audit.php and on output form (GET) for typing ?
-		$vendor_info = [
-			'infotext' => 'consumables.edit_vendor_info',
-			'mail' => 'consumables.edit_vendor_mail',
-			'phone' => 'consumables.edit_vendor_phone',
-			'address' => 'consumables.edit_vendor_address',
-			'sales_representative' => 'consumables.edit_vendor_sales_representative',
-			'customer_id' => 'consumables.edit_vendor_customer_id',
-		];
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
-				/**
-				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
-				 * thus directories can not be renamed on name changes of vendors
-				 */
-				$vendor_info = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
-				$vendor = [
-					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')),
-					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
-					'info' => $vendor_info,
-					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
-					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
-					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . date('Ymd')
-				];
-				
-				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
-				}
-				// ensure valid json for filters
-				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
-
-				// save certificate
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
-				}
-				// save documents
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
-				}
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
-					'values' => [
-						':name' => $vendor['name'],
-						':active' => $vendor['active'],
-						':info' => json_encode($vendor['info']),
-						':certificate' => json_encode($vendor['certificate']),
-						':pricelist' => json_encode($vendor['pricelist']),
-						':immutable_fileserver' => $vendor['immutable_fileserver']
-					]
-				])) $this->response([
-					'response' => [
-						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]),
-						'type' => 'info'
-					]]);
-				else $this->response([
-					'response' => [
-						'id' => false,
-						'name' => LANG::GET('consumables.edit_vendor_not_saved'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
-				// prepare vendor-array to update, return error if not found
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
-				]);
-				$vendor = $vendor ? $vendor[0] : null;
-				if (!$vendor) $this->response(null, 406);
-
-				$vendor['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
-				$vendor['name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name'));
-				$vendor_info = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
-				$vendor['info'] = $vendor_info;
-				$vendor['certificate'] = json_decode($vendor['certificate'], true);
-				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
-				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
-				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
-				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval')) ? : INI['lifespan']['mdr14_sample_interval'];
-				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval_reusable')) ? : INI['lifespan']['mdr14_sample_reusable'];
-
-				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
-				}
-
-				// ensure valid json for filters
-				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
-
-				// save certificate
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
-				}
-				// save documents
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
-				}
-				// update pricelist
-				$pricelistImportError = '';
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
-					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
-					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
-				}
-
-				// tidy up consumable products database if inactive
-				if (!$vendor['active']){
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
-						'values' => [
-							':id' => $vendor['id']
-							]
-					]);
-					$vendor['pricelist']['validity'] = '';
-				}
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
-					'values' => [
-						':id' => $vendor['id'],
-						':active' => $vendor['active'],
-						':name' => $vendor['name'],
-						':info' => json_encode($vendor['info']),
-						':certificate' => json_encode($vendor['certificate']),
-						':pricelist' => json_encode($vendor['pricelist'])
-					]
-				]) !== false) $this->response([
-					'response' => [
-						'id' => $vendor['id'],
-						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError,
-						'type' => 'info'
-					]]);
-				else $this->response([
-					'response' => [
-						'id' => $vendor['id'],
-						'name' => LANG::GET('consumables.edit_vendor_not_saved'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'GET':
-				$datalist = [];
-				$options = ['...' . (PERMISSION::permissionFor('vendors') ? LANG::GET('consumables.edit_existing_vendors_new') : '') => (!$this->_requestedID) ? ['selected' => true] : []];
-				$result = [];
-				
-				// select single vendor based on id or name
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
-				]);
-				$vendor = $vendor ? $vendor[0] : null;
-
-				if (!$vendor) $vendor = [
-					'id' => null,
-					'name' => '',
-					'active' => 0,
-					'info' => '',
-					'certificate' => '{"validity":""}',
-					'pricelist' => '{"validity":"", "filter": ""}'
-				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
-					$result['response'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
-
-				$vendor['info'] = json_decode($vendor['info'], true) ? : [];
-				$vendor['certificate'] = json_decode($vendor['certificate'], true);
-				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
-				$isactive = $vendor['active'] ? ['checked' => true] : [];
-				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
-
-				// prepare existing vendor lists
-				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-				foreach($vendorlist as $key => $row) {
-					$datalist[] = $row['name'];
-					$options[$row['name']] = [];
-					if ($row['name'] == $vendor['name']) $options[$row['name']]['selected'] = true;
-				}
-				
-				$certificates = [];
-				$documents = [];
-				if ($vendor['id']) {
-					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
-					foreach($certfiles as $path){
-						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
-					}
-					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
-					foreach($docfiles as $path){
-						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => substr($path, 1)];
-					}
-				}
-				if (!PERMISSION::permissionFor('products')) {
-					// standard user view
-					$result['render'] = ['content' => [
-						[
-							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'vendors'
-								]
-							], [
-								'type' => 'select',
-								'attributes' => [
-									'name' => LANG::GET('consumables.information_vendor'),
-									'onchange' => "api.purchase('get', 'vendor', this.value)"
-								],
-								'content' => $options
-							], [
-								'type' => 'search',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_existing_vendors_search'),
-									'list' => 'vendors',
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
-								]
-							]
-						]]];
-					// display selected vendor
-					if ($vendor['id']) {
-						$isactive['disabled'] = $isinactive['disabled'] = true;
-						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-							'values' => [
-								':ids' => intval($vendor['id'])
-							]
-						]);
-						$available = 0;
-						foreach($products as $product){
-							if ($product['active']) $available++;
-						}
-						$result['render']['content'][] = [
-							[
-								'type' => 'textblock',
-								'description' => $vendor['name'],
-								'content' => implode(" \n", array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) .
-									(array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
-									" \n" . LANG::GET('consumables.information_products_available', [':available' => $available])
-							],[
-								'type' => 'radio',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_active')
-								],
-								'content' => [
-									LANG::GET('consumables.edit_vendor_isactive') => $isactive,
-									LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
-								]
-							]
-						];
-						if ($certificates) $result['render']['content'][1][] = [
-								'type' => 'links',
-								'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
-								'content' => $certificates,
-								'hint' => $vendor['certificate']['validity'] ? LANG::GET('consumables.edit_vendor_certificate_validity') . $vendor['certificate']['validity'] : false
-							];
-		
-						if ($documents) $result['render']['content'][1][] = [
-							'type' => 'links',
-							'description' => LANG::GET('consumables.edit_vendor_documents_download'),
-							'content' => $documents
-						];
-					}
-				}
-				else {
-					// display form for adding a new vendor
-					$result['render'] = ['content' => [
-						[
-							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'vendors'
-								]
-							], [
-								'type' => 'select',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_existing_vendors'),
-									'onchange' => "api.purchase('get', 'vendor', this.value)"
-								],
-								'content' => $options
-							], [
-								'type' => 'search',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_existing_vendors_search'),
-									'list' => 'vendors',
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
-								]
-							]
-						], [
-							[
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_name'),
-									'required' => true,
-									'value' => $vendor['name'] ? : ''
-								]
-							], [
-								'type' => 'textarea',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_info'),
-									'value' => array_key_exists('infotext', $vendor['info']) ? $vendor['info']['infotext']: '',
-									'rows' => 8
-								],
-								'hint' => LANG::GET('consumables.edit_vendor_info_hint')
-							], [
-								'type' => 'email',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_mail'),
-									'value' => array_key_exists('mail', $vendor['info']) ? $vendor['info']['mail']: '',
-									'rows' => 8
-								]
-							], [
-								'type' => 'tel',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_phone'),
-									'value' => array_key_exists('phone', $vendor['info']) ? $vendor['info']['phone']: '',
-									'rows' => 8
-								]
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_address'),
-									'value' => array_key_exists('address', $vendor['info']) ? $vendor['info']['address']: '',
-									'rows' => 8
-								]
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
-									'value' => array_key_exists('sales_representative', $vendor['info']) ? $vendor['info']['sales_representative']: '',
-									'rows' => 8
-								]
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_customer_id'),
-									'value' => array_key_exists('customer_id', $vendor['info']) ? $vendor['info']['customer_id']: '',
-									'rows' => 8
-								]
-							], [
-								'type' => 'radio',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_active')
-								],
-								'content' => [
-									LANG::GET('consumables.edit_vendor_isactive') => $isactive,
-									LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
-								]
-							]
-						], [
-							[
-								[
-									'type' => 'date',
-									'attributes' => [
-										'name' => LANG::GET('consumables.edit_vendor_certificate_validity'),
-										'value' => $vendor['certificate']['validity'] ? : ''
-									]
-								]
-							], [
-								[
-									'type' => 'file',
-									'attributes' => [
-										'name' => LANG::GET('consumables.edit_vendor_certificate_update')
-									]
-								]
-							]
-						], [
-							[
-								'type' => 'file',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_documents_update'),
-									'multiple' => true
-								]
-							]
-						], [
-							[
-								[
-									'type' => 'code',
-									'attributes' => [
-										'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
-										'value' => $vendor['pricelist']['filter'] ? : '',
-										'placeholder' => $this->filtersample
-									]
-								]
-							]
-						]
-					],
-					'form' => [
-						'data-usecase' => 'purchase',
-						'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
-						'data-confirm' => true
-					]];
-
-					if ($vendor['id'] && $vendor['active'] == 1)
-						array_splice($result['render']['content'][4], 0, 0,
-							[[[
-								'type' => 'file',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_pricelist_update'),
-									'accept' => '.csv'
-								]
-							]]]
-						);
-					if ($certificates) array_splice($result['render']['content'][2], 0, 0,
-						[
-							[
-								'type' => 'links',
-								'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
-								'content' => $certificates
-							]
-						]
-					);
-					if ($documents) $result['render']['content'][3]=[
-						[
-							[
-								'type' => 'links',
-								'description' => LANG::GET('consumables.edit_vendor_documents_download'),
-								'content' => $documents
-							]
-						],
-						$result['render']['content'][3]
-					];
-					if ($vendor['pricelist']['validity']) array_splice($result['render']['content'][4], 0, 0,
-						[[
-							[
-								'type' => 'textblock',
-								'description' => LANG::GET('consumables.edit_vendor_pricelist_validity'),
-								'content' => $vendor['pricelist']['validity']
-							],
-							[
-								'type' => 'number',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
-									'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : INI['lifespan']['mdr14_sample_interval']
-								]
-							],
-							[
-								'type' => 'number',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
-									'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : INI['lifespan']['mdr14_sample_reusable']
-								]
-							]
-						]]
-					);
-				}
-				if ($vendor['name']) $result['header'] = $vendor['name'];
-				$this->response($result);
-				break;
-		}
-	}
-
-	/**
+	 *                 _         _
+	 *   ___ ___ ___ _| |_ _ ___| |_
+	 *  | . |  _| . | . | | |  _|  _|
+	 *  |  _|_| |___|___|___|___|_|
+	 *  |_|
 	 * product management
 	 * posts new products
 	 * updates (put) existing products
@@ -1701,6 +1152,11 @@ class CONSUMABLES extends API {
 	}
 
 	/**
+	 *                 _         _                   _ _   _                     _                 _     _
+	 *   ___ ___ ___ _| |_ _ ___| |_ ___       _ _ _|_| |_| |_       ___ _ _ ___|_|___ _ _       _| |___| |_ ___ ___
+	 *  | . |  _| . | . | | |  _|  _|_ -|     | | | | |  _|   |     | -_|_'_| . | |  _| | |     | . | .'|  _| -_|_ -|
+	 *  |  _|_| |___|___|___|___|_| |___|_____|_____|_|_| |_|_|_____|___|_,_|  _|_|_| |_  |_____|___|__,|_| |___|___|
+	 *  |_|                             |_____|               |_____|       |_|       |___|_____|
 	 * list products with expiry dates
 	 */
 	public function products_with_expiry_dates(){
@@ -1759,6 +1215,11 @@ class CONSUMABLES extends API {
 	}
 
 	/**
+	 *                 _         _                   _ _   _                         _     _           _   _           _   _
+	 *   ___ ___ ___ _| |_ _ ___| |_ ___       _ _ _|_| |_| |_       ___ ___ ___ ___|_|___| |      ___| |_| |_ ___ ___| |_|_|___ ___
+	 *  | . |  _| . | . | | |  _|  _|_ -|     | | | | |  _|   |     |_ -| . | -_|  _| | .'| |     | .'|  _|  _| -_|   |  _| | . |   |
+	 *  |  _|_| |___|___|___|___|_| |___|_____|_____|_|_| |_|_|_____|___|  _|___|___|_|__,|_|_____|__,|_| |_| |___|_|_|_| |_|___|_|_|
+	 *  |_|                             |_____|               |_____|   |_|                 |_____|
 	 * list products flagged as needing special attention
 	 */
 	public function products_with_special_attention(){
@@ -1810,6 +1271,595 @@ class CONSUMABLES extends API {
 			}
 		}
 		$this->response($result);
+	}
+	
+	/**
+	 *           _         _       _       _ _           _ _     _
+	 *   ___ ___| |___ ___| |_ ___|_|_____|_| |___ ___ _| |_|___| |___ ___
+	 *  |_ -| -_| | -_|  _|  _|_ -| |     | | | .'|  _| . | | .'| | . | . |
+	 *  |___|___|_|___|___|_| |___|_|_|_|_|_|_|__,|_| |___|_|__,|_|___|_  |
+	 *                                                                |___|
+	 * returns a js dialog script as defined within assemble.js
+	 * @param string $target document elementId
+	 * @param array $similarproducts prepared named array for checkbox
+	 * @param string|array $substring start or [start, end]
+	 * @param string $type input|input2
+	 */
+	private function selectSimilarDialog($target = '', $similarproducts = [], $substring = '0', $type = 'input'){
+		if (gettype($substring) === 'array') $substring = implode(',', $substring);
+		return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
+			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
+			"new Dialog({type: '" . $type . "', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => INI['likeliness']['consumables_article_no_similarity']]) . 
+			"', render: [{type: 'checkbox', content: similarproducts}], options:{".
+			"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
+			"'".LANG::GET('consumables.edit_product_batch_confirm')."': {value: true, class: 'reducedCTA'}".
+			"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key=>{return key.substring(" . $substring . ")}).join(',') : '';})";
+	}
+
+	/**
+	 *             _     _               _         _ _     _
+	 *   _ _ ___ _| |___| |_ ___ ___ ___|_|___ ___| |_|___| |_
+	 *  | | | . | . | .'|  _| -_| . |  _| |  _| -_| | |_ -|  _|
+	 *  |___|  _|___|__,|_| |___|  _|_| |_|___|___|_|_|___|_|
+	 *      |_|                 |_|
+	 * imports pricelist according to set filter and populates product database
+	 * deletes all unprotected entries
+	 * updates all protected entries based on vendor name and order number
+	 * 
+	 * chunkifies requests to avoid overflow
+	 */
+	private function update_pricelist($file, $filter, $vendorID){
+		$filter = json_decode($filter, true);
+		$filter['filesetting']['source'] = $file;
+		$filter['filesetting']['encoding'] = INI['likeliness']['csvprocessor_source_encoding'];
+		if (!array_key_exists('headerrowindex', $filter['filesetting'])) $filter['filesetting']['headerrowindex'] = INI['csv']['headerrowindex'];
+		if (!array_key_exists('dialect', $filter['filesetting'])) $filter['filesetting']['dialect'] = INI['csv']['dialect'];
+		$pricelist = new Listprocessor($filter);
+		$sqlchunks = [];
+		$date = '';
+		try {
+			if (!array_key_exists(1, $pricelist->_list)) $this->response([
+				'response' => [
+					'msg' => implode("\n", $pricelist->_log),
+					'type' => 'error'
+				]]);
+		}
+		catch(Error $e){
+			$this->response([
+				'response' => [
+					'msg' => implode("\n", $pricelist->_log),
+					'type' => 'error'
+				]]);
+		}
+		if (count($pricelist->_list[1])){
+			// purge all unprotected products for a fresh data set
+			SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+				'values' => [
+					':id' => $vendorID
+				]
+			]);
+			// retrieve left items
+			$remainder = [];
+			$remained = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+				'values' => [
+					':ids' => intval($vendorID)
+				]
+			]);
+			foreach($remained as $row) {
+				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated']];
+			}
+
+			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_pricelist_import'),
+				[
+					':id' => $remainder[$update]['id'],
+					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
+					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
+					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
+					':has_expiry_date' => array_key_exists('has_expiry_date', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
+					':special_attention' => array_key_exists('special_attention', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
+					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
+				]) . '; ');
+			}
+			$insertions = [];
+			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+				$insertions[]=[
+					':vendor_id' => $vendorID,
+					':article_no' => $pricelist->_list[1][$index]['article_no'],
+					':article_name' => $pricelist->_list[1][$index]['article_name'],
+					':article_alias' => '',
+					':article_unit' => $pricelist->_list[1][$index]['article_unit'],
+					':article_ean' => $pricelist->_list[1][$index]['article_ean'],
+					':active' => 1,
+					':protected' => 0,
+					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
+					':incorporated' => '',
+					':has_expiry_date' => array_key_exists('has_expiry_date', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
+					':special_attention' => array_key_exists('special_attention', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
+				];
+			}
+			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
+
+			foreach ($sqlchunks as $chunk){
+				try {
+					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = date("d.m.Y");
+				}
+				catch (Exception $e) {
+					echo $e, $chunk;
+					die();
+				}
+			}
+			return $date;
+		}
+		return '';
+	}
+
+	/**
+	 *                 _
+	 *   _ _ ___ ___ _| |___ ___
+	 *  | | | -_|   | . | . |  _|
+	 *   \_/|___|_|_|___|___|_|
+	 *
+	 * vendor management
+	 * posts new vendors
+	 * updates (put) existing vendors
+	 * dispays form to choose and edit vendors
+	 * 
+	 * on disabling vendor all unprotected products will be deleted
+	 * 
+	 * $this->_payload as genuine form data
+	 */
+	 public function vendor(){
+		// Y U NO DELETE? because of audit safety, that's why!
+		// dynamic vendor info fields with storage key and lang-property value
+		// only define once here, audit.php and on output form (GET) for typing ?
+		$vendor_info = [
+			'infotext' => 'consumables.edit_vendor_info',
+			'mail' => 'consumables.edit_vendor_mail',
+			'phone' => 'consumables.edit_vendor_phone',
+			'address' => 'consumables.edit_vendor_address',
+			'sales_representative' => 'consumables.edit_vendor_sales_representative',
+			'customer_id' => 'consumables.edit_vendor_customer_id',
+		];
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
+				/**
+				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
+				 * thus directories can not be renamed on name changes of vendors
+				 */
+				$vendor_info = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
+				$vendor = [
+					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')),
+					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
+					'info' => $vendor_info,
+					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
+					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
+					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . date('Ymd')
+				];
+				
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
+				}
+				// ensure valid json for filters
+				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
+
+				// save certificate
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+				}
+				// save documents
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+				}
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
+					'values' => [
+						':name' => $vendor['name'],
+						':active' => $vendor['active'],
+						':info' => json_encode($vendor['info']),
+						':certificate' => json_encode($vendor['certificate']),
+						':pricelist' => json_encode($vendor['pricelist']),
+						':immutable_fileserver' => $vendor['immutable_fileserver']
+					]
+				])) $this->response([
+					'response' => [
+						'id' => $this->_pdo->lastInsertId(),
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]),
+						'type' => 'info'
+					]]);
+				else $this->response([
+					'response' => [
+						'id' => false,
+						'name' => LANG::GET('consumables.edit_vendor_not_saved'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'PUT':
+				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
+				// prepare vendor-array to update, return error if not found
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+				$vendor = $vendor ? $vendor[0] : null;
+				if (!$vendor) $this->response(null, 406);
+
+				$vendor['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
+				$vendor['name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name'));
+				$vendor_info = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
+				$vendor['info'] = $vendor_info;
+				$vendor['certificate'] = json_decode($vendor['certificate'], true);
+				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
+				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
+				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval')) ? : INI['lifespan']['mdr14_sample_interval'];
+				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval_reusable')) ? : INI['lifespan']['mdr14_sample_reusable'];
+
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
+				}
+
+				// ensure valid json for filters
+				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
+
+				// save certificate
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+				}
+				// save documents
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
+					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . date('Ymd')]);
+				}
+				// update pricelist
+				$pricelistImportError = '';
+				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
+					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
+					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
+				}
+
+				// tidy up consumable products database if inactive
+				if (!$vendor['active']){
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+						'values' => [
+							':id' => $vendor['id']
+							]
+					]);
+					$vendor['pricelist']['validity'] = '';
+				}
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
+					'values' => [
+						':id' => $vendor['id'],
+						':active' => $vendor['active'],
+						':name' => $vendor['name'],
+						':info' => json_encode($vendor['info']),
+						':certificate' => json_encode($vendor['certificate']),
+						':pricelist' => json_encode($vendor['pricelist'])
+					]
+				]) !== false) $this->response([
+					'response' => [
+						'id' => $vendor['id'],
+						'msg' => LANG::GET('consumables.edit_vendor_saved', [':name' => $vendor['name']]) . $pricelistImportError,
+						'type' => 'info'
+					]]);
+				else $this->response([
+					'response' => [
+						'id' => $vendor['id'],
+						'name' => LANG::GET('consumables.edit_vendor_not_saved'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				$datalist = [];
+				$options = ['...' . (PERMISSION::permissionFor('vendors') ? LANG::GET('consumables.edit_existing_vendors_new') : '') => (!$this->_requestedID) ? ['selected' => true] : []];
+				$result = [];
+				
+				// select single vendor based on id or name
+				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+				$vendor = $vendor ? $vendor[0] : null;
+
+				if (!$vendor) $vendor = [
+					'id' => null,
+					'name' => '',
+					'active' => 0,
+					'info' => '',
+					'certificate' => '{"validity":""}',
+					'pricelist' => '{"validity":"", "filter": ""}'
+				];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
+					$result['response'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+				$vendor['info'] = json_decode($vendor['info'], true) ? : [];
+				$vendor['certificate'] = json_decode($vendor['certificate'], true);
+				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+				$isactive = $vendor['active'] ? ['checked' => true] : [];
+				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
+
+				// prepare existing vendor lists
+				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+				foreach($vendorlist as $key => $row) {
+					$datalist[] = $row['name'];
+					$options[$row['name']] = [];
+					if ($row['name'] == $vendor['name']) $options[$row['name']]['selected'] = true;
+				}
+				
+				$certificates = [];
+				$documents = [];
+				if ($vendor['id']) {
+					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
+					foreach($certfiles as $path){
+						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
+					}
+					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
+					foreach($docfiles as $path){
+						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => substr($path, 1)];
+					}
+				}
+				if (!PERMISSION::permissionFor('products')) {
+					// standard user view
+					$result['render'] = ['content' => [
+						[
+							[
+								'type' => 'datalist',
+								'content' => array_values(array_unique($datalist)),
+								'attributes' => [
+									'id' => 'vendors'
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('consumables.information_vendor'),
+									'onchange' => "api.purchase('get', 'vendor', this.value)"
+								],
+								'content' => $options
+							], [
+								'type' => 'search',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_existing_vendors_search'),
+									'list' => 'vendors',
+									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+								]
+							]
+						]]];
+					// display selected vendor
+					if ($vendor['id']) {
+						$isactive['disabled'] = $isinactive['disabled'] = true;
+						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+							'values' => [
+								':ids' => intval($vendor['id'])
+							]
+						]);
+						$available = 0;
+						foreach($products as $product){
+							if ($product['active']) $available++;
+						}
+						$result['render']['content'][] = [
+							[
+								'type' => 'textblock',
+								'description' => $vendor['name'],
+								'content' => implode(" \n", array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) .
+									(array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
+									" \n" . LANG::GET('consumables.information_products_available', [':available' => $available])
+							],[
+								'type' => 'radio',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_active')
+								],
+								'content' => [
+									LANG::GET('consumables.edit_vendor_isactive') => $isactive,
+									LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
+								]
+							]
+						];
+						if ($certificates) $result['render']['content'][1][] = [
+								'type' => 'links',
+								'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
+								'content' => $certificates,
+								'hint' => $vendor['certificate']['validity'] ? LANG::GET('consumables.edit_vendor_certificate_validity') . $vendor['certificate']['validity'] : false
+							];
+		
+						if ($documents) $result['render']['content'][1][] = [
+							'type' => 'links',
+							'description' => LANG::GET('consumables.edit_vendor_documents_download'),
+							'content' => $documents
+						];
+					}
+				}
+				else {
+					// display form for adding a new vendor
+					$result['render'] = ['content' => [
+						[
+							[
+								'type' => 'datalist',
+								'content' => array_values(array_unique($datalist)),
+								'attributes' => [
+									'id' => 'vendors'
+								]
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_existing_vendors'),
+									'onchange' => "api.purchase('get', 'vendor', this.value)"
+								],
+								'content' => $options
+							], [
+								'type' => 'search',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_existing_vendors_search'),
+									'list' => 'vendors',
+									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+								]
+							]
+						], [
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_name'),
+									'required' => true,
+									'value' => $vendor['name'] ? : ''
+								]
+							], [
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_info'),
+									'value' => array_key_exists('infotext', $vendor['info']) ? $vendor['info']['infotext']: '',
+									'rows' => 8
+								],
+								'hint' => LANG::GET('consumables.edit_vendor_info_hint')
+							], [
+								'type' => 'email',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_mail'),
+									'value' => array_key_exists('mail', $vendor['info']) ? $vendor['info']['mail']: '',
+									'rows' => 8
+								]
+							], [
+								'type' => 'tel',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_phone'),
+									'value' => array_key_exists('phone', $vendor['info']) ? $vendor['info']['phone']: '',
+									'rows' => 8
+								]
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_address'),
+									'value' => array_key_exists('address', $vendor['info']) ? $vendor['info']['address']: '',
+									'rows' => 8
+								]
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
+									'value' => array_key_exists('sales_representative', $vendor['info']) ? $vendor['info']['sales_representative']: '',
+									'rows' => 8
+								]
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_customer_id'),
+									'value' => array_key_exists('customer_id', $vendor['info']) ? $vendor['info']['customer_id']: '',
+									'rows' => 8
+								]
+							], [
+								'type' => 'radio',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_active')
+								],
+								'content' => [
+									LANG::GET('consumables.edit_vendor_isactive') => $isactive,
+									LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
+								]
+							]
+						], [
+							[
+								[
+									'type' => 'date',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_certificate_validity'),
+										'value' => $vendor['certificate']['validity'] ? : ''
+									]
+								]
+							], [
+								[
+									'type' => 'file',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_certificate_update')
+									]
+								]
+							]
+						], [
+							[
+								'type' => 'file',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_documents_update'),
+									'multiple' => true
+								]
+							]
+						], [
+							[
+								[
+									'type' => 'code',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_pricelist_filter'),
+										'value' => $vendor['pricelist']['filter'] ? : '',
+										'placeholder' => $this->filtersample
+									]
+								]
+							]
+						]
+					],
+					'form' => [
+						'data-usecase' => 'purchase',
+						'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
+						'data-confirm' => true
+					]];
+
+					if ($vendor['id'] && $vendor['active'] == 1)
+						array_splice($result['render']['content'][4], 0, 0,
+							[[[
+								'type' => 'file',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_pricelist_update'),
+									'accept' => '.csv'
+								]
+							]]]
+						);
+					if ($certificates) array_splice($result['render']['content'][2], 0, 0,
+						[
+							[
+								'type' => 'links',
+								'description' => LANG::GET('consumables.edit_vendor_certificate_download'),
+								'content' => $certificates
+							]
+						]
+					);
+					if ($documents) $result['render']['content'][3]=[
+						[
+							[
+								'type' => 'links',
+								'description' => LANG::GET('consumables.edit_vendor_documents_download'),
+								'content' => $documents
+							]
+						],
+						$result['render']['content'][3]
+					];
+					if ($vendor['pricelist']['validity']) array_splice($result['render']['content'][4], 0, 0,
+						[[
+							[
+								'type' => 'textblock',
+								'description' => LANG::GET('consumables.edit_vendor_pricelist_validity'),
+								'content' => $vendor['pricelist']['validity']
+							],
+							[
+								'type' => 'number',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
+									'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : INI['lifespan']['mdr14_sample_interval']
+								]
+							],
+							[
+								'type' => 'number',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
+									'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : INI['lifespan']['mdr14_sample_reusable']
+								]
+							]
+						]]
+					);
+				}
+				if ($vendor['name']) $result['header'] = $vendor['name'];
+				$this->response($result);
+				break;
+		}
 	}
 }
 ?>

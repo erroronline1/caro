@@ -36,6 +36,23 @@ class APPLICATION extends API {
 	}
 
 	/**
+	 *   _
+	 *  | |___ ___ ___ _ _ ___ ___ ___
+	 *  | | .'|   | . | | | .'| . | -_|
+	 *  |_|__,|_|_|_  |___|__,|_  |___|
+	 *            |___|       |___|
+	 * respond with LANGUAGEFILE as transfer to js frontend
+	 */
+    public function language(){
+		$this->response(['data' => LANG::GETALL()]);
+	}
+
+	/**
+	 *   _         _
+	 *  | |___ ___|_|___
+	 *  | | . | . | |   |
+	 *  |_|___|_  |_|_|_|
+	 *        |___|
 	 * log in user or destroy session
 	 * without current user respond with login form
 	 */
@@ -111,265 +128,11 @@ class APPLICATION extends API {
 	}
 
 	/**
-	 * respond with menu taking user permissions into account
-	 */
-	public function menu(){
-		// get permission based menu items
-		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
-		$menu=[
-			LANG::GET('menu.communication_header') => [
-				LANG::GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
-				LANG::GET('menu.message_register') => ['onpointerup' => "api.message('get', 'register')"],
-				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
-			],
-			LANG::GET('menu.record_header') => [
-				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
-				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
-			],
-			LANG::GET('menu.calendar_header') => [
-				LANG::GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
-			],
-			LANG::GET('menu.application_header') => [
-				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('post', 'login', 'logout')"],
-				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
-				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
-			],
-			LANG::GET('menu.files_header') => [
-				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
-				LANG::GET('menu.files_bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
-				LANG::GET('menu.files_sharepoint') => ['onpointerup' => "api.file('get', 'sharepoint')"],
-			],
-			LANG::GET('menu.purchase_header') => [
-				LANG::GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
-				LANG::GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
-				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
-				LANG::GET('menu.purchase_vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
-				LANG::GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"],
-				LANG::GET('menu.purchase_products_with_expiry_dates') => ['onpointerup' => "api.purchase('get', 'products_with_expiry_dates')"],
-				LANG::GET('menu.purchase_products_with_special_attention') => ['onpointerup' => "api.purchase('get', 'products_with_special_attention')"],
-			],
-			LANG::GET('menu.tools_header') => [
-				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
-				LANG::GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
-				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"]
-			],
-		];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
-		// make sure risk management comes after forms 
-		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && array_key_exists('weeklyhours', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'])
-			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
-
-		if (PERMISSION::permissionFor('files')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
-		if (PERMISSION::permissionFor('externaldocuments')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
-		if (PERMISSION::permissionFor('formcomposer')){
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_bundles')] = ['onpointerup' => "api.form('get', 'bundle')"];
-		}
-		if (PERMISSION::permissionFor('filebundles')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
-		if (PERMISSION::permissionFor('users')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
-		if (PERMISSION::permissionFor('texttemplates')) {
-			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
-			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
-		}
-		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
-		if (PERMISSION::permissionFor('csvfilter')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
-		if (PERMISSION::permissionFor('formapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
-		if (PERMISSION::permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
-		if (PERMISSION::permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
-		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
-
-		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
-	}
-
-	/**
-	 * respond with LANGUAGEFILE as transfer to js frontend
-	 */
-    public function language(){
-		$this->response(['data' => LANG::GETALL()]);
-	}
-
-	/**
-	 * respond with landing page
-	 */
-	public function start(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
-		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
-		$tiles = [];
-
-		$notifications = new NOTIFICATION;
-
-		// messages
-		$unseen = $notifications->messageunseen();
-		if ($unseen) {
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onpointerup' => "api.message('get', 'conversation')",
-				],
-				'content' => [
-					[
-						'type' => 'textblock',
-						'content' => LANG::GET('application.overview_messages', [':number' => $unseen]),
-						'description' => LANG::GET('menu.message_conversations'),
-						'attributes' => [
-							'data-type' => 'message'
-						]
-					]
-				]
-			];
-		}
-
-		// unprocessed orders
-		if (PERMISSION::permissionFor('orderprocessing')){
-			$unprocessed = $notifications->order();
-			if ($unprocessed) {
-				$tiles[] = [
-					'type' => 'tile',
-					'attributes' => [
-						'onpointerup' => "api.purchase('get', 'approved')",
-					],
-					'content' => [
-						[
-							'type' => 'textblock',
-							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed]),
-							'description' => LANG::GET('menu.purchase_approved_orders'),
-							'attributes' => [
-								'data-type' => 'purchase'
-							]
-						]
-					]
-				];
-			}
-		}
-
-		// unclosed case documentation for own unit
-		$number = $notifications->records();
-		if ($number){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onpointerup' => "api.record('get', 'records')",
-				],
-				'content' => [
-					[
-						'type' => 'textblock',
-						'content' => LANG::GET('application.overview_cases', [':number' => $number]),
-						'description' => LANG::GET('menu.record_header'),
-						'attributes' => [
-							'data-type' => 'record'
-						]
-					]
-				]
-			];
-		}
-
-		// unapproved forms and components
-		$unapproved = $notifications->forms();
-		if ($unapproved){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onpointerup' => "api.form('get', 'approval')",
-				],
-				'content' => [
-					[
-						'type' => 'textblock',
-						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
-						'description' => LANG::GET('menu.forms_manage_approval'),
-						'attributes' => [
-							'data-type' => 'record'
-						]
-					]
-				]
-			];
-		}
-
-		// pending product incorporations
-		$unapproved = $notifications->consumables();
-		if ($unapproved){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onpointerup' => "api.purchase('get', 'pendingincorporations')",
-				],
-				'content' => [
-					[
-						'type' => 'textblock',
-						'content' => LANG::GET('consumables.approve_landing_page', [':number' => $unapproved]),
-						'description' => LANG::GET('menu.purchase_incorporated_pending'),
-						'attributes' => [
-							'data-type' => 'purchase'
-						]
-					]
-				]
-			];
-		}
-		
-		if (count($tiles)) $result['render']['content'][] = $tiles;
-
-		// calendar scheduled events
-		$overview = [];
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$week = $calendar->render('week', 'schedule');
-		$overview[] = [
-			'type' => 'calendar',
-			'description' => $week['header'],
-			'content' => $week['content'],
-			'api' => 'schedule'
-		];
-
-		$displayevents = $displayabsentmates = '';
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
-		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
-		foreach ($thisDaysEvents as $row){
-			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
-			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . "\n";
-			if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
-		}
-		if ($displayevents) $overview[] = [
-			'type' => 'textblock',
-			'description' => LANG::GET('calendar.events_assigned_units'),
-			'content' => $displayevents
-		];
-		if ($displayabsentmates) $overview[] = [
-			'type' => 'textblock',
-			'description' => LANG::GET('calendar.timesheet_irregular'),
-			'content' => $displayabsentmates
-		];
-
-		$today->modify('-1 day');
-		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
-		$uncompleted = [];
-		foreach ($pastEvents as $row){
-			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . substr($row['span_start'], 0, 10) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
-		}
-		if ($uncompleted) $overview[] = [
-			'type' => 'links',
-			'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
-			'content' => $uncompleted
-		];
-
-		if ($overview) $result['render']['content'][] = $overview;
-
-		// manual
-		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
-		$topics = [];
-		foreach ($query as $row){
-			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
-				[[
-					'type' => 'textblock',
-					'description' => $row['title'],
-					'content' => $row['content']
-				]];
-		}
-		if ($topics) $result['render']['content'][] = $topics;
-		$this->response($result);
-	}
-
-	
-	/**
+	 *                         _
+	 *   _____ ___ ___ _ _ ___| |
+	 *  |     | .'|   | | | .'| |
+	 *  |_|_|_|__,|_|_|___|__,|_|
+	 *
 	 * manual edting
 	 * POST, PUT and DELETE manual entries or
 	 * respond with form to add or edit manual entries 
@@ -553,6 +316,267 @@ class APPLICATION extends API {
 					]]);
 				break;
 		}
+		$this->response($result);
+	}
+
+	/**
+	 *
+	 *   _____ ___ ___ _ _
+	 *  |     | -_|   | | |
+	 *  |_|_|_|___|_|_|___|
+	 *
+	 * respond with menu taking user permissions into account
+	 */
+	public function menu(){
+		// get permission based menu items
+		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
+		$menu=[
+			LANG::GET('menu.communication_header') => [
+				LANG::GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
+				LANG::GET('menu.message_register') => ['onpointerup' => "api.message('get', 'register')"],
+				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
+			],
+			LANG::GET('menu.record_header') => [
+				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
+				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
+			],
+			LANG::GET('menu.calendar_header') => [
+				LANG::GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
+			],
+			LANG::GET('menu.application_header') => [
+				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('post', 'login', 'logout')"],
+				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
+				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
+			],
+			LANG::GET('menu.files_header') => [
+				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
+				LANG::GET('menu.files_bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
+				LANG::GET('menu.files_sharepoint') => ['onpointerup' => "api.file('get', 'sharepoint')"],
+			],
+			LANG::GET('menu.purchase_header') => [
+				LANG::GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
+				LANG::GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
+				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
+				LANG::GET('menu.purchase_vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
+				LANG::GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"],
+				LANG::GET('menu.purchase_products_with_expiry_dates') => ['onpointerup' => "api.purchase('get', 'products_with_expiry_dates')"],
+				LANG::GET('menu.purchase_products_with_special_attention') => ['onpointerup' => "api.purchase('get', 'products_with_special_attention')"],
+			],
+			LANG::GET('menu.tools_header') => [
+				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
+				LANG::GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
+				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"]
+			],
+		];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
+		// make sure risk management comes after forms 
+		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && array_key_exists('weeklyhours', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'])
+			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
+
+		if (PERMISSION::permissionFor('files')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
+		if (PERMISSION::permissionFor('externaldocuments')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
+		if (PERMISSION::permissionFor('formcomposer')){
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_bundles')] = ['onpointerup' => "api.form('get', 'bundle')"];
+		}
+		if (PERMISSION::permissionFor('filebundles')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
+		if (PERMISSION::permissionFor('users')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
+		if (PERMISSION::permissionFor('texttemplates')) {
+			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
+			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
+		}
+		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('csvfilter')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
+		if (PERMISSION::permissionFor('formapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
+		if (PERMISSION::permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
+		if (PERMISSION::permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
+		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
+
+		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
+	}
+
+	/**
+	 *       _           _
+	 *   ___| |_ ___ ___| |_
+	 *  |_ -|  _| .'|  _|  _|
+	 *  |___|_| |__,|_| |_|
+	 *
+	 * respond with landing page
+	 */
+	public function start(){
+		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
+		$tiles = [];
+
+		$notifications = new NOTIFICATION;
+
+		// messages
+		$unseen = $notifications->messageunseen();
+		if ($unseen) {
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.message('get', 'conversation')",
+				],
+				'content' => [
+					[
+						'type' => 'textblock',
+						'content' => LANG::GET('application.overview_messages', [':number' => $unseen]),
+						'description' => LANG::GET('menu.message_conversations'),
+						'attributes' => [
+							'data-type' => 'message'
+						]
+					]
+				]
+			];
+		}
+
+		// unprocessed orders
+		if (PERMISSION::permissionFor('orderprocessing')){
+			$unprocessed = $notifications->order();
+			if ($unprocessed) {
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onpointerup' => "api.purchase('get', 'approved')",
+					],
+					'content' => [
+						[
+							'type' => 'textblock',
+							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed]),
+							'description' => LANG::GET('menu.purchase_approved_orders'),
+							'attributes' => [
+								'data-type' => 'purchase'
+							]
+						]
+					]
+				];
+			}
+		}
+
+		// unclosed case documentation for own unit
+		$number = $notifications->records();
+		if ($number){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.record('get', 'records')",
+				],
+				'content' => [
+					[
+						'type' => 'textblock',
+						'content' => LANG::GET('application.overview_cases', [':number' => $number]),
+						'description' => LANG::GET('menu.record_header'),
+						'attributes' => [
+							'data-type' => 'record'
+						]
+					]
+				]
+			];
+		}
+
+		// unapproved forms and components
+		$unapproved = $notifications->forms();
+		if ($unapproved){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.form('get', 'approval')",
+				],
+				'content' => [
+					[
+						'type' => 'textblock',
+						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
+						'description' => LANG::GET('menu.forms_manage_approval'),
+						'attributes' => [
+							'data-type' => 'record'
+						]
+					]
+				]
+			];
+		}
+
+		// pending product incorporations
+		$unapproved = $notifications->consumables();
+		if ($unapproved){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.purchase('get', 'pendingincorporations')",
+				],
+				'content' => [
+					[
+						'type' => 'textblock',
+						'content' => LANG::GET('consumables.approve_landing_page', [':number' => $unapproved]),
+						'description' => LANG::GET('menu.purchase_incorporated_pending'),
+						'attributes' => [
+							'data-type' => 'purchase'
+						]
+					]
+				]
+			];
+		}
+		
+		if (count($tiles)) $result['render']['content'][] = $tiles;
+
+		// calendar scheduled events
+		$overview = [];
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$week = $calendar->render('week', 'schedule');
+		$overview[] = [
+			'type' => 'calendar',
+			'description' => $week['header'],
+			'content' => $week['content'],
+			'api' => 'schedule'
+		];
+
+		$displayevents = $displayabsentmates = '';
+		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
+		foreach ($thisDaysEvents as $row){
+			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
+			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . "\n";
+			if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+		}
+		if ($displayevents) $overview[] = [
+			'type' => 'textblock',
+			'description' => LANG::GET('calendar.events_assigned_units'),
+			'content' => $displayevents
+		];
+		if ($displayabsentmates) $overview[] = [
+			'type' => 'textblock',
+			'description' => LANG::GET('calendar.timesheet_irregular'),
+			'content' => $displayabsentmates
+		];
+
+		$today->modify('-1 day');
+		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+		$uncompleted = [];
+		foreach ($pastEvents as $row){
+			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . substr($row['span_start'], 0, 10) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+		}
+		if ($uncompleted) $overview[] = [
+			'type' => 'links',
+			'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
+			'content' => $uncompleted
+		];
+
+		if ($overview) $result['render']['content'][] = $overview;
+
+		// manual
+		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+		$topics = [];
+		foreach ($query as $row){
+			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
+				[[
+					'type' => 'textblock',
+					'description' => $row['title'],
+					'content' => $row['content']
+				]];
+		}
+		if ($topics) $result['render']['content'][] = $topics;
 		$this->response($result);
 	}
 }

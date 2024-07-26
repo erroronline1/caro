@@ -54,26 +54,65 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * calculates holidays for given year, according to setup.ini
-	 * no setting up on construction for possible year overlaps on week rendering
-	 * @param int $year Y
-	 * @return array containing holiday dates for a given year
+	 *       _         _
+	 *   ___| |___ ___| |_
+	 *  | .'| | -_|  _|  _|
+	 *  |__,|_|___|_| |_|
+	 *
+	 * @return array sql result
 	 */
-	public function holidays($year){
-		$holidays = $this->_holidays;
-		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
-
-		$easter = new DateTime('now', new DateTimeZone(INI['timezone']));
-		$easter->setTimestamp(easter_date($year));
-		foreach($this->_easter_holidays as $day => $offset){
-			$easterholiday = clone $easter;
-			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
-			$holidays[] = $easterholiday->format('Y-m-d');
-		}
-		return $holidays;
+	public function alert(){
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_alert');
 	}
-
+	
 	/**
+	 *                     _     _
+	 *   ___ ___ _____ ___| |___| |_ ___
+	 *  |  _| . |     | . | | -_|  _| -_|
+	 *  |___|___|_|_|_|  _|_|___|_| |___|
+	 *                |_|
+	 * @param str $id eventually comma separated multiple ints
+	 * @param any $close boolval false will clear
+	 * @param any $alert null remains state, bool updates
+	 * @return int affected rows
+	 */
+	public function complete($id = '0', $close = null, $alert = null){
+		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
+		$sqlchunks = [];
+		$affected_rows = 0;
+		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+			'replacements' => [
+				':id' => $id
+			]
+		]);
+		foreach ($entries as $entry){
+			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
+				[
+					':id' => $this->_pdo->quote($entry['id']),
+					':closed' => $this->_pdo->quote($close ? json_encode($close) : ''),
+					':alert' => $alert === null ? $entry['alert'] : intval($alert)
+				]
+			));
+		}
+		foreach ($sqlchunks as $chunk){
+			try {
+				$rows = SQLQUERY::EXECUTE($this->_pdo, $chunk);
+				if ($rows) $affected_rows += $rows;
+			}
+			catch (Exception $e) {
+				echo $e, $chunk;
+				die();
+			}
+		}
+		return $affected_rows;
+	}
+	
+	/**
+	 *     _
+	 *   _| |___ _ _ ___
+	 *  | . | .'| | |_ -|
+	 *  |___|__,|_  |___|
+	 *          |___|
 	 * calculates a calendar view, for given date week starts on monday, month on 1st
 	 * 
 	 * @param string $format month|week
@@ -110,55 +149,30 @@ class CALENDARUTILITY {
 		$result[count($result) - 1] = $last_day;
 		$this->_days = $result;
 	}
-
+	
 	/**
-	 * renders a calendar view, for given date week starts on monday, month on 1st, weekday offsets are empty
-	 * calculates holidays for every date for possible year overlaps in selected view-format
-	 * 
-	 * @param string $format month|week
-	 * @param string $type schedule|timesheet
-	 * @param string $date yyyy-mm-dd
-	 * 
-	 * @return array assemble.js calendar type
+	 *     _     _     _
+	 *   _| |___| |___| |_ ___
+	 *  | . | -_| | -_|  _| -_|
+	 *  |___|___|_|___|_| |___|
+	 *
+	 * @param int $id
+	 * @return int affected rows
 	 */
-	public function render($format = '', $type = '', $date = '', ){
-		$result = ['header' => null, 'content' => []];
-		if (!$this->_days || $date) $this->days($format, $date);
-
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
-		foreach ($this->_days as $day){
-			if ($day === null) $result['content'][] = null;
-			else {
-				$events = $this->getDay($day->format('Y-m-d'));
-				$numbers = 0;
-				foreach ($events as $row){
-					switch ($type){
-						case 'schedule':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))
-								if (!$row['closed'])
-								$numbers++;
-							break;
-						case 'timesheet':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))
-							$numbers++;
-					}	
-				}
-				$result['content'][] = [
-					'date' => $day->format('Y-m-d'),
-					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
-					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
-					'selected' => $date === $day->format('Y-m-d'),
-					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
-				];
-				if ($result['header']) continue;
-				if ($format === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
-				if ($format === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
-			}
-		}
-		return $result;
+	public function delete($id = 0){
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+			'values' => [
+				':id' => $id
+			]
+		]);
 	}
-
+	
 	/**
+	 *     _ _     _
+	 *   _| |_|___| |___ ___
+	 *  | . | | .'| | . | . |
+	 *  |___|_|__,|_|___|_  |
+	 *                  |___|
 	 * returns an assemble.js dialog script to contribute to the calendar
 	 * 
 	 * @param array $columns, like put-method, but :type must be provided
@@ -394,8 +408,213 @@ class CALENDARUTILITY {
 		return "new Dialog({type:'input', header: '', render: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
 			".then(response => {if (response) {_client.calendar.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
 	}
+	
+	/**
+	 *           _     _
+	 *   ___ ___| |_ _| |___ _ _
+	 *  | . | -_|  _| . | .'| | |
+	 *  |_  |___|_| |___|__,|_  |
+	 *  |___|               |___|
+	 * get all events where passed date is within span_start and span_end
+	 * this results in all currently happening events
+	 * 
+	 * @param string $date Y-m-d
+	 * @return array sql result
+	 */
+	public function getDay($date = ''){
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_day', [
+			'values' => [
+				':date' => $date
+			]
+		]);
+	}
+	
+	/**
+	 *           _         _ _   _   _       _     _
+	 *   ___ ___| |_ _ _ _|_| |_| |_|_|___ _| |___| |_ ___ ___ ___ ___ ___ ___
+	 *  | . | -_|  _| | | | |  _|   | |   | . | .'|  _| -_|  _| .'|   | . | -_|
+	 *  |_  |___|_| |_____|_|_| |_|_|_|_|_|___|__,|_| |___|_| |__,|_|_|_  |___|
+	 *  |___|                                                         |___|
+	 * get all events where span_start or span_end are within passed timespan 
+	 * 
+	 * @param string $earlier Y-m-d | null
+	 * @param string $later Y-m-d | null
+	 * @return array sql result
+	 */
+	public function getWithinDateRange($earlier = '', $later = ''){
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_within_date_range', [
+			'values' => [
+				':earlier' => $earlier ? : '1970-01-01 00:00:01',
+				':later' => $later ? : '2079-06-06 23:59:59'	
+			]
+		]);
+	}
+	
+	/**
+	 *   _       _ _   _
+	 *  | |_ ___| |_|_| |___ _ _ ___
+	 *  |   | . | | | . | .'| | |_ -|
+	 *  |_|_|___|_|_|___|__,|_  |___|
+	 *                      |___|
+	 * calculates holidays for given year, according to setup.ini
+	 * no setting up on construction for possible year overlaps on week rendering
+	 * @param int $year Y
+	 * @return array containing holiday dates for a given year
+	 */
+	public function holidays($year){
+		$holidays = $this->_holidays;
+		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
+
+		$easter = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$easter->setTimestamp(easter_date($year));
+		foreach($this->_easter_holidays as $day => $offset){
+			$easterholiday = clone $easter;
+			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
+			$holidays[] = $easterholiday->format('Y-m-d');
+		}
+		return $holidays;
+	}
 
 	/**
+	 *                 _               ___               _     _
+	 *   ___ _ _ _____| |_ ___ ___ ___|  _|_ _ _ ___ ___| |_ _| |___ _ _ ___
+	 *  |   | | |     | . | -_|  _| . |  _| | | | . |  _| '_| . | .'| | |_ -|
+	 *  |_|_|___|_|_|_|___|___|_| |___|_| |_____|___|_| |_,_|___|__,|_  |___|
+	 *                                                              |___|
+	 * @param datetime $start
+	 * @param datetime $end
+	 * 
+	 * @return int number of non-working days within timespan
+	 */
+	private function numberOfNonWorkdays($start, $end){
+		$start = clone $start; // not passed by value but by reference
+		$end = clone $end; // not passed by value but by reference
+		// subtract holidays and weekends
+		$holiday_num = 0;
+		$holidays = $this->holidays($start->format('Y'));
+		while ($start < $end){
+			$year = $start->format('Y');
+			if (in_array($start->format('Y-m-d'), $holidays) || !in_array($start->format('N'), $this->_workdays)) $holiday_num++;
+			$start->modify('+1 day');
+			if ($year !== $start->format('Y')) $holidays = $this->holidays($start->format('Y'));
+		}
+		return $holiday_num;
+	}
+
+	/**
+	 *               _
+	 *   ___ ___ ___| |_
+	 *  | . | . |_ -|  _|
+	 *  |  _|___|___|_|
+	 *  |_|
+	 * @param array $columns
+	 * 	[
+	 * 	':type' => string,
+	 * 	':span_start' => string Y-m-d H:i:s,
+	 * 	':span_end' => string Y-m-h H:i:s,
+	 * 	':author_id' => int,
+	 * 	':affected_user_id' => int,
+	 * 	':organizational_unit' => str,
+	 * 	':subject' => str,
+	 * 	':misc' => str (e.g. json_encoded whatnot),
+	 * 	':closed' => str (e.g. json_encoded when, by whom),
+	 * 	':alert' => int 1|0
+	 * 	]
+	 * @return int|bool insert id
+	 */
+	public function post($columns = []){
+		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
+			'values' => $columns
+		])) return $this->_pdo->lastInsertId();
+		return false;
+	}
+	
+	/**
+	 *           _
+	 *   ___ _ _| |_
+	 *  | . | | |  _|
+	 *  |  _|___|_|
+	 *  |_|
+	 * @param array $columns
+	 * 	[
+	 * 	':id' => int
+	 * 	type isn't supposed to change
+	 * 	':span_start' => string Y-m-d H:i:s,
+	 * 	':span_end' => string Y-m-h H:i:s,
+	 * 	':author_id' => int,
+	 * 	':affected_user_id' => int,
+	 * 	':organizational_unit' => str,
+	 * 	':subject' => str,
+	 * 	':misc' => str (e.g. json_encoded whatnot),
+	 * 	':closed' => str (e.g. json_encoded when, by whom),
+	 * 	':alert' => int 1|0
+	 * 	]
+	 * @return int affected rows
+	 */
+	public function put($columns = []){
+		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
+			'values' => $columns
+		]);
+	}
+
+	/**
+	 *                 _
+	 *   ___ ___ ___ _| |___ ___
+	 *  |  _| -_|   | . | -_|  _|
+	 *  |_| |___|_|_|___|___|_|
+	 *
+	 * renders a calendar view, for given date week starts on monday, month on 1st, weekday offsets are empty
+	 * calculates holidays for every date for possible year overlaps in selected view-format
+	 * 
+	 * @param string $format month|week
+	 * @param string $type schedule|timesheet
+	 * @param string $date yyyy-mm-dd
+	 * 
+	 * @return array assemble.js calendar type
+	 */
+	public function render($format = '', $type = '', $date = '', ){
+		$result = ['header' => null, 'content' => []];
+		if (!$this->_days || $date) $this->days($format, $date);
+
+		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		foreach ($this->_days as $day){
+			if ($day === null) $result['content'][] = null;
+			else {
+				$events = $this->getDay($day->format('Y-m-d'));
+				$numbers = 0;
+				foreach ($events as $row){
+					switch ($type){
+						case 'schedule':
+							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))
+								if (!$row['closed'])
+								$numbers++;
+							break;
+						case 'timesheet':
+							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))
+							$numbers++;
+					}	
+				}
+				$result['content'][] = [
+					'date' => $day->format('Y-m-d'),
+					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
+					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
+					'selected' => $date === $day->format('Y-m-d'),
+					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
+				];
+				if ($result['header']) continue;
+				if ($format === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
+				if ($format === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 *   _   _               _           _
+	 *  | |_|_|_____ ___ ___| |_ ___ ___| |_ ___ _ _ _____ _____ ___ ___ _ _
+	 *  |  _| |     | -_|_ -|   | -_| -_|  _|_ -| | |     |     | .'|  _| | |
+	 *  |_| |_|_|_|_|___|___|_|_|___|___|_| |___|___|_|_|_|_|_|_|__,|_| |_  |
+	 *                                                                  |___|
 	 * calculates time and off-duty days summed up for users from beginning of a given month to the end of another given month
 	 * overtime and vacation calculation only works if $from_date starts from the dawn of time
 	 * so you might have to do two queries and combine their output,
@@ -583,6 +802,11 @@ class CALENDARUTILITY {
 	}
 
 	/**
+	 *   _   _               _       _       ___ _         _
+	 *  | |_|_|_____ ___ ___| |_ ___| |_ ___|  _| |___ ___| |_
+	 *  |  _| |     | -_|_ -|  _|  _|  _| . |  _| | . | .'|  _|
+	 *  |_| |_|_|_|_|___|___|_| |_| |_| |___|_| |_|___|__,|_|
+	 *
 	 * returns a float from H:i format
 	 * 
 	 * @param string $string H:i
@@ -595,65 +819,11 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 * @param datetime $start
-	 * @param datetime $end
-	 * 
-	 * @return int number of non-working days within timespan
-	 */
-	private function numberOfNonWorkdays($start, $end){
-		$start = clone $start; // not passed by value but by reference
-		$end = clone $end; // not passed by value but by reference
-		// subtract holidays and weekends
-		$holiday_num = 0;
-		$holidays = $this->holidays($start->format('Y'));
-		while ($start < $end){
-			$year = $start->format('Y');
-			if (in_array($start->format('Y-m-d'), $holidays) || !in_array($start->format('N'), $this->_workdays)) $holiday_num++;
-			$start->modify('+1 day');
-			if ($year !== $start->format('Y')) $holidays = $this->holidays($start->format('Y'));
-		}
-		return $holiday_num;
-	}
-
-	/**
-	 * get all events where passed date is within span_start and span_end
-	 * this results in all currently happening events
-	 * 
-	 * @param string $date Y-m-d
-	 * @return array sql result
-	 */
-	public function getDay($date = ''){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_day', [
-			'values' => [
-				':date' => $date
-			]
-		]);
-	}
-
-	/**
-	 * @return array sql result
-	 */
-	public function alert(){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_alert');
-	}
-
-	/**
-	 * get all events where span_start or span_end are within passed timespan 
-	 * 
-	 * @param string $earlier Y-m-d | null
-	 * @param string $later Y-m-d | null
-	 * @return array sql result
-	 */
-	public function getWithinDateRange($earlier = '', $later = ''){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_within_date_range', [
-			'values' => [
-				':earlier' => $earlier ? : '1970-01-01 00:00:01',
-				':later' => $later ? : '2079-06-06 23:59:59'	
-			]
-		]);
-	}
-
-	/**
+	 *                       _
+	 *   ___ ___ ___ ___ ___| |_
+	 *  |_ -| -_| .'|  _|  _|   |
+	 *  |___|___|__,|_| |___|_|_|
+	 *
 	 * @param string $search
 	 * @return array sql result
 	 */
@@ -661,101 +831,6 @@ class CALENDARUTILITY {
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
 				':subject' => $search
-			]
-		]);
-	}
-
-	/**
-	 * @param array $columns
-	 * 	[
-	 * 	':type' => string,
-	 * 	':span_start' => string Y-m-d H:i:s,
-	 * 	':span_end' => string Y-m-h H:i:s,
-	 * 	':author_id' => int,
-	 * 	':affected_user_id' => int,
-	 * 	':organizational_unit' => str,
-	 * 	':subject' => str,
-	 * 	':misc' => str (e.g. json_encoded whatnot),
-	 * 	':closed' => str (e.g. json_encoded when, by whom),
-	 * 	':alert' => int 1|0
-	 * 	]
-	 * @return int|bool insert id
-	 */
-	public function post($columns = []){
-		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
-			'values' => $columns
-		])) return $this->_pdo->lastInsertId();
-		return false;
-	}
-
-	/**
-	 * @param array $columns
-	 * 	[
-	 * 	':id' => int
-	 * 	type isn't supposed to change
-	 * 	':span_start' => string Y-m-d H:i:s,
-	 * 	':span_end' => string Y-m-h H:i:s,
-	 * 	':author_id' => int,
-	 * 	':affected_user_id' => int,
-	 * 	':organizational_unit' => str,
-	 * 	':subject' => str,
-	 * 	':misc' => str (e.g. json_encoded whatnot),
-	 * 	':closed' => str (e.g. json_encoded when, by whom),
-	 * 	':alert' => int 1|0
-	 * 	]
-	 * @return int affected rows
-	 */
-	public function put($columns = []){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
-			'values' => $columns
-		]);
-	}
-
-	/**
-	 * @param str $id eventually comma separated multiple ints
-	 * @param any $close boolval false will clear
-	 * @param any $alert null remains state, bool updates
-	 * @return int affected rows
-	 */
-	public function complete($id = '0', $close = null, $alert = null){
-		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
-		$sqlchunks = [];
-		$affected_rows = 0;
-		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
-			'replacements' => [
-				':id' => $id
-			]
-		]);
-		foreach ($entries as $entry){
-			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
-				[
-					':id' => $this->_pdo->quote($entry['id']),
-					':closed' => $this->_pdo->quote($close ? json_encode($close) : ''),
-					':alert' => $alert === null ? $entry['alert'] : intval($alert)
-				]
-			));
-		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				$rows = SQLQUERY::EXECUTE($this->_pdo, $chunk);
-				if ($rows) $affected_rows += $rows;
-			}
-			catch (Exception $e) {
-				echo $e, $chunk;
-				die();
-			}
-		}
-		return $affected_rows;
-	}
-
-	/**
-	 * @param int $id
-	 * @return int affected rows
-	 */
-	public function delete($id = 0){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-			'values' => [
-				':id' => $id
 			]
 		]);
 	}

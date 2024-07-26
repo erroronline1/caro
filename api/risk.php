@@ -31,6 +31,13 @@ class RISK extends API {
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 	}
 
+	/**
+	 *       _     _
+	 *   ___|_|___| |_
+	 *  |  _| |_ -| '_|
+	 *  |_| |_|___|_,_|
+	 *
+	 */
 	public function risk(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':

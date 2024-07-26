@@ -125,25 +125,48 @@ class API {
 	}
 	
 	/**
-	 * api response
-	 * @param array|string $data what should be responded
-	 * @param int $status optional override for error cases
-	 * no return, end of api processing
+	 * posts a system message to a user group
+	 * @param array $group 'permission'=>[] ||&& 'unit'=>[] reach out for permission holders or unit member or permission holders within units
+	 * @param string $message actual message content
+	 * no return
+	 * 
+	 * if permission and unit are both set only permission holders within units get the message! 
 	 */
-	public function response($data, $status = 200){
-		if(is_array($data)) {
-			$data = json_encode($data);
-			$this->_httpResponse = $status;
+	public function alertUserGroup($group = [], $message = ''){
+		$permission = $unit = $recipients = [];
+		if (array_key_exists('permission', $group)){
+			foreach($group['permission'] as $prmssn){
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
+				$statement->execute([
+					':group' => $prmssn
+				]);
+				array_push($permission, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
+			}
 		}
-		else {
-			$data = '';
-			$this->_httpResponse = 500;
+		if (array_key_exists('unit', $group)){
+			foreach($group['unit'] as $unt){
+				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
+				$statement->execute([
+					':group' => $unt
+				]);
+				array_push($unit, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
+			}
 		}
-		$this->set_headers();
-		echo $data;
-		exit;
+		if ($permission) $recipients = $permission;
+		if ($unit) $recipients = $unit;
+		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
+		$recipients = array_unique($recipients);
+		foreach($recipients as $rcpnt_id) {
+			$postmessage = [
+				'to_user' => $rcpnt_id,
+				'message' => $message
+			];
+			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));
+			$statement->execute($postmessage);
+		}
 	}
-	
+
+
 	/**
 	 * @return str readable http status message based on $this->_httpResponse
 	 */
@@ -193,68 +216,6 @@ class API {
 		return ($status[$this->_httpResponse])?$status[$this->_httpResponse]:$status[500];
 	}
 
-	/**
-	 * sets document headers in advance of output stream
-	 * no return
-	 */
-	private function set_headers(){
-		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
-		header("Content-Type:application/json; charset=utf-8");
-	}
-
-	/**
-	 * executes the called api method
-	 * no return
-	 */
-	public function processApi(){
-		$func = strtolower($this->_requestedMethod);
-		if(method_exists($this, $func))
-			$this->$func();
-		else
-			$this->response([], 404); // If the method not exist with in this class, response would be "Page not found".
-	}
-
-	/**
-	 * posts a system message to a user group
-	 * @param array $group 'permission'=>[] ||&& 'unit'=>[] reach out for permission holders or unit member or permission holders within units
-	 * @param string $message actual message content
-	 * no return
-	 * 
-	 * if permission and unit are both set only permission holders within units get the message! 
-	 */
-	public function alertUserGroup($group = [], $message = ''){
-		$permission = $unit = $recipients = [];
-		if (array_key_exists('permission', $group)){
-			foreach($group['permission'] as $prmssn){
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
-				$statement->execute([
-					':group' => $prmssn
-				]);
-				array_push($permission, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
-			}
-		}
-		if (array_key_exists('unit', $group)){
-			foreach($group['unit'] as $unt){
-				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
-				$statement->execute([
-					':group' => $unt
-				]);
-				array_push($unit, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
-			}
-		}
-		if ($permission) $recipients = $permission;
-		if ($unit) $recipients = $unit;
-		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
-		$recipients = array_unique($recipients);
-		foreach($recipients as $rcpnt_id) {
-			$postmessage = [
-				'to_user' => $rcpnt_id,
-				'message' => $message
-			];
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));
-			$statement->execute($postmessage);
-		}
-	}
 
 	/**
 	 * returns a default content for lack of database entries
@@ -267,6 +228,48 @@ class API {
 			'content' => LANG::GET('general.no_content_available', [':content' => $type])]
 		]];
 	}
+
+	/**
+	 * api response
+	 * @param array|string $data what should be responded
+	 * @param int $status optional override for error cases
+	 * no return, end of api processing
+	 */
+	public function response($data, $status = 200){
+		if(is_array($data)) {
+			$data = json_encode($data);
+			$this->_httpResponse = $status;
+		}
+		else {
+			$data = '';
+			$this->_httpResponse = 500;
+		}
+		$this->set_headers();
+		echo $data;
+		exit;
+	}
+
+	/**
+	 * executes the called api method
+	 * no return
+	 */
+	public function processApi(){
+		$func = strtolower($this->_requestedMethod);
+		if(method_exists($this, $func))
+			$this->$func();
+		else
+			$this->response([], 404); // If the method not exist within this class, response would be "Page not found".
+	}
+
+	/**
+	 * sets document headers in advance of output stream
+	 * no return
+	 */
+	private function set_headers(){
+		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
+		header("Content-Type:application/json; charset=utf-8");
+	}
+
 }
 
 if (in_array(REQUEST[0], ['application', 'audit', 'calendar', 'consumables', 'csvfilter', 'file', 'form', 'message', 'notification', 'order', 'record', 'risk', 'texttemplate', 'tool', 'user'])) require_once(REQUEST[0] . '.php');

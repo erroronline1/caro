@@ -32,6 +32,13 @@ class TEXTTEMPLATE extends API {
 		$this->_modal = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
 	}
 
+	/**
+	 *       _           _
+	 *   ___| |_ _ _ ___| |_
+	 *  |  _|   | | |   | '_|
+	 *  |___|_|_|___|_|_|_,_|
+	 *
+	 */
 	public function chunk(){
 		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -279,6 +286,13 @@ class TEXTTEMPLATE extends API {
 		}					
 	}
 
+	/**
+	 *   _                 _     _
+	 *  | |_ ___ _____ ___| |___| |_ ___
+	 *  |  _| -_|     | . | | .'|  _| -_|
+	 *  |_| |___|_|_|_|  _|_|__,|_| |___|
+	 *                |_|
+	 */
 	public function template(){
 		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -523,6 +537,13 @@ class TEXTTEMPLATE extends API {
 		}
 	}
 
+	/**
+	 *   _           _
+	 *  | |_ ___ _ _| |_
+	 *  |  _| -_|_'_|  _|
+	 *  |_| |___|_,_|_|
+	 *
+	 */
 	public function text(){
 		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
 

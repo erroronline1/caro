@@ -54,6 +54,14 @@ class LANG {
 	}
 
 	/**
+	 * returns languagefile as transfer for js frontend
+	 * @return array LANGUAGEFILE
+	 */
+	public static function GETALL(){
+		return LANGUAGEFILE;
+	}
+	
+	/**
 	 * returns a language specific chunk with whitespaces replaced with underscore as in request parameters
 	 * @param str $request dot separated keys of LANGUAGEFILE
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
@@ -62,14 +70,5 @@ class LANG {
 	public static function PROPERTY($request, $replace=[]){
 		return str_replace(' ', '_', self::GET($request, $replace));
 	}
-
-	/**
-	 * returns languagefile as transfer for js frontend
-	 * @return array LANGUAGEFILE
-	 */
-	public static function GETALL(){
-		return LANGUAGEFILE;
-	}
 }
-
 ?>

@@ -41,6 +41,287 @@ class CALENDAR extends API {
 	}
 
 	/**
+	 *                     _     _
+	 *   ___ ___ _____ ___| |___| |_ ___
+	 *  |  _| . |     | . | | -_|  _| -_|
+	 *  |___|___|_|_|_|  _|_|___|_| |___|
+	 *                |_|
+	 * updates scheduled events in terms of completion
+	 * $this->_requestedId string with eventually comma separated integers
+	 */
+	public function complete(){
+		if ($this->_requestedCalendarType === 'timesheet'
+			&& !(PERMISSION::permissionFor('calendarfullaccess')
+			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
+			&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
+		$response = [
+			'schedule' => [
+				0 => LANG::GET('calendar.event_incompleted'),
+				1 => LANG::GET('calendar.event_completed')
+			],
+			'timesheet' => [
+				0 => LANG::GET('calendar.timesheet_disapproved'),
+				1 => LANG::GET('calendar.timesheet_approved')
+			],
+		];
+		$alert = null;
+		if ($this->_requestedCalendarType === 'schedule') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
+
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
+			'response' => [
+				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
+				'type' => 'success'
+			]]);
+		else $this->response([
+			'response' => [
+				'msg' => LANG::GET('calendar.event_not_found'),
+				'type' => 'error'
+			]]);
+	}
+
+	/**
+	 *                 _   _   _     _   _               _           _
+	 *   _____ ___ ___| |_| |_| |_ _| |_|_|_____ ___ ___| |_ ___ ___| |_
+	 *  |     | . |   |  _|   | | | |  _| |     | -_|_ -|   | -_| -_|  _|
+	 *  |_|_|_|___|_|_|_| |_|_|_|_  |_| |_|_|_|_|___|___|_|_|___|___|_|
+	 *                          |___|
+	 * retrieve all timesheet entries from the database,
+	 * prepare and calculate hours, vacation days and other pto
+	 * gathers all the entries though, supposed to be filtered by different methods 
+	 */
+	public function monthlyTimesheets(){
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar->days('month', $this->_requestedTimespan);
+		$holidays = $calendar->holidays(substr($this->_requestedTimespan, 0, 4));
+		$days = $calendar->_days;
+		$first = $last = '';
+
+		function timeStrToFloat($string){
+			$string = explode(':', $string);
+			return intval($string[0]) + (intval($string[1]) / 60);
+		}
+
+		foreach($days as $id => $day){
+			if ($day === null) unset($days[$id]);
+			else {
+				$first = clone $day;
+				break;
+			}
+		}
+		$last = clone $days[count($days) - 1];
+		$days = array_values($days);
+		
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		// retrieve stats in advance
+		$timesheet_stats_month = $calendar->timesheetSummary($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
+		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $last->format('Y-m-d'));
+		// item listing still needs another request for all monthly events and entries
+		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
+
+		$timesheets = [];
+		// prepare interval for daily hours display
+		$minuteInterval = new DateInterval('PT1M');
+
+		//iterate over all days of the selected month
+		foreach ($days as $day){
+			if (!$day) continue; // null, beginning of month
+			// iterate over all entries within the selected month
+			foreach ($month as $id => $entry){
+				if ($entry['type'] !== 'timesheet'){
+					unset($month[$id]); // default delete for next iteration
+					continue;
+				}
+				//retrieve stats for affected user
+				$stats_month_row = array_search($entry['affected_user_id'], array_column($timesheet_stats_month, '_id'));
+				if ($stats_month_row === false) continue;
+
+				$stats_month_row = $timesheet_stats_month[$stats_month_row];
+				$stats_all_row = $timesheet_stats_all[array_search($entry['affected_user_id'], array_column($timesheet_stats_all, '_id'))];
+				if (!array_key_exists($entry['affected_user_id'], $timesheets)) {
+					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
+					$pto = [];
+					foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $translation){
+						if (array_key_exists($key, $stats_month_row)) $pto[$key] = $stats_month_row[$key];
+					}
+					$timesheets[$entry['affected_user_id']] = [
+						'name' => $entry['affected_user'],
+						'user_id' => $entry['affected_user_id'],
+						'units' => implode(', ', $units),
+						'month' => LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
+						'days' => [],
+						'pto' => $pto,
+						'performed' => $stats_month_row['_performed'],
+						'projected' => $stats_month_row['_projected'],
+						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
+						'leftvacation' => $stats_all_row['_leftvacation'],
+						'overtime' => $stats_all_row['_overtime'],
+						'monthlyovertime' => $stats_month_row['_overtime']
+					];
+				}
+				
+				$span_start = new DateTime($entry['span_start'], new DateTimeZone(INI['timezone']));
+				$span_end = new DateTime($entry['span_end'], new DateTimeZone(INI['timezone']));
+				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
+					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
+					&& !array_key_exists($day->format('Y-m-d'), $timesheets[$entry['affected_user_id']]['days'])){
+					// calculate hours for stored regular working days only
+					$misc = json_decode($entry['misc'], true);
+					if (!strlen($entry['subject'])) {
+						$firstday = $days[0]; // copy object for down below method usage
+						$lastday = $days[count($days) - 1];  // copy object for down below method usage
+						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
+						$dailyhours = iterator_count($periods) / 60;
+						if (array_key_exists('homeoffice', $misc)) $dailyhours += timeStrToFloat($misc['homeoffice']);
+						if (array_key_exists('break', $misc)) $dailyhours -= timeStrToFloat($misc['break']);
+
+						$timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = [
+							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
+							'break' => array_key_exists('break', $misc) ? $misc['break'] : '',
+							'homeoffice' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
+							'note' => array_key_exists('note', $misc) ? $misc['note'] : '',
+							'hours' => $dailyhours,
+						];
+					}
+					// else state subject
+					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => LANGUAGEFILE['calendar']['timesheet_pto'][$entry['subject']], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
+				}
+			}
+		}
+		// postprocess array
+		foreach($timesheets as $id => $user){
+			// append missing dates for overview, after all the output shall be comprehensible
+			foreach ($days as $day){
+				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
+				$timesheets[$id]['days'][$day->format('Y-m-d')]['weekday'] = LANGUAGEFILE['general']['weekday'][$day->format('N')];
+				$timesheets[$id]['days'][$day->format('Y-m-d')]['holiday'] = in_array($day->format('Y-m-d'), $holidays) || !in_array($day->format('N'), $calendar->_workdays);
+			}
+			// sort date keys
+			ksort($timesheets[$id]['days']);
+		}
+		// sort by user name
+		usort($timesheets, function ($a, $b) {
+			return $a['name'] === $b['name'] ? 0 : ($a['name'] < $b['name'] ? -1 : 1); 
+		});
+		// set self to top 
+		$self = array_splice($timesheets, array_search($_SESSION['user']['id'], array_column($timesheets, 'user_id')), 1);
+		array_splice($timesheets, 0, 0, $self);
+
+		$summary = [
+			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('menu.calendar_timesheet') . '_' . date('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => $this->prepareTimesheetOutput($timesheets),
+			'files' => [],
+			'images' => [],
+			'title' => LANG::GET('menu.calendar_timesheet'),
+			'date' => date('y-m-d H:i')
+		];
+
+		$downloadfiles = [];
+		$downloadfiles[LANG::GET('menu.calendar_timesheet')] = [
+			'href' => PDF::timesheetPDF($summary)
+		];
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  LANG::GET('calendar.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
+	/**
+	 *                               _   _               _           _           _           _
+	 *   ___ ___ ___ ___ ___ ___ ___| |_|_|_____ ___ ___| |_ ___ ___| |_ ___ _ _| |_ ___ _ _| |_
+	 *  | . |  _| -_| . | .'|  _| -_|  _| |     | -_|_ -|   | -_| -_|  _| . | | |  _| . | | |  _|
+	 *  |  _|_| |___|  _|__,|_| |___|_| |_|_|_|_|___|___|_|_|___|___|_| |___|___|_| |  _|___|_|
+	 *  |_|         |_|                                                             |_|
+	 * filter by permission, prepare output for pdf handler
+	 * @param array $timesheets prepared database results
+	 * 
+	 * @return array prepared for pdf processing
+	 * [
+	 * 		[ // user
+	 * 			[], // empty row
+	 * 			[
+	 * 				[str description, bool greyed out], // marked holidays and non working day as per ini
+	 * 				str content
+	 * 			]
+	 * 		]
+	 * ]
+	 */
+	private function prepareTimesheetOutput($timesheets = []){
+		$result = [];
+		foreach($timesheets as $user){
+			$rows = [];
+			if (PERMISSION::permissionFor('calendarfulltimesheetexport')
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
+				|| $id === $_SESSION['user']['id']
+			){
+				// summary
+				$rows[] = [
+					[$user['name'], false],
+					LANG::GET('calendar.export_sheet_subject', [
+						':appname' => INI['system']['caroapp'],
+						':id' => $user['user_id'],
+						':units' => $user['units'],
+						':weeklyhours' => $user['weeklyhours'],
+					])
+				];
+				$rows[] = [];
+				// days
+				foreach ($user['days'] as $date => $day){
+					$dayinfo = [];
+					if (array_key_exists('subject', $day)) $dayinfo[] = $day['subject'];
+					foreach(LANGUAGEFILE['calendar']['export_sheet_daily'] as $key => $value){
+						if (array_key_exists($key, $day) && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
+					}
+					if (array_key_exists('note', $day) && $day['note']) $dayinfo[] = $day['note'];
+					
+					$rows[] = [
+						[$day['weekday'] . ' ' . $date, $day['holiday']],
+						implode(', ', $dayinfo)
+					];
+				}
+				$rows[] = [];
+				// pto
+				foreach ($user['pto'] as $pto => $number){
+					$rows[] = [
+						[LANGUAGEFILE['calendar']['timesheet_pto'][$pto], false],
+						LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number])
+					];
+				}
+				if ($user['pto']) $rows[] = [];
+				$rows[] = [
+					[LANG::GET('calendar.export_sheet_summary'), false],
+					LANG::GET('calendar.export_sheet_summary_text', [
+						':name' => $user['name'],
+						':performed' => $user['performed'],
+						':projected' => $user['projected'],
+						':month' => $user['month'],
+						':overtime' => $user['overtime'],
+						':_monthlyovertime' => $user['monthlyovertime'],
+						':vacation' => $user['leftvacation'],
+					])
+				];
+				$rows[] = [];
+
+				$result[] = $rows;				
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 *                       _
+	 *   ___ ___ ___ ___ ___| |_
+	 *  |_ -| -_| .'|  _|  _|   |
+	 *  |___|___|__,|_| |___|_|_|
+	 *
 	 * search scheduled events by $this->_requestedId (search string)
 	 * 
 	 * reroutes to calendar method without search string
@@ -79,124 +360,11 @@ class CALENDAR extends API {
 	}
 
 	/**
-	 * updates scheduled events in terms of completion
-	 * $this->_requestedId string with eventually comma separated integers
-	 */
-	public function complete(){
-		if ($this->_requestedCalendarType === 'timesheet'
-			&& !(PERMISSION::permissionFor('calendarfullaccess')
-			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
-			&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
-		$response = [
-			'schedule' => [
-				0 => LANG::GET('calendar.event_incompleted'),
-				1 => LANG::GET('calendar.event_completed')
-			],
-			'timesheet' => [
-				0 => LANG::GET('calendar.timesheet_disapproved'),
-				1 => LANG::GET('calendar.timesheet_approved')
-			],
-		];
-		$alert = null;
-		if ($this->_requestedCalendarType === 'schedule') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
-
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
-			'response' => [
-				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
-				'type' => 'success'
-			]]);
-		else $this->response([
-			'response' => [
-				'msg' => LANG::GET('calendar.event_not_found'),
-				'type' => 'error'
-			]]);
-	}
-
-	/**
-	 * renders scheduled events as tiles
-	 * @param array $dbevents db query results
-	 * @param object $calendar inherited CALENDARUTILITY-object
-	 * 
-	 * @return array render options for assemble.js 
- 	*/
-	private function scheduledEvents($dbevents, $calendar){
-		$events = [];
-		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone(INI['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone(INI['timezone']));
-			if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['type'] !== 'schedule' ) continue;
-			$display = LANG::GET('calendar.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
-				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
-			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
-
-			// replace deleted user names
-			if (!$row['author']) $row['author'] = LANG::GET('message.deleted_user');
-			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
-
-			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'schedule')"];
-			$completed_hint = '';
-			if ($row['closed']) {
-				$completed[LANG::GET('calendar.event_complete')]['checked'] = true;
-				$row['closed'] = json_decode($row['closed'], true);
-				$completed_hint = LANG::GET('calendar.event_completed_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
-			}
-
-			$events[] = [
-				'type' => 'tile',
-				'content' => [
-					[
-						'type' => 'textblock',
-						'attributes' => [
-							'data-type' => $row['alert'] ? 'alert' : 'text'
-						],
-						'description' => $row['subject'],
-						'content' => $display
-					],
-					[
-						'type' => 'checkbox',
-						'content' => $completed,
-						'hint' => $completed_hint
-					],					
-				]
-			];
-			if (PERMISSION::permissionFor('calendaredit')) {
-				$columns = [
-					':id' => $row['id'],
-					':type' => 'schedule',
-					':span_start' => $date->format('Y-m-d'),
-					':span_end' => $due->format('Y-m-d'),
-					':author_id' => $row['author_id'],
-					':affected_user_id' => $row['affected_user_id'],
-					':organizational_unit' => $row['organizational_unit'],
-					':subject' => $row['subject'],
-					':misc' => '',
-					':closed' => '',
-					':alert' => $row['alert']
-				];			   
-				$events[count($events)-1]['content'][] = [
-					'type' => 'button',
-					'attributes' => [
-						'type' => 'button',
-						'value' => LANG::GET('calendar.event_edit'),
-						'onpointerup' => $calendar->dialog($columns)
-					],
-					'hint' => LANG::GET('calendar.event_author') . ': ' . $row['author']
-				];
-				$events[count($events)-1]['content'][] = [
-					'type' => 'deletebutton',
-					'attributes' => [
-						'value' => LANG::GET('calendar.event_delete'),
-						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('calendar.event_delete') . " " . $row['subject'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('calendar.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . ");});"
-					]
-				];
-			}
-		}
-		return $events;
-	}
-
-	/**
+	 *           _         _     _
+	 *   ___ ___| |_ ___ _| |_ _| |___
+	 *  |_ -|  _|   | -_| . | | | | -_|
+	 *  |___|___|_|_|___|___|___|_|___|
+	 *
 	 * handle scheduled events
 	 * post adds event to calendar
 	 * put updates event data
@@ -416,41 +584,37 @@ class CALENDAR extends API {
 	}
 	
 	/**
-	 * renders timesheet entries as tiles
+	 *           _         _     _       _                 _
+	 *   ___ ___| |_ ___ _| |_ _| |___ _| |___ _ _ ___ ___| |_ ___
+	 *  |_ -|  _|   | -_| . | | | | -_| . | -_| | | -_|   |  _|_ -|
+	 *  |___|___|_|_|___|___|___|_|___|___|___|\_/|___|_|_|_| |___|
+	 *
+	 * renders scheduled events as tiles
 	 * @param array $dbevents db query results
 	 * @param object $calendar inherited CALENDARUTILITY-object
 	 * 
 	 * @return array render options for assemble.js 
  	*/
-	 private function timesheetEntries($dbevents, $calendar){
+	private function scheduledEvents($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
 			$date = new DateTime($row['span_start'], new DateTimeZone(INI['timezone']));
 			$due = new DateTime($row['span_end'], new DateTimeZone(INI['timezone']));
-			if ($row['type'] !== 'timesheet'
-				|| !($row['affected_user_id'] === $_SESSION['user']['id']
-				|| PERMISSION::permissionFor('calendarfulltimesheetexport')
-				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
-				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
-			)) continue;
+			if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['type'] !== 'schedule' ) continue;
+			$display = LANG::GET('calendar.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
+				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
+			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
 
 			// replace deleted user names
 			if (!$row['author']) $row['author'] = LANG::GET('message.deleted_user');
 			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 
-			$hint = '';
-			$display = '';
-			if ($row['subject']) $display .= LANG::GET('calendar.timesheet_irregular') . ': ' . LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . "\n";
-			$display .=	LANG::GET('calendar.timesheet_start') . ': ' . $date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n" .
-				LANG::GET('calendar.timesheet_end') . ': ' . $due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n";
-
-			if ($row['misc']){
-				$misc = json_decode($row['misc'], true);
-				if (!$row['subject'] && array_key_exists('break', $misc)) $display .= LANG::GET('calendar.timesheet_break') . ': ' . $misc['break'] . "\n";
-				if (!$row['subject'] && array_key_exists('homeoffice', $misc)) $display .= LANG::GET('calendar.timesheet_homeoffice') . ': ' . $misc['homeoffice'] . "\n";
-				if ($row['author_id'] != $row['affected_user_id']) {
-					$hint = LANG::GET('calendar.timesheet_foreign_contributor') . ': ' . $row['author'] . "\n";
-				}
+			$completed[LANG::GET('calendar.event_complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'schedule')"];
+			$completed_hint = '';
+			if ($row['closed']) {
+				$completed[LANG::GET('calendar.event_complete')]['checked'] = true;
+				$row['closed'] = json_decode($row['closed'], true);
+				$completed_hint = LANG::GET('calendar.event_completed_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
 			}
 
 			$events[] = [
@@ -461,65 +625,44 @@ class CALENDAR extends API {
 						'attributes' => [
 							'data-type' => $row['alert'] ? 'alert' : 'text'
 						],
-						'description' => $row['affected_user'],
-						'content' => $display,
-						'hint' => $hint ? : null
+						'description' => $row['subject'],
+						'content' => $display
+					],
+					[
+						'type' => 'checkbox',
+						'content' => $completed,
+						'hint' => $completed_hint
 					],					
 				]
 			];
-			/**
-			 * approval can only be set by
-			 * admin, ceo and supervisor of assigned unit
-			 */
-			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
-			if (!(PERMISSION::permissionFor('calendarfullaccess')
-				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
-				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))))
-				$completed[LANG::GET('calendar.timesheet_approve')]['disabled'] = true;
-			$completed_hint = '';
-			if ($row['closed']) {
-				$completed[LANG::GET('calendar.timesheet_approve')]['checked'] = true;
-				$row['closed'] = json_decode($row['closed'], true);
-				$completed_hint = LANG::GET('calendar.timesheet_approved_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
-			}
-			$events[count($events)-1]['content'][] = [
-				'type' => 'checkbox',
-				'content' => $completed,
-				'hint' => $completed_hint,
-			];
-
-			/**
-			 * editing and deleting is only allowed for admin and owning user on unapproved entries
-			 */
-			if (array_intersect(['admin'], $_SESSION['user']['permissions']) || 
-				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed'])
-			) {
+			if (PERMISSION::permissionFor('calendaredit')) {
 				$columns = [
 					':id' => $row['id'],
-					':type' => 'timesheet',
-					':span_start' => $date->format('Y-m-d H:i'),
-					':span_end' => $due->format('Y-m-d H:i'),
+					':type' => 'schedule',
+					':span_start' => $date->format('Y-m-d'),
+					':span_end' => $due->format('Y-m-d'),
 					':author_id' => $row['author_id'],
 					':affected_user_id' => $row['affected_user_id'],
-					':organizational_unit' => '',
+					':organizational_unit' => $row['organizational_unit'],
 					':subject' => $row['subject'],
-					':misc' => $row['misc'],
+					':misc' => '',
 					':closed' => '',
 					':alert' => $row['alert']
-				];
+				];			   
 				$events[count($events)-1]['content'][] = [
 					'type' => 'button',
 					'attributes' => [
 						'type' => 'button',
 						'value' => LANG::GET('calendar.event_edit'),
 						'onpointerup' => $calendar->dialog($columns)
-					]
+					],
+					'hint' => LANG::GET('calendar.event_author') . ': ' . $row['author']
 				];
 				$events[count($events)-1]['content'][] = [
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => LANG::GET('calendar.event_delete'),
-						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('calendar.event_delete') . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('calendar.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('calendar.event_delete') . " " . $row['subject'] . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('calendar.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
 							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . ");});"
 					]
 				];
@@ -529,6 +672,11 @@ class CALENDAR extends API {
 	}
 
 	/**
+	 *   _   _               _           _
+	 *  | |_|_|_____ ___ ___| |_ ___ ___| |_
+	 *  |  _| |     | -_|_ -|   | -_| -_|  _|
+	 *  |_| |_|_|_|_|___|___|_|_|___|___|_|
+	 *
 	 * handle timesheet entries
 	 * post adds entry to calendar
 	 * put updates entry data
@@ -790,230 +938,122 @@ class CALENDAR extends API {
 		$this->response($result);
 	}
 
-	/**
-	 * retrieve all timesheet entries from the database,
-	 * prepare and calculate hours, vacation days and other pto
-	 * gathers all the entries though, supposed to be filtered by different methods 
-	 */
-	public function monthlyTimesheets(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$calendar->days('month', $this->_requestedTimespan);
-		$holidays = $calendar->holidays(substr($this->_requestedTimespan, 0, 4));
-		$days = $calendar->_days;
-		$first = $last = '';
-
-		function timeStrToFloat($string){
-			$string = explode(':', $string);
-			return intval($string[0]) + (intval($string[1]) / 60);
-		}
-
-		foreach($days as $id => $day){
-			if ($day === null) unset($days[$id]);
-			else {
-				$first = clone $day;
-				break;
-			}
-		}
-		$last = clone $days[count($days) - 1];
-		$days = array_values($days);
-		
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		// retrieve stats in advance
-		$timesheet_stats_month = $calendar->timesheetSummary($users, $first->format('Y-m-d'), $last->format('Y-m-d'));
-		$timesheet_stats_all = $calendar->timesheetSummary($users, null, $last->format('Y-m-d'));
-		// item listing still needs another request for all monthly events and entries
-		$month = $calendar->getWithinDateRange($first->format('Y-m-d H:i:s'), $last->format('Y-m-d H:i:s'));
-
-		$timesheets = [];
-		// prepare interval for daily hours display
-		$minuteInterval = new DateInterval('PT1M');
-
-		//iterate over all days of the selected month
-		foreach ($days as $day){
-			if (!$day) continue; // null, beginning of month
-			// iterate over all entries within the selected month
-			foreach ($month as $id => $entry){
-				if ($entry['type'] !== 'timesheet'){
-					unset($month[$id]); // default delete for next iteration
-					continue;
-				}
-				//retrieve stats for affected user
-				$stats_month_row = array_search($entry['affected_user_id'], array_column($timesheet_stats_month, '_id'));
-				if ($stats_month_row === false) continue;
-
-				$stats_month_row = $timesheet_stats_month[$stats_month_row];
-				$stats_all_row = $timesheet_stats_all[array_search($entry['affected_user_id'], array_column($timesheet_stats_all, '_id'))];
-				if (!array_key_exists($entry['affected_user_id'], $timesheets)) {
-					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
-					$pto = [];
-					foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $translation){
-						if (array_key_exists($key, $stats_month_row)) $pto[$key] = $stats_month_row[$key];
-					}
-					$timesheets[$entry['affected_user_id']] = [
-						'name' => $entry['affected_user'],
-						'user_id' => $entry['affected_user_id'],
-						'units' => implode(', ', $units),
-						'month' => LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
-						'days' => [],
-						'pto' => $pto,
-						'performed' => $stats_month_row['_performed'],
-						'projected' => $stats_month_row['_projected'],
-						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
-						'leftvacation' => $stats_all_row['_leftvacation'],
-						'overtime' => $stats_all_row['_overtime'],
-						'monthlyovertime' => $stats_month_row['_overtime']
-					];
-				}
-				
-				$span_start = new DateTime($entry['span_start'], new DateTimeZone(INI['timezone']));
-				$span_end = new DateTime($entry['span_end'], new DateTimeZone(INI['timezone']));
-				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
-					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
-					&& !array_key_exists($day->format('Y-m-d'), $timesheets[$entry['affected_user_id']]['days'])){
-					// calculate hours for stored regular working days only
-					$misc = json_decode($entry['misc'], true);
-					if (!strlen($entry['subject'])) {
-						$firstday = $days[0]; // copy object for down below method usage
-						$lastday = $days[count($days) - 1];  // copy object for down below method usage
-						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
-						$dailyhours = iterator_count($periods) / 60;
-						if (array_key_exists('homeoffice', $misc)) $dailyhours += timeStrToFloat($misc['homeoffice']);
-						if (array_key_exists('break', $misc)) $dailyhours -= timeStrToFloat($misc['break']);
-
-						$timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = [
-							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
-							'break' => array_key_exists('break', $misc) ? $misc['break'] : '',
-							'homeoffice' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
-							'note' => array_key_exists('note', $misc) ? $misc['note'] : '',
-							'hours' => $dailyhours,
-						];
-					}
-					// else state subject
-					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => LANGUAGEFILE['calendar']['timesheet_pto'][$entry['subject']], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
-				}
-			}
-		}
-		// postprocess array
-		foreach($timesheets as $id => $user){
-			// append missing dates for overview, after all the output shall be comprehensible
-			foreach ($days as $day){
-				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
-				$timesheets[$id]['days'][$day->format('Y-m-d')]['weekday'] = LANGUAGEFILE['general']['weekday'][$day->format('N')];
-				$timesheets[$id]['days'][$day->format('Y-m-d')]['holiday'] = in_array($day->format('Y-m-d'), $holidays) || !in_array($day->format('N'), $calendar->_workdays);
-			}
-			// sort date keys
-			ksort($timesheets[$id]['days']);
-		}
-		// sort by user name
-		usort($timesheets, function ($a, $b) {
-			return $a['name'] === $b['name'] ? 0 : ($a['name'] < $b['name'] ? -1 : 1); 
-		});
-		// set self to top 
-		$self = array_splice($timesheets, array_search($_SESSION['user']['id'], array_column($timesheets, 'user_id')), 1);
-		array_splice($timesheets, 0, 0, $self);
-
-		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('menu.calendar_timesheet') . '_' . date('Y-m-d H:i')),
-			'identifier' => null,
-			'content' => $this->prepareTimesheetOutput($timesheets),
-			'files' => [],
-			'images' => [],
-			'title' => LANG::GET('menu.calendar_timesheet'),
-			'date' => date('y-m-d H:i')
-		];
-
-		$downloadfiles = [];
-		$downloadfiles[LANG::GET('menu.calendar_timesheet')] = [
-			'href' => PDF::timesheetPDF($summary)
-		];
-		$body = [];
-		array_push($body, 
-			[[
-				'type' => 'links',
-				'description' =>  LANG::GET('calendar.export_proceed'),
-				'content' => $downloadfiles
-			]]
-		);
-		$this->response([
-			'render' => $body,
-		]);
-	}
-
-	/**
-	 * filter by permission, prepare output for pdf handler
-	 * @param array $timesheets prepared database results
+		/**
+	 *   _   _               _           _           _       _
+	 *  | |_|_|_____ ___ ___| |_ ___ ___| |_ ___ ___| |_ ___|_|___ ___
+	 *  |  _| |     | -_|_ -|   | -_| -_|  _| -_|   |  _|  _| | -_|_ -|
+	 *  |_| |_|_|_|_|___|___|_|_|___|___|_| |___|_|_|_| |_| |_|___|___|
+	 *
+	 * renders timesheet entries as tiles
+	 * @param array $dbevents db query results
+	 * @param object $calendar inherited CALENDARUTILITY-object
 	 * 
-	 * @return array prepared for pdf processing
-	 * [
-	 * 		[ // user
-	 * 			[], // empty row
-	 * 			[
-	 * 				[str description, bool greyed out], // marked holidays and non working day as per ini
-	 * 				str content
-	 * 			]
-	 * 		]
-	 * ]
-	 */
-	private function prepareTimesheetOutput($timesheets = []){
-		$result = [];
-		foreach($timesheets as $user){
-			$rows = [];
-			if (PERMISSION::permissionFor('calendarfulltimesheetexport')
-				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
-				|| $id === $_SESSION['user']['id']
-			){
-				// summary
-				$rows[] = [
-					[$user['name'], false],
-					LANG::GET('calendar.export_sheet_subject', [
-						':appname' => INI['system']['caroapp'],
-						':id' => $user['user_id'],
-						':units' => $user['units'],
-						':weeklyhours' => $user['weeklyhours'],
-					])
-				];
-				$rows[] = [];
-				// days
-				foreach ($user['days'] as $date => $day){
-					$dayinfo = [];
-					if (array_key_exists('subject', $day)) $dayinfo[] = $day['subject'];
-					foreach(LANGUAGEFILE['calendar']['export_sheet_daily'] as $key => $value){
-						if (array_key_exists($key, $day) && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
-					}
-					if (array_key_exists('note', $day) && $day['note']) $dayinfo[] = $day['note'];
-					
-					$rows[] = [
-						[$day['weekday'] . ' ' . $date, $day['holiday']],
-						implode(', ', $dayinfo)
-					];
-				}
-				$rows[] = [];
-				// pto
-				foreach ($user['pto'] as $pto => $number){
-					$rows[] = [
-						[LANGUAGEFILE['calendar']['timesheet_pto'][$pto], false],
-						LANG::GET('calendar.export_sheet_exemption_days', [':number' => $number])
-					];
-				}
-				if ($user['pto']) $rows[] = [];
-				$rows[] = [
-					[LANG::GET('calendar.export_sheet_summary'), false],
-					LANG::GET('calendar.export_sheet_summary_text', [
-						':name' => $user['name'],
-						':performed' => $user['performed'],
-						':projected' => $user['projected'],
-						':month' => $user['month'],
-						':overtime' => $user['overtime'],
-						':_monthlyovertime' => $user['monthlyovertime'],
-						':vacation' => $user['leftvacation'],
-					])
-				];
-				$rows[] = [];
+	 * @return array render options for assemble.js 
+ 	*/
+	 private function timesheetEntries($dbevents, $calendar){
+		$events = [];
+		foreach($dbevents as $row){
+			$date = new DateTime($row['span_start'], new DateTimeZone(INI['timezone']));
+			$due = new DateTime($row['span_end'], new DateTimeZone(INI['timezone']));
+			if ($row['type'] !== 'timesheet'
+				|| !($row['affected_user_id'] === $_SESSION['user']['id']
+				|| PERMISSION::permissionFor('calendarfulltimesheetexport')
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions'])
+				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))
+			)) continue;
 
-				$result[] = $rows;				
+			// replace deleted user names
+			if (!$row['author']) $row['author'] = LANG::GET('message.deleted_user');
+			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
+
+			$hint = '';
+			$display = '';
+			if ($row['subject']) $display .= LANG::GET('calendar.timesheet_irregular') . ': ' . LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . "\n";
+			$display .=	LANG::GET('calendar.timesheet_start') . ': ' . $date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n" .
+				LANG::GET('calendar.timesheet_end') . ': ' . $due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n";
+
+			if ($row['misc']){
+				$misc = json_decode($row['misc'], true);
+				if (!$row['subject'] && array_key_exists('break', $misc)) $display .= LANG::GET('calendar.timesheet_break') . ': ' . $misc['break'] . "\n";
+				if (!$row['subject'] && array_key_exists('homeoffice', $misc)) $display .= LANG::GET('calendar.timesheet_homeoffice') . ': ' . $misc['homeoffice'] . "\n";
+				if ($row['author_id'] != $row['affected_user_id']) {
+					$hint = LANG::GET('calendar.timesheet_foreign_contributor') . ': ' . $row['author'] . "\n";
+				}
+			}
+
+			$events[] = [
+				'type' => 'tile',
+				'content' => [
+					[
+						'type' => 'textblock',
+						'attributes' => [
+							'data-type' => $row['alert'] ? 'alert' : 'text'
+						],
+						'description' => $row['affected_user'],
+						'content' => $display,
+						'hint' => $hint ? : null
+					],					
+				]
+			];
+			/**
+			 * approval can only be set by
+			 * admin, ceo and supervisor of assigned unit
+			 */
+			$completed[LANG::GET('calendar.timesheet_approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
+			if (!(PERMISSION::permissionFor('calendarfullaccess')
+				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
+				&& array_intersect(explode(',', $row['organization_unit']), $_SESSION['user']['units']))))
+				$completed[LANG::GET('calendar.timesheet_approve')]['disabled'] = true;
+			$completed_hint = '';
+			if ($row['closed']) {
+				$completed[LANG::GET('calendar.timesheet_approve')]['checked'] = true;
+				$row['closed'] = json_decode($row['closed'], true);
+				$completed_hint = LANG::GET('calendar.timesheet_approved_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
+			}
+			$events[count($events)-1]['content'][] = [
+				'type' => 'checkbox',
+				'content' => $completed,
+				'hint' => $completed_hint,
+			];
+
+			/**
+			 * editing and deleting is only allowed for admin and owning user on unapproved entries
+			 */
+			if (array_intersect(['admin'], $_SESSION['user']['permissions']) || 
+				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed'])
+			) {
+				$columns = [
+					':id' => $row['id'],
+					':type' => 'timesheet',
+					':span_start' => $date->format('Y-m-d H:i'),
+					':span_end' => $due->format('Y-m-d H:i'),
+					':author_id' => $row['author_id'],
+					':affected_user_id' => $row['affected_user_id'],
+					':organizational_unit' => '',
+					':subject' => $row['subject'],
+					':misc' => $row['misc'],
+					':closed' => '',
+					':alert' => $row['alert']
+				];
+				$events[count($events)-1]['content'][] = [
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => LANG::GET('calendar.event_edit'),
+						'onpointerup' => $calendar->dialog($columns)
+					]
+				];
+				$events[count($events)-1]['content'][] = [
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => LANG::GET('calendar.event_delete'),
+						'onpointerup' => "new Dialog({type:'confirm', header:'" . LANG::GET('calendar.event_delete') . "', options:{'" . LANG::GET('general.cancel_button') . "': false, '" . LANG::GET('calendar.event_delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . ");});"
+					]
+				];
 			}
 		}
-		return $result;
+		return $events;
 	}
 }
 ?>

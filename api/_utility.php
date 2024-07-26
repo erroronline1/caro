@@ -24,6 +24,11 @@ define("UTILITY_IMAGE_RESOURCE", 0x4);
 class UTILITY {
 
 	/**
+	 *       _             _             _
+	 *   ___| |___ ___ ___|_|___ ___ _ _| |_ ___
+	 *  |  _| | -_| .'|   | |   | . | | |  _|_ -|
+	 *  |___|_|___|__,|_|_|_|_|_|  _|___|_| |___|
+	 *                          |_|
 	 * trim input data
 	 */
 	public static function cleanInputs($data){
@@ -39,6 +44,11 @@ class UTILITY {
 	}
 
 	/**
+	 *     _     _     _
+	 *   _| |___| |___| |_ ___
+	 *  | . | -_| | -_|  _| -_|
+	 *  |___|___|_|___|_| |___|
+	 *
 	 * deletes files and folders recursively unregarding of content!
 	 * 
 	 * @param string|array $paths 
@@ -69,6 +79,11 @@ class UTILITY {
 	}
 
 	/**
+	 *     _ _             _
+	 *   _| |_|___ ___ ___| |_ ___ ___ _ _
+	 *  | . | |  _| -_|  _|  _| . |  _| | |
+	 *  |___|_|_| |___|___|_| |___|_| |_  |
+	 *                                |___|
 	 * returns folders defined in setup.ini
 	 * 
 	 * @param string $request key
@@ -96,6 +111,11 @@ class UTILITY {
 	}
 
 	/**
+	 *   _ _     _     _ _             _           _
+	 *  | |_|___| |_ _| |_|___ ___ ___| |_ ___ ___|_|___ ___
+	 *  | | |_ -|  _| . | |  _| -_|  _|  _| . |  _| | -_|_ -|
+	 *  |_|_|___|_| |___|_|_| |___|___|_| |___|_| |_|___|___|
+	 *
 	 * scans a directory and returns contained subdirectories
 	 * 
 	 * @param string $folder folder to scan
@@ -121,6 +141,11 @@ class UTILITY {
 	}
 
 	/**
+	 *   _ _     _   ___ _ _
+	 *  | |_|___| |_|  _|_| |___ ___
+	 *  | | |_ -|  _|  _| | | -_|_ -|
+	 *  |_|_|___|_| |_| |_|_|___|___|
+	 *
 	 * scans a directory and returns contained files
 	 * 
 	 * @param string $folder folder to scan
@@ -146,6 +171,11 @@ class UTILITY {
 	}
 
 	/**
+	 *                                   _           _
+	 *   ___ ___ ___ ___ ___ ___ ___ _ _| |___ ___ _| |
+	 *  | . | .'|  _|_ -| -_| . | .'| | | | . | .'| . |
+	 *  |  _|__,|_| |___|___|  _|__,|_  |_|___|__,|___|
+	 *  |_|                 |_|     |___|
 	 * prepares passed request parameters, mimics post data for put method
 	 * 
 	 * @return object with request parameters and their value
@@ -268,6 +298,11 @@ class UTILITY {
 	}		
 	
 	/**
+	 *                           _               _
+	 *   ___ ___ ___ ___ ___ ___| |_ _ _ ___ ___| |_
+	 *  | . |  _| . | . | -_|  _|  _| | |_ -| -_|  _|
+	 *  |  _|_| |___|  _|___|_| |_| |_  |___|___|_|
+	 *  |_|         |_|             |___|
 	 * shorthand checking for a set property
 	 * 
 	 * @param object $object to look within
@@ -280,6 +315,11 @@ class UTILITY {
 	}
 
 	/**
+	 *               _         _
+	 *   ___ ___ ___|_|___ ___|_|_____ ___ ___ ___
+	 *  |  _| -_|_ -| |- _| -_| |     | .'| . | -_|
+	 *  |_| |___|___|_|___|___|_|_|_|_|__,|_  |___|
+	 *                                    |___|
 	 * @param string $file filename
 	 * @param int $maxSize max pixels on longest side
 	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
@@ -371,6 +411,11 @@ class UTILITY {
 	}
 
 	/**
+	 *       _                       _           _       _ ___ _ _
+	 *   ___| |_ ___ ___ ___ _ _ ___| |___ ___ _| |___ _| |  _|_| |___ ___
+	 *  |_ -|  _| . |  _| -_| | | . | | . | .'| . | -_| . |  _| | | -_|_ -|
+	 *  |___|_| |___|_| |___|___|  _|_|___|__,|___|___|___|_| |_|_|___|___|
+	 *                          |_|
 	 * moves uploaded files to folder according to input name, adds possible prefix
 	 * 
 	 * @param array $name mandatory array of input names
@@ -425,6 +470,11 @@ class UTILITY {
 	}
 
 	/**
+	 *   _   _   _       _ _
+	 *  | |_|_|_| |_ _ _| |_|___
+	 *  |  _| | . | | | . | |  _|
+	 *  |_| |_|___|_  |___|_|_|
+	 *            |___|
 	 * prepares a folder according to setup.ini and deletes files if lifespan is set
 	 * 
 	 * @param string $dir one of the fileserver keys
@@ -457,6 +507,11 @@ class UTILITY {
 class PERMISSION {
 
 	/**
+	 *   ___     _ _                                   _
+	 *  |  _|_ _| | |_ _ ___ ___ ___ ___ ___ _ _ ___ _| |
+	 *  |  _| | | | | | | .'| . | . |  _| . | | | -_| . |
+	 *  |_| |___|_|_|_  |__,|  _|  _|_| |___|\_/|___|___|
+	 *              |___|   |_| |_|
 	 * check whether an approvalcolumn has been fully approved according to function
 	 * @param string $function as defined within setup.ini
 	 * @param string|array $approvalcolumn 'approval'-column
@@ -473,6 +528,33 @@ class PERMISSION {
 	}
 
 	/**
+	 *                 _ _
+	 *   ___ ___ ___ _| |_|___ ___
+	 *  | . | -_|   | . | |   | . |
+	 *  |  _|___|_|_|___|_|_|_|_  |
+	 *  |_|                   |___|
+	 * check whether an approvalcolumn has pending approvals according to function
+	 * check per user permission so there is only one count per unapproved element even on multiple permissions
+	 * @param string $function as defined within setup.ini
+	 * @param string|array $approvalcolumn 'approval'-column
+	 * @return array of pending approval permission
+	 * 
+	 */
+	public static function pending($function = '', $approvalcolumn = ''){
+		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
+		$pending = [];
+		foreach(self::permissionFor($function, true) as $permission){
+			if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $approvalcolumn)) $pending[] = $permission;
+		}
+		return $pending;
+	}
+	
+	/**
+	 *                     _         _         ___
+	 *   ___ ___ ___ _____|_|___ ___|_|___ ___|  _|___ ___
+	 *  | . | -_|  _|     | |_ -|_ -| | . |   |  _| . |  _|
+	 *  |  _|___|_| |_|_|_|_|___|___|_|___|_|_|_| |___|_|
+	 *  |_|
 	 * returns a boolean if user is authorized for requested app-function, array of permissions if $returnvalues argument is true
 	 * @param string $function as defined within setup.ini
 	 * @param bool $returnvalues
@@ -489,23 +571,6 @@ class PERMISSION {
 			return preg_split('/\W+/', INI['permissions'][$function]);
 		}
 		var_dump('permission ' . $function . ' not found in setup.ini file');
-	}
-
-	/**
-	 * check whether an approvalcolumn has pending approvals according to function
-	 * check per user permission so there is only one count per unapproved element even on multiple permissions
-	 * @param string $function as defined within setup.ini
-	 * @param string|array $approvalcolumn 'approval'-column
-	 * @return array of pending approval permission
-	 * 
-	 */
-	public static function pending($function = '', $approvalcolumn = ''){
-		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
-		$pending = [];
-		foreach(self::permissionFor($function, true) as $permission){
-			if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $approvalcolumn)) $pending[] = $permission;
-		}
-		return $pending;
 	}
 }
 ?>
