@@ -742,10 +742,10 @@ Ordered products identify themself as incorporated or not or whether they are qu
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
 
-Approved orders can be marked as *ordered*, *received* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
+Approved orders can be marked as *ordered*, *received*, *delivered* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
 
 Information can be added anytime.
-Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processiong orders flags as received simultaneously - this does not track refunds intentionally to reduce load on purchase staff.
+Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally to reduce load on purchase staff.
 All actions offer to append a message.
 
 Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation. 
@@ -803,7 +803,7 @@ graph TD;
     order_type-->|return|auto_delete;
     order_type-->|service|auto_delete;
     order_type-->|cancellation|order_deleted(order deleted)
-    mark-->|retrieved|auto_delete;
+    mark-->|delivered|auto_delete;
     mark-->|archived|delete[delete manually];
     process_order-->|delete|delete;
     process_order-->cancel_order[cancel order];
@@ -2471,11 +2471,11 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {id} | path parameter | required | order item database id (int) |
-| {update} | path parameter | required | ordered, received, archived, addinformation, disapproved, cancellation, return |
+| {update} | path parameter | required | ordered, received, delivered, archived, addinformation, disapproved, cancellation, return |
 | {state} | path parameter | optional | true, false |
 | payload | form data | optional | messages |
 
-* *ordered*, *received*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
+* *ordered*, *received*, *delivered*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
 * *addinformation* appends payload to order info, alerts ordering unit on matching special words (order state changes)
 * *disapproved* transfers to prepared orders, payload message to ordering unit
 * *cancellation*, *return* convert to unprocessed order setting the respective database flag
