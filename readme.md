@@ -263,7 +263,6 @@ Beside the apps architecture you will still have to set up your quality manageme
     * MPBetreibV
 
 ### Tips
-* Records are stored with a timestamp of processing. If you want to document the actual date of recording or anticipate delayed documentation, add a manadatory date input to the respective forms.
 * Use a calendar-button within surveillance forms to immediately set the next due date while handling the current documentation.
 * Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 * If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
