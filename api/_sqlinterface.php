@@ -552,8 +552,8 @@ class SQLQUERY {
 		],
 
 		'order_post_approved_order' => [
-			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)",
-			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, archived, ordertype) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, :ordertype)"
+			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received, delivered, archived, ordertype) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, :ordertype)",
+			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, delivered, archived, ordertype) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, :ordertype)"
 		],
 		'order_put_approved_order_ordered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id",
@@ -562,6 +562,10 @@ class SQLQUERY {
 		'order_put_approved_order_received' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id"
+		],
+		'order_put_approved_order_delivered' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET delivered = :state WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET delivered = :state WHERE id = :id"
 		],
 		'order_put_approved_order_archived' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET archived = :state WHERE id = :id",
@@ -572,8 +576,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id"
 		],
 		'order_put_approved_order_cancellation' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 
 		'order_get_approved_order_by_unit' => [
@@ -588,9 +592,9 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
 		],
-		'order_get_approved_order_by_received' => [
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE received < :date_time AND archived IS NULL",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE received < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
+		'order_get_approved_order_by_delivered' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < :date_time AND archived IS NULL",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
 		],		
 		'order_delete_approved_order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",

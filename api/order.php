@@ -52,8 +52,8 @@ class ORDER extends API {
 			]);
 			$order = $order ? $order[0] : null;
 			if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
-			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
-			if (in_array($this->_subMethod, ['ordered', 'received', 'archived'])){
+			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+			if (in_array($this->_subMethod, ['ordered', 'received', 'delivered', 'archived'])){
 					switch ($this->_subMethod){
 						case 'ordered':
 							if ($order['ordertype'] === 'cancellation'){
@@ -89,6 +89,9 @@ class ORDER extends API {
 							break;
 						case 'received':
 							$query = 'order_put_approved_order_received';
+							break;
+						case 'delivered':
+							$query = 'order_put_approved_order_delivered';
 							break;
 						case 'archived':
 							$query = 'order_put_approved_order_archived';
@@ -212,6 +215,7 @@ class ORDER extends API {
 							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.received') . ': ' . $order['received'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.delivered') . ': ' . $order['delivered'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 
 							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
@@ -251,7 +255,7 @@ class ORDER extends API {
 				break;
 			case 'GET':
 				// delete old received unarchived orders
-				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_received', [
+				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_delivered', [
 					'values' => [
 						':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24 * 3600)),
 					]
@@ -270,6 +274,7 @@ class ORDER extends API {
 							LANG::GET('order.untreated')=>['checked' => true, 'onchange' => '_client.order.filter()'],
 							LANG::GET('order.ordered')=>['onchange' => '_client.order.filter("ordered")'],
 							LANG::GET('order.received')=>['onchange' => '_client.order.filter("received")'],
+							LANG::GET('order.delivered')=>['onchange' => '_client.order.filter("delivered")'],
 							LANG::GET('order.archived')=>['onchange' => '_client.order.filter("archived")'],
 						]],
 						['type' => 'filtered',
@@ -394,7 +399,7 @@ class ORDER extends API {
 					];
 
 					$status = [];
-					foreach(['ordered', 'received', 'archived'] as $s){
+					foreach(['ordered', 'received', 'delivered', 'archived'] as $s){
 						$status[LANG::GET('order.' . $s)] = [
 							'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "', this.checked); this.setAttribute('data-".$s."', this.checked.toString());",
 							'data-' . $s => boolval($row[$s]) ? 'true' : 'false',
@@ -405,11 +410,12 @@ class ORDER extends API {
 						}
 						switch ($s){
 							case 'ordered':
+							case 'received':
 								if (!PERMISSION::permissionFor('orderprocessing')){
 									$status[LANG::GET('order.' . $s)]['disabled'] = true;
 								}
 								break;
-							case 'received':
+							case 'delivered':	
 							case 'archived':
 								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
 									$status[LANG::GET('order.' . $s)]['disabled'] = true;
@@ -580,7 +586,7 @@ class ORDER extends API {
 						'content' => $status
 					];
 					$autodelete='';
-					if ($row['received'] && !$row['archived']){
+					if ($row['delivered'] && !$row['archived']){
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
 					}
 
@@ -1258,9 +1264,9 @@ class ORDER extends API {
 					':order_id' => intval($order_id)
 				],
 				'replacements' => [
-					':received' => $order['received'] ? : 'NULL',
+					':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
 				]
-			]) == false) SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+			]) === false) SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
 				'values' => [
 					':order_id' => intval($order_id),
 					':order_data' => $order['order_data'],
@@ -1268,7 +1274,7 @@ class ORDER extends API {
 					':ordertype' => $order['ordertype']
 				],
 				'replacements' => [
-					':received' => $order['received'] ? : 'NULL',
+					':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
 				]
 			]);
 	}

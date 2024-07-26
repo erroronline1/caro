@@ -314,6 +314,7 @@ const _client = {
 			const filters = {
 				ordered: document.querySelectorAll("[data-ordered=true]"),
 				received: document.querySelectorAll("[data-received=true]"),
+				delivered: document.querySelectorAll("[data-delivered=true]"),
 				archived: document.querySelectorAll("[data-archived=true]"),
 			};
 			let display = [...document.querySelectorAll("[data-ordered=false]")].map(function (node) {
@@ -321,15 +322,18 @@ const _client = {
 			});
 			if (type === "ordered")
 				display = [...filters.ordered].map(function (node) {
-					return [...filters.received]
+					return [...filters.received, ...filters.delivered, ...filters.archived]
 						.map((n) => n.parentNode)
-						.concat([...filters.archived].map((n) => n.parentNode))
 						.includes(node.parentNode)
 						? undefined
 						: node.parentNode;
 				});
 			if (type === "received")
 				display = [...filters.received].map(function (node) {
+					return [...filters.delivered, ...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
+				});
+			if (type === "delivered")
+				display = [...filters.delivered].map(function (node) {
 					return [...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
 				});
 			if (type === "archived")

@@ -876,7 +876,7 @@ export const api = {
 				}
 				break;
 			case "put":
-				if (["ordered", "received", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
+				if (["ordered", "received", "delivered", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
 					if (typeof request[4] === "object") {
 						payload = request[4];
 						delete request[4];
