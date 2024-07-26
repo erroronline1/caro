@@ -314,7 +314,7 @@ export function rendertest(element) {
 					{
 						type: "textblock",
 						description: "Highlighted textblock descriptions are possible",
-						content: "available class options are red, orange, yellow and green",
+						content: "Available class options are red, orange, yellow and green",
 						attributes: { class: "green" },
 					},
 				],
