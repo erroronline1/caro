@@ -358,7 +358,8 @@ class ORDER extends API {
 								'name' => LANG::GET('order.ordernumber_label'),
 								'readonly' => true,
 								'onpointerup' => '_client.order.toClipboard(this)'
-							]
+							],
+							'hint' => LANG::GET('order.copy_value')
 						],
 						[
 							'type' => 'text',
@@ -366,9 +367,29 @@ class ORDER extends API {
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
 								'name' => LANG::GET('order.commission'),
 								'readonly' => true,
-								'onpointerup' => '_client.order.toClipboard(this)'
+								'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.commission') . "', render:JSON.parse(`" . // backtick ` necessary
+									json_encode(
+										[
+											[
+												'type' => 'text',
+												'attributes' => [
+													'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
+													'name' => LANG::GET('order.commission'),
+													'readonly' => true,
+													'onpointerup' => '_client.order.toClipboard(this)'
+												],
+												'hint' => LANG::GET('order.copy_value')
+											], [
+												'type' => 'button',
+												'attributes' => [
+													'value' => LANG::GET('menu.record_create_identifier'),
+													'onpointerup' => "_client.order.postLabelSheet('" . (UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '') . "')"
+												]
+											]
+										]
+									) . "`), options:{'" . LANG::GET('general.ok_button') . "': true}})"
 							],
-							'hint' => LANG::GET('order.copy_values')
+							'hint' => LANG::GET('order.copy_or_labelsheet')
 						],
 					];
 
@@ -396,7 +417,7 @@ class ORDER extends API {
 								break;
 						}
 					}
-					if (!($row['ordered'] || $row['received']) && in_array($row['ordertype'], ['order', 'service'])) $status[LANG::GET('order.disapprove')]=[
+					if (!($row['ordered'] || $row['received']) && in_array($row['ordertype'], ['order', 'service'])) $status[LANG::GET('order.disapprove')] = [
 						'data_disapproved' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', render:JSON.parse('" . 
 							json_encode(
@@ -517,7 +538,7 @@ class ORDER extends API {
 								"})"]
 						]
 					];
-					$content[] = $copy;
+					array_push($content, ...$copy);
 
 					if (array_key_exists('attachments', $decoded_order_data)){
 						$files = [];

@@ -1043,7 +1043,10 @@ export const api = {
 				}
 				break;
 			case "post":
-				payload = _.getInputs("[data-usecase=record]", true);
+				if (request[3]) {
+					payload = request[3]; // form data object passed by utility.js
+					delete request[3];
+				} else payload = _.getInputs("[data-usecase=record]", true);
 				break;
 			case "put":
 				break;

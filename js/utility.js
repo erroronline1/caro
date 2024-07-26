@@ -369,11 +369,17 @@ const _client = {
 				api.purchase("post", "mdrsamplecheck", productid, formdata);
 			} else new Toast(LANG.GET("order.sample_check_failure"), "error");
 		},
+		postLabelSheet: (value) => {
+			const formdata = new FormData();
+			formdata.append(LANG.GET('record.create_identifier'), value);
+			api.record("post", "identifier", null, formdata);
+		},
 		toClipboard: (node) => {
 			if (node.constructor.name === "HTMLInputElement") {
 				node.select();
 				node.setSelectionRange(0, 99999); // For mobile devices
 				navigator.clipboard.writeText(node.value);
+				node.selectionStart = node.selectionEnd;
 			} else navigator.clipboard.writeText(node); // passed string
 			new Toast(LANG.GET("general.copied_to_clipboard"), "info");
 		},
