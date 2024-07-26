@@ -301,13 +301,21 @@ export function rendertest(element) {
 					},
 					{
 						type: "code",
-						attributes: { name: "Text input with linenumbers"},
-						hint:"As seen in CSV filter management",
+						attributes: { name: "Text input with linenumbers" },
+						hint: "As seen in CSV filter management",
 					},
 					{
 						type: "textarea",
-						attributes: { name: "Text input without linenumbers", rows:3},
-						hint:"As comparison",
+						attributes: { name: "Text input without linenumbers", rows: 3 },
+						hint: "As comparison",
+					},
+				],
+				[
+					{
+						type: "textblock",
+						description: "Highlighted textblock descriptions are possible",
+						content: "available class options are red, orange, yellow and green",
+						attributes: { class: "green" },
 					},
 				],
 				[
@@ -342,9 +350,7 @@ export function rendertest(element) {
 					},
 					{
 						type: "tile",
-						content: [
-							{ type: "text", attributes: { name: "Any element is possible" }, hint: "Not necessarily sensible though." },
-						],
+						content: [{ type: "text", attributes: { name: "Any element is possible" }, hint: "Not necessarily sensible though." }],
 					},
 				],
 				[
@@ -352,8 +358,7 @@ export function rendertest(element) {
 						{
 							type: "textblock",
 							description: "Sliding panels are possible as well",
-							content:
-								"Just try not to distract or obfuscate. Mobile view is just swiping, desktop view has supporting buttons.",
+							content: "Just try not to distract or obfuscate. Mobile view is just swiping, desktop view has supporting buttons.",
 						},
 					],
 					[
