@@ -90,7 +90,7 @@ export const api = {
 			for (const [key, value] of Object.entries(sanitizedpayload)) {
 				// remove file keys for being shifted to $_FILES within the stream
 				// and quick sanitation of arrays; can't be handled by this object
-				if (value instanceof File && (method === "post" || (method === "put" && value.size)) || key.endsWith('[]')) {
+				if ((value instanceof File && (method === "post" || (method === "put" && value.size))) || key.endsWith("[]")) {
 					delete sanitizedpayload[key];
 				}
 				// unset '0' values that are not recognized by backend
@@ -160,7 +160,7 @@ export const api = {
 	 *  | | | . | . | .'|  _| -_|   | -_| .'| . | -_|  _|
 	 *  |___|  _|___|__,|_| |___|_|_|___|__,|___|___|_|
 	 *      |_|
-	 * 
+	 *
 	 * sets the documents header and is supposed to scroll to top
 	 * @param {string} string content
 	 */
@@ -178,7 +178,7 @@ export const api = {
 	 *  | .'| . | . | | |  _| .'|  _| | . |   |
 	 *  |__,|  _|  _|_|_|___|__,|_| |_|___|_|_|
 	 *      |_| |_|
-	 * 
+	 *
 	 * imports serverside defined languagefile
 	 * handles user login/logout
 	 * loads application menu
@@ -219,9 +219,15 @@ export const api = {
 					}
 					window._user = data.user;
 					if (_user.image) {
-						const firstLabel = document.querySelector("[data-for=userMenuApplication]>label");
-						firstLabel.style.backgroundImage = "url('" + _user.image + "')";
-						firstLabel.style.maskImage = firstLabel.style.webkitMaskImage = "none";
+						let applicationLabel;
+						while (!applicationLabel) {
+							await _.sleep(50);
+							applicationLabel = document.querySelector("[data-for=userMenu" + LANG.GET("menu.application_header") + "]>label");
+						}
+						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
+						applicationLabel.style.backgroundImage = "url('" + _user.image + "')";
+						applicationLabel.style.backgroundSize = "cover";
+						applicationLabel.style.borderRadius = "50%";
 					}
 					if (_user.app_settings) {
 						for (const [key, value] of Object.entries(_user.app_settings)) {
@@ -348,7 +354,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.render) {
-								api.update_header(title[request[1]] + (request[2] ? (" - " + LANG.GET("audit.checks_type." + request[2])) : ""));
+								api.update_header(title[request[1]] + (request[2] ? " - " + LANG.GET("audit.checks_type." + request[2]) : ""));
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
@@ -764,7 +770,8 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates", "products_with_special_attention"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates", "products_with_special_attention"].includes(request[0]))
+			request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -1063,7 +1070,7 @@ export const api = {
 	 *  |_| |_|___|_,_|
 	 *
 	 * risk management
-	 * displays form to edit risks or overview, according to permissions 
+	 * displays form to edit risks or overview, according to permissions
 	 *
 	 * @param {string} method get|post
 	 * @param  {array} request api method
