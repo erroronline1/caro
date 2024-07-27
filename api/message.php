@@ -304,7 +304,7 @@ class MESSAGE extends API {
 					$panel[] = [
 						[
 							'type' => 'links',
-							'description' => ($group === 'units' ? LANG::GET('order.unit_label') : LANG::GET('user.display_permissions')) . ' ' . LANGUAGEFILE[$group][$sub],
+							'description' => ($group === 'units' ? LANG::GET('user.edit_units') : LANG::GET('user.display_permissions')) . ' ' . LANGUAGEFILE[$group][$sub],
 							'content' => $users,
 						]
 					];
