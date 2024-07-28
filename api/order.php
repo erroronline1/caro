@@ -585,9 +585,9 @@ class ORDER extends API {
 						'type' => 'checkbox',
 						'content' => $status
 					];
-					$autodelete='';
+					$autodelete = '';
 					if ($row['delivered'] && !$row['archived']){
-						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600))]);
+						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600)), ':unit' => $row['organizational_unit']]);
 					}
 
 					// add statechange if applicable
