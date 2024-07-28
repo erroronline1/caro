@@ -87,58 +87,57 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
         * Benachrichtigung von Nutzergruppen zu geplanten Ereignissen
     * Die Anwendung hat einen integrierten Kalender. Dieser soll die Aufgabenplanung und Bearbeitung zeitkritischer wiederkehrender Ereignisse wie Kalibrationsmaßnahmen und dergleichen unterstützen.
     * Die Anwendung hat ein Bestellmodul. Bestellungen können vorbereitet und freigegeben werden. Der Einkauf hat alle erforderlichen Daten aus der Lieferantenpreisliste vorliegen um die Bestellung bearbeiten zu können; die Markierung des Bestellstatus erlaubt eine zeitnahe Rückmeldung an den Besteller.
-    Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, die die Möglichkeiten des Nachrichtendienstes übersteigen.
+    * Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, die die Möglichkeiten des Nachrichtendienstes übersteigen.
     * Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offender Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.
     * Formulare können auf andere Formulare verweisen. Dabei können diese nur angezeigt werden (z.B. Verfahrens- oder Arbeitsanweisungen) oder mit Übernahme des Identifikators für einen reibungslosen Transfer sorgen.
     * siehe [Unterhaltungen](#unterhaltungen), [Kalender](#kalender), [Bestellung](#bestellung), [Dateien](#dateien), [Werkzeuge](#werkzeuge)
-* ISO 13485 6.2 Human resources
-    * Within user management trainings, expiry dates, experience points and documents can be added.
-    * Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).
-    * An overview of trainings and skill settings can be viewed within the audit module.
-    * Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.
-    * also see [Users](#users), [Tools](#tools)
-* ISO 13485 7.4.1 Procurement process
-    * Procurement is guided through the application. Vendors and products can be added into the database.
-    * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
-    * Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.
-    * Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.
-    * Products are deleted by default on update of the pricelist unless
-        * an incorporation has been made
-        * a sample check has been made
-        * any document to the product has been provided
-        * an alias has been modified
-    * Vendor and product editing is permitted by defined authorized users only.
-    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
-    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
-* ISO 13485 7.4.3 Verification of procured products
-    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the setup.ini file.
-    * Sample check information is to be enriched through a dedicated form with the respective context. All users can gather the required information and commit the check. 
-    * Sample checks can be revoked by authorized users.
-    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
-* ISO 13485 7.5.1 Control of production and service
-    * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
-    * Form contexts allow the definition as process or work instructions.
-    * The inbuilt calendar assists in scheduling operations.
-    * also see [Forms](#forms), [Records](#records), [Calendar](#calendar)
-* ISO 13485 7.5.8 Product indentification
-    * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
-    * also see [Records](#records)
-* ISO 13485 7.6 Surveillance and measuring equipment control
-    * Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.
-    * Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.
-* ISO 13485 8.2.4 Internal audit
-    * The audit module aquires data from the application and is partially able to export
-        * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
-        * records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.
-        * a list of current documents in use (forms and their components)
-        * user skills and trainings (with expiries highlighted)
-        * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
-        * fulfilment of regulatory issues considered by forms
-    * also see [Tools](#tools)
-* ISO 13485 8.4 Data analysis
-    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpeted though.
-    * [Order](#order), [Tools](#tools)
-
+* ISO 13485 6.2 Personelle Ressourcen
+    * innerhalb der Nutzerverwaltung können Schulungen, deren Ablaufdaten, Erfahrungspunkte und anhängende Dokumente hinzugefügt werden.
+    * Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.
+    * Eine Übersicht über die Schulungen und Fähigkeiten ist im Audit-Modul einsehbar.
+    * Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Die Übersicht kann im Audit-Modul exportiert werden.
+    * siehe [Benutzer](#benutzer), [Anpassung](#anpassung), [Werkzeuge](#werkzeuge)
+* ISO 13485 7.4.1 Beschaffungsprozess
+    * Die Beschaffung wird durch die Anwendung begleitet. Lieferanten und Produkte können zur Datenbank hinzugefügt werden.
+    * Lieferanteneinträge können durch Dokumente, Zertifikate und deren Gültigkeitsdaten ergänzt werden. Die Gültigkeit von Zertifikaten können angezeigt und im Audit-Modul exportiert werden. Lieferanten können als inaktiv markiert, jedoch nicht gelöscht werden. Produkte, die deaktiviert werden sind über das Bestellmodul nicht erreichbar.
+    * Produkte können mit Dokumenten ergänzt werden, welche nicht gelöscht werden. Den Dateinamen werden der Lieferantenname, der Zeitstempel der Übermittlung und die Artikelnummer angefügt.
+    * Produkte sollen eingeführt werden. Produkteinführungen können durch berechtigte Nutzer freigegeben, entzogen oder zurückgesetzt werden. Alle Nutzer (außer Gruppen) sammeln zuvor die erforderlichen Informationen. Produkteinführungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt.
+    * Produkte werden im Falle einer Presilistenaktualisierung automatisch gelöscht, es sei denn
+        * es fand eine Produkteinführung statt
+        * es wurde eine Stichprobenprüfung durchgeführt
+        * es wurde ein Dokument beigefügt
+        * es wurde ein Alias festgelegt
+    * Änderungen an Produkteinträgen ist nur für berechtigte Nutzer möglich
+    * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt.
+    * siehe [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Werkzeuge](#werkzeuge)
+* ISO 13485 7.4.3 Verifizierung von beschafften Produkten
+    * Die Stichprobenprüfung nach MDR §14 erbittet eine Prüfung für jedes [als Handelsware definierte](#importierung-von-lieferantenpreislisten) Produkt, sofern die letzte zurückliegende Prüfung innerhalb des Sortiments dieses Lieferanten die mdr14_sample_interval-Zeitspanne überschreitet, z.B. einmal jährlich. Dies betrifft alle Produkte welche nicht innerhalb der mdr14_sample_reusable-Zeitspanne liegen, welche ebenfalls für jeden Lieferanten individuell festgelegt werden kann, wenn es das Sortiment erfordert. Beide Werte erhalten durch die setup.ini einen Standardwert.
+    * Stichprobenprüfungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt. Alle Nutzer (außer Gruppen) sammeln die erforderlichen Informationen.
+    * Stichprobenprüfungen können durch berechtigte Nutzer zurückgezogen werden.
+    * siehe [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung)
+* ISO 13485 7.5.1 Lenkung der Produktion und Dienstleistungserbringung
+    * Entsprechende Formulare zeichnen die Schritte der Fertigung auf. Mit dem Zugriff auf die Aufzeichnungen ist der aktuelle Status erkennbar. Ist beispielsweise eine Aufzeichnung für einen Fertigungsabschnitt vorhanden, bei dem die Arbeitsschritte festgelegt werden, kann das Formular auch ein Auswahlfeld für die Erledigung beinhalten. In einem ersten Dokumentationsschritt können die Schritte festgelegt werden, in einem folgenden kann das Formular erneut verwendet und das Auswahlfeld markiert werden. Damit wird der Zeitpunkt und eintragende Nutzer aufgezeichnet.
+    * Formular-Kontexte erlauben eine Zuordnung als Verfahrens- oder Arbeitsanweisungen.
+    * Der integrierte Kalender unterstützt bei der Planung von Arbeiten.
+    * siehe [Formulare](#formulare), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender)
+* ISO 13485 7.5.8 Identifizierung
+    * Aufzeichnungen erfordern einen Identifikator. Dieser Identifikator ist derzeit als QR-Code implementiert, welcher exportiert und ausgedruckt, sowie mit dem integrierten Scanner ausgelesen werden kann. Aufkleberbögen mit dem Code können auch zur Kennzeichnung von Produkten und Komponenten während der Herstellung verwendet werden.
+    * siehe [Aufzeichnungen](#aufzeichnungen-1)
+* ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln
+    * Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugetreilt bekommen.
+    * Eine Berücksichtigung eines Kalendereintragt innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
+* ISO 13485 8.2.4 Internes Audit
+    * Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für
+        * Aufzeichnungen über Produkteinführungen. Sofern aktuell bestellte Artikel nicht berücksichtigt sind erfolgt ein Hinweis.
+        * Aufzeichnungen über Stichprobenprüfungen. Sofern aktuell Lieferanten für eine Prüfung fällig sind erfolgt ein Hinweis.
+        * eine Übersicht über die aktuell gültigen Formulare und deren Komponenten.
+        * Fähigkeiten und Schulungen der Mitarbeiter mit ggf. markierten abgelaufenen Zertifikaten
+        * Lieferantenlisten mit den jeweiligen letzten Preislistenaktualisierungen, der letzten Stichprobenprüfung und Details zu Zertifikaten sofern bereitgestellt.
+        * die Berücksichtung regulatorischer Anforderungen durch verwendete Formulare und Dokumente
+    * siehe [Werkzeuge](#werkzeuge)
+* ISO 13485 8.4 Datenanalyse
+    * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten.
+    * siehe [Bestellung](#bestellung), [Werkzeuge](#werkzeuge)
 
 [Content](#content)
 
