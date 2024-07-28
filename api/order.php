@@ -587,7 +587,7 @@ class ORDER extends API {
 					];
 					$autodelete = '';
 					if ($row['delivered'] && !$row['archived']){
-						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600)), ':unit' => $row['organizational_unit']]);
+						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600)), ':unit' => LANG::GET('units.' . $row['organizational_unit'])]);
 					}
 
 					// add statechange if applicable
