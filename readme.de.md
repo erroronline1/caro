@@ -143,89 +143,88 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 
 ## Integrierte regulatorische Unterstützung
 * MPDG §83
-    * medical device consultants are defined by the respective permission flag and listed as such within the register.
-    * also see [Users](#users)
-* ISO 14971 Risk management for medical devices
-    * The application has a risk management module to consider, evaluate and handle risks.
-    * Items of appedix E are prepared for use by default.
-    * also see [Risk management](#risk-management)
-
+    * Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt.
+    * siehe [Benutzer](#benutzer)
+* ISO 14971 Anwendung des Risikomanagements auf Medizinprodukte
+    * Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.
+    * Anhang E ist für die Nutzung standardmäßig verbereitet.
+    * siehe [Risikomanagement](#risikomanagement) 
 
 [Content](#content)
 
 ## Extras
-* Text recommendations
-    * Default and adaptive [texts can be defined](#text-recommendations) to support a consistent company language.
-* Time tracking
-    * Registered users can contribute their working hours, vacations, sick leaves, etc. to the [calendar](#calendar). These inputs can be exported for documentation regarding labour laws.
-* File sharing
-    * The application has a [sharepoint](#files) for files and an [STL-viewer](#tools) to easily exchange information.
-* CSV filtering
-    * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
+* Textempfehlungen
+    * Standard- und anpassbare [Textvorschläge](#textvorschläge) können definiert werden um eine durchgängige Sprachregelung zu unterstützen.
+* Zeiterfassung
+    * Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. in den [Kalender](#kalender) eintragen. Die Einträge können unter Berücksichtigung con Arbeitszeitgesetzen exportiert werden.
+* Dateiverteilung
+    * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien und einen [STL-Betrachter](#werkzeuge) um vereinfacht Informationen austauschen zu können.
+* CSV-Filterung
+    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weite zu [filtern und zu verarbeiten](#csv-processor).
 
 [Content](#content)
 
 ## Erforderliche Infrastruktur 
-You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
+Es wird ein Server zur Speicherung und Verarbeitung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Formularen oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
 
-Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. After all, administration can not demand going digital without providing a decent infrastructure. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well. 
+Das oberste Ziel ist die Ausstattung der Belegschaft oder zumindest von Schlüsselpositionen und Arbeitsplätzen mit mobilen Geräten. Schließlich kann die Administration nicht nach Digitalisierung verlangen ohne eine geeignete Infrastruktur zur Verfügung zu stellen. Scanner sind optional, da Scannen ebensogut mit in den Geräten eingebauten Kameras umgesetzt werden kann.
 
-For technical details see [prerequisites](#prerequisites). 
+Für technische Details siehe [Voraussetzungen](#voraussetzungen).
 
 ## Was es nicht ist
-Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
+Abgesehen von einigen architektonische Entscheidungen ist die Anwendung kein voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
 
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
+Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Preislisten der Lieferanten bestückt und dabei von vorneherein regelhaft um unwichtige Daten bereinigt werden.
 
-Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan. This module is for operational communication only, not for persistent documentation purpose.
+Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Bereiche jederzeit und zudem nach Ablauf einer definierten Zeit nach Auslieferung gelöscht werden. Dieses Modul dient in erster Linie der internen Kommunikation und nicht einer dauerhaften Dokumentation.
 
 ## Datenintegrität
-As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
 
-Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
+Formulardaten und Serveranfragen beinhaltet teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebige papierbasierten Doumentation.
 
-Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
+Formulare können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nicht um ein dokumentenechtes Verfahren handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
 
 [Content](#content)
 
 ## Empfehlungen zur Umsetzung regulatorischer Anforderungen
-Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#tools).
-* Create forms describing required documentation of processes and assign a *Process or work instruction*-form-context and the fitting regulatory context.
-    * ISO 13485 all chapters should be applicationed
-    * You may refer to this documentation regarding the chapters stated in the [aims above](#aims).
-* Create forms that can be exported for a written form and assign a *General company record*-form-context and the fitting regulatory context.
+Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selbst aufgestellt werden. Die meisten regulatorischen Anforderungen werden durch Formulare erfüllt. Auf diese Weise wird eine zuverlässige Versionskontrolle und Freigabe, sowie eine Prüfung der Erfüllung der Anforderungen innerhalb des [Audit-Moduls](#werkzeuge) sichergestellt.
+* Es können Formulare für die Beschreibung von Prozessen erstellt werden und mit dem Kontext *Verfahrens- oder Arbeitsanweisung* und passendem regulatorischen Zusammenhang versehen werden.
+    * ISO 13485 alle Kapitel sollten berücksichtigt werden
+    * Es kann auf diese Dokumentation und die oben genannten [Ziele](#ziele) verwiesen werden.
+* Es können Formulare erstellt werden die ebenfalls für eine schriftliche Form exportierbar sind und mit dem Kontext *Allgemeine Dokumentation* und passendem regulatorischen Zusammenhang versehen werden.
     * ISO 13485 4.1.5
-* Create forms and assign a *General company record*-form-context and the fitting regulatory context.
-    * any generic records, especially but not necessarily limited to:
+* Es können Formulare erstellt und mit dem Kontext *Allgemeine Dokumentation* und passendem regulatorischen Zusammenhang versehen werden.
+    * Alle allgemeinen Aufzeichnungen besonders aber nicht beschränkt auf:
     * ISO 13485 6.2
     * ISO 13485 6.3
     * ISO 13485 8.2, 8.2.3, 8.2.4
-    * educational regulations
-* Create forms and assign a *Incident*-form-context and the fitting regulatory context.
+    * Ausbildungsverordnungen
+* Es können Formulare erstellt und mit dem Kontext *Vorkommnis* und passendem regulatorischen Zusammenhang versehen werden.
     * ISO 13485 8.2.3
-* Create forms and assign a *Case documentation*-form-context and the fitting regulatory context.
+* Es können Formulare erstellt und mit dem Kontext *Vorgangsdokumentation* und passendem regulatorischen Zusammenhang versehen werden.
     * ISO 13485 7.2, 7.2.1
     * ISO 13485 7.3, 7.3.3, 7.3.4, 7.3.5, 7.3.6, 7.3.7, 7.3.8, 7.3.9, 7.3.10
     * ISO 13483 7.5, 7.5.1, 7.5.3, 7.5.4, 7.5.6
-    * privacy statements
+    * Datenschutzhinweise
     * SGB 5 §33
     * MDR annex 1
     * MDR annex 6
     * MDR annex 7
     * MDR annex 13
-* Create forms and assign a *MDR §14 Sample Check*- and/or *Product incorporation*-form-context and the fitting regulatory context.
+Es können Formulare erstellt und mit dem Kontext *MDR §14 Stichprobenprüfung* und/oder *Produkteinführung* und passendem regulatorischen Zusammenhang versehen werden.
     * ISO 13485 7.4, 7.4.3
-* Create forms and assign a *Equipment surveillance*-form-context and the fitting regulatory context.
-    * computer software and their version tracking on terminal devices may be seen as equipment as well.
+Es können Formulare erstellt und mit dem Kontext *Überwachung von Arbeitsmitteln* und passendem regulatorischen Zusammenhang versehen werden.
+    * Computer Software und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel betrachtet werden.
     * ISO 13485 4.1.6, 7.6
     * MPBetreibV
 
 ### Tips
-* Use a calendar-button within surveillance forms to immediately set the next due date while handling the current documentation.
-* Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
-* If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
-* Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.
-* Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities. 
+* Ein Kalender-Element kann in die Überwachungs-Formulare eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
+* Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden.
+* Wenn die Branchensoftware in der Lage ist Barcodes für Waren zu erzeugen, können Mehrfach-Scannerfelder innerhalb der Vorgangsdokumentation eine Rückverfolgung unterstützen.
+* Der Liste der gewünschten Fähigkeiten sollen die für das Unternehmen angemessenen Punkte [hinzugefügt](#anpassung) werden um eine zielführende Übersicht über die Erfüllung zu ermöglichen.
+* Innerhalb der Formulare für die Vorkommnisaufzeichnungen können Links z.B. zu den [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) eingefügt werden um die erforderlichen Codes zu finden.
 
 ![sample form screenshot](assets/sample%20form.png)
 
