@@ -64,7 +64,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Formulare und deren Komponenten müssen von [berechtigten Nutzern](#benutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Formular selbst freigegeben wurde.
     * Neue Formulare, deren Komponenten, Formular-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Formulare können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Formulare sind für eine Verwendung nicht erreichbar.
     * Bilder für Komponenten können nach einer Freigabe nicht mehr gelöscht werden. Ihrem Dateinamen wird der Name der Komponenten und ein Zeitstempel beigefügt. Sie sind dauerhaft auch für ältere Versionen verfügbar, können aber nicht wiederverwendet werden, da sie fester Bestandteil der jeweiligen Komponente sind.
-    * Formulare können primör nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen.
+    * Formulare können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen.
     * Externe Dokumente werden gelenkt und erhalten die Angabe der Einrichtung, des regulatorischen Zusammenhangs, einer möglichen Außerbetriebnahme und dem jeweils letzten bearbeitenden Mitarbeiter.
     * siehe [Formulare](#formulare), [Dateien](#dateien)
 * ISO 13485 4.2.5 Lenkung von Aufzeichnungen
@@ -310,7 +310,7 @@ graph TD;
 
 ### Anleitung
 
-Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprchend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht für alle anderen auszublenden.
+Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht für alle anderen auszublenden.
 
 ## Kommunikation
 
@@ -330,58 +330,58 @@ Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, grupp
 [Content](#content)
 
 ### Textvorschläge
-To avoid unneccesary or repetitive poetry and support a consistent linguistic style text recommendations can be provided. These are assembled with predefined text chunks for either replacements that handle pronouns or generic text chunks. Latter can make use of former. Currently a german language model is implemented where replacements are defined as chunks of
-* Child female - the girl
-* Child male - the boy
-* Child genderless - the child
-* Adult female - the woman
-* Adult male - the man
-* Adult genderless - the person
-* Informal you - "buddy"
-* Formal you - "your honor" (this is the german model part where there is more than just "you")
+Um unnötige und wiederholte Poesie zu vermeiden und einen durchgängigen Wortlaut zu unterstützen können Textvorschläge zur Verfügung gestellt werden. Diese werden auf vorbereiteten Textbausteinen zusammengesetzt, die entweder Pronomen oder allgemeine Abschnitte handhaben. Letztere können erstere verwenden. Ersatzbausteine werden in folgender Form definiert
+* weibliche Kindform - das Mädchen
+* männliche Kindform - der Junge
+* neutrale Kindform - das Kind
+* weibliche Erwachsenenform - die Frau
+* männliche Erwachsenenform - der Mann
+* neutrale Erwachsenenform - die Person
+* persönliche Ansprache - Du
+* förmliche Ansprache - Sie
 
-Such a replacement may be named addressee. If a generic text chunk contains :addressee this will be replaced with the chosen genus from a selection list. If you intend to write a text for the insurance company you may talk about the patient and select a genus from the first four options, if you address the customer directly you may choose one of the last two depending on your individual distance. A selection of the desired genus will be rendered on the creation form and reused for all types of replacements.
+Eine solche Ersetzung könnte beispielsweise *Adressat* gennnt werden. Sobald ein allgemeiner Textbaustein :Adressat enthält wird dieser Platzhalte durch den aus einer Liste gewählten Genus ersetzt. Wird beispielsweise ein Text an den Kostenträger verfasst kann von einem Patienten gesprochen werden und die geeigenete Wahl aus den ersten vier Optionen getroffen werden; bei einer persönliche Ansprache eine Wahl aus den letzten Beiden, abhängig vom jeweiligen Grad des Vertrauensverhältnisses. Die Auswahl des passenden Genus wird automatisch im Fomular angezeigt und sobald eine Wahl des Genus erfolgt, werden alle weiteren Bausteine entsprechend ersetzt.
 
-On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNomative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
+Bei der Erstellung eines Textes können die jeweils passenden grammatikalische Fälle vorbereitet verden (z.B. *:AdressatNominativ, *:AdressatAkkusativ, :AdressatDativ, etc.). Undefinierte Platzhalter erzeugen im Formular ein Eingabefeld, welches im Weiteren Verlauf wiederverwendet wird:
 
-*"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNomative can make use of the aid."*
+*"Wir berichten über :AdressatAkkusativ :Name. Wir möchten zusammenfassen, dass die Versorgung von :Name voranschreitet und :AdressatNominativ die Nutzung gut umsetzen kann."*
 
-Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
+Bei der Erstellung von Textvorschlägen können die Textbausteine individuell Sortiert und zu Absätzen zusammengestellt werden. Dazu werden die jeweiligen Abschnitte mit der [Maus an die gewünschte Position gezogen](#verschiedenes). Bei der Nutzung von Textvorschlägen können die vorbereiteten Textbausteine und Abschnitte abgewählt werden um den Text an den Bedarf anzupassen. Eine Gruppierung nach Abschnitten erleichtert die visuelle  Darstellung und Wiedererkennung des Formulars.
 
-Output will be copied to clipboad on clicking or tapping the output field.
+Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwischenablage eingefügt.
 
 ![text recommendation screenshot](assets/text%20recommendation.png)
 
 ```mermaid
 graph TD;
-    textrecommendation(("text
-    recommendation")) -->select[select template];
-    select -->chunks[(chunks)];
-    chunks-->|get recent by name|display["display template
-    and inputs"];
-    display -->|input|render(rendered text);
+    textrecommendation(("Textvorschlag")) -->select[Vorlage auswählen];
+    select -->chunks[(Textbausteine)];
+    chunks-->|"Wiedergabe des neuesten
+    Bausteins nach Name"|display["Darstellung des Textvorschlags
+    und der Eingabefelder"];
+    display -->|Eingabe|render(vorbereiteter Text);
 
-    managechunks(("manage
-    text chunks")) -->select2["select recent
-    by name or new"];
-    managechunks(("manage
-    text chunks")) -->select3["select any or new"];
-    select2-->chunks2[(chunks)];
+    managechunks(("Textabschnitte
+    verwalten")) -->select2["Wahl des neuesten nach
+    Name oder Neuanlage"];
+    managechunks-->select3["beliebige Auswahl
+    oder Neuanlage"];
+    select2-->chunks2[(Textbausteine)];
     select3-->chunks2;
-    chunks2 -->editchunk[edit chunk];
-    editchunk -->type{type};
-    type -->|replacement|chunks2;
-    type -->|text|chunks2;
+    chunks2 -->editchunk[Baustein bearbeiten];
+    editchunk -->type{Typ};
+    type -->|Ersatz|chunks2;
+    type -->|Text|chunks2;
     
-    managetemplates(("manage
-    text templates")) -->select4["select recent
-    by name or new"];
-    managetemplates(("manage
-    text chunks")) -->select5["select any or new"];
-    select4-->chunks3[(chunks)];
+    managetemplates(("Textvorlagen
+    verwalten")) -->select4["Wahl des neuesten nach
+    Name oder Neuanlage"];
+    managetemplates-->select5["beliebige Auswahl
+    oder Neuanlage"];
+    select4-->chunks3[(Textbausteine)];
     select5-->chunks3;
-    chunks3 -->edittemplate[edit template];
-    edittemplate -->|add template|chunks3;
+    chunks3 -->edittemplate[Vorlage bearbeiten];
+    edittemplate -->|Vorlage hinzurüfen|chunks3;
 ```
 
 [Content](#content)
@@ -391,52 +391,51 @@ graph TD;
 ![sample records menu](assets/records%20menu.png)
 
 ### Formulare
-Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
+Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Ohne größere Nachforschungen ist nicht ersichtlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: Die Dokumente und internen Formulare sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies könnte für das Ziel einer papierlosen Lösung bereits ausreichen, Exporte sind aber zusätzlich als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
 
-To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by defined authorized users to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
+Um gelenkte und versionierte Dokumente und Formulare anzulegen müssen zunächt deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Formulare anschließend zusammensetzen lassen. Komponenten und Formulare müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Formulare für den jeweiligen Anwendungsfall berücksichtigt wurden.
 
-An approvement request is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. 
+Eine Freigabe-Anfrage für Komponenten und Formulare wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der brechtigten Rolle während der Anmeldung in der Anwendung.
 
-Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
+Komponenten können mit der [Maus sortier und positioniert](#verschiedenes) werden. Formulare können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
 
-The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
+Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form).
-
-Forms can be managed to bundles so records can be reviewed for completeness.
+Formulare können als bearbeitbare PDF-Dateien für hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Dateiuploads aus dem Formular entfernt. Formulare können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird).
 
 ![form composer screenshot](assets/forms.png)
 
 ```mermaid
 graph TD;
-    manage_components(("manage
-    components"))-->|new component|edit_component["edit content,
-    add widgets,
-    reorder"];
-    manage_components(("manage
-    components"))-->|existing component|edit_component;
-    edit_component-->|save|new_forms_database[("append new dataset to
-    forms database")];
+    manage_components(("Komponenten
+    verwalten"))-->|neue Komponente|edit_component["Inhalte bearbeiten,
+    hinzufügen oder
+    sortieren"];
+    manage_components-->|bestehende Komponente|edit_component;
+    edit_component-->|speichern|new_forms_database[("neuen Datensatz zur
+    Formulardatenbank hinzufügen")];
 
-    manage_forms(("manage
-    forms"))-->|new form|edit_form["edit form,
-    reorder components"];
-    manage_forms-->|existing form|edit_form;
-    edit_form-->add_component[add component];
-    add_component-->forms_database[(forms database)];
-    forms_database-->|latest unhidden, approved component|edit_form;
-    edit_form-->|save|new_forms_database;
+    manage_forms(("Formulare
+    verwalten"))-->|neues Formular|edit_form["Formular bearbeiten,
+    Komponenten sortieren"];
+    manage_forms-->|bestehendes Formular|edit_form;
+    edit_form-->add_component[Komponente hinzufügen];
+    add_component-->forms_database[(Formulardatenbank)];
+    forms_database-->|"neueste verfügbare,
+    freigebene Komponente"|edit_form;
+    edit_form-->|speichern|new_forms_database;
 
-    manage_bundles(("manage
-    bundles"))-->|new bundle|edit_bundle["edit bundle"];
-    manage_bundles-->|existing bundle|edit_bundle;
-    edit_bundle-->add_form[add form];
-    add_form-->forms_database2[(forms database)];
-    forms_database2-->|latest unhidden, approved form|edit_bundle;
-    edit_bundle-->|save|new_forms_database
+    manage_bundles(("Formularpakete
+    verwalten"))-->|neues Paket|edit_bundle["Paket verwalten"];
+    manage_bundles-->|besteheden Paket|edit_bundle;
+    edit_bundle-->add_form[Formular hinzufügen];
+    add_form-->forms_database2[(Formulardatenbank)];
+    forms_database2-->|"neuestes verfübares,
+    freigebenes Formular"|edit_bundle;
+    edit_bundle-->|speichern|new_forms_database
 
-    new_forms_database-->returns("returns only latest dataset on request
-    if named item is not hidden and approved")
+    new_forms_database-->returns("gibt auf Anfrage nur den neuesten Datensatz heraus,
+    sofern dieser nicht verborgen und vollständig freigegeben ist")
 ```
 
 [Content](#content)
