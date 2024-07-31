@@ -361,15 +361,13 @@ Set up the manual according to your users comprehension. While editing single en
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
-The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
-
 ![conversation screenshot](assets/conversation.png)
 
 [Content](#content)
 
 ### Register
 
-All registered users are listed and grouped by organizational units and permissions. Direct messaging is possible from here.
+The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
 
 [Content](#content)
 
