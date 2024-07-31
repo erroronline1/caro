@@ -237,88 +237,87 @@ Es können Formulare erstellt und mit dem Kontext *Überwachung von Arbeitsmitte
 ![sample application menu](assets/application%20menu.png)
 
 ### Benutzer
-On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
+Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielweise als laminierte Karte verwendet werden.
 
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
+Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds und individuelle Anwendungeinstellungen können an dieser Stelle ebenfalls vorgenommen werden.
 
-The application provides a dedicated role management for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
+Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich. Nutzer können unterschiedliche Berechtigungen erhalten. Diese Berechtigungen steuern, welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.
 
-Some permissions/restrictions are default set though:
+Manche Berechtigungen/Einschränkugen sind jedoch systemisch festgelegt:
 
-Timesheets are accessible only if weekly hours are defined for the user - even the application admin.
+Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das Gilt auch für den Anwendungsadministrator.
 
-* User
-    * can see orders for own assigned organizational units only
-    * can export own timesheet only
-    * can perform the MDR§14 sample check and gather information for product incorporation
-* Group
-    * can **NEVER** add records due to limited identification data
-    * can place orders, but will be prompted to identify themself
-    * can see orders for own assigned organizational units only
-    * can **NEVER** incorporate and sample check due to limited identification data
-    * can **NEVER** access nor contribute to timesheets
-* Supervisor
-    * can export all timesheets of assigned unit members
-    * can edit, delete and close scheduled events and timesheet entries of assigned units and unit members
-* Application admin
-    * **full access**
-    * can approve as all eligible permission groups
-    * can export all timesheets
-    * default user CARO App has this permission. Use it to implement new users. Change default token immediately and store it in a safe place!
-    * assign only to trusted, preferably administative staff members
+* Mitarbeiter
+    * können nur Bestellungen der eigenen zugewiesenen Bereiche einsehen
+    * können nur die eigenen Arbeitszeitdokumentationen exportieren
+    * können Stichprobenprüfungen und Produkteinführungen durchführen
+* Gruppen
+    * können mangels persönlicher Identifizierbarkeit **nicht** zu Aufzeichnungen beitragen
+    * können Bestellungen durchführen, müssen jedoch einen Namen angeben
+    * können nur Bestellungen der eigenen zugewiesenen Bereiche einsehen
+    * können mangels persönlicher Identifizierbarkeit **keine** Stichprobenprüfung und Produkteinführung durchführen
+    * haben **keinen** Zugriff auf Arbeitszeitdokumentationen
+* Bereichsleiter
+    * können alle Arbeitszeitdokumentationen der Mitarbeiter zugewiesener Bereiche exportieren
+    * können geplante Kalenderereignisse zugewiesener Bereiche und Arbeitszeiteinträge der mitarbeiter zugewiesener Bereiche anlegen, ändern und abschließen
+* Anwendungsadministratoren
+    * haben **vollen Zugriff** und **alle Rechte**
+    * können als jede Berechtige Nutzergruppe Freigaben erteilen
+    * können alle Arbeitszeitdokumentationen exportieren
+    * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen. Der Standard-Token sollte unverzüglich geändert und an einem Sicheren Ort verwahrt werden!
+    * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitern der Leitungsebene erteilt werden
 
-Users can have multiple assigned organizational units and permissions.
+Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
 
 ![user screenshot](assets/user.png)
 
 ```mermaid
 graph TD;
-    application((application))-->login[login];
+    application((Anwendung))-->login[Anmeldung];
     login-->scan_code;
-    scan_code{scan code}-->user_db[(user database)];
-    user_db-->|found|logged_in[logged in];
-    user_db-->|not found|login;
-    logged_in-->manage_users((manage users));
-    manage_users-->new_user[new user];
-    manage_users-->edit_user[edit user];
-    new_user-->user_settings["set name, authorization,
-    unit, photo, order auth pin, skills, trainings,
-    login token, user documents"];
+    scan_code{Code scannen}-->user_db[(Nutzerdatenbank)];
+    user_db-->|gefunden|logged_in[angemeldet];
+    user_db-->|nicht gefunden|login;
+    logged_in-->manage_users((Nutzerverwaltung));
+    manage_users-->new_user[neuer Nutzer];
+    manage_users-->edit_user[Nutzer bearbeiten];
+    new_user-->user_settings["Namen, Berechtigungen,
+    Bereiche, Profilbild, Bestellberechtigungs-PIN,
+    Fähigkeiten, Schulungen, Anmelde-Token
+    bearbeiten"];
     edit_user-->user_settings;
-    user_settings-->export_token[export token];
-    export_token-->user(((user)));
+    user_settings-->export_token[Token exportieren];
+    export_token-->user(((Nutzer)));
     user-->login;
     user_settings-->user;
 
-    logged_in-->own_profile((profile));
-    own_profile-->profile["view information,
-    renew photo"];
+    logged_in-->own_profile((Profil));
+    own_profile-->profile["Informationen einsehen,
+    Profilbild und Anwendungeinstellungen anpassen"];
     profile-->user;
 
-    edit_user-->delete_user[delete user];
+    edit_user-->delete_user[Nutzer löschen];
     delete_user-->user;
 
-    user-->|has pin|orders((approve orders))
-    user-->|authorized|authorized(("see content based
-    on authorization"))
-    user-->|units|units(("see content based
-    on units"))
+    user-->|PIN vorhanden|orders((Bestellungen freigeben))
+    user-->|berechtigt|authorized(("Inhalte gemäß
+    Berechtigung einsehen"))
+    user-->|Bereiche|units(("Inhalte gemäß
+    Bereichen einsehen"))
 ```
 
 [Content](#content)
 
 ### Anleitung
 
-Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others.
+Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprchend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht für alle anderen auszublenden.
 
 ## Kommunikation
 
 ![sample communication menu](assets/communication%20menu.png)
 
 ### Unterhaltungen
-This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
-
-The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
+Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprcähspartner gruppiert. Dabei kann abgesehen vom Systemnutzer jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semicolon getrennt angesprochen werden. Ein Druck oder Klick auf die Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
 
 ![conversation screenshot](assets/conversation.png)
 
@@ -326,7 +325,7 @@ The user register gives an overview of all registered users, also grouped by org
 
 ### Verzeichnis
 
-All registered users are listed and grouped by organizational units and permissions. Direct messaging is possible from here.
+Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern können direkt von dort aus Nachrichten zugesandt werden.
 
 [Content](#content)
 
