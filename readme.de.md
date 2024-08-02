@@ -397,7 +397,7 @@ Um gelenkte und versionierte Dokumente und Formulare anzulegen müssen zunächt 
 
 Eine Freigabe-Anfrage für Komponenten und Formulare wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der brechtigten Rolle während der Anmeldung in der Anwendung.
 
-Komponenten können mit der [Maus sortier und positioniert](#verschiedenes) werden. Formulare können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
+Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Formulare können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
@@ -815,7 +815,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
     * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst werden)
     * SSL (Kamerazugriff für den Scanner, Serviceworker und SHA256-Verschlüsselung kann sonst nicht genutzt werden)
 * Netzwerkzugriff für Endgeräte und einen Browser
-    * Desktop PSc
+    * Desktop PCs
     * mobile Geräte
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzverkverbindung) (Cache, indexedDB) beim Beenden
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
@@ -863,7 +863,7 @@ Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenliste
 * Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Brwoserberechtigungen.
 
 ## Laufzeitvariablen
-Manchse Variables können wärend der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
+Manche Variables können wärend der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
 
 ```
 ; Standard Anwendungssprache
@@ -922,53 +922,53 @@ mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für
 
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Texten in Prozent
 [likeliness]
-consumables_article_no_similarity = 70 ; percent
-file_search_similarity = 50 ; percent
-records_search_similarity = 20 ; percent
+consumables_article_no_similarity = 70 ; Prozent
+file_search_similarity = 50 ; Prozent
+records_search_similarity = 20 ; Prozent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
-max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-user_image = 256 ; max pixels on longer side
-order_approvalsignature_image = 2048 ; max pixels on longer side
-form_image = 2048 ; max pixels on longer side
-record_image = 2048 ; max pixels on longer side
-risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
+max_records = 128 ; maximal angezeigte offene Dokumentationen
+user_image = 256 ; Pixel für längste Seite
+order_approvalsignature_image = 2048 ; Pixel für längste Seite
+form_image = 2048 ; Pixel für längste Seite
+record_image = 2048 ; Pixel für längste Seite
+risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittwahrscheinlichkeit * Schadenshöhe 
 
-; permissions based of and matching languages.xx.ini permissions
-; dynamic handling for modules and methods
-; admin by default
-; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
+; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
+; dynamische Verarbeitung innerhalb der Module
+; Anwendungsadministratoren haben grunsätzlich volle Berechtifungen
+; Im Falle einer Änderung von Berechtigungen für Freigaben müssen alle Elemente auch Rückwirkend von der neuen Gruppe freigegeben werden!
 [permissions]
-appmanual = "qmo" ; contribute to and edit application manual
-audits = "ceo, qmo, prrc" ; access audits
-calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
-calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert sick days after calling in
-calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
-calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
-csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
-csvrules = "qmo" ; add csv filter
-externaldocuments = "office, ceo, qmo" ; upload and manage external documents
-filebundles = "ceo, qmo" ; create file bundles
-files = "office, ceo, qmo" ; upload and delete files
-formapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve forms and components
-formcomposer = "ceo, qmo" ; compose forms
-formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
-incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
-mdrsamplecheck = "ceo, qmo, prrc"; must have access to audit as well
-orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
-ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
-orderdisplayall = "purchase" ; display all orders by default, not only for own units
-orderprocessing = "purchase"; process orders
-products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
-productslimited = "purchase_assistant" ; limited editing of products 
-recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
-riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
-texttemplates = "ceo, qmo" ; add and edit text templates
-users = "ceo, qmo" ; add and edit application users
-vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
+appmanual = "qmo" ; Ergänzugen und Änderungen der Anleitung
+audits = "ceo, qmo, prrc" ; Zugriff auf das Audit-Modul
+calendaredit = "ceo, qmo, supervisor" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
+calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach Anruf
+calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
+calendarfulltimesheetexport = "ceo, human_ressources" ; Arbeitszeitexporte aller Nutzer, zu fremden Arbeitszeiten beitragen
+csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
+csvrules = "qmo" ; neue CSV-Filter anlegen
+externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente
+filebundles = "ceo, qmo" ; Dateipakete erstellen
+files = "office, ceo, qmo" ; Dateien bereitstellen und Verlwalten
+formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Formularen und ihrer Komponenten
+formcomposer = "ceo, qmo" ; Formulare und Komponenten erstellen
+formexport = "ceo, qmo, supervisor" ; Formulare als PDF exportieren
+incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
+mdrsamplecheck = "ceo, qmo, prrc"; Strichprobenprüfung zurücksetzen - müssen auch Zugriff auf Audit haben
+orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Beriche hinzuzufügen
+ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu Stornieren oder Zurückzusenden
+orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
+orderprocessing = "purchase"; Bestellungen bearbeiten
+products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleiche Gruppen wie incorporation
+productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
+recordsclosing = "ceo, qmo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen
+riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
+texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
+users = "ceo, qmo" ; Nutzer anlegen, bearbeiten und löschen
+vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
 
-; page settings for pdf
+; Seiteneinstellungen für PDF-Dateien
 [pdf]
 labelsheet[format] = 'A4'
 labelsheet[rows] = 11
@@ -990,45 +990,45 @@ products_per_slide = 6
 ## Anmerkungen und Hinweise zur Nutzung
 
 ### Handhabe der Netzverkverbindung
-* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* Cached POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records.
+* Die Anwendung speichert Serveranfragen im Chache. GET-Anfragen erhalten die letzte erfolgreiche Version, die im Falle eines Verbindungabbruchs nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Formularversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann nur die EDV-Abteilung behilflich sein.
+* gespeicherte POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von Aufzeichnungen sicher.
 
 ### Verschiedenes
-* Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
-* Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
-* Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
-* Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
-* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
-* The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay.
+* Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der setup.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
+* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es wird keine Implementierung einer Push-Api geben um die Menge an Drittbibliotheken zu reduzieren und aufgrund eines Mangels and Funktion für Safari-Browser.
+* Das Ziehen von Formularelementen für die Sortierung in der Formularverwaltung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Formulare und deren Komponenten müssen daher auf einem Gerät mt Maus oder anderen unterstützen Eingabegeräten erfolgen um den Quelltext nicht unnötig zu vergrößern. Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig.
+* Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum Ausgewählten Artikel gehören.
+* Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
+* Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
+* Die Produktdatenbank und anhängige Funktionen (Bestellungen, Artikelsuche) haben eine Bearbeitungszeit von etwa 0,5 Sekunden pro 100k Einträgen. Bei 1m Einträgen kann dies zu einer Verzögerung von bis zu 5 Sekunden führen.
 
 ## Anpassung
-* The manual is intentionally editable to accomodate it to users comprehension.
-* Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.xx.ini-files or delete unused - user customization lists all available files automated. Most of the keys are hardcoded so you may occasionally append to but better not reduce
-    * [permission] (has no effect without consideration in role management within setup.ini)
+* Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können.
+* Manche Teile der setup.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
+* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX.ini) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber teilweise Werte ergänzt (idealerweise nicht gekürzt) werden:
+    * [permission] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in setup.ini berücksichtigt)
     * [units]
-    * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
+    * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
     * [formcontext][anonymous]
-    * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
+    * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
 
-If you ever fiddle around with the sourcecode:
-* [CSV Processor](#csv-prozessor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
-* Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
-* See available frontend render options importing unittest.js and calling `rendertest('forms')` or `rendertest('app')` from the console.
+Im Falle einer anpassung des Quelltexts:
+* der [CSV-Prozessor](#csv-prozessor) liefert ein assoziatives Array, daher muss eine nachgelagerte Verarbeitung der Daten selbst implementiert werden.
+* Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten.
+* Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('forms')` oder `rendertest('app')` in der Konsole angezeigt werden.
 
 [Content](#content)
 
 ## Importierung von Lieferantenpreislisten
-Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
+Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar zu sein. Es kann einer zusätzlichen Anpassung außerhalb dieser Anwendung bedürfen um Eingabedaten mit folgender Struktur zu erhalten:
 
-| Article Number | Article Name | EAN         | Sales Unit |
-| :------------- | :----------- | :---------- | :--------- |
-| 1234           | Shirt        | 90879087    | Piece      |
-| 2345           | Trousers     | 23459907    | Package    |
-| 3456           | Socks        | 90897345    | Pair       |
+| Artikelnummer  | Artikelbezeichnung  | EAN         | Verkaufseinheit |
+| :------------- | :------------------ | :---------- | :-------------- |
+| 1234           | Shirt               | 90879087    | Piece           |
+| 2345           | Trousers            | 23459907    | Package         |
+| 3456           | Socks               | 90897345    | Pair            |
 
-while setting up a vendor an import rule must be defined like:
+Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstell werden ähnlich:
 ```js
 {
     "filesettings": {
@@ -1039,10 +1039,10 @@ while setting up a vendor an import rule must be defined like:
             "escape": ""
         },
         "columns": [
-            "Article Number",
-            "Article Name",
+            "Artikelnummer",
+            "Artikelbezeichnung",
             "EAN",
-            "Sales Unit"
+            "Verkaufseinheit"
         ]
     },
     "modify": {
@@ -1055,24 +1055,24 @@ while setting up a vendor an import rule must be defined like:
             ["EAN", "\\s+", ""]
         ],
         "conditional_and": [
-            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
+            ["trading_good", "1", ["Artikelbezeichnung", "ein beliebiges REGEX-Muster, welches Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]
         ],
         "conditional_or": [
-            ["has_expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]],
-            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT"]]
+            ["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiges REGEX-Muster, welches Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
+            ["special_attention", "1", ["Artikelnummer", "eine beliebiges REGEX-Muster, welches Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]]
         ],
         "rewrite": [{
-            "article_no": ["Article Number"],
-            "article_name": ["Article Name"],
+            "article_no": ["Artikelnummer"],
+            "article_name": ["Artikelbezeichnung"],
             "article_ean": ["EAN"],
-            "article_unit": ["Sales Unit"]
+            "article_unit": ["Verkaufseinheit"]
         }]
     }
 }
 ```
-*headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+*headerrowindex* und *dialect* werden mit dem Standardwert der setup.ini ergänzt, falls sie nicht Teil des Filters sind.
 
-Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
+Manche Preislisten enthalten Artikelnummern mit Platzhaltern. Manche Artikel können dabei als *ProduktXYYZ* gelistet sein, wobei Y einen Wert zwischen 0 und 9 darstellt, yy 20 bis 30 und Z für L oder R steht (wie im falle von Prothesenfüßen). Um die Auswahl und Bestellung zu vereinfachen kann ein Ersatzfilter erstellt werden und vor der rewrite-Regel angewendet werden. Dadurch wird die Preisliste mit allen möglichen Versionen aufgefüllt. Dabei ist es stets die zweite Klammer, welche ersetzt wird. 
 
 ```js
 "replace": [
@@ -1082,21 +1082,22 @@ Some vendors list products with placeholders. Some product may be listed as *pro
 ]
 ```
 
-Other vendors may list products missing color variants appended to the article number. Make sure to include line end to the pattern to avoid recursive matching, endless appending to list and memory overflows.
+Andere Lieferanten listen Artikel deren Bestellnummer noch eine Farbvariante angehängt werden muss. Bei der Filterregel muss sichergestellt werden das Zeilenende zu erfassen, um eine rekursive Erkennung, nicht endende Ergänzungen und damit einen Speicherüberlauf zu vermeiden.
 ```js
 "replace":[
     ["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5"]
 ]
 ```
 
-You can, of course, decide to go the extra mile and apply any additional filter, e.g. to omit products you will not use anyway, speed up the import for next time by leaving out products that did not fit incorporation, etc.
+Natürlich können auch beliebige andere Filter eingefügt werden, z.B. um ohnehin ungenutzte Artikel von vorneherein beim Import auszuschließen oder den nächsten Import durch den Ausschluss nicht eingeführter Produkte zu beschleunigen.
 
-### Sample check, expiry dates and special attention
-*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
 
-You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates and required special attention.
+### Stichprobenprüfung, Verfallsdaten und besondere Aufmerksamkeit
+*modify.add* und *modify.conditional* erkennen Handelswaren für die Stichprobenprüfung nach MDR §14 und markieren Artikel mit Verfallsdaten oder besonderer Aufmerksamkeit. *conditional* kann auch nach dem *rewrite* von "article_name" angewendet werden, sofern diese Spalte aus zusammenhängenden Ursprungsspalten besteht. Sollen alle Artikel des Lieferanten als Handelswaren markiert werden kann "trading_good" als 1 ergänzt (*add*) und *conditional* ausgelassen werden. Wenn bekanntermaßen keine Handelswaren in der Preisliste enthalten sind kann dies komplett entfallen, da "trading_good" standardmäßig mit 0 angelegt wird. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
 
-*special_attention* will be displayed within approved orders and is intended to inform about required batch number allocation for products with skin contact by default. This can be customized to anything within the language file.
+Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedingung für 0 erstellt werden, falls das einfacher ist. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
+
+*special_attention* wird bei den freigegebenen Bestellungen angezeigt und ist dafür vorgesehen auf eine Vergabe von Chargennummern für Produkte mit Hautkontakt hinzuweisen. Dies kann aber in den Sprachdateien eine beliebige andere Aufgabe erhalten.
 
 [Content](#content)
 
@@ -1106,99 +1107,99 @@ Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse 
 [Content](#content)
 
 # CSV Prozessor
-The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
+Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
 
-Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
+Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genaus so gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
 
-Description of options:
+Beschreibung der Optionen:
 
-	"postProcessing": Optional string as hint what to do with the result file
+	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Regebnisdatei passieren soll
 	"filesetting":
-		"source": File to process, SELF or a named array (the other filesettings don't matter then)
-		"headerrowindex": Offset for title row
-		"dialect": Settings according to php fgetcsv
-		"columns": list/array of column names to process and export to destination
-		"encoding": Comma separated string of possible character encoding of sourcefile
+		"source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
+		"headerrowindex": Offset für die Titelzeile
+		"dialect": Einstellungen gemäß php fgetcsv
+		"columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
+		"encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
 
-	"filter": List/array of objects/dicts
+	"filter": Liste von Objekten
 		"apply": "filter_by_expression"
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
 		"match":
-			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
-			"any": At least one expression has to be matched, it's either "all" or "any"
+			"all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
+			"any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nut "all" oder "any" genutzt werden
 
 		"apply": "filter_by_monthdiff"
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"date": Filter by identifier and date diff in months
-			"identifier": Column name with recurring values, e.g. customer id
-			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["d", "m", "y"],
-			"threshold": Integer for months,
-			"bias": < less than, > greater than threshold
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"date": Filtert nach identifier und Unterschied zweier Daten in Monaten
+			"identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
+			"column": Spaltenname mit einem zu vergleichenden Datum,
+			"format": Liste des Datum-Formats, z.B. ["d", "m", "y"],
+			"threshold": Ganzzahl für Monate,
+			"bias": < kleiner als, > größer als threshold
 
 		"apply": "filter_by_duplicates",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-			"orderby": List/array of column names whose values concatenate for comparison
-			"descending": Boolean,
-			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
-			"amount": Integer > 0
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"duplicates": Behalte Anzahl an Duplikaten eines Spaltenwerts, sortiert nach den Werten anderer verketteter Spalten (auf- oder absteigend)
+			"orderby": Liste von Spaltennamen deren Werte als Vergleich verkettet werden sollen
+			"descending": Boolescher Wert,
+			"column": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer, von denen X gleiche Zeilen erlaubt sein sollen
+			"amount": Ganzzahl > 0
 
 		"apply": "filter_by_comparison_file",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
-			"filesetting": Same structure as base. if source == "SELF" the origin file will be processed
-			"filter": Same structure as base
-			"modify": Same structure as base
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"compare": Behalte oder lösche z.B. bestimmte Werte gemäß Vergleichsdatei, basierend auf dem selben Identifikator
+			"filesetting": die gleiche Struktur wie allgmein. Wenn source = "SELF" wird die Ursprungsdatei verarbeitet
+			"filter": die gleiche Struktur wie allgemein
+			"modify": die gleiche Struktur wie allgemein
 			"match":
-				"all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
-				"any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
-		"transfer": Add a new column with comparison value
+				"all": Object mit ein oder mehreren "ORIGININDEX": "COMPAREFILEINDEX" - Paaren, alle Vergleiche müssen zutreffen
+				"any": Object mit ein oder mehreren "ORIGININDEX": "COMPAREFILEINDEX" - Paaren, mindestens ein Vergleich muss zutreffen
+		"transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der Vergleichsdatei hinzu
 
 		"apply": "filter_by_monthinterval",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"interval": Discard by not matching interval in months, optional offset from initial column value
-			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["d", "m", "y"],
-			"interval": Integer for months,
-			"offset": Optional offset in months
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
+			"column": Spaltenname mit einem zu vergleichenden Datum,
+			"format": Liste des Datum-Formats, z.B. ["d", "m", "y"],
+			"interval": Ganzzahl für Monate,
+			"offset": optionaler Verschiebung in Monaten (Ganzzahl)
 
 		"apply": "filter_by_rand",
-		"comment": Description, will be displayed
-		"keep": boolean if matches are kept or omitted
-		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
-			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
-			"amount": Integer > 0
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"data": Wähle eine Anzahl zufälliger Zeilen aus deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
+			"columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
+			"amount": Ganzzahl > 0
 
-	"modify": Modifies the result
-		"add": Adds a column with the set value. if the name is already in use this will be replaced!
-			   If property is an array with number values and arithmetic operators it will try to calculate
-			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
-		"replace": Replaces regex matches with the given value either at a specified field or in all
-				   according to index 0 being a column name or none/null
-				   If more than one replacement are provided new lines with altered column values will be added to the result
-				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
-		"remove": Remove columns from result, may have been used solely for filtering
-		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
-				   Original columns will be omitted, nested within a list to make sure to order as given
-		"translate": Column values to be translated according to specified translation object
-		"conditional_and": changes a columns value if all regex matches on other columns, adds column by default with empty value
-		"conditional_or": changes a columns value if any regex matches on other columns, adds column by default with empty value
+	"modify": Ändert das Ergebnis
+		"add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
+			   Ist der Wert eine Liste mit Zahlen und matheamtischen Operatoren wird versucht dies als Formel zu berechnen
+			   Kommas werden in diesem Fall mit einem Dezimalpunkt ersetzt.
+		"replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen FSpalte oder an allen
+				   abhängig davon ob das erste Listenelement ein Spaltenname oder null ist
+				   Falls mehr als eine Ersetzung angegen wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
+				   Ersetzungen an einer bestimmten Position müssen Treffer 2 sein (full match, group 1 (^ if necessary), group 2, ...rest)
+		"remove": Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung erforderlich waren
+		"rewrite": Fügt neue Spalten hinzu welche aus Verkettungen der Originalwerte der angegebenen Spalten und anderen Zeichen bestehen
+				   Die Originalspalten werden entfernt.
+		"translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
+		"conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
+		"conditional_or": ändert den Wert einer Spalte wenn iner der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
 
-	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+	"split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
 
-	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+	"evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
 
-	"translations" : Can replace e.g. numerical values with legible translations.
-					 This is an object/dict whose keys can be refered to from the modifier. 
-					 The dict keys are processed as regex for a possible broader use.
+	"translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.
+					 Auf die Schlüssel dieses Objekts können die o.g. modifier verweisen.
+					 Die Schlüssel werden als Ausdruck verarbeitet um eine vielseitige Verwendung zu ermöglichen.
 
-A generic sample:
+Ein beliebiges Beispiel:
 
 ```javascript
 {
