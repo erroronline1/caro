@@ -769,7 +769,7 @@ export class Assemble {
 	header() {
 		if (this.currentElement.description === undefined) return [];
 		let header = document.createElement("header");
-		header.appendChild(document.createTextNode(this.currentElement.description));
+		header.appendChild(document.createTextNode(this.currentElement.description.replace(/\[\]|DEFAULT_/g, "")));
 		header.setAttribute("data-type", this.currentElement.type);
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		return [header];
@@ -923,7 +923,7 @@ export class Assemble {
 				input.dataset.grouped = this.currentElement.description;
 				input.name = this.names_numerator(checkbox);
 			}
-			label.append(document.createTextNode(checkbox.replace(/\[\]/g, "")));
+			label.append(document.createTextNode(checkbox.replace(/\[\]|DEFAULT_/g, "")));
 			input = this.apply_attributes(attributes, input);
 			label.htmlFor = input.id;
 			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
