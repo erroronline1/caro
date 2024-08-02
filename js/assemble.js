@@ -1400,72 +1400,6 @@ export class Assemble {
 		return [...this.header(), input, ...this.hint()];
 	}
 
-	search() {
-		return this.input("search");
-	}
-
-	select() {
-		/*{
-			type: 'select',
-			hint: 'this is a list',
-			numeration: anything resulting in true to prevent enumeration
-			content: {
-				'entry one': {
-					value: '1'
-				},
-				'entry two': {
-					value: '2',
-					selected: true
-				}
-			}
-			attributes: {
-				name: 'variable name'
-			},
-		}*/
-		const groups = {};
-		let select = document.createElement("select"),
-			label,
-			selectModal = {};
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		select.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
-
-		for (const [key, element] of Object.entries(this.currentElement.content)) {
-			if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
-			else groups[key[0]].push([key, element]);
-			selectModal[key] = element.value || key;
-		}
-		for (const [group, elements] of Object.entries(groups)) {
-			let optgroup = document.createElement("optgroup");
-			optgroup.label = group;
-			for (const element of Object.entries(elements)) {
-				let option = document.createElement("option");
-				option = this.apply_attributes(element[1][1], option);
-				option.appendChild(document.createTextNode(element[1][0]));
-				optgroup.appendChild(option);
-			}
-			select.appendChild(optgroup);
-		}
-		label = document.createElement("label");
-		label.htmlFor = select.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
-		label.classList.add("input-label");
-		select.addEventListener("pointerdown", (e) => {
-			e.preventDefault();
-			if (!e.target.disabled)
-				new Dialog({
-					type: "select",
-					header: select.title,
-					options: selectModal,
-				}).then((response) => {
-					e.target.value = response;
-					e.target.dispatchEvent(new Event("change"));
-				});
-		});
-		return [...this.icon(), select, label, ...this.hint()];
-	}
-
 	scanner() {
 		/*{
 			type: 'scanner',
@@ -1542,6 +1476,72 @@ export class Assemble {
 			result.push(button);
 		}
 		return result;
+	}
+
+	search() {
+		return this.input("search");
+	}
+
+	select() {
+		/*{
+			type: 'select',
+			hint: 'this is a list',
+			numeration: anything resulting in true to prevent enumeration
+			content: {
+				'entry one': {
+					value: '1'
+				},
+				'entry two': {
+					value: '2',
+					selected: true
+				}
+			}
+			attributes: {
+				name: 'variable name'
+			},
+		}*/
+		const groups = {};
+		let select = document.createElement("select"),
+			label,
+			selectModal = {};
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		select.id = getNextElementID();
+		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
+
+		for (const [key, element] of Object.entries(this.currentElement.content)) {
+			if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
+			else groups[key[0]].push([key, element]);
+			selectModal[key] = element.value || key;
+		}
+		for (const [group, elements] of Object.entries(groups)) {
+			let optgroup = document.createElement("optgroup");
+			optgroup.label = group;
+			for (const element of Object.entries(elements)) {
+				let option = document.createElement("option");
+				option = this.apply_attributes(element[1][1], option);
+				option.appendChild(document.createTextNode(element[1][0]));
+				optgroup.appendChild(option);
+			}
+			select.appendChild(optgroup);
+		}
+		label = document.createElement("label");
+		label.htmlFor = select.id;
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+		label.classList.add("input-label");
+		select.addEventListener("pointerdown", (e) => {
+			e.preventDefault();
+			if (!e.target.disabled)
+				new Dialog({
+					type: "select",
+					header: select.title,
+					options: selectModal,
+				}).then((response) => {
+					e.target.value = response;
+					e.target.dispatchEvent(new Event("change"));
+				});
+		});
+		return [...this.icon(), select, label, ...this.hint()];
 	}
 
 	signature() {
