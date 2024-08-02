@@ -246,7 +246,7 @@ export function rendertest(element) {
 						attributes: {
 							name: "Select one option of many",
 						},
-						hint: "This opens a longer list that yould otherwise clutter up the screen",
+						hint: "This opens a longer list that would otherwise clutter up the screen",
 						content: {
 							"Selection one": {},
 							"Selection two": {},
@@ -257,6 +257,112 @@ export function rendertest(element) {
 				[
 					{ type: "calendarbutton", attributes: { value: "Add event to calendar" } },
 					{ type: "formbutton", attributes: { value: "Display SILLY FORM" } },
+				],
+			],
+		},
+		forms_de: {
+			content: [
+				[
+					{
+						type: "scanner",
+						attributes: {
+							name: "Barcode Scanner",
+							multiple: true,
+						},
+					},
+					{
+						type: "textblock",
+						description: "Informativer Text",
+						content: "...um Nutzer über wichtige Dinge zu informieren",
+					},
+					{ type: "file", attributes: { name: "Füge einen Upload für eine Datei hinzu" }, hint: "Du kannst auch einstellen, dass mehrere Dateien gewählt werden können" },
+					{
+						type: "photo",
+						attributes: { name: "Stelle Fotos direkt mit der Kamera zur Verfügung" },
+						hint: "Desktop PCs öffnen allerdings eine weitere Dateiauswahl",
+					},
+					{
+						type: "signature",
+						attributes: { name: "Füge ein Unterschriftenfeld hinzu" },
+						hint: "Dies ist allerdings nicht zertifiziert, also liegt es bei dir",
+					},
+				],
+				[
+					{
+						type: "text",
+						attributes: {
+							name: "Eine einfache Texteingabe",
+						},
+						hint: "Erläutere mit Hinweisen",
+					},
+					{
+						type: "textarea",
+						attributes: {
+							name: "Ein mehrzeiliges Textfeld",
+							value: "Der Knopf öffnet Textvorschläge die kopiert und hier eingefügt werden können",
+						},
+						texttemplates: true,
+						hint: "Mit optionalem Zugriff auf Textvorschläge",
+					},
+					{
+						type: "number",
+						attributes: { name: "Eine Nummerneingabe" },
+						hint: "Übrigens: alle Felder können als erforderlich markiert werden, dann kann das Formular nur gespeichert werden, wenn alles vollständig ist!",
+					},
+					{ type: "date", attributes: { name: "Ein Datumfeld macht die Eingabe einfach wenn das Gerät eine Auswahl darstellt" } },
+					{ type: "tel", attributes: { name: "Das Telefonnummernfeld zeigt auf mobilen Geräten eine Nummerneingabe an" } },
+					{ type: "email", attributes: { name: "Das gilt auch für ein eMail-Feld" } },
+				],
+				[
+					{
+						type: "links",
+						description: "Verknüpfungen können auch hinzugefügt werden",
+						content: {
+							"https://www.mozilla.org/en-UD/firefox": { href: "https://www.mozilla.org/en-UD/firefox" },
+							"https://www.microsoft.com/en-us/edge": { href: "https://www.microsoft.com/en-us/edge" },
+							"https://www.google.com/intl/en/chrome": { href: "https://www.google.com/intl/en/chrome" },
+						},
+						hint: "Bekannte Browser",
+					},
+				],
+				[
+					{
+						type: "range",
+						attributes: { min: 0, max: 10, value: 3, name: "Ein einfacher Regler" },
+						hint: "Du kannst auch Schritte einstellen",
+					},
+					{
+						type: "checkbox",
+						description: "Wähle aus mehreren Optionen auf einen Blick aus",
+						hint: "Am besten aber nicht mehr als 8 Optionen, sonst wird es unübersichtlich",
+						content: { "Das ist toll": {}, "Das ist großartig": {}, "Das ist Fabelhaft": { checked: true } },
+					},
+					{
+						type: "radio",
+						attributes: { name: "Wähle nur eine Option aus mehreren auf einen Blick" },
+						hint: "Auch hier gilt: weniger ist mehr",
+						content: {
+							"Entweder dies": {},
+							"oder das": { checked: true },
+							"oder jenes": {},
+						},
+					},
+					{
+						type: "select",
+						attributes: {
+							name: "Wähle eine Option aus vielen aus",
+						},
+						hint: "Hier öffnet sich eine längere Liste die sonst den Bildschirm überfüllen würde",
+						content: {
+							"Auswahl eins": {},
+							"Auswahl zwei": {},
+							"Auswahl drei": {},
+						},
+					},
+				],
+				[
+					{ type: "calendarbutton", attributes: { value: "Füge ein Ereignis zum Kalender hinzu" } },
+					{ type: "formbutton", attributes: { value: "Zeige TOLLES FORMULAR an" } },
 				],
 			],
 		},
@@ -366,6 +472,117 @@ export function rendertest(element) {
 							type: "textblock",
 							description: "It's just another layer of nesting",
 							content: "All options above are valid. As seen in user manager",
+						},
+					],
+				],
+			],
+		},
+		app_de: {
+			content: [
+				[
+					{
+						type: "time",
+						attributes: {
+							name: "Zeitangabe",
+						},
+						hint: "Einfache Zeitangabe mit einer Wahlmaske des Geräts, sofern verfügbar. Verwendet in der Zeiterfassung.",
+					},
+					{
+						type: "search",
+						attributes: { name: "Sucheingabe" },
+						hint: "Suchtastatur und Lupensymbol, Verwendet bei neuen Bestellungen.",
+					},
+					{
+						type: "filtered",
+						attributes: { name: "Filtereingabe" },
+						hint: "Suchtastatur und Trichtersymbol, Verwendet bei Doumentationen.",
+					},
+					{
+						type: "checkbox2text",
+						attributes: { name: "Die ausgewählten Optionen des Popups werden mit Kommata verkettet" },
+						hint: "Vereinfacht eine Auswahlentscheidung und stellt ein einfaches Datenobjekt bereit, Verwendet in der Formularverwaltung.",
+						content: { One: { value: "1" }, Two: { value: 2 }, Three: { value: "Drei" } },
+					},
+					{ type: "range", attributes: { name: "Regler mit Datenliste", list: "range_datalist", min: 0, max: 4, value: 2 } },
+					{
+						type: "datalist",
+						attributes: { id: "range_datalist", class: "rangedatalist" },
+						content: [{ label: "Ein" }, { label: "Regler" }, { label: "mit" }, { label: "einer" }, { label: "Datenliste" }],
+						hint: "Verwendet in der Nutzerverwaltung.",
+					},
+					{ type: "datalist", attributes: { id: "text_datalist" }, content: ["Eine", "Texteingabe", "mit", "einer", "Datenliste"] },
+					{
+						type: "text",
+						attributes: { name: "Texteingabe mit einer Datenliste", list: "text_datalist" },
+						hint: "Verwendet in Konversationen.",
+					},
+					{
+						type: "code",
+						attributes: { name: "Texteingabe mit Zeilennummerierung" },
+						hint: "Verwendet bei CSV-Filtern",
+					},
+					{
+						type: "textarea",
+						attributes: { name: "Texteingabe ohne Zeilennummerierung", rows: 3 },
+						hint: "Als Vergleich",
+					},
+				],
+				[
+					{
+						type: "textblock",
+						description: "Hervorgehobene Textüberschriften sind möglich",
+						content: "Verfügbare CSS-Klassen sind red, orange, yellow and green",
+						attributes: { class: "green" },
+					},
+				],
+				[
+					{
+						type: "button",
+						attributes: {
+							value: "Ein einfacher Knopf",
+							type: "button",
+						},
+						hint: "Buttons können auch Hinweise haben!",
+					},
+					{
+						type: "deletebutton",
+						attributes: { value: "Ein Lösch-Knopf", type: "button" },
+					},
+					{
+						type: "submitbutton",
+						attributes: { value: "Ein Absendeknopf", type: "button" },
+						hint: "Sendet das umgebende Formular ab",
+					},
+				],
+				[
+					{
+						type: "tile",
+						content: [
+							{
+								type: "textblock",
+								description: "Textblock auf einer Kachel",
+								content: "Dies ist ein Drittel der Breite, Verwendet auf der Startseite",
+							},
+						],
+					},
+					{
+						type: "tile",
+						content: [{ type: "text", attributes: { name: "Jeses Element ist möglich" }, hint: "aber nicht unbedingt sinnvoll." }],
+					},
+				],
+				[
+					[
+						{
+							type: "textblock",
+							description: "Verschiebliche Tafeln sind ebenfalls möglich",
+							content: "Versuche nur möglichst nicht zu verwirren oder abzulenken. Auf mobilen Geräten muss nur gewischt werden, die Desktop-Ansicht hat auch Knöpfe.",
+						},
+					],
+					[
+						{
+							type: "textblock",
+							description: "Dies ist nur eine zusätzlich Verschachtelungsebene",
+							content: "Alle optionen sind möglich. Verwendet in der Nutzerverwaltung.",
 						},
 					],
 				],
