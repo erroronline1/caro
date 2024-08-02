@@ -1,7 +1,7 @@
 ![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
 # CARO - Cloud Assisted Records and Operations
 
-## Content
+## Übersicht
 * [Ziele](#ziele)
     * [Vorgesehene Zielsetzungen für ISO 13485](#vorgesehene-zielsetzungen-für-iso-13485)
     * [Integrierte regulatorische Unterstützung](#integrierte-regulatorische-unterstützung)
@@ -59,7 +59,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * siehe [Aufzeichnungen](#aufzeichnungen)
 * ISO 13485 4.2.4 Lenkung von Dokumenten
     * Die Anwendung ermöglicht es wiederverwendbare Formulare und deren Komponenten zu gestalten.
-    * Nur die jüngsten freigegebenen Komponenten und Formulare sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzverkverbindung).
+    * Nur die jüngsten freigegebenen Komponenten und Formulare sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzwerkverbindung).
     * Die Erstellung von Komponenten, Formularen, Formular-Paketen und Textvorschlägen ist nur berechtigten Nutzern vorbehalten.
     * Formulare und deren Komponenten müssen von [berechtigten Nutzern](#nutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Formular selbst freigegeben wurde.
     * Neue Formulare, deren Komponenten, Formular-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Formulare können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Formulare sind für eine Verwendung nicht erreichbar.
@@ -139,7 +139,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten.
     * siehe [Bestellung](#bestellung), [Werkzeuge](#werkzeuge)
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Integrierte regulatorische Unterstützung
 * MPDG §83
@@ -150,7 +150,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Anhang E ist für die Nutzung standardmäßig verbereitet.
     * siehe [Risikomanagement](#risikomanagement) 
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Extras
 * Textempfehlungen
@@ -162,7 +162,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * CSV-Filterung
     * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Erforderliche Infrastruktur 
 Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Formularen oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
@@ -185,7 +185,7 @@ Formulardaten und Serveranfragen beinhaltet teilweise IDs um spezifische Inhalte
 
 Formulare können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nicht um ein dokumentenechtes Verfahren handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Empfehlungen zur Umsetzung regulatorischer Anforderungen
 Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selbst aufgestellt werden. Die meisten regulatorischen Anforderungen werden durch Formulare erfüllt. Auf diese Weise wird eine zuverlässige Versionskontrolle und Freigabe, sowie eine Prüfung der Erfüllung der Anforderungen innerhalb des [Audit-Moduls](#werkzeuge) sichergestellt.
@@ -226,9 +226,9 @@ Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selb
 * Der Liste der gewünschten Fähigkeiten sollen die für das Unternehmen angemessenen Punkte [hinzugefügt](#anpassung) werden um eine zielführende Übersicht über die Erfüllung zu ermöglichen.
 * Innerhalb der Formulare für die Vorkommnisaufzeichnungen können Links z.B. zu den [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) eingefügt werden um die erforderlichen Codes zu finden.
 
-![sample form screenshot](assets/sample%20form.png)
+![sample form screenshot](assets/sample%20form%20de.png)
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # Module
 
@@ -306,7 +306,7 @@ graph TD;
     Bereichen einsehen"))
 ```
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ### Anleitung
 
@@ -321,13 +321,13 @@ Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und 
 
 ![conversation screenshot](assets/conversation.png)
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ### Verzeichnis
 
 Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern können direkt von dort aus Nachrichten zugesandt werden.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ### Textvorschläge
 Um unnötige und wiederholte Poesie zu vermeiden und einen durchgängigen Wortlaut zu unterstützen können Textvorschläge zur Verfügung gestellt werden. Diese werden aus vorbereiteten Textbausteinen zusammengesetzt, die entweder Pronomina oder allgemeine Abschnitte handhaben. Letztere können erstere verwenden. Ersatzbausteine werden in folgender Form definiert
@@ -386,7 +386,7 @@ graph TD;
     edittemplate -->|Vorlage hinzurüfen|chunks3;
 ```
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Aufzeichnungen
 
@@ -440,7 +440,7 @@ graph TD;
     sofern dieser nicht verborgen und vollständig freigegeben ist")
 ```
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ### Aufzeichnungen
 Aufzeichnungen speichern alle Eingaben für jedes gewählte Formular. Manche Formular-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter.
@@ -497,7 +497,7 @@ graph TD;
     missing-->|nein|nonemissing(Statusbenachrichtigung);
 ```
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ### Risikomanagement
 Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org).
@@ -508,7 +508,7 @@ Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#werkz
 
 ![risk screenshot](assets/risks.png)
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Kalender
 
@@ -595,7 +595,7 @@ graph TD;
     permission2-->|Mitarbeiter|ownexport["Export der eigenen Zeiterfassung
     des gewählten Monats"]
 ```
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Dateien
 
@@ -611,7 +611,7 @@ Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werd
 
 ![files screenshot](assets/files.png)
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Einkauf
 
@@ -687,7 +687,7 @@ graph TD;
     edit_product-->product_inactive;
 ```
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ### Bestellung
 Das Bestellodul unterstützt alle Parteien. Der Einauf erhält strukturierte und vollständige Daten für Bestellungen, während die bestellenden Bereiche unmittelbare Informationen über den Bestellstatus erhalten.
@@ -787,7 +787,7 @@ graph TD;
 Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.
 Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung widerrufen. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Werkzeuge
 
@@ -810,7 +810,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 
 ![audit screenshot](assets/audit.png)
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # Voraussetzungen
 * Server mit
@@ -820,7 +820,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 * Netzwerkzugriff für Endgeräte und einen Browser
     * Desktop PCs
     * mobile Geräte
-    * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzverkverbindung) (Cache, indexedDB) beim Beenden
+    * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
 
 Getestete Serverumgebungen:
@@ -836,7 +836,7 @@ Getestete Geräte
 
 Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenlisten bei Eingaben eine Vorschau, welche die Auswahl verfügbarer Optionen (z.B. Wahl von Nechrichtenempfängern) vereinfacht. Andere Browser wurden nicht getestet.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Installation
 * php.ini memory_limit ~4096M zur [Verarbeitung großer CSV-Dateien und dem Preislistenimport](#csv-prozessor), open_basedir zumindest für das lokale IIS für die Dateiverarbeitung deaktivieren.
@@ -992,7 +992,7 @@ products_per_slide = 6
 
 ## Anmerkungen und Hinweise zur Nutzung
 
-### Handhabe der Netzverkverbindung
+### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Formularversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
 * POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von Aufzeichnungen sicher.
 
@@ -1020,7 +1020,7 @@ Im Falle einer Anpassung des Quelltexts:
 * Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten.
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('forms_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 ## Importierung von Lieferantenpreislisten
 Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar zu sein. Es kann einer zusätzlichen Anpassung außerhalb dieser Anwendung bedürfen, um Eingabedaten mit folgender Struktur zu erhalten:
@@ -1102,12 +1102,12 @@ Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedin
 
 *special_attention* wird bei den freigegebenen Bestellungen angezeigt und ist dafür vorgesehen auf eine Vergabe von Chargennummern für Produkte mit Hautkontakt hinzuweisen. Dies kann aber in den Sprachdateien eine beliebige andere Aufgabe erhalten.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # Code Design Vorlagen
 Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse liegt in der englischsprachigen Beschreibung vor.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # CSV Prozessor
 Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
@@ -1369,24 +1369,24 @@ Ein beliebiges Beispiel:
 }
 ```
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # API Dokumentation
 Eine ausführliche API-Dokumentation liegt in der englischsprachigen Beschreibung vor.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # Stellungnahme zu technischen Richtlinien zur Datensicherheit
 Eine Stellungnahme zu den technischen Richtlinien für Anwendungen im Gesundheitswesen liegt in der englischsprachigen Beschreibung vor.
 
 Basis für die Bewertung sind die Richtlinien des BSI für [Frontend](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) und [Backend](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-3.pdf?__blob=publicationFile&v=9).
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # Bibliotheken
 Eine Auflistung der verwendeten Bibliotheken liegt in der englischsprachigen Beschreibung vor.
 
-[Content](#content)
+[Übersicht](#übersicht)
 
 # Lizenz
 
