@@ -36,7 +36,7 @@
     * [Anpassung](#anpassung)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [Code Design Vorlagen](#code-design-vorlagen)
-* [CSV Processor](#csv-processor)
+* [CSV Processor](#csv-prozessor)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
 * [Bibliotheken](#bibliotheken)
@@ -160,7 +160,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Dateiverteilung
     * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien und einen [STL-Betrachter](#werkzeuge) um vereinfacht Informationen austauschen zu können.
 * CSV-Filterung
-    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weite zu [filtern und zu verarbeiten](#csv-processor).
+    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weite zu [filtern und zu verarbeiten](#csv-prozessor).
 
 [Content](#content)
 
@@ -441,68 +441,68 @@ graph TD;
 [Content](#content)
 
 ### Aufzeichnungen
-Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. 
+Aufzeichnungen speichern alle Eingaben für jedes gewählte Formular. Manche Formular-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronoligischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter.
 
-Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
+Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet sein. Daher können einzelne Dokumente ebenfalls exportiert werden um die Daten in Situationen bereithalten zu können, in denen elektronische Geräte Schaden nehmen könnten.
 
-The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
+Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesbarer Form steht und der sich auch auf Exporten wiederfindet. Um den Arbeitsfluss zu verbessern können Aufkleberbögen erstellt werden, mit deren Hilfe zum Beispiel Produkte und exportierte Fomulare manuell gekennzeichnet werden können. Das Scannen des Codes reduziert eine Fehlerwahrscheinlichkeit bei der Zuordnung. Der Identifikator kann ebenfalls genutzt werden um Daten von anderen Aufzeichnungen zu importieren, beispielsweise bei der Übernahme von vergleichbaren Datensätzen anderer Versorgungsbereiche.
 
 ![sample identifier code](assets/sample%20identifier%20code.png)
 
-Checking for completeness of form bundles can be applied on display of a record summary.
+Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
-Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default.
+Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Übersicht der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status des Ablusses wieder entzogen.
 
 ![record screenshot](assets/records.png)
 
 ```mermaid
 graph TD;
-    records((records))-->identifiersheet(("create
-    identifier
-    sheet"));
-    identifiersheet-->input[input data];
-    input-->|generate|print("print sheet,
-    handout to workmates");
+    records((Aufzeichnungen))-->identifiersheet(("Erstelle einen Aufkleberbogen
+    mit Identifikatoren"));
+    identifiersheet-->input[Eingabedaten];
+    input-->|Absenden|print("Bogen ausdrucken und
+    an Mitarbeiter aushändigen");
 
-    records-->fillform((fill out form));
-    fillform-->selectform[select form];
-    selectform-->forms[(forms)];
-    forms-->|get recent by name|displayform[display form];
-    displayform-->inputdata[add data];
-    inputdata-->|input new dataset with form name|recorddb[(record database)];
-    displayform-->idimport[import by identifier];
-    idimport-->recorddb2[(record database)];
-    recorddb2-->selectbyid[retrieve all with identifier];
-    selectbyid-->|render last appended data|inputdata;
-    displayform-->|permission to export|exportform[export fillable pdf]
+    records-->fillform((Formular ausfüllen));
+    fillform-->selectform[Formular wählen];
+    selectform-->forms[(Formulare)];
+    forms-->|neuestes Fomular nach Name ausgeben|displayform[Formular anzeigen];
+    displayform-->inputdata[Dateneingabe];
+    inputdata-->|neuen Datensatz mit Formularname speichern|recorddb[(Aufzeichnungsdatenbank)];
+    displayform-->idimport[Import mit Identifikator];
+    idimport-->recorddb2[(Aufzeichnungsdatenbank)];
+    recorddb2-->selectbyid[erhalte alle Datensätze mit Identifikator];
+    selectbyid-->|füge neueste Datensätze ein|inputdata;
+    displayform-->|Exportberechtigung|exportform[exportiere editierbares PFD]
 
     print-.->idimport;
 
-    records-->summaries((record summary));
-    summaries-->recorddb3[(record database)]
-    recorddb3-->|not closed and within limit|displayids[display identifier];
-    recorddb3-->|matching filter|displayids;
-    displayids-->|select|summary[display summary];
-    summary-->|supervisor, admin or ceo|close[close];
+    records-->summaries((Dokumentationen));
+    summaries-->recorddb3[(Aufzeichnungsdatenbank)]
+    recorddb3-->|"nicht abgeschlossen und
+    innerhalb der Grenzmenge"|displayids[Anzeige des Identifikators];
+    recorddb3-->|Filter trifft zu|displayids;
+    displayids-->|Auswahl|summary[zeige Zusammenfassung an];
+    summary-->|Bereichsleiter, Leitung, QMB|close[abschließen];
     close-->recorddb3
-    summary-->export[export];
-    export-->pdf("summary as pdf,
-    attached files");
-    summary-->matchbundles[match with form bundles];
-    matchbundles-->missing{missing form};
-    missing-->|yes|appenddata[append form];
+    summary-->export[exportieren];
+    export-->pdf("Zusammenfassung als PDF,
+    angehängte Dateien");
+    summary-->matchbundles[Abgleich mit Formular-Paketen];
+    matchbundles-->missing{fehlendes Formular};
+    missing-->|ja|appenddata[Formular hinzufügen];
     appenddata-->forms;
-    missing-->|no|nonemissing(status message);
+    missing-->|nein|nonemissing(Statusbenachrichtigung);
 ```
 
 [Content](#content)
 
 ### Risikomanagement
-The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals.
+Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org).
 
-You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold ad defined within [setup.ini](#runtime-variables).
+Dabei werden Ursache und Auswirkungen erfasst, die Einstrittwahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [setup.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt.
 
-Entries are not persistent but can be exported if desired through the [audit module](#tools). Available entries store and display the user name and date of the last edit. 
+Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#werkzeuge) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung. 
 
 ![risk screenshot](assets/risks.png)
 
@@ -512,85 +512,86 @@ Entries are not persistent but can be exported if desired through the [audit mod
 
 ![sample calendar menu](assets/calendar%20menu.png)
 
-Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
+Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
-Events may trigger a [message](#conversations) to a defined user group if set.
+Ereignisse können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen auslösen, wenn diese Einstellung vorgenommen wurde.
 
-As scheduling is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place you get only to select dates. This unclutters the input form too.
+Da die Terminplanung primär die Arbeitsplanung (beispielweise die Festlegung von täglichen Aufgaben für einen Bereich) oder Erinnerungen in Zusammenhang mit Aufzeichnungen unterstützen soll, kann nur ein Datum und keine Zeit ausgewählt werden. Dies vereinfacht zudem die Eingabemaske.
 
-Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
+Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar, um sicherzustellen, dass es nicht übersehen wird falls ein geplantes Ereignis an einem solchen Tag statt findet.
 
-Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records).
+Die Planung von Terminen ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht.
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only.
+Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeiter genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst zu berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Benutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nut durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden.
 
-This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly.
+Dies soll eine transparente Kommunikation, einen vertraulichen Umgang mit den Daten und eine gemeinsame Übereinkunft über die Zeiterfassung sicherstellen. Ziel ist es allen bekannten Anliegen deutschen Rechts und denen der Personalräte und Gewerkschaften zu entsprechen. Dabei handelt es sich nicht um eine dauerhafte Erfassung, da die Datenbank um Nutzereinträge bei deren Löschung bereinigt wird. Arbeitszeitzusammenfassungen können exportiert werden, was nach aktuellem Stand ein bevorzugter Weg ist und im Sinne einer langfristigeren Datenspeicherung im Sinne von Arbeitszeitgesetzen empfohlen wird. Die Nutzereinstellungen erlauben die Eingabe von Wochenstunden zugunsten einer zielführenden Berechnung.
 
-Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
+Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten Ereignissen angezeigt als auch andersherum um für das Arbeitsaufkommen der verbleibenden Belegschaft zu sensibilisieren.
 
-*Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution! On minor changes it is recommended to export the most recent timesheets and start tracking anew.*
+*Warnung: die aktuelle Implementierung hat eine recht starre Definition von Feiertagen und berücksichtigt weder unterschiedliche Regionen, noch mögliche Änderungen gesetzlicher Feiertage. Derzeit würden Änderungen auch vergangene Zeiterfassungen berücksichtigen und unterschiedliche Berechnungen ergeben. Bei kleineren Änderungen wird empfohlen die neuesten Zeiterfassungen zu exportieren und innerhalb der Anwendung neu zu beginnen.*
 
-Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
+Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
-Exports are ordered by user name with exporting user coming first regardless, for convenience.
+Exporte sind nach Nutzernamen aphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber als erstes.
 
 ![calendar screenshot](assets/calendar.png)
 
 ```mermaid
 graph TD;
-    scheduling((scheduling))-->select_day[select day];
-    scheduling-->search[search];
-    select_day-->database[(calendar db)];
-    select_day-->add[add];
+    scheduling((Planung))-->select_day[Auswahl Tag];
+    scheduling-->search[Suche];
+    select_day-->database[(Kalenderdatenbank)];
+    select_day-->add[hinzufügen];
     add-->database;
     search-->database;
-    database-->matches["display matches
-    for assigned units"];
-    matches-->permission{"admin, ceo,
-    qmo,
-    supervisor"};
-    permission-->|yes|edit[edit or delete];
-    permission-->|no|complete[mark as completed];
+    database-->matches["Ergebnisse zugewiesener
+    Bereiche anzeigen"];
+    matches-->permission{"Administrator,
+    Leitung, QMB,
+    Bereichsleiter"};
+    permission-->|ja|edit[ändern oder löschen];
+    permission-->|nein|complete[abschließen];
     edit-->complete;
-    database-->alert["alert selected unit members once"]
+    database-->alert["Mitarbeiter ausgewählter Bereiche
+    einmalig benachrichtigen"]
 
-    landing_page((landing page))-->summary["calendar week,
-    current scheduled events,
-    uncompleted past scheduled events"];
+    landing_page((Startseite))-->summary["Kalenderwoche,
+    aktuell geplante Ereignisse,
+    nicht abgeschlossene vergangene Ereignisse"];
     summary-->select_day
 
-    timesheet((timesheet))-->select_day2[select day];
-    select_day2-->add2[add];
-    add2-->usertype{usertype};
-    usertype-->|any|own[own entries];
-    usertype-->|human ressources, supervisor|foreign[own and third party];
+    timesheet((Zeiterfassung))-->select_day2[Auswahl Tag];
+    select_day2-->add2[hinzufügen];
+    add2-->usertype{Nutzertyp};
+    usertype-->|jeder|own[eigene Einträge];
+    usertype-->|Personalverwaltung, Bereichsleiter|foreign[eigene und fremde Einträge];
     own-->database2;
     foreign-->database2;
-    select_day2-->database2[(calendar db)];
+    select_day2-->database2[(Kalenderdatenbank)];
     database2-->alert;
-    database2-->entrytype{entry type};
-    entrytype-->|regular working day|usertype2{usertype};
-    usertype2-->|affected user|display_edit["display
-    edit, delete
-    if not closed"];
-    usertype2-->|supervisor, ceo, admin|display_close["display
-    close, open"];
-    entrytype-->|unavailable|usertype3{usertype};
+    database2-->entrytype{Eintragstyp};
+    entrytype-->|regulärer Arbeitstag|usertype2{Nutzertyp};
+    usertype2-->|betroffener Nutzer|display_edit["Anzeige,
+    Änderung,
+    Löschung,
+    falls nicht abgeschlossen"];
+    usertype2-->|Bereichsleiter, Leitung, Administrator|display_close["Anzeige,
+    abschließen,
+    wiedereröffnen"];
+    entrytype-->|Dienstfrei|usertype3{Nutzertyp};
     usertype3-->usertype2;
-    usertype3-->|human ressources|display_only[display]
+    usertype3-->|Personalverwaltung|display_only[Anzeige]
     
-    database2-->export[export];
-    export-->permission2{permission};
-    permission2-->|admin, ceo, human ressources|fullexport["full export of all
-    user timesheets
-    for selected month"];
-    permission2-->|supervisor|partexport["export of all
-    user timesheets
-    of assigned units
-    for selected month"];
-    permission2-->|user|ownexport["export of own
-    timesheet display only
-    for selected month"]
+    database2-->export[Export];
+    export-->permission2{Berechtigung};
+    permission2-->|Leitung, Personalverwaltung|fullexport["vollständiger Export
+    aller Zeiterfassungen
+    des gewählten Monats"];
+    permission2-->|Bereichsleiter|partexport["Export aller Zeiterfassungen
+    zugewiesener Bereiche
+    des gewählten Monats"];
+    permission2-->|Mitarbeiter|ownexport["Export der eigenen Zeiterfassung
+    des gewählten Monats"]
 ```
 [Content](#content)
 
@@ -598,13 +599,13 @@ graph TD;
 
 ![sample files menu](assets/files%20menu.png)
 
-Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
+Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer könne zudem zum öffentlichen Sharepoint beitragen in welchem Dateien nur eine begrenzte Verweildauer haben und automatisch gelöscht werden.
 
-Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
+Beide Speicherorte bestücken den [STL-Betrachter](#werkzeuge).
 
-This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion; register external documents for the same reason.*
+Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionkonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
+Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden.
 
 ![files screenshot](assets/files.png)
 
@@ -615,74 +616,70 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ![sample purchase menu](assets/purchase%20menu.png)
 
 ### Lieferanten- und Artikelverwaltung
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters, or disable vendors and products. Importing pricelists with filtering makes use of the [CSV processor](#csv-processor).
+Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren, oder Lieferanten und Artikel deaktivieren. Der Impoert von Preislisten nutzt den [CSV-Prozessor](#csv-prozessor).
 
-Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
+Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschüzt markiert sind. Lieferanten können nicht gelöscht werden.
 
-Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
+Besondere berechtigte Nutzer (z.B. *Einkaufsassistenten*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
 
-Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
+Lieferanten können Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern.
 
-While editing products, one can edit the
-* *trading good*-setting,
-* *has expiry date*-setting,
-* *special attention*-setting (meaning being defined within languagefile),
-* revoke a possible *incorporated*-state and
-* set the product *active and available* or *inactive*.
+Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bearbeitet werden:
+* Handelsware,
+* Verfallsdatum,
+* besondere Beachtung (die konkrete Bedeutung wird in der Sprachdatei festgelegt, z.B. Hautkontakt),
+* Entzug der Produkteinführung,
+* den Artikel als *verfübar* oder *nicht verfügbar* markieren.
 
-On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
+Bei jeder dieser Einstellungen können vergleichbaren Artikel gewählt werden auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [setup.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
 ![vendor manager screenshot](assets/vendor%20manager.png)
 
 ```mermaid
 graph TD;
-    manage_vendors((manage vendors))-->edit_vendor[edit existing vendor];
-    manage_vendors-->new_vendor[new vendor];
-    edit_vendor-->add_vinfo["add documents,
-    update info,
-    set pricelist filter"];
+    manage_vendors((Lieferanten))-->edit_vendor[bestehenden Lieferanten bearbeiten];
+    manage_vendors-->new_vendor[neuer Lieferant];
+    edit_vendor-->add_vinfo["Dokumente hinzufügen
+    Informationen aktualisieren,
+    Preislistenfilter festlegen"];
     new_vendor-->add_vinfo;
-    add_vinfo-->import_pricelist[import pricelist];
-    import_pricelist-->delete_all_products[delete all products];
-    delete_all_products-->has_docs2{"product
-    has documents,
-    been incorporated,
-    had samplecheck
-    (protected)"};
-    has_docs2-->|yes|update[update based on ordernumber];
-    has_docs2-->|no|delete[delete];
-    delete-->|reinserted from pricelist|orderable(orderable);
-    delete-->|not in pricelist|inorderable(not available in orders)
+    add_vinfo-->import_pricelist[Preisliste importieren];
+    import_pricelist-->delete_all_products[alle Artikel löschen];
+    delete_all_products-->has_docs2{"Dokumente vorhanden,
+    Einführung erfolgt,
+    Stichprobenprüfung erfolgt,
+    (geschützt)"};
+    has_docs2-->|ja|update[Aktualisierung nach Artikelnummer];
+    has_docs2-->|nein|delete[Löschung];
+    delete-->|Einfügen aus Preisliste|orderable(bestellbar);
+    delete-->|nicht in Preisliste enthalten|inorderable(nicht bestellbar)
     update-->orderable;
 
-    manage_products((manage products))-->edit_product[edit existing product];
-    manage_products-->add_product[add new product];
-    add_product-->select_vendor[(select vendor)];
-    select_vendor-->add_pinfo["Add documents,
-    update info"];
+    manage_products((Produkte))-->edit_product[bestehendes Produkt bearbeiten];
+    manage_products-->add_product[neues Produkt];
+    add_product-->select_vendor[(Lieferanten Auswählen)];
+    select_vendor-->add_pinfo["Dokumente hinzufügen,
+    Information aktualiseren"];
     add_pinfo-->known_vendor;
 
-    edit_product-->similar{select similar products};
-    similar-->add_pinfo["add documents,
-    update info"];
-    similar-->database[("update selected products
-    within database,
-    apply active state,
-    trading good,
-    revoke incorporation")];
-    known_vendor{vendor in database}-->|yes|add_pinfo;
-    known_vendor-->|no|new_vendor
-    edit_product-->delete_product(delete product);
-    delete_product-->has_docs{"product
-    has documents,
-    been incorporated,
-    had samplecheck
-    (protected)"};
-    has_docs-->|no|product_deleted["product
-    deleted"];
-    has_docs-->|yes|product_inactive["deactivate
-    product"];
-    database-->|inactive|product_inactive
+    edit_product-->similar{ähnlie Produkte auswählen};
+    similar-->add_pinfo["Dokumente hinzufügen,
+    Informationen aktualisieren"];
+    similar-->database[("aktualisiere gewählte Produkte
+    innerhalb der Datenbank,
+    setze Verfügbarkeit,
+    Handelware,
+    entziehe Einführung")];
+    known_vendor{Lieferant in Datenbank}-->|ja|add_pinfo;
+    known_vendor-->|nein|new_vendor
+    edit_product-->delete_product(lösche Produkt);
+    delete_product-->has_docs{"Produkt hat Dokumente
+    wurde eingeführt,
+    wurde stichprobengeprüft
+    (geschützt)"};
+    has_docs-->|nein|product_deleted["Produkt gelöscht"];
+    has_docs-->|yes|product_inactive["deaktiviere Produkt"];
+    database-->|inaktiv|product_inactive
     product_deleted-->inorderable;
     product_inactive-->inorderable;
     edit_product-->product_inactive;
@@ -691,103 +688,101 @@ graph TD;
 [Content](#content)
 
 ### Bestellung
-The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
-Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up.
+das Bestellodul unterstützt alle Parteien. Der Einauf erhält strukturierte und vollständige Daten für Bestellungen, während die bestellenden Bereiche unmittelbare Informationen über den Bestellstatus erhalten.
+Bestellte Artikel erteilen unmittelbar Auskunft über ihren Einführungsstatus oder ob sie für eine Stichprobenprüfung in Frage kommen. Beide Maßnahmen können direkt aus der Aufstellung bestellter Artikel ergriffen werden, während des laufenden Betriebs und ohne Verwechslungen.
 
-Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
+Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN) gesammelt freigegeben werden.
 
-Approved orders can be marked as *ordered*, *received*, *delivered* and *archived* with only the last not being deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
+Freigegebene Bestellungen können als *bestellt*, *vollständig erhalten*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert.
 
-Information can be added anytime.
-Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally to reduce load on purchase staff.
-All actions offer to append a message.
+Jeder Bestellung kann jederzeit Informationen angehängt werden.
+Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine Abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
+Alle Maßnahmen bieten an eine Nachricht beizfügen.
 
-Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation. 
+Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) erxportiert und für die Lieferantenbewertung genutzt werden.
 
 ![orders screenshot](assets/orders.png)
 
 ```mermaid
 graph TD;
-    new_order((new order))-->search_products[(search products)];
-    search_products-->product_found{product found};
-    product_found-->|yes|add_product[add product to order];
-    new_order-->add_manually[add manually];
-    product_found-->|no|add_manually;
-    product_found-->|no|manage_products((manage products));
+    new_order((neue Bestellung))-->search_products[(Artikelsuche)];
+    search_products-->product_found{Artikel gefunden};
+    product_found-->|yes|add_product[zur Bestellung hinzufügen];
+    new_order-->add_manually[manuelle Angabe];
+    product_found-->|nein|add_manually;
+    product_found-->|nein|manage_products((Produkte bearbeiten));
     add_manually-->add_product;
     add_product-->search_products;
-    add_product-->add_info["set unit,
-    justification,
-    add files"];
-    add_info-->approve_order{approve order};
-    approve_order-->|by signature|approved_orders(("approved orders,
-    only from own unit
-    unless admin
-    or purchase"));
-    approve_order-->|by pin|approved_orders;
-    approve_order-->|no|prepared_orders(("prepared orders,
-    only from own unit
-    unless admin or
-    order authorized
-    and selected"));
+    add_product-->add_info["Bereich wählen,
+    Begründung angeben,
+    Dateien anhängen"];
+    add_info-->approve_order{Bestellung freigeben};
+    approve_order-->|mit Unterschrift|approved_orders(("freigegebene Bestellungen
+    nur von eigenen Bereichen,
+    außer Einkauf"));
+    approve_order-->|mit PIN|approved_orders;
+    approve_order-->|nein|prepared_orders(("vorbereitete Bestellungen,
+    nur von eigenen Bereichen,
+    außer bestellberechtigt
+    und Bereich ausgewählt"));
 
-    approved_orders-->process_order{process order};
-    process_order-->disapprove[disapprove];
-    disapprove-->append_message[append message];
-    append_message-->message_unit[message all unit members];
+    approved_orders-->process_order{Bestellung bearbeiten};
+    process_order-->disapprove[zurückweisen];
+    disapprove-->append_message[Nachricht anhängen];
+    append_message-->message_unit["alle Bereichsmitarbeiter
+    benachrichtigen"];
     disapprove-->message_unit;
     message_unit-->prepared_orders;
 
-    process_order-->|not incorporated|incorporate;
-    incorporate-->incorporate_similar{"similar
-    products"};
-    incorporate_similar-->|yes|select_similar["select similar,
-    append data"];
-    select_similar-->productdb[(product database)]
-    incorporate_similar-->|no|insert_data[insert data];
-    insert_data-->productdb[(product database)];
-    productdb[(product database)]-->checksdb[(checks database)];
+    process_order-->|nicht eingeführt|incorporate;
+    incorporate-->incorporate_similar{"ähnliche Produkte"};
+    incorporate_similar-->|ja|select_similar["ähnliche wählen,
+    Daten anfügen"];
+    select_similar-->productdb[(Produktdatenbank)]
+    incorporate_similar-->|nein|insert_data[Daten anfügen];
+    insert_data-->productdb;
+    productdb-->checksdb[(Prüfungsdatenbank)];
 
-    process_order-->|sample check required|sample_check[sample check];
-    sample_check-->productdb[(product database)];
+    process_order-->|Stichprobenprüfung erforderlich|sample_check[Stichprobenprüfung];
+    sample_check-->productdb;
 
-    process_order-->mark[mark];
-    mark-->|processed|order_type{order type};
-    order_type-->|order|auto_delete[auto delete after X days];
-    order_type-->|return|auto_delete;
-    order_type-->|service|auto_delete;
-    order_type-->|cancellation|order_deleted(order deleted)
-    mark-->|delivered|auto_delete;
-    mark-->|archived|delete[delete manually];
-    process_order-->|delete|delete;
-    process_order-->cancel_order[cancel order];
-    cancel_order-->rewrite_cancel[rewrite order as cancellation];
+    process_order-->mark[markieren];
+    mark-->|bestellt|order_type{Bestellart};
+    order_type-->|Bestellung|auto_delete[automatische Lösung
+    nach x Tagen];
+    order_type-->|Rücksendung|auto_delete;
+    order_type-->|Service|auto_delete;
+    order_type-->|Storno|order_deleted(Bestellung gelöscht)
+    mark-->|ausgeliefert|auto_delete;
+    mark-->|archiviert|delete[manuelle Löschung];
+    process_order-->|löschen|delete;
+    process_order-->cancel_order[Storno];
+    cancel_order-->rewrite_cancel[in Stornierung umwandeln];
     rewrite_cancel-->approved_orders;
-    process_order-->return_order[return order];
-    return_order-->clone_order[clone order, set return type];
+    process_order-->return_order[Rücksendung];
+    return_order-->clone_order["Bestellung kopieren,
+    als Rücksendung markieren"];
     clone_order-->approved_orders
-    delete-->delete_permission{"permission
-    to delete"};
-    delete_permission-->|is admin|order_deleted;
-    delete_permission-->|is unit member|order_deleted;
-    delete_permission-->|purchase member, unprocessed order|order_deleted;
-    delete_permission-->|purchase member, processed order|approved_orders;
-    process_order-->update_state[update state];
-    update_state-->append_inform["append info,
-    message all unit members"];
+    delete-->delete_permission{"Berechtigung zur Löschung"};
+    delete_permission-->|Bereichsmitarbeiter|order_deleted;
+    delete_permission-->|Einkauf, unbearbeitete Bestellung|order_deleted;
+    delete_permission-->|Einkauf, bearbeitete Bestellung|approved_orders;
+    process_order-->update_state[Bestellstatusaktualisierung];
+    update_state-->append_inform["Information angebene,
+    Bereichsmitarbeiter benachrichtigen"];
     append_inform-->process_order
     
-    process_order-->|add info|process_order;
-    process_order-->message((message user))
+    process_order-->|Information anfügen|process_order;
+    process_order-->message((Besteller benachrichtigen))
 
-    prepared_orders-->mark_bulk{"mark orders
-    for approval"};
-    mark_bulk-->|yes|approve_order;
-    mark_bulk-->|no|prepared_orders;
+    prepared_orders-->mark_bulk{"Bestellungen für
+    Freigabe markieren"};
+    mark_bulk-->|ja|approve_order;
+    mark_bulk-->|nein|prepared_orders;
     prepared_orders-->add_product;
 ```
-Initialized incorporations are marked as approved by all applicable users permissions/roles. They may still have to be fully approved by defined authorized roles.
-Sample checks are added to the records. Defined authorized users can revoke the sample check from within the [audit module](#tools). New checks trigger a sytem message to these users.
+Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die den bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Nutzer erforderlich sein.
+Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung wiederrufen. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus.
 
 [Content](#content)
 
@@ -795,63 +790,63 @@ Sample checks are added to the records. Defined authorized users can revoke the 
 
 ![sample tools menu](assets/tools%20menu.png)
 
-Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
+Es stehen einige allgemeine Werkzeuge für das Lesen und erzeugen von 2D-Codes und der Betrachtung von STL-Dateien zur Verfügung.
 
-Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
+Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Veraltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl and Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
-The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
-* incoporated articles
-* MDR §14 sample checks
-* current documents in use including external documents
-* user skills and trainings
-* skill fulfilment
-* vendor list
-* order statistics
-* regulatory issues
-* risks
+Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen untestützen:
+* eingeführte Produkte
+* Stiachprobenprüfungen gemäß MDR §14
+* aktuell gültige Dokumente, incl. externe Dokumente
+* Mitarbeiterqualifikationen und Schulungen
+* Qualifikationserfüllung
+* Lieferantenverzeichnis
+* Bestellstatistiken
+* regulatorische Anforderungen
+* Risiken
 
 ![audit screenshot](assets/audit.png)
 
 [Content](#content)
 
 # Voraussetzungen
-* Server with
+* Server mit
     * PHP >= 8.2
-    * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted)
-    * SSL (camera access for qr-scanner, serviceworker and sha256 encryption don't work otherwise)
-* Network access for endpoints and a browser
-    * Desktop pcs
-    * Mobile devices
-    * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
-* Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
+    * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst werden)
+    * SSL (Kamerazugriff für den Scanner, Serviceworker und SHA256-Verschlüsselung kann sonst nicht genutzt werden)
+* Netzwerkzugriff für Endgeräte und einen Browser
+    * Desktop PSc
+    * mobile Geräte
+    * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzverkverbindung) (Cache, indexedDB) beim Beenden
+* Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
 
-Tested server environments:
-* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
-* Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
-* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
+Getestete Serverumgebungen:
+* Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
+* Apache (native) mit PHP 8.2, MariaDB 15.1 (seit 2024-05-30)
+* Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 22)
 
-Tested devices:
-* Win10 Edge-browser
-* Win11 Firefox-browser (until 2024-05-30)
-* Linux Mint 21.3 Firefox-Browser (from 2024-05-30)
-* Android12 Firefox-browser
+Getestete Geräte
+* Win10 Edge-Browser
+* Win11 Firefox-Browser (bis 2024-05-30)
+* Linux Mint 21.3 Firefox-Browser (seit 2024-05-30)
+* Android12 Firefox-Browser
 
-Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
+Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenlisten bei Eingaben eine Vorschau, welche die Auswahl verfügbarer Optionen (z.B. Wahl von Nechrichtenempfängern) vereinfacht. Andere Browser wurden nicht getestet.
 
 [Content](#content)
 
 ## Installation
-* php.ini memory_limit ~4096M for [processing of large CSV-files and pricelist imports](#csv-processor), disable open_basedir at least for local IIS for file handlers.
-    * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
-    * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
-* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
-* php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
-    * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
-    * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
+* php.ini memory_limit ~4096M zur [Verarbeitung großer CSV-Dateien und dem Preislistenimport](#csv-prozessor), open_basedir zumindest für das lokale IIS für die Dteiverabeitung deaktivieren.
+    * [CSV Verarbeitung](#csv-prozessor) von 48mb @ 59k Zeilen mit diversen Filtern, incl. Dateifilter, beansprucht etwa 1.7GB Speicher
+    * [CSV Verarbeitung](#importierung-von-lieferantenpreislisten) @ 100MB beansprucht etwa 2.3GB Speicher
+* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config für IIS entsprechend der erwarteten Dateigrößen für z.B. Sharepoint und CSV-Dateien ~350MB.
+* php.ini max_input_time -1 für das Teilen großer Uploads mit max_execution_time, abhängig von der erwarteten Verbindungsgeschwindigkeit.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann.
+    * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
+    * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime according to [setup.ini[limits][idle_logout]](#runtime-variables)
-* php.ini enable extensions:
+* php.ini session.gc_maxlifetime gemäß [setup.ini[limits][idle_logout]](#laufzeitvariablen)
+* php.ini Aktivierung folgender Erweiterungen:
     * gd
     * gettext
     * mbstring
@@ -860,72 +855,72 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
     * zip
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
-* Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
-* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
-* [Customize](#customisation) your appropriate language-file (language.XX.ini)
-* Run api/_install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
-* Change system users default token immediately and store it in a safe place!
-* Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
+* manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
+* Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Zugangsdaten, Paketgröße gemäß SQL-Konfiguration.
+* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.ini)
+* Aufruf api/_install.php, es erfolgt anschließend eine Weiterleitung - keine Sorge, bei einem erneuten Aufruf passiert nichts.
+* Änderung des Zugangstokens des Systemnutzers und eine sichere Verwahrung!
+* Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Brwoserberechtigungen.
 
 ## Laufzeitvariablen
-Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
+Manchse Variables können wärend der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
 
 ```
-; default fallback application language
-defaultlanguage = "en" ; en, de, etc. according to available language.xx.ini files; user can customize within profile
+; Standard Anwendungssprache
+defaultlanguage = "en" ; en, de, etc. entrpechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
 
-; timezone for calendar handling
+; Zeitzone für den Kalender
 timezone = "Europe/Berlin"
 
-; address for application and security issues
+; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
 issue_mail = "dev@erroronline.one" 
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
-; comment out if any of these holidays don't apply
-; second key is just for comprehension, value is offset to easter sunday
+; nicht anwendbare Feiertage können auskommentiert werden
+; der zweite Schlüssel dient dem Verständnis, der Wert ist der Abstand zu Ostersonntag
 ; easter_holidays[maundy_thursday] = -3
-easter_holidays[good_friday] = -2
+easter_holidays[karfreitag] = -2
 ; easter_holidays[holy_saturday] = -1
-easter_holidays[easter_monday] = 1
-easter_holidays[ascension] = 39
-easter_holidays[pentecost] = 50
-easter_holidays[corpus_christi] = 60
+easter_holidays[ostermontag] = 1
+easter_holidays[himmelfahrt] = 39
+easter_holidays[pfingsten] = 50
+easter_holidays[frohnleichnahm] = 60
 
-workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
-default_due = 7 ; scheduled events are due in x days by default
+workdays = "1, 2, 3, 4, 5" ; Montag=1 bis Sonntag=7, Tage wie Wochenenden mit der gleichen Markierung wie Feiertage auslassen
+default_due = 7 ; Standardeinstellung für Fälligkeiten von Terminen
 
-hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
-; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.xx.ini to adhere to your company policies regarding data safety
+hide_offduty_reasons[] = "" ; bitte nicht ändern
+; hide_offduty_reasons[] = "sickleave" ; Ursachen gemäß Sprachdatei können in übereinstimmung mit unternehmensspezifischen Datenschutzbestimmungen ausgeblendet werden
 
-; default values for csv processing if left out of filter rules
+; Standardeinstellungen für CSV-Verarbeitung falls nicht im Filter definiert
 [csv]
 headerrowindex = 0
 dialect["separator"] = ";"
 dialect["enclosure"] = "\"" ; coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
 
-;"forbidden names as regex-patterns
+;"unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
-names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whitespace, decimals, special characters 
-names[] = "^.{0,3}$" ; less than 4 characters
+names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind
+names[] = "^.{0,3}$" ; weniger als 4 Zeichen
 
-; immutable hardcoded reserved keywords
-names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
-names[] = "^_" ; names must not start with _
-names[] = "IDENTIFY_BY_" ; special substrings |-separated
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
+; unveränderliche fest einprogrammierte reservierte Begriffe
+names[] = "^\d+$" ; Namen dürfen nicht nur numerisch sein, da dies für Datenbank-IDs reserviert istids
+names[] = "^_" ; Namen dürfen nicht mit _ beginnen
+names[] = "IDENTIFY_BY_" ; besondere Teilzeichenketten, getrennt mit |
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 [lifespan]
-sharepoint =  48 ; HOURS, after these files will be deleted
-tmp =  24 ; HOURS, after these files will be deleted
-order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
-idle = 1440 ; SECONDS after which a session expires without intermittend request
-training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews
-mdr14_sample_interval = 365 ; DAYS until a new sample check is required as default value
-mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
+sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
+tmp =  24 ; Stunden nach denen Dateien gelöscht werden
+order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
+idle = 1440 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
+training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
+mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
+mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stickprobenprüfung verwendet werden darf
 
-; probability factor for similarity of texts in percent
+; Wahrscheinlichkeiten für Ähnlichkeiten von Texten in Prozent
 [likeliness]
 consumables_article_no_similarity = 70 ; percent
 file_search_similarity = 50 ; percent
@@ -1018,7 +1013,7 @@ products_per_slide = 6
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
 
 If you ever fiddle around with the sourcecode:
-* [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
+* [CSV Processor](#csv-prozessor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning.
 * See available frontend render options importing unittest.js and calling `rendertest('forms')` or `rendertest('app')` from the console.
 
@@ -1110,7 +1105,7 @@ Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse 
 
 [Content](#content)
 
-# CSV Processor
+# CSV Prozessor
 The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
 
 Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
