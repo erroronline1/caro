@@ -86,7 +86,7 @@
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment; while technically being usable on any webserver this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security) and is **not recommended**. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
-Data gathering is supposed to be completely digital and finally wants to get rid of paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
+Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
 ![landing page screenshot](assets/landing%20page.png)
 
@@ -115,7 +115,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
     * also see [Users](#users), [Records](#records)
 * ISO 13485 5.5.1 Responsibility and authority
-    * Users are assigned [special permissions](#users) that limit access and unclutter menu items.
+    * Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.
     * Permissions define access to app functions.
     * Users can be assigned a pin to approve orders.
     * A user register summarizes all users, also grouped by organizational unit and permission
@@ -142,7 +142,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Procurement is guided through the application. Vendors and products can be added into the database.
     * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
     * Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.
-    * Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.
+    * Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.
     * Products are deleted by default on update of the pricelist unless
         * an incorporation has been made
         * a sample check has been made
@@ -153,7 +153,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the setup.ini file.
-    * Sample check information is to be enriched through a dedicated form with the respective context. All users can gather the required information and commit the check. 
+    * Sample check information is to be enriched through a dedicated form with the respective context. All users (except groups) can gather the required information and commit the check. 
     * Sample checks can be revoked by authorized users.
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
 * ISO 13485 7.5.1 Control of production and service
@@ -171,15 +171,14 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The audit module aquires data from the application and is partially able to export
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
         * records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.
-        * a list of current documents in use (forms and their components)
-        * user skills and trainings (with expiries highlighted)
-        * vendor lists with last article update, last MDR sample check and details for certificates (if provided)
-        * fulfilment of regulatory issues considered by forms
+        * a list of current documents in use (forms and their components).
+        * user skills and trainings (with expiries highlighted).
+        * vendor lists with last article update, last MDR sample check and details for certificates (if provided).
+        * fulfilment of regulatory issues considered by forms.
     * also see [Tools](#tools)
 * ISO 13485 8.4 Data analysis
     * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpeted though.
     * [Order](#order), [Tools](#tools)
-
 
 [Content](#content)
 
@@ -191,7 +190,6 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * The application has a risk management module to consider, evaluate and handle risks.
     * Items of appedix E are prepared for use by default.
     * also see [Risk management](#risk-management)
-
 
 [Content](#content)
 
@@ -219,7 +217,7 @@ Beside a few architectural decisions the app is not a preset quality management 
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
-Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan. This module is for operational communication only, not for persistent documentation purpose.
+Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
 
 ## Data integrity
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
@@ -388,6 +386,8 @@ On creating a text you can make use of predefined replacements that may contain 
 
 *"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNominative can make use of the aid."*
 
+rendered to *"We write to inform you about **the woman Gladys**. We just want to tell you **Gladys** is doing fine. **The woman** can make use od the aid."*
+
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
 Output will be copied to clipboad on clicking or tapping the output field.
@@ -433,17 +433,17 @@ graph TD;
 ![sample records menu](assets/records%20menu.png)
 
 ### Forms
-Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be enough, but documents can still be exported as editable or prefilled PDFs within boundaries.
+Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be suitable enough; documents can still be exported as editable or prefilled PDFs within boundaries though.
 
 To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by defined authorized users to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
-An approvement request is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. 
+An approvement request for forms and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. 
 
-Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended. Approvement requests are delivered same way as for components.
+Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form).
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options, identifiers, links and buttons are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form), while in the latte case any searchability and quick overviews suffer.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -643,7 +643,7 @@ Defined authorized users can provide files for everyone to access. Also all user
 
 Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
 
-This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion; register external documents for the same reason.*
+This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
 External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
@@ -656,7 +656,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ![sample purchase menu](assets/purchase%20menu.png)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters, or disable vendors and products. Importing pricelists with filtering makes use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. Importing pricelists with filtering makes use of the [CSV processor](#csv-processor).
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -742,6 +742,7 @@ Approved orders can be marked as *ordered*, *received*, *delivered* and *archive
 Information can be added anytime.
 Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.
 All actions offer to append a message.
+A label sheet can be created directly from the commission field to support allocation of products during internal delivery.
 
 Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation. 
 
@@ -827,7 +828,7 @@ graph TD;
     mark_bulk-->|no|prepared_orders;
     prepared_orders-->add_product;
 ```
-Initialized incorporations are marked as approved by all applicable users permissions/roles. They may still have to be fully approved by defined authorized roles.
+Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.
 Sample checks are added to the records. Defined authorized users can revoke the sample check from within the [audit module](#tools). New checks trigger a sytem message to these users.
 
 [Content](#content)
@@ -858,7 +859,7 @@ The audit module gathers data from the application in regards of proofing lists 
 # Prerequisites
 * Server with
     * PHP >= 8.2
-    * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted)
+    * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted/extended)
     * SSL (camera access for qr-scanner, serviceworker and sha256 encryption don't work otherwise)
 * Network access for endpoints and a browser
     * Desktop pcs
@@ -1036,12 +1037,12 @@ products_per_slide = 6
 ## Useage notes and caveats
 
 ### Network connection handling
-* The application caches requests. Get requests return the latest version, which might not always be the recent system state but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* Cached POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records.
+* The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
+* POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records.
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for lack of safari support.
+* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for [lack of full safari support](https://caniuse.com/push-api) as time of writing.
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
@@ -1051,7 +1052,7 @@ products_per_slide = 6
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.xx.ini-files or delete unused - user customization lists all available files automated. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.xx.ini-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [permission] (has no effect without consideration in role management within setup.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
@@ -1104,8 +1105,8 @@ while setting up a vendor an import rule must be defined like:
             ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
         ],
         "conditional_or": [
-            ["has_expiry_date", "1", ["Article NameNumber", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]],
-            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT"]]
+            ["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
+            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]]
         ],
         "rewrite": [{
             "article_no": ["Article Number"],
@@ -1138,7 +1139,7 @@ Other vendors may list products missing color variants appended to the article n
 You can, of course, decide to go the extra mile and apply any additional filter, e.g. to omit products you will not use anyway, speed up the import for next time by leaving out products that did not fit incorporation, etc.
 
 ### Sample check, expiry dates and special attention
-*modify.add* and *modify.conditional* detect trading goods for the MDR §14 sample check and flag an expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
+*modify.add* and *modify.conditional* define trading goods for the MDR §14 sample check and the expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
 
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates and required special attention.
 

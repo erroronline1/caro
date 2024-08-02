@@ -13,7 +13,7 @@
     * [Tips](#tips)
 * [Module](#module)
     * [Anwendung](#anwendung)
-        * [Benutzer](#benutzer)
+        * [Nutzer](#nutzer)
         * [Anleitung](#Anleitung)
     * [Kommunikation](#kommunikation)
         * [Unterhaltungen](#unterhaltungen)
@@ -43,9 +43,9 @@
 * [Lizenz](#lizenz)
 
 # Ziele
-Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 13485 und der internen Kommunikation unterstützen. Sie wird als Web-Anwendung auf einem Server verwendet. Datensicherheitsmaßnahmen sind auf die Nutzung innerhalb eines geschlossenen Netzwerks ausgelegt; während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist diese Verwendung ausdrücklich **nicht empfohlen**. Die Gestaltung ermöglicht es der Belegschaft Daten abzurufen und bereitzustellen wo andere Branchensoftware aufgrund ihrer Lizenzmodelle einschränkt.
+Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 13485 und der internen Kommunikation unterstützen. Sie wird als Web-Anwendung auf einem Server verwendet. Datensicherheitsmaßnahmen sind auf die Nutzung innerhalb eines geschlossenen Netzwerks ausgelegt; während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist diese Verwendung ausdrücklich **nicht empfohlen**. Die Gestaltung ermöglicht es der Belegschaft Daten abzurufen und bereitzustellen wo andere Branchensoftware aufgrund ihrer Lizenzmodelle nur eingeschränkt verwendet werden kann.
 
-Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln anstelle von Sonderanfertigungen, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle dem primären Dokumentationsgedanken der CARO App. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
+Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln anstelle von Sonderanfertigungen, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
 
 ![landing page screenshot](assets/landing%20page.png)
 
@@ -61,24 +61,24 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Die Anwendung ermöglicht es wiederverwendbare Formulare und deren Komponenten zu gestalten.
     * Nur die jüngsten freigegebenen Komponenten und Formulare sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzverkverbindung).
     * Die Erstellung von Komponenten, Formularen, Formular-Paketen und Textvorschlägen ist nur berechtigten Nutzern vorbehalten.
-    * Formulare und deren Komponenten müssen von [berechtigten Nutzern](#benutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Formular selbst freigegeben wurde.
+    * Formulare und deren Komponenten müssen von [berechtigten Nutzern](#nutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Formular selbst freigegeben wurde.
     * Neue Formulare, deren Komponenten, Formular-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Formulare können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Formulare sind für eine Verwendung nicht erreichbar.
     * Bilder für Komponenten können nach einer Freigabe nicht mehr gelöscht werden. Ihrem Dateinamen wird der Name der Komponenten und ein Zeitstempel beigefügt. Sie sind dauerhaft auch für ältere Versionen verfügbar, können aber nicht wiederverwendet werden, da sie fester Bestandteil der jeweiligen Komponente sind.
     * Formulare können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen.
     * Externe Dokumente werden gelenkt und erhalten die Angabe der Einrichtung, des regulatorischen Zusammenhangs, einer möglichen Außerbetriebnahme und dem jeweils letzten bearbeitenden Mitarbeiter.
     * siehe [Formulare](#formulare), [Dateien](#dateien)
 * ISO 13485 4.2.5 Lenkung von Aufzeichnungen
-    * Aufzeichnungen laufen zusammen und sind innerhalb der Anwendung nicht löschbar. Jeder Eintrag erhält einen Zeitstempel und den Namen des Nutzers. Zusammenfassungen führen alle Daten zusammen und stellen sie in der Reihenfolge ihrer Übermittlung dar.
+    * Aufzeichnungen laufen zusammen und sind innerhalb der Anwendung nicht löschbar. Jeder Eintrag erhält einen Zeitstempel und den Namen des übermittelnden Nutzers. Zusammenfassungen führen alle Daten zusammen und stellen sie in der Reihenfolge ihrer Übermittlung dar.
     * Bilder und Dateien für Aufzeichnungen werden nicht gelöscht. Ihren Dateinamen wird der Identifikator und Zeitstempel der Übermittlung beigefügt.
     * Aufzeichnungen können jederzeit exportiert werden falls eine zusätzliche Revisionssicherheit gewünscht wird oder die Daten mit dritten Parteien geteilt werden müssen.
-    * Der Zugriff auf die Inhalte der Anwendung inclusive vertraulicher personenbezogener Patientendaten erfordert eine persönliche Anmeldung registrierter Nutzer.
-    * siehe [Benutzer](#benutzer), [Aufzeichnungen](#aufzeichnungen)
+    * Der Zugriff auf die Inhalte der Anwendung inklusive vertraulicher personenbezogener Patientendaten erfordert eine persönliche Anmeldung registrierter Nutzer.
+    * siehe [Nutzer](#nutzer), [Aufzeichnungen](#aufzeichnungen)
 * ISO 13485 5.5.1 Verantwortung und Befugnis
-    * Nutzern werden [Berechtigungen](#benutzer) erteilt, die den Zugriff einschränken und das Menü vereinfachen.
+    * Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.
     * Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.
-    * Nutzer können eine Bestellberechtigungs-PIN erhalten um Bestellungen freizugeben.
+    * Nutzer können eine PIN erhalten um Bestellungen freizugeben.
     * Das Nutzerverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.
-    * siehe [Benutzer](#benutzer), [Verzeichnis](#verzeichnis), [Laufzeitvariablen](#laufzeitvariablen)
+    * siehe [Nutzer](#nutzer), [Verzeichnis](#verzeichnis), [Laufzeitvariablen](#laufzeitvariablen)
 * ISO 13485 5.5.3 Interne Kommunikation
     * Die Anwendung hat einen internen [Nachrichtendienst](#unterhaltungen). Dieser Dienst wird von internen Modulen genutzt um eine zielführende Datenübermittlung sicherzustellen, z.B. für
         * die Benachrichtigung von Nutzergruppen für die Freigabe von Formularen und deren Komponenten
@@ -87,27 +87,27 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
         * Benachrichtigung von Nutzergruppen zu geplanten Ereignissen
     * Die Anwendung hat einen integrierten Kalender. Dieser soll die Aufgabenplanung und Bearbeitung zeitkritischer wiederkehrender Ereignisse wie Kalibrationsmaßnahmen und dergleichen unterstützen.
     * Die Anwendung hat ein Bestellmodul. Bestellungen können vorbereitet und freigegeben werden. Der Einkauf hat alle erforderlichen Daten aus der Lieferantenpreisliste vorliegen um die Bestellung bearbeiten zu können; die Markierung des Bestellstatus erlaubt eine zeitnahe Rückmeldung an den Besteller.
-    * Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, die die Möglichkeiten des Nachrichtendienstes übersteigen.
-    * Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offender Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.
+    * Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, welche die Möglichkeiten des Nachrichtendienstes übersteigen.
+    * Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offener Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.
     * Formulare können auf andere Formulare verweisen. Dabei können diese nur angezeigt werden (z.B. Verfahrens- oder Arbeitsanweisungen) oder mit Übernahme des Identifikators für einen reibungslosen Transfer sorgen.
     * siehe [Unterhaltungen](#unterhaltungen), [Kalender](#kalender), [Bestellung](#bestellung), [Dateien](#dateien), [Werkzeuge](#werkzeuge)
 * ISO 13485 6.2 Personelle Ressourcen
     * innerhalb der Nutzerverwaltung können Schulungen, deren Ablaufdaten, Erfahrungspunkte und anhängende Dokumente hinzugefügt werden.
     * Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.
     * Eine Übersicht über die Schulungen und Fähigkeiten ist im Audit-Modul einsehbar.
-    * Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Die Übersicht kann im Audit-Modul exportiert werden.
-    * siehe [Benutzer](#benutzer), [Anpassung](#anpassung), [Werkzeuge](#werkzeuge)
+    * Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Eine Übersicht kann im Audit-Modul exportiert werden.
+    * siehe [Nutzer](#nutzer), [Anpassung](#anpassung), [Werkzeuge](#werkzeuge)
 * ISO 13485 7.4.1 Beschaffungsprozess
     * Die Beschaffung wird durch die Anwendung begleitet. Lieferanten und Produkte können zur Datenbank hinzugefügt werden.
     * Lieferanteneinträge können durch Dokumente, Zertifikate und deren Gültigkeitsdaten ergänzt werden. Die Gültigkeit von Zertifikaten können angezeigt und im Audit-Modul exportiert werden. Lieferanten können als inaktiv markiert, jedoch nicht gelöscht werden. Produkte, die deaktiviert werden sind über das Bestellmodul nicht erreichbar.
     * Produkte können mit Dokumenten ergänzt werden, welche nicht gelöscht werden. Den Dateinamen werden der Lieferantenname, der Zeitstempel der Übermittlung und die Artikelnummer angefügt.
-    * Produkte sollen eingeführt werden. Produkteinführungen können durch berechtigte Nutzer freigegeben, entzogen oder zurückgesetzt werden. Alle Nutzer (außer Gruppen) sammeln zuvor die erforderlichen Informationen. Produkteinführungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt.
-    * Produkte werden im Falle einer Presilistenaktualisierung automatisch gelöscht, es sei denn
+    * Produkte sollen eingeführt werden. Produkteinführungen können durch berechtigte Nutzer freigegeben, verwehrt oder entzogen werden. Alle Nutzer (außer Gruppen) sammeln zuvor die erforderlichen Informationen. Produkteinführungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt.
+    * Produkte werden im Falle einer Preislistenaktualisierung automatisch gelöscht, es sei denn
         * es fand eine Produkteinführung statt
         * es wurde eine Stichprobenprüfung durchgeführt
         * es wurde ein Dokument beigefügt
         * es wurde ein Alias festgelegt
-    * Änderungen an Produkteinträgen ist nur für berechtigte Nutzer möglich
+    * Änderungen an Produkteinträgen ist nur für berechtigte Nutzer möglich.
     * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt.
     * siehe [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Werkzeuge](#werkzeuge)
 * ISO 13485 7.4.3 Verifizierung von beschafften Produkten
@@ -116,7 +116,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Stichprobenprüfungen können durch berechtigte Nutzer zurückgezogen werden.
     * siehe [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung)
 * ISO 13485 7.5.1 Lenkung der Produktion und Dienstleistungserbringung
-    * Entsprechende Formulare zeichnen die Schritte der Fertigung auf. Mit dem Zugriff auf die Aufzeichnungen ist der aktuelle Status erkennbar. Ist beispielsweise eine Aufzeichnung für einen Fertigungsabschnitt vorhanden, bei dem die Arbeitsschritte festgelegt werden, kann das Formular auch ein Auswahlfeld für die Erledigung beinhalten. In einem ersten Dokumentationsschritt können die Schritte festgelegt werden, in einem folgenden kann das Formular erneut verwendet und das Auswahlfeld markiert werden. Damit wird der Zeitpunkt und eintragende Nutzer aufgezeichnet.
+    * Entsprechende Formulare zeichnen die Schritte der Fertigung auf. Mit dem Zugriff auf die Dokumentationen ist der aktuelle Status erkennbar. Ist beispielsweise eine Aufzeichnung für einen Fertigungsabschnitt vorhanden, bei dem die Arbeitsschritte festgelegt werden, kann das Formular auch ein Auswahlfeld für die Erledigung beinhalten. In einem ersten Dokumentationsschritt können die Schritte festgelegt werden, in einem folgenden kann das Formular erneut verwendet und das Auswahlfeld markiert werden. Damit wird der Zeitpunkt und eintragende Nutzer aufgezeichnet.
     * Formular-Kontexte erlauben eine Zuordnung als Verfahrens- oder Arbeitsanweisungen.
     * Der integrierte Kalender unterstützt bei der Planung von Arbeiten.
     * siehe [Formulare](#formulare), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender)
@@ -124,16 +124,16 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Aufzeichnungen erfordern einen Identifikator. Dieser Identifikator ist derzeit als QR-Code implementiert, welcher exportiert und ausgedruckt, sowie mit dem integrierten Scanner ausgelesen werden kann. Aufkleberbögen mit dem Code können auch zur Kennzeichnung von Produkten und Komponenten während der Herstellung verwendet werden.
     * siehe [Aufzeichnungen](#aufzeichnungen-1)
 * ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln
-    * Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugetreilt bekommen.
-    * Eine Berücksichtigung eines Kalendereintragt innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
+    * Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugeteilt bekommen.
+    * Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
 * ISO 13485 8.2.4 Internes Audit
     * Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für
         * Aufzeichnungen über Produkteinführungen. Sofern aktuell bestellte Artikel nicht berücksichtigt sind erfolgt ein Hinweis.
         * Aufzeichnungen über Stichprobenprüfungen. Sofern aktuell Lieferanten für eine Prüfung fällig sind erfolgt ein Hinweis.
         * eine Übersicht über die aktuell gültigen Formulare und deren Komponenten.
-        * Fähigkeiten und Schulungen der Mitarbeiter mit ggf. markierten abgelaufenen Zertifikaten
+        * Fähigkeiten und Schulungen der Mitarbeiter mit ggf. markierten Ablaufdaten.
         * Lieferantenlisten mit den jeweiligen letzten Preislistenaktualisierungen, der letzten Stichprobenprüfung und Details zu Zertifikaten sofern bereitgestellt.
-        * die Berücksichtung regulatorischer Anforderungen durch verwendete Formulare und Dokumente
+        * die Berücksichtung regulatorischer Anforderungen durch verwendete Formulare und Dokumente.
     * siehe [Werkzeuge](#werkzeuge)
 * ISO 13485 8.4 Datenanalyse
     * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten.
@@ -144,7 +144,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 ## Integrierte regulatorische Unterstützung
 * MPDG §83
     * Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt.
-    * siehe [Benutzer](#benutzer)
+    * siehe [Nutzer](#nutzer)
 * ISO 14971 Anwendung des Risikomanagements auf Medizinprodukte
     * Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.
     * Anhang E ist für die Nutzung standardmäßig verbereitet.
@@ -156,32 +156,32 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Textempfehlungen
     * Standard- und anpassbare [Textvorschläge](#textvorschläge) können definiert werden um eine durchgängige Sprachregelung zu unterstützen.
 * Zeiterfassung
-    * Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. in den [Kalender](#kalender) eintragen. Die Einträge können unter Berücksichtigung con Arbeitszeitgesetzen exportiert werden.
+    * Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. in den [Kalender](#kalender) eintragen. Die Einträge können unter Berücksichtigung von Arbeitszeitgesetzen als Dokumentation exportiert werden.
 * Dateiverteilung
     * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien und einen [STL-Betrachter](#werkzeuge) um vereinfacht Informationen austauschen zu können.
 * CSV-Filterung
-    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weite zu [filtern und zu verarbeiten](#csv-prozessor).
+    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
 
 [Content](#content)
 
 ## Erforderliche Infrastruktur 
-Es wird ein Server zur Speicherung und Verarbeitung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Formularen oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
+Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Formularen oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
 
-Das oberste Ziel ist die Ausstattung der Belegschaft oder zumindest von Schlüsselpositionen und Arbeitsplätzen mit mobilen Geräten. Schließlich kann die Administration nicht nach Digitalisierung verlangen ohne eine geeignete Infrastruktur zur Verfügung zu stellen. Scanner sind optional, da Scannen ebensogut mit in den Geräten eingebauten Kameras umgesetzt werden kann.
+Das oberste Ziel ist die Ausstattung der gesamten Belegschaft oder zumindest von Schlüsselpositionen und Arbeitsplätzen mit mobilen Geräten. Schließlich kann die Administration nicht nach Digitalisierung verlangen ohne eine geeignete Infrastruktur zur Verfügung zu stellen. Scanner sind optional, da Scannen ebensogut mit in den Geräten eingebauten Kameras umgesetzt werden kann.
 
 Für technische Details siehe [Voraussetzungen](#voraussetzungen).
 
 ## Was es nicht ist
 Abgesehen von einigen architektonische Entscheidungen ist die Anwendung kein voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
 
-Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Preislisten der Lieferanten bestückt und dabei von vorneherein regelhaft um unwichtige Daten bereinigt werden.
+Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Preislisten der Lieferanten bestückt und dabei von vorneherein regelmäßig um unwichtige Daten bereinigt werden.
 
 Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Bereiche jederzeit und zudem nach Ablauf einer definierten Zeit nach Auslieferung gelöscht werden. Dieses Modul dient in erster Linie der internen Kommunikation und nicht einer dauerhaften Dokumentation.
 
 ## Datenintegrität
 Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
 
-Formulardaten und Serveranfragen beinhaltet teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebige papierbasierten Doumentation.
+Formulardaten und Serveranfragen beinhaltet teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
 
 Formulare können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nicht um ein dokumentenechtes Verfahren handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
 
@@ -195,7 +195,7 @@ Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selb
 * Es können Formulare erstellt werden die ebenfalls für eine schriftliche Form exportierbar sind und mit dem Kontext *Allgemeine Dokumentation* und passendem regulatorischen Zusammenhang versehen werden.
     * ISO 13485 4.1.5
 * Es können Formulare erstellt und mit dem Kontext *Allgemeine Dokumentation* und passendem regulatorischen Zusammenhang versehen werden.
-    * Alle allgemeinen Aufzeichnungen besonders aber nicht beschränkt auf:
+    * Alle allgemeinen Aufzeichnungen, besonders aber nicht beschränkt auf:
     * ISO 13485 6.2
     * ISO 13485 6.3
     * ISO 13485 8.2, 8.2.3, 8.2.4
@@ -212,10 +212,10 @@ Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selb
     * MDR annex 6
     * MDR annex 7
     * MDR annex 13
-Es können Formulare erstellt und mit dem Kontext *MDR §14 Stichprobenprüfung* und/oder *Produkteinführung* und passendem regulatorischen Zusammenhang versehen werden.
+* Es können Formulare erstellt und mit dem Kontext *MDR §14 Stichprobenprüfung* und/oder *Produkteinführung* und passendem regulatorischen Zusammenhang versehen werden.
     * ISO 13485 7.4, 7.4.3
-Es können Formulare erstellt und mit dem Kontext *Überwachung von Arbeitsmitteln* und passendem regulatorischen Zusammenhang versehen werden.
-    * Computer Software und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel betrachtet werden.
+* Es können Formulare erstellt und mit dem Kontext *Überwachung von Arbeitsmitteln* und passendem regulatorischen Zusammenhang versehen werden.
+    * Computersoftware und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel betrachtet werden.
     * ISO 13485 4.1.6, 7.6
     * MPBetreibV
 
@@ -236,8 +236,8 @@ Es können Formulare erstellt und mit dem Kontext *Überwachung von Arbeitsmitte
 
 ![sample application menu](assets/application%20menu.png)
 
-### Benutzer
-Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielweise als laminierte Karte verwendet werden.
+### Nutzer
+Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden.
 
 Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds und individuelle Anwendungeinstellungen können an dieser Stelle ebenfalls vorgenommen werden.
 
@@ -245,7 +245,7 @@ Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer
 
 Manche Berechtigungen/Einschränkugen sind jedoch systemisch festgelegt:
 
-Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das Gilt auch für den Anwendungsadministrator.
+Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das gilt auch für den Anwendungsadministrator.
 
 * Mitarbeiter
     * können nur Bestellungen der eigenen zugewiesenen Bereiche einsehen
@@ -259,12 +259,12 @@ Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutze
     * haben **keinen** Zugriff auf Arbeitszeitdokumentationen
 * Bereichsleiter
     * können alle Arbeitszeitdokumentationen der Mitarbeiter zugewiesener Bereiche exportieren
-    * können geplante Kalenderereignisse zugewiesener Bereiche und Arbeitszeiteinträge der mitarbeiter zugewiesener Bereiche anlegen, ändern und abschließen
+    * können geplante Kalenderereignisse zugewiesener Bereiche und Arbeitszeiteinträge der Mitarbeiter zugewiesener Bereiche anlegen, ändern und abschließen
 * Anwendungsadministratoren
     * haben **vollen Zugriff** und **alle Rechte**
-    * können als jede Berechtige Nutzergruppe Freigaben erteilen
+    * können als jede berechtige Nutzergruppe Freigaben erteilen
     * können alle Arbeitszeitdokumentationen exportieren
-    * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen. Der Standard-Token sollte unverzüglich geändert und an einem Sicheren Ort verwahrt werden!
+    * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen. Der Standard-Token sollte unverzüglich geändert und an einem sicheren Ort verwahrt werden!
     * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitern der Leitungsebene erteilt werden
 
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
@@ -310,14 +310,14 @@ graph TD;
 
 ### Anleitung
 
-Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht für alle anderen auszublenden.
+Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht auf der Startseite für alle anderen auszublenden.
 
 ## Kommunikation
 
 ![sample communication menu](assets/communication%20menu.png)
 
 ### Unterhaltungen
-Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprcähspartner gruppiert. Dabei kann abgesehen vom Systemnutzer jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semicolon getrennt angesprochen werden. Ein Druck oder Klick auf die Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
+Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf die Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
 
 ![conversation screenshot](assets/conversation.png)
 
@@ -330,7 +330,7 @@ Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, grupp
 [Content](#content)
 
 ### Textvorschläge
-Um unnötige und wiederholte Poesie zu vermeiden und einen durchgängigen Wortlaut zu unterstützen können Textvorschläge zur Verfügung gestellt werden. Diese werden auf vorbereiteten Textbausteinen zusammengesetzt, die entweder Pronomen oder allgemeine Abschnitte handhaben. Letztere können erstere verwenden. Ersatzbausteine werden in folgender Form definiert
+Um unnötige und wiederholte Poesie zu vermeiden und einen durchgängigen Wortlaut zu unterstützen können Textvorschläge zur Verfügung gestellt werden. Diese werden aus vorbereiteten Textbausteinen zusammengesetzt, die entweder Pronomina oder allgemeine Abschnitte handhaben. Letztere können erstere verwenden. Ersatzbausteine werden in folgender Form definiert
 * weibliche Kindform - das Mädchen
 * männliche Kindform - der Junge
 * neutrale Kindform - das Kind
@@ -340,13 +340,15 @@ Um unnötige und wiederholte Poesie zu vermeiden und einen durchgängigen Wortla
 * persönliche Ansprache - Du
 * förmliche Ansprache - Sie
 
-Eine solche Ersetzung könnte beispielsweise *Adressat* gennnt werden. Sobald ein allgemeiner Textbaustein :Adressat enthält wird dieser Platzhalte durch den aus einer Liste gewählten Genus ersetzt. Wird beispielsweise ein Text an den Kostenträger verfasst kann von einem Patienten gesprochen werden und die geeigenete Wahl aus den ersten vier Optionen getroffen werden; bei einer persönliche Ansprache eine Wahl aus den letzten Beiden, abhängig vom jeweiligen Grad des Vertrauensverhältnisses. Die Auswahl des passenden Genus wird automatisch im Fomular angezeigt und sobald eine Wahl des Genus erfolgt, werden alle weiteren Bausteine entsprechend ersetzt.
+Eine solche Ersetzung könnte beispielsweise *Adressat* genannt werden. Sobald ein allgemeiner Textbaustein :Adressat enthält wird dieser Platzhalter durch den aus einer Liste gewählten Genus ersetzt. Wird beispielsweise ein Text an den Kostenträger verfasst kann von einem Patienten gesprochen werden und die geeignete Wahl aus den ersten sechs Optionen getroffen werden; bei einer persönliche Ansprache eine Wahl aus den letzten Beiden, abhängig vom jeweiligen Grad des Vertrauensverhältnisses. Die Auswahl des passenden Genus wird automatisch im Fomular angezeigt und sobald eine Wahl des Genus erfolgt, werden alle weiteren Bausteine entsprechend ersetzt.
 
-Bei der Erstellung eines Textes können die jeweils passenden grammatikalische Fälle vorbereitet verden (z.B. *:AdressatNominativ, *:AdressatAkkusativ, :AdressatDativ, etc.). Undefinierte Platzhalter erzeugen im Formular ein Eingabefeld, welches im Weiteren Verlauf wiederverwendet wird:
+Bei der Erstellung eines Textes können die jeweils passenden grammatikalische Fälle vorbereitet verden (z.B. *:AdressatNominativ, *:AdressatAkkusativ, :AdressatDativ, etc.). Undefinierte Platzhalter erzeugen im Formular ein Eingabefeld, welches im weiteren Verlauf wiederverwendet wird:
 
 *"Wir berichten über :AdressatAkkusativ :Name. Wir möchten zusammenfassen, dass die Versorgung von :Name voranschreitet und :AdressatNominativ die Nutzung gut umsetzen kann."*
 
-Bei der Erstellung von Textvorschlägen können die Textbausteine individuell Sortiert und zu Absätzen zusammengestellt werden. Dazu werden die jeweiligen Abschnitte mit der [Maus an die gewünschte Position gezogen](#verschiedenes). Bei der Nutzung von Textvorschlägen können die vorbereiteten Textbausteine und Abschnitte abgewählt werden um den Text an den Bedarf anzupassen. Eine Gruppierung nach Abschnitten erleichtert die visuelle  Darstellung und Wiedererkennung des Formulars.
+erzeugt *"Wir berichten über **die Patientin Gladys**. Wir möchten zusammenfassen, dass die Versorgung von **Gladys** voranschreitet und **die Patientin** die Nutzung gut umsetzen kann."*
+
+Bei der Erstellung von Textvorschlägen können die Textbausteine individuell sortiert und zu Absätzen zusammengestellt werden. Dazu werden die jeweiligen Abschnitte mit der [Maus an die gewünschte Position gezogen](#verschiedenes). Bei der Nutzung von Textvorschlägen können die vorbereiteten Textbausteine und Abschnitte abgewählt werden um den Text an den Bedarf anzupassen. Eine Gruppierung nach Abschnitten erleichtert die visuelle Darstellung und Wiedererkennung des Formulars.
 
 Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwischenablage eingefügt.
 
@@ -391,17 +393,17 @@ graph TD;
 ![sample records menu](assets/records%20menu.png)
 
 ### Formulare
-Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Ohne größere Nachforschungen ist nicht ersichtlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: Die Dokumente und internen Formulare sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies könnte für das Ziel einer papierlosen Lösung bereits ausreichen, Exporte sind aber zusätzlich als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
+Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Es ist (ohne größere Nachforschungen betrieben zu haben) nicht erkenntlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: die Dokumente und internen Formulare sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies dient dem Ziel einer papierlosen Lösung bereits ausreichend, dennoch sind zusätzlich Exporte als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
 
-Um gelenkte und versionierte Dokumente und Formulare anzulegen müssen zunächt deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Formulare anschließend zusammensetzen lassen. Komponenten und Formulare müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Formulare für den jeweiligen Anwendungsfall berücksichtigt wurden.
+Um gelenkte und versionierte Dokumente und Formulare anzulegen müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Formulare anschließend zusammensetzen lassen. Komponenten und Formulare müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Formulare für den jeweiligen Anwendungsfall berücksichtigt wurden.
 
-Eine Freigabe-Anfrage für Komponenten und Formulare wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der brechtigten Rolle während der Anmeldung in der Anwendung.
+Eine Freigabe-Anfrage für Komponenten und Formulare wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der berechtigten Rolle während der Anmeldung in der Anwendung.
 
 Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Formulare können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
-Formulare können als bearbeitbare PDF-Dateien für hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Dateiuploads aus dem Formular entfernt. Formulare können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird).
+Formulare können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Dateiuploads, Identifikatoren, Verknüpfungen und Bedienfelder aus dem Formular entfernt. Formulare können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit und Übersicht leidet.
 
 ![form composer screenshot](assets/forms.png)
 
@@ -441,7 +443,7 @@ graph TD;
 [Content](#content)
 
 ### Aufzeichnungen
-Aufzeichnungen speichern alle Eingaben für jedes gewählte Formular. Manche Formular-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronoligischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter.
+Aufzeichnungen speichern alle Eingaben für jedes gewählte Formular. Manche Formular-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter.
 
 Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet sein. Daher können einzelne Dokumente ebenfalls exportiert werden um die Daten in Situationen bereithalten zu können, in denen elektronische Geräte Schaden nehmen könnten.
 
@@ -451,7 +453,7 @@ Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesb
 
 Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
-Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Übersicht der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status des Ablusses wieder entzogen.
+Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Übersicht der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen.
 
 ![record screenshot](assets/records.png)
 
@@ -518,21 +520,21 @@ Ereignisse können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen aus
 
 Da die Terminplanung primär die Arbeitsplanung (beispielweise die Festlegung von täglichen Aufgaben für einen Bereich) oder Erinnerungen in Zusammenhang mit Aufzeichnungen unterstützen soll, kann nur ein Datum und keine Zeit ausgewählt werden. Dies vereinfacht zudem die Eingabemaske.
 
-Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar, um sicherzustellen, dass es nicht übersehen wird falls ein geplantes Ereignis an einem solchen Tag statt findet.
+Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar, um sicherzustellen, dass versehentlich an einem solchen Tag geplante Ereignisse nicht übersehen werden.
 
 Die Planung von Terminen ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht.
 
-Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeiter genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst zu berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Benutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nut durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden.
+Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeiter genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst und berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Nutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nur durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden.
 
 Dies soll eine transparente Kommunikation, einen vertraulichen Umgang mit den Daten und eine gemeinsame Übereinkunft über die Zeiterfassung sicherstellen. Ziel ist es allen bekannten Anliegen deutschen Rechts und denen der Personalräte und Gewerkschaften zu entsprechen. Dabei handelt es sich nicht um eine dauerhafte Erfassung, da die Datenbank um Nutzereinträge bei deren Löschung bereinigt wird. Arbeitszeitzusammenfassungen können exportiert werden, was nach aktuellem Stand ein bevorzugter Weg ist und im Sinne einer langfristigeren Datenspeicherung im Sinne von Arbeitszeitgesetzen empfohlen wird. Die Nutzereinstellungen erlauben die Eingabe von Wochenstunden zugunsten einer zielführenden Berechnung.
 
-Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten Ereignissen angezeigt als auch andersherum um für das Arbeitsaufkommen der verbleibenden Belegschaft zu sensibilisieren.
+Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten Ereignissen angezeigt als auch andersherum, um für das Arbeitsaufkommen der verbleibenden Belegschaft zu sensibilisieren.
 
 *Warnung: die aktuelle Implementierung hat eine recht starre Definition von Feiertagen und berücksichtigt weder unterschiedliche Regionen, noch mögliche Änderungen gesetzlicher Feiertage. Derzeit würden Änderungen auch vergangene Zeiterfassungen berücksichtigen und unterschiedliche Berechnungen ergeben. Bei kleineren Änderungen wird empfohlen die neuesten Zeiterfassungen zu exportieren und innerhalb der Anwendung neu zu beginnen.*
 
 Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
-Exporte sind nach Nutzernamen aphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber als erstes.
+Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
 ![calendar screenshot](assets/calendar.png)
 
@@ -599,11 +601,11 @@ graph TD;
 
 ![sample files menu](assets/files%20menu.png)
 
-Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer könne zudem zum öffentlichen Sharepoint beitragen in welchem Dateien nur eine begrenzte Verweildauer haben und automatisch gelöscht werden.
+Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
 Beide Speicherorte bestücken den [STL-Betrachter](#werkzeuge).
 
-Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionkonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
+Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
 Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden.
 
@@ -616,11 +618,11 @@ Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werd
 ![sample purchase menu](assets/purchase%20menu.png)
 
 ### Lieferanten- und Artikelverwaltung
-Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren, oder Lieferanten und Artikel deaktivieren. Der Impoert von Preislisten nutzt den [CSV-Prozessor](#csv-prozessor).
+Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der Impoert von Preislisten nutzt den [CSV-Prozessor](#csv-prozessor).
 
 Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschüzt markiert sind. Lieferanten können nicht gelöscht werden.
 
-Besondere berechtigte Nutzer (z.B. *Einkaufsassistenten*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
+Besondere berechtigte Nutzer (z.B. *Einkaufsassistent*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
 
 Lieferanten können Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern.
 
@@ -629,9 +631,9 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 * Verfallsdatum,
 * besondere Beachtung (die konkrete Bedeutung wird in der Sprachdatei festgelegt, z.B. Hautkontakt),
 * Entzug der Produkteinführung,
-* den Artikel als *verfübar* oder *nicht verfügbar* markieren.
+* den Artikel als *verfügbar* oder *nicht verfügbar* markieren.
 
-Bei jeder dieser Einstellungen können vergleichbaren Artikel gewählt werden auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [setup.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
+Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [setup.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
 ![vendor manager screenshot](assets/vendor%20manager.png)
 
@@ -688,18 +690,19 @@ graph TD;
 [Content](#content)
 
 ### Bestellung
-das Bestellodul unterstützt alle Parteien. Der Einauf erhält strukturierte und vollständige Daten für Bestellungen, während die bestellenden Bereiche unmittelbare Informationen über den Bestellstatus erhalten.
-Bestellte Artikel erteilen unmittelbar Auskunft über ihren Einführungsstatus oder ob sie für eine Stichprobenprüfung in Frage kommen. Beide Maßnahmen können direkt aus der Aufstellung bestellter Artikel ergriffen werden, während des laufenden Betriebs und ohne Verwechslungen.
+Das Bestellodul unterstützt alle Parteien. Der Einauf erhält strukturierte und vollständige Daten für Bestellungen, während die bestellenden Bereiche unmittelbare Informationen über den Bestellstatus erhalten.
+Bestellte Artikel erteilen unmittelbar Auskunft über ihren Einführungsstatus oder ob sie für eine Stichprobenprüfung in Frage kommen. Beide Maßnahmen können direkt aus der Auflistung bestellter Artikel ergriffen werden, während des laufenden Betriebs und ohne Verwechslungen.
 
 Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN) gesammelt freigegeben werden.
 
 Freigegebene Bestellungen können als *bestellt*, *vollständig erhalten*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert.
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
-Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine Abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
+Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
 Alle Maßnahmen bieten an eine Nachricht beizfügen.
+Aus den in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen erzeugt werden um bei der internen Auslieferung eine Zuordnung zu unterstützen.
 
-Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) erxportiert und für die Lieferantenbewertung genutzt werden.
+Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) exportiert und für die Lieferantenbewertung genutzt werden.
 
 ![orders screenshot](assets/orders.png)
 
@@ -781,8 +784,8 @@ graph TD;
     mark_bulk-->|nein|prepared_orders;
     prepared_orders-->add_product;
 ```
-Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die den bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Nutzer erforderlich sein.
-Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung wiederrufen. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus.
+Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.
+Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung widerrufen. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus.
 
 [Content](#content)
 
@@ -790,11 +793,11 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer k
 
 ![sample tools menu](assets/tools%20menu.png)
 
-Es stehen einige allgemeine Werkzeuge für das Lesen und erzeugen von 2D-Codes und der Betrachtung von STL-Dateien zur Verfügung.
+Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes und der Betrachtung von STL-Dateien zur Verfügung.
 
-Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Veraltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl and Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
+Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
-Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen untestützen:
+Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte
 * Stiachprobenprüfungen gemäß MDR §14
 * aktuell gültige Dokumente, incl. externe Dokumente
@@ -812,8 +815,8 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 # Voraussetzungen
 * Server mit
     * PHP >= 8.2
-    * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst werden)
-    * SSL (Kamerazugriff für den Scanner, Serviceworker und SHA256-Verschlüsselung kann sonst nicht genutzt werden)
+    * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst/ergänzt werden)
+    * SSL (Kamerazugriff für den Scanner, ServiceWorker und SHA256-Verschlüsselung können sonst technisch nicht genutzt werden)
 * Netzwerkzugriff für Endgeräte und einen Browser
     * Desktop PCs
     * mobile Geräte
@@ -836,12 +839,12 @@ Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenliste
 [Content](#content)
 
 ## Installation
-* php.ini memory_limit ~4096M zur [Verarbeitung großer CSV-Dateien und dem Preislistenimport](#csv-prozessor), open_basedir zumindest für das lokale IIS für die Dteiverabeitung deaktivieren.
+* php.ini memory_limit ~4096M zur [Verarbeitung großer CSV-Dateien und dem Preislistenimport](#csv-prozessor), open_basedir zumindest für das lokale IIS für die Dateiverarbeitung deaktivieren.
     * [CSV Verarbeitung](#csv-prozessor) von 48mb @ 59k Zeilen mit diversen Filtern, incl. Dateifilter, beansprucht etwa 1.7GB Speicher
     * [CSV Verarbeitung](#importierung-von-lieferantenpreislisten) @ 100MB beansprucht etwa 2.3GB Speicher
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config für IIS entsprechend der erwarteten Dateigrößen für z.B. Sharepoint und CSV-Dateien ~350MB.
 * php.ini max_input_time -1 für das Teilen großer Uploads mit max_execution_time, abhängig von der erwarteten Verbindungsgeschwindigkeit.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV-Verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann.
     * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
@@ -856,18 +859,18 @@ Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenliste
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
-* Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Zugangsdaten, Paketgröße gemäß SQL-Konfiguration.
+* Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.ini)
 * Aufruf api/_install.php, es erfolgt anschließend eine Weiterleitung - keine Sorge, bei einem erneuten Aufruf passiert nichts.
-* Änderung des Zugangstokens des Systemnutzers und eine sichere Verwahrung!
-* Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Brwoserberechtigungen.
+* Änderung des Zugangstokens der Systemnutzerin und eine sichere Verwahrung!
+* Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 
 ## Laufzeitvariablen
 Manche Variables können wärend der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
 
 ```
 ; Standard Anwendungssprache
-defaultlanguage = "en" ; en, de, etc. entrpechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
+defaultlanguage = "en" ; en, de, etc. entsprechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
 
 ; Zeitzone für den Kalender
 timezone = "Europe/Berlin"
@@ -876,22 +879,22 @@ timezone = "Europe/Berlin"
 issue_mail = "dev@erroronline.one" 
 
 [calendar]
-holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
+holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31" ; Monat-Tag
 ; nicht anwendbare Feiertage können auskommentiert werden
-; der zweite Schlüssel dient dem Verständnis, der Wert ist der Abstand zu Ostersonntag
-; easter_holidays[maundy_thursday] = -3
+; der zweite Schlüssel dient dem Verständnis, der Wert ist der Abstand an Tagens zu Ostersonntag
+; easter_holidays[gruendonnerstag] = -3
 easter_holidays[karfreitag] = -2
-; easter_holidays[holy_saturday] = -1
+; easter_holidays[ostersamstag] = -1
 easter_holidays[ostermontag] = 1
 easter_holidays[himmelfahrt] = 39
 easter_holidays[pfingsten] = 50
 easter_holidays[frohnleichnahm] = 60
 
-workdays = "1, 2, 3, 4, 5" ; Montag=1 bis Sonntag=7, Tage wie Wochenenden mit der gleichen Markierung wie Feiertage auslassen
+workdays = "1, 2, 3, 4, 5" ; Montag=1 bis Sonntag=7, Tage wie z.B. Wochenenden mit der gleichen Markierung wie Feiertage auslassen
 default_due = 7 ; Standardeinstellung für Fälligkeiten von Terminen
 
 hide_offduty_reasons[] = "" ; bitte nicht ändern
-; hide_offduty_reasons[] = "sickleave" ; Ursachen gemäß Sprachdatei können in übereinstimmung mit unternehmensspezifischen Datenschutzbestimmungen ausgeblendet werden
+; hide_offduty_reasons[] = "sickleave" ; Ursachen gemäß Sprachdatei können in Übereinstimmung mit unternehmensspezifischen Datenschutzbestimmungen ausgeblendet werden
 
 ; Standardeinstellungen für CSV-Verarbeitung falls nicht im Filter definiert
 [csv]
@@ -906,7 +909,7 @@ names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; alles was keine Buchstaben, Leerzeiche
 names[] = "^.{0,3}$" ; weniger als 4 Zeichen
 
 ; unveränderliche fest einprogrammierte reservierte Begriffe
-names[] = "^\d+$" ; Namen dürfen nicht nur numerisch sein, da dies für Datenbank-IDs reserviert istids
+names[] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
 names[] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[] = "IDENTIFY_BY_" ; besondere Teilzeichenketten, getrennt mit |
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; buchstäbliche Zeichenfogen, getrennt mit |
@@ -920,7 +923,7 @@ training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in �
 mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
 mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stickprobenprüfung verwendet werden darf
 
-; Wahrscheinlichkeiten für Ähnlichkeiten von Texten in Prozent
+; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
 [likeliness]
 consumables_article_no_similarity = 70 ; Prozent
 file_search_similarity = 50 ; Prozent
@@ -929,38 +932,38 @@ csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
 max_records = 128 ; maximal angezeigte offene Dokumentationen
-user_image = 256 ; Pixel für längste Seite
-order_approvalsignature_image = 2048 ; Pixel für längste Seite
-form_image = 2048 ; Pixel für längste Seite
-record_image = 2048 ; Pixel für längste Seite
-risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittwahrscheinlichkeit * Schadenshöhe 
+user_image = 256 ; maximale Pixel für längste Seite
+order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
+form_image = 2048 ; maximale Pixel für längste Seite
+record_image = 2048 ; maximale Pixel für längste Seite
+risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
 
 ; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
 ; dynamische Verarbeitung innerhalb der Module
-; Anwendungsadministratoren haben grunsätzlich volle Berechtifungen
+; Anwendungsadministratoren haben grundsätzlich volle Berechtigungen
 ; Im Falle einer Änderung von Berechtigungen für Freigaben müssen alle Elemente auch Rückwirkend von der neuen Gruppe freigegeben werden!
 [permissions]
 appmanual = "qmo" ; Ergänzugen und Änderungen der Anleitung
 audits = "ceo, qmo, prrc" ; Zugriff auf das Audit-Modul
 calendaredit = "ceo, qmo, supervisor" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
-calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach Anruf
+calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach telefonischer Meldung
 calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
 calendarfulltimesheetexport = "ceo, human_ressources" ; Arbeitszeitexporte aller Nutzer, zu fremden Arbeitszeiten beitragen
 csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
 csvrules = "qmo" ; neue CSV-Filter anlegen
 externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente
 filebundles = "ceo, qmo" ; Dateipakete erstellen
-files = "office, ceo, qmo" ; Dateien bereitstellen und Verlwalten
+files = "office, ceo, qmo" ; Dateien bereitstellen und Verwalten
 formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Formularen und ihrer Komponenten
 formcomposer = "ceo, qmo" ; Formulare und Komponenten erstellen
 formexport = "ceo, qmo, supervisor" ; Formulare als PDF exportieren
 incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
-mdrsamplecheck = "ceo, qmo, prrc"; Strichprobenprüfung zurücksetzen - müssen auch Zugriff auf Audit haben
-orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Beriche hinzuzufügen
-ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu Stornieren oder Zurückzusenden
+mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen auch Zugriff auf Audit haben
+orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Bereiche hinzuzufügen
+ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu stornieren oder Rücksendungen zu veranlassen
 orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
 orderprocessing = "purchase"; Bestellungen bearbeiten
-products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleiche Gruppen wie incorporation
+products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
 recordsclosing = "ceo, qmo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
@@ -990,14 +993,14 @@ products_per_slide = 6
 ## Anmerkungen und Hinweise zur Nutzung
 
 ### Handhabe der Netzverkverbindung
-* Die Anwendung speichert Serveranfragen im Chache. GET-Anfragen erhalten die letzte erfolgreiche Version, die im Falle eines Verbindungabbruchs nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Formularversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann nur die EDV-Abteilung behilflich sein.
-* gespeicherte POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von Aufzeichnungen sicher.
+* Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Formularversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
+* POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von Aufzeichnungen sicher.
 
 ### Verschiedenes
 * Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der setup.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
-* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es wird keine Implementierung einer Push-Api geben um die Menge an Drittbibliotheken zu reduzieren und aufgrund eines Mangels and Funktion für Safari-Browser.
-* Das Ziehen von Formularelementen für die Sortierung in der Formularverwaltung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Formulare und deren Komponenten müssen daher auf einem Gerät mt Maus oder anderen unterstützen Eingabegeräten erfolgen um den Quelltext nicht unnötig zu vergrößern. Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig.
-* Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum Ausgewählten Artikel gehören.
+* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Menge an Drittbibliotheken zu reduzieren und aufgrund [mangelnder implementierung im Safari-Browser](https://caniuse.com/push-api) zum Zeitpunkt der Erstellung.
+* Das Ziehen von Formularelementen für die Sortierung in der Formularverwaltung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Formulare und deren Komponenten müssen daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen um den Quelltext nicht unnötig zu vergrößern. Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig.
+* Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Die Produktdatenbank und anhängige Funktionen (Bestellungen, Artikelsuche) haben eine Bearbeitungszeit von etwa 0,5 Sekunden pro 100k Einträgen. Bei 1m Einträgen kann dies zu einer Verzögerung von bis zu 5 Sekunden führen.
@@ -1005,22 +1008,22 @@ products_per_slide = 6
 ## Anpassung
 * Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können.
 * Manche Teile der setup.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
-* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX.ini) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber teilweise Werte ergänzt (idealerweise nicht gekürzt) werden:
+* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX.ini) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
     * [permission] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in setup.ini berücksichtigt)
     * [units]
     * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
     * [formcontext][anonymous]
     * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
 
-Im Falle einer anpassung des Quelltexts:
+Im Falle einer Anpassung des Quelltexts:
 * der [CSV-Prozessor](#csv-prozessor) liefert ein assoziatives Array, daher muss eine nachgelagerte Verarbeitung der Daten selbst implementiert werden.
 * Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten.
-* Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('forms')` oder `rendertest('app')` in der Konsole angezeigt werden.
+* Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('forms_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 
 [Content](#content)
 
 ## Importierung von Lieferantenpreislisten
-Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar zu sein. Es kann einer zusätzlichen Anpassung außerhalb dieser Anwendung bedürfen um Eingabedaten mit folgender Struktur zu erhalten:
+Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar zu sein. Es kann einer zusätzlichen Anpassung außerhalb dieser Anwendung bedürfen, um Eingabedaten mit folgender Struktur zu erhalten:
 
 | Artikelnummer  | Artikelbezeichnung  | EAN         | Verkaufseinheit |
 | :------------- | :------------------ | :---------- | :-------------- |
@@ -1028,7 +1031,7 @@ Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar 
 | 2345           | Trousers            | 23459907    | Package         |
 | 3456           | Socks               | 90897345    | Pair            |
 
-Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstell werden ähnlich:
+Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden ähnlich:
 ```js
 {
     "filesettings": {
@@ -1055,11 +1058,11 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstell werden ähn
             ["EAN", "\\s+", ""]
         ],
         "conditional_and": [
-            ["trading_good", "1", ["Artikelbezeichnung", "ein beliebiges REGEX-Muster, welches Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]
+            ["trading_good", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]
         ],
         "conditional_or": [
-            ["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiges REGEX-Muster, welches Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
-            ["special_attention", "1", ["Artikelnummer", "eine beliebiges REGEX-Muster, welches Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]]
+            ["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
+            ["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]]
         ],
         "rewrite": [{
             "article_no": ["Artikelnummer"],
@@ -1072,13 +1075,13 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstell werden ähn
 ```
 *headerrowindex* und *dialect* werden mit dem Standardwert der setup.ini ergänzt, falls sie nicht Teil des Filters sind.
 
-Manche Preislisten enthalten Artikelnummern mit Platzhaltern. Manche Artikel können dabei als *ProduktXYYZ* gelistet sein, wobei Y einen Wert zwischen 0 und 9 darstellt, yy 20 bis 30 und Z für L oder R steht (wie im falle von Prothesenfüßen). Um die Auswahl und Bestellung zu vereinfachen kann ein Ersatzfilter erstellt werden und vor der rewrite-Regel angewendet werden. Dadurch wird die Preisliste mit allen möglichen Versionen aufgefüllt. Dabei ist es stets die zweite Klammer, welche ersetzt wird. 
+Manche Preislisten enthalten Artikelnummern mit Platzhaltern. Manche Artikel können dabei als *ProduktXYYZ* gelistet sein, wobei Y einen Wert zwischen 0 und 9 darstellt, YY 20 bis 30 und Z für L oder R steht (wie im Falle von Prothesenfüßen). Um die Auswahl und Bestellung zu vereinfachen kann ein Ersatzfilter erstellt werden und vor der rewrite-Regel angewendet werden. Dadurch wird die Preisliste mit allen möglichen Versionen aufgefüllt. Dabei ist es stets die zweite Klammer, welche ersetzt wird. 
 
 ```js
 "replace": [
-    ["Article Number", "(product)(X)(.*?)", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    ["Article Number", "(product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
-    ["Article Number", "(product...)(Z)", "L", "R"]
+    ["Artikelnummer", "(Product)(X)(.*?)", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ["Artikelnummer", "(Product.)(YY)(.*?)", 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+    ["Artikelnummer", "(Product...)(Z)", "L", "R"]
 ]
 ```
 
@@ -1093,9 +1096,9 @@ Natürlich können auch beliebige andere Filter eingefügt werden, z.B. um ohneh
 
 
 ### Stichprobenprüfung, Verfallsdaten und besondere Aufmerksamkeit
-*modify.add* und *modify.conditional* erkennen Handelswaren für die Stichprobenprüfung nach MDR §14 und markieren Artikel mit Verfallsdaten oder besonderer Aufmerksamkeit. *conditional* kann auch nach dem *rewrite* von "article_name" angewendet werden, sofern diese Spalte aus zusammenhängenden Ursprungsspalten besteht. Sollen alle Artikel des Lieferanten als Handelswaren markiert werden kann "trading_good" als 1 ergänzt (*add*) und *conditional* ausgelassen werden. Wenn bekanntermaßen keine Handelswaren in der Preisliste enthalten sind kann dies komplett entfallen, da "trading_good" standardmäßig mit 0 angelegt wird. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
+*modify.add* und *modify.conditional* definieren Handelswaren für die Stichprobenprüfung nach MDR §14 und Artikel mit Verfallsdaten oder besonderer Aufmerksamkeit. *conditional* kann auch nach dem *rewrite* von "article_name" angewendet werden, sofern diese Spalte aus zusammenhängenden Ursprungsspalten besteht. Sollen alle Artikel des Lieferanten als Handelswaren markiert werden kann "trading_good" als 1 ergänzt (*add*) und *conditional* ausgelassen werden. Wenn bekanntermaßen keine Handelswaren in der Preisliste enthalten sind kann dies komplett entfallen, da "trading_good" standardmäßig mit 0 angelegt wird. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
 
-Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedingung für 0 erstellt werden, falls das einfacher ist. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
+Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedingung für den Wert 0 erstellt werden, falls das einfacher ist. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
 
 *special_attention* wird bei den freigegebenen Bestellungen angezeigt und ist dafür vorgesehen auf eine Vergabe von Chargennummern für Produkte mit Hautkontakt hinzuweisen. Dies kann aber in den Sprachdateien eine beliebige andere Aufgabe erhalten.
 
@@ -1109,11 +1112,11 @@ Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse 
 # CSV Prozessor
 Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
 
-Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genaus so gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
+Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genauso gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
 
 Beschreibung der Optionen:
 
-	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Regebnisdatei passieren soll
+	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Ergebnisdatei passieren soll
 	"filesetting":
 		"source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
 		"headerrowindex": Offset für die Titelzeile
@@ -1127,7 +1130,7 @@ Beschreibung der Optionen:
 		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
 		"match":
 			"all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
-			"any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nut "all" oder "any" genutzt werden
+			"any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nur "all" oder "any" genutzt werden
 
 		"apply": "filter_by_monthdiff"
 		"comment": Beschreibung, wird angezeigt
@@ -1167,29 +1170,29 @@ Beschreibung der Optionen:
 			"column": Spaltenname mit einem zu vergleichenden Datum,
 			"format": Liste des Datum-Formats, z.B. ["d", "m", "y"],
 			"interval": Ganzzahl für Monate,
-			"offset": optionaler Verschiebung in Monaten (Ganzzahl)
+			"offset": optionale Verschiebung in Monaten (Ganzzahl)
 
 		"apply": "filter_by_rand",
 		"comment": Beschreibung, wird angezeigt
 		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"data": Wähle eine Anzahl zufälliger Zeilen aus deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
+		"data": Wähle eine Anzahl zufälliger Zeilen aus, deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
 			"columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
 			"amount": Ganzzahl > 0
 
 	"modify": Ändert das Ergebnis
 		"add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
-			   Ist der Wert eine Liste mit Zahlen und matheamtischen Operatoren wird versucht dies als Formel zu berechnen
+			   Ist der Wert eine Liste mit Zahlen und mathematischen Operatoren wird versucht dies als Formel zu berechnen
 			   Kommas werden in diesem Fall mit einem Dezimalpunkt ersetzt.
-		"replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen FSpalte oder an allen
+		"replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen Spalte oder an allen
 				   abhängig davon ob das erste Listenelement ein Spaltenname oder null ist
-				   Falls mehr als eine Ersetzung angegen wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
-				   Ersetzungen an einer bestimmten Position müssen Treffer 2 sein (full match, group 1 (^ if necessary), group 2, ...rest)
+				   Falls mehr als eine Ersetzung angegeben wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
+				   Ersetzungen an einer bestimmten Position müssen die zweite Treffergruppe sein (full match, group 1 (^ if necessary), group 2, ...rest)
 		"remove": Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung erforderlich waren
 		"rewrite": Fügt neue Spalten hinzu welche aus Verkettungen der Originalwerte der angegebenen Spalten und anderen Zeichen bestehen
 				   Die Originalspalten werden entfernt.
 		"translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
 		"conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
-		"conditional_or": ändert den Wert einer Spalte wenn iner der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
+		"conditional_or": ändert den Wert einer Spalte wenn einer der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
 
 	"split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
 
