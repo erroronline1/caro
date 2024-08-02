@@ -72,7 +72,7 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* incidents, errors, complaints - acknowledgement permission, statistics
+* complaints - acknowledgement permission, statistics, list complaints within audit grouped by year, marked as closed
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -167,6 +167,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * ISO 13485 7.6 Surveillance and measuring equipment control
     * Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.
     * Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.
+* ISO 13485 8.2.2 Complaint handling
+    * Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement.
 * ISO 13485 8.2.4 Internal audit
     * The audit module aquires data from the application and is partially able to export
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
@@ -955,7 +957,7 @@ names[] = "^.{0,3}$" ; less than 4 characters
 ; immutable hardcoded reserved keywords
 names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[] = "^_" ; names must not start with _
-names[] = "IDENTIFY_BY_" ; special substrings |-separated
+names[] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
 
 [lifespan]

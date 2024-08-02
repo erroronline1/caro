@@ -126,6 +126,8 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln
     * Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugeteilt bekommen.
     * Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
+* ISO 13485 8.2.2 Reklamationsbearbeitung
+    * Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt.
 * ISO 13485 8.2.4 Internes Audit
     * Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für
         * Aufzeichnungen über Produkteinführungen. Sofern aktuell bestellte Artikel nicht berücksichtigt sind erfolgt ein Hinweis.
@@ -911,7 +913,7 @@ names[] = "^.{0,3}$" ; weniger als 4 Zeichen
 ; unveränderliche fest einprogrammierte reservierte Begriffe
 names[] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
 names[] = "^_" ; Namen dürfen nicht mit _ beginnen
-names[] = "IDENTIFY_BY_" ; besondere Teilzeichenketten, getrennt mit |
+names[] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 [lifespan]

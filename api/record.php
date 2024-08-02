@@ -144,7 +144,7 @@ class RECORD extends API {
 						}
 					}
 					else {
-						$content['content'][$subs['attributes']['name']] = " ";
+						if (isset($subs['attributes']['name'])) $content['content'][$subs['attributes']['name']] = " ";
 					}
 				}
 			}
@@ -280,9 +280,21 @@ class RECORD extends API {
 						'value' => $now->format('H:i'),
 						'required' => true
 					]
+				],
+				[
+					'type' => 'radio',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_complaint')
+					],
+					'content' => [
+						LANG::GET('record.record_complaint_no') => ['value' => '0', 'required' => true],
+						LANG::GET('record.record_complaint_yes') => ['value' => '1', 'required' => true],
+					]
 				]
+
 			];
 		}
+
 		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
 			$return['render']['content'][] = [
 				[
@@ -604,6 +616,7 @@ class RECORD extends API {
 				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
+				if ($complaint = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_complaint'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_complaint')});
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time . ':00';
 				if (strlen($entry_timestamp) > 19) { // yyyy-mm-dd hh:ii
@@ -656,7 +669,8 @@ class RECORD extends API {
 						':author' => $_SESSION['user']['name'],
 						':author_id' => $_SESSION['user']['id'],
 						':content' => json_encode($this->_payload),
-						':entry_timestamp' => $entry_timestamp
+						':entry_timestamp' => $entry_timestamp,
+						':complaint' => $complaint == '0' ? null : 1
 					]
 				])) $this->response([
 					'response' => [
@@ -888,10 +902,11 @@ class RECORD extends API {
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
-			$contexts[$row['context']][$targets[$target]][$row['identifier']] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+			$linkdisplay = $row['identifier'] . ($row['complaint'] ? ' *' : '');
+			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
 			if ($row['closed'] == 1 /*no type comparison*/ || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
-				$contexts[$row['context']][$targets[$target]][$row['identifier']]['style'] = 'display:none';
-				$contexts[$row['context']][$targets[$target]][$row['identifier']]['data-filtered_max'] = $row['id'];
+				$contexts[$row['context']][$targets[$target]][$linkdisplay]['style'] = 'display:none';
+				$contexts[$row['context']][$targets[$target]][$linkdisplay]['data-filtered_max'] = $row['id'];
 			}
 		}
 		// delete double entries, reset filted_max state
@@ -1000,8 +1015,8 @@ class RECORD extends API {
 			$content = json_decode($row['content'], true);
 			foreach($content as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])]];
-				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']])];
+				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]) . ($row['complaint'] ? ' ' . LANG::GET('record.record_export_complaint') : ' ')]];
+				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]) . ($row['complaint'] ? ' ' . LANG::GET('record.record_export_complaint') : ' ')];
 			}
 		}
 
