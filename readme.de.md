@@ -127,7 +127,8 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugeteilt bekommen.
     * Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
 * ISO 13485 8.2.2 Reklamationsbearbeitung
-    * Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt.
+    * Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt. Eine Übersicht kann im Audit-Modul angezeigt werden.
+    * siehe [Werkzeuge](#werkzeuge)
 * ISO 13485 8.2.4 Internes Audit
     * Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für
         * Aufzeichnungen über Produkteinführungen. Sofern aktuell bestellte Artikel nicht berücksichtigt sind erfolgt ein Hinweis.
@@ -807,6 +808,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 * Qualifikationserfüllung
 * Lieferantenverzeichnis
 * Bestellstatistiken
+* Reklamationen
 * regulatorische Anforderungen
 * Risiken
 

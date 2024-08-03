@@ -72,7 +72,7 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* complaints - acknowledgement permission, statistics, list complaints within audit grouped by year, marked as closed
+* complaints - acknowledgement permission?
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -168,7 +168,8 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.
     * Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.
 * ISO 13485 8.2.2 Complaint handling
-    * Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement.
+    * Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed within the audit module.
+    * see [Tools](#tools)
 * ISO 13485 8.2.4 Internal audit
     * The audit module aquires data from the application and is partially able to export
         * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
@@ -851,6 +852,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * skill fulfilment
 * vendor list
 * order statistics
+* complaints
 * regulatory issues
 * risks
 

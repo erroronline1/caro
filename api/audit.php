@@ -72,6 +72,7 @@ class AUDIT extends API {
 					'userexperience', // experience points per user and year
 					'vendors', // vendor list
 					'orderstatistics', // order statistics
+					'complaints', // complaints within records
 					'regulatory', // regulatory issues
 					'risks', // risks
 					] as $category){
@@ -105,6 +106,48 @@ class AUDIT extends API {
 	}
 
 	/**
+	 *                     _     _     _       
+	 *   ___ ___ _____ ___| |___|_|___| |_ ___ 
+	 *  |  _| . |     | . | | .'| |   |  _|_ -|
+	 *  |___|___|_|_|_|  _|_|__,|_|_|_|_| |___|
+	 *                |_|
+	 * list and link complaints from records, sum by year
+	 */
+	private function complaints(){
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
+		$entries = $content = [];
+		foreach ($data as $row){
+			if ($row['complaint']){
+				$year = substr($row['date'], 0, 4);
+				if (!isset($entries[$year])) $entries[$year] = [];
+				$entries[$year][$row['identifier']] = ['closed' => $row['closed'], 'units' => $row['units']];
+			}
+		}
+		//order by year descending
+		arsort($entries);
+		foreach ($entries as $year => $cases){
+			$current = $links = [];
+			$current[] = [
+				'type' => 'textblock',
+				'description' => strval($year),
+				'content' => LANG::GET('audit.complaints_summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => boolval($c['closed'])))])
+			];
+			foreach ($cases as $identifier => $property){
+				$units = implode(', ', array_map(Fn($u)=> LANGUAGEFILE['units'][$u], explode(',', $property['units'])));
+				$linkdescription = LANG::GET('audit.complaints_case_description', [':identifier' => $identifier, ':units' => $units]);
+				if ($property['closed']) $linkdescription .= LANG::GET('audit.complaints_closed');
+				$links[$linkdescription] = ['href' => "javascript:api.record('get', 'record', '" . $identifier . "')"];
+			}
+			$current[] = [
+				'type' => 'links',
+				'content' => $links
+			];
+			$content[] = $current;
+		}
+		return $content;
+	}
+	
+	/**
 	 *                       _
 	 *   ___ _ _ ___ ___ ___| |_
 	 *  | -_|_'_| . | . |  _|  _|
@@ -122,6 +165,7 @@ class AUDIT extends API {
 			'userexperience',
 			'vendors',
 			'orderstatistics',
+			'complaints',
 			'regulatory',
 			'risks'
 		];
