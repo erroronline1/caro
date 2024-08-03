@@ -117,7 +117,13 @@ export const api = {
 				if (successFn) await successFn(data.body);
 			})
 			.catch((error) => {
+				// erroronline1.js _.api returns something like *Error: server responded 401: Unauthorized*
+				// translate errorcode with languagefile translations
+				// no altering library
 				console.trace(error);
+				const errorcode = error.message.match(/\d+/g);
+				if (LANGUAGEFILE['application']['error_response'][errorcode]) error = LANGUAGEFILE['application']['error_response'][errorcode];
+
 				if (errorFn != null) errorFn(error);
 				new Toast(error, "error");
 			});
