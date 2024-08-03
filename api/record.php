@@ -1015,8 +1015,8 @@ class RECORD extends API {
 			$content = json_decode($row['content'], true);
 			foreach($content as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]) . ($row['complaint'] ? ' ' . LANG::GET('record.record_export_complaint') : ' ')]];
-				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]) . ($row['complaint'] ? ' ' . LANG::GET('record.record_export_complaint') : ' ')];
+				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'complaint' => $row['complaint']]];
+				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'complaint' => $row['complaint']];
 			}
 		}
 
@@ -1047,7 +1047,7 @@ class RECORD extends API {
 						switch ($type){
 							case 'form':
 							case 'full':
-								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
+								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ($entry['complaint'] ? LANG::GET('record.record_export_complaint') : '') . ")\n";
 								break;
 							case 'simplified':
 								$summary['content'][$form][$key] = $displayvalue . "\n";
