@@ -47,7 +47,7 @@ Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 1
 
 Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln anstelle von Sonderanfertigungen, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
 
-![landing page screenshot](assets/landing%20page.png)
+![landing page screenshot](assets/landing%20page%20de.png)
 
 ## Vorgesehene Zielsetzungen für ISO 13485
 * ISO 13485 4.1.2 Risikobasierter Ansatz
@@ -237,7 +237,7 @@ Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selb
 
 ## Anwendung
 
-![sample application menu](assets/application%20menu.png)
+![sample application menu](assets/application%20menu%20de.png)
 
 ### Nutzer
 Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden.
@@ -246,7 +246,7 @@ Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihre
 
 Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich. Nutzer können unterschiedliche Berechtigungen erhalten. Diese Berechtigungen steuern, welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.
 
-Manche Berechtigungen/Einschränkugen sind jedoch systemisch festgelegt:
+Manche Berechtigungen/Einschränkungen sind jedoch systemisch festgelegt:
 
 Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das gilt auch für den Anwendungsadministrator.
 
@@ -272,7 +272,7 @@ Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutze
 
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
 
-![user screenshot](assets/user.png)
+![user screenshot](assets/profile%20de.png)
 
 ```mermaid
 graph TD;
@@ -317,7 +317,7 @@ Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenhe
 
 ## Kommunikation
 
-![sample communication menu](assets/communication%20menu.png)
+![sample communication menu](assets/communication%20menu%20de.png)
 
 ### Unterhaltungen
 Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf die Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
@@ -393,7 +393,7 @@ graph TD;
 
 ## Aufzeichnungen
 
-![sample records menu](assets/records%20menu.png)
+![sample records menu](assets/records%20menu%20de.png)
 
 ### Formulare
 Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Es ist (ohne größere Nachforschungen betrieben zu haben) nicht erkenntlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: die Dokumente und internen Formulare sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies dient dem Ziel einer papierlosen Lösung bereits ausreichend, dennoch sind zusätzlich Exporte als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
@@ -515,7 +515,7 @@ Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#werkz
 
 ## Kalender
 
-![sample calendar menu](assets/calendar%20menu.png)
+![sample calendar menu](assets/calendar%20menu%20de.png)
 
 Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
@@ -602,7 +602,7 @@ graph TD;
 
 ## Dateien
 
-![sample files menu](assets/files%20menu.png)
+![sample files menu](assets/files%20menu%20de.png)
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
@@ -618,7 +618,7 @@ Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werd
 
 ## Einkauf
 
-![sample purchase menu](assets/purchase%20menu.png)
+![sample purchase menu](assets/purchase%20menu%20de.png)
 
 ### Lieferanten- und Artikelverwaltung
 Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der Impoert von Preislisten nutzt den [CSV-Prozessor](#csv-prozessor).
@@ -794,7 +794,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer k
 
 ## Werkzeuge
 
-![sample tools menu](assets/tools%20menu.png)
+![sample tools menu](assets/tools%20menu%20de.png)
 
 Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes und der Betrachtung von STL-Dateien zur Verfügung.
 
@@ -802,7 +802,7 @@ Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet
 
 Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte
-* Stiachprobenprüfungen gemäß MDR §14
+* Stichprobenprüfungen gemäß MDR §14
 * aktuell gültige Dokumente, incl. externe Dokumente
 * Mitarbeiterqualifikationen und Schulungen
 * Qualifikationserfüllung
