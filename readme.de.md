@@ -136,7 +136,10 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
         * eine Übersicht über die aktuell gültigen Formulare und deren Komponenten.
         * Fähigkeiten und Schulungen der Mitarbeiter mit ggf. markierten Ablaufdaten.
         * Lieferantenlisten mit den jeweiligen letzten Preislistenaktualisierungen, der letzten Stichprobenprüfung und Details zu Zertifikaten sofern bereitgestellt.
+        * Bestellstatistiken.
+        * Reklamationen.
         * die Berücksichtung regulatorischer Anforderungen durch verwendete Formulare und Dokumente.
+        * Risikoanalysen.
     * siehe [Werkzeuge](#werkzeuge)
 * ISO 13485 8.4 Datenanalyse
     * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten.
@@ -707,7 +710,7 @@ Aus den in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen 
 
 Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) exportiert und für die Lieferantenbewertung genutzt werden.
 
-![orders screenshot](assets/orders.png)
+![orders screenshot](assets/orders%20de.png)
 
 ```mermaid
 graph TD;
@@ -925,7 +928,7 @@ order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind
 idle = 1440 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
 training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
 mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
-mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stickprobenprüfung verwendet werden darf
+mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
 
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
 [likeliness]

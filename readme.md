@@ -177,7 +177,10 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * a list of current documents in use (forms and their components).
         * user skills and trainings (with expiries highlighted).
         * vendor lists with last article update, last MDR sample check and details for certificates (if provided).
+        * order statistics.
+        * complaints.
         * fulfilment of regulatory issues considered by forms.
+        * risk analyses.
     * also see [Tools](#tools)
 * ISO 13485 8.4 Data analysis
     * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpeted though.
