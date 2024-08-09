@@ -209,6 +209,7 @@ export const api = {
 				payload = _.getInputs("[data-usecase=login]", true);
 
 				successFn = async function (data) {
+					await api.application("get","language");
 					await api.application("get", "menu");
 					if (data.render && data.render.form) {
 						const render = new Assemble(data.render);
