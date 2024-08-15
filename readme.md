@@ -73,6 +73,9 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * complaints - acknowledgement permission?
+* print identifier sheet from record
+* limit record visibility to groups
+* qr code size (identifier) within setup.ini
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
