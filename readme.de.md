@@ -445,7 +445,8 @@ graph TD;
     edit_bundle-->|speichern|new_forms_database
 
     new_forms_database-->returns("gibt auf Anfrage nur den neuesten Datensatz heraus,
-    sofern dieser nicht verborgen und vollständig freigegeben ist")
+    sofern dieser nicht verborgen,
+    vollständig freigegeben ist und die Berechtigungen übereinstimmen")
 ```
 
 [Übersicht](#übersicht)
@@ -463,8 +464,8 @@ Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Pak
 
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen.
 
-Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Formulare hat. Es ist Ermessenssache on Formularpakete so sinnvoll eingesetzt werden können:
-* Einerseits vereinfach dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
+Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Formulare hat. Es ist Ermessenssache ob Formularpakete so sinnvoll eingesetzt werden können:
+* Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
 * andererseits bedeutet dies mehr Aufmerksamkeit auf die vergebenen Rollen und wer im Falle von Anfragen tatsächlich vollständige Daten exportiert.
 
 ![record screenshot](assets/records.png)
@@ -480,7 +481,8 @@ graph TD;
     records-->fillform((Formular ausfüllen));
     fillform-->selectform[Formular wählen];
     selectform-->forms[(Formulare)];
-    forms-->|neuestes Fomular nach Name ausgeben|displayform[Formular anzeigen];
+    forms-->|"neuestes Fomular nach Name ausgeben
+    sofern Berechtigungen übereinstimmen "|displayform[Formular anzeigen];
     displayform-->inputdata[Dateneingabe];
     inputdata-->|neuen Datensatz mit Formularname speichern|recorddb[(Aufzeichnungsdatenbank)];
     displayform-->idimport[Import mit Identifikator];
@@ -496,7 +498,8 @@ graph TD;
     recorddb3-->|"nicht abgeschlossen und
     innerhalb der Grenzmenge"|displayids[Anzeige des Identifikators];
     recorddb3-->|Filter trifft zu|displayids;
-    displayids-->|Auswahl|summary[zeige Zusammenfassung an];
+    displayids-->|Auswahl|summary["zeige Zusammenfassung an
+    sofern Berechtigungen übereinstimmen"];
     summary-->|Bereichsleiter, Leitung, QMB|close[abschließen];
     close-->recorddb3
     summary-->export[exportieren];

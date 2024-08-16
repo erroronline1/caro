@@ -484,7 +484,8 @@ graph TD;
     edit_bundle-->|save|new_forms_database
 
     new_forms_database-->returns("returns only latest dataset on request
-    if named item is not hidden and approved")
+    if named item is not hidden,
+    approved and permissions match")
 ```
 
 [Content](#content)
@@ -520,7 +521,8 @@ graph TD;
     records-->fillform((fill out form));
     fillform-->selectform[select form];
     selectform-->forms[(forms)];
-    forms-->|get recent by name|displayform[display form];
+    forms-->|"get recent by name
+    if permissions match"|displayform[display form];
     displayform-->inputdata[add data];
     inputdata-->|input new dataset with form name|recorddb[(record database)];
     displayform-->idimport[import by identifier];
@@ -535,7 +537,8 @@ graph TD;
     summaries-->recorddb3[(record database)]
     recorddb3-->|not closed and within limit|displayids[display identifier];
     recorddb3-->|matching filter|displayids;
-    displayids-->|select|summary[display summary];
+    displayids-->|select|summary["display summary
+    if permissions match"];
     summary-->|supervisor, admin or ceo|close[close];
     close-->recorddb3
     summary-->export[export];
