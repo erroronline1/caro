@@ -27,6 +27,7 @@ class RECORD extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_appendDate = null;
 	private $_passedIdentify = null;
 	private $_formExport = null;
 
@@ -34,7 +35,7 @@ class RECORD extends API {
 		parent::__construct();
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = $this->_appendDate = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_passedIdentify = $this->_formExport = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
 	}
 
@@ -438,7 +439,7 @@ class RECORD extends API {
 					}
 					catch (Exception $e){
 						$now = new DateTime('now', new DateTimeZone(INI['timezone']));
-						$content .= ' ' . $now->format('Y-m-d H:i');
+						if ($this->_appendDate) $content .= ' ' . $now->format('Y-m-d H:i');
 					}
 				}
 				if ($content){
@@ -467,7 +468,7 @@ class RECORD extends API {
 				[
 					'form' => [
 						'data-usecase' => 'record',
-						'action' => "javascript:api.record('post', 'identifier')"],
+						'action' => "javascript:api.record('post', 'identifier', 'appendDate')"],
 					'content'=>[
 						[
 							[
