@@ -101,7 +101,7 @@ class RECORD extends API {
 			]
 		]);
 		$form = $form ? $form[0] : null;
-		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export']) $this->response([], 401);
+		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
 			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
@@ -186,7 +186,7 @@ class RECORD extends API {
 	public function form(){
 		// prepare existing forms lists
 		$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
-		if (!$form || $form['hidden']) $this->response(['response' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$form || $form['hidden'] || !PERMISSION::permissionIn($form['restricted_access'])) $this->response(['response' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $form['name'], 'render' => [
 			'content' => []
@@ -377,7 +377,7 @@ class RECORD extends API {
 		};
 
 		foreach($fd as $row) {
-			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['id'], $matches) && !in_array($row['name'], $hidden)) {
 				$terms = [$row['name']];
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
@@ -411,6 +411,68 @@ class RECORD extends API {
 		]);
 	}
 	
+	/**
+	 *   ___                   
+	 *  |  _|___ ___ _____ ___ 
+	 *  |  _| . |  _|     |_ -|
+	 *  |_| |___|_| |_|_|_|___|
+	 *   
+	 */
+	public function forms(){
+		$formdatalist = $forms = [];
+		$return = [];
+
+		// prepare existing forms lists
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$hidden = [];
+		foreach($fd as $key => $row) {
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
+			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
+				$formdatalist[] = $row['name'];
+				$forms[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
+				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
+			}
+		}
+		$return['render'] = [
+			'content' => [
+				[
+					[
+						'type' => 'datalist',
+						'content' => array_values(array_unique($formdatalist)),
+						'attributes' => [
+							'id' => 'forms'
+						]
+					], [
+						'type' => 'filtered',
+						'attributes' => [
+							'name' => LANG::GET('record.form_filter'),
+							'list' => 'forms',
+							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}",
+							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
+						],
+						'hint' => LANG::GET('record.form_filter_hint')
+					]
+				]
+			]];
+		foreach ($forms as $context => $list){
+			$contexttranslation = '';
+			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
+				if (array_key_exists($context, $contexts)){
+					$contexttranslation = $contexts[$context];
+					break;
+				}
+			}
+			$return['render']['content'][] = 					[
+				'type' => 'links',
+				'description' => $contexttranslation,
+				'content' => $list
+			];
+
+		}
+		$this->response($return);
+	}
+
 	/**
 	 *   ___     _ _                     _
 	 *  |  _|_ _| | |___ _ _ ___ ___ ___| |_
@@ -567,7 +629,7 @@ class RECORD extends API {
 		// unset hidden forms from bundle presets
 		$allforms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		foreach($allforms as $row){
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
+			if (!PERMISSION::fullyapproved('formapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
 			if ($row['hidden'] && ($key = array_search($row['name'], $necessaryforms)) !== false) unset($necessaryforms[$key]);
 		}
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
@@ -837,61 +899,6 @@ class RECORD extends API {
 		]);
 	}
 
-	public function forms(){
-		$formdatalist = $forms = [];
-		$return = [];
-
-		// prepare existing forms lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = [];
-		foreach($fd as $key => $row) {
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
-			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
-				$formdatalist[] = $row['name'];
-				$forms[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
-			}
-		}
-		$return['render'] = [
-			'content' => [
-				[
-					[
-						'type' => 'datalist',
-						'content' => array_values(array_unique($formdatalist)),
-						'attributes' => [
-							'id' => 'forms'
-						]
-					], [
-						'type' => 'filtered',
-						'attributes' => [
-							'name' => LANG::GET('record.form_filter'),
-							'list' => 'forms',
-							'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}",
-							'onblur' => "api.record('get', 'formfilter', this.value); return false;",
-						],
-						'hint' => LANG::GET('record.form_filter_hint')
-					]
-				]
-			]];
-		foreach ($forms as $context => $list){
-			$contexttranslation = '';
-			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
-				if (array_key_exists($context, $contexts)){
-					$contexttranslation = $contexts[$context];
-					break;
-				}
-			}
-			$return['render']['content'][] = 					[
-				'type' => 'links',
-				'description' => $contexttranslation,
-				'content' => $list
-			];
-
-		}
-		$this->response($return);
-	}
-
 	/**
 	 *                         _
 	 *   ___ ___ ___ ___ ___ _| |___
@@ -1027,6 +1034,7 @@ class RECORD extends API {
 		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
+			if (!PERMISSION::permissionIn($row['restricted_access'])) continue;
 			$summary['closed'] = boolval($row['closed']);
 			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => $row['form_date']]);
 			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
@@ -1040,7 +1048,7 @@ class RECORD extends API {
 		}
 
 		if ($type === 'form') {
-			foreach(array_keys($accumulatedcontent) as $key) if ($key !==$this->_formExport) unset($accumulatedcontent[$key]);
+			foreach(array_keys($accumulatedcontent) as $key) if ($key !== $this->_formExport) unset($accumulatedcontent[$key]);
 		}
 		foreach($accumulatedcontent as $form => $entries){
 			$summary['content'][$form] = [];

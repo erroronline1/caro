@@ -73,7 +73,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * complaints - acknowledgement permission?
-* limit record visibility to groups
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -450,7 +449,9 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options, identifiers, links and buttons are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form), while in the latte case any searchability and quick overviews suffer.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options, identifiers, links and buttons are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form), while in the latter case any searchability and quick overviews suffer.
+
+Forms can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
 
 ![form composer screenshot](assets/forms.png)
 
@@ -500,6 +501,10 @@ The identifier is always a QR-code with additional readable content that will ap
 Checking for completeness of form bundles can be applied on display of a record summary.
 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default.
+
+If records contain data from restricted forms, summaries will only contain these data if the requesting user has the permission to handle the form as well. It is up to you if it is reasonable to handle form bundles this way:
+* On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
+* on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
 ![record screenshot](assets/records.png)
 

@@ -435,12 +435,12 @@ class SQLQUERY {
 
 
 		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export)"
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
 		],
 		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export WHERE id = :id"
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
 		],
 		'form_put_approve' => [
 			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",
@@ -639,8 +639,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content, complaint) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content, :complaint)"
 		],
 		'records_import' => [
-			'mysql' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
-			'sqlsrv' => "SELECT caro_records.*, caro_form.date as form_date FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
+			'mysql' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
+			'sqlsrv' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
 		'records_identifiers' => [
 			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(IFNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, MIN(IFNULL(r.closed, 0)) AS closed, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",

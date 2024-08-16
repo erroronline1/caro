@@ -411,6 +411,8 @@ Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen
 
 Formulare können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Dateiuploads, Identifikatoren, Verknüpfungen und Bedienfelder aus dem Formular entfernt. Formulare können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit und Übersicht leidet.
 
+Formulare können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche).
+
 ![form composer screenshot](assets/forms.png)
 
 ```mermaid
@@ -459,7 +461,11 @@ Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesb
 
 Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
-Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Übersicht der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen.
+Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen.
+
+Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Formulare hat. Es ist Ermessenssache on Formularpakete so sinnvoll eingesetzt werden können:
+* Einerseits vereinfach dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
+* andererseits bedeutet dies mehr Aufmerksamkeit auf die vergebenen Rollen und wer im Falle von Anfragen tatsächlich vollständige Daten exportiert.
 
 ![record screenshot](assets/records.png)
 

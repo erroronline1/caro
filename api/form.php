@@ -471,7 +471,8 @@ class FORM extends API {
 							':hidden' => $component_hidden,
 							':regulatory_context' => '',
 							':id' => $exists['id'],
-							':permitted_export' => NULL
+							':permitted_export' => NULL,
+							':restricted_access' => NULL
 						]
 					])) $this->response([
 							'response' => [
@@ -526,7 +527,8 @@ class FORM extends API {
 						':author' => $_SESSION['user']['name'],
 						':content' => json_encode($component),
 						':regulatory_context' => '',
-						':permitted_export' => NULL
+						':permitted_export' => NULL,
+						':restricted_access' => NULL
 					]
 				])) {
 						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => $component_name]);
@@ -862,6 +864,14 @@ class FORM extends API {
 						$regulatory_context[] = array_search($context, LANGUAGEFILE['regulatory']); 
 					}
 				}
+				// convert values to keys for restricted_access
+				$restricted_access = [];
+				if ($this->_payload->restricted_access) {
+					$rc = explode(', ', $this->_payload->restricted_access);
+					foreach($rc as $context){
+						$restricted_access[] = array_search($context, LANGUAGEFILE['permissions']); 
+					}
+				}
 				
 				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
 				// get latest approved by name
@@ -874,7 +884,8 @@ class FORM extends API {
 							':hidden' => intval($this->_payload->hidden),
 							':regulatory_context' => implode(',', $regulatory_context),
 							':id' => $exists['id'],
-							':permitted_export' => $this->_payload->permitted_export ? : 0
+							':permitted_export' => $this->_payload->permitted_export ? : 0,
+							':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
 						]
 					])) $this->response([
 							'response' => [
@@ -896,7 +907,8 @@ class FORM extends API {
 						':author' => $_SESSION['user']['name'],
 						':content' => implode(',', $this->_payload->content),
 						':regulatory_context' => implode(',', $regulatory_context),
-						':permitted_export' => $this->_payload->permitted_export ? : 0
+						':permitted_export' => $this->_payload->permitted_export ? : 0,
+						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
 					]
 				])) {
 						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => $this->_payload->name]);
@@ -974,7 +986,8 @@ class FORM extends API {
 			'alias' => '',
 			'context' => '',
 			'regulatory_context' => '',
-			'permitted_export' => null
+			'permitted_export' => null,
+			'restricted_access' => null
 		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1059,6 +1072,16 @@ class FORM extends API {
 				LANG::GET('assemble.edit_form_permitted_export') => $form['permitted_export'] ? ['checked' => true]: []
 			]
 		];
+		$restricted_access = [
+			'description' => LANG::GET('assemble.edit_form_restricted_access'),
+			'hint' => LANG::GET('assemble.edit_form_restricted_access_hint'),
+			'content' => []
+		];
+		$form['restricted_access'] = explode(',', strval($form['restricted_access']));
+		foreach(LANGUAGEFILE['permissions'] as $value => $translation){
+			$restricted_access['content'][$translation] = ['value' => $value];
+			if (in_array($value, $form['restricted_access'])) $restricted_access['content'][$translation]['checked'] = true;
+		}
 
 		$return['render'] = [
 			'content' => [
@@ -1142,7 +1165,8 @@ class FORM extends API {
 						'hidden' => $form['name'] ? intval($form['hidden']) : 1,
 						'approve' => $approve,
 						'regulatory_context' => $regulatory_context ? : ' ',
-						'permitted_export' => $permitted_export
+						'permitted_export' => $permitted_export,
+						'restricted_access' => $restricted_access
 					]
 				], [
 					[

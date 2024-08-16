@@ -24,9 +24,9 @@ import { getNextElementID, Assemble } from "./assemble.js";
 export const compose_helper = {
 	/**
 	 * e.g. adding new input fields for link collections
-	 * @param {object} startNode 
-	 * @param {int} offset 
-	 * @param {int} numberOfElements 
+	 * @param {object} startNode
+	 * @param {int} offset
+	 * @param {int} numberOfElements
 	 * @returns nodes
 	 */
 	cloneMultipleItems: function (startNode, offset = -4, numberOfElements = 4) {
@@ -66,7 +66,7 @@ export const compose_helper = {
 
 	/**
 	 * create widget from composer and append to view and newFormComponents
-	 * @param {object} parent 
+	 * @param {object} parent
 	 * @returns none
 	 */
 	composeNewElementCallback: function (parent) {
@@ -209,7 +209,7 @@ export const compose_helper = {
 
 	/**
 	 * append new text chunk to view and newTextElements. used by texttemplate.php composer
-	 * @param {string} key 
+	 * @param {string} key
 	 */
 	composeNewTextTemplateCallback: function (key) {
 		const chunk = new Compose({
@@ -243,7 +243,7 @@ export const compose_helper = {
 	},
 	/**
 	 * appends or updates a hidden form fiels with the components json structure to the editor form. used by api.js
-	 * @param {object} composedComponent 
+	 * @param {object} composedComponent
 	 * @returns none
 	 */
 	addComponentStructureToComponentForm: function (composedComponent) {
@@ -316,6 +316,7 @@ export const compose_helper = {
 			context = document.getElementById("ComponentContext").value,
 			approve = document.getElementById("ComponentApprove").value,
 			regulatory_context = document.getElementById("ComponentRegulatoryContext").value,
+			restricted_access = document.getElementById("ComponentRestrictedAccess").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
 			permitted_export = document.getElementById("ComponentPermittedExport") ? document.getElementById("ComponentPermittedExport").checked : false;
 		let content = [];
@@ -332,6 +333,7 @@ export const compose_helper = {
 				approve: approve,
 				regulatory_context: regulatory_context,
 				permitted_export: permitted_export,
+				restricted_access: restricted_access,
 			};
 		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), "error");
 		return null;
@@ -379,7 +381,7 @@ export const compose_helper = {
 
 	/**
 	 * appends a component to view and newFormComponents after being fetched by api.js
-	 * @param {object} form 
+	 * @param {object} form
 	 */
 	importComponent: function (form) {
 		compose_helper.newFormComponents = {};
@@ -408,7 +410,7 @@ export const compose_helper = {
 
 	/**
 	 * appends components to view and newFormElements after being fetched by api.js
-	 * @param {object} form 
+	 * @param {object} form
 	 */
 	importForm: function (components) {
 		function lookupIdentify(element) {
@@ -435,7 +437,7 @@ export const compose_helper = {
 
 	/**
 	 * appends text chunks to view and newTextElements after being fetched by api.js
-	 * @param {object} form 
+	 * @param {object} form
 	 */
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};
@@ -907,7 +909,8 @@ export class Compose extends Assemble {
 			hidden = Boolean(this.currentElement.hidden),
 			approve = this.currentElement.approve,
 			regulatory_context = this.currentElement.regulatory_context,
-			permitted_export = this.currentElement.permitted_export;
+			permitted_export = this.currentElement.permitted_export,
+			restricted_access = this.currentElement.restricted_access;
 		this.currentElement = {
 			type: "text",
 			hint: this.currentElement.hint,
@@ -955,8 +958,21 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.checkbox());
 		}
+		if (restricted_access) {
+			this.currentElement = {
+				type: "checkbox2text",
+				content: restricted_access.content,
+				attributes: {
+					name: LANG.GET("assemble.edit_form_restricted_access"),
+					id: "ComponentRestrictedAccess",
+				},
+				hint: restricted_access.hint,
+			};
+			result = result.concat(...this.checkbox2text());
+		}
 		if (regulatory_context) {
 			this.currentElement = {
+				type: "checkbox2text",
 				content: regulatory_context,
 				attributes: {
 					name: LANG.GET("assemble.compose_form_regulatory_context"),
@@ -1310,7 +1326,7 @@ export class Compose extends Assemble {
 			multiple: "optional",
 		});
 	}
-	
+
 	compose_select() {
 		return this.compose_multilist({
 			type: "select",

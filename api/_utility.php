@@ -572,5 +572,22 @@ class PERMISSION {
 		}
 		var_dump('permission ' . $function . ' not found in setup.ini file');
 	}
+
+	/**
+	 *                     _         _         _     
+	 *   ___ ___ ___ _____|_|___ ___|_|___ ___|_|___ 
+	 *  | . | -_|  _|     | |_ -|_ -| | . |   | |   |
+	 *  |  _|___|_| |_|_|_|_|___|___|_|___|_|_|_|_|_|
+	 *  |_|
+	 * 
+	 * returns a boolean if user matches with passed authorizations
+	 * @param array|string $auth as either array or comma separated string
+	 * @return bool
+	 */
+	public static function permissionIn($auth){
+		if (!$auth) return true;
+		if (gettype($auth) === 'string') $auth = preg_split('/\W+/', $auth);
+		return array_intersect($auth, $_SESSION['user']['permissions']);
+	}
 }
 ?>
