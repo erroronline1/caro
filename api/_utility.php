@@ -587,7 +587,7 @@ class PERMISSION {
 	public static function permissionIn($auth){
 		if (!$auth) return true;
 		if (gettype($auth) === 'string') $auth = preg_split('/\W+/', $auth);
-		return array_intersect($auth, $_SESSION['user']['permissions']);
+		return array_intersect(['admin', ...$auth], $_SESSION['user']['permissions']);
 	}
 }
 ?>

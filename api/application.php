@@ -569,7 +569,7 @@ class APPLICATION extends API {
 		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 		$topics = [];
 		foreach ($query as $row){
-			if (array_intersect(explode(',', $row['permissions']), $_SESSION['user']['permissions'])) $topics[]=
+			if (PERMISSION::permissionIn($row['permissions'])) $topics[]=
 				[[
 					'type' => 'textblock',
 					'description' => $row['title'],
