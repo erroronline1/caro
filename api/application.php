@@ -41,7 +41,7 @@ class APPLICATION extends API {
 	 *  | | .'|   | . | | | .'| . | -_|
 	 *  |_|__,|_|_|_  |___|__,|_  |___|
 	 *            |___|       |___|
-	 * respond with LANGUAGEFILE as transfer to js frontend
+	 * respond with constant LANGUAGEFILE as transfer to js frontend
 	 */
     public function language(){
 		$this->response(['data' => LANG::GETALL()]);
@@ -96,7 +96,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'scanner',
 							'attributes' => [
-								'name' => LANG::GET('user.login_description'),
+								'name' => LANG::GET('user.login_description', [], true),
 								'type' => 'password'
 							]
 						]
@@ -120,7 +120,7 @@ class APPLICATION extends API {
 			[
 				'type' => 'checkbox',
 				'content' => [
-					LANG::GET('application.terms_of_service_accepted') => ['required' => true]
+					LANG::GET('application.terms_of_service_accepted', [], true) => ['required' => true]
 				]
 			]
 		];

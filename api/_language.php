@@ -34,13 +34,16 @@ class LANG {
 	 * returns a language specific chunk
 	 * @param str $request dot separated keys of LANGUAGEFILE
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
+	 * @param str $forceDefault override user setting, especially on logout, otherwise first login attempts may fail
 	 * @return str textchunk with replacements
 	 */
-	public static function GET($request, $replace=[]){
-		$request=explode('.', $request);
-		if (!array_key_exists($request[0], LANGUAGEFILE) ||
-			!array_key_exists($request[1], LANGUAGEFILE[$request[0]]) ||
-			(array_key_exists(2, $request) && !array_key_exists($request[2], LANGUAGEFILE[$request[0]][$request[1]]))){
+	public static function GET($request, $replace = [], $forceDefault = false){
+		$request = explode('.', $request);
+		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . INI['defaultlanguage'] . '.ini', true); 
+
+		if (!array_key_exists($request[0], $languagefile) ||
+			!array_key_exists($request[1], $languagefile[$request[0]]) ||
+			(array_key_exists(2, $request) && !array_key_exists($request[2], $languagefile[$request[0]][$request[1]]))){
 			return 'undefined language';
 		}
 		$patterns = [];
@@ -49,8 +52,8 @@ class LANG {
 			$patterns[] = '/' . $pattern . '/';
 			$replacements[] = $replacement;
 		}
-		if (array_key_exists(2, $request)) return preg_replace($patterns, $replacements, LANGUAGEFILE[$request[0]][$request[1]][$request[2]]);
-		return preg_replace($patterns, $replacements, LANGUAGEFILE[$request[0]][$request[1]]);
+		if (array_key_exists(2, $request)) return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]][$request[2]]);
+		return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]]);
 	}
 
 	/**
