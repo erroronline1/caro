@@ -619,16 +619,25 @@ class RECORD extends API {
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
 				if ($complaint = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_complaint'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_complaint')});
 
-				$entry_timestamp = $entry_date . ' ' . $entry_time . ':00';
-				if (strlen($entry_timestamp) > 19) { // yyyy-mm-dd hh:ii
-					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
-					$entry_timestamp = $date->format('Y-m-d H:i:s');
+				$entry_timestamp = $entry_date . ' ' . $entry_time;
+				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
+					$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$entry_timestamp = $now->format('Y-m-d H:i');
 				}
 
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
 						unset ($this->_payload->$key);
+
+						$possibledate = substr($identifier, -16);
+						try {
+							new DateTime($possibledate);
+						}
+						catch (Exception $e){
+							$identifier .= ' ' . $entry_timestamp;
+						}
+	
 					}
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
@@ -639,6 +648,7 @@ class RECORD extends API {
 				if (!$identifier) {
 					$identifier = $form_name . ' ' . $entry_timestamp;
 				}
+				$entry_timestamp .= ':00'; // append seconds for database format
 
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
@@ -690,11 +700,19 @@ class RECORD extends API {
 				$closed = false;
 				// summarize content
 				$content = $this->summarizeRecord();
-				$body[] = [[
-					'type' => 'textblock',
-					'description' => LANG::GET('record.create_identifier'),
-					'content' => $this->_requestedID
-				]];
+				$body[] = [
+					[
+						'type' => 'textblock',
+						'description' => LANG::GET('record.create_identifier'),
+						'content' => $this->_requestedID
+					], [
+						'type' => 'button',
+						'attributes' => [
+							'value' => LANG::GET('menu.record_create_identifier'),
+							'onpointerup' => "_client.application.postLabelSheet('" . $this->_requestedID . "')"
+						]
+					]
+				];
 				foreach($content['content'] as $form => $entries){
 					$body[] = [
 						[

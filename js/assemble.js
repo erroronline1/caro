@@ -1474,6 +1474,14 @@ export class Assemble {
 				if (document.getElementById(inputid).value) api.record("get", "import", document.getElementById(inputid).value);
 			};
 			result.push(button);
+			
+			button = document.createElement("button");
+			button.appendChild(document.createTextNode(LANG.GET("menu.record_create_identifier")));
+			button.type = "button";
+			button.onpointerup = function () {
+				if (document.getElementById(inputid).value) _client.application.postLabelSheet(document.getElementById(inputid).value, true);
+			};
+			result.push(button);
 		}
 		return result;
 	}

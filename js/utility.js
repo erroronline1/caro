@@ -135,10 +135,10 @@ const _client = {
 			}
 			return formdata;
 		},
-		postLabelSheet: (value) => {
+		postLabelSheet: (value, appendDate = null) => {
 			const formdata = new FormData();
-			formdata.append(LANG.GET('record.create_identifier'), value);
-			api.record("post", "identifier", null, formdata);
+			formdata.append(LANG.GET("record.create_identifier"), value);
+			api.record("post", "identifier", appendDate, formdata);
 		},
 		toClipboard: (node) => {
 			if (node.constructor.name === "HTMLInputElement") {
@@ -336,11 +336,7 @@ const _client = {
 			});
 			if (type === "ordered")
 				display = [...filters.ordered].map(function (node) {
-					return [...filters.received, ...filters.delivered, ...filters.archived]
-						.map((n) => n.parentNode)
-						.includes(node.parentNode)
-						? undefined
-						: node.parentNode;
+					return [...filters.received, ...filters.delivered, ...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
 				});
 			if (type === "received")
 				display = [...filters.received].map(function (node) {
