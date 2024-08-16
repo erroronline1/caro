@@ -2537,13 +2537,14 @@ Sample response
 {"render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'identifier')"},"content": [[{"type": "textblock","description": "Create an identifier that will connect database entries. A current timestamp will be added by default. On submitting you will receive a prepared PDF-file to print out scannable codes. You can scan an existing identifier to recreate a label sheet."},{"type": "scanner","hint": "e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended.","attributes": {"name": "Identifying data","maxlength": 128}}]]}}
 ```
 
-> POST ./api/api.php/record/identifier
+> POST ./api/api.php/record/identifier/{appendDate}
 
 Returns a download link to a temporary file with identifier label sheet.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {appendDate} | path parameter | optional | if provided a passed identifier will be checked for a timestamp at the end and appened one if not found |
 | payload | form data | required | identifier to be converted to a qr-code |
 
 Sample response
