@@ -478,7 +478,7 @@ class RECORD extends API {
 								'hint' => LANG::GET('record.create_identifier_hint'),
 								'attributes' => [
 									'name' => LANG::GET('record.create_identifier'),
-									'maxlength' => 128
+									'maxlength' => INI['limits']['identifier']
 								]
 							]
 						]

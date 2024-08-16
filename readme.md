@@ -75,7 +75,6 @@
 * complaints - acknowledgement permission?
 * print identifier sheet from record
 * limit record visibility to groups
-* qr code size (identifier) within setup.ini
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -985,6 +984,7 @@ records_search_similarity = 20 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
+identifier = 128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 user_image = 256 ; max pixels on longer side
 order_approvalsignature_image = 2048 ; max pixels on longer side

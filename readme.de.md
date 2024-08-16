@@ -938,6 +938,7 @@ records_search_similarity = 20 ; Prozent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
+identifier = 128 ; Zeichenlänge für Identifikator, je länger desto komplexer und fehleranfälliger wird der QR-Code. 17 Zeichen werden für einen Zeitstempel automatisch angefügt
 max_records = 128 ; maximal angezeigte offene Dokumentationen
 user_image = 256 ; maximale Pixel für längste Seite
 order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
