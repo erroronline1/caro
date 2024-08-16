@@ -412,7 +412,7 @@ class FILE extends API {
 									'attributes' => [
 										'value' => LANG::GET('file.manager_copy_path'),
 										'type' => 'button',
-										'onpointerup' => "_client.order.toClipboard('" . $file['path'] . "')",
+										'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
 										'class' => 'inlinebutton',
 										'data-filtered' => $file['path']
 									]
@@ -591,7 +591,7 @@ class FILE extends API {
 										'attributes' => [
 											'value' => LANG::GET('file.manager_copy_path'),
 											'type' => 'button',
-											'onpointerup' => "_client.order.toClipboard('" . $file['path'] . "')",
+											'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
 											'class' => 'inlinebutton'
 										]
 									],

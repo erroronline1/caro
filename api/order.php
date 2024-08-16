@@ -362,7 +362,7 @@ class ORDER extends API {
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
 								'name' => LANG::GET('order.ordernumber_label'),
 								'readonly' => true,
-								'onpointerup' => '_client.order.toClipboard(this)'
+								'onpointerup' => '_client.application.toClipboard(this)'
 							],
 							'hint' => LANG::GET('order.copy_value')
 						],
@@ -381,14 +381,14 @@ class ORDER extends API {
 													'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
 													'name' => LANG::GET('order.commission'),
 													'readonly' => true,
-													'onpointerup' => '_client.order.toClipboard(this)'
+													'onpointerup' => '_client.application.toClipboard(this)'
 												],
 												'hint' => LANG::GET('order.copy_value')
 											], [
 												'type' => 'button',
 												'attributes' => [
 													'value' => LANG::GET('menu.record_create_identifier'),
-													'onpointerup' => "_client.order.postLabelSheet('" . (UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '') . "')"
+													'onpointerup' => "_client.application.postLabelSheet('" . (UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '') . "')"
 												]
 											]
 										]
