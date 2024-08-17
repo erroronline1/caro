@@ -894,6 +894,7 @@ Manche Variables können wärend der Laufzeit angepasst werden. Dies betrifft al
 [application]
 defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
 issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
+require_complaint_selection = 1 ; 1: ja, 0: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
 timezone = "Europe/Berlin" ; Zeitzone für den Kalender
 
 [calendar]

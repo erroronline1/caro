@@ -305,11 +305,10 @@ class RECORD extends API {
 						'name' => 'DEFAULT_' . LANG::GET('record.record_complaint')
 					],
 					'content' => [
-						LANG::GET('record.record_complaint_no') => ['value' => '0', 'required' => true],
-						LANG::GET('record.record_complaint_yes') => ['value' => '1', 'required' => true],
+						LANG::GET('record.record_complaint_no') => boolval(INI['application']['require_complaint_selection']) ? ['value' => '0', 'required' => true] : ['value' => '0'],
+						LANG::GET('record.record_complaint_yes') => boolval(INI['application']['require_complaint_selection']) ? ['value' => '1', 'required' => true] : ['value' => '1'],
 					]
 				]
-
 			];
 		}
 
