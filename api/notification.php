@@ -222,7 +222,18 @@ class NOTIFICATION extends API {
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		$number = 0;
 		foreach ($data as $row){
-			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units']) && !$row['closed']) $number++;
+			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])){
+				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+					'values' => [
+						':id' => $row['id']
+						]
+					]);
+				$closed = $closed ? $closed[0] : '';
+				if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
+					|| (!$row['complaint'] && $closed)){
+					$number++;
+				}
+			} 
 		}
 		return $number;
 	}
