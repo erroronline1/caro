@@ -533,7 +533,7 @@ class APPLICATION extends API {
 						'content' => LANG::GET('record.record_complaints_landing_page', [':number' => $complaints]),
 						'description' => LANG::GET('menu.record_header'),
 						'attributes' => [
-							'data-type' => 'purchase'
+							'data-type' => 'record'
 						]
 					]
 				]
