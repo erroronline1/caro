@@ -127,7 +127,7 @@ class NOTIFICATION extends API {
 						]
 					]);
 				$closed = $closed ? $closed[0] : '';
-				if (PERMISSION::pending('complaintclosing', $closed)) $number++;
+				if (PERMISSION::pending('complaintclosing', $closed['closed'])) $number++;
 			}
 		} 
 		return $number;
