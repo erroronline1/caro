@@ -23,7 +23,7 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 define ('INI', parse_ini_file('setup.ini', true));
-define ('REQUEST', explode("/", substr(@utf8_encode($_SERVER['PATH_INFO']), 1)));
+define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'])), 1)));
 include_once('_sqlinterface.php');
 include_once('_language.php');
 include_once('_utility.php'); // general unities
