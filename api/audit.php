@@ -62,7 +62,7 @@ class AUDIT extends API {
 				$types = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_types');
 				foreach($types as $type){
 					$selecttypes[LANG::GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
-					if ($this->_requestedType===$type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
+					if ($this->_requestedType === $type['type']) $selecttypes[LANG::GET('audit.checks_type.' . $type['type'])]['selected'] = true;
 				}
 				foreach([
 					'incorporation', // incorporated products
@@ -145,6 +145,9 @@ class AUDIT extends API {
 					$linkdescription .= LANG::GET('audit.complaints_closed');
 				}
 				$links[$linkdescription] = ['href' => "javascript:api.record('get', 'record', '" . $identifier . "')"];
+				if (PERMISSION::pending('complaintclosing', $property['closed'])) {
+					$links[$linkdescription]['class'] = 'orange';
+				}
 			}
 			$current[] = [
 				'type' => 'links',
