@@ -64,11 +64,11 @@ class NOTIFICATION extends API {
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 		$today->setTime(0, 0);
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'], true);
-			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['timezone']));
+			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['application']['timezone']));
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new

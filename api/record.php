@@ -58,7 +58,7 @@ class RECORD extends API {
 		if (!$data) $this->response([], 204);
 		$data['closed'] = $data['closed'] ? json_decode($data['closed'], true) : [];
 
-		$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 		$data['closed'][$this->_passedIdentify] = [
 			'name' => $_SESSION['user']['name'],
 			'date' => $time->format('Y-m-d H:i')
@@ -282,7 +282,7 @@ class RECORD extends API {
 		];
 
 		if (isset($return['render']['form'])) {
-			$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 			$return['render']['content'][] = [
 				[
 					'type' => 'date',
@@ -517,7 +517,7 @@ class RECORD extends API {
 						new DateTime($possibledate);
 					}
 					catch (Exception $e){
-						$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+						$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 						if ($this->_appendDate) $content .= ' ' . $now->format('Y-m-d H:i');
 					}
 				}
@@ -700,7 +700,7 @@ class RECORD extends API {
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-					$now = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 					$entry_timestamp = $now->format('Y-m-d H:i');
 				}
 

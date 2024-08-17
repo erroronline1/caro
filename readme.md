@@ -934,14 +934,11 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
 
 ```
-; default fallback application language
-defaultlanguage = "en" ; en, de, etc. according to available language.xx.ini files; user can customize within profile
-
-; timezone for calendar handling
-timezone = "Europe/Berlin"
-
-; address for application and security issues
-issue_mail = "dev@erroronline.one" 
+; general application settings
+[application]
+defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.xx.ini files; user can customize within profile
+issue_mail = "dev@erroronline.one" ; address for application and security issues
+timezone = "Europe/Berlin" ; timezone for calendar handling
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
@@ -1071,6 +1068,7 @@ products_per_slide = 6
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay.
+* Only one timezone is supported.
 
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension.

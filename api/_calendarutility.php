@@ -120,7 +120,7 @@ class CALENDARUTILITY {
 	 */
 	public function days($format = '', $date = ''){
 		$result = [];
-		$date = new DateTime($date ? : 'now', new DateTimeZone(INI['timezone']));
+		$date = new DateTime($date ? : 'now', new DateTimeZone(INI['application']['timezone']));
 		$date->setTime(0, 0);
 		if ($format === 'week') {
 			$date->modify('- ' . ($date->format('N') - 1) . ' days');
@@ -219,12 +219,12 @@ class CALENDARUTILITY {
 		$alert = $span_start = $span_end = null; 
 		$alert = [LANG::GET('calendar.event_alert') => $columns[':alert'] ? ['checked' => true] : []];
 		
-		if ($columns[':span_start']) $span_start = new DateTime($columns[':span_start'], new DateTimeZone(INI['timezone']));
-		else $span_start = new DateTime('now', new DateTimeZone(INI['timezone']));
+		if ($columns[':span_start']) $span_start = new DateTime($columns[':span_start'], new DateTimeZone(INI['application']['timezone']));
+		else $span_start = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 
 		switch ($columns[':type']){
 			case 'schedule':
-				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['timezone']));
+				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['application']['timezone']));
 				else {
 					$span_end = clone $span_start;
 					$span_end->modify('+' . INI['calendar']['default_due'] . ' days');
@@ -282,7 +282,7 @@ class CALENDARUTILITY {
 				];
 				break;
 			case 'timesheet':
-				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['timezone']));
+				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(INI['application']['timezone']));
 				else {
 					$span_end = clone $span_start;
 					$span_end->modify('+1 hour');
@@ -465,7 +465,7 @@ class CALENDARUTILITY {
 		$holidays = $this->_holidays;
 		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
 
-		$easter = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$easter = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 		$easter->setTimestamp(easter_date($year));
 		foreach($this->_easter_holidays as $day => $offset){
 			$easterholiday = clone $easter;
@@ -576,7 +576,7 @@ class CALENDARUTILITY {
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($format, $date);
 
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
@@ -646,7 +646,7 @@ class CALENDARUTILITY {
 	 * 	]
 	 */
 	public function timesheetSummary($users = [], $from_date = '', $to_date = ''){
-		$datetimezone = new DateTimeZone(INI['timezone']);
+		$datetimezone = new DateTimeZone(INI['application']['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
 		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1970-01-01', $datetimezone);
 		$from_date->modify('first day of this month')->setTime(0, 0);

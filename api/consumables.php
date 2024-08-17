@@ -146,7 +146,7 @@ class CONSUMABLES extends API {
 				if ($denied) $approve['_denied'] = true;
 
 				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('formapproval', true)];
-				$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+				$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (in_array($permission, $_SESSION['user']['permissions'])){
 						$approve[$permission] = [
@@ -582,7 +582,7 @@ class CONSUMABLES extends API {
 						if (in_array(LANG::GET('consumables.edit_product_incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
 						else {
 							$product['incorporated'] = json_decode($product['incorporated'], true);
-							$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+							$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 							foreach(LANGUAGEFILE['permissions'] as $permission => $translation){
 								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
 									'name' => $_SESSION['user']['name'],

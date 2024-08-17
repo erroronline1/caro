@@ -684,7 +684,7 @@ class AUDIT extends API {
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
 			if ($order['received']){
-				$datetimezone = new DateTimeZone(INI['timezone']);
+				$datetimezone = new DateTimeZone(INI['application']['timezone']);
 				$now = new DateTime('now', $datetimezone);
 				$ordered = new DateTime($order['ordered'], $datetimezone);
 				$received = new DateTime($order['received'], $datetimezone);
@@ -1082,7 +1082,7 @@ class AUDIT extends API {
 			]
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 		foreach ($users as $user){
 			if ($user['id'] < 2) continue;
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
@@ -1113,7 +1113,7 @@ class AUDIT extends API {
 				foreach ($usertrainings as $row){
 					$attributes = [];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(INI['timezone']));
+						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
 						if ($expire < $today) $attributes = ['class' => 'red'];
 						else {
 							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');

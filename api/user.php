@@ -276,11 +276,11 @@ class USER extends API {
 						':ids' => $user['id'] ? : 0
 					]
 				]);
-				$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+				$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				foreach ($trainings as $row){
 					$attributes = [];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(INI['timezone']));
+						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
 						if ($expire < $today) $attributes = ['class' => 'red'];
 						else {
 							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
@@ -401,7 +401,7 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
@@ -531,7 +531,7 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+					$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
@@ -669,11 +669,11 @@ class USER extends API {
 						':ids' => $user['id'] ? : 0
 					]
 				]);
-				$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+				$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				foreach ($trainings as $row){
 					$attributes = [];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(INI['timezone']));
+						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
 						if ($expire < $today) $attributes = ['class' => 'red'];
 						else {
 							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');

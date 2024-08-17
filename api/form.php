@@ -60,7 +60,7 @@ class FORM extends API {
 
 				$approve['approval'] = $approve['approval'] ? json_decode($approve['approval'], true) : []; 
 				$tobeapprovedby = PERMISSION::permissionFor('formapproval', true);
-				$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+				$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.' . $permission), $approveas)){
 						$approve['approval'][$permission] = [

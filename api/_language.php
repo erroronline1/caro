@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$language = INI['defaultlanguage'];
+$language = INI['application']['defaultlanguage'];
 if (array_key_exists('user', $_SESSION) && array_key_exists('language', $_SESSION['user']['app_settings'])) $language = $_SESSION['user']['app_settings']['language'];
-$file = file_exists('language.' . $language . '.ini') ? 'language.' . $language . '.ini' : 'language.' . INI['defaultlanguage'] . '.ini';
+$file = file_exists('language.' . $language . '.ini') ? 'language.' . $language . '.ini' : 'language.' . INI['application']['defaultlanguage'] . '.ini';
 
 define ('LANGUAGEFILE', parse_ini_file($file, true));
 

@@ -890,14 +890,11 @@ Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenliste
 Manche Variables können wärend der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
 
 ```
-; Standard Anwendungssprache
-defaultlanguage = "en" ; en, de, etc. entsprechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
-
-; Zeitzone für den Kalender
-timezone = "Europe/Berlin"
-
-; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
-issue_mail = "dev@erroronline.one" 
+; general application settings
+[application]
+defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
+issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
+timezone = "Europe/Berlin" ; Zeitzone für den Kalender
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31" ; Monat-Tag
@@ -1027,6 +1024,7 @@ products_per_slide = 6
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Die Produktdatenbank und anhängige Funktionen (Bestellungen, Artikelsuche) haben eine Bearbeitungszeit von etwa 0,5 Sekunden pro 100k Einträgen. Bei 1m Einträgen kann dies zu einer Verzögerung von bis zu 5 Sekunden führen.
+* Es wird nur eine Zeitzone unterstützt.
 
 ## Anpassung
 * Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können.

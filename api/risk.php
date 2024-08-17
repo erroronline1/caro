@@ -42,7 +42,7 @@ class RISK extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
-				$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+				$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				$risk = [
 					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
 					':risk' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk')),
@@ -78,7 +78,7 @@ class RISK extends API {
 				break;
 			case 'PUT':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
-				$date = new DateTime('now', new DateTimeZone(INI['timezone']));
+				$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				$risk = [
 					':id' => intval($this->_requestedID),
 					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),

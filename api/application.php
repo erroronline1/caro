@@ -106,7 +106,7 @@ class APPLICATION extends API {
 		];
 		$tos = [];
 		$replacements = [
-			':issue_mail' => INI['issue_mail']
+			':issue_mail' => INI['application']['issue_mail']
 		];
 		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
@@ -553,7 +553,7 @@ class APPLICATION extends API {
 		];
 
 		$displayevents = $displayabsentmates = '';
-		$today = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 		foreach ($thisDaysEvents as $row){
 			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
