@@ -47,9 +47,26 @@ class RECORD extends API {
 	 *
 	 */
 	public function close(){
-		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('recordsclosing') && !PERMISSION::permissionFor('complaintclosing')) $this->response([], 401);
+		if (!in_array($this->_passedIdentify, PERMISSION::permissionFor('recordsclosing', true)) && !in_array($this->_passedIdentify, PERMISSION::permissionFor('complaintclosing', true))) $this->response([], 401);
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
+			'values' => [
+				':identifier' => $this->_requestedID
+			]
+		]);
+		$data = $data ? $data[count($data) - 1] : []; // most recent entry suffices 
+		if (!$data) $this->response([], 204);
+		$data['closed'] = $data['closed'] ? json_decode($data['closed'], true) : [];
+
+		$time = new DateTime('now', new DateTimeZone(INI['timezone']));
+		$data['closed'][$this->_passedIdentify] = [
+			'name' => $_SESSION['user']['name'],
+			'date' => $time->format('Y-m-d H:i')
+		];
+
 		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
 			'values' => [
+				':closed' => json_encode($data['closed']),
 				':identifier' => $this->_requestedID
 			]
 		]);
@@ -759,7 +776,6 @@ class RECORD extends API {
 			case 'GET':
 				$return = ['render' => []];
 				$body = [];
-				$closed = false;
 				// summarize content
 				$content = $this->summarizeRecord();
 				$body[] = [
@@ -860,16 +876,43 @@ class RECORD extends API {
 							]
 						]
 					];
-					if (PERMISSION::permissionFor('recordsclosing') && !$content['closed']){
+					
+					$content['closed'] = $content['closed'] ? json_decode($content['closed'], true) : [];
+					$approvalposition = [];
+					foreach ($content['closed'] as $role => $property){
 						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => LANG::GET('record.record_mark_as_closed'),
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ."', render: '" . LANG::GET('record.record_mark_as_closed_info') . "', options:{".
-									"'" . LANG::GET('general.cancel_button') . "': false,".
-									"'" . LANG::GET('record.record_mark_as_closed') . "': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "')}})"
-							]
+							'type' => 'textblock',
+							'description' => LANG::GET('record.record_closed', [':role' => LANG::GET('permissions.' . $role), ':name' => $property['name'], ':date' => $property['date']])
+						]);
+					}
+
+					if ($content['complaint'] && PERMISSION::permissionFor('complaintclosing')){
+						foreach(PERMISSION::pending('complaintclosing', $content['closed']) as $position){
+							$approvalposition[LANG::GET('permissions.' . $position)] = [
+								'value' => $position,
+								'onchange' => "if (this.checked) new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ." ' + this.name, render: '" . LANG::GET('record.record_complaint_mark_as_closed_info') . "', options:{".
+								"'" . LANG::GET('general.cancel_button') . "': false,".
+								"'" . LANG::GET('record.record_mark_as_closed') . ' ' . LANG::GET('permissions.' . $position) ."': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value)} else this.checked = false})"
+							];
+						}
+					}
+					elseif (!$content['closed'] && PERMISSION::permissionFor('recordsclosing')) {
+						foreach(PERMISSION::pending('recordsclosing', $content['closed']) as $position){
+							$approvalposition[LANG::GET('permissions.' . $position)] = [
+								'value' => $position,
+								'onchange' => "if (this.checked) new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ." ' + this.name, render: '" . LANG::GET('record.record_mark_as_closed_info') . "', options:{".
+								"'" . LANG::GET('general.cancel_button') . "': false,".
+								"'" . LANG::GET('record.record_mark_as_closed') . ' ' . LANG::GET('permissions.' . $position) . "': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value)} else this.checked = false})"
+							];
+						}
+					}
+					if ($approvalposition){
+						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
+									'type' => 'checkbox',
+									'content' => $approvalposition,
+									'description' => LANG::GET('record.record_mark_as_closed')
 						]);
 					}
 				}
@@ -930,12 +973,21 @@ class RECORD extends API {
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 			$linkdisplay = $row['identifier'] . ($row['complaint'] ? ' *' : '');
 			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-			if ($row['closed'] == 1 /*no type comparison*/ || count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+			$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+				'values' => [
+					':id' => $row['id']
+					]
+				]);
+			$closed = $closed ? $closed[0] : '';
+			$closed = json_decode($closed['closed'] ? : '', true);
+			if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
+				|| (!$row['complaint'] && $closed)
+				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
 				$contexts[$row['context']][$targets[$target]][$linkdisplay]['style'] = 'display:none';
 				$contexts[$row['context']][$targets[$target]][$linkdisplay]['data-filtered_max'] = $row['id'];
 			}
 		}
-		// delete double entries, reset filted_max state
+		// delete double entries, reset filtered_max state
 		foreach($contexts as &$context){
 			$previouslydeleted = null;
 			foreach ($context['unassigned'] as $identifier => $attributes){
@@ -1030,12 +1082,14 @@ class RECORD extends API {
 			'images' => [],
 			'title' => LANG::GET('menu.record_summary'),
 			'date' => date('y-m-d H:i'),
-			'closed' => false
+			'closed' => false,
+			'complaint' => false
 		];
 		$accumulatedcontent = [];
 		foreach ($data as $row){
 			if (!PERMISSION::permissionIn($row['restricted_access'])) continue;
-			$summary['closed'] = boolval($row['closed']);
+			$summary['closed'] = $row['closed']; // last row decides
+			if ($row['complaint']) $summary['complaint'] = true; // does record contain any complaints?
 			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => $row['form_date']]);
 			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
 
@@ -1074,7 +1128,7 @@ class RECORD extends API {
 						switch ($type){
 							case 'form':
 							case 'full':
-								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ($entry['complaint'] ? LANG::GET('record.record_export_complaint') : '') . ")\n";
+								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ($entry['complaint'] ? ' ' . LANG::GET('record.record_export_complaint') : '') . ")\n";
 								break;
 							case 'simplified':
 								$summary['content'][$form][$key] = $displayvalue . "\n";

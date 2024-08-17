@@ -522,7 +522,7 @@ class PERMISSION {
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
 		$approved = true;
 		foreach(self::permissionFor($function, true) as $permission){
-			if (!array_key_exists($permission, $approvalcolumn)) $approved = false;
+			if (!$approvalcolumn || !array_key_exists($permission, $approvalcolumn)) $approved = false;
 		}
 		return $approved;
 	}
@@ -544,7 +544,7 @@ class PERMISSION {
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
 		$pending = [];
 		foreach(self::permissionFor($function, true) as $permission){
-			if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $approvalcolumn)) $pending[] = $permission;
+			if (!$approvalcolumn || array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $approvalcolumn)) $pending[] = $permission;
 		}
 		return $pending;
 	}

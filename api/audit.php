@@ -120,7 +120,13 @@ class AUDIT extends API {
 			if ($row['complaint']){
 				$year = substr($row['date'], 0, 4);
 				if (!isset($entries[$year])) $entries[$year] = [];
-				$entries[$year][$row['identifier']] = ['closed' => $row['closed'], 'units' => $row['units']];
+				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+					'values' => [
+						':id' => $row['id']
+						]
+					]);
+				$closed = $closed ? $closed[0] : '';
+				$entries[$year][$row['identifier']] = ['closed' => json_decode($closed['closed'] ? : '', true), 'units' => $row['units']];
 			}
 		}
 		//order by year descending
@@ -130,12 +136,14 @@ class AUDIT extends API {
 			$current[] = [
 				'type' => 'textblock',
 				'description' => strval($year),
-				'content' => LANG::GET('audit.complaints_summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => boolval($c['closed'])))])
+				'content' => LANG::GET('audit.complaints_summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
 			];
 			foreach ($cases as $identifier => $property){
 				$units = implode(', ', array_map(Fn($u)=> LANGUAGEFILE['units'][$u], explode(',', $property['units'])));
 				$linkdescription = LANG::GET('audit.complaints_case_description', [':identifier' => $identifier, ':units' => $units]);
-				if ($property['closed']) $linkdescription .= LANG::GET('audit.complaints_closed');
+				if (PERMISSION::fullyapproved('complaintclosing', $property['closed'])) {
+					$linkdescription .= LANG::GET('audit.complaints_closed');
+				}
 				$links[$linkdescription] = ['href' => "javascript:api.record('get', 'record', '" . $identifier . "')"];
 			}
 			$current[] = [

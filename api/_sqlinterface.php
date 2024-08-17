@@ -643,12 +643,16 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
 		'records_identifiers' => [
-			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(IFNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, MIN(IFNULL(r.closed, 0)) AS closed, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
-			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(ISNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, MIN(ISNULL(r.closed, 0)) AS closed, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
+			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(IFNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
+			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(ISNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
+		],
+		'records_closed' => [
+			'mysql' => "SELECT closed FROM caro_records WHERE id = :id",
+			'sqlsrv' => "SELECT closed FROM caro_records WHERE id = :id"
 		],
 		'records_close' => [
-			'mysql' => "UPDATE caro_records SET closed = 1 WHERE identifier = :identifier",
-			'sqlsrv' => "UPDATE caro_records SET closed = 1 WHERE identifier = :identifier"
+			'mysql' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier",
+			'sqlsrv' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier"
 		],
 
 

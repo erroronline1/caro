@@ -128,6 +128,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
 * ISO 13485 8.2.2 Reklamationsbearbeitung
     * Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt. Eine Übersicht kann im Audit-Modul angezeigt werden.
+    * Das als abgeschlossen Kennzeichnen von Aufzeichnungen, die eine Reklamation beinhalten erfordert eine Aktion aller definierter Rollen.
     * siehe [Werkzeuge](#werkzeuge)
 * ISO 13485 8.2.4 Internes Audit
     * Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für
@@ -462,7 +463,7 @@ Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesb
 
 Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
-Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen.
+Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.
 
 Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Formulare hat. Es ist Ermessenssache ob Formularpakete so sinnvoll eingesetzt werden können:
 * Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
@@ -495,13 +496,17 @@ graph TD;
 
     records-->summaries((Dokumentationen));
     summaries-->recorddb3[(Aufzeichnungsdatenbank)]
-    recorddb3-->|"nicht abgeschlossen und
+    recorddb3-->|"nicht vollständig abgeschlossen und
     innerhalb der Grenzmenge"|displayids[Anzeige des Identifikators];
     recorddb3-->|Filter trifft zu|displayids;
     displayids-->|Auswahl|summary["zeige Zusammenfassung an
     sofern Berechtigungen übereinstimmen"];
-    summary-->|Bereichsleiter, Leitung, QMB|close[abschließen];
-    close-->recorddb3
+    summary-->close[abschließen];
+    close-->complaint{Reklamation};
+    complaint-->|ja|complaintclose[Verantwortliche Person, Bereichsleiter UND QMB];
+    complaintclose-->recorddb3;
+    complaint-->|nein|nocomplaintclose[Bereichsleiter oder Leitung];
+    nocomplaintclose-->recorddb3;
     summary-->export[exportieren];
     export-->pdf("Zusammenfassung als PDF,
     angehängte Dateien");
@@ -966,6 +971,7 @@ calendaredit = "ceo, qmo, supervisor" ; Änderung, Löschung oder Abschluss von 
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach telefonischer Meldung
 calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
 calendarfulltimesheetexport = "ceo, human_ressources" ; Arbeitszeitexporte aller Nutzer, zu fremden Arbeitszeiten beitragen
+complaintclosing = "supervisor, qmo, prrc" ; obige Warnung beachten - Dokumentationen mit Reklamationen als abgeschlossen kennzeichnen
 csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
 csvrules = "qmo" ; neue CSV-Filter anlegen
 externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente
@@ -982,7 +988,7 @@ orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
 orderprocessing = "purchase"; Bestellungen bearbeiten
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
-recordsclosing = "ceo, qmo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen
+recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
 texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
 users = "ceo, qmo" ; Nutzer anlegen, bearbeiten und löschen

@@ -189,7 +189,7 @@ $queries = [
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author_id` int NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`closed` tinyint NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`complaint` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -415,7 +415,7 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	closed tinyint NULL," .
+				"	closed varchar(MAX) tinyint NULL DEFAULT NULL," .
 				"	complaint tinyint NULL" .
 				");"
 				,

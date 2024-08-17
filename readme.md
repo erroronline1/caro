@@ -72,7 +72,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* complaints - acknowledgement permission?
 
 #### planning considerations
 * list / reminder for unfinished cases, current state?
@@ -169,6 +168,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.
 * ISO 13485 8.2.2 Complaint handling
     * Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed within the audit module.
+    * Closing records containing a complaint requires action from all defined roles.
     * see [Tools](#tools)
 * ISO 13485 8.2.4 Internal audit
     * The audit module aquires data from the application and is partially able to export
@@ -501,7 +501,7 @@ The identifier is always a QR-code with additional readable content that will ap
 
 Checking for completeness of form bundles can be applied on display of a record summary.
 
-Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default.
+Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
 
 If records contain data from restricted forms, summaries will only contain these data if the requesting user has the permission to handle the form as well. It is up to you if it is reasonable to handle form bundles this way:
 * On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
@@ -535,12 +535,17 @@ graph TD;
 
     records-->summaries((record summary));
     summaries-->recorddb3[(record database)]
-    recorddb3-->|not closed and within limit|displayids[display identifier];
+    recorddb3-->|"not fully closed
+    and within limit"|displayids[display identifier];
     recorddb3-->|matching filter|displayids;
     displayids-->|select|summary["display summary
     if permissions match"];
-    summary-->|supervisor, admin or ceo|close[close];
-    close-->recorddb3
+    summary-->close[close];
+    close-->complaint{complaint};
+    complaint-->|yes|complaintclose[prrc, supervisor AND qmo];
+    complaintclose-->recorddb3;
+    complaint-->|no|nocomplaintclose[supervisor or ceo];
+    nocomplaintclose-->recorddb3;
     summary-->export[export];
     export-->pdf("summary as pdf,
     attached files");
@@ -1010,6 +1015,7 @@ calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entr
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert sick days after calling in
 calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
 calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
+complaintclosing = "supervisor, qmo, prrc" ; SEE WARNING ABOVE - close case documentation containing a complaint
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
 csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
@@ -1026,7 +1032,7 @@ orderdisplayall = "purchase" ; display all orders by default, not only for own u
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products 
-recordsclosing = "ceo, qmo, supervisor" ; mark record as closed
+recordsclosing = "ceo, supervisor" ; mark record as closed
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
 users = "ceo, qmo" ; add and edit application users
