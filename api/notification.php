@@ -106,6 +106,34 @@ class NOTIFICATION extends API {
 	}
 
 	/**
+	 *                     _     _     _       
+	 *   ___ ___ _____ ___| |___|_|___| |_ ___ 
+	 *  |  _| . |     | . | | .'| |   |  _|_ -|
+	 *  |___|___|_|_|_|  _|_|__,|_|_|_|_| |___|
+	 *                |_|
+	 * notify on open records containing complaints (currently landing page only)
+	 * especially to inform any defined roles but supervisors about any existing open complaints
+	 * ceo too keeping them informed
+	 */
+	public function complaints(){
+		if (!PERMISSION::permissionFor('complaintclosing') && !array_intersect(['ceo'], $_SESSION['user']['permissions'])) return 0;
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
+		$number = 0;
+		foreach ($data as $row){
+			if ($row['complaint']){
+				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+					'values' => [
+						':id' => $row['id']
+						]
+					]);
+				$closed = $closed ? $closed[0] : '';
+				if (PERMISSION::pending('complaintclosing', $closed)) $number++;
+			}
+		} 
+		return $number;
+	}
+
+	/**
 	 *                                 _   _
 	 *   ___ ___ ___ ___ _ _ _____ ___| |_| |___ ___
 	 *  |  _| . |   |_ -| | |     | .'| . | | -_|_ -|

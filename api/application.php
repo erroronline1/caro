@@ -519,6 +519,26 @@ class APPLICATION extends API {
 			];
 		}
 		
+		// open complaints
+		$complaints = $notifications->complaints();
+		if ($complaints){
+			$tiles[] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onpointerup' => "api.audit('get', 'checks', 'complaints')",
+				],
+				'content' => [
+					[
+						'type' => 'textblock',
+						'content' => LANG::GET('record.record_complaints_landing_page', [':number' => $complaints]),
+						'description' => LANG::GET('menu.record_header'),
+						'attributes' => [
+							'data-type' => 'purchase'
+						]
+					]
+				]
+			];
+		}
 		if (count($tiles)) $result['render']['content'][] = $tiles;
 
 		// calendar scheduled events
