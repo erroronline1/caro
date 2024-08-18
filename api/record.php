@@ -970,15 +970,19 @@ class RECORD extends API {
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
 			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
-			$linkdisplay = $row['identifier'] . ($row['complaint'] ? ' *' : '');
-			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
-			$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+			$touched = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
 				'values' => [
 					':id' => $row['id']
 					]
 				]);
-			$closed = $closed ? $closed[0] : '';
-			$closed = json_decode($closed['closed'] ? : '', true);
+			$touched = $touched ? $touched[0] : '';
+			$linkdisplay = LANG::GET('record.record_list_touched', [
+				':identifier' => $row['identifier'],
+				':date' => $touched['date'],
+				':form' => $touched['form_name']
+				]) . ($row['complaint'] ? ' *' : '');
+			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+			$closed = json_decode($touched['closed'] ? : '', true);
 			if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
 				|| (!$row['complaint'] && $closed)
 				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
