@@ -120,13 +120,13 @@ class RECORD extends API {
 		$form = $form ? $form[0] : null;
 		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . date('Y-m-d H:i')),
+			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => $form['date']]),
-			'date' => LANG::GET('record.form_export_exported', [':date' => date('y-m-d H:i')])
+			'date' => LANG::GET('record.form_export_exported', [':date' => $this->_currentdate->format('y-m-d H:i')])
 		];
 
 		function printable($element){
@@ -731,7 +731,7 @@ class RECORD extends API {
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . date('YmdHis') . '_' . $fileinput)], null, false)){
+					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_currentdate->format('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
 								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[$i], INI['limits']['record_image'], UTILITY_IMAGE_REPLACE);
@@ -1074,13 +1074,13 @@ class RECORD extends API {
 			]
 		]);
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . date('Y-m-d H:i')),
+			'filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => LANG::GET('menu.record_summary'),
-			'date' => date('y-m-d H:i'),
+			'date' => $this->_currentdate->format('y-m-d H:i'),
 			'closed' => false,
 			'complaint' => false
 		];

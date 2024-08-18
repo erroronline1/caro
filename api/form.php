@@ -489,7 +489,7 @@ class FORM extends API {
 				}
 				// recursively replace images with actual $_FILES content according to content nesting
 				if (array_key_exists('composedComponent_files', $_FILES)){
-					$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . date('YmdHis')]);
+					$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $this->_currentdate->format('YmdHis')]);
 					$files=[];
 					foreach($uploads as $path){
 						UTILITY::resizeImage($path, INI['limits']['form_image'], UTILITY_IMAGE_REPLACE);

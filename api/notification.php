@@ -92,12 +92,12 @@ class NOTIFICATION extends API {
 					]);		   
 			}
 		}
-		$alerts = $calendar->alert(date('Y-m-d'));
+		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (array_key_exists($event['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
 		}
 
-		$events = $calendar->getWithinDateRange(null, date('Y-m-d'));
+		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = 0;
 		foreach ($events as $row){
 			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;

@@ -228,14 +228,14 @@ class CSVFILTER extends API {
 							'type' => 'number',
 							'attributes' => [
 								'name' => LANG::GET('csvfilter.use_filter_month'),
-								'value' => date('m'),
+								'value' => $this->_currentdate->format('m'),
 								'readonly' => true
 							]
 						], [
 							'type' => 'number',
 							'attributes' => [
 								'name' => LANG::GET('csvfilter.use_filter_year'),
-								'value' => date('Y'),
+								'value' => $this->_currentdate->format('Y'),
 								'readonly' => true
 							]
 						]

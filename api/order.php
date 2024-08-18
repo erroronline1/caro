@@ -1548,14 +1548,14 @@ class ORDER extends API {
 		// handle attachments
 		$attachments = [];
 		if (array_key_exists(LANG::PROPERTY('order.attach_photo'), $_FILES) && $_FILES[LANG::PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [date('YmdHis')]));
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
 		if (array_key_exists(LANG::PROPERTY('order.attach_file'), $_FILES) && $_FILES[LANG::PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [date('YmdHis')]));
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);

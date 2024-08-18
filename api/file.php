@@ -398,10 +398,11 @@ class FILE extends API {
 								$regulatory_context[$value] = ['value' => $key];
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
+							$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(INI['application']['timezone']));
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
-									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path'])), ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => date('Y-m-d H:i', filemtime('.' . $file['path']))])),
+									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => $filedate->format('Y-m-d H:i'), ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => $filedate->format('Y-m-d H:i')])),
 									'content' => [
 										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 									],
@@ -517,10 +518,11 @@ class FILE extends API {
 						$content=[];
 						foreach ($folders as $folder){
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
+							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone(INI['application']['timezone']));
 							array_push($result['render']['content'][0],
 								[
 									'type' => 'links',
-									'description' => LANG::GET('file.manager_folder_header', [':date' => date('Y-m-d H:i', filemtime($folder))]),
+									'description' => LANG::GET('file.manager_folder_header', [':date' => $filedate->format('Y-m-d H:i')]),
 									'content' => [
 										$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]
 									]
@@ -578,10 +580,11 @@ class FILE extends API {
 						foreach ($files as $file){
 							if ($file) {
 								$file = ['path' => substr($file, 1), 'name' => pathinfo($file)['basename']];
+								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(INI['application']['timezone']));
 								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
-										'description' => date('Y-m-d H:i', filemtime('.' . $file['path'])),
+										'description' => $filedate->format('Y-m-d H:i'),
 										'content' => [
 											$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 										]

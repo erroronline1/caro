@@ -77,7 +77,8 @@ class CALENDARUTILITY {
 	 * @return int affected rows
 	 */
 	public function complete($id = '0', $close = null, $alert = null){
-		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => date('Y-m-d')];
+		$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d')];
 		$sqlchunks = [];
 		$affected_rows = 0;
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [

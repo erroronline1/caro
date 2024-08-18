@@ -44,6 +44,11 @@ class API {
 	 * preset standard response code
 	 */
 	private $_httpResponse = 200;
+
+	/**
+	 * current date with correct timezone
+	 */
+	public $_currentdate;
 	
 	/**
 	 * constructor prepares payload and database connection
@@ -59,6 +64,8 @@ class API {
 		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
+
+		$this->_currentdate = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 
 		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > INI['lifespan']['idle'])){
 			session_unset();
