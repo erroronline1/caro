@@ -892,7 +892,7 @@ class RECORD extends API {
 								'onchange' => "if (this.checked) new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ." ' + this.name, render: '" . LANG::GET('record.record_complaint_mark_as_closed_info') . "', options:{".
 								"'" . LANG::GET('general.cancel_button') . "': false,".
 								"'" . LANG::GET('record.record_mark_as_closed') . ' ' . LANG::GET('permissions.' . $position) ."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value)} else this.checked = false})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
 							];
 						}
 					}
@@ -903,15 +903,15 @@ class RECORD extends API {
 								'onchange' => "if (this.checked) new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') ." ' + this.name, render: '" . LANG::GET('record.record_mark_as_closed_info') . "', options:{".
 								"'" . LANG::GET('general.cancel_button') . "': false,".
 								"'" . LANG::GET('record.record_mark_as_closed') . ' ' . LANG::GET('permissions.' . $position) . "': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value)} else this.checked = false})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
 							];
 						}
 					}
 					if ($approvalposition){
 						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
-									'type' => 'checkbox',
-									'content' => $approvalposition,
-									'description' => LANG::GET('record.record_mark_as_closed')
+							'type' => 'checkbox',
+							'content' => $approvalposition,
+							'description' => LANG::GET('record.record_mark_as_closed')
 						]);
 					}
 				}
