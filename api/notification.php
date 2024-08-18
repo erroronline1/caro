@@ -121,7 +121,7 @@ class NOTIFICATION extends API {
 		$number = 0;
 		foreach ($data as $row){
 			if ($row['complaint']){
-				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
 					'values' => [
 						':id' => $row['id']
 						]
@@ -251,7 +251,7 @@ class NOTIFICATION extends API {
 		$number = 0;
 		foreach ($data as $row){
 			if ($row['units'] && $row['context'] == 'casedocumentation' && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])){
-				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
 					'values' => [
 						':id' => $row['id']
 						]

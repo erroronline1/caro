@@ -646,9 +646,9 @@ class SQLQUERY {
 			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(IFNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
 			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(ISNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
 		],
-		'records_closed' => [
-			'mysql' => "SELECT closed FROM caro_records WHERE id = :id",
-			'sqlsrv' => "SELECT closed FROM caro_records WHERE id = :id"
+		'records_touched' => [
+			'mysql' => "SELECT closed, form_name, date FROM caro_records WHERE id = :id",
+			'sqlsrv' => "SELECT closed, form_name, date FROM caro_records WHERE id = :id"
 		],
 		'records_close' => [
 			'mysql' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier",

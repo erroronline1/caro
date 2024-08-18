@@ -120,7 +120,7 @@ class AUDIT extends API {
 			if ($row['complaint']){
 				$year = substr($row['date'], 0, 4);
 				if (!isset($entries[$year])) $entries[$year] = [];
-				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_closed', [
+				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
 					'values' => [
 						':id' => $row['id']
 						]
