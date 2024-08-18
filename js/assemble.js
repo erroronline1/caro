@@ -245,8 +245,8 @@ export class Dialog {
 						return response.target.returnValue;
 					case "confirm":
 						result = response.target.returnValue;
-						if (result === "true") return true;
-						else if (result === "false") return false;
+						if (result && result === "true") return true;
+						else if (!result || result === "false") return false;
 						return result;
 					default:
 						if (response.target.returnValue === "true") {
