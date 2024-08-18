@@ -74,7 +74,7 @@
 * unittests (frontend)
 
 #### planning considerations
-* list / reminder for unfinished cases, current state?
+* calendar reminder with message for unfinished cases, current state, ini lifespan 
 
 #### records considerations
 * linked files on separate external path, input type convert to link
