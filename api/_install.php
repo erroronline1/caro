@@ -415,7 +415,7 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	closed varchar(MAX) tinyint NULL DEFAULT NULL," .
+				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	complaint tinyint NULL" .
 				");"
 				,
