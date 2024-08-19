@@ -39,7 +39,7 @@ class LANG {
 	 */
 	public static function GET($request, $replace = [], $forceDefault = false){
 		$request = explode('.', $request);
-		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . INI['defaultlanguage'] . '.ini', true); 
+		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . INI['application']['defaultlanguage'] . '.ini', true); 
 
 		if (!array_key_exists($request[0], $languagefile) ||
 			!array_key_exists($request[1], $languagefile[$request[0]]) ||
