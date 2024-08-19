@@ -423,7 +423,7 @@ class ORDER extends API {
 								break;
 						}
 					}
-					if (!($row['ordered'] || $row['received']) && in_array($row['ordertype'], ['order', 'service'])) $status[LANG::GET('order.disapprove')] = [
+					if (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])) $status[LANG::GET('order.disapprove')] = [
 						'data_disapproved' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', render:JSON.parse('" . 
 							json_encode(
@@ -442,7 +442,7 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')] = [
+					if ($row['ordered'] && !($row['received'] || $row['delivered']) && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')] = [
 						'data_cancellation' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', render:JSON.parse('" . 
 							json_encode(
@@ -461,7 +461,7 @@ class ORDER extends API {
 							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
 					];
-					if ($row['received'] && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')] = [
+					if (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')] = [
 						'data_return' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', render:JSON.parse('" . 
 							json_encode(
@@ -586,12 +586,12 @@ class ORDER extends API {
 						'content' => $status
 					];
 					$autodelete = '';
-					if ($row['delivered'] && !$row['archived']){
+					if ($row['delivered'] && $row['received'] && !$row['archived']){
 						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600)), ':unit' => LANG::GET('units.' . $row['organizational_unit'])]);
 					}
 
 					// add statechange if applicable
-					if ($row['ordered'] && !$row['received'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) {
+					if ($row['ordered'] && !$row['received']  && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) {
 						$content[] = [
 							'type' => 'select',
 							'content' => $statechange,
