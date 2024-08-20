@@ -75,6 +75,8 @@
 * records: type complaints + neuversorgung, nacharbeit, service/reparatur (import as well) override option?
 * export form with filled in fields (auftragserteilung, schweigepflichtentbindung, empfangsbestätigung)
 * timeout indicator? pass ini settings to js?
+* reduce language export, exclude top keys
+* install-languagepacks reducing memory footprint
 
 #### planning considerations
 * calendar reminder with message for unfinished cases, current state, ini lifespan 
