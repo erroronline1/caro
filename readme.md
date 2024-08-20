@@ -74,6 +74,7 @@
 * unittests (frontend)
 * records: type complaints + neuversorgung, nacharbeit, service/reparatur (import as well) override option?
 * export form with filled in fields (auftragserteilung, schweigepflichtentbindung, empfangsbestätigung)
+* timeout indicator? pass ini settings to js?
 
 #### planning considerations
 * calendar reminder with message for unfinished cases, current state, ini lifespan 
