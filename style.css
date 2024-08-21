@@ -98,6 +98,7 @@ body > header {
 		font-size: 1.5em;
 	}
 
+	/* server connection loss */
 	& > div:nth-of-type(1) {
 		right: 1em;
 		top: 1em;
@@ -112,6 +113,7 @@ body > header {
 		z-index: 1;
 	}
 
+	/* session expired */
 	& > div:nth-of-type(2) {
 		right: 1em;
 		top: 1em;
@@ -126,11 +128,30 @@ body > header {
 		z-index: 1;
 	}
 
+	/* scoll process */
 	& > div:last-of-type {
 		left: 0;
 		height: 0.4em;
 		position: fixed;
 		background: var(--yellow);
+	}
+
+	.session-timeout{
+		right: 1em;
+		top: 1em;
+		height: 2em;
+		width: 2em;
+		position: fixed;
+		z-index: 1;
+
+		& .session-timeout__circle{
+			stroke-dasharray: 10 10;
+			stroke: var(--red);
+			transition: 0.35s stroke-dashoffset;
+			/* axis compensation */
+			transform: rotate(-90deg);
+			transform-origin: 50% 50%;
+		}
 	}
 }
 

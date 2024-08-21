@@ -114,6 +114,8 @@ export const api = {
 					_serviceWorker.onPostCache();
 					return;
 				}
+				// todo : process passed ini value, init if logged in, else render(0)
+				api.session_timeout.init(5000);
 				if (successFn) await successFn(data.body);
 			})
 			.catch((error) => {
@@ -176,6 +178,40 @@ export const api = {
 			top: 0,
 			behavior: "smooth",
 		});
+	},
+
+	/**
+	 *                   _               _   _                   _
+	 *   ___ ___ ___ ___|_|___ ___      | |_|_|_____ ___ ___ _ _| |_
+	 *  |_ -| -_|_ -|_ -| | . |   |     |  _| |     | -_| . | | |  _|
+	 *  |___|___|___|___|_|___|_|_|_____|_| |_|_|_|_|___|___|___|_|
+	 *                            |_____|
+	 * 
+	 * render the session timeout indicator in upper right corner
+	 */
+	session_timeout: {
+		circle: null,
+		init: function(length){
+			this.length = length;
+			this.stop = new Date().getTime() + length;
+			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
+			api.session_timeout.interval = setInterval(function(){
+				const remaining = api.session_timeout.stop - new Date().getTime();
+				api.session_timeout.render(100 * remaining / api.session_timeout.length);
+				if (remaining < 0) clearInterval(api.session_timeout.interval);
+			}, 1000);
+		},
+		length: null,
+		render: function (percent){
+			if (!this.circle) this.circle = document.querySelector('.session-timeout__circle');
+			percent = percent < 0 ? 0 : percent;
+			if (percent < 0 || !this.circle) return;
+			const circumference = this.circle.r.baseVal.value*2*Math.PI,
+				offset = circumference - percent / 100 * circumference;
+			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
+			this.circle.style.strokeDashoffset = offset;
+		},
+		stop: null,
 	},
 
 	/**
