@@ -75,7 +75,6 @@
 * records: type complaints + neuversorgung, nacharbeit, service/reparatur (import as well) override option?
 * export form with filled in fields (auftragserteilung, schweigepflichtentbindung, empfangsbestätigung)
 * timeout indicator? pass ini settings to js?
-* install-languagepacks reducing memory footprint
 
 #### planning considerations
 * calendar reminder with message for unfinished cases, current state, ini lifespan 
@@ -929,13 +928,13 @@ Firefox, Edge and most probably any chromium browser have previews for input dat
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
-* [Customize](#customisation) your appropriate language-file (language.XX.ini)
+* [Customize](#customisation) your appropriate language-files (language.XX.ini and _install.default.XX.ini)
 * Run api/_install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
 * Change system users default token immediately and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.xx.ini files and some settings in setup.ini
+Some variables can be edited during runtime. This applies for all *values* of language.XX.ini files and some settings in setup.ini
 
 ```
 ; general application settings
@@ -1076,9 +1075,9 @@ products_per_slide = 6
 * Only one timezone is supported.
 
 ## Customisation
-* The manual is intentionally editable to accomodate it to users comprehension.
+* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.xx.ini-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.ini-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [permission] (has no effect without consideration in role management within setup.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)

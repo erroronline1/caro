@@ -21,7 +21,6 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 define ('INI', parse_ini_file('setup.ini', true));
-include_once('language.php');
 
 $pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password']);
 
@@ -497,16 +496,20 @@ catch (Exception $e){
 		// add default user
 		$processing[] = $queries['install'][$driver]['insertions']['user'];
 		// add default manual entries according to set up language
-		foreach(LANGUAGEFILE['defaultmanual'] as $entry){
-			$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
-				':title' => $entry['title'],
-				':content' => $entry['content'],
-				':permissions' => $entry['permissions']
-			]);
-		}
-		foreach ($processing as $command){
-			echo $command . "\n";
-			$statement = $pdo->query($command);
+		$language = INI['application']['defaultlanguage'];
+		if ($file = file_exists('language.' . $language . '.ini') ? 'language.' . $language . '.ini' : false){
+			$languagefile = parse_ini_file($file, true);
+			foreach($languagefile['defaultmanual'] as $entry){
+				$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
+					':title' => $entry['title'],
+					':content' => $entry['content'],
+					':permissions' => $entry['permissions']
+				]);
+			}
+			foreach ($processing as $command){
+				echo $command . "\n";
+				$statement = $pdo->query($command);
+			}
 		}
 	}
 } 
