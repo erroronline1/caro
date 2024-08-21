@@ -57,11 +57,15 @@ class LANG {
 	}
 
 	/**
-	 * returns languagefile as transfer for js frontend
-	 * @return array LANGUAGEFILE
+	 * returns slightly reduced languagefile as transfer for js frontend
+	 * @return object
 	 */
 	public static function GETALL(){
-		return LANGUAGEFILE;
+		$return = LANGUAGEFILE;
+		foreach(['skills', 'formcontext', 'risk', 'regulatory'] as $unset) {
+			unset($return[$unset]);
+		}
+		return $return;
 	}
 	
 	/**

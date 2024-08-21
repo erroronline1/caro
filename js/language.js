@@ -36,7 +36,7 @@ class Lang {
 			!(request[1] in LANGUAGEFILE[request[0]]) ||
 			(2 in request && !(request[2] in LANGUAGEFILE[request[0]][request[1]]))
 		) {
-			return "undefined language";
+			return "undefined or not provided for client";
 		}
 		let result = (2 in request) ? LANGUAGEFILE[request[0]][request[1]][request[2]] : LANGUAGEFILE[request[0]][request[1]];
 		for (const [pattern, replacement] of Object.entries(replace)) {
