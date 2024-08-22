@@ -65,7 +65,7 @@ class APPLICATION extends API {
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 				],
 				'application' => [
-					'session_timeout_seconds' => INI['lifespan']['idle']
+					'session_timeout_seconds' => min(INI['lifespan']['idle'], ini_get('session.gc_maxlifetime'))
 				]]);
 			}
 			// select single user based on token
@@ -85,7 +85,7 @@ class APPLICATION extends API {
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 					],
 					'application' => [
-						'session_timeout_seconds' => INI['lifespan']['idle']
+						'session_timeout_seconds' => min(INI['lifespan']['idle'], ini_get('session.gc_maxlifetime'))
 					]
 				]);
 			}
