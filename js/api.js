@@ -202,11 +202,15 @@ export const api = {
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function(){
 				const remaining = api.session_timeout.stop - new Date().getTime();
-				api.session_timeout.render(100 * remaining / (api._settings.application.session_timeout_seconds * 1000), remaining);
-				if (remaining < 0) clearInterval(api.session_timeout.interval);
+				if (api._settings.application.session_timeout_seconds > 0 && remaining > 0){
+					api.session_timeout.render(100 * remaining / (api._settings.application.session_timeout_seconds * 1000), remaining);
+					return;
+				}
+				api.session_timeout.render(0);
+				clearInterval(api.session_timeout.interval);
 			}, 1000);
 		},
-		render: function (percent, remaining){
+		render: function (percent, remaining = 0){
 			if (!this.circle) this.circle = document.querySelector('.session-timeout__circle');
 			percent = percent < 0 ? 0 : percent;
 			if (percent < 0 || !this.circle) return;
