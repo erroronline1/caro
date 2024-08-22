@@ -46,7 +46,15 @@ class TOOL extends API {
 	public function calculator(){
 
 		// resin rigid/soft, destination weight -> weight rigid / weight soft
-		// silicone shore stiffness 20/35/65, destination weight -> weight parts, number parts
+		function parts_of_weight($parts = '', $weight = 0){
+			$parts = preg_split('/\W+/', $parts);
+			$sum = array_sum($parts);
+			$destination = [];
+			foreach($parts as $part) if ($part) $destination[] = ceil($weight * $part / $sum);
+			return implode(' / ', $destination);
+		}
+		// silicone shore stiffness 20/35/65, destination shore -> parts, percent
+		
 		// radial distance diameter, holes -> distance
 		$options = [];
 
