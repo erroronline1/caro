@@ -16,7 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
+session_set_cookie_params([
+	'domain' => $_SERVER['HTTP_HOST'],
+	'secure' => true,
+	'httponly' => true,
+]);
 session_start();
 
 ini_set('display_errors', 1); error_reporting(E_ALL);
