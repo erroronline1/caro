@@ -74,7 +74,6 @@
 * unittests (frontend)
 * records: type complaints + neuversorgung, nacharbeit, service/reparatur (import as well) override option?
 * export form with filled in fields (auftragserteilung, schweigepflichtentbindung, empfangsbestätigung)
-* timeout indicator? pass ini settings to js?
 
 #### planning considerations
 * calendar reminder with message for unfinished cases, current state, ini lifespan 
@@ -1491,6 +1490,7 @@ Response properties are
 * *render* (for assemble or toast)
 * *title* (dynamic page title updates)
 * *user* (user settings on login/reload)
+* *application* (application settings on login/reload)
 * *data* (filtered ids, record imports)
 * *response* (state messages, message type, affected ids, redirect path params, names)
 * *log* (csv-filter log)
@@ -1521,7 +1521,7 @@ Parameters
 
 Sample response
 ```
-{"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_error on line 1_token.png","app_settings":{"annualvacation":"2024-01-01 30","weeklyhours":"2024-01-01 39,5","initialovertime":false,"forceDesktop":"on","homeoffice":false,"primaryUnit":"prosthetics2"}}}
+{"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_dev.png","app_settings":{"forceDesktop":"on","annualvacation":"2023-01-01 30\r;2024-01-01 30","weeklyhours":"2024-05-01 5","initialovertime":"10","homeoffice":"on","primaryUnit":"prosthetics2","language":"en","theme":"light"},"cached_identity":"d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"},"application":{"session_timeout_seconds":"1440"}}
 ```
 
 > GET ./api/api.php/application/menu

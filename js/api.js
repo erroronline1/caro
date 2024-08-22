@@ -114,8 +114,7 @@ export const api = {
 					_serviceWorker.onPostCache();
 					return;
 				}
-				// todo : process passed ini value, init if logged in, else render(0)
-				api.session_timeout.init(5000);
+				api.session_timeout.init();
 				if (successFn) await successFn(data.body);
 			})
 			.catch((error) => {
@@ -191,9 +190,8 @@ export const api = {
 	 */
 	session_timeout: {
 		circle: null,
-		init: function(length){
-			this.length = length;
-			this.stop = new Date().getTime() + length;
+		init: function(){
+			this.stop = new Date().getTime() + this.length;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function(){
 				const remaining = api.session_timeout.stop - new Date().getTime();
@@ -201,7 +199,7 @@ export const api = {
 				if (remaining < 0) clearInterval(api.session_timeout.interval);
 			}, 1000);
 		},
-		length: null,
+		length: 0,
 		render: function (percent){
 			if (!this.circle) this.circle = document.querySelector('.session-timeout__circle');
 			percent = percent < 0 ? 0 : percent;
@@ -261,6 +259,7 @@ export const api = {
 						return;
 					}
 					window._user = data.user;
+					api.session_timeout.length = data.application.session_timeout_seconds ? data.application.session_timeout_seconds * 1000 : 0
 					if (_user.image) {
 						let applicationLabel;
 						while (!applicationLabel) {

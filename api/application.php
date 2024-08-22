@@ -63,6 +63,9 @@ class APPLICATION extends API {
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
+				],
+				'application' => [
+					'session_timeout_seconds' => INI['lifespan']['idle']
 				]]);
 			}
 			// select single user based on token
@@ -80,7 +83,11 @@ class APPLICATION extends API {
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
-				]]);
+					],
+					'application' => [
+						'session_timeout_seconds' => INI['lifespan']['idle']
+					]
+				]);
 			}
 		}
 		session_unset();
@@ -102,6 +109,9 @@ class APPLICATION extends API {
 						]
 					]
 				]
+			],
+			'application' => [
+				'session_timeout_seconds' => 0
 			]
 		];
 		$tos = [];
