@@ -145,8 +145,7 @@ body > header {
 		z-index: 1;
 
 		& .session-timeout__circle{
-			stroke-dasharray: 10 10;
-			stroke: var(--red);
+			stroke: var(--green);
 			transition: 0.35s stroke-dashoffset;
 			/* axis compensation */
 			transform: rotate(-90deg);
