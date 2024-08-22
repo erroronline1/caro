@@ -37,6 +37,45 @@ class TOOL extends API {
 	}
 
 	/**
+	 *           _         _     _
+	 *   ___ ___| |___ _ _| |___| |_ ___ ___
+	 *  |  _| .'| |  _| | | | .'|  _| . |  _|
+	 *  |___|__,|_|___|___|_|__,|_| |___|_|
+	 *
+	 */
+	public function calculator(){
+
+		// resin rigid/soft, destination weight -> weight rigid / weight soft
+		// silicone shore stiffness 20/35/65, destination weight -> weight parts, number parts
+		// radial distance diameter, holes -> distance
+		$options = [];
+
+		$result['render'] = ['form' => [
+			'data-usecase' => 'tool_calculator',
+			'action' => "javascript:api.tool('post', 'calculator', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "')"
+		],
+		'content' => [
+			[
+				[
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('tool.code_select_type'),
+						'onchange' => "api.tool('get', 'calculator', this.value)"
+					],
+					'content' => $options
+				],
+				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content'],
+			]
+		]];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				break;
+		}
+		$this->response($result);
+	}
+
+	/**
 	 *             _
 	 *   ___ ___ _| |___
 	 *  |  _| . | . | -_|
