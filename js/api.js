@@ -253,6 +253,8 @@ export const api = {
 				successFn = async function (data) {
 					await api.application("get","language");
 					await api.application("get", "menu");
+					api._settings.user = data.user;
+					api._settings.application = data.application;
 					if (data.render && data.render.form) {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
@@ -266,8 +268,6 @@ export const api = {
 						);
 						return;
 					}
-					api._settings.user = data.user;
-					api._settings.application = data.application;
 					if (api._settings.user.image) {
 						let applicationLabel;
 						while (!applicationLabel) {
