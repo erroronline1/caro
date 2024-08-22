@@ -216,7 +216,6 @@ export const api = {
 			else this.circle.classList.remove('warning');
 			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
 			this.circle.style.strokeDashoffset = offset;
-			console.log(percent, remaining/1000);
 		},
 		stop: null,
 	},
