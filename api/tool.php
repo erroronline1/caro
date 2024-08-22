@@ -44,18 +44,46 @@ class TOOL extends API {
 	 *
 	 */
 	public function calculator(){
-
 		// resin rigid/soft, destination weight -> weight rigid / weight soft
 		function parts_of_weight($parts = '', $weight = 0){
 			$parts = preg_split('/\W+/', $parts);
+			$weight = floatval($weight);
 			$sum = array_sum($parts);
 			$destination = [];
 			foreach($parts as $part) if ($part) $destination[] = ceil($weight * $part / $sum);
 			return implode(' / ', $destination);
 		}
 		// silicone shore stiffness 20/35/65, destination shore -> parts, percent
-		
-		// radial distance diameter, holes -> distance
+		function parts_of_attribute($attributes = '', $target = 0){
+			$attributes = preg_split('/\W+/', $attributes);
+			$target = floatval($target);
+			$parts = [];
+			$failsafe = 0;
+			// insert first value
+			foreach ($attributes as $attribute) {
+				if ($attribute >= $target) {
+					$parts[] = $attribute;
+				}
+			}
+			// iterate over values
+			do {
+				foreach ($attributes as $attribute) {
+					$mean = array_sum($parts)/count($parts);
+					if (($mean < $target && $attribute > $target) || ($mean > $target && $attribute < $target)) $parts[] = $attribute;
+				}
+				$failsafe++;
+			} while (array_sum($parts)/count($parts) != $target && $failsafe < 100);
+			$destination = [];
+			foreach (array_count_values($parts) as $part => $occurence) $destination[] = $occurence . " x " . $part . ' (' . round(100 * $occurence/count($parts), 2) .' %)';
+			return implode(' / ', $destination);
+		}		
+		// circular distance diameter, holes -> distance
+		function circular_distance($diameter = '', $holes = 1){
+			$diameter = floatval($diameter);
+			$holes = intval($holes);
+			if ($holes < 1) return '';
+			return strval(round(pi() * $diameter/ $holes, 2));
+		}
 		$options = [];
 
 		$result['render'] = ['form' => [
