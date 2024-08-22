@@ -20,6 +20,12 @@ import { assemble_helper, Dialog, Toast } from "./assemble.js";
 import { compose_helper } from "./compose.js";
 
 export const api = {
+
+	_settings: {
+		user: {},
+		application: {}
+	},
+
 	/**
 	 *                           _     _     _       _
 	 *   ___ ___ ___ _ _ ___ ___| |_ _| |___| |_ ___| |___ ___ ___
@@ -85,7 +91,7 @@ export const api = {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
 		api.loadindicator(true);
-		if (window._user && window._user.cached_identity && ["post", "put"].includes(method) && payload instanceof FormData) {
+		if (api._settings.user && api._settings.user.cached_identity && ["post", "put"].includes(method) && payload instanceof FormData) {
 			let sanitizedpayload = Object.fromEntries(payload);
 			for (const [key, value] of Object.entries(sanitizedpayload)) {
 				// remove file keys for being shifted to $_FILES within the stream
@@ -103,7 +109,7 @@ export const api = {
 				type: "application/json",
 			});
 			//console.log(payload, sanitizedpayload, b.size);
-			payload.append("_user_cache", await _.sha256(window._user.cached_identity + b.size.toString()));
+			payload.append("_user_cache", await _.sha256(api._settings.user.cached_identity + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {
@@ -191,23 +197,26 @@ export const api = {
 	session_timeout: {
 		circle: null,
 		init: function(){
-			this.stop = new Date().getTime() + this.length;
+			if (!('session_timeout_seconds' in api._settings.application)) api._settings.application.session_timeout_seconds = 0;
+			this.stop = new Date().getTime() + api._settings.application.session_timeout_seconds * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function(){
 				const remaining = api.session_timeout.stop - new Date().getTime();
-				api.session_timeout.render(100 * remaining / api.session_timeout.length);
+				api.session_timeout.render(100 * remaining / (api._settings.application.session_timeout_seconds * 1000), remaining);
 				if (remaining < 0) clearInterval(api.session_timeout.interval);
 			}, 1000);
 		},
-		length: 0,
-		render: function (percent){
+		render: function (percent, remaining){
 			if (!this.circle) this.circle = document.querySelector('.session-timeout__circle');
 			percent = percent < 0 ? 0 : percent;
 			if (percent < 0 || !this.circle) return;
 			const circumference = this.circle.r.baseVal.value*2*Math.PI,
 				offset = circumference - percent / 100 * circumference;
+			if (remaining / 1000 < 120) this.circle.classList.add('warning');
+			else this.circle.classList.remove('warning');
 			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
 			this.circle.style.strokeDashoffset = offset;
+			console.log(percent, remaining/1000);
 		},
 		stop: null,
 	},
@@ -258,21 +267,21 @@ export const api = {
 						);
 						return;
 					}
-					window._user = data.user;
-					api.session_timeout.length = data.application.session_timeout_seconds ? data.application.session_timeout_seconds * 1000 : 0
-					if (_user.image) {
+					api._settings.user = data.user;
+					api._settings.application = data.application;
+					if (api._settings.user.image) {
 						let applicationLabel;
 						while (!applicationLabel) {
 							await _.sleep(50);
 							applicationLabel = document.querySelector("[data-for=userMenu" + LANG.GET("menu.application_header") + "]>label");
 						}
 						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
-						applicationLabel.style.backgroundImage = "url('" + _user.image + "')";
+						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";
 						applicationLabel.style.backgroundSize = "cover";
 						applicationLabel.style.borderRadius = "50%";
 					}
-					if (_user.app_settings) {
-						for (const [key, value] of Object.entries(_user.app_settings)) {
+					if (api._settings.user.app_settings) {
+						for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
 							switch (key) {
 								case "forceDesktop":
 									if (value) {
