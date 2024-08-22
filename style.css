@@ -151,6 +151,9 @@ body > header {
 			transform: rotate(-90deg);
 			transform-origin: 50% 50%;
 		}
+		& .warning {
+			stroke: var(--red) !important;
+		}
 	}
 }
 
