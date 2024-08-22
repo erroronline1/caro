@@ -980,29 +980,29 @@ names[] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
 
 [lifespan]
-sharepoint =  48 ; HOURS, after these files will be deleted
-tmp =  24 ; HOURS, after these files will be deleted
-order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
-idle = 1440 ; SECONDS after which a session expires without intermittend request
-training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews
+idle = 2700 ; SECONDS after which a session expires without intermittend request
 mdr14_sample_interval = 365 ; DAYS until a new sample check is required as default value
 mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
+order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+sharepoint =  48 ; HOURS, after these files will be deleted
+tmp =  24 ; HOURS, after these files will be deleted
+training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews
 
 ; probability factor for similarity of texts in percent
 [likeliness]
 consumables_article_no_similarity = 70 ; percent
+csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; percent
 records_search_similarity = 20 ; percent
-csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
+form_image = 2048 ; max pixels on longer side
 identifier = 128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
-user_image = 256 ; max pixels on longer side
 order_approvalsignature_image = 2048 ; max pixels on longer side
-form_image = 2048 ; max pixels on longer side
 record_image = 2048 ; max pixels on longer side
 risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
+user_image = 256 ; max pixels on longer side
 
 ; permissions based of and matching languages.xx.ini permissions
 ; dynamic handling for modules and methods

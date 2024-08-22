@@ -934,29 +934,29 @@ names[] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
 names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 [lifespan]
-sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
-tmp =  24 ; Stunden nach denen Dateien gelöscht werden
-order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
-idle = 1440 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
-training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
+idle = 2700 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
 mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
 mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
+order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
+sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
+tmp =  24 ; Stunden nach denen Dateien gelöscht werden
+training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
 
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
 [likeliness]
 consumables_article_no_similarity = 70 ; Prozent
+csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; Prozent
 records_search_similarity = 20 ; Prozent
-csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 [limits]
+form_image = 2048 ; maximale Pixel für längste Seite
 identifier = 128 ; Zeichenlänge für Identifikator, je länger desto komplexer und fehleranfälliger wird der QR-Code. 17 Zeichen werden für einen Zeitstempel automatisch angefügt
 max_records = 128 ; maximal angezeigte offene Dokumentationen
-user_image = 256 ; maximale Pixel für längste Seite
 order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
-form_image = 2048 ; maximale Pixel für längste Seite
 record_image = 2048 ; maximale Pixel für längste Seite
 risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
+user_image = 256 ; maximale Pixel für längste Seite
 
 ; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
 ; dynamische Verarbeitung innerhalb der Module
