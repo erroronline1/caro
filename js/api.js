@@ -1269,6 +1269,7 @@ export const api = {
 			},
 			title = {
 				code: LANG.GET("menu.tools_digital_codes"),
+				calculator: LANG.GET("menu.tools_calculator"),
 				scanner: LANG.GET("menu.tools_scanner"),
 				stlviewer: LANG.GET("menu.tools_stl_viewer"),
 			};
@@ -1276,7 +1277,14 @@ export const api = {
 			case "get":
 				break;
 			case "post":
-				payload = _.getInputs("[data-usecase=tool_create_code]", true);
+				switch (request[1]) {
+					case "calculator":
+						payload = _.getInputs("[data-usecase=tool_calculator]", true);
+						break;
+					case "code":
+						payload = _.getInputs("[data-usecase=tool_create_code]", true);
+						break;
+				}
 				break;
 			default:
 				return;
