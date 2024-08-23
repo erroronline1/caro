@@ -113,15 +113,12 @@ class RECORD extends API {
 	 */
 	public function exportform(){
 
-		$context = $form_name = $form_id = null;
+		$context = $form_id = null;
 		$identifier = null;
-		$grouped_checkboxes = [];
 		if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
-		if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
 		if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
-		if ($complaint = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_complaint'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_complaint')});
 
 		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
 			'values' => [
@@ -341,7 +338,7 @@ class RECORD extends API {
 
 		if (isset($return['render']['form'])) {
 			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
-			$return['render']['content'][] = [
+			$defaults = [
 				[
 					'type' => 'date',
 					'attributes' => [
@@ -356,18 +353,22 @@ class RECORD extends API {
 						'value' => $now->format('H:i'),
 						'required' => true
 					]
-				],
-				[
-					'type' => 'radio',
-					'attributes' => [
-						'name' => 'DEFAULT_' . LANG::GET('record.record_complaint')
-					],
-					'content' => [
-						LANG::GET('record.record_complaint_no') => boolval(INI['application']['require_complaint_selection']) ? ['value' => '0', 'required' => true] : ['value' => '0'],
-						LANG::GET('record.record_complaint_yes') => boolval(INI['application']['require_complaint_selection']) ? ['value' => '1', 'required' => true] : ['value' => '1'],
-					]
 				]
 			];
+			if (in_array($form['context'], ['casedocumentation'])) {
+				$options = [];
+				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
+					$options[$value] = boolval(INI['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
+				}
+				$defaults[] = [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
+					],
+					'content' => $options
+				];
+			}
+			$return['render']['content'][] = $defaults;
 		}
 
 		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
@@ -747,13 +748,12 @@ class RECORD extends API {
 			case 'POST':
 				$context = $form_name = $form_id = null;
 				$identifier = '';
-				$grouped_checkboxes = [];
 				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
 				if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
 				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
-				if ($complaint = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_complaint'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_complaint')});
+				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_type_description')});
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
@@ -815,7 +815,7 @@ class RECORD extends API {
 						':author_id' => $_SESSION['user']['id'],
 						':content' => json_encode($this->_payload),
 						':entry_timestamp' => $entry_timestamp,
-						':complaint' => $complaint == '0' ? null : 1
+						':record_type' => $record_type ? : null
 					]
 				])) $this->response([
 					'response' => [
@@ -1148,15 +1148,15 @@ class RECORD extends API {
 		foreach ($data as $row){
 			if (!PERMISSION::permissionIn($row['restricted_access'])) continue;
 			$summary['closed'] = $row['closed']; // last row decides
-			if ($row['complaint']) $summary['complaint'] = true; // does record contain any complaints?
+			if ($row['record_type'] === 'complaint') $summary['complaint'] = true; // does record contain any complaints?
 			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => $row['form_date']]);
 			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
 
 			$content = json_decode($row['content'], true);
 			foreach($content as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'complaint' => $row['complaint']]];
-				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'complaint' => $row['complaint']];
+				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'complaint' => $row['record_type'] === 'complaint']];
+				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'complaint' => $row['record_type'] === 'complaint'];
 			}
 		}
 

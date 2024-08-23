@@ -635,16 +635,16 @@ class SQLQUERY {
 
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content, complaint) VALUES (NULL, :context, :form_name, :form_id, :identifier, :entry_timestamp, :author, :author_id, :content, :complaint)",
-			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content, complaint) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content, :complaint)"
+			'mysql' => "INSERT INTO caro_records (id, context, form_name, form_id, identifier, date, author, author_id, content, record_type) VALUES (NULL, :context, :form_name, :form_id, :identifier, :entry_timestamp, :author, :author_id, :content, :record_type)",
+			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content, record_type) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content, :record_type)"
 		],
 		'records_import' => [
 			'mysql' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
 			'sqlsrv' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
 		'records_identifiers' => [
-			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(IFNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
-			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(ISNULL(r.complaint, 0)) AS complaint, MAX(r.date) AS date, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
+			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(CASE r.record_type WHEN 'complaint' THEN 1 ELSE 0 END) AS complaint, MAX(r.date) AS date, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
+			'sqlsrv' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(CASE r.record_type WHEN 'complaint' THEN 1 ELSE 0 END) AS complaint, MAX(r.date) AS date, MAX(r.author_id) AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier"
 		],
 		'records_touched' => [
 			'mysql' => "SELECT closed, form_name, date FROM caro_records WHERE id = :id",
