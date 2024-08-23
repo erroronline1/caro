@@ -643,7 +643,10 @@ class RECORD extends API {
 		if ($data) {
 			$result = [];
 			foreach($data as $row)
+				if (!PERMISSION::permissionIn($row['restricted_access'])) continue;
 				foreach(json_decode($row['content'], true) as $key => $value) $result[$key] = $value;
+				$result['DEFAULT_' . LANG::PROPERTY('record.record_type_description')] = $row['record_type'];
+
 			$this->response([
 				'data' => $result,
 				'response' => [
