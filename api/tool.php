@@ -58,6 +58,7 @@ class TOOL extends API {
 			foreach($parts as $part) if ($part) $destination[] = ceil($weight * floatval($part) / $sum);
 			return implode(' / ', $destination);
 		}
+
 		/**
 		 * silicone shore stiffness 20/35/65, destination shore -> parts, percent
 		 * @param str $attributes '20,65' \D will be stripped
@@ -69,7 +70,7 @@ class TOOL extends API {
 			$target = floatval(str_replace(',', '.', $target));
 			$parts = [];
 			$failsafe = 0;
-			// insert first value
+			// insert first value to prevent 'infinite' loop
 			foreach ($attributes as $attribute) {
 				if ($attribute >= $target) {
 					$parts[] = $attribute;
@@ -82,11 +83,13 @@ class TOOL extends API {
 					if (($mean < $target && $attribute > $target) || ($mean > $target && $attribute < $target)) $parts[] = $attribute;
 				}
 				$failsafe++;
-			} while (array_sum($parts)/count($parts) != $target && $failsafe < 100);
+			} while (array_sum($parts)/count($parts) != $target && $failsafe < 200);
 			$destination = [];
 			foreach (array_count_values($parts) as $part => $occurence) $destination[] = $occurence . " x " . $part . ' (' . round(100 * $occurence/count($parts), 2) .' %)';
+			if ($failsafe > 199) return '&#8734;';
 			return implode(' / ', $destination);
 		}
+
 		/**
 		 * circular distance diameter, holes -> distance
 		 * @param str $diameter '22.7' , replaced by decimal point, other \D will be stripped
@@ -99,28 +102,104 @@ class TOOL extends API {
 			if ($holes < 1) return '';
 			return strval(round(pi() * $diameter / $holes, 2));
 		}
-		$options = [];
+
+		$types = [
+			'pow' => [
+				[
+					'type' => 'text',
+					'attributes' => [
+						'name' => LANG::GET('tool.calculator_pow_parts'),
+						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_parts')) ? : ''
+					],
+					'hint' => LANG::GET('tool.calculator_pow_hint')
+				], [
+					'type' => 'text',
+					'attributes' => [
+						'name' => LANG::GET('tool.calculator_pow_weight'),
+						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_weight')) ? : ''
+					]
+				]
+			],
+			'poa' => [
+				[
+					'type' => 'text',
+					'attributes' => [
+						'name' => LANG::GET('tool.calculator_poa_parts'),
+						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_parts')) ? : ''
+					],
+					'hint' => LANG::GET('tool.calculator_poa_hint')
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => LANG::GET('tool.calculator_poa_target'),
+						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_target')) ? : ''
+					]
+				]
+			],
+			'cd' => [
+				[
+					'type' => 'text',
+					'attributes' => [
+						'name' => LANG::GET('tool.calculator_cd_diameter'),
+						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_diameter')) ? : ''
+					],
+					'hint' => LANG::GET('tool.calculator_cd_hint')
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => LANG::GET('tool.calculator_cd_bores'),
+						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_bores')) ? : ''
+					]
+				]
+			],
+		];
 
 		$result['render'] = ['form' => [
 			'data-usecase' => 'tool_calculator',
-			'action' => "javascript:api.tool('post', 'calculator', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "')"
+			'action' => "javascript:api.tool('post', 'calculator', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'pow') . "')"
 		],
 		'content' => [
 			[
 				[
 					'type' => 'select',
 					'attributes' => [
-						'name' => LANG::GET('tool.code_select_type'),
+						'name' => LANG::GET('tool.calculator_select_type'),
 						'onchange' => "api.tool('get', 'calculator', this.value)"
 					],
-					'content' => $options
+					'content' => [
+						LANG::GET('tool.calculator_pow') => $this->_requestedType === 'pow' ? ['value' => 'pow', 'selected' => true] : ['value' => 'pow'],
+						LANG::GET('tool.calculator_poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
+						LANG::GET('tool.calculator_cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
+					]
 				],
-				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content'],
+				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'pow'],
 			]
 		]];
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				$calculation = '';
+				switch($this->_requestedType){
+					case 'pow':
+						$calculation = parts_of_weight(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_parts')), UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_weight')));
+						break;
+					case 'poa':
+						$calculation = parts_of_attribute(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_parts')), UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_target')));
+						break;
+					case 'cd':
+						$calculation = circular_distance(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_diameter')), UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_bores')));
+						break;
+				}
+				$result['render']['content'][] = [
+					[
+						'type' => 'text',
+						'attributes' => [
+							'name' => LANG::GET('tool.calculator_result'),
+							'value' => $calculation,
+							'readonly' => true
+						]
+					]
+				];
 				break;
 		}
 		$this->response($result);
