@@ -154,7 +154,7 @@ class RECORD extends API {
 		}
 		if (!$identifier) $identifier = in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null;
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
@@ -1137,7 +1137,7 @@ class RECORD extends API {
 			]
 		]);
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
 			'content' => [],
 			'files' => [],

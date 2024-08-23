@@ -924,7 +924,7 @@ dialect["escape"] = ""
 
 ;"unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
-names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind
+names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, MUSS DER ERSTE EINTRAG SEIN, gilt auch für Export-Dateinamen
 names[] = "^.{0,3}$" ; weniger als 4 Zeichen
 
 ; unveränderliche fest einprogrammierte reservierte Begriffe

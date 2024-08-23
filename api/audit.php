@@ -200,7 +200,7 @@ class AUDIT extends API {
 			]
 		]);
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -367,7 +367,7 @@ class AUDIT extends API {
 	 */
 	private function exportforms(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -482,7 +482,7 @@ class AUDIT extends API {
 	 */
 	private function exportincorporation(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -816,7 +816,7 @@ class AUDIT extends API {
 	 */
 	private function exportregulatory(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.regulatory') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.regulatory') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -906,7 +906,7 @@ class AUDIT extends API {
 	 */
 	private function exportrisks(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.risks') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.risks') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -1010,7 +1010,7 @@ class AUDIT extends API {
 	 */
 	private function exportuserexperience(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userexperience') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.userexperience') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -1190,7 +1190,7 @@ class AUDIT extends API {
 	 */
 	private function exportuserskills(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.userskills') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.userskills') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -1300,7 +1300,7 @@ class AUDIT extends API {
 	 */
 	private function exportvendors(){
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', LANG::GET('audit.checks_type.vendors') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.vendors') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],

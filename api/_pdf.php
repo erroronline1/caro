@@ -73,7 +73,7 @@ class PDF{
 
 		//Close and output PDF document
 		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
-		$filename = preg_replace('/[^\w\d]/', '', $content) . '.pdf';
+		$filename = preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $content) . '.pdf';
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
 	}
