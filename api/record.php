@@ -159,7 +159,7 @@ class RECORD extends API {
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => $form['date']]),
+			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => substr($form['date'], 0, -3)]),
 			'date' => LANG::GET('record.form_export_exported', [':date' => $this->_currentdate->format('y-m-d H:i')])
 		];
 
@@ -1037,7 +1037,7 @@ class RECORD extends API {
 			$touched = $touched ? $touched[0] : '';
 			$linkdisplay = LANG::GET('record.record_list_touched', [
 				':identifier' => $row['identifier'],
-				':date' => $touched['date'],
+				':date' => substr($touched['date'], 0, -3),
 				':form' => $touched['form_name']
 				]) . ($row['complaint'] ? ' *' : '');
 			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
@@ -1152,14 +1152,14 @@ class RECORD extends API {
 			if (!PERMISSION::permissionIn($row['restricted_access'])) continue;
 			$summary['closed'] = $row['closed']; // last row decides
 			if ($row['record_type'] === 'complaint') $summary['complaint'] = true; // does record contain any complaints?
-			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => $row['form_date']]);
+			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => substr($row['form_date'], 0, -3)]);
 			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
 
 			$content = json_decode($row['content'], true);
 			foreach($content as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'type' => $row['record_type']]];
-				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => $row['date']]), 'type' => $row['record_type']];
+				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]), 'type' => $row['record_type']]];
+				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]), 'type' => $row['record_type']];
 			}
 		}
 
