@@ -813,7 +813,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer k
 
 ![sample tools menu](assets/tools%20menu%20de.png)
 
-Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes und der Betrachtung von STL-Dateien zur Verfügung.
+Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, der Betrachtung von STL-Dateien und der Unterstützung bei wiederkehrenden Berechnungen zur Verfügung.
 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 

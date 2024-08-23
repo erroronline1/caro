@@ -72,8 +72,7 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* records: type complaints + neuversorgung, nacharbeit, service/reparatur (import as well) override option?
-* tool->calculator
+* records: type complaints override option?
 
 #### planning considerations
 * calendar reminder with message for unfinished cases, current state, ini lifespan 
@@ -859,7 +858,7 @@ Sample checks are added to the records. Defined authorized users can revoke the 
 
 ![sample tools menu](assets/tools%20menu.png)
 
-Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit).
+Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit) and support recurring calculations.
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
@@ -2875,6 +2874,35 @@ Sample response
 [Content](#content)
 
 ### Tool endpoints
+
+> GET ./api/api.php/tool/calculator/{type}
+
+Returns a form with selection of calculating options.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | supported calculator type (pow, poa, cd) |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"tool_calculator","action":"javascript:api.tool('post', 'calculator', 'pow')"},"content":[[{"type":"select","attributes":{"name":"Calculate","onchange":"api.tool('get', 'calculator', this.value)"},"content":{"Parts of weight":{"value":"pow"},"Parts of attribute":{"value":"poa"},"Circular distance":{"value":"cd"}}},[{"type":"text","attributes":{"name":"Parts","value":""},"hint":"e.g. resin mixing 70\/20, decimal point is allowed"},{"type":"text","attributes":{"name":"Target weight","value":""}}]]]}}
+```
+
+> POST ./api/api.php/tool/calculator/{type}
+
+Returns a prefilled form and a calculated result.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | supported code type (pow, poa, cd) |
+| payload | form data | required | defined fields from previus GET fetch |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"tool_calculator","action":"javascript:api.tool('post', 'calculator', 'poa')"},"content":[[{"type":"select","attributes":{"name":"Calculate","onchange":"api.tool('get', 'calculator', this.value)"},"content":{"Parts of weight":{"value":"pow"},"Parts of attribute":{"value":"poa","selected":true},"Circular distance":{"value":"cd"}}},[{"type":"text","attributes":{"name":"Parts","value":"20,65"},"hint":"e.g. silicone shore mixing 20,35,65, no decimals"},{"type":"number","attributes":{"name":"Target attribute","value":"35"}}]],[{"type":"text","attributes":{"name":"Result","value":"1 x 65 (33.33 %) \/ 2 x 20 (66.67 %)","readonly":true}}]]}}
+```
 
 > GET ./api/api.php/tool/code/{type}
 
