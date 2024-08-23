@@ -76,7 +76,7 @@ export const compose_helper = {
 			value;
 		const setName = {
 				name: ["select", "scanner", "radio", "photo", "file", "signature"],
-				description: ["links", "checkbox"],
+				description: ["links", "checkbox", 'textblock'],
 			},
 			buttonValues = {
 				calendarbutton: LANG.GET("planning.event_new"),
@@ -135,11 +135,11 @@ export const compose_helper = {
 					}
 				}
 			} else if (["textblock"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_text_description")) {
+				if (elementName === LANG.GET("assemble.compose_textblock_description")) {
 					if (value) element.description = value;
 					else return;
 				}
-				if (elementName === LANG.GET("assemble.compose_text_content") && value) {
+				if (elementName === LANG.GET("assemble.compose_textblock_content") && value) {
 					element.content = value;
 				}
 			} else if (["formbutton"].includes(element.type)) {
