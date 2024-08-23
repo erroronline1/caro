@@ -44,19 +44,29 @@ class TOOL extends API {
 	 *
 	 */
 	public function calculator(){
-		// resin rigid/soft, destination weight -> weight rigid / weight soft
-		function parts_of_weight($parts = '', $weight = 0){
-			$parts = preg_split('/\W+/', $parts);
-			$weight = floatval($weight);
+		/**
+		 * resin rigid/soft, destination weight -> weight rigid / weight soft
+		 * @param str $parts '70/30' \D beside decimal point will be stripped
+		 * @param str $weight '730' , replaced by decimal point, other \D will be stripped
+		 * @return str '511 / 219'
+		 */
+		function parts_of_weight($parts = '', $weight = '0'){
+			$parts = preg_split('/[^\d\.]+/', $parts);
+			$weight = floatval(str_replace(',', '.', $weight));
 			$sum = array_sum($parts);
 			$destination = [];
-			foreach($parts as $part) if ($part) $destination[] = ceil($weight * $part / $sum);
+			foreach($parts as $part) if ($part) $destination[] = ceil($weight * floatval($part) / $sum);
 			return implode(' / ', $destination);
 		}
-		// silicone shore stiffness 20/35/65, destination shore -> parts, percent
-		function parts_of_attribute($attributes = '', $target = 0){
-			$attributes = preg_split('/\W+/', $attributes);
-			$target = floatval($target);
+		/**
+		 * silicone shore stiffness 20/35/65, destination shore -> parts, percent
+		 * @param str $attributes '20,65' \D will be stripped
+		 * @param str $target '35' , replaced by decimal point, other \D will be stripped
+		 * @return str '1 x 65 (33.33 %) / 2 x 20 (66.67 %)'
+		 */
+		function parts_of_attribute($attributes = '', $target = '0'){
+			$attributes = preg_split('/\D+/', $attributes);
+			$target = floatval(str_replace(',', '.', $target));
 			$parts = [];
 			$failsafe = 0;
 			// insert first value
@@ -76,13 +86,18 @@ class TOOL extends API {
 			$destination = [];
 			foreach (array_count_values($parts) as $part => $occurence) $destination[] = $occurence . " x " . $part . ' (' . round(100 * $occurence/count($parts), 2) .' %)';
 			return implode(' / ', $destination);
-		}		
-		// circular distance diameter, holes -> distance
-		function circular_distance($diameter = '', $holes = 1){
-			$diameter = floatval($diameter);
+		}
+		/**
+		 * circular distance diameter, holes -> distance
+		 * @param str $diameter '22.7' , replaced by decimal point, other \D will be stripped
+		 * @param str $holes '3' converted to int
+		 * @return str '23.77'
+		 */
+		function circular_distance($diameter = '', $holes = '1'){
+			$diameter = floatval(str_replace(',', '.', $diameter));
 			$holes = intval($holes);
 			if ($holes < 1) return '';
-			return strval(round(pi() * $diameter/ $holes, 2));
+			return strval(round(pi() * $diameter / $holes, 2));
 		}
 		$options = [];
 
