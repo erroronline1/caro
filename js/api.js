@@ -20,10 +20,9 @@ import { assemble_helper, Dialog, Toast } from "./assemble.js";
 import { compose_helper } from "./compose.js";
 
 export const api = {
-
 	_settings: {
 		user: {},
-		application: {}
+		application: {},
 	},
 
 	/**
@@ -129,7 +128,7 @@ export const api = {
 				// no altering library
 				console.trace(error);
 				const errorcode = error.message.match(/\d+/g);
-				if (LANGUAGEFILE['application']['error_response'][errorcode]) error = LANGUAGEFILE['application']['error_response'][errorcode];
+				if (LANGUAGEFILE["application"]["error_response"][errorcode]) error = LANGUAGEFILE["application"]["error_response"][errorcode];
 
 				if (errorFn != null) errorFn(error);
 				new Toast(error, "error");
@@ -191,33 +190,33 @@ export const api = {
 	 *  |_ -| -_|_ -|_ -| | . |   |     |  _| |     | -_| . | | |  _|
 	 *  |___|___|___|___|_|___|_|_|_____|_| |_|_|_|_|___|___|___|_|
 	 *                            |_____|
-	 * 
+	 *
 	 * render the session timeout indicator in upper right corner
 	 */
 	session_timeout: {
 		circle: null,
-		init: function(){
-			if (!('session_timeout_seconds' in api._settings.application)) api._settings.application.session_timeout_seconds = 0;
+		init: function () {
+			if (!("session_timeout_seconds" in api._settings.application)) api._settings.application.session_timeout_seconds = 0;
 			this.stop = new Date().getTime() + api._settings.application.session_timeout_seconds * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
-			api.session_timeout.interval = setInterval(function(){
+			api.session_timeout.interval = setInterval(function () {
 				const remaining = api.session_timeout.stop - new Date().getTime();
-				if (api._settings.application.session_timeout_seconds > 0 && remaining > 0){
-					api.session_timeout.render(100 * remaining / (api._settings.application.session_timeout_seconds * 1000), remaining);
+				if (api._settings.application.session_timeout_seconds > 0 && remaining > 0) {
+					api.session_timeout.render((100 * remaining) / (api._settings.application.session_timeout_seconds * 1000), remaining);
 					return;
 				}
 				api.session_timeout.render(0);
 				clearInterval(api.session_timeout.interval);
 			}, 1000);
 		},
-		render: function (percent, remaining = 0){
-			if (!this.circle) this.circle = document.querySelector('.session-timeout__circle');
+		render: function (percent, remaining = 0) {
+			if (!this.circle) this.circle = document.querySelector(".session-timeout__circle");
 			percent = percent < 0 ? 0 : percent;
 			if (percent < 0 || !this.circle) return;
-			const circumference = this.circle.r.baseVal.value*2*Math.PI,
-				offset = circumference - percent / 100 * circumference;
-			if (remaining / 1000 < 120) this.circle.classList.add('warning');
-			else this.circle.classList.remove('warning');
+			const circumference = this.circle.r.baseVal.value * 2 * Math.PI,
+				offset = circumference - (percent / 100) * circumference;
+			if (remaining / 1000 < 120) this.circle.classList.add("warning");
+			else this.circle.classList.remove("warning");
 			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
 			this.circle.style.strokeDashoffset = offset;
 		},
@@ -255,7 +254,7 @@ export const api = {
 				payload = _.getInputs("[data-usecase=login]", true);
 
 				successFn = async function (data) {
-					await api.application("get","language");
+					await api.application("get", "language");
 					await api.application("get", "menu");
 					api._settings.user = data.user;
 					api._settings.application = data.application;
@@ -1086,7 +1085,6 @@ export const api = {
 					case "fullexport":
 					case "simplifiedexport":
 					case "formexport": // sorry. exports a form with records, not so paperless after all
-					case "exportform": // exports the empty form as editable pdf
 					case "matchbundles":
 						//prevent default successFn
 						break;

@@ -112,16 +112,53 @@ class RECORD extends API {
 	 *          |_|
 	 */
 	public function exportform(){
+
+		$context = $form_name = $form_id = null;
+		$identifier = null;
+		$grouped_checkboxes = [];
+		if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
+		if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
+		if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
+		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
+		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
+		if ($complaint = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_complaint'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_complaint')});
+
 		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
 			'values' => [
-				':id' => $this->_requestedID
+				':id' => $form_id
 			]
 		]);
 		$form = $form ? $form[0] : null;
 		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
+
+		$entry_timestamp = $entry_date . ' ' . $entry_time;
+		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
+			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+			$entry_timestamp = $now->format('Y-m-d H:i');
+		}
+
+		foreach($this->_payload as $key => &$value){
+			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
+				$identifier = $value;
+				unset ($this->_payload->$key);
+				$possibledate = substr($identifier, -16);
+				try {
+					new DateTime($possibledate);
+				}
+				catch (Exception $e){
+					$identifier .= ' ' . $entry_timestamp;
+				}
+			}
+			if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+			/////////////////////////////////////////
+			// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+			////////////////////////////////////////
+			if (!$value || $value == 'on') unset($this->_payload->$key);
+		}
+		if (!$identifier) $identifier = in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null;
 		$summary = [
 			'filename' => preg_replace('/[^\w\d]/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
-			'identifier' => in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null,
+			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
 			'images' => [],
@@ -129,40 +166,55 @@ class RECORD extends API {
 			'date' => LANG::GET('record.form_export_exported', [':date' => $this->_currentdate->format('y-m-d H:i')])
 		];
 
-		function printable($element){
+		function printable($element, $payload){
 			// todo: enumerate names
 			$content = ['content' => [], 'images' => []];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
-					$subcontent = printable($subs);
+					$subcontent = printable($subs, $payload);
 					$content['content'] = array_merge($content['content'], $subcontent['content']);
 					$content['images'] = array_merge($content['images'], $subcontent['images']);
 				}
 				else {
-					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton'])) continue;
+					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton', 'formbutton'])) continue;
+					if (in_array($subs['type'], ['checkbox', 'textblock', 'image'])) {
+						$name = $subs['description'];
+					}
+					else $name = $subs['attributes']['name'];
+					$postname = str_replace(' ', '_', $name);
+
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
-						if ($subs['type'] ==='checkbox') $name = $subs['description'];
-						else $name = $subs['attributes']['name'];
 						$content['content'][$name] = [];
 						foreach($subs['content'] as $key => $v){
-							$content['content'][$name][] = $key;
+							$selected = '';
+							if (UTILITY::propertySet($payload, $name) && (
+								($subs['type'] !== 'checkbox' && $key === UTILITY::propertySet($payload, $postname)) ||
+								($subs['type'] === 'checkbox' && in_array($key, explode(', ', UTILITY::propertySet($payload, $postname))))
+								)) $selected = '_____';
+							$content['content'][$name][] = $selected . $key;
 						}
 					}
-					elseif ($subs['type']==='text'){
-						$content['content'][$subs['description']] = array_key_exists('content', $subs) ? $subs['content'] : '';
+					elseif ($subs['type']==='textblock'){
+						$content['content'][$name] = isset($subs['content']) ? $subs['content'] : '';
 					}
 					elseif ($subs['type']==='textarea'){
-						$content['content'][$subs['attributes']['name']] = str_repeat(" \n", 2);
+						$content['content'][$name] = UTILITY::propertySet($payload, $postname) ? : str_repeat(" \n", 2);
+					}
+					elseif ($subs['type']==='signature'){
+						$content['content'][$name] = str_repeat(" \n", 2);
 					}
 					elseif ($subs['type']==='image'){
-						$content['content'][$subs['description']] = $subs['attributes']['url'];
+						$content['content'][$name] = $subs['attributes']['url'];
 						$file = pathinfo($subs['attributes']['url']);
 						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 							$content['images'][] = $subs['attributes']['url'];
 						}
 					}
+					elseif ($subs['type']==='range'){
+						$content['content'][$name] = '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '');
+					}
 					else {
-						if (isset($subs['attributes']['name'])) $content['content'][$subs['attributes']['name']] = " ";
+						if (isset($name)) $content['content'][$name] = UTILITY::propertySet($payload, $postname) ? : ' ';
 					}
 				}
 			}
@@ -173,12 +225,13 @@ class RECORD extends API {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			$component['content'] = json_decode($component['content'], true);
 
-			$printablecontent = printable($component['content']['content']);
+			$printablecontent = printable($component['content']['content'], $this->_payload);
 			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
 			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
 		}
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
+
 		$downloadfiles[LANG::GET('record.form_export')] = [
 			'href' => PDF::formsPDF($summary)
 		];
@@ -318,9 +371,9 @@ class RECORD extends API {
 					'type' => 'button',
 					'hint' => LANG::GET('record.form_export_hint'),
 					'attributes' => [
-						'type' => 'button',
+						'type' => 'submit',
 						'value' => LANG::GET('record.form_export'),
-						'onpointerup' => "api.record('get', 'exportform', " . $form['id'] . ")"
+						'formaction' => "javascript:api.record('post', 'exportform')"
 					]
 				]
 			];
@@ -707,7 +760,6 @@ class RECORD extends API {
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
 						unset ($this->_payload->$key);
-
 						$possibledate = substr($identifier, -16);
 						try {
 							new DateTime($possibledate);
@@ -715,7 +767,6 @@ class RECORD extends API {
 						catch (Exception $e){
 							$identifier .= ' ' . $entry_timestamp;
 						}
-	
 					}
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////

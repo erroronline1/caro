@@ -195,7 +195,7 @@ class PDF{
 					} else { // textarea
 						$height = 31;
 						$pdf->SetFontSize(0); // variable font size
-						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], [], 63, $pdf->GetY() + 4);
+						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value, 'dv' => $value], 63, $pdf->GetY() + 4);
 						$pdf->Ln($height + 5);
 					}
 					$pdf->SetFontSize($originalFontSize);
@@ -203,9 +203,9 @@ class PDF{
 				if (gettype($value) === 'array'){
 					foreach($value as $option){
 						$pdf->SetFontSize(14);
-						$pdf->CheckBox($option, 5, false, [], [], 'OK', 63, $pdf->GetY() + 4);
+						$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 63, $pdf->GetY() + 4);
 						$pdf->SetFontSize($originalFontSize);
-						$pdf->MultiCell(50, 4, $option, 0, '', 0, 1, 65, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						$pdf->MultiCell(50, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 65, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 						$pdf->Ln(-7);
 					}
 				}

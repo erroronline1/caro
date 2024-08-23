@@ -73,7 +73,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * records: type complaints + neuversorgung, nacharbeit, service/reparatur (import as well) override option?
-* export form with filled in fields (auftragserteilung, schweigepflichtentbindung, empfangsbestätigung)
 * tool->calculator
 
 #### planning considerations
@@ -2710,14 +2709,14 @@ Sample response
 {"response":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_":"qwer"},"type":"success"}}
 ```
 
-> GET ./api/api.php/records/exportform/{id}
+> POST ./api/api.php/records/exportform
 
-Returns a download link to a temporary file with the selected form as blank pdf.
+Returns a download link to a temporary file with the selected form as editable blank or prefilled  pdf.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id for form |
+| payload | form data | required | according to form |
 
 Sample response
 ```
