@@ -69,13 +69,13 @@ class MESSAGE extends API {
 							'content' => [
 								'img' => $conversation['image'],
 								'user' => $conversation['conversation_user_name'] ? : LANG::GET('message.deleted_user'),
-								'text' => $conversation['message'],
+								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
 								'date' => $conversation['timestamp'],
 							],
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
-								'onpointerup' => "_client.message.newMessage('". LANG::GET('message.forward') ."', '', '" . 
-									preg_replace(["/\r/","/\n/"], ["\\r", "\\n"], LANG::GET('message.forward_message', [':message' => $conversation['message'], ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
+								'ICON_onpointerup' => "_client.message.newMessage('". LANG::GET('message.forward') ."', '', '" . 
+									preg_replace(["/\r/","/\n/"], ["\\r", "\\n"], LANG::GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')"
 							]
 						];
@@ -148,7 +148,7 @@ class MESSAGE extends API {
 							]);
 							$unseen = $unseen ? intval($unseen[0]['unseen']) : 0;
 
-							$conversation['message'] = preg_replace('/\n|\r/', ' ', $conversation['message']);
+							$conversation['message'] = preg_replace('/\n|\r/', ' ', strip_tags($conversation['message']));
 							$result['render']['content'][] = [
 								[
 									'type' => 'message',

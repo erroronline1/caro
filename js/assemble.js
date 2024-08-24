@@ -1232,11 +1232,18 @@ export class Assemble {
 			},
 			attributes:{
 				onpointerup
-				class: right, conversation, 
+				class: right, conversation,
+				ICON_onpointerup: event only applies to user icon
 			}
 		} */
-		let message, icondiv, icon, p, date, unseen;
+		let message, icondiv, icon, p, date, unseen, onpointerup_forward;
 		message = document.createElement("div");
+
+		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.ICON_onpointerup !== undefined) {
+			// ugly but effective
+			onpointerup_forward = this.currentElement.attributes.ICON_onpointerup;
+			delete this.currentElement.attributes.ICON_onpointerup;
+		}
 
 		if (this.currentElement.content.img != undefined) {
 			icondiv = document.createElement("div");
@@ -1244,6 +1251,7 @@ export class Assemble {
 			icon = document.createElement("img");
 			icon.src = this.currentElement.content.img;
 			icondiv.append(icon);
+			if (onpointerup_forward) icondiv.onpointerup = new Function(onpointerup_forward);
 			message.append(icondiv);
 		}
 		p = document.createElement("p");
@@ -1259,7 +1267,34 @@ export class Assemble {
 		let display = this.currentElement.content.text.split(/\r|\n/);
 		for (const line of display) {
 			p = document.createElement("p");
-			p.append(document.createTextNode(line));
+			// extract and convert links
+			// this assumes links are always preceded by some text!!!!
+			let textbetween = line.split(/<a.+?\/a>/),
+				links = [...line.matchAll(/<a.+?\/a>/g)],
+				link,
+				a;
+
+			for (let i = 0; i < textbetween.length; i++) {
+				p.append(document.createTextNode(textbetween[i]));
+				if (i in links) {
+					link = links[i][0].match(/href="(.+?)".*>(.+?)</);
+					a = document.createElement("a");
+					a.href = link[1];
+					a.classList.add("inline");
+					a.appendChild(document.createTextNode(link[2]));
+					p.append(a);
+				}
+			}
+			if (links.length > textbetween.length) {
+				for (let j = i; j < links.length; j++) {
+					link = links[j][0].match(/href="(.+?)".*>(.+?)</);
+					a = document.createElement("a");
+					a.href = link[1];
+					a.classList.add("inline");
+					a.appendChild(document.createTextNode(link[2]));
+					p.append(a);
+				}
+			}
 			message.append(p);
 		}
 
@@ -1363,7 +1398,7 @@ export class Assemble {
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		return this.checkbox("radioinstead");
 	}
-	
+
 	range() {
 		/*{
 			type: 'range',
@@ -1474,7 +1509,7 @@ export class Assemble {
 				if (document.getElementById(inputid).value) api.record("get", "import", document.getElementById(inputid).value);
 			};
 			result.push(button);
-			
+
 			button = document.createElement("button");
 			button.appendChild(document.createTextNode(LANG.GET("menu.record_create_identifier")));
 			button.type = "button";
@@ -1657,7 +1692,7 @@ export class Assemble {
 				const numberOfLines = event.target.value.split("\n").length;
 				document.getElementById(linenumber.id).innerHTML = Array(numberOfLines).fill("<span></span>").join("");
 			});
-			div.append(document.createElement('br'));
+			div.append(document.createElement("br"));
 			textarea = div;
 		}
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), this.br()];
@@ -1718,5 +1753,4 @@ export class Assemble {
 		// empty method but necessary to display the delete-area for composer or other future use
 		return [...this.icon(), document.createTextNode(this.currentElement.description)];
 	}
-
 }

@@ -271,7 +271,7 @@ class NOTIFICATION extends API {
 							':days' => $last->diff($this->_currentdate)->days,
 							':date' => substr($closed['date'], 0, -3),
 							':form' => $closed['form_name'],			
-							':identifier' => $row['identifier']
+							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 						])
 					);
 					// prepare alert flags

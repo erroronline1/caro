@@ -136,7 +136,7 @@ body > header {
 		background: var(--yellow);
 	}
 
-	.session-timeout{
+	.session-timeout {
 		right: 1em;
 		top: 1em;
 		height: 2em;
@@ -144,7 +144,7 @@ body > header {
 		position: fixed;
 		z-index: 1;
 
-		& .session-timeout__circle{
+		& .session-timeout__circle {
 			stroke: var(--green);
 			transition: 0.35s stroke-dashoffset;
 			/* axis compensation */
@@ -487,6 +487,10 @@ a[data-filtered] {
 	line-height: 3em;
 }
 
+a.inline {
+	display: inline !important;
+}
+
 input[type="text"],
 input[type="number"],
 input[type="search"],
@@ -513,14 +517,14 @@ input[type="checkbox"] {
 	display: inline;
 	width: 0;
 	height: 0;
-	margin:0;
-	padding:0;
+	margin: 0;
+	padding: 0;
 }
 
 .radio,
 .checkbox {
 	display: inline-block;
-	margin: .5em -.5em .5em 1.5em;
+	margin: 0.5em -0.5em 0.5em 1.5em;
 	padding: 0.5em 1em;
 	border-radius: 2em;
 	background-color: var(--article);
@@ -611,7 +615,7 @@ select + label.input-label {
 	line-height: 1.5em;
 	height: 15em;
 	overflow: auto;
-	padding:.75em;
+	padding: 0.75em;
 
 	& > textarea {
 		font-family: monospace;
@@ -800,7 +804,7 @@ article > span[data-type] {
 	font-size: 0.75em;
 	clear: both;
 }
-.editor+.hint{
+.editor + .hint {
 	margin: 1em 0 0 2.3em;
 }
 
