@@ -69,6 +69,9 @@ class FORM extends API {
 						];
 					}
 				}
+				require_once('notification.php');
+				$notifications = new NOTIFICATION;
+
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_put_approve', [
 					'values' => [
 						':id' => $approve['id'],
@@ -79,7 +82,8 @@ class FORM extends API {
 							'msg' => LANG::GET('assemble.approve_saved') . "<br />". (PERMISSION::fullyapproved('formapproval', $approve['approval']) ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
 							'type' => 'success',
 							'reload' => 'approval',
-							]]);
+							],
+							'data' => ['form_approval' => $notifications->forms()]]);
 				else $this->response([
 					'response' => [
 						'msg' => LANG::GET('assemble.approve_not_saved'),

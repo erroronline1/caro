@@ -116,6 +116,9 @@ class MESSAGE extends API {
 							'action' => "javascript:api.message('post', 'message', '_')"
 						];
 					}
+					require_once('notification.php');
+					$notifications = new NOTIFICATION;
+					$result['data'] = ['message_unseen' => $notifications->messageunseen()];
 				}
 				else {
 					$result['render']['content'][] = [

@@ -74,7 +74,6 @@
 * unittests (frontend)
 * records: type complaints override option?
 * partial runtime application settings overriding setup.ini
-* run selective notifications e.g. on reading and deleting conversations
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -1489,7 +1488,7 @@ Response properties are
 * *title* (dynamic page title updates)
 * *user* (user settings on login/reload)
 * *application* (application settings on login/reload)
-* *data* (filtered ids, record imports)
+* *data* (filtered ids, record imports, notif numbers)
 * *response* (state messages, message type, affected ids, redirect path params, names)
 * *log* (csv-filter log)
 * *links* (csv-filter result file)
@@ -1635,7 +1634,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"id":"8","msg":"Event has been saved.","type":"success"}}
+{"response":{"id":"8","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
 ```
 
 > PUT ./api/api.php/calendar/schedule/{id}
@@ -1649,7 +1648,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"id":"9","msg":"Event has been saved.","type":"success"}}
+{"response":{"id":"9","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
 ```
 
 > PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
@@ -1665,7 +1664,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Event has been marked as completed.","type":"success"}}
+{"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedevents":1}}
 ```
 
 > DELETE ./api/api.php/calendar/schedule/{id}
@@ -1679,7 +1678,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Event has been deleted.","type":"success"}}
+{"response":{"msg":"Event has been deleted.","type":"success"},"data":{"calendar_uncompletedevents":1}}
 ```
 
 > GET ./api/api.php/calendar/timesheet/{date Y-m-d}/{date Y-m-d}
@@ -1796,6 +1795,11 @@ Similar to vendor.
 Updates product data.
 
 Similar to vendor.
+
+Sample response
+```
+{"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+```
 
 > DELETE ./api/api.php/consumables/product/{id}
 
@@ -2264,7 +2268,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"}}
+{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
 ```
 
 > GET ./api/api.php/form/form/{name|id}
@@ -2501,7 +2505,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"msg": "Information has been added set","type": "info"}}
+{"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
 > DELETE ./api/api.php/order/approved/{id}
@@ -2515,7 +2519,7 @@ Parameters
 
 Sample response
 ```
-{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
 > GET ./api/api.php/order/filter/{search}

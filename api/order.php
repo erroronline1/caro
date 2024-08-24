@@ -43,17 +43,20 @@ class ORDER extends API {
 	 *      |_| |_|
 	 */
 	public function approved(){
+		require_once('notification.php');
+		$notifications = new NOTIFICATION;
+
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-			$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
-				'values' => [
-					':id' => intval($this->_requestedID)
-				]
-			]);
-			$order = $order ? $order[0] : null;
-			if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
-			if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
-			if (in_array($this->_subMethod, ['ordered', 'received', 'delivered', 'archived'])){
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				]);
+				$order = $order ? $order[0] : null;
+				if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
+				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+				if (in_array($this->_subMethod, ['ordered', 'received', 'delivered', 'archived'])){
 					switch ($this->_subMethod){
 						case 'ordered':
 							if ($order['ordertype'] === 'cancellation'){
@@ -64,7 +67,8 @@ class ORDER extends API {
 										'id' => false,
 										'msg' => LANG::GET('order.deleted'),
 										'type' => 'success'
-									]];
+									],
+									'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 								}
 								else $result = [
 									'response' => [
@@ -248,7 +252,9 @@ class ORDER extends API {
 					'response' => [
 						'msg' => LANG::GET('order.ora_set', [':type' => LANG::GET('order.' . $this->_subMethod)]),
 						'type' => 'info'
-					]];
+					],
+					'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+				];
 
 				$this->orderStatistics($this->_requestedID, ($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved');
 
@@ -713,7 +719,8 @@ class ORDER extends API {
 						'id' => false,
 						'msg' => LANG::GET('order.deleted'),
 						'type' => 'success'
-					]];
+					],
+					'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 				}
 				else $result = [
 					'response' => [

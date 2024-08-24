@@ -650,6 +650,8 @@ class CONSUMABLES extends API {
 						]);
 					}
 				}
+				require_once('notification.php');
+				$notifications = new NOTIFICATION;
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_product', [
 					'values' => [
@@ -672,7 +674,9 @@ class CONSUMABLES extends API {
 						'id' => $this->_requestedID,
 						'msg' => LANG::GET('consumables.edit_product_saved', [':name' => $product['article_name']]) . ($batchactive || $_batchupdate ? '. ' . LANG::GET('consumables.edit_product_batch_saved'): ''),
 						'type' => 'success'
-					]]);
+						],
+						'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+					]);
 				else $this->response([
 					'response' => [
 						'id' => $this->_requestedID,

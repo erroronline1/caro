@@ -68,11 +68,14 @@ class CALENDAR extends API {
 		if ($this->_requestedCalendarType === 'schedule') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
 
 		$calendar = new CALENDARUTILITY($this->_pdo);
+		require_once('notification.php');
+		$notifications = new NOTIFICATION;
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
 			'response' => [
 				'msg' => $response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')],
 				'type' => 'success'
-			]]);
+			],
+			'data' => ['calendar_uncompletedevents' => $notifications->calendar()]]);
 		else $this->response([
 			'response' => [
 				'msg' => LANG::GET('calendar.event_not_found'),
@@ -377,6 +380,8 @@ class CALENDAR extends API {
 	 */
 	public function schedule(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
+		require_once('notification.php');
+		$notifications = new NOTIFICATION;
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -403,7 +408,8 @@ class CALENDAR extends API {
 						'id' => $newid,
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
-					]]);
+					],
+					'data' => ['calendar_uncompletedevents' => $notifications->calendar()]]);
 				else $this->response([
 					'response' => [
 						'id' => false,
@@ -436,7 +442,8 @@ class CALENDAR extends API {
 						'id' => $event[':id'],
 						'msg' => LANG::GET('calendar.event_success'),
 						'type' => 'success'
-					]]);
+					],
+					'data' => ['calendar_uncompletedevents' => $notifications->calendar()]]);
 				else {
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
@@ -448,7 +455,8 @@ class CALENDAR extends API {
 							'id' => $newid,
 							'msg' => LANG::GET('calendar.event_success'),
 							'type' => 'success'
-						]]);
+						],
+						'data' => ['calendar_uncompletedevents' => $notifications->calendar()]]);
 					else $this->response([
 						'response' => [
 							'id' => false,
@@ -571,7 +579,8 @@ class CALENDAR extends API {
 					'response' => [
 						'msg' => LANG::GET('calendar.event_deleted'),
 						'type' => 'success'
-					]]);
+					],
+					'data' => ['calendar_uncompletedevents' => $notifications->calendar()]]);
 				else $this->response([
 					'response' => [
 						'msg' => LANG::GET('calendar.event_not_found'),
