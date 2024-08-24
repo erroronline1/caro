@@ -73,9 +73,8 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * records: type complaints override option?
-
-#### planning considerations
-* calendar reminder with message for unfinished cases, current state, ini lifespan 
+* partial runtime application settings overriding setup.ini
+* run selective notifications e.g. on reading and deleting conversations
 
 #### records considerations
 * linked files on separate external path, input type convert to link

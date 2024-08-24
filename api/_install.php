@@ -190,6 +190,7 @@ $queries = [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`record_type` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`notified` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -415,7 +416,8 @@ $queries = [
 				"	author_id int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
-				"	record_type varchar(MAX) NULL DEFAULT NULL" .
+				"	record_type varchar(MAX) NULL DEFAULT NULL," .
+				"	notified tinyint NULL DEFAULT NULL," .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .

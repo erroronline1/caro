@@ -249,19 +249,43 @@ class NOTIFICATION extends API {
 	public function records(){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
 		$number = 0;
+		$alerts = [];
 		foreach ($data as $row){
-			if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])){
-				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
-					'values' => [
-						':id' => $row['id']
-						]
-					]);
-				$closed = $closed ? $closed[0] : '';
-				if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
-					|| (!$row['complaint'] && $closed)){
-					$number++;
+			$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
+				'values' => [
+					':id' => $row['id']
+					]
+				]);
+			$closed = $closed ? $closed[0] : '';
+			if (($row['complaint'] && !PERMISSION::fullyapproved('complaintclosing', $closed['closed']))
+				|| (!$row['complaint'] && !$closed['closed'])){
+				// rise counter for unit member
+				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
+				// alert if applicable
+				$last = new DateTime($row['date'], new DateTimeZone(INI['application']['timezone']));
+				$diff = intval(abs($last->diff($this->_currentdate)->days / INI['lifespan']['open_record_reminder']));
+				if ($row['notified'] < $diff){
+					$this->alertUserGroup(
+						['unit' => explode(',', $row['units'])],
+						LANG::GET('record.record_reminder_message', [
+							':days' => $last->diff($this->_currentdate)->days,
+							':date' => substr($closed['date'], 0, -3),
+							':form' => $closed['form_name'],			
+							':identifier' => $row['identifier']
+						])
+					);
+					// prepare alert flags
+					$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
+						[
+							':notified' => $diff,
+							':identifier' => $this->_pdo->quote($row['identifier'])
+						]) . '; ');
 				}
-			} 
+			}
+		}
+		// set alert flags
+		foreach ($alerts as $alert){
+			SQLQUERY::EXECUTE($this->_pdo, $alert);
 		}
 		return $number;
 	}
