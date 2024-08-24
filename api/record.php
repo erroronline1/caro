@@ -1191,6 +1191,12 @@ class RECORD extends API {
 							case 'form':
 							case 'full':
 								$addendum = '';
+								/*if ($entry['type'] === 'complaint') $addendum = " <a href=\"javascript:" . "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') . " ', render: '" . LANG::GET('record.record_mark_as_closed_info') . "', options:{".
+									"'" . LANG::GET('general.cancel_button') . "': false,".
+									"'" . LANG::GET('record.record_mark_as_closed')  . "': {value: true, class: 'reducedCTA'},".
+									"}})"
+									. "\">" . LANG::GET('record.record_export_complaint') . '</a>';
+								*/
 								if ($entry['type'] === 'complaint') $addendum = ' ' . LANG::GET('record.record_export_complaint');
 								if ($entry['type'] === 'rework') $addendum = ' ' . LANG::GET('record.record_export_rework');
 								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . $addendum . ")\n";

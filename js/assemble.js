@@ -1703,18 +1703,20 @@ export class Assemble {
 		/* {
 			type: 'textblock',
 			description: 'very informative',
-			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
+			linkedcontent: may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>
 			attributes: {
 				attribute: value // applies to header
 			}
 		}*/
 		let result = [],
-			p;
+			p,
+			content;
 		if (this.currentElement.description) {
 			result = result.concat(this.header());
 		}
 		if (this.currentElement.content) {
-			const content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+			content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
 			p = document.createElement("p");
 			for (const part of content) {
 				if (!part[1].length) continue;
@@ -1723,6 +1725,45 @@ export class Assemble {
 			}
 			result.push(p);
 		}
+		if (this.currentElement.linkedcontent) {
+			content = this.currentElement.linkedcontent.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+			p = document.createElement("p");
+			for (const part of content) {
+				if (!part[1].length) continue;
+				// extract and convert links
+				// this assumes links are always preceded by some text!!!!
+				let textbetween = part[1].split(/<a.+?\/a>/),
+					links = [...part[1].matchAll(/<a.+?\/a>/g)],
+					link,
+					a;
+
+				for (let i = 0; i < textbetween.length; i++) {
+					p.append(document.createTextNode(textbetween[i]));
+					if (i in links) {
+						link = links[i][0].match(/href="(.+?)".*>(.+?)</);
+						a = document.createElement("a");
+						a.href = link[1];
+						a.classList.add("inline");
+						a.appendChild(document.createTextNode(link[2]));
+						p.append(a);
+					}
+				}
+				if (links.length > textbetween.length) {
+					for (let j = i; j < links.length; j++) {
+						link = links[j][0].match(/href="(.+?)".*>(.+?)</);
+						a = document.createElement("a");
+						a.href = link[1];
+						a.classList.add("inline");
+						a.appendChild(document.createTextNode(link[2]));
+						p.append(a);
+					}
+				}
+				p.append(document.createElement("br"));
+			}
+
+			result.push(p);
+		}
+
 		if (this.currentElement.attributes !== undefined) {
 			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
 		}
