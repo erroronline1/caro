@@ -19,6 +19,54 @@
 const _serviceWorker = {
 	worker: null,
 	permission: null,
+	notif: {
+		message_unseen: function(data){
+			if ("message_unseen" in data) {
+				let notif;
+				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.message_unseen);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.message_unseen);
+			}	
+		},
+		order_unprocessed_consumables_pendingincorporation: function(data){
+			let notif;
+			if ("order_unprocessed" in data || "consumables_pendingincorporation" in data) {
+				let order_unprocessed = 0,
+					consumables_pendingincorporation = 0;
+				if ("order_unprocessed" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
+					order_unprocessed = data.order_unprocessed;
+				}
+				if ("consumables_pendingincorporation" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
+					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
+					consumables_pendingincorporation = data.consumables_pendingincorporation;
+				}
+				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
+			}
+		},
+		calendar_uncompletedevents: function(data){
+			let notif;
+			if ("calendar_uncompletedevents" in data) {
+				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
+			}
+		},
+		form_approval: function(data){
+			let notif;
+			if ("form_approval" in data) {
+				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.form_approval);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.form_approval);
+			}
+		}
+	},
 	onMessage: function (message) {
 		const data = message.data;
 		if (!Object.keys(data).length) {
@@ -37,42 +85,10 @@ const _serviceWorker = {
 				this.showLocalNotification(LANG.GET("menu.communication_header"), body);
 			}
 		}
-		let notif;
-
-		if ("message_unseen" in data) {
-			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.message_unseen);
-			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.message_unseen);
-		}
-		if ("order_unprocessed" in data || "consumables_pendingincorporation" in data) {
-			let order_unprocessed = 0,
-				consumables_pendingincorporation = 0;
-			if ("order_unprocessed" in data) {
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
-				order_unprocessed = data.order_unprocessed;
-			}
-			if ("consumables_pendingincorporation" in data) {
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
-				consumables_pendingincorporation = data.consumables_pendingincorporation;
-			}
-			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
-		}
-		if ("calendar_uncompletedevents" in data) {
-			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-		}
-		if ("form_approval" in data) {
-			notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.form_approval);
-			notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
-			if (notif) notif.setAttribute("data-notification", data.form_approval);
-		}
+		this.notif.message_unseen(data);
+		this.notif.order_unprocessed_consumables_pendingincorporation(data);
+		this.notif.calendar_uncompletedevents(data);
+		this.notif.form_approval(data);
 	},
 	onPostCache: function () {
 		const buttons = document.querySelectorAll("[type=submit]");
