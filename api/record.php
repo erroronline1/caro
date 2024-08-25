@@ -861,7 +861,7 @@ class RECORD extends API {
 							[
 								'type' => 'textblock',
 								'description' => $key,
-								'content' => $value
+								'linkedcontent' => $value
 							]); 
 					}
 					if (array_key_exists($form, $content['images'])){
@@ -1158,8 +1158,8 @@ class RECORD extends API {
 			$content = json_decode($row['content'], true);
 			foreach($content as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]), 'type' => $row['record_type']]];
-				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]), 'type' => $row['record_type']];
+				if (!array_key_exists($key, $accumulatedcontent[$form])) $accumulatedcontent[$form][$key] = [['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]), 'type' => $row['record_type'], 'id' => $row['id']]];
+				else $accumulatedcontent[$form][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]), 'type' => $row['record_type'], 'id' => $row['id']];
 			}
 		}
 
@@ -1191,13 +1191,28 @@ class RECORD extends API {
 							case 'form':
 							case 'full':
 								$addendum = '';
-								/*if ($entry['type'] === 'complaint') $addendum = " <a href=\"javascript:" . "new Dialog({type: 'confirm', header: '". LANG::GET('record.record_mark_as_closed') . " ', render: '" . LANG::GET('record.record_mark_as_closed_info') . "', options:{".
-									"'" . LANG::GET('general.cancel_button') . "': false,".
-									"'" . LANG::GET('record.record_mark_as_closed')  . "': {value: true, class: 'reducedCTA'},".
-									"}})"
-									. "\">" . LANG::GET('record.record_export_complaint') . '</a>';
-								*/
-								if ($entry['type'] === 'complaint') $addendum = ' ' . LANG::GET('record.record_export_complaint');
+								if ($entry['type'] === 'complaint') {
+									if (PERMISSION::permissionFor('recordsretyping')) {
+										$options = [];
+										foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
+											$options[$description] = ['value' => $record_type];
+										}						
+										$addendum = " <a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$entry['type']]]) . " ', render: JSON.parse('" . json_encode(
+											[[
+												'type' => 'radio',
+												'attributes' => [
+													'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
+												],
+												'content' => $options
+											]]
+										) . "'), options:{".
+										"'" . LANG::GET('general.cancel_button') . "': false,".
+										"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+										"}}).then(response => { if (response) alert('".$entry['id']."')})"
+										. "\">" . LANG::GET('record.record_export_complaint') . '</a>';
+									}
+									else $addendum = ' ' . LANG::GET('record.record_export_complaint');
+								}
 								if ($entry['type'] === 'rework') $addendum = ' ' . LANG::GET('record.record_export_rework');
 								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . $addendum . ")\n";
 								break;

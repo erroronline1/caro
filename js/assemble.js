@@ -1277,21 +1277,23 @@ export class Assemble {
 			for (let i = 0; i < textbetween.length; i++) {
 				p.append(document.createTextNode(textbetween[i]));
 				if (i in links) {
-					link = links[i][0].match(/href="(.+?)".*>(.+?)</);
+					link = links[i][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
 					a = document.createElement("a");
-					a.href = link[1];
+					a.href = link[2];
+					if (link[4]) a.onpointerup = new Function(link[4]);
 					a.classList.add("inline");
-					a.appendChild(document.createTextNode(link[2]));
+					a.appendChild(document.createTextNode(link[5]));
 					p.append(a);
 				}
 			}
 			if (links.length > textbetween.length) {
 				for (let j = i; j < links.length; j++) {
-					link = links[j][0].match(/href="(.+?)".*>(.+?)</);
+					link = links[i][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
 					a = document.createElement("a");
-					a.href = link[1];
+					a.href = link[2];
+					if (link[4]) a.onpointerup = new Function(link[4]);
 					a.classList.add("inline");
-					a.appendChild(document.createTextNode(link[2]));
+					a.appendChild(document.createTextNode(link[5]));
 					p.append(a);
 				}
 			}
@@ -1740,21 +1742,23 @@ export class Assemble {
 				for (let i = 0; i < textbetween.length; i++) {
 					p.append(document.createTextNode(textbetween[i]));
 					if (i in links) {
-						link = links[i][0].match(/href="(.+?)".*>(.+?)</);
+						link = links[i][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
 						a = document.createElement("a");
-						a.href = link[1];
+						a.href = link[2];
+						if (link[4]) a.onpointerup = new Function(link[4]);
 						a.classList.add("inline");
-						a.appendChild(document.createTextNode(link[2]));
+						a.appendChild(document.createTextNode(link[5]));
 						p.append(a);
 					}
 				}
 				if (links.length > textbetween.length) {
 					for (let j = i; j < links.length; j++) {
-						link = links[j][0].match(/href="(.+?)".*>(.+?)</);
+						link = links[j][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
 						a = document.createElement("a");
-						a.href = link[1];
+						a.href = link[2];
+						if (link[4]) a.onpointerup = new Function(link[4]);
 						a.classList.add("inline");
-						a.appendChild(document.createTextNode(link[2]));
+						a.appendChild(document.createTextNode(link[5]));
 						p.append(a);
 					}
 				}

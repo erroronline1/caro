@@ -1030,6 +1030,7 @@ orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products 
 recordsclosing = "ceo, supervisor" ; mark record as closed
+recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
 users = "ceo, qmo" ; add and edit application users
