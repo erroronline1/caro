@@ -835,7 +835,7 @@ class RECORD extends API {
 				$return = ['render' => []];
 				$body = [];
 				// summarize content
-				$content = $this->summarizeRecord();
+				$content = $this->summarizeRecord('full', PERMISSION::permissionFor('recordsretyping'));
 				$body[] = [
 					[
 						'type' => 'textblock',
@@ -1130,7 +1130,7 @@ class RECORD extends API {
 	 *  |___|___|_|_|_|_|_|_|__,|_| |_|___|___|_| |___|___|___|_| |___|
 	 *
 	 */
-	private function summarizeRecord($type = 'full'){
+	private function summarizeRecord($type = 'full', $retype = false){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [
 				':identifier' => $this->_requestedID
@@ -1192,7 +1192,7 @@ class RECORD extends API {
 							case 'full':
 								$addendum = '';
 								if ($entry['type'] === 'complaint') {
-									if (PERMISSION::permissionFor('recordsretyping')) {
+									if ($retype) {
 										$options = [];
 										foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
 											$options[$description] = ['value' => $record_type];
