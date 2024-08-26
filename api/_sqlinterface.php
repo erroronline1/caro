@@ -658,6 +658,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier",
 			'sqlsrv' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier"
 		],
+		'records_retype' => [
+			'mysql' => "UPDATE caro_records SET record_type = :record_type WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_records SET record_type = :record_type WHERE id = :id"
+		],
 
 
 

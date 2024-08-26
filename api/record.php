@@ -749,6 +749,8 @@ class RECORD extends API {
 	public function record(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				if (array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
+
 				$context = $form_name = $form_id = null;
 				$identifier = '';
 				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
@@ -1113,6 +1115,35 @@ class RECORD extends API {
 	}
 
 	/**
+	 *           _
+	 *   ___ ___| |_ _ _ ___ ___
+	 *  |  _| -_|  _| | | . | -_|
+	 *  |_| |___|_| |_  |  _|___|
+	 *              |___|_|
+	 */
+	public function retype(){
+		if (!PERMISSION::permissionFor('recordsretyping')) $this->response([], 401);
+		$entry_id = UTILITY::propertySet($this->_payload, 'entry_id');
+		$record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'));
+
+		if ($entry_id && $record_type && SQLQUERY::EXECUTE($this->_pdo, 'records_retype', [
+			'values' => [
+				':id' => $entry_id,
+				':record_type' => $record_type
+			]
+		])) $this->response([
+			'response' => [
+				'msg' => LANG::GET('record.record_saved'),
+				'type' => 'success'
+			]]);
+		else $this->response([
+			'response' => [
+				'msg' => LANG::GET('record.record_error'),
+				'type' => 'error'
+			]]);
+	}
+
+	/**
 	 *       _           _ _ ___ _       _                     _
 	 *   ___|_|_____ ___| |_|  _|_|___ _| |___ _ _ ___ ___ ___| |_
 	 *  |_ -| |     | . | | |  _| | -_| . | -_|_'_| . | . |  _|  _|
@@ -1191,7 +1222,7 @@ class RECORD extends API {
 							case 'form':
 							case 'full':
 								$addendum = '';
-								if ($entry['type'] === 'complaint') {
+								if (in_array($entry['type'], ['complaint', 'rework'])) {
 									if ($retype) {
 										$options = [];
 										foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
@@ -1204,16 +1235,21 @@ class RECORD extends API {
 													'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
 												],
 												'content' => $options
+											], [
+												'type' => 'hidden',
+												'attributes' => [
+													'name' => 'entry_id',
+													'value' => $entry['id']
+												]
 											]]
 										) . "'), options:{".
 										"'" . LANG::GET('general.cancel_button') . "': false,".
 										"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-										"}}).then(response => { if (response) alert('".$entry['id']."')})"
-										. "\">" . LANG::GET('record.record_export_complaint') . '</a>';
+										"}}).then(response => { if (response) api.record('post','retype', null, _client.application.dialogToFormdata(response))})"
+										. "\">" . LANG::GET('record.record_export_' . $entry['type'] ) . '</a>';
 									}
-									else $addendum = ' ' . LANG::GET('record.record_export_complaint');
+									else $addendum = ' ' . LANG::GET('record.record_export_'. $entry['type']);
 								}
-								if ($entry['type'] === 'rework') $addendum = ' ' . LANG::GET('record.record_export_rework');
 								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . $addendum . ")\n";
 								break;
 							case 'simplified':
