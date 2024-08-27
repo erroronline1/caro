@@ -888,13 +888,15 @@ class RECORD extends API {
 							'content' => $content['files'][$form]
 						]); 
 					}
-					array_push($body[count($body) -1],[
-						'type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('record.record_form_export'),
-							'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')"
-						]
-					]);
+					if ($form != LANG::GET('record.record_retype_pseudoform_name')){
+						array_push($body[count($body) -1],[
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('record.record_form_export'),
+								'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')"
+							]
+						]);
+					}
 				}
 		
 				$return['render']['content'] = $body;
@@ -1126,12 +1128,37 @@ class RECORD extends API {
 		$entry_id = UTILITY::propertySet($this->_payload, 'entry_id');
 		$record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'));
 
-		if ($entry_id && $record_type && SQLQUERY::EXECUTE($this->_pdo, 'records_retype', [
+		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_unique', [
+			'values' => [
+				':id' => $entry_id
+			]
+		]);
+		$original = $original ? $original[0] : null;
+		if ($original && $record_type && SQLQUERY::EXECUTE($this->_pdo, 'records_retype', [
 			'values' => [
 				':id' => $entry_id,
 				':record_type' => $record_type
 			]
-		])) $this->response([
+		]) && SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			'values' => [
+				':context' => $original['context'],
+				':form_name' => 'recordretype',
+				':form_id' => 0,
+				':identifier' => $original['identifier'],
+				':author' => $_SESSION['user']['name'],
+				':author_id' => $_SESSION['user']['id'],
+				':content' => json_encode([
+					LANG::GET('record.record_retype_pseudoform_name') => LANG::GET('record.record_retype_content', [
+						':author' => $original['author'],
+						':form' => $original['form_name'],
+						':date' => $original['date'],
+						':previoustype' => $original['record_type'],
+						':newtype' => $record_type
+					])
+				]),
+				':entry_timestamp' => $this->_currentdate->format('Y-m-d H:i:s'),
+				':record_type' => $record_type
+		]])) $this->response([
 			'response' => [
 				'msg' => LANG::GET('record.record_saved'),
 				'type' => 'success'
@@ -1160,7 +1187,11 @@ class RECORD extends API {
 	 *  |_ -| | |     |     | .'|  _| |- _| -_|  _| -_|  _| . |  _| . |
 	 *  |___|___|_|_|_|_|_|_|__,|_| |_|___|___|_| |___|___|___|_| |___|
 	 *
+	 * @param str $type full, simplified, form
+	 * @param bool $retype based on view and permission link to retype or not
+	 * @return array $summary
 	 */
+
 	private function summarizeRecord($type = 'full', $retype = false){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_import', [
 			'values' => [
@@ -1183,7 +1214,11 @@ class RECORD extends API {
 			if (!PERMISSION::permissionIn($row['restricted_access'])) continue;
 			$summary['closed'] = $row['closed']; // last row decides
 			if ($row['record_type'] === 'complaint') $summary['complaint'] = true; // does record contain any complaints?
-			$form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => substr($row['form_date'], 0, -3)]);
+			if ($row['form_id'] == 0) { // retype autoform
+				if ($type === 'simplified') continue;
+				$form = LANG::GET('record.record_retype_pseudoform_name');
+			}
+			else $form = LANG::GET('record.record_export_form', [':form' => $row['form_name'], ':date' => substr($row['form_date'], 0, -3)]);
 			if (!array_key_exists($form, $accumulatedcontent)) $accumulatedcontent[$form] = [];
 
 			$content = json_decode($row['content'], true);

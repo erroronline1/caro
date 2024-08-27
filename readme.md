@@ -72,7 +72,7 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* records: type complaints override option -> create a tracking "form" to record changes
+* records: retype all types
 * partial runtime application settings overriding setup.ini
 
 #### records considerations

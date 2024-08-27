@@ -639,8 +639,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_records (context, form_name, form_id, identifier, date, author, author_id, content, record_type, notified) VALUES (:context, :form_name, :form_id, :identifier, CONVERT(SMALLDATETIME, :entry_timestamp, 120), :author, :author_id, :content, :record_type, NULL)"
 		],
 		'records_import' => [
-			'mysql' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
-			'sqlsrv' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records INNER JOIN caro_form on caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
+			'mysql' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records LEFT JOIN caro_form ON caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC",
+			'sqlsrv' => "SELECT caro_records.*, caro_form.date AS form_date, caro_form.restricted_access AS restricted_access FROM caro_records LEFT JOIN caro_form ON caro_records.form_id = caro_form.id WHERE caro_records.identifier = :identifier ORDER BY caro_records.id ASC"
 		],
 		'records_identifiers' => [
 			'mysql' => "SELECT MAX(r.id) AS id, r.context, r.identifier, MAX(CASE r.record_type WHEN 'complaint' THEN 1 ELSE 0 END) AS complaint, MAX(IFNULL(r.notified, 0)) AS notified, MAX(r.date) AS date, r.author_id AS author_id, u.units AS units FROM caro_records r LEFT JOIN caro_user u ON r.author_id = u.id GROUP BY r.context, u.units, r.identifier",
@@ -661,6 +661,10 @@ class SQLQUERY {
 		'records_retype' => [
 			'mysql' => "UPDATE caro_records SET record_type = :record_type WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_records SET record_type = :record_type WHERE id = :id"
+		],
+		'records_unique' => [
+			'mysql' => "SELECT * FROM caro_records WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_records WHERE id = :id"
 		],
 
 
