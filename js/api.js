@@ -200,6 +200,7 @@ export const api = {
 			this.stop = new Date().getTime() + api._settings.ini.lifespan.idle * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function () {
+				if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = {idle: 0};
 				const remaining = api.session_timeout.stop - new Date().getTime();
 				if (api._settings.ini.lifespan.idle > 0 && remaining > 0) {
 					api.session_timeout.render((100 * remaining) / (api._settings.ini.lifespan.idle * 1000), remaining);
@@ -256,8 +257,8 @@ export const api = {
 				successFn = async function (data) {
 					await api.application("get", "language");
 					await api.application("get", "menu");
-					api._settings.user = data.user;
-					api._settings.ini = data.ini;
+					api._settings.user = data.user || {};
+					api._settings.ini = data.ini || {};
 					if (data.render && data.render.form) {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
