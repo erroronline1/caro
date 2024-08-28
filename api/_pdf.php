@@ -64,7 +64,7 @@ class PDF{
 
 		for ($row = 0; $row < INI['pdf']['labelsheet']['rows']; $row++){
 			for ($column = 0; $column < INI['pdf']['labelsheet']['columns']; $column++){
-				$pdf->write2DBarcode($content, 'QRCODE,M', $column * $columnwidth, $row * $rowheight, $codesize, $codesize, $style, 'N');
+				$pdf->write2DBarcode($content, 'QRCODE,' . INI['limits']['qr_errorlevel'], $column * $columnwidth, $row * $rowheight, $codesize, $codesize, $style, 'N');
 				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === INI['pdf']['labelsheet']['columns'] - 1), $column * $columnwidth + $codesize, $row * $rowheight, true, 0, false, true, 24, 'T', true);
 			}
 		}
@@ -348,7 +348,7 @@ class RECORDTCPDF extends TCPDF {
 				'module_width' => 1, // width of a single module in points
 				'module_height' => 1 // height of a single module in points
 			);
-			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,M', 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
+			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,' . INI['limits']['qr_errorlevel'], 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
 			$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
 		}
 	}
