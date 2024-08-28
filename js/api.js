@@ -22,7 +22,7 @@ import { compose_helper } from "./compose.js";
 export const api = {
 	_settings: {
 		user: {},
-		application: {},
+		ini: {},
 	},
 
 	/**
@@ -196,13 +196,13 @@ export const api = {
 	session_timeout: {
 		circle: null,
 		init: function () {
-			if (!("session_timeout_seconds" in api._settings.application)) api._settings.application.session_timeout_seconds = 0;
-			this.stop = new Date().getTime() + api._settings.application.session_timeout_seconds * 1000;
+			if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = {idle: 0};
+			this.stop = new Date().getTime() + api._settings.ini.lifespan.idle * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function () {
 				const remaining = api.session_timeout.stop - new Date().getTime();
-				if (api._settings.application.session_timeout_seconds > 0 && remaining > 0) {
-					api.session_timeout.render((100 * remaining) / (api._settings.application.session_timeout_seconds * 1000), remaining);
+				if (api._settings.ini.lifespan.idle > 0 && remaining > 0) {
+					api.session_timeout.render((100 * remaining) / (api._settings.ini.lifespan.idle * 1000), remaining);
 					return;
 				}
 				api.session_timeout.render(0);
@@ -257,7 +257,7 @@ export const api = {
 					await api.application("get", "language");
 					await api.application("get", "menu");
 					api._settings.user = data.user;
-					api._settings.application = data.application;
+					api._settings.ini = data.ini;
 					if (data.render && data.render.form) {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());

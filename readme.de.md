@@ -954,6 +954,7 @@ form_image = 2048 ; maximale Pixel für längste Seite
 identifier = 128 ; Zeichenlänge für Identifikator, je länger desto komplexer und fehleranfälliger wird der QR-Code. 17 Zeichen werden für einen Zeitstempel automatisch angefügt
 max_records = 128 ; maximal angezeigte offene Dokumentationen
 order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
+qr_errorlevel = 'M'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 record_image = 2048 ; maximale Pixel für längste Seite
 risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
 user_image = 256 ; maximale Pixel für längste Seite

@@ -64,8 +64,13 @@ class APPLICATION extends API {
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 				],
-				'application' => [
-					'session_timeout_seconds' => min(INI['lifespan']['idle'], ini_get('session.gc_maxlifetime'))
+				'ini' => [
+					'lifespan' => [
+						'idle' => min(INI['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+					],
+					'limits' => [
+						'qr_errorlevel' => INI['limits']['qr_errorlevel']
+					]
 				]]);
 			}
 			// select single user based on token

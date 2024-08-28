@@ -997,6 +997,7 @@ form_image = 2048 ; max pixels on longer side
 identifier = 128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 order_approvalsignature_image = 2048 ; max pixels on longer side
+qr_errorlevel = 'M'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 record_image = 2048 ; max pixels on longer side
 risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
 user_image = 256 ; max pixels on longer side
