@@ -74,7 +74,6 @@
 * unittests (frontend)
 * records: retype all types
 * partial runtime application settings overriding setup.ini
-* qr quality default fallback
 * audit links in system messages
 * retype api documentation
 * retype documentation
