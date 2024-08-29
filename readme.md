@@ -74,7 +74,6 @@
 * unittests (frontend)
 * records: retype all types
 * partial runtime application settings overriding setup.ini
-* audit links in system messages
 * retype api documentation
 * retype documentation
 * record reminder documentation

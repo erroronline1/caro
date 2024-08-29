@@ -346,7 +346,10 @@ class CONSUMABLES extends API {
 							':checked' => 'CURRENT_TIMESTAMP'
 						]
 					])) {
-						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)], LANG::GET('order.sample_check_alert') . $content);
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
+						LANG::GET('order.sample_check_alert',[
+							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . LANG::GET('menu.audit') . '</a>'
+						]) . $content);
 						$this->response([
 						'response' => [
 							'msg' => LANG::GET('order.sample_check_success'),
@@ -414,7 +417,7 @@ class CONSUMABLES extends API {
 				// set check to null
 				SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
 					'values' => [
-						':checked' => 'NULL'
+						':checked' => null
 					],
 					'replacements' => [
 						':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
