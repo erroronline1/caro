@@ -598,13 +598,14 @@ class USER extends API {
 				foreach($user as $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = ($row['name'] === $this->_requestedID) ? ['selected' => true] : [];
+					if ($row['name'] === $this->_requestedID) $this->_requestedID = $row['id'];
 				}
 		
 				// select single user based on id or name
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => intval($this->_requestedID) ? : '',
-						':name' => strval($this->_requestedID) ? : ''
+						':name' => ''
 					]
 				]);
 				$user = $user ? $user[0] : null;
