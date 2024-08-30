@@ -1141,7 +1141,7 @@ class RECORD extends API {
 					])
 				]),
 				':entry_timestamp' => $this->_currentdate->format('Y-m-d H:i:s'),
-				':record_type' => $record_type
+				':record_type' => null
 		]])) $this->response([
 			'response' => [
 				'msg' => LANG::GET('record.record_saved'),
