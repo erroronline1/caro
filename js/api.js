@@ -1012,7 +1012,6 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "recordfilter":
 					case "formfilter":
 						api.preventDataloss.monitor = false;
 						successFn = function (data) {

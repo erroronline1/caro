@@ -986,25 +986,6 @@ class RECORD extends API {
 	}
 	
 	/**
-	 *                         _ ___ _ _ _
-	 *   ___ ___ ___ ___ ___ _| |  _|_| | |_ ___ ___
-	 *  |  _| -_|  _| . |  _| . |  _| | |  _| -_|  _|
-	 *  |_| |___|___|___|_| |___|_| |_|_|_| |___|_|
-	 *
-	 */
-	public function recordfilter(){
-		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
-		$matches = $all = [];
-		foreach($records as $row) {
-			similar_text($this->_requestedID, $row['identifier'], $percent);
-			if (($percent >= INI['likeliness']['records_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) $matches[] = strval($row['id']);
-		}
-		$this->response([
-			'data' => $this->_requestedID ? $matches : array_map(Fn($row) => strval($row['id']), $records)
-		]);
-	}
-
-	/**
 	 *                         _
 	 *   ___ ___ ___ ___ ___ _| |___
 	 *  |  _| -_|  _| . |  _| . |_ -|
@@ -1024,6 +1005,10 @@ class RECORD extends API {
 		$unassigned = [];
 		$targets = array_keys(LANGUAGEFILE['record']['record_list']); // ['units', 'other', 'unassigned']
 		foreach($data as $row){
+			if ($this->_requestedID){
+				similar_text($this->_requestedID, $row['identifier'], $percent);
+				if ($percent < INI['likeliness']['records_search_similarity']) continue;
+			}
 			if (!in_array($row['identifier'], $recorddatalist)) $recorddatalist[] = $row['identifier'];
 			if ($row['units']){
 				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 0;
@@ -1044,13 +1029,12 @@ class RECORD extends API {
 				':date' => substr($touched['date'], 0, -3),
 				':form' => $touched['form_name']
 				]) . ($row['complaint'] ? ' *' : '');
-			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')", 'data-filtered' => $row['id']];
+			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"];
 			$closed = json_decode($touched['closed'] ? : '', true);
 			if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
 				|| (!$row['complaint'] && $closed)
 				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
 				$contexts[$row['context']][$targets[$target]][$linkdisplay]['style'] = 'display:none';
-				$contexts[$row['context']][$targets[$target]][$linkdisplay]['data-filtered_max'] = $row['id'];
 			}
 		}
 		// delete double entries, reset filtered_max state
@@ -1058,7 +1042,6 @@ class RECORD extends API {
 			$previouslydeleted = null;
 			foreach ($context['unassigned'] as $identifier => $attributes){
 				if ($previouslydeleted) {
-					unset($context['unassigned'][$identifier]['data-filtered_max']);
 					unset($context['unassigned'][$identifier]['style']);
 				}
 				if (array_key_exists($identifier, $context['units']) || array_key_exists($identifier, $context['other'])) {
@@ -1089,8 +1072,8 @@ class RECORD extends API {
 						'id' => 'recordfilter',
 						'name' => LANG::GET('record.record_filter'),
 						'list' => 'records',
-						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'recordfilter', this.value); return false;}",
-						'onblur' => "api.record('get', 'recordfilter', this.value); return false;",
+						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}",
+						'onblur' => "api.record('get', 'records', this.value); return false;",
 						]
 				]
 			]

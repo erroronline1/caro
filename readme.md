@@ -2720,20 +2720,6 @@ Sample response
 {"response": {"msg": "The record has been saved.","type": "success"}}
 ```
 
-> GET ./api/api.php/record/recordfilter/{search}
-
-Returns ids of available records whose identifier matches {search}.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string |
-
-Sample response
-```
-{"data": ["5","7"]}
-```
-
 > GET ./api/api.php/record/records
 
 Returns current active records grouped by record type and organizational units.
