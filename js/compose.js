@@ -669,9 +669,9 @@ export const compose_helper = {
 							}
 						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
-						} else if (["text"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_text_description")) sibling.value = importable.description;
-							if (elementName === LANG.GET("assemble.compose_text_content")) if (importable.content) sibling.value = importable.content;
+						} else if (["textblock"].includes(importable.type)) {
+							if (elementName === LANG.GET("assemble.compose_textblock_description")) sibling.value = importable.description;
+							if (elementName === LANG.GET("assemble.compose_textblock_content")) if (importable.content) sibling.value = importable.content;
 						} else if (["range"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
 							if (elementName === LANG.GET("assemble.compose_range_min")) sibling.value = importable.attributes.min;
