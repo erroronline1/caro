@@ -81,7 +81,7 @@
 
 
 # Aims
-This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment; while technically being usable on any webserver this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security) and is **not recommended**. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
+This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
@@ -906,6 +906,7 @@ Tested devices:
 * Android12 Firefox-browser
 
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
+Technically the application is being usable on any webserver but this is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
 
 [Content](#content)
 
@@ -3170,7 +3171,7 @@ This software aims to match as much relevant aspects of security measures as rea
     > Every request matches the session and user permissions.
 * O.Auth_3 Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei-FaktorAuthentifizierung umgesetzt werden.
     > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials.
-* O.Auth_4 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291
+* O.Auth_4 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 Abs. 8 SGB V mit ein.
     > This is not applicable.
 * O.Auth_5 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen (z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit einbezogen werden.
     > This is not reasonable for the application used within a closed environment.
@@ -3465,7 +3466,7 @@ This software aims to match as much relevant aspects of security measures as rea
 > The operator of the infrastructure is responsible for fulfilling these requirements.
 
 ### 3.1.10 Prüfaspekt (10): Organisatorische Sicherheit 
->The operator of the infrastructure is responsible for fulfilling these requirements.
+> The operator of the infrastructure is responsible for fulfilling these requirements.
 
 [Content](#content)
 
