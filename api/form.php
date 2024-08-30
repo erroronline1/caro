@@ -805,7 +805,7 @@ class FORM extends API {
 				]]
 			]
 		];
-		if ($component['name'] && !PERMISSION::fullyapproved('formapproval', $row['approval']))
+		if ($component['name'] && (!PERMISSION::fullyapproved('formapproval', $component['approval'])))
 			$return['render']['content'][count($return['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
