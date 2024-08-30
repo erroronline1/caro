@@ -1025,9 +1025,9 @@ class RECORD extends API {
 				]);
 			$touched = $touched ? $touched[0] : '';
 			$closed = json_decode($touched['closed'] ? : '', true);
-			if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
+			if (!$this->_requestedID && (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
 				|| (!$row['complaint'] && $closed)
-				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records'])) {
 				continue;
 			}
 			if ($touched['form_name'] === 'recordretype') $touched['form_name'] = LANG::GET('record.record_retype_pseudoform_name');
