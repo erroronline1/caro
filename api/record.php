@@ -1024,6 +1024,12 @@ class RECORD extends API {
 					]
 				]);
 			$touched = $touched ? $touched[0] : '';
+			$closed = json_decode($touched['closed'] ? : '', true);
+			if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
+				|| (!$row['complaint'] && $closed)
+				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
+				continue;
+			}
 			if ($touched['form_name'] === 'recordretype') $touched['form_name'] = LANG::GET('record.record_retype_pseudoform_name');
 			$linkdisplay = LANG::GET('record.record_list_touched', [
 				':identifier' => $row['identifier'],
@@ -1031,14 +1037,8 @@ class RECORD extends API {
 				':form' => $touched['form_name']
 				]) . ($row['complaint'] ? ' *' : '');
 			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"];
-			$closed = json_decode($touched['closed'] ? : '', true);
-			if (($row['complaint'] && PERMISSION::fullyapproved('complaintclosing', $closed))
-				|| (!$row['complaint'] && $closed)
-				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records']) {
-				$contexts[$row['context']][$targets[$target]][$linkdisplay]['style'] = 'display:none';
-			}
 		}
-		// delete double entries, reset filtered_max state
+		// delete double entries
 		foreach($contexts as &$context){
 			$previouslydeleted = null;
 			foreach ($context['unassigned'] as $identifier => $attributes){
