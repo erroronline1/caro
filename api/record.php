@@ -1024,6 +1024,7 @@ class RECORD extends API {
 					]
 				]);
 			$touched = $touched ? $touched[0] : '';
+			if ($touched['form_name'] === 'recordretype') $touched['form_name'] = LANG::GET('record.record_retype_pseudoform_name');
 			$linkdisplay = LANG::GET('record.record_list_touched', [
 				':identifier' => $row['identifier'],
 				':date' => substr($touched['date'], 0, -3),
