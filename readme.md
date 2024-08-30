@@ -74,9 +74,6 @@
 * unittests (frontend)
 * records: retype all types
 * partial runtime application settings overriding setup.ini
-* retype api documentation
-* retype documentation
-* record reminder documentation
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -504,6 +501,8 @@ The identifier is always a QR-code with additional readable content that will ap
 Checking for completeness of form bundles can be applied on display of a record summary.
 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
+If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
+Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
 
 If records contain data from restricted forms, summaries will only contain these data if the requesting user has the permission to handle the form as well. It is up to you if it is reasonable to handle form bundles this way:
 * On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
@@ -556,6 +555,12 @@ graph TD;
     missing-->|yes|appenddata[append form];
     appenddata-->forms;
     missing-->|no|nonemissing(status message);
+    summary-->retype[reassign record type];
+    retype-->recorddb3;
+
+    recorddb3-->notification((notification));
+    notification-->|"unclosed,
+    last record x days ago"|message(message to units users)
 ```
 
 [Content](#content)
@@ -2716,7 +2721,7 @@ Sample response
 {"response":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_":"qwer"},"type":"success"}}
 ```
 
-> POST ./api/api.php/records/exportform
+> POST ./api/api.php/record/exportform
 
 Returns a download link to a temporary file with the selected form as editable blank or prefilled pdf.
 
@@ -2730,7 +2735,7 @@ Sample response
 {"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
 ```
 
-> GET ./api/api.php/records/fullexport/{identifier}
+> GET ./api/api.php/record/fullexport/{identifier}
 
 Returns a download link to a temporary file with all records as a pdf.
 
@@ -2744,7 +2749,7 @@ Sample response
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
 ```
 
-> GET ./api/api.php/records/simplifiedexport/{identifier}
+> GET ./api/api.php/record/simplifiedexport/{identifier}
 
 Returns a download link to a temporary file with the most recent records as a pdf.
 
@@ -2756,6 +2761,20 @@ Parameters
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+```
+
+> POST ./api/api.php/record/retype/
+
+Returns a download link to a temporary file with the most recent records as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | new record type, entry id |
+
+Sample response
+```
+{"response":{"msg":"The record has been saved.","type":"success"}}
 ```
 
 [Content](#content)

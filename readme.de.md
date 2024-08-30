@@ -464,6 +464,8 @@ Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesb
 Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.
+Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen der Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.
+An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abständen](#laufzeitvariablen) erinnert. Dies erfolgt über eine Nachricht an alle Nutzer der Bereiche des letzten eintragenden Nutzers.
 
 Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Formulare hat. Es ist Ermessenssache ob Formularpakete so sinnvoll eingesetzt werden können:
 * Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
@@ -515,6 +517,12 @@ graph TD;
     missing-->|ja|appenddata[Formular hinzufügen];
     appenddata-->forms;
     missing-->|nein|nonemissing(Statusbenachrichtigung);
+    summary-->retype[Aufzeichnungstyp ändern];
+    retype-->recorddb3;
+
+    recorddb3-->notification((Benachrichtigungen));
+    notification-->|"nicht abgeschlossen,
+    letzter Eintrag vor X Tagen"|message(Nachricht an Benutzer der Bereiche)
 ```
 
 [Übersicht](#übersicht)
