@@ -72,7 +72,9 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* partial runtime application settings overriding setup.ini
+* group messages
+* logos within pdf exports
+
 
 #### records considerations
 * linked files on separate external path, input type convert to link
