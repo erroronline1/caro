@@ -373,7 +373,6 @@ const _client = {
 		performIncorporation(formdata, productid) {
 			const check = [],
 				submit = new FormData();
-			console.log(formdata);
 			for (const [key, value] of Object.entries(formdata)) {
 				if (key.startsWith("_")) {
 					submit.append(key, value);
