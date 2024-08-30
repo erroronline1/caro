@@ -1241,7 +1241,7 @@ class RECORD extends API {
 							case 'form':
 							case 'full':
 								$addendum = '';
-								if (in_array($entry['type'], ['complaint', 'rework'])) {
+								if ($entry['type']){
 									if ($retype) {
 										$options = [];
 										foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
@@ -1265,9 +1265,9 @@ class RECORD extends API {
 										"'" . LANG::GET('general.cancel_button') . "': false,".
 										"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
 										"}}).then(response => { if (response) api.record('post','retype', null, _client.application.dialogToFormdata(response))})"
-										. "\">" . LANG::GET('record.record_export_' . $entry['type'] ) . '</a>';
+										. "\">" . LANG::GET('record.record_export_type', [':type' => $entry['type']]) . '</a>';
 									}
-									else $addendum = ' ' . LANG::GET('record.record_export_'. $entry['type']);
+									else $addendum = ' ' . LANG::GET('record.record_export_type', [':type' => $entry['type']]);
 								}
 								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . $addendum . ")\n";
 								break;
