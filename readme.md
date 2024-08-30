@@ -1558,20 +1558,6 @@ Parameters
 
 ### Audit endpoints
 
-> GET ./api/api.php/audit/checks/{type}
-
-Returns selection of available checks, given type the result of the selected type.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {type} | path parameter | optional | adds contents based on given type to response |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
-```
-
 > DELETE ./api/api.php/audit/checks/{type}
 
 Deletes records. Currently implemented for order statistics only.
@@ -1584,6 +1570,20 @@ Parameters
 Sample response
 ```
 {"response":{"msg":"Order statistics have been deleted.","type":"success"}}
+```
+
+> GET ./api/api.php/audit/checks/{type}
+
+Returns selection of available checks, given type the result of the selected type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | adds contents based on given type to response |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
 > GET ./api/api.php/audit/export/{type}
@@ -1604,6 +1604,50 @@ Sample response
 
 ### Calendar endpoints
 
+> PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
+
+Markes scheduled events as complete or revoke state.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+| {bool} | path parameter| required | true or false completed state |
+| {type} | path parameter | required | schedule or timesheet |
+
+Sample response
+```
+{"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedevents":1}}
+```
+
+> GET ./api/api.php/calendar/monthlyTimesheets/{date Y-m-d}
+
+Returns a download link to a temporary file based on date.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {date Y-m-d} | path parameter | required | defines the response, none if omitted |
+
+Sample response
+```
+{"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
+```
+
+> DELETE ./api/api.php/calendar/schedule/{id}
+
+Deletes scheduled events.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"response":{"msg":"Event has been deleted.","type":"success"},"data":{"calendar_uncompletedevents":1}}
+```
+
 > GET ./api/api.php/calendar/schedule/{date Y-m-d}/{date Y-m-d}
 
 Returns a calendar.
@@ -1617,20 +1661,6 @@ Parameters
 Sample response
 ```
 {"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
-```
-
-> GET ./api/api.php/calendar/search/{search}
-
-Returns scheduled events according to search phrase.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | displays scheduled events according to search, calendar overview if omitted |
-
-Sample response
-```
-{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textblock","attributes":{"data-type":"textblock"},"description":"test event","content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'schedule')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
 ```
 
 > POST ./api/api.php/calendar/schedule
@@ -1661,35 +1691,25 @@ Sample response
 {"response":{"id":"9","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
 ```
 
-> PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
+> GET ./api/api.php/calendar/search/{search}
 
-Markes scheduled events as complete or revoke state.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
-| {bool} | path parameter| required | true or false completed state |
-| {type} | path parameter | required | schedule or timesheet |
-
-Sample response
-```
-{"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedevents":1}}
-```
-
-> DELETE ./api/api.php/calendar/schedule/{id}
-
-Deletes scheduled events.
+Returns scheduled events according to search phrase.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
+| {search} | path parameter | optional | displays scheduled events according to search, calendar overview if omitted |
 
 Sample response
 ```
-{"response":{"msg":"Event has been deleted.","type":"success"},"data":{"calendar_uncompletedevents":1}}
+{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeypress":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textblock","attributes":{"data-type":"textblock"},"description":"test event","content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'schedule')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
 ```
+
+> DELETE ./api/api.php/calendar/timesheet/{id}
+
+Deletes timesheet entries.
+
+Similar to schedules.
 
 > GET ./api/api.php/calendar/timesheet/{date Y-m-d}/{date Y-m-d}
 
@@ -1715,29 +1735,145 @@ Markes timesheet entries as complete or revokes state
 
 Similar to schedules.
 
-> DELETE ./api/api.php/calendar/timesheet/{id}
+[Content](#content)
 
-Deletes timesheet entries.
+### Consumables endpoints
 
-Similar to schedules.
+> GET ./api/api.php/consumables/incorporation
 
-> GET ./api/api.php/calendar/monthlyTimesheets/{date Y-m-d}
+Stores the incorporation to product and selected similar, system message to defined users.
 
-Returns a download link to a temporary file based on date.
+Similar to mdrsamplecheck.
+
+> POST ./api/api.php/consumables/incorporation
+
+Returns the current form for an incorporation.
+
+Similar to mdrsamplecheck
+
+> DELETE ./api/api.php/consumables/mdrsamplecheck
+
+Deletes the sample check from records, unmark product as checked.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {date Y-m-d} | path parameter | required | defines the response, none if omitted |
+| {id} | path parameter | required | product database id |
 
 Sample response
 ```
-{"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
+{"response":{"msg":"Sample check has been revoked","type":"success"}}
 ```
 
-[Content](#content)
+> GET ./api/api.php/consumables/mdrsamplecheck/{id}
 
-### Consumables endpoints
+Returns the current form for a sample check.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+
+Sample response
+```
+{"render":{"content":[[{"type":"textblock","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
+```
+
+> POST ./api/api.php/consumables/mdrsamplecheck/{id}
+
+Stores the sample check to records, mark product as checked, system message to defined users.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | product database id |
+| payload | form data | required | check notes |
+
+Sample response
+```
+{"response":{"msg":"Sample check has been saved","type":"success"}}
+```
+
+> GET ./api/api.php/consumables/pendingincorporations
+
+Returns a list of links to products with pending incorporations.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"render":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
+```
+
+> DELETE ./api/api.php/consumables/product/{id}
+
+Deletes a product if permitted.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"response":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
+```
+
+> GET ./api/api.php/consumables/product/{id}
+
+Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
+
+Returns available information on product if role has no permission to add and edit.
+
+Similar to vendor.
+
+> POST ./api/api.php/consumables/product
+
+Stores new product data.
+
+Similar to vendor.
+
+> PUT ./api/api.php/consumables/product/{id}
+
+Updates product data.
+
+Similar to vendor.
+
+Sample response
+```
+{"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+```
+
+> GET ./api/api.php/consumables/products_with_expiry_dates/{id}
+
+Returns a list of products grouped by vendor that have been flagged as having an expiry date.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | vendor id to filter |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
+```
+
+> GET ./api/api.php/consumables/products_with_special_attention/{id}
+
+Returns a list of products grouped by vendor that have been flagged as needing special attention.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | vendor id to filter |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
+```
 
 > GET ./api/api.php/consumables/vendor/{name|id}
 
@@ -1783,143 +1919,6 @@ Parameters
 Sample response
 ```
 {"response":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
-```
-
-> GET ./api/api.php/consumables/product/{id}
-
-Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
-
-Returns available information on product if role has no permission to add and edit.
-
-
-Similar to vendor.
-
-> POST ./api/api.php/consumables/product
-
-Stores new product data.
-
-Similar to vendor.
-
-> PUT ./api/api.php/consumables/product/{id}
-
-Updates product data.
-
-Similar to vendor.
-
-Sample response
-```
-{"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
-```
-
-> DELETE ./api/api.php/consumables/product/{id}
-
-Deletes a product if permitted.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
-
-Sample response
-```
-{"response":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
-```
-
-> GET ./api/api.php/consumables/mdrsamplecheck/{id}
-
-Returns the current form for a sample check.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | product database id |
-
-Sample response
-```
-{"render":{"content":[[{"type":"textblock","description":"160O10=1 Fingerorthese Otto Bock"}],[{"attributes":[],"type":"checkbox","description":"sample check","content":{"super":[],"duper":[]}}]],"options":{"No, thank you":false,"Submit sample check":{"value":true,"class":"reducedCTA"}},"productid":1}}
-```
-
-> POST ./api/api.php/consumables/mdrsamplecheck/{id}
-
-Stores the sample check to records, mark product as checked, system message to defined users.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | product database id |
-| payload | form data | required | check notes |
-
-Sample response
-```
-{"response":{"msg":"Sample check has been saved","type":"success"}}
-```
-
-> DELETE ./api/api.php/consumables/mdrsamplecheck
-
-Deletes the sample check from records, unmark product as checked.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | product database id |
-
-Sample response
-```
-{"response":{"msg":"Sample check has been revoked","type":"success"}}
-```
-
-> POST ./api/api.php/consumables/incorporation
-
-Returns the current form for an incorporation.
-
-Similar to mdrsamplecheck
-
-> GET ./api/api.php/consumables/incorporation
-
-Stores the incorporation to product and selected similar, system message to defined users.
-
-Similar to mdrsamplecheck.
-
-> GET ./api/api.php/consumables/pendingincorporations
-
-Returns a list of links to products with pending incorporations.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"render":{"content":[[{"type":"links","content":{"Otto Bock 99B25 Schlauch-Strumpf":{"href":"javascript:void(0)","onpointerup":"api.purchase('get', 'product', 1752)"}}}]]}}
-```
-
-> GET ./api/api.php/consumables/products_with_expiry_dates/{id}
-
-Returns a list of products grouped by vendor that have been flagged as having an expiry date.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | vendor id to filter |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
-```
-
-> GET ./api/api.php/consumables/products_with_special_attention/{id}
-
-Returns a list of products grouped by vendor that have been flagged as needing special attention.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | vendor id to filter |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textblock","description":"Otto Bock","content":"633S2 Procomfort-Gel\n"}]]}}
 ```
 
 [Content](#content)
@@ -1987,76 +1986,60 @@ Sample response
 
 ### File endpoints
 
-> GET ./api/api.php/file/filter/{directory}/{query}
+> GET ./api/api.php/file/bundle
 
-Returns a list of paths that have a similarity to query.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {directory} | path parameter | optional | specified sharepoint dir, user dir, other documents if null |
-| {query} | path parameter | optional | search string, returns all files if null |
-
-Sample response
-```
-{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}
-```
-
-> GET ./api/api.php/file/files/{directory}
-
-Returns files to display, grouped by directories as provided including external documents.
+Returns lists of file paths grouped by bundle names.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {directory} | path parameter | optional | specified dir, all if null |
+| none |  |  |  |
 
 Sample response
 ```
-{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}
+{"render":{"content":[[{"type":"filtered","attributes":{"name":"Filter by bundle name","onkeypress":"if (event.key ==='Enter'){api.file('get','bundlefilter', this.value); return false;}","onblur":"api.file('get','bundlefilter', this.value); return false;","id":"filesearch"}}],[{"type":"links","description":"einkauf","content":{"einkauf.png":{"href":"./fileserver/documents/test2/....
 ```
 
-> GET ./api/api.php/file/filemanager/{directory}
+> GET ./api/api.php/file/bundlefilter/{query}
 
-Returns folders or files to display, interface elements to create new directories, upload and delete files. 
+Returns a list of bundle ids whose name have a similarity to query.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {directory} | path parameter | optional | specified dir, directory manager and access if left |
+| {query} | path parameter | optional | search string, returns all ids if null |
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','filemanager')"},"content":[[{"type":"links","description":"Folder created on 2024-01-31 15:14","content":{"test":{"href":"javascript:api.file('get','filemanager','test')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","type":"button","onpointerup":"new Dialog({type:....
+{"data":["9"]}
 ```
 
-> POST ./api/api.php/file/filemanager
+> POST ./api/api.php/file/bundlemanager
 
-Creates Directories or stores files to a destination.
+Creates a database entry for a new bundle or updates active state.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | including new folder name or destination folder and file(s) |
+| payload | form data | required | including selected file paths, bundle name, active state |
 
 Sample response
 ```
-{"response":{"msg":"Upload has been completed","redirect":["filemanager","test"],"type":"success"}}
+{"response":{"name":"external","msg":"Bundle external has been saved","type":"success"}}
 ```
 
-> DELETE ./api/api.php/file/filemanager/{directory}/{file}
+> GET ./api/api.php/file/bundlemanager/{bundle}
 
-Deletes folders and their content, files if file is specified.
+Returns a form to define a new bundle or revise bundle if provided.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {directory} | path parameter | required | directory to delete |
-| {file} | path parameter | optional | file to delete from specified directory |
+| {bundle} | path parameter | optional | if provided current setting are selected |
 
 Sample response
 ```
-{"response":{"msg":"test3 has been permanently deleted","redirect":["filemanager", null ],"type":"success"}}
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','bundlemanager')"},"content":[[{"type":"datalist","content":["einkauf","external","test"],"attributes":{"id":"bundles"}},{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get','bundlemanager', this.value)"},"content":{"...":[],"einkauf":[],"external":[],"test":{"selected": true }}},....
 ```
 
 > GET ./api/api.php/file/externalfilemanager
@@ -2102,60 +2085,76 @@ Sample response
 {"response":{"msg":"Regulatory context has been updated","type":"success"}}
 ```
 
-> GET ./api/api.php/file/bundlefilter/{query}
+> GET ./api/api.php/file/filter/{directory}/{query}
 
-Returns a list of bundle ids whose name have a similarity to query.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {query} | path parameter | optional | search string, returns all ids if null |
-
-Sample response
-```
-{"data":["9"]}
-```
-
-> GET ./api/api.php/file/bundle
-
-Returns lists of file paths grouped by bundle names.
+Returns a list of paths that have a similarity to query.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none |  |  |  |
+| {directory} | path parameter | optional | specified sharepoint dir, user dir, other documents if null |
+| {query} | path parameter | optional | search string, returns all files if null |
 
 Sample response
 ```
-{"render":{"content":[[{"type":"filtered","attributes":{"name":"Filter by bundle name","onkeypress":"if (event.key ==='Enter'){api.file('get','bundlefilter', this.value); return false;}","onblur":"api.file('get','bundlefilter', this.value); return false;","id":"filesearch"}}],[{"type":"links","description":"einkauf","content":{"einkauf.png":{"href":"./fileserver/documents/test2/....
+{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}
 ```
 
-> POST ./api/api.php/file/bundlemanager
+> GET ./api/api.php/file/files/{directory}
 
-Creates a database entry for a new bundle or updates active state.
+Returns files to display, grouped by directories as provided including external documents.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | including selected file paths, bundle name, active state |
+| {directory} | path parameter | optional | specified dir, all if null |
 
 Sample response
 ```
-{"response":{"name":"external","msg":"Bundle external has been saved","type":"success"}}
+{"data":[".\/fileserver\/documents\/test\/ottobock.csv"]}
 ```
 
-> GET ./api/api.php/file/bundlemanager/{bundle}
+> DELETE ./api/api.php/file/filemanager/{directory}/{file}
 
-Returns a form to define a new bundle or revise bundle if provided.
+Deletes folders and their content, files if file is specified.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {bundle} | path parameter | optional | if provided current setting are selected |
+| {directory} | path parameter | required | directory to delete |
+| {file} | path parameter | optional | file to delete from specified directory |
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','bundlemanager')"},"content":[[{"type":"datalist","content":["einkauf","external","test"],"attributes":{"id":"bundles"}},{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get','bundlemanager', this.value)"},"content":{"...":[],"einkauf":[],"external":[],"test":{"selected": true }}},....
+{"response":{"msg":"test3 has been permanently deleted","redirect":["filemanager", null ],"type":"success"}}
+```
+
+> GET ./api/api.php/file/filemanager/{directory}
+
+Returns folders or files to display, interface elements to create new directories, upload and delete files. 
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {directory} | path parameter | optional | specified dir, directory manager and access if left |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','filemanager')"},"content":[[{"type":"links","description":"Folder created on 2024-01-31 15:14","content":{"test":{"href":"javascript:api.file('get','filemanager','test')"}}},{"type":"deletebutton","attributes":{"value":"Delete folder and all of its content","type":"button","onpointerup":"new Dialog({type:....
+```
+
+> POST ./api/api.php/file/filemanager
+
+Creates Directories or stores files to a destination.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | including new folder name or destination folder and file(s) |
+
+Sample response
+```
+{"response":{"msg":"Upload has been completed","redirect":["filemanager","test"],"type":"success"}}
 ```
 
 > GET ./api/api.php/file/sharepoint
@@ -2190,68 +2189,6 @@ Sample response
 
 ### Form endpoints
 
-> GET ./api/api.php/form/component_editor/{name|id}
-
-Returns content to create or modify form components. If path parameter is not int the latest approved component is returned.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name/id} | path parameter | optional | string or int |
-
-Sample response
-```
-{"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
-```
-
-> GET ./api/api.php/form/form_editor/{name|id}
-
-Returns content to create or modify forms. If path parameter is not int the latest approved form is returned.
-
-Sililar to component_editor.
-
-> GET ./api/api.php/form/component/{name|id}
-
-Returns database content of selected component. If path parameter is not int the latest approved component is returned.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name/id} | path parameter | required | string or int |
-
-Sample response
-```
-{"render":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","description":"incorporation","hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
-```
-
-> POST ./api/api.php/form/component
-
-Stores a new component to the database or updates the *hidden*-setting.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | contents and setting for respective component |
-
-Sample response
-```
-{"name":"adddocuments","msg":"Component adddocuments has been saved","reload":"component_editor","type":"success"}
-```
-
-> DELETE ./api/api.php/form/component/{id}
-
-Deletes an unapproved form component.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | int id of unapproved component |
-
-Sample response
-```
-{"response":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
-```
-
 > GET ./api/api.php/form/approval/{id}
 
 Returns selection of components and forms pending approval, selected element if {id} is provided and unsatisfied approvals per role.
@@ -2281,6 +2218,68 @@ Sample response
 {"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
 ```
 
+> DELETE ./api/api.php/form/component/{id}
+
+Deletes an unapproved form component.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | int id of unapproved component |
+
+Sample response
+```
+{"response":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
+```
+
+> GET ./api/api.php/form/component/{name|id}
+
+Returns database content of selected component. If path parameter is not int the latest approved component is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | required | string or int |
+
+Sample response
+```
+{"render":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","description":"incorporation","hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
+```
+
+> POST ./api/api.php/form/component
+
+Stores a new component to the database or updates the *hidden*-setting.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | contents and setting for respective component |
+
+Sample response
+```
+{"name":"adddocuments","msg":"Component adddocuments has been saved","reload":"component_editor","type":"success"}
+```
+
+> GET ./api/api.php/form/component_editor/{name|id}
+
+Returns content to create or modify form components. If path parameter is not int the latest approved component is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | optional | string or int |
+
+Sample response
+```
+{"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
+```
+
+> DELETE ./api/api.php/form/form/{id}
+
+Deletes an unapproved form.
+
+Similar to components.
+
 > GET ./api/api.php/form/form/{name|id}
 
 Returns database content of selected form. If path parameter is not int the latest approved form is returned.
@@ -2293,29 +2292,15 @@ Stores a new form to the database or updates the following uncritical settings: 
 
 Similar to components.
 
-> DELETE ./api/api.php/form/form/{id}
+> GET ./api/api.php/form/form_editor/{name|id}
 
-Deletes an unapproved form.
+Returns content to create or modify forms. If path parameter is not int the latest approved form is returned.
 
-Similar to components.
+Sililar to component_editor.
 
 [Content](#content)
 
 ### Message endpoints
-
-> GET ./api/api.php/message/conversation/{user id}
-
-Returns conversations. Overview with the recent message per user if user id is omitted, or all messages of the conversation with the passed user id.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {user id} | path parameter | optional | int id of the opposite user of the conversation |
-
-Sample response
-```
-{"render":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","type":"button","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/ios/256.png","user":"CARO App","textblock":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
-```
 
 > DELETE ./api/api.php/message/conversation/{user id}
 
@@ -2329,6 +2314,20 @@ Parameters
 Sample response
 ```
 {"response":{"msg":"Conversation successfully deleted","redirect": false,"type":"success"}}
+```
+
+> GET ./api/api.php/message/conversation/{user id}
+
+Returns conversations. Overview with the recent message per user if user id is omitted, or all messages of the conversation with the passed user id.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {user id} | path parameter | optional | int id of the opposite user of the conversation |
+
+Sample response
+```
+{"render":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","type":"button","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/ios/256.png","user":"CARO App","textblock":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
 ```
 
 > POST ./api/api.php/message/message
@@ -2381,6 +2380,84 @@ Sample response
 
 ### Order endpoints
 
+> DELETE ./api/api.php/order/approved/{id}
+
+Returns approved orders by product.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | approved order database id (int) |
+
+Sample response
+```
+{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+```
+
+> GET ./api/api.php/order/approved/
+
+Returns aprovved orders by product.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"render": {"content": [[{"type": "radio","attributes": {"name": "Filter"},"content": {"Unprocessed": {"checked": true,"onchange": "_client.order.filter()"},"Order processed": {"onchange": "_client.order.filter(\"ordered\")"},"Received in full": {"onchange": "_client.order.filter(\"received\")"},"Archived": {"onchange": "_client.order.filter(\"archived\")"}}},{"type": "search","attributes": {"name": "Or filter by term","onkeypress": "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",....
+```
+
+> PUT ./api/api.php/order/approved/{id}/{update}/{state}
+
+Updates approved order (states, appending information, etc.) or transfer to prepared order revoking order authorization.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | order item database id (int) |
+| {update} | path parameter | required | ordered, received, delivered, archived, addinformation, disapproved, cancellation, return |
+| {state} | path parameter | optional | true, false |
+| payload | form data | optional | messages |
+
+* *ordered*, *received*, *delivered*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
+* *addinformation* appends payload to order info, alerts ordering unit on matching special words (order state changes)
+* *disapproved* transfers to prepared orders, payload message to ordering unit
+* *cancellation*, *return* convert to unprocessed order setting the respective database flag
+
+Sample response
+```
+{"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+```
+
+> GET ./api/api.php/order/filter/{search}
+
+Returns order ids whose contents match {search}.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string  |
+
+Sample response
+```
+{"data": ["89","90"]}
+```
+
+> DELETE ./api/api.php/order/order/{id}
+
+Deletes a prepared order.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | prepared order database id (int) |
+
+Sample response
+```
+{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
+```
+
 > GET ./api/api.php/order/order/{id}
 
 Returns an order form, prefilled if valid id for a prepared order is provided.
@@ -2422,20 +2499,6 @@ Parameters
 Sample response
 ```
 {"response": {"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}}
-```
-
-> DELETE ./api/api.php/order/order/{id}
-
-Deletes a prepared order.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | prepared order database id (int) |
-
-Sample response
-```
-{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"}}
 ```
 
 > GET ./api/api.php/order/prepared/{unit}
@@ -2482,73 +2545,94 @@ Sample response
 {"render": {"content": [[[{"type": "textblock","description": "Add article from 1 matches"},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "textblock","description": "Incorporation pending","content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
 ```
 
-> GET ./api/api.php/order/approved/
-
-Returns aprovved orders by product.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"render": {"content": [[{"type": "radio","attributes": {"name": "Filter"},"content": {"Unprocessed": {"checked": true,"onchange": "_client.order.filter()"},"Order processed": {"onchange": "_client.order.filter(\"ordered\")"},"Received in full": {"onchange": "_client.order.filter(\"received\")"},"Archived": {"onchange": "_client.order.filter(\"archived\")"}}},{"type": "search","attributes": {"name": "Or filter by term","onkeypress": "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",....
-```
-
-> PUT ./api/api.php/order/approved/{id}/{update}/{state}
-
-Updates approved order (states, appending information, etc.) or transfer to prepared order revoking order authorization.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | order item database id (int) |
-| {update} | path parameter | required | ordered, received, delivered, archived, addinformation, disapproved, cancellation, return |
-| {state} | path parameter | optional | true, false |
-| payload | form data | optional | messages |
-
-* *ordered*, *received*, *delivered*, *archived* set the respective flag for the order (timestamp or null) depending on {state}
-* *addinformation* appends payload to order info, alerts ordering unit on matching special words (order state changes)
-* *disapproved* transfers to prepared orders, payload message to ordering unit
-* *cancellation*, *return* convert to unprocessed order setting the respective database flag
-
-Sample response
-```
-{"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
-```
-
-> DELETE ./api/api.php/order/approved/{id}
-
-Returns approved orders by product.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | approved order database id (int) |
-
-Sample response
-```
-{"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
-```
-
-> GET ./api/api.php/order/filter/{search}
-
-Returns order ids whose contents match {search}.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string  |
-
-Sample response
-```
-{"data": ["89","90"]}
-```
-
 [Content](#content)
 
 ### Record endpoints
+
+> PUT ./api/api.php/record/close/{identifier}
+
+Marks all database entries with passed identifier as closed.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"response": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
+```
+
+> POST ./api/api.php/record/exportform
+
+Returns a download link to a temporary file with the selected form as editable blank or prefilled pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | according to form |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
+```
+
+> GET ./api/api.php/record/form/{name}/{identifier}
+
+Returns latest available approved form by {name}. Prefills identifier field if pased.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name} | path parameter | required | form name |
+| {identifier} | path parameter | optional | identifier for records |
+
+Sample response
+```
+{"title": "Kontakt","render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hidden","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hidden","attributes": {"name": "form_name","value": "Kontakt"}},....
+```
+
+> GET ./api/api.php/record/formfilter/{search}
+
+Returns ids of available approved forms matching {search} by name or alias, or where the search string is found within the used components.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string |
+
+Sample response
+```
+{"response": {"data": ["26"]}}
+```
+
+> GET ./api/api.php/record/forms
+
+Returns available approved forms grouped by record type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |   |
+
+Sample response
+```
+{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filtered","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}","onblur": "api.record('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
+```
+
+> GET ./api/api.php/record/fullexport/{identifier}
+
+Returns a download link to a temporary file with all records as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
+```
 
 > GET ./api/api.php/record/identifier
 
@@ -2579,75 +2663,18 @@ Sample response
 {"render": [{"type": "links","description": "Open the link, print the identifiers and use them where applicable.","content": {"Identifying data": {"href": "./fileserver/tmp/test202406131600.pdf"}}}]}
 ```
 
-> GET ./api/api.php/record/records
+> GET ./api/api.php/record/import/{identifier}
 
-Returns current active records grouped by record type and organizational units.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |   |
-
-Sample response
-```
-{"render": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filtered","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
-```
-
-> GET ./api/api.php/record/recordfilter/{search}
-
-Returns ids of available records whose identifier matches {search}.
+Returns the most recent data for the given identifier.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string |
+| {identifier} | path parameter | required | identifier for records |
 
 Sample response
 ```
-{"data": ["5","7"]}
-```
-
-> GET ./api/api.php/record/forms
-
-Returns available approved forms grouped by record type.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |   |
-
-Sample response
-```
-{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filtered","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}","onblur": "api.record('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
-```
-
-> GET ./api/api.php/record/formfilter/{search}
-
-Returns ids of available approved forms matching {search} by name or alias, or where the search string is found within the used components.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string |
-
-Sample response
-```
-{"response": {"data": ["26"]}}
-```
-
-> GET ./api/api.php/record/form/{name}/{identifier}
-
-Returns latest available approved form by {name}. Prefills identifier field if pased.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name} | path parameter | required | form name |
-| {identifier} | path parameter | optional | identifier for records |
-
-Sample response
-```
-{"title": "Kontakt","render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hidden","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hidden","attributes": {"name": "form_name","value": "Kontakt"}},....
+{"response":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_":"qwer"},"type":"success"}}
 ```
 
 > GET ./api/api.php/record/matchbundles/{bundle}/{identifier}
@@ -2693,74 +2720,32 @@ Sample response
 {"response": {"msg": "The record has been saved.","type": "success"}}
 ```
 
-> PUT ./api/api.php/record/close/{identifier}
+> GET ./api/api.php/record/recordfilter/{search}
 
-Marks all database entries with passed identifier as closed.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for records |
-
-Sample response
-```
-{"response": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
-```
-
-> GET ./api/api.php/record/import/{identifier}
-
-Returns the most recent data for the given identifier.
+Returns ids of available records whose identifier matches {search}.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for records |
+| {search} | path parameter | required | search string |
 
 Sample response
 ```
-{"response":{"msg":"Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!","data":{"text_":"qwer"},"type":"success"}}
+{"data": ["5","7"]}
 ```
 
-> POST ./api/api.php/record/exportform
+> GET ./api/api.php/record/records
 
-Returns a download link to a temporary file with the selected form as editable blank or prefilled pdf.
+Returns current active records grouped by record type and organizational units.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | according to form |
+| none |  |  |   |
 
 Sample response
 ```
-{"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
-```
-
-> GET ./api/api.php/record/fullexport/{identifier}
-
-Returns a download link to a temporary file with all records as a pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for records |
-
-Sample response
-```
-{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132021.pdf"}}}]}
-```
-
-> GET ./api/api.php/record/simplifiedexport/{identifier}
-
-Returns a download link to a temporary file with the most recent records as a pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id for form |
-
-Sample response
-```
-{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+{"render": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filtered","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
 ```
 
 > POST ./api/api.php/record/retype/
@@ -2777,9 +2762,37 @@ Sample response
 {"response":{"msg":"The record has been saved.","type":"success"}}
 ```
 
+> GET ./api/api.php/record/simplifiedexport/{identifier}
+
+Returns a download link to a temporary file with the most recent records as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id for form |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+```
+
 [Content](#content)
 
 ### Risk endpoints
+
+> DELETE ./api/api.php/risk/risk
+
+Deletes a risk.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id for risk |
+
+Sample response
+```
+{"response":{"msg":"The risk entry has been deleted","id":false,"type":"success"}}
+```
 
 > GET ./api/api.php/risk/risk/{id}
 
@@ -2823,21 +2836,6 @@ Sample response
 ```
 {"response":{"msg":"The edited risk has been saved","id":2,"type":"success"}}
 ```
-
-> DELETE ./api/api.php/risk/risk
-
-Deletes a risk.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | database id for risk |
-
-Sample response
-```
-{"response":{"msg":"The risk entry has been deleted","id":false,"type":"success"}}
-```
-
 
 [Content](#content)
 
@@ -2996,32 +2994,18 @@ Sample response if no files are available
 
 ### User endpoints
 
-> GET ./api/api.php/user/profile
+> DELETE ./api/api.php/user/user/{id}
 
-Returns the logged in users system information and custom settings.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"content": [[{"type": "textblock","description": "Your data within CARO","content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
-```
-
-> POST ./api/api.php/user/profile
-
-Stores custom settings.
+Deletes a user from database including assigned messages and calendar events.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | user image, application settings |
+| {id} | path parameter | required | user id |
 
 Sample response
 ```
-{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+{"response": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
 ```
 
 > GET ./api/api.php/user/user/{id|name}
@@ -3067,18 +3051,32 @@ Sample response
 {"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
 ```
 
-> DELETE ./api/api.php/user/user/{id}
+> GET ./api/api.php/user/profile
 
-Deletes a user from database including assigned messages and calendar events.
+Returns the logged in users system information and custom settings.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | user id |
+| none |  |  |  |
 
 Sample response
 ```
-{"response": {"msg": "User testuser has been permanently deleted","id": false,"type": "success"}}
+{"content": [[{"type": "textblock","description": "Your data within CARO","content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
+```
+
+> POST ./api/api.php/user/profile
+
+Stores custom settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | user image, application settings |
+
+Sample response
+```
+{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
 ```
 
 [Content](#content)
