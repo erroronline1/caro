@@ -90,7 +90,7 @@ class PDF{
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'], 1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
@@ -333,10 +333,21 @@ class RECORDTCPDF extends TCPDF {
 	public function Header() {
 		// Title
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		$right_margin = 0;
+		if ($image = INI['pdf']['record']['header_image']){
+			// given the image will always be 20mm high
+			list($width, $height, $type, $attr) = getimagesize('../' . $image);
+			if ($width && $height){ // avoid division by zero error for faulty input
+				$right_margin = $width * 20 / $height;
+				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+				$this->Image('../' . $image, $this->getPageDimensions()['wk'] - 10 - $right_margin, 10, '', 20, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$right_margin += 5;
+			}
+		}
 		$this->SetFont('helvetica', 'B', 20); // font size
-		$this->MultiCell(110, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+		$this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
 		$this->SetFont('helvetica', '', 10); // font size
-		$this->MultiCell(110, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
+		$this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
 
 		if ($this->qrcodecontent){
 			$style = array(
@@ -357,10 +368,22 @@ class RECORDTCPDF extends TCPDF {
 	public function Footer() {
 		// Position at 15 mm from bottom
 		$this->SetY(-15);
+		$right_margin = 0;
+		if ($image = INI['pdf']['record']['footer_image']){
+			list($width, $height, $type, $attr) = getimagesize('../' . $image);
+			if ($width && $height){ // avoid division by zero error for faulty input
+				// given the image will always be 10mm high
+				$right_margin = $width * 10 / $height;
+				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
+				$this->Image('../' . $image, $this->getPageDimensions()['wk'] - 10 - $right_margin, $this->GetY(), '', 10, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$right_margin += 5;
+			}
+		}
 		// Set font
 		$this->SetFont('helvetica', 'I', 8);
-		// Page number
-		$this->Cell(0, 10, INI['system']['caroapp'] . ' | ' . LANG::GET('company.address') . ' | '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+		// company contacts and page number
+		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		$this->MultiCell($this->getPageDimensions()['wk'] - INI['pdf']['record']['marginleft'] - 10 - $right_margin, 10, LANG::GET('company.address') . ' | ' . INI['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, INI['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, INI['pdf']['record']['marginbottom'], 'T', true);
 	}
 }
 

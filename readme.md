@@ -38,7 +38,7 @@
 * [Code design patterns](#code-design-patterns)
 * [CSV processor](#csv-processor)
 * [API documentation](#api-documentation)
-    * [Application endponts](#application-endpoints)
+    * [Application endpoints](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
     * [Calendar endpoints](#calendar-endpoints)
     * [Consumables endpoints](#consumables-endpoints)
@@ -73,8 +73,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * group messages
-* logos within pdf exports
-
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -913,6 +911,8 @@ Technically the application is being usable on any webserver but this is **not r
 [Content](#content)
 
 ## Installation
+
+### Server setup
 * php.ini memory_limit ~4096M for [processing of large CSV-files and pricelist imports](#csv-processor), disable open_basedir at least for local IIS for file handlers.
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
@@ -933,9 +933,14 @@ Technically the application is being usable on any webserver but this is **not r
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
-* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
+
+### Application setup
+* Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner) e.g. in directory media/favicon/
+* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos.
 * [Customize](#customisation) your appropriate language-files (language.XX.ini and _install.default.XX.ini)
 * Select an installation password for the system user.
+
+### Installation procedure
 * Run api/_install.php/*your_selected_installation_password*, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
@@ -1053,13 +1058,15 @@ vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
 labelsheet[format] = 'A4'
 labelsheet[rows] = 11
 labelsheet[columns] = 5
-labelsheet[margintop] = 0 ; in points
-labelsheet[marginbottom] = 10 ; in points
+labelsheet[margintop] = 0 ; in mm
+labelsheet[marginbottom] = 10 ; in mm
 record[format] = 'A4'
-record[margintop] = 35 ; in points
-record[marginright] = 15 ; in points
-record[marginbottom] = 15 ; in points
-record[marginleft] = 20 ; in points
+record[margintop] = 30 ; in mm
+record[marginright] = 15 ; in mm
+record[marginbottom] = 20 ; in mm
+record[marginleft] = 20 ; in mm
+record[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
+record[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
 exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
 
 [splitresults]

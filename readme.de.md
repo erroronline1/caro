@@ -869,6 +869,8 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 [Übersicht](#übersicht)
 
 ## Installation
+
+### Servereinrichtung
 * php.ini memory_limit ~4096M zur [Verarbeitung großer CSV-Dateien und dem Preislistenimport](#csv-prozessor), open_basedir zumindest für das lokale IIS für die Dateiverarbeitung deaktivieren.
     * [CSV Verarbeitung](#csv-prozessor) von 48mb @ 59k Zeilen mit diversen Filtern, incl. Dateifilter, beansprucht etwa 1.7GB Speicher
     * [CSV Verarbeitung](#importierung-von-lieferantenpreislisten) @ 100MB beansprucht etwa 2.3GB Speicher
@@ -889,7 +891,10 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
-* Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration.
+
+### Anwendungseinrichtung
+* Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke) z.B. im Verzeichnis media/favicon/
+* Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.ini und _install.default.XX.ini)
 * Auswahl eines Installationskenntworts für die Systemnutzerin.
 * Aufruf api/_install.php/*das_gewählte_Installationskennwort*, es erfolgt anschließend eine Weiterleitung - keine Sorge, bei einem erneuten Aufruf passiert nichts.
@@ -1009,14 +1014,16 @@ vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
 labelsheet[format] = 'A4'
 labelsheet[rows] = 11
 labelsheet[columns] = 5
-labelsheet[margintop] = 0 ; in points
-labelsheet[marginbottom] = 10 ; in points
+labelsheet[margintop] = 0 ; in mm
+labelsheet[marginbottom] = 10 ; in mm
 record[format] = 'A4'
-record[margintop] = 35 ; in points
-record[marginright] = 15 ; in points
-record[marginbottom] = 15 ; in points
-record[marginleft] = 20 ; in points
-exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
+record[margintop] = 30 ; in mm
+record[marginright] = 15 ; in mm
+record[marginbottom] = 20 ; in mm
+record[marginleft] = 20 ; in mm
+record[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
+record[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
+exportimage[maxheight] = 75 ; Je nach typischen Seitenverhältnissen für Querformat, muss ausgetestet werden
 
 [splitresults]
 bundle_files_per_slide = 12
