@@ -311,7 +311,7 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
     * **full access**
     * can approve as all eligible permission groups
     * can export all timesheets
-    * default user CARO App has this permission. Use it to implement new users. Change default token immediately and store it in a safe place!
+    * default user CARO App has this permission. Use it to initially implement new users.
     * assign only to trusted, preferably administative staff members
 
 Users can have multiple assigned organizational units and permissions.
@@ -935,8 +935,9 @@ Technically the application is being usable on any webserver but this is **not r
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 * Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration.
 * [Customize](#customisation) your appropriate language-files (language.XX.ini and _install.default.XX.ini)
-* Run api/_install.php, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
-* Change system users default token immediately and store it in a safe place!
+* Select an installation password for the system user.
+* Run api/_install.php/*your_selected_installation_password*, you will be redirected to the frontpage afterwards - no worries, in case of a rerun nothing will happen.
+* Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables

@@ -271,7 +271,7 @@ Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutze
     * haben **vollen Zugriff** und **alle Rechte**
     * können als jede berechtige Nutzergruppe Freigaben erteilen
     * können alle Arbeitszeitdokumentationen exportieren
-    * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen. Der Standard-Token sollte unverzüglich geändert und an einem sicheren Ort verwahrt werden!
+    * die bei der Installation angelegte Systemnutzerin CARO App hat diese Berechtigung und kann genutzt werden um weitere Nutzer anzulegen.
     * diese Berechtigung sollte idealerweise nur wenigen vertrauenswürdigen Mitarbeitern der Leitungsebene erteilt werden
 
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
@@ -891,8 +891,9 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
 * Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.ini und _install.default.XX.ini)
-* Aufruf api/_install.php, es erfolgt anschließend eine Weiterleitung - keine Sorge, bei einem erneuten Aufruf passiert nichts.
-* Änderung des Zugangstokens der Systemnutzerin und eine sichere Verwahrung!
+* Auswahl eines Installationskenntworts für die Systemnutzerin.
+* Aufruf api/_install.php/*das_gewählte_Installationskennwort*, es erfolgt anschließend eine Weiterleitung - keine Sorge, bei einem erneuten Aufruf passiert nichts.
+* Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 
 ## Laufzeitvariablen
