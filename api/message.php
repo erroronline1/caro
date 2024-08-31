@@ -44,7 +44,7 @@ class MESSAGE extends API {
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $key => $row) {
-					if ($row['id'] > 1)	$datalist[] = $row['name'];
+					if ($row['id'] > 1 && $row['id'] !== $_SESSION['user']['id']) $datalist[] = $row['name'];
 				}
 
 				if ($this->_conversation){
@@ -213,6 +213,15 @@ class MESSAGE extends API {
 						'msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]),
 						'type' => 'error'
 					]]);
+				// do not send messages to yourself
+				if (($self = array_search($_SESSION['user']['id'], array_column($recipients, 'id'))) !== false) {
+					unset($recipients[$self]);
+					if (!$recipients) $this->response([
+						'response' => [
+							'msg' => LANG::GET('message.send_failure_self'),
+							'type' => 'error'
+						]]);
+					}
 				$success = 0;
 				foreach ($recipients as $recipient){
 					if ($recipient['id'] < 2) continue;
