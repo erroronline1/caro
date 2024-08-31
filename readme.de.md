@@ -332,7 +332,7 @@ Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und 
 
 ### Verzeichnis
 
-Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern können direkt von dort aus Nachrichten zugesandt werden.
+Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern und ganzen Bereichen und Berechtigungsgruppen können direkt von dort aus Nachrichten zugesandt werden.
 
 [Übersicht](#übersicht)
 

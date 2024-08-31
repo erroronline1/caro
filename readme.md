@@ -72,7 +72,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* group messages
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -369,7 +368,7 @@ This is for internal communication and system alerts only and has no record aspe
 
 ### Register
 
-The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users can be sent a message directly from here.
+The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users and whole units and permission groups can be sent a message directly from here.
 
 [Content](#content)
 

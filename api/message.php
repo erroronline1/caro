@@ -267,48 +267,67 @@ class MESSAGE extends API {
 				'data-type' => 'input',
 				'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 			];
-			$groups['name'][$user['name']] = $mailto;
-			if ($user['orderauth']) $groups['orderauth'][$user['name']] = $mailto;
+			$groups['name'][] = $user['name'];
+			if ($user['orderauth']) $groups['orderauth'][] = $user['name'];
 			if ($user['units'])
 				foreach(explode(',', $user['units']) as $unit){
 					if (!array_key_exists($unit, $groups['units'])) $groups['units'][$unit] = [];
-					$groups['units'][$unit][$user['name']] = $mailto;
+					$groups['units'][$unit][] = $user['name'];
 				}
 			if ($user['permissions'])
 				foreach(explode(',', $user['permissions']) as $permission){
 					if (in_array($permission, ['user', 'group'])) continue;
 					if (!array_key_exists($permission, $groups['permissions'])) $groups['permissions'][$permission] = [];
-					$groups['permissions'][$permission][$user['name']] = $mailto;
+					$groups['permissions'][$permission][] = $user['name'];
 				}
 		}
 
 		foreach($groups as $group => $content){
-			ksort($content);
-			if ($group === 'name'){
-				$result['render']['content'][] = [
-					[
-						'type' => 'links',
-						'description' => LANG::GET('message.register_users'),
-						'content' => $content,
-					]
+			if (in_array($group, ['name', 'orderauth'])){
+				$links = [];
+				ksort($content);
+				foreach($content as $user) $links[$user] = [
+					'href' => 'javascript:void(0)',
+					'data-type' => 'input',
+					'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user]) . "', '" . $user . "', '', {}, [])"
 				];
-			} elseif ($group === 'orderauth'){
+				switch ($group){
+					case 'name':
+						$description = LANG::GET('message.register_users');
+						break;
+					case 'orderauth':
+						$description = LANG::GET('message.register_orderauth');
+						break;
+				}
 				$result['render']['content'][] = [
 					[
 						'type' => 'links',
-						'description' => LANG::GET('message.register_orderauth'),
-						'content' => $content,
+						'description' => $description,
+						'content' => $links,
 					]
 				];
 			} else {
 				$panel = [];
 				foreach($content as $sub => $users){
+					$users = array_unique($users);
 					ksort($users);
+					$links = [
+						LANG::GET('message.register_message_all') => [
+							'href' => 'javascript:void(0)',
+							'data-type' => 'input',
+							'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
+						]
+					];
+					foreach($users as $user) $links[$user] = [
+						'href' => 'javascript:void(0)',
+						'data-type' => 'input',
+						'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
+					];
 					$panel[] = [
 						[
 							'type' => 'links',
 							'description' => ($group === 'units' ? LANG::GET('user.edit_units') : LANG::GET('user.display_permissions')) . ' ' . LANGUAGEFILE[$group][$sub],
-							'content' => $users,
+							'content' => $links,
 						]
 					];
 				}
