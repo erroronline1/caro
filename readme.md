@@ -3494,7 +3494,6 @@ This software aims to match as much relevant aspects of security measures as rea
 | Performance issues (data transfer) | Medium | High (application unstable) | Create reduced server data scheme, use clients render capabilities | none |
 | Performance issues (database processing) | Medium | High (application unstable) | Analyse data, combine queries where possible | none |
 | Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production | At best compensating skipped updates |
-| User error | High | High | User training, providing a manual, adding hints to frontend, adhere to best practices for UI, customizeable language | none |
 
 ## Software environment risks
 > The operator of the infrastructure is responsible for fulfilling these requirements.
@@ -3511,8 +3510,14 @@ This software aims to match as much relevant aspects of security measures as rea
 | Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed readability | [Encryption statement](#encryption-statement) |
 | Unauthorized access | High (without measures) | High (data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | One token only as a tradeoff regarding usability |
 | Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
-| No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
 | Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
+| No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
+| User error | High | High | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |
+| Data breach | High | High | Data export for authorized responsible users only, add warning | none |
+| Information neglect | High | High | Add system messages, trigger system alert, landing page summaries, notifications | none |
+| Malicious inserts | Medium | High | Sanitize input and output | none |
+| Outdated content | Medium | High | Export permissions, add warning, information about connectivity state | none |
+| Unfulfilled regulatory satisfaction | High | High | Checklist for context | none |
 
 [Content](#content)
 
