@@ -163,7 +163,7 @@ class ORDER extends API {
 							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order', [
 								':order' => LANG::GET('order.message', $messagepayload),
 								':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
-								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply'). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload) . ',' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload) . ',' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
 							])) . "\n \n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')));
 							break;
 						case 'addinformation':
@@ -193,7 +193,7 @@ class ORDER extends API {
 								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_orderstate_change', [
 									':order' => LANG::GET('order.message', $messagepayload),
 									':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
-									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply'). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ',LANG::GET('order.message', $messagepayload)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ',LANG::GET('order.message', $messagepayload)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 								])));
 							}
 							break;
