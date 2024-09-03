@@ -125,7 +125,9 @@ class APPLICATION extends API {
 		];
 		$tos = [];
 		$replacements = [
-			':issue_mail' => INI['application']['issue_mail']
+			':issue_mail' => INI['application']['issue_mail'],
+			// no use of PERMISSIONS::permissionFor, because this method required a logged in user
+			':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], ['admin', ...preg_split('/\W+/', INI['permissions']['users'])]))
 		];
 		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
