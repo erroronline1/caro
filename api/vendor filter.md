@@ -1,5 +1,6 @@
 ### ean/gtin may have to be formatted as number or fracture before resaving as csv to avoid being displayed as exponential function
 
+# list
 * [basko](#basko)
 * [caroli](#caroli)
 * [feet control](#feet-control)
@@ -61,6 +62,8 @@ delete . from headers, replace specialchars
 }
 ```
 
+[list](#list)
+
 ### caroli
 delete first two columns and rows
 ```json
@@ -80,6 +83,8 @@ delete first two columns and rows
 }
 ```
 
+[list](#list)
+
 ### feet control
 add header
 ```json
@@ -88,6 +93,12 @@ add header
 		"columns": ["artnr"]
 	},
 	"modify": {
+		"add": {
+			"has_expiry_date": "0"
+		},
+		"conditional_and": [
+			["has_expiry_date", "1", ["artnr", "s35sc11_|sansc35_"]],
+		],
 		"rewrite": [{
 			"article_no": ["artnr"],
 			"article_name": [""],
@@ -97,6 +108,8 @@ add header
 	}
 }
 ```
+
+[list](#list)
 
 ### fior gentz
 add name headers where empty, delete . from headers
@@ -125,6 +138,8 @@ add name headers where empty, delete . from headers
 }
 ```
 
+[list](#list)
+
 ### ihle
 delete . from headers, replace specialchars
 ```json
@@ -150,6 +165,8 @@ delete . from headers, replace specialchars
 }
 ```
 
+[list](#list)
+
 ### gottinger
 delete whitespaces and . from headers
 ```json
@@ -168,6 +185,8 @@ delete whitespaces and . from headers
 	}
 }
 ```
+
+[list](#list)
 
 ### juzo
 delete unreqired columns
@@ -192,6 +211,8 @@ delete unreqired columns
 }
 ```
 
+[list](#list)
+
 ### lohmann und rauscher
 ```json
 {
@@ -208,6 +229,8 @@ delete unreqired columns
 	}
 }
 ```
+
+[list](#list)
 
 ### medi
 replace . and specialchars in header
@@ -234,6 +257,8 @@ replace . and specialchars in header
 }
 ```
 
+[list](#list)
+
 ### minke
 rewrite pricelist (concat sections (bit of a pita) Beschreibung to Staffel, repaste as values)
 ```json
@@ -254,6 +279,12 @@ rewrite pricelist (concat sections (bit of a pita) Beschreibung to Staffel, repa
 		}
 	],
 	"modify": {
+		"add": {
+			"special_attention": "0"
+		},
+		"conditional_and": [
+			["special_attention", "1", ["Staffel", "pryx|deusith"]],
+		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
 			"article_name": ["Staffel"],
@@ -263,6 +294,8 @@ rewrite pricelist (concat sections (bit of a pita) Beschreibung to Staffel, repa
 	}
 }
 ```
+
+[list](#list)
 
 ### mmib
 rewrite pricelist (concat first three columns to article number, paste as values, add name column, delete the rest)
@@ -281,6 +314,8 @@ rewrite pricelist (concat first three columns to article number, paste as values
 	}
 }
 ```
+
+[list](#list)
 
 ### neatec
 replace specialchars in header
@@ -304,6 +339,8 @@ replace specialchars in header
 	}
 }
 ```
+
+[list](#list)
 
 ### nowecare
 add headers on line 7
@@ -339,6 +376,8 @@ add headers on line 7
 }
 ```
 
+[list](#list)
+
 ### nowecor
 ```json
 {
@@ -365,6 +404,8 @@ add headers on line 7
 	}
 }
 ```
+
+[list](#list)
 
 ### oessur
 merge lists, delete . from headers
@@ -470,6 +511,8 @@ modify product description for:
 }
 ```
 
+[list](#list)
+
 ### ofa
 delete . from headers
 
@@ -501,6 +544,8 @@ delete . from headers
 }
 ```
 
+[list](#list)
+
 ### ortho reha neuhof
 line end is mandatory on gloves particular article_no, otherwise the filter matches recursively and having a memory overflow.
 ```json
@@ -508,17 +553,17 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 	"filesetting": {
 		"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
 	},
-    "filter": [
-        {
-            "apply": "filter_by_expression",
-            "comment": "drop microcoating",
-            "keep": false,
-            "match": {
-                "all": {
-                    "Art.Nr.": "501[BDKJ].+C=.+"
-                }
-            }
-        }
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "drop microcoating",
+			"keep": false,
+			"match": {
+				"all": {
+					"Art.Nr.": "501[BDKJ].+C=.+"
+				}
+			}
+		}
 	],
 	"modify": {
 		"add": {
@@ -542,6 +587,8 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 }
 ```
 
+[list](#list)
+
 ### ortho systems
 delete . and () from header
 ```json
@@ -560,6 +607,8 @@ delete . and () from header
 }
 ```
 
+[list](#list)
+
 ### otto bock
 join tables
 ```json
@@ -570,11 +619,14 @@ join tables
 	"modify": {
 		"add": {
 			"trading_good": "0",
-			"has_expiry_date": "0"
+			"has_expiry_date": "0",
+			"special_attention": "0"
+		},
 		},
 		"conditional_and": [
 			["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
 			["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|85h.+|636K.+"]]
+			["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen"]],
 		],
 		"rewrite": [{
 			"article_no": ["Material"],
@@ -585,6 +637,8 @@ join tables
 	}
 }
 ```
+
+[list](#list)
 
 ### perpedes
 ```json
@@ -609,6 +663,8 @@ join tables
 	}
 }
 ```
+
+[list](#list)
 
 ### prowalk
 replace specialchars in header
@@ -636,6 +692,8 @@ replace specialchars in header
 }
 ```
 
+[list](#list)
+
 ### protheseus
 add header on first line
 ```json
@@ -661,6 +719,8 @@ add header on first line
 }
 ```
 
+[list](#list)
+
 ### rebotec
 delete last row
 ```json
@@ -685,6 +745,8 @@ delete last row
 	}
 }
 ```
+
+[list](#list)
 
 ### rehaforum
 ```json
@@ -718,6 +780,8 @@ delete last row
 	}
 }
 ```
+
+[list](#list)
 
 ### russka
 ```json
@@ -755,6 +819,8 @@ delete last row
 }
 ```
 
+[list](#list)
+
 ### schein
 ```json
 {
@@ -779,6 +845,8 @@ delete last row
 }
 ```
 
+[list](#list)
+
 ### sporlastic
 delete . from headers, replace specialchars and whitespaces
 ```json
@@ -802,6 +870,8 @@ delete . from headers, replace specialchars and whitespaces
 }
 ```
 
+[list](#list)
+
 ### streifeneder
 delete . from headers, replace specialchars and whitespaces
 ```json
@@ -812,10 +882,12 @@ delete . from headers, replace specialchars and whitespaces
 	},
 	"modify": {
 		"add": {
-			"trading_good": "0"
+			"trading_good": "0",
+			"special_attention": "0"
 		},
 		"conditional_and": [
-			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]]
+			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]],
+			["special_attention", "1", ["Bezeichnung", "varioform|streifydur|streifylast|PET glasklar|streifyflex"]]
 		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
@@ -826,6 +898,8 @@ delete . from headers, replace specialchars and whitespaces
 	}
 }
 ```
+
+[list](#list)
 
 ### taska
 ```json
@@ -849,6 +923,8 @@ delete . from headers, replace specialchars and whitespaces
 	}
 }
 ```
+
+[list](#list)
 
 ### tigges
 delete . from headers, replace specialchars and whitespaces
@@ -875,6 +951,8 @@ delete . from headers, replace specialchars and whitespaces
 }
 ```
 
+[list](#list)
+
 ### triconmed
 delete . from headers, replace specialchars and whitespaces
 ```json
@@ -897,6 +975,8 @@ delete . from headers, replace specialchars and whitespaces
 }
 ```
 
+[list](#list)
+
 ### uniprox
 delete . from headers, replace specialchars and whitespaces
 ```json
@@ -907,10 +987,12 @@ delete . from headers, replace specialchars and whitespaces
 	},
 	"modify": {
 		"add": {
-			"trading_good": "0"
+			"trading_good": "0",
+			"special_attention": "0"
 		},
 		"conditional_and": [
 			["trading_good", "1", ["Beschreibung", "^bob|^daho|liner|philadelphia"]]
+			["special_attention", "1", ["Beschreibung", "thermoflex"]]
 		],
 		"rewrite": [{
 			"article_no": ["Artikel-Nr"],
@@ -921,6 +1003,8 @@ delete . from headers, replace specialchars and whitespaces
 	}
 }
 ```
+
+[list](#list)
 
 ### werkmeister
 delete . from headers, replace specialchars and whitespaces
