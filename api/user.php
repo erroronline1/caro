@@ -330,9 +330,17 @@ class USER extends API {
 					'app_settings' => [],
 					'skills' => []
 				];
-		
+				
+				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'replacements' => [
+						':id' => '',
+						':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_name'))
+					]
+				]);
+				$nametaken = $nametaken ? $nametaken[0] : null;
+
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -456,8 +464,16 @@ class USER extends API {
 				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name')));
 				$user['name'] = UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name'));
 
+				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'replacements' => [
+						':id' => '',
+						':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_name'))
+					]
+				]);
+				$nametaken = $nametaken ? $nametaken[0] : null;
+
 				foreach(INI['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 				
 				// chain checked permission levels
