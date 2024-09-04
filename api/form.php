@@ -401,7 +401,7 @@ class FORM extends API {
 									'required' => true,
 									'data-loss' => 'prevent'
 								],
-								'hint' => ($bundle['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => substr($bundle['date'], 0, -3)]) . '<br>' : '')
+								'hint' => ($bundle['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => substr($bundle['date'], 0, -3)]) . '<br>' : LANG::GET('assemble.compose_component_name_hint'))
 							], [
 								'type' => 'select',
 								'attributes' => [
@@ -794,7 +794,7 @@ class FORM extends API {
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
 					'value' => $component['name'],
-					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '<br>' : '') .
+					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '<br>' : LANG::GET('assemble.compose_component_name_hint')) .
 						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
 					'hidden' => $component['name'] ? intval($component['hidden']) : 1,
 					'approve' => $approve
@@ -1164,7 +1164,7 @@ class FORM extends API {
 							'content' => $contextoptions,
 							'hint' => LANG::GET('assemble.edit_form_context_hint')
 						],
-						'hint' => ($form['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => substr($form['date'], 0, -3)]) . '<br />' : '') .
+						'hint' => ($form['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => substr($form['date'], 0, -3)]) . '<br />' : LANG::GET('assemble.compose_component_name_hint')) .
 						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '<br />' : '') .
 						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '<br />' : '')
 						,
