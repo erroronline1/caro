@@ -423,6 +423,22 @@ export function rendertest(element) {
 						content: "Available class options are red, orange, yellow and green",
 						attributes: { class: "green" },
 					},
+					{
+						type: 'image',
+						description: "A barcode",
+						attributes: {
+							name: 'Barcode CODE128',
+							barcode: {value:'a CODE128 barcode', format: 'CODE128'},
+						}
+					},
+					{
+						type: 'image',
+						description: "A QR-code",
+						attributes: {
+							name: 'QR code', 
+							qrcode: 'QR code',
+						}
+					}
 				],
 				[
 					{
@@ -534,6 +550,22 @@ export function rendertest(element) {
 						content: "Verfügbare CSS-Klassen sind red, orange, yellow and green",
 						attributes: { class: "green" },
 					},
+					{
+						type: 'image',
+						description: "Ein Barcode",
+						attributes: {
+							name: 'Barcode CODE128',
+							barcode: {value:'Ein CODE128 Barcode', format: 'CODE128'},
+						}
+					},
+					{
+						type: 'image',
+						description: "Ein QR-Code",
+						attributes: {
+							name: 'QR Code',
+							qrcode: 'QR Code',
+						}
+					}
 				],
 				[
 					{
