@@ -13,11 +13,12 @@
 * [minke](#minke)
 * [mmib](#mmib)
 * [neatec](#neatec)
+* [nowecare](#nowecare)
 * [nowecor](#nowecor)
 * [oessur](#oessur)
 * [ofa](#ofa)
-* [ortho systems](#ortho-systems)
 * [ortho reha neuhof](#ortho-reha-neuhof)
+* [ortho systems](#ortho-systems)
 * [otto bock](#otto-bock)
 * [perpedes](#perpedes)
 * [protheseus](#protheseus)
@@ -33,6 +34,56 @@
 * [triconmed](#triconmed)
 * [uniprox](#uniprox)
 * [werkmeister](#werkmeister)
+
+## no lists / no response
+ruthner
+aet /tsm
+aidamed
+albrecht
+alps
+amt aromando
+apm technika
+arthroven
+aspen
+bauerfeind
+bionic germany
+bort
+bsn jobst
+bsn medical
+busch
+cosmesil
+darco
+dirame
+endolite / blatchford
+erkodent
+kowsky
+extremtextil
+feguramed
+guentherbionics
+hakupa
+halarit (lange + ritter)
+hema
+kaupo
+krewi
+leder haag
+ludwig leiner
+m+w dental
+nexus cnc
+ormed enovis medtech
+orthoservice
+ossenberg
+plastico
+ochert
+polyform
+qualiserve
+ruckgaber
+spannrit
+springer aktiv
+storitec
+teufel
+thuasne
+unyq
+wagner polymertechnik
 
 ### basko
 delete . from headers, replace specialchars
@@ -140,6 +191,27 @@ add name headers where empty, delete . from headers
 
 [list](#list)
 
+### gottinger
+delete whitespaces and . from headers
+```json
+{
+	"filesetting": {
+		"headerrowindex": 2,
+		"columns": ["Art Nr", "Bezeichnung", "Menge"]
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Art Nr"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["Menge"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+
+[list](#list)
+
 ### ihle
 delete . from headers, replace specialchars
 ```json
@@ -158,27 +230,6 @@ delete . from headers, replace specialchars
 			"article_no": ["Nr"],
 			"article_name": ["Beschreibung 1", ", ", "Beschreibung 2", ", ", "Farbe", ", ", "Groesse"],
 			"article_unit": ["Einheiten"],
-			"article_ean": [""]
-		}]
-	}
-}
-```
-
-[list](#list)
-
-### gottinger
-delete whitespaces and . from headers
-```json
-{
-	"filesetting": {
-		"headerrowindex": 2,
-		"columns": ["Art Nr", "Bezeichnung", "Menge"]
-	},
-	"modify": {
-		"rewrite": [{
-			"article_no": ["Art Nr"],
-			"article_name": ["Bezeichnung"],
-			"article_unit": ["Menge"],
 			"article_ean": [""]
 		}]
 	}
@@ -664,6 +715,33 @@ join tables
 
 [list](#list)
 
+### protheseus
+add header on first line
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["artno", "name", "unit"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional_or": [
+			["trading_good", "1", ["name", "Compression|Weste|Peronäusschiene|Stax|liner"]]
+		],
+		"rewrite": [{
+			"article_no": ["artno"],
+			"article_name": ["name"],
+			"article_unit": ["unit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
+
+[list](#list)
+
 ### prowalk
 replace specialchars in header
 
@@ -684,33 +762,6 @@ replace specialchars in header
 			"article_no": ["ArtikelNummer"],
 			"article_name": ["Bezeichnung 1", ", ", "Bezeichnung 2", ", ", "Farbe", ", ", "Groesse"],
 			"article_unit": ["Menge"],
-			"article_ean": [""]
-		}]
-	}
-}
-```
-
-[list](#list)
-
-### protheseus
-add header on first line
-```json
-{
-	"filesetting": {
-		"headerrowindex": 0,
-		"columns": ["artno", "name", "unit"]
-	},
-	"modify": {
-		"add": {
-			"trading_good": "0"
-		},
-		"conditional_or": [
-			["trading_good", "1", ["name", "Compression|Weste|Peronäusschiene|Stax|liner"]]
-		],
-		"rewrite": [{
-			"article_no": ["artno"],
-			"article_name": ["name"],
-			"article_unit": ["unit"],
 			"article_ean": [""]
 		}]
 	}
