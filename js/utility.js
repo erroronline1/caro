@@ -20,6 +20,25 @@ const _serviceWorker = {
 	worker: null,
 	permission: null,
 	notif: {
+		calendar_uncompletedevents: function(data){
+			let notif;
+			if ("calendar_uncompletedevents" in data) {
+				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
+			}
+		},
+		form_approval: function(data){
+			let notif;
+			if ("form_approval" in data) {
+				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.form_approval);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.form_approval);
+			}
+		},
+		interval : null,
 		message_unseen: function(data){
 			if ("message_unseen" in data) {
 				let notif;
@@ -46,24 +65,6 @@ const _serviceWorker = {
 				}
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
-			}
-		},
-		calendar_uncompletedevents: function(data){
-			let notif;
-			if ("calendar_uncompletedevents" in data) {
-				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-			}
-		},
-		form_approval: function(data){
-			let notif;
-			if ("form_approval" in data) {
-				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.form_approval);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.form_approval);
 			}
 		}
 	},
@@ -104,8 +105,8 @@ const _serviceWorker = {
 			this.worker = await navigator.serviceWorker.register("./service-worker.js");
 			this.permission = await window.Notification.requestPermission();
 			navigator.serviceWorker.ready.then((registration) => {
-				if (registration) {
-					setInterval(() => {
+				if (registration && !_serviceWorker.notif.interval) {
+					_serviceWorker.notif.interval = setInterval(() => {
 						_serviceWorker.postMessage("getnotifications");
 					}, 300000);
 				}

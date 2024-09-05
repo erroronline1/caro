@@ -208,6 +208,9 @@ export const api = {
 				}
 				api.session_timeout.render(0);
 				clearInterval(api.session_timeout.interval);
+				clearInterval(_serviceWorker.notif.interval);
+				_serviceWorker.notif.interval = null;
+				document.querySelector("header>div:nth-of-type(2)").style.display = "block";
 			}, 1000);
 		},
 		render: function (percent, remaining = 0) {
@@ -259,6 +262,11 @@ export const api = {
 					await api.application("get", "menu");
 					api._settings.user = data.user || {};
 					api._settings.ini = data.ini || {};
+					if (data.user) _serviceWorker.register();
+					else {
+						clearInterval(_serviceWorker.notif.interval);
+						_serviceWorker.notif.interval = null;
+					}
 					if (data.render && data.render.form) {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
@@ -1315,7 +1323,7 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
-				api.user("get", request[1], data.response.id);
+				if (data.response.id) api.user("get", request[1], data.response.id);
 			},
 			title = {
 				profile: LANG.GET("menu.application_user_profile"),
