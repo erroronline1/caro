@@ -1209,31 +1209,43 @@ There is a UTILITY class handling
 * parsing of requests
 * file handling within permitted directories
 * image processing
+
 Using these methods for fitting usecases is mandatory. (./api/_utility.php)
 
 There is a PERMISSION class handling
 * permissions as set within setup.ini
 * full approval check
 * pending approval check
-Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin* or limiting access for
+
+Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin*, scenarios lacking a logged in user (login page) or limiting access for
 * *supervisors* having access to assigned organizational unit content only
 * *groups* not having access to recording
 
-There is a SQLQUERY class handling
+There is as SQLQUERY class handling
 * database connections
 * query preparation
 * masking user input (avoiding injections)
 * support of chunkifying queries for improved performance
-Using these methods is mandatory. If preprocessing statements dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
+
+Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
 
 Helper modules start with _, only endpoints do not.
 
 All requests have to be executed through the api ensuring
 * responses for logged in users only
 * reaching only intended endpoints
+
 Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
 
 Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
+
+## Integration test
+* html5-qrcode
+* JsBarcode
+* qr-creator
+* signature_pad
+
+can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
 
 ## Deployment process
 
