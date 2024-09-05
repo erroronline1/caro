@@ -73,6 +73,9 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
+* define record export permissions? formwise, full, simplified
+* supervisor insights for trainings outside of audit scope - or audit readonly and special export and post/put permission
+* review modal return on closing -> still not always returning false
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -3082,7 +3085,32 @@ Sample response
 This software aims to match as much relevant aspects of security measures as reasonable and possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
 
 ### Encryption statement
-> **Unfortunately there is no reasonable way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for staff is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures have to depend on unreachability for the network from outside. Frontend and backend are supposed to run within a closed network.**
+> **Unfortunately there appears to be no reasonable way to encrypt data considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for staff is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures have to depend on unreachability for the network from outside. Frontend and backend are supposed to run within a closed network (LAN, restricted WiFi, VPN).**
+
+```mermaid
+graph TD;
+    database[(encrypted data)]-->onekey(system key);
+    onekey-->handling{key handling};
+    handling-->|"server decryption
+    for all users"|storedkey{{"key has to be stored
+    on the server"}};
+    handling-->|"pass decryption token
+    by user for each request"|sharedkey{{"unusable application,
+    possible spread of key"}}
+
+    database-->userkey(user key);
+    userkey-->access{access};
+    access-->|contributing user|granted{{"granted for lifecycle
+    of token only"}};
+    access-->|other users|denied{{data not
+    decryptable/accessable}}
+
+    database-->processing(data processing);
+    processing-->drag{{"performance loss
+    for sql queries"}}
+```
+
+I welcome any constructive input on this topic.
 
 ## Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
@@ -3491,8 +3519,6 @@ This software aims to match as much relevant aspects of security measures as rea
 | Version control unavailable | Low | High (recording changes is crucial) | Git is an established version control running locally | It is *really* unlikely Git will vanish in the near future |
 | Lacking user input | High | High (user requirements not satisfied, lack of compliance) | Regular meetings to match requirements | I do the best I can |
 | Insufficient testing | High (currently single developer) | High (application unstable) | Reduce errors by implementing globally reusable methods and a simplified framework, modularize endpoints | none | 
-| Performance issues (data transfer) | Medium | High (application unstable) | Create reduced server data scheme, use clients render capabilities | none |
-| Performance issues (database processing) | Medium | High (application unstable) | Analyse data, combine queries where possible | none |
 | Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production | At best compensating skipped updates |
 
 ## Software environment risks
@@ -3500,24 +3526,31 @@ This software aims to match as much relevant aspects of security measures as rea
 
 | Risk | Probability | Impact | Measure | Statement |
 | ---- | ---- | ---- | ---- | ---- |
-| Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source software | none |
-| Infrastructure outdated | Medium | High (application unstable) | see above | none |
+| Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source software | Responsibility delegated to operator of infrastructure |
+| Infrastructure outdated | Medium | High (application unstable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source software | Responsibility delegated to operator of infrastructure |
+| Data loss | Low | High (regulatory penalties) | Database backups | Responsibility delegated to operator of infrastructure |
 
 ## Software risks
 | Risk | Probability | Impact | Measures | Statement |
 | ---- | ---- | ---- | ---- | ---- |
-| Security vulnerabilities | Medium (as it’s an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within closed network | none |
+| Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within closed network | none |
 | Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed readability | [Encryption statement](#encryption-statement) |
-| Unauthorized access | High (without measures) | High (data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | One token only as a tradeoff regarding usability |
+| Unencrypted data access | Medium | High (regulatory penalties) | Use within closed network | Bears the same risk as accessing confidential data on personal network drives |
+| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | Single token only as a tradeoff regarding usability |
 | Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
-| Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
 | No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
-| User error | High | High | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |
-| Data breach | High | High | Data export for authorized responsible users only, add warning | none |
-| Information neglect | High | High | Add system messages, trigger system alert, landing page summaries, notifications | none |
-| Malicious inserts | Medium | High | Sanitize input and output | none |
-| Outdated content | Medium | High | Export permissions, add warning, information about connectivity state | none |
-| Unfulfilled regulatory satisfaction | High | High | Checklist for context | none |
+| User error | High | High (faulty data) | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |
+| Data breach | High | High (regulatory penalties, reputation loss) | Data export for authorized responsible users only, add warning | Personal responsibility remains |
+| Information neglect | High | High (regulatory penalties)| Add system messages, trigger system alert, landing page summaries, notifications | Personal responsibility remains |
+| Malicious inserts | Medium | High (application unstable, corrupted data) | Sanitize input and output, auto delete of public added files, link username to public contributions | Possible insertion of executable code patterns reduced to a minimum |
+| Outdated content | Medium | High (regulatory penalties)| Export permissions, add warning, information about connectivity state | none |
+| Unfulfilled regulatory satisfaction | High | High (regulatory penalties) | Checklist for context | Personal responsibility remains |
+| Performance issues (data transfer) | Medium | Medium (application unresponsive) | Create reduced server data scheme, use clients render capabilities | none |
+| Performance issues (database processing) | Medium | Medium (application unresponsive) | Analyse data, combine queries where possible | none |
+| Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
+| Insufficient configuration | Medium | High (application unstable) | Documentation of setup.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
+| Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
+| Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 
 [Content](#content)
 
