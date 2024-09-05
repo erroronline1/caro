@@ -30,6 +30,7 @@
 * [sporlastic](#sporlastic)
 * [streifeneder](#streifeneder)
 * [taska](#taska)
+* [thuasne](#tuasne)
 * [tigges](#tigges)
 * [triconmed](#triconmed)
 * [uniprox](#uniprox)
@@ -81,7 +82,6 @@ spannrit
 springer aktiv
 storitec
 teufel
-thuasne
 unyq
 wagner polymertechnik
 
@@ -973,6 +973,47 @@ delete . from headers, replace specialchars and whitespaces
 }
 ```
 
+[list](#list)
+
+### thuasne
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikel-Nummer", "Art.-Bez. 1 NEU", "Art.-Bez. 2 NEU", "GTIN", "Verpackungseinheit"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "keep if all general patterns match",
+			"keep": false,
+			"match": {
+				"any": {
+					"Art.-Bez. 1 NEU": "^BH |badeanzug|bikini|tankini|mamille|epithese"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"special_attention": "0",
+			"has_expiry_date": "1"
+		},
+		"conditional_or": [
+			["trading_good", "0", ["Art.-Bez. 1 NEU", "COTTON SHORT STRETCH|LOMBAMUM|binden|spray|biplast|pelotte|kulanz|pauschale|wechselpolster|flexi-pads|ersatz|verlängerungs|haftpad"]],
+			//["special_attention", "1", ["Art.-Bez. 1 NEU", ""]],
+			//["has_expiry_date", "0", ["Art.-Bez. 1 NEU", ""]]
+		],
+		"rewrite": [{
+			"article_no": ["Artikel-Nummer"],
+			"article_name": ["Art.-Bez. 1 NEU", " ", "Art.-Bez. 2 NEU"],
+			"article_unit": ["Verpackungseinheit"],
+			"article_ean": ["GTIN"]
+		}]
+	}
+}
+```
 [list](#list)
 
 ### tigges
