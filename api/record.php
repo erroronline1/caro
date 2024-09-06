@@ -822,11 +822,42 @@ class RECORD extends API {
 						':entry_timestamp' => $entry_timestamp,
 						':record_type' => $record_type ? : null
 					]
-				])) $this->response([
-					'response' => [
-						'msg' => LANG::GET('record.record_saved'),
-						'type' => 'success'
-					]]);
+				])) {
+					// get form recommendations
+					$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+					$hidden = $recommended = [];
+					foreach($bd as $key => $row) {
+						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+						if (!in_array($row['name'], $hidden)) {
+							$necessaryforms = $row['content'] ? explode(',', $row['content']) : [];
+							if ($necessaryforms && ($formindex = array_search($form_name, $necessaryforms)) !== false)
+								if (isset($necessaryforms[++$formindex])) $recommended[$necessaryforms[$formindex]] = ['href' => "javascript:api.record('get', 'form', '" . $necessaryforms[$formindex] . "', '" . $identifier . "')"];
+						}
+					}
+					ksort($recommended);
+					if ($recommended)
+						$this->response([
+							'response' => [
+								'msg' => LANG::GET('record.record_saved'),
+								'type' => 'success'
+							],
+							'render' => [
+								'content' => [
+									[
+										'type' => 'links',
+										'description' => LANG::GET('record.record_recommended_continue'),
+										'content' => $recommended
+									]
+								]
+							]
+						]);
+					$this->response([
+						'response' => [
+							'msg' => LANG::GET('record.record_saved'),
+							'type' => 'success'
+						],
+					]);
+				}
 				else $this->response([
 					'response' => [
 						'msg' => LANG::GET('record.record_error'),
