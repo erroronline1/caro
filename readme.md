@@ -35,8 +35,8 @@
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
-* [Code design patterns](#code-design-patterns)
 * [CSV processor](#csv-processor)
+* [Code design patterns](#code-design-patterns)
 * [API documentation](#api-documentation)
     * [Application endpoints](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
@@ -74,7 +74,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false
-* create database backups on updates
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -1191,69 +1190,6 @@ You can as well define all products as trading goods and set to 0 conditionally 
 
 [Content](#content)
 
-# Code design patterns
-For static code analysis
-
-## Frontend design
-All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
-
-A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
-
-DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
-
-_client-object handles module specific recurring tasks of form preparations (./js/utility.js)
-
-## Backend design
-There is a UTILITY class handling
-* parsing of requests
-* file handling within permitted directories
-* image processing
-
-Using these methods for fitting usecases is mandatory. (./api/_utility.php)
-
-There is a PERMISSION class handling
-* permissions as set within setup.ini
-* full approval check
-* pending approval check
-
-Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin*, scenarios lacking a logged in user (login page) or limiting access for
-* *supervisors* having access to assigned organizational unit content only
-* *groups* not having access to recording
-
-There is as SQLQUERY class handling
-* database connections
-* query preparation
-* masking user input (avoiding injections)
-* support of chunkifying queries for improved performance
-
-Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
-
-Helper modules start with _, only endpoints do not.
-
-All requests have to be executed through the api ensuring
-* responses for logged in users only
-* reaching only intended endpoints
-
-Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
-
-Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
-
-## Integration test
-* html5-qrcode
-* JsBarcode
-* qr-creator
-* signature_pad
-
-can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
-
-## Deployment process
-
-* For **installation** see [here](#installation).
-* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Code files are simply to be uploaded to the server to be available. 
-* The operator of the infrastructure is responsible for a sufficient **deletion / uninstallation** of the software, especially backend, database and backups.
-
-[Content](#content)
-
 # CSV processor
 The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
 
@@ -1513,6 +1449,69 @@ A generic sample:
 	}
 }
 ```
+
+[Content](#content)
+
+# Code design patterns
+For static code analysis
+
+## Frontend design
+All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
+
+A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
+
+DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
+
+_client-object handles module specific recurring tasks of form preparations (./js/utility.js)
+
+## Backend design
+There is a UTILITY class handling
+* parsing of requests
+* file handling within permitted directories
+* image processing
+
+Using these methods for fitting usecases is mandatory. (./api/_utility.php)
+
+There is a PERMISSION class handling
+* permissions as set within setup.ini
+* full approval check
+* pending approval check
+
+Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin*, scenarios lacking a logged in user (login page) or limiting access for
+* *supervisors* having access to assigned organizational unit content only
+* *groups* not having access to recording
+
+There is as SQLQUERY class handling
+* database connections
+* query preparation
+* masking user input (avoiding injections)
+* support of chunkifying queries for improved performance
+
+Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
+
+Helper modules start with _, only endpoints do not.
+
+All requests have to be executed through the api ensuring
+* responses for logged in users only
+* reaching only intended endpoints
+
+Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
+
+Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
+
+## Integration test
+* html5-qrcode
+* JsBarcode
+* qr-creator
+* signature_pad
+
+can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
+
+## Deployment process
+
+* For **installation** see [here](#installation).
+* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Code files are simply to be uploaded to the server to be available. Before altering tables a backup (BACKUP_caro_table) is created. On creation failure the update is supposed to be aborted.
+* The operator of the infrastructure is responsible for a sufficient **deletion / uninstallation** of the software, especially backend, database and backups.
 
 [Content](#content)
 

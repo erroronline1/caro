@@ -26,6 +26,7 @@ include_once('_sqlinterface.php');
 
 class UPDATE{
 	public $_pdo;
+	private $driver;
 
 	public function __construct(){
 		$options = [
@@ -35,16 +36,33 @@ class UPDATE{
 		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
+		$this->driver = INI['sql'][INI['sql']['use']]['driver'];
 	}
 
 	public function update(){
-		$driver = INI['sql'][INI['sql']['use']]['driver'];
 		foreach(['_2024_06_18'] as $update){
-			foreach($this->{$update}()[$driver] as $query){
+			foreach($this->{$update}() as $query){
 				echo $query . '<br />';
-				SQLQUERY::EXECUTE($this->_pdo, $query);
+				if (SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[0]) !== false)	SQLQUERY::EXECUTE($this->_pdo, $query);
+				else {
+					echo 'This update has been skipped because the database backup failed. Aborting further updates. Please contact the developer' . '<br />';
+					die();
+				}
 			}
 		}
+	}
+
+	private function backup($query){
+		preg_match("/ALTER TABLE (.+?) /m", $query, $table);
+		if (!$table[1]) return false;
+		return [
+			'mysql' => [
+				"DROP TABLE IF EXISTS BACKUP_" . $table[1]. "; CREATE TABLE BACKUP_" . $table[1]. " LIKE " . $table[1]. "; INSERT INTO BACKUP_" . $table[1]. " SELECT * FROM " . $table[1] . ";"
+			],
+			'sqlsrv' => [
+				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table[1]. "; CREATE TABLE BACKUP_" . $table[1]. " LIKE " . $table[1]. "; INSERT INTO BACKUP_" . $table[1]. " SELECT * FROM " . $table[1] . ";"
+			]
+		][$this->driver];
 	}
 
 	private function _2024_06_18(){
@@ -71,7 +89,7 @@ class UPDATE{
 				"    ADD info VARCHAR(MAX) NULL DEFAULT ''" .
 				" END"
 			]
-		];
+		][$this->driver];
 	}
 }
 $db = new UPDATE();
