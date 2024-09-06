@@ -35,8 +35,8 @@
     * [Anmerkungen und Hinweise zur Nutzung](#anmerkungen-und-hinweise-zur-nutzung)
     * [Anpassung](#anpassung)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
-* [Code Design Vorlagen](#code-design-vorlagen)
 * [CSV Processor](#csv-prozessor)
+* [Code Design Vorlagen](#code-design-vorlagen)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
 * [Risikoanalyse](#risikoanalyse)
@@ -1147,11 +1147,6 @@ Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedin
 
 [Übersicht](#übersicht)
 
-# Code Design Vorlagen
-Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse liegt in der englischsprachigen Beschreibung vor.
-
-[Übersicht](#übersicht)
-
 # CSV Prozessor
 Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
 
@@ -1411,6 +1406,11 @@ Ein beliebiges Beispiel:
 	}
 }
 ```
+
+[Übersicht](#übersicht)
+
+# Code Design Vorlagen
+Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse liegt in der englischsprachigen Beschreibung vor.
 
 [Übersicht](#übersicht)
 
