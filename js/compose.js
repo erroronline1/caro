@@ -76,7 +76,7 @@ export const compose_helper = {
 			value;
 		const setName = {
 				name: ["select", "scanner", "radio", "photo", "file", "signature"],
-				description: ["links", "checkbox", 'textblock'],
+				description: ["links", "checkbox", "textblock"],
 			},
 			buttonValues = {
 				calendarbutton: LANG.GET("planning.event_new"),
@@ -1313,6 +1313,33 @@ export class Compose extends Assemble {
 			attributes: {
 				value: LANG.GET("assemble.compose_range"),
 				"data-type": "addblock",
+			},
+		};
+		result = result.concat(...this.button());
+		return result;
+	}
+
+	compose_raw() {
+		let result = [];
+		this.currentElement = {
+			type: "code",
+			hint: LANG.GET("assemble.compose_raw_hint"),
+			attributes: {
+				name: LANG.GET("assemble.compose_raw"),
+				id: "_compose_raw",
+			},
+		};
+		result = result.concat(...this.code());
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET("assemble.compose_raw"),
+				"data-type": "addblock",
+				onpointerup:
+					"if (document.getElementById('_compose_raw').value) try {compose_helper.importComponent({content:JSON.parse(document.getElementById('_compose_raw').value)})} catch(e){ new Dialog({type:'alert', header:'" +
+					LANG.GET("assemble.compose_raw") +
+					"', render:'" +
+					LANG.GET("assemble.compose_raw_json_error") +
+					"'})}",
 			},
 		};
 		result = result.concat(...this.button());

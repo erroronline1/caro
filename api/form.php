@@ -805,6 +805,13 @@ class FORM extends API {
 				]]
 			]
 		];
+		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
+			$return['render']['content'][1][] = [[
+				'form' => false,
+				'type' => 'compose_raw',
+				'description' => LANG::GET('assemble.compose_raw')
+			]];
+		}
 		if ($component['name'] && (!PERMISSION::fullyapproved('formapproval', $component['approval'])))
 			$return['render']['content'][count($return['render']['content']) - 2][] = [
 				[
