@@ -280,8 +280,8 @@ class SQLQUERY {
 		],
 
 		'consumables_post_product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)"
 		],
 		'consumables_put_product' => [
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
@@ -302,6 +302,10 @@ class SQLQUERY {
 		'consumables_put_incorporation' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)"
+		],
+		'consumables_put_last_order' => [
+			'mysql' => "UPDATE caro_consumables_products SET last_order = CURRENT_TIMESTAMP WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET last_order = CURRENT_TIMESTAMP WHERE id  = :id"
 		],
 		'consumables_get_product' => [ // preprocess via strtr
 			'mysql' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id IN (:ids) AND prod.vendor_id = dist.id",
@@ -358,8 +362,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) IN (:ids) AND prod.vendor_id = dist.id"
 		],
 		'consumables_delete_all_unprotected_products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0 AND last_order IS NULL",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0 AND last_order IS NULL"
 		],
 		'consumables_delete_unprotected_product' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias = '' AND checked IS NULL AND incorporated = '' AND protected = 0",

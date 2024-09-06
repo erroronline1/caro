@@ -95,6 +95,22 @@ class ORDER extends API {
 							$query = 'order_put_approved_order_received';
 							break;
 						case 'delivered':
+							$decoded_order_data = json_decode($order['order_data'], true);
+							if (array_key_exists('ordernumber_label', $decoded_order_data) && array_key_exists('vendor_label', $decoded_order_data)){
+								$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+									'values' => [
+										':article_no' => $decoded_order_data['ordernumber_label'],
+										':vendor' => $decoded_order_data['vendor_label']
+									]
+								]);
+								$product = $product ? $product[0] : null;
+								if ($product) 
+								SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_last_order', [
+									'values' => [
+										':id' => $product['id']
+									]
+								]);
+							}
 							$query = 'order_put_approved_order_delivered';
 							break;
 						case 'archived':

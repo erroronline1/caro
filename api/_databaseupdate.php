@@ -40,7 +40,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach(['_2024_06_18'] as $update){
+		foreach(['_2024_09_07'] as $update){
 			foreach($this->{$update}() as $query){
 				echo $query . '<br />';
 				if (SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[0]) !== false)	SQLQUERY::EXECUTE($this->_pdo, $query);
@@ -91,6 +91,21 @@ class UPDATE{
 			]
 		][$this->driver];
 	}
+	private function _2024_09_07(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_consumables_products ADD COLUMN IF NOT EXISTS last_order datetime NULL DEFAULT NULL;"
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_consumables_products', 'last_order') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_consumables_products" .
+				"    ADD last_order smalldatetime NULL DEFAULT NULL" .
+				" END"
+			]
+		][$this->driver];
+	}
+
 }
 $db = new UPDATE();
 $db->update();

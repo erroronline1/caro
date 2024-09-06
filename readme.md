@@ -69,6 +69,8 @@
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
+* display last_ordered within orders and in product overview
+* use this information for vendor mailto regarding prodict certificates
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -761,7 +763,8 @@ graph TD;
 
 ### Order
 The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
-Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up.
+Products are intended to be selected from the database populated by pricelist imports. Manual ordering is possible though. But only products within the database can store additional information:
+Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
 
@@ -772,7 +775,7 @@ Processed but not yet received orders can have a order state change in which cas
 All actions offer to append a message.
 A label sheet can be created directly from the commission field to support allocation of products during internal delivery.
 
-Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation. 
+Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation.
 
 ![orders screenshot](assets/orders.png)
 
@@ -1026,7 +1029,8 @@ user_image = 256 ; max pixels on longer side
 ; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
 [permissions]
 appmanual = "qmo" ; contribute to and edit application manual
-audits = "ceo, qmo, prrc" ; access audits
+audits = "ceo, qmo, prrc, supervisor" ; access audits
+auditsoperation = "ceo, qmo, prrc" ; export, revoke sample checks, drain order statistics, etc.
 calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert sick days after calling in
 calendarfullaccess = "ceo" ; edit, delete or complete events and entries 

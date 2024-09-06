@@ -721,7 +721,8 @@ graph TD;
 
 ### Bestellung
 Das Bestellmodul unterstützt alle Parteien. Der Einkauf erhält strukturierte und vollständige Daten für Bestellungen, während die bestellenden Bereiche unmittelbare Informationen über den Bestellstatus erhalten.
-Bestellte Artikel erteilen unmittelbar Auskunft über ihren Einführungsstatus oder ob sie für eine Stichprobenprüfung in Frage kommen. Beide Maßnahmen können direkt aus der Auflistung bestellter Artikel ergriffen werden, während des laufenden Betriebs und ohne Verwechslungen.
+Artikel sollen aus der Datenbank gewählt werden, die durch die Preislistenimporte befüllt wird. Eine manuelle Bestellung ist jedoch möglich. Jedoch können nur Artikel in der Datenbank zusätzliche Informationen speichern:
+Bestellte Artikel erteilen unmittelbar Auskunft über ihren Einführungsstatus oder ob sie für eine Stichprobenprüfung in Frage kommen. Beide Maßnahmen können direkt aus der Auflistung bestellter Artikel ergriffen werden, während des laufenden Betriebs und ohne Verwechslungen. Das Datum der letzten Bestellung wird bei ausgelieferten Artikeln aktualisiert.
 
 Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN) gesammelt freigegeben werden.
 
@@ -982,7 +983,8 @@ user_image = 256 ; maximale Pixel für längste Seite
 ; Im Falle einer Änderung von Berechtigungen für Freigaben müssen alle Elemente auch Rückwirkend von der neuen Gruppe freigegeben werden!
 [permissions]
 appmanual = "qmo" ; Ergänzugen und Änderungen der Anleitung
-audits = "ceo, qmo, prrc" ; Zugriff auf das Audit-Modul
+audits = "ceo, qmo, prrc, supervisor" ; Zugriff auf das Audit-Modul
+auditsoperation = "ceo, qmo, prrc" ; Erlaubnis zum Export, dem Widerruf von Stichprobenprüfungen, dem Löschen von Bestellstatistiken, etc.
 calendaredit = "ceo, qmo, supervisor" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach telefonischer Meldung
 calendarfullaccess = "ceo" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
