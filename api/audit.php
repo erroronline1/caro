@@ -79,7 +79,7 @@ class AUDIT extends API {
 						$selecttypes[LANG::GET('audit.checks_type.' . $category)] = ['value' => $category];
 						if ($this->_requestedType === $category) $selecttypes[LANG::GET('audit.checks_type.' . $category)]['selected'] = true;
 				}
-
+				ksort($selecttypes);
 				$result['render']['content'][] = [
 					[
 						'type' => 'select',
@@ -97,6 +97,7 @@ class AUDIT extends API {
 				$this->response($result);
 				break;
 			case 'DELETE':
+				if (!PERMISSION::permissionFor('auditsoperation')) $this->response([], 401);
 				$permitted = [
 					'orderstatistics'
 				];
@@ -168,6 +169,7 @@ class AUDIT extends API {
 	 * calls export . $this->_requestedType method
 	 */
 	public function export(){
+		if (!PERMISSION::permissionFor('auditsoperation')) $this->response([], 401);
 		$static = [
 			'incorporation',
 			'forms',
@@ -345,7 +347,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		$content[] = [
+		if (PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -445,7 +447,7 @@ class AUDIT extends API {
 			]
 		];
 		// add export button
-		$content[] = [
+		if (PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -570,7 +572,7 @@ class AUDIT extends API {
 			]
 		];
 		// add export button
-		$content[] = [
+		if (PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -595,7 +597,7 @@ class AUDIT extends API {
 				]),
 				'content' => $row['content']
 			];
-			$entries[] = [
+			if(PERMISSION::permissionFor('auditsoperation')) $entries[] = [
 				'type' => 'button',
 				'attributes' => [
 					'type' => 'button',
@@ -632,7 +634,7 @@ class AUDIT extends API {
 			]
 		];
 
-		if (count($orders)){
+		if (count($orders) && PERMISSION::permissionFor('auditsoperation')){
 			// add export button
 			$content[] = [
 				[
@@ -782,7 +784,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		$content[] = [
+		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -861,7 +863,7 @@ class AUDIT extends API {
 		// prepare existing risks lists
 		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 		// add export button
-		$content[] = [
+		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -951,7 +953,7 @@ class AUDIT extends API {
 	 */
 	private function userexperience(){
 		// add export button
-		$content[] = [
+		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -1060,7 +1062,7 @@ class AUDIT extends API {
 	 */
 	private function userskills(){
 		// add export button
-		$content[] = [
+		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -1250,7 +1252,7 @@ class AUDIT extends API {
 		];
 
 		// add export button
-		$content[] = [
+		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
