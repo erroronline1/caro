@@ -491,6 +491,12 @@ export function rendertest(element) {
 						},
 					],
 				],
+				[
+					{
+						type: "undefined",
+						description: "This is deliberately to fail by the assembler."
+					}
+				]
 			],
 		},
 		app_de: {
@@ -618,6 +624,12 @@ export function rendertest(element) {
 						},
 					],
 				],
+				[
+					{
+						type: "undefined",
+						description: "Dies soll absichtlich einen Fehler im Assembler erzeugen"
+					}
+				]
 			],
 		},
 	};

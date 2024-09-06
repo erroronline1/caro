@@ -466,7 +466,7 @@ export class Assemble {
 					{
 						text: image.content,
 						size: 1024,
-						ecLevel: (api._settings.ini.limits && api._settings.ini.limits.qr_errorlevel) ? api._settings.ini.limits.qr_errorlevel : "M",
+						ecLevel: api._settings.ini.limits && api._settings.ini.limits.qr_errorlevel ? api._settings.ini.limits.qr_errorlevel : "M",
 						background: null,
 						fill: "#000000",
 						radius: 1,
@@ -555,8 +555,15 @@ export class Assemble {
 			try {
 				if (elements.type) content = content.concat(this[elements.type]());
 			} catch (e) {
-				console.trace(elements.type, e);
-				return false;
+				this.currentElement = {
+					type: "textblock",
+					description: LANG.GET("assemble.error_faulty_widget"),
+					content: JSON.stringify(elements, null, " "),
+					attributes: {
+						class: "red",
+					},
+				};
+				content = content.concat(this.textblock());
 			}
 		}
 		return content;
