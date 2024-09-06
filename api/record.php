@@ -140,6 +140,7 @@ class RECORD extends API {
 	 *          |_|
 	 */
 	private function export($summarize = "full"){
+		if (!PERMISSION::permissionFor('recordsexport')) $this->response([], 401);
 		$content = $this->summarizeRecord($summarize);
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
@@ -978,7 +979,7 @@ class RECORD extends API {
 							'content' => $content['files'][$form]
 						]); 
 					}
-					if ($form != LANG::GET('record.record_retype_pseudoform_name')){
+					if ($form != LANG::GET('record.record_retype_pseudoform_name') && PERMISSION::permissionFor('recordsexport')){
 						array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
@@ -1014,20 +1015,24 @@ class RECORD extends API {
 							],
 							'hint' => LANG::GET('record.record_match_bundles_hint'),
 							'content' => $bundles
-						], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => LANG::GET('record.record_full_export'),
-								'onpointerup' => "api.record('get', 'fullexport', '" . $this->_requestedID . "')"
+						]];
+						
+					if (PERMISSION::permissionFor('recordsexport'))
+						array_push ($return['render']['content'][count($return['render']['content']) - 1], [
+							[
+								'type' => 'button',
+								'attributes' => [
+									'value' => LANG::GET('record.record_full_export'),
+									'onpointerup' => "api.record('get', 'fullexport', '" . $this->_requestedID . "')"
+								]
+							], [
+								'type' => 'button',
+								'attributes' => [
+									'value' => LANG::GET('record.record_simplified_export'),
+									'onpointerup' => "api.record('get', 'simplifiedexport', '" . $this->_requestedID . "')"
+								]
 							]
-						], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => LANG::GET('record.record_simplified_export'),
-								'onpointerup' => "api.record('get', 'simplifiedexport', '" . $this->_requestedID . "')"
-							]
-						]
-					];
+						]);
 					
 					$content['closed'] = $content['closed'] ? json_decode($content['closed'], true) : [];
 					$approvalposition = [];

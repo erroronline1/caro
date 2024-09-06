@@ -73,7 +73,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* define record export permissions? formwise, full, simplified
 * supervisor insights for trainings outside of audit scope - or audit readonly and special export and post/put permission
 * review modal return on closing -> still not always returning false
 * create database backups on updates
