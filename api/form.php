@@ -236,7 +236,8 @@ class FORM extends API {
 					':author' => $_SESSION['user']['name'],
 					':content' => $content,
 					':regulatory_context' => '',
-					':permitted_export' => null
+					':permitted_export' => null,
+					':restricted_access' => null
 				];
 
 				if (!trim($bundle[':name']) || !trim($bundle[':content'])) $this->response([], 400);
@@ -261,7 +262,8 @@ class FORM extends API {
 							':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_hidden')) === LANG::PROPERTY('assemble.edit_bundle_hidden_hidden')? 1 : 0,
 							':id' => $exists['id'],
 							':regulatory_context' => '',
-							':permitted_export' => null
+							':permitted_export' => null,
+							':restricted_access' => null
 						]
 					])) $this->response([
 						'response' => [
