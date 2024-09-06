@@ -76,6 +76,7 @@
 * define record export permissions? formwise, full, simplified
 * supervisor insights for trainings outside of audit scope - or audit readonly and special export and post/put permission
 * review modal return on closing -> still not always returning false
+* create database backups on updates
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -2575,6 +2576,20 @@ Sample response
 
 ### Record endpoints
 
+> GET ./api/api.php/record/bundles/{search}
+
+Returns available approved forms grouped by bundles.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | optional | search term to filter results |
+
+Sample response
+```
+{"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'form', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'form', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'form', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'form', 'restricted documentation')"}}}]}}
+```
+
 > PUT ./api/api.php/record/close/{identifier}
 
 Marks all database entries with passed identifier as closed.
@@ -3531,7 +3546,7 @@ I welcome any constructive input on this topic.
 | Version control unavailable | Low | High (recording changes is crucial) | Git is an established version control running locally | It is *really* unlikely Git will vanish in the near future |
 | Lacking user input | High | High (user requirements not satisfied, lack of compliance) | Regular meetings to match requirements | I do the best I can |
 | Insufficient testing | High (currently single developer) | High (application unstable) | Reduce errors by implementing globally reusable methods and a simplified framework, modularize endpoints | none | 
-| Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production | At best compensating skipped updates |
+| Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production, create database backups | At best compensating skipped updates |
 
 ## Software environment risks
 > The operator of the infrastructure is responsible for fulfilling these requirements.

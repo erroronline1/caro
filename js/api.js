@@ -1012,10 +1012,11 @@ export const api = {
 				}
 			},
 			title = {
-				identifier: LANG.GET("menu.record_create_identifier"),
+				bundles: LANG.GET("menu.record_bundles"),
 				forms: LANG.GET("menu.record_record"),
-				records: LANG.GET("menu.record_summary"),
+				identifier: LANG.GET("menu.record_create_identifier"),
 				record: LANG.GET("menu.record_summary"),
+				records: LANG.GET("menu.record_summary"),
 			};
 		switch (method) {
 			case "get":

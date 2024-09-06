@@ -40,6 +40,61 @@ class RECORD extends API {
 	}
 
 	/**
+	 *   _             _ _         
+	 *  | |_ _ _ ___ _| | |___ ___ 
+	 *  | . | | |   | . | | -_|_ -|
+	 *  |___|___|_|_|___|_|___|___|
+	 * 
+	 */
+	public function bundles(){
+		$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+		$hidden = $bundles = [];
+		foreach($bd as $key => $row) {
+			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if ($this->_requestedID) similar_text($this->_requestedID, $row['name'], $percent);
+			if (!in_array($row['name'], $hidden) && (!$this->_requestedID || $percent >= INI['likeliness']['file_search_similarity'])) {
+				if (($forms = $row['content'] ? explode(',', $row['content']) : false) !== false){
+					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
+					foreach ($forms as $key => $formname){
+						// recurring queries to make sure linked forms are permitted
+						if ($form = $this->latestApprovedName('form_form_get_by_name', $formname))
+							$bundles[$row['name']][$form['name']] = ['href' => "javascript:api.record('get', 'form', '" . $form['name'] . "')", 'data-filtered' => $row['id']];
+					}
+				}
+			}
+		}
+		
+		$return['render'] = ['content' => [
+			[
+				[
+					'type' => 'datalist',
+					'content' => array_keys($bundles),
+					'attributes' => [
+						'id' => 'bundles'
+					]
+				], [
+					'type' => 'filtered',
+					'attributes' => [
+						'name' => LANG::GET('record.form_filter'),
+						'list' => 'bundles',
+						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'bundles', this.value); return false;}",
+						'onblur' => "api.record('get', 'bundles', this.value); return false;",
+						'value' => $this->_requestedID ? : ''
+					]
+				]
+			]
+		]];
+		foreach ($bundles as $bundle => $list){
+			$return['render']['content'][] = [
+				'type' => 'links',
+				'description' => $bundle,
+				'content' => $list
+			];
+		}
+		$this->response($return);
+	}
+
+	/**
 	 *       _
 	 *   ___| |___ ___ ___
 	 *  |  _| | . |_ -| -_|
@@ -538,12 +593,11 @@ class RECORD extends API {
 					break;
 				}
 			}
-			$return['render']['content'][] = 					[
+			$return['render']['content'][] = [
 				'type' => 'links',
 				'description' => $contexttranslation,
 				'content' => $list
 			];
-
 		}
 		$this->response($return);
 	}
@@ -682,8 +736,8 @@ class RECORD extends API {
 			]
 		]);
 		foreach ($elements as $element){
-			if (in_array($element['context'], ['bundle'])) return $element;
-			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+			if (!$element['hidden'] && in_array($element['context'], ['bundle'])) return $element;
+			if (!$element['hidden'] && PERMISSION::fullyapproved('formapproval', $element['approval']) && PERMISSION::permissionIn($element['restricted_access'])) return $element;
 		}
 		return false;
 	}
@@ -830,8 +884,13 @@ class RECORD extends API {
 						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 						if (!in_array($row['name'], $hidden)) {
 							$necessaryforms = $row['content'] ? explode(',', $row['content']) : [];
-							if ($necessaryforms && ($formindex = array_search($form_name, $necessaryforms)) !== false)
-								if (isset($necessaryforms[++$formindex])) $recommended[$necessaryforms[$formindex]] = ['href' => "javascript:api.record('get', 'form', '" . $necessaryforms[$formindex] . "', '" . $identifier . "')"];
+							if ($necessaryforms && ($formindex = array_search($form_name, $necessaryforms)) !== false) {
+								if (isset($necessaryforms[++$formindex])) {
+									// recurring queries to make sure linked forms are permitted
+									if ($form = $this->latestApprovedName('form_form_get_by_name', $necessaryforms[$formindex]))
+										$recommended[$form['name']] = ['href' => "javascript:api.record('get', 'form', '" . $form['name'] . "', '" . $identifier . "')"];
+								}
+							}
 						}
 					}
 					ksort($recommended);
