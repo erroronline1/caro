@@ -674,8 +674,8 @@ join tables
 		},
 		"conditional_or": [
 			["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
-			["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|85h.+|636K.+"]]
-			["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen"]],
+			["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|85h.+|636K.+"]],
+			["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen"]]
 		],
 		"rewrite": [{
 			"article_no": ["Material"],
