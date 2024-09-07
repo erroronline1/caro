@@ -37,6 +37,11 @@
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [CSV processor](#csv-processor)
 * [Code design patterns](#code-design-patterns)
+    * [Frontend design](#frontend-design)
+    * [Backend design](#backend-design)
+    * [Integrations tests](#integration-test)
+    * [Dependency graph](#dependency-graph)
+    * [Deployment process](#deployment-process)
 * [API documentation](#api-documentation)
     * [Application endpoints](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
@@ -1505,6 +1510,8 @@ Application endpoint (landing page) differs for availability of login page for o
 
 Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
 
+[Content](#content)
+
 ## Integration test
 * html5-qrcode
 * JsBarcode
@@ -1512,6 +1519,61 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 * signature_pad
 
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
+
+## Dependency graph
+
+```mermaid
+graph LR;
+    frontend((frontend))-->libraries_js(libraries);
+    libraries_js-->html5qrcode(html5-qrcode.min.js);
+    libraries_js-->jsbarcode(JsBarcode.all.min.js);
+    libraries_js-->qr-creator(qr-creator.js);
+    libraries_js-->signature_pad(signature_pad.umd.js)
+    libraries_js-->viewstl(viewstl)
+
+    frontend-->modules_js(modules);
+    modules_js-->api_js(api.js);
+    modules_js-->assemble_js(assemble.js);
+    modules_js-->conpose_js(compose.js);
+    modules_js-->import_js(import.js);
+    modules_js-->language_js(language.js);
+    modules_js-->utility_js(utility.js);
+
+    backend((backend))-->libraries_php(libraries);
+    libraries_php-->tcpdf(TCPDF);
+    libraries_php-->xlsxwriter(xlsxwriter.class.php)
+
+    backend-->modules_php(modules);
+    modules_php-->calendarutility(_calendarutility.php);
+    modules_php-->csvprocessor(_csvprocessor.php);
+    modules_php-->databaseupdate(_databaseupdate.php);
+    modules_php-->installdefault("_installdefault.de.ini
+    _installdefault.en.ini");
+    modules_php-->install(_install.php);
+    modules_php-->language(_language.php);
+    modules_php-->pdf(_pdf.php);
+    modules_php-->sqlinterface(_sqlinterface.php);
+    modules_php-->utility(_utility.php);
+    modules_php-->api(api.php);
+    modules_php-->application(application.php);
+    modules_php-->audit(audit.php);
+    modules_php-->calendar(calendar.php)
+    modules_php-->consumables(consumables.php);
+    modules_php-->csvfilter(csvfilter.php);
+    modules_php-->file(file.php);
+    modules_php-->form(form.php);
+    modules_php-->languagefiles("language.de.ini
+    language.en.ini");
+    modules_php-->message(message.php);
+    modules_php-->notification(notification.php);
+    modules_php-->order(order.php);
+    modules_php-->record(record.php);
+    modules_php-->risk(risk.php);
+    modules_php-->setup(setup.ini);
+    modules_php-->texttemplate(texttemplate.php);
+    modules_php-->tool(toolp.php);
+    modules_php-->user(user.php);
+```
 
 ## Deployment process
 
