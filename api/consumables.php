@@ -850,11 +850,18 @@ class CONSUMABLES extends API {
 								]
 							]
 						];
-						if ($product['incorporated'] !== '' ) {					
+						if ($product['id'] && $product['last_order']){
+							$result['render']['content'][2][] = [
+								'type' => 'textblock',
+								'description' => LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]),
+							];
+						}
+						if ($product['incorporated'] !== '') {					
 							$product['incorporated'] = json_decode($product['incorporated'], true);
 							$incorporationState = '';
 							if (array_key_exists('_denied', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
 							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
+							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_accepted');
 			
 							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 							foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
@@ -1044,6 +1051,12 @@ class CONSUMABLES extends API {
 									'id' => '_batchactive'
 								]
 							] 
+						];
+					}
+					if ($product['id'] && $product['last_order']){
+						$result['render']['content'][2][] = [
+							'type' => 'textblock',
+							'description' => LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)])
 						];
 					}
 

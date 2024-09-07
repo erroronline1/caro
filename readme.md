@@ -69,7 +69,6 @@
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
 * vendor mailto (certificates)
-* display last_ordered within orders and in product overview
 * use this information for vendor mailto regarding prodict certificates
 
 #### application considerations

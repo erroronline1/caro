@@ -320,8 +320,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id"
 		],
 		'consumables_get_product_by_article_no_vendor' => [
-			'mysql' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT prod.id, prod.last_order FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.id, prod.last_order FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id"
 		],
 		'consumables_get_eligible_sample_check' => [ // must be splitted with the following two queries for sql performance reasons
 			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "

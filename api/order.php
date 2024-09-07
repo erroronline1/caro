@@ -541,6 +541,14 @@ class ORDER extends API {
 							];		
 						}}
 
+					if (array_key_exists('ordernumber_label', $decoded_order_data) && array_key_exists('vendor_label', $decoded_order_data))
+						$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+							'values' => [
+								':article_no' => $decoded_order_data['ordernumber_label'],
+								':vendor' => $decoded_order_data['vendor_label']
+							]
+						]);
+					$product = $product ? $product[0] : null;
 
 					$messagepayload=[];
 					foreach (['quantity'=> 'quantity_label',
@@ -564,7 +572,8 @@ class ORDER extends API {
 								"'".LANG::GET('order.add_information_cancel')."': false,".
 								"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
 								"})"]
-						]
+						],
+						'hint' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null
 					];
 					array_push($content, ...$copy);
 
