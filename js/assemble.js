@@ -1190,7 +1190,7 @@ export class Assemble {
 					"': {value: true, class: 'reducedCTA'}," +
 					"}}).then(response => { const e = document.getElementById('" +
 					input.id +
-					"'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}; e.dispatchEvent(new Event('change'));})"
+					"'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}; e.dispatchEvent(new Event('change')); e.blur();})"
 			);
 		}
 
