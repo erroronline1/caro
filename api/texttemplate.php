@@ -23,6 +23,7 @@ class TEXTTEMPLATE extends API {
     public $_requestedMethod = REQUEST[1];
     private $_requestedID = null;
 	private $_modal = null;
+	private $_clientimport = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -30,6 +31,7 @@ class TEXTTEMPLATE extends API {
 
 		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
 		$this->_modal = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
+		$this->_clientimport = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -54,6 +56,9 @@ class TEXTTEMPLATE extends API {
 				];
 
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
+				foreach(INI['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
+				}
 				preg_match("/[^\w\d]/m", $chunk[':name'], $matches);
 				if ($matches) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 
@@ -148,6 +153,9 @@ class TEXTTEMPLATE extends API {
 					}
 					$alloptions[$display . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
+				}
+				foreach (LANGUAGEFILE['texttemplate']['system'] as $key => $value){
+					$insertreplacement[$value] = ['value' => ':' . $key];
 				}
 
 				$units = [];
@@ -595,7 +603,7 @@ class TEXTTEMPLATE extends API {
 					'type' => 'select',
 					'attributes' => [
 						'name' => LANG::GET('texttemplate.use_text_select', [':unit' => LANGUAGEFILE['units'][$unit]]),
-						'onchange' => "api.texttemplate('get', 'text', this.value" . ($this->_modal ? ", 'modal')" : ")")
+						'onchange' => "api.texttemplate('get', 'text', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 					],
 					'content' => $templates
 				]
@@ -644,6 +652,24 @@ class TEXTTEMPLATE extends API {
 					]
 				];
 			}
+			// import button (values from passed document-element-ids)
+			// $this->_clientimport as json-string with ':placeholder' : 'inputid' pairs
+			if($this->_clientimport && $undefined){
+				$clientimport = [];
+				// only display placeholders defined within chunk on button, not neccessarily all passed ones
+				foreach(json_decode($this->_clientimport, true) as $key => $value){
+					if (in_array($key, $undefined)) $clientimport[$key] = $value;
+				}
+				$inputs[] = [
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => LANG::GET('texttemplate.use_import', [':placeholders' => implode(', ', array_keys($clientimport))]),
+						'onpointerup' => "_client.texttemplate.import('" . $this->_clientimport . "');"
+					],
+					'hint' => LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
+				];	
+			}
 
 			foreach (json_decode($template['content']) as $block){
 				$useblocks = [];
@@ -656,6 +682,7 @@ class TEXTTEMPLATE extends API {
 					'content' => $useblocks
 				];
 			}
+			// refreshbutton
 			$inputs[] = [
 				'type' => 'button',
 				'attributes' => [

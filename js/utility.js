@@ -20,7 +20,7 @@ const _serviceWorker = {
 	worker: null,
 	permission: null,
 	notif: {
-		calendar_uncompletedevents: function(data){
+		calendar_uncompletedevents: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
@@ -29,7 +29,7 @@ const _serviceWorker = {
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
-		form_approval: function(data){
+		form_approval: function (data) {
 			let notif;
 			if ("form_approval" in data) {
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
@@ -38,17 +38,17 @@ const _serviceWorker = {
 				if (notif) notif.setAttribute("data-notification", data.form_approval);
 			}
 		},
-		interval : null,
-		message_unseen: function(data){
+		interval: null,
+		message_unseen: function (data) {
 			if ("message_unseen" in data) {
 				let notif;
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-			}	
+			}
 		},
-		order_unprocessed_consumables_pendingincorporation: function(data){
+		order_unprocessed_consumables_pendingincorporation: function (data) {
 			let notif;
 			if ("order_unprocessed" in data || "consumables_pendingincorporation" in data) {
 				let order_unprocessed = 0,
@@ -66,7 +66,7 @@ const _serviceWorker = {
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 			}
-		}
+		},
 	},
 	onMessage: function (message) {
 		const data = message.data;
@@ -432,6 +432,22 @@ const _client = {
 				}
 			}
 			document.getElementById("texttemplate").value = output;
+		},
+		import: (elements = "") => {
+			try {
+				elements = JSON.parse(elements);
+			} catch (e) {
+				return;
+			}
+			const converted_elements = {};
+			// convert element keys to valid placeholder ids
+			for (const [key, value] of Object.entries(elements)) {
+				converted_elements[key.replace(/\W/gm, "")] = value;
+			}
+			const placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
+			for (const input of placeholder) {
+				if (input.id in converted_elements) input.value = document.getElementById(converted_elements[input.id]) ? document.getElementById(converted_elements[input.id]).value : "";
+			}
 		},
 	},
 	tool: {
