@@ -1623,6 +1623,13 @@ class CONSUMABLES extends API {
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => substr($path, 1)];
 					}
 				}
+
+				if ($vendor['id']) $vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+					'values' => [
+						':ids' => intval($vendor['id'])
+					]
+				]);
+
 				if (!PERMISSION::permissionFor('products')) {
 					// standard user view
 					$result['render'] = ['content' => [
@@ -1652,13 +1659,8 @@ class CONSUMABLES extends API {
 					// display selected vendor
 					if ($vendor['id']) {
 						$isactive['disabled'] = $isinactive['disabled'] = true;
-						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-							'values' => [
-								':ids' => intval($vendor['id'])
-							]
-						]);
 						$available = 0;
-						foreach($products as $product){
+						foreach($vendorproducts as $product){
 							if ($product['active']) $available++;
 						}
 						$result['render']['content'][] = [
@@ -1739,35 +1741,31 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_mail'),
 									'value' => array_key_exists('mail', $vendor['info']) ? $vendor['info']['mail']: '',
-									'rows' => 8
 								]
 							], [
 								'type' => 'tel',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_phone'),
 									'value' => array_key_exists('phone', $vendor['info']) ? $vendor['info']['phone']: '',
-									'rows' => 8
 								]
 							], [
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_address'),
 									'value' => array_key_exists('address', $vendor['info']) ? $vendor['info']['address']: '',
-									'rows' => 8
 								]
 							], [
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
 									'value' => array_key_exists('sales_representative', $vendor['info']) ? $vendor['info']['sales_representative']: '',
-									'rows' => 8
 								]
 							], [
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_customer_id'),
 									'value' => array_key_exists('customer_id', $vendor['info']) ? $vendor['info']['customer_id']: '',
-									'rows' => 8
+									'id' => 'vendor_customer_id'
 								]
 							], [
 								'type' => 'radio',
@@ -1785,7 +1783,8 @@ class CONSUMABLES extends API {
 									'type' => 'date',
 									'attributes' => [
 										'name' => LANG::GET('consumables.edit_vendor_certificate_validity'),
-										'value' => $vendor['certificate']['validity'] ? : ''
+										'value' => $vendor['certificate']['validity'] ? : '',
+										'id' => 'vendor_certificate_validity'
 									]
 								]
 							], [
@@ -1823,6 +1822,7 @@ class CONSUMABLES extends API {
 						'data-confirm' => true
 					]];
 
+					// add pricelist upload form
 					if ($vendor['id'] && $vendor['active'] == 1)
 						array_splice($result['render']['content'][4], 0, 0,
 							[[[
@@ -1833,6 +1833,7 @@ class CONSUMABLES extends API {
 								]
 							]]]
 						);
+					// add certificate download
 					if ($certificates) array_splice($result['render']['content'][2], 0, 0,
 						[
 							[
@@ -1842,6 +1843,7 @@ class CONSUMABLES extends API {
 							]
 						]
 					);
+					// add document downloads
 					if ($documents) $result['render']['content'][3]=[
 						[
 							[
@@ -1852,6 +1854,7 @@ class CONSUMABLES extends API {
 						],
 						$result['render']['content'][3]
 					];
+					// add pricelist info if provided
 					if ($vendor['pricelist']['validity']) array_splice($result['render']['content'][4], 0, 0,
 						[[
 							[
@@ -1875,6 +1878,49 @@ class CONSUMABLES extends API {
 							]
 						]]
 					);
+
+					// mail vendor e.g. requesting documents regarding products with special attention
+					// requires text chunks though
+					// using :CID and :PRD as reserved replacement keys
+					if ($vendor['id']){
+						$special_attention = [];
+						// create selection of products to request, ordered are preselected for relevance 
+						foreach($vendorproducts as $product){
+							if ($product['special_attention']){
+								$prd = $product['article_no'] . " " . $product['article_name'];
+								$special_attention[$prd] = ['value' => $prd];
+								if ($product['last_order']) $special_attention[$prd]['checked'] = true;
+							}
+						}
+						$result['render']['content'][] = [
+							[
+								'type' => 'textblock',
+								'description' => LANG::GET('consumables.message_vendor'),
+								'content' => LANG::GET('consumables.message_vendor_hint')
+							],
+							[
+								'type' => 'checkbox2text',
+								'attributes' => [
+									'name' => LANG::GET('consumables.message_vendor_select_special_attention_products'),
+									'id' => 'select_special_attention_products'
+								],
+								'content' => $special_attention,
+								'hint' => LANG::GET('consumables.message_vendor_select_special_attention_products_hint')
+							],
+							[
+								'type' => 'button',
+								'attributes' => [
+									'type' => 'button',
+									'value' => LANG::GET('menu.texttemplate_texts'),
+									'onpointerup' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
+										':PRD' => 'select_special_attention_products',
+										':CID' => 'vendor_customer_id',
+										':ECR' => 'vendor_certificate_validity'
+									]) . "')",
+								]
+							]
+						];
+					}
 				}
 				if ($vendor['name']) $result['header'] = $vendor['name'];
 				$this->response($result);

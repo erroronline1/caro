@@ -68,8 +68,6 @@
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
-* vendor mailto (certificates)
-* use this information for vendor mailto regarding prodict certificates
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -148,6 +146,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * a sample check has been made
         * any document to the product has been provided
         * an alias has been modified
+        * it has been ordered 
     * Vendor and product editing is permitted by defined authorized users only.
     * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
@@ -272,7 +271,8 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 * If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing.
 * Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.
-* Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities. 
+* Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities.
+* Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.
 
 ![sample form screenshot](assets/sample%20form.png)
 
@@ -394,6 +394,8 @@ On creating a text you can make use of predefined replacements that may contain 
 *"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNominative can make use of the aid."*
 
 rendered to *"We write to inform you about **the woman Gladys**. We just want to tell you **Gladys** is doing fine. **The woman** can make use od the aid."*
+
+The [vendor management](#vendor-and-product-management) makes use of system preset placeholders. Text recommendations making use of :CID, :PRD or :ECR for example can import prepared values for these.
 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
@@ -692,6 +694,7 @@ Disabled products are not accessible through the order module. Products can be d
 Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
+The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 
 While editing products, one can edit the
 * *trading good*-setting,
@@ -994,7 +997,7 @@ names[] = "^.{0,3}$" ; less than 4 characters
 names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[] = "^_" ; names must not start with _
 names[] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle)$" ; literal terms |-separated
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle|recordretype|CID|PRD|ECR)$" ; literal terms |-separated
 
 [lifespan]
 idle = 2700 ; SECONDS after which a session expires without intermittend request
@@ -2908,7 +2911,7 @@ Stores a text template.
 
 Similar to chunk.
 
-> GET ./api/api.php/texttemplate/text/{id}/{modal}
+> GET ./api/api.php/texttemplate/text/{id}/{modal}/{clientimport}
 
 Returns a form with selection of text recommendations, content if {id} is added. Formats for modal if passed literally.
 
@@ -2917,6 +2920,7 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {id} | path parameter | optional | database id for chunk or false |
 | {modal} | path parameter | optional | "modal" literally alters response to be loadable within modal |
+| {clientimport} | path parameter | optional | json-string with ':placeholder' : 'inputid' pairs to import placeholders from prepared client elements |
 
 Sample response
 ```
