@@ -78,6 +78,8 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
+* vendor message import button only if something is passed
+* vendor message special attention selection only if there are any
 
 #### records considerations
 * linked files on separate external path, input type convert to link
