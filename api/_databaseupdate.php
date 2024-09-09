@@ -60,7 +60,7 @@ class UPDATE{
 				"DROP TABLE IF EXISTS BACKUP_" . $table[1]. "; CREATE TABLE BACKUP_" . $table[1]. " LIKE " . $table[1]. "; INSERT INTO BACKUP_" . $table[1]. " SELECT * FROM " . $table[1] . ";"
 			],
 			'sqlsrv' => [
-				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table[1]. "; CREATE TABLE BACKUP_" . $table[1]. " LIKE " . $table[1]. "; INSERT INTO BACKUP_" . $table[1]. " SELECT * FROM " . $table[1] . ";"
+				"IF OBJECT_ID(N'dbo.BACKUP_" . $table[1]. "', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table[1]. "; SELECT * INTO BACKUP_" . $table[1]. " FROM " . $table[1] . ";"
 			]
 		][$this->driver];
 	}
