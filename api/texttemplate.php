@@ -660,7 +660,7 @@ class TEXTTEMPLATE extends API {
 				foreach(json_decode($this->_clientimport, true) as $key => $value){
 					if (in_array($key, $undefined)) $clientimport[$key] = $value;
 				}
-				$inputs[] = [
+				if ($clientimport) $inputs[] = [
 					'type' => 'button',
 					'attributes' => [
 						'type' => 'button',
