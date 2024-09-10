@@ -1883,7 +1883,7 @@ class CONSUMABLES extends API {
 					// requires text chunks though
 					// using :CID and :PRD as reserved replacement keys
 					if ($vendor['id']){
-						$special_attention = [];
+						$special_attention = $texttemplate = [];
 						// create selection of products to request, ordered are preselected for relevance 
 						foreach($vendorproducts as $product){
 							if ($product['special_attention']){
@@ -1892,34 +1892,33 @@ class CONSUMABLES extends API {
 								if ($product['last_order']) $special_attention[$prd]['checked'] = true;
 							}
 						}
-						$result['render']['content'][] = [
-							[
-								'type' => 'textblock',
-								'description' => LANG::GET('consumables.message_vendor'),
-								'content' => LANG::GET('consumables.message_vendor_hint')
+						$texttemplate[] = [
+							'type' => 'textblock',
+							'description' => LANG::GET('consumables.message_vendor'),
+							'content' => $special_attention ? LANG::GET('consumables.message_vendor_hint') : ''
+						];
+						if ($special_attention) $texttemplate[] = [
+							'type' => 'checkbox2text',
+							'attributes' => [
+								'name' => LANG::GET('consumables.message_vendor_select_special_attention_products'),
+								'id' => 'select_special_attention_products'
 							],
-							[
-								'type' => 'checkbox2text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.message_vendor_select_special_attention_products'),
-									'id' => 'select_special_attention_products'
-								],
-								'content' => $special_attention,
-								'hint' => LANG::GET('consumables.message_vendor_select_special_attention_products_hint')
-							],
-							[
+							'content' => $special_attention,
+							'hint' => LANG::GET('consumables.message_vendor_select_special_attention_products_hint')
+						];
+						$texttemplate[] = [
+							'type' => 'button',
+							'attributes' => [
 								'type' => 'button',
-								'attributes' => [
-									'type' => 'button',
-									'value' => LANG::GET('menu.texttemplate_texts'),
-									'onpointerup' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
-										':PRD' => 'select_special_attention_products',
-										':CID' => 'vendor_customer_id',
-										':ECR' => 'vendor_certificate_validity'
-									]) . "')",
-								]
+								'value' => LANG::GET('menu.texttemplate_texts'),
+								'onpointerup' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
+									':PRD' => 'select_special_attention_products',
+									':CID' => 'vendor_customer_id',
+									':ECR' => 'vendor_certificate_validity'
+								]) . "')",
 							]
 						];
+						$result['render']['content'][] = $texttemplate;
 					}
 				}
 				if ($vendor['name']) $result['header'] = $vendor['name'];
