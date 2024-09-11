@@ -43,6 +43,7 @@
     * [Dependency graph](#dependency-graph)
     * [Deployment process](#deployment-process)
 * [API documentation](#api-documentation)
+    * [Request flow](#request-flow)
     * [Application endpoints](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
     * [Calendar endpoints](#calendar-endpoints)
@@ -1596,6 +1597,40 @@ Response properties are
 * *links* (csv-filter result file)
 
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS compose_helper-methods (./js/compose.js). Processing is regularily dependent on specific names.
+
+## Request flow
+```mermaid
+graph TD;
+    request((request))-->api_js(api.js);
+    api_js-->api_php(api.php);
+    api_php-->language_php(_language.php);
+    api_php-->setup(setup.ini);
+    api_php-->sql(_sqlinterface.php);
+    api_php-->utility_php(_utility.php);
+
+    api_php<==>module(*.php);
+    language_php<-->module;
+    setup<-->module;
+    sql<-->module;
+    utility_php<-->module;
+
+    module<-->calendar(_calendarutility.php)
+    module<-->csv(_csvprocessor.php);
+    module<-->pdf(_pdf.php);
+    module<-->libraries([libraries]);
+    module==>api_php2(api.php);
+
+    api_php2-->response((response));
+    response-->api_js2(api.js);
+    api_js2<-->language_js(language.js);
+    api_js2<-->utility_js(utility.js);
+    api_js2<-->libraries;
+    api_js2==>compose(compose.js);
+    api_js2==>assemble(assemble.js);
+    compose==>assemble;
+```
+
+[Content](#content)
 
 ## Application endpoints
 
