@@ -1112,6 +1112,7 @@ products_per_slide = 6
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
     * [formcontext][anonymous]
+    * [calendar][timesheet_signature]
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
 
 If you ever fiddle around with the sourcecode:

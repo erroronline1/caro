@@ -1063,6 +1063,7 @@ products_per_slide = 6
     * [units]
     * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
     * [formcontext][anonymous]
+    * [calendar][timesheet_signature]
     * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
 
 Im Falle einer Anpassung des Quelltexts:
