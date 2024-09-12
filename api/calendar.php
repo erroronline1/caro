@@ -309,8 +309,10 @@ class CALENDAR extends API {
 						':overtime' => $user['overtime'],
 						':_monthlyovertime' => $user['monthlyovertime'],
 						':vacation' => $user['leftvacation'],
-					])
+					])					
 				];
+				$rows[] = [];
+				foreach(LANGUAGEFILE['calendar']['timesheet_signature'] as $key => $value) $rows[] = [[$value, false], str_repeat('_', 20)];
 				$rows[] = [];
 
 				$result[] = $rows;				
