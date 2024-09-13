@@ -999,7 +999,7 @@ class RECORD extends API {
 					}
 					
 					if ($form != LANG::GET('record.record_retype_pseudoform_name') && PERMISSION::permissionFor('recordsexport')){
-						if (isset($includedForms[$form])) array_push($body[count($body) -1],[
+						if (isset($includedForms[$form]) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
 								'value' => LANG::GET('record.record_append_form'),
