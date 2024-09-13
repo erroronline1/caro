@@ -942,6 +942,24 @@ class RECORD extends API {
 						]
 					]
 				];
+				// get form recommendations
+				$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+				$hidden = $bundles = [];
+				foreach($bd as $key => $row) {
+					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!in_array($row['name'], $hidden) && !isset($bundles[$row['name']])) {
+						$bundles[$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
+					}
+				}
+				ksort($bundles);
+				$includedForms = [];
+				// revert form name from summary
+				foreach($content['content'] as $form => $entries){
+					preg_match('/(.*?):form(.*):date/m', LANGUAGEFILE['record']['record_export_form'], $wrapper);
+					preg_match('/' . $wrapper[1] . '(.+?)' . $wrapper[2] . '/m', $form, $form_name);
+					if ($form_name) $includedForms[$form] = $form_name[1];
+				}
+
 				foreach($content['content'] as $form => $entries){
 					$body[] = [
 						[
@@ -979,7 +997,15 @@ class RECORD extends API {
 							'content' => $content['files'][$form]
 						]); 
 					}
+					
 					if ($form != LANG::GET('record.record_retype_pseudoform_name') && PERMISSION::permissionFor('recordsexport')){
+						if (isset($includedForms[$form])) array_push($body[count($body) -1],[
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('record.record_append_form'),
+								'onpointerup' => "api.record('get', 'form', '" . $includedForms[$form] . "', '" . $this->_requestedID . "')"
+							]
+						]);
 						array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
@@ -988,6 +1014,24 @@ class RECORD extends API {
 							]
 						]);
 					}
+					$recommended = [];
+					// append next recommendations inline -> caveat, missing first forms will not be displayed inline
+					if (isset($includedForms[$form])) foreach($bundles as $bundle => $necessaryforms){
+						if (($formindex = array_search($includedForms[$form], $necessaryforms)) !== false){ // this form is part of the current bundle
+							if (isset($necessaryforms[++$formindex])) { // there is a form defined in bundle coming afterwards 
+								if (array_search($necessaryforms[$formindex], $includedForms) === false) {// the following form has not been taken into account
+									// recurring queries to make sure linked forms are permitted
+									if ($approvedform = $this->latestApprovedName('form_form_get_by_name', $necessaryforms[$formindex])) // form is permitted
+										$recommended[LANG::GET('record.record_append_missing_form_of_bundle', [':form' => $approvedform['name'], ':bundle' => $bundle])] = ['href' => "javascript:api.record('get', 'form', '" . $approvedform['name'] . "', '" . $this->_requestedID . "')"];
+								}
+							}
+						}
+					}
+					if ($recommended) $body[]= [[
+							'type' => 'links',
+							'description' => LANG::GET('record.record_append_missing_form'),
+							'content' => $recommended
+						]];
 				}
 		
 				$return['render']['content'] = $body;
