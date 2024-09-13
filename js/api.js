@@ -196,11 +196,11 @@ export const api = {
 	session_timeout: {
 		circle: null,
 		init: function () {
-			if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = {idle: 0};
+			if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = { idle: 0 };
 			this.stop = new Date().getTime() + api._settings.ini.lifespan.idle * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function () {
-				if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = {idle: 0};
+				if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = { idle: 0 };
 				const remaining = api.session_timeout.stop - new Date().getTime();
 				if (api._settings.ini.lifespan.idle > 0 && remaining > 0) {
 					api.session_timeout.render((100 * remaining) / (api._settings.ini.lifespan.idle * 1000), remaining);
@@ -835,7 +835,7 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates", "products_with_special_attention"].includes(request[0]))
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates", "products_with_special_attention", "exportpricelist"].includes(request[0]))
 			request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
@@ -931,6 +931,13 @@ export const api = {
 								api.preventDataloss.start();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.links !== undefined) {
+								const dialog = {
+									type: "input",
+									render: [{ type: "links", content: data.links }],
+								};
+								new Dialog(dialog);
+							}
 						};
 				}
 				break;

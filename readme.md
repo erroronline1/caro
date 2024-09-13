@@ -700,8 +700,9 @@ Disabled products are not accessible through the order module. Products can be d
 
 Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
 
-Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update.
+Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
+Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter will be generated if not defined. 
 
 While editing products, one can edit the
 * *trading good*-setting,
@@ -1867,6 +1868,20 @@ Similar to schedules.
 [Content](#content)
 
 ### Consumables endpoints
+
+> GET ./api/api.php/consumables/exportpricelist/{id}
+
+Returns the current form for a sample check.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | vendor database id |
+
+Sample response
+```
+{"links":{"Download 1726252272testlieferantpricelist.csv":{"href":".\/fileserver\/tmp\/1726252272testlieferantpricelist.csv","download":"1726252272testlieferantpricelist.csv"},"Download 1726252272testlieferantpricelistfilter.txt":{"href":".\/fileserver\/tmp\/1726252272testlieferantpricelistfilter.txt","download":"1726252272testlieferantpricelistfilter.txt"}}}
+```
 
 > GET ./api/api.php/consumables/incorporation
 
