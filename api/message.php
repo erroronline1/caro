@@ -94,7 +94,7 @@ class MESSAGE extends API {
 						]
 					];
 					$result['render']['content'][] = $conversation_content;
-					if ($conversation['conversation_user'] !== '1' && $conversation_user['name']) {
+					if ($conversation['conversation_user'] != '1' && $conversation_user['name']) {
 						$result['render']['content'][] = [
 							[
 								'type' => 'hidden',
