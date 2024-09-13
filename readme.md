@@ -90,7 +90,7 @@ This software aims to support you with your ISO 13485 quality management system 
 
 Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
-![landing page screenshot](assets/landing%20page.png)
+![landing page screenshot](http://toh.erroronline.one/caro/landing%20page.png)
 
 ## Intended ISO 13485 goals
 * ISO 13485 4.1.2 Risk based approach
@@ -279,7 +279,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities.
 * Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.
 
-![sample form screenshot](assets/sample%20form.png)
+![sample form screenshot](http://toh.erroronline.one/caro/sample%20form.png)
 
 [Content](#content)
 
@@ -287,7 +287,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 
 ## Application
 
-![sample application menu](assets/application%20menu.png)
+![sample application menu](http://toh.erroronline.one/caro/application%20menu.png)
 
 ### Users
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
@@ -322,7 +322,7 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
 
 Users can have multiple assigned organizational units and permissions.
 
-![user screenshot](assets/user.png)
+![user screenshot](http://toh.erroronline.one/caro/user.png)
 
 ```mermaid
 graph TD;
@@ -366,12 +366,12 @@ Set up the manual according to your users comprehension. While editing single en
 
 ## Communication
 
-![sample communication menu](assets/communication%20menu.png)
+![sample communication menu](http://toh.erroronline.one/caro/communication%20menu.png)
 
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
-![conversation screenshot](assets/conversation.png)
+![conversation screenshot](http://toh.erroronline.one/caro/conversation.png)
 
 [Content](#content)
 
@@ -406,7 +406,7 @@ Text templates arrange generic text chunks. Arrange or group chunks within the [
 
 Output will be copied to clipboad on clicking or tapping the output field.
 
-![text recommendation screenshot](assets/text%20recommendation.png)
+![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation.png)
 
 ```mermaid
 graph TD;
@@ -444,7 +444,7 @@ graph TD;
 
 ## Records
 
-![sample records menu](assets/records%20menu.png)
+![sample records menu](http://toh.erroronline.one/caro/records%20menu.png)
 
 ### Forms
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be suitable enough; documents can still be exported as editable or prefilled PDFs within boundaries though.
@@ -461,7 +461,7 @@ Forms can be exported as an editable PDF in hopefully rare scenarios where a dig
 
 Forms can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
 
-![form composer screenshot](assets/forms.png)
+![form composer screenshot](http://toh.erroronline.one/caro/forms.png)
 
 ```mermaid
 graph TD;
@@ -505,7 +505,7 @@ Paperless might not be suitable in humid environments. Thus single documents can
 
 The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
 
-![sample identifier code](assets/sample%20identifier%20code.png)
+![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code.png)
 
 Checking for completeness of form bundles can be applied on display of a record summary.
 
@@ -517,7 +517,7 @@ If records contain data from restricted forms, summaries will only contain these
 * On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
 * on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
-![record screenshot](assets/records.png)
+![record screenshot](http://toh.erroronline.one/caro/records.png)
 
 ```mermaid
 graph TD;
@@ -581,13 +581,13 @@ You are supposed to track a cause and effect, recognize a probability and damage
 
 Entries are not persistent but can be exported if desired through the [audit module](#tools). Available entries store and display the user name and date of the last edit. 
 
-![risk screenshot](assets/risks.png)
+![risk screenshot](http://toh.erroronline.one/caro/risks.png)
 
 [Content](#content)
 
 ## Calendar
 
-![sample calendar menu](assets/calendar%20menu.png)
+![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu.png)
 
 Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
@@ -611,7 +611,7 @@ Timesheets support changes in weekly hours and annual vacation though. Respectiv
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
-![calendar screenshot](assets/calendar.png)
+![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
 
 ```mermaid
 graph TD;
@@ -673,7 +673,7 @@ graph TD;
 
 ## Files
 
-![sample files menu](assets/files%20menu.png)
+![sample files menu](http://toh.erroronline.one/caro/files%20menu.png)
 
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
@@ -683,13 +683,13 @@ This source can also be used to provide documents that are [unsuitable to be fil
 
 External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
 
-![files screenshot](assets/files.png)
+![files screenshot](http://toh.erroronline.one/caro/files.png)
 
 [Content](#content)
 
 ## Purchase
 
-![sample purchase menu](assets/purchase%20menu.png)
+![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu.png)
 
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. Importing pricelists with filtering makes use of the [CSV processor](#csv-processor).
@@ -711,7 +711,7 @@ While editing products, one can edit the
 
 On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
 
-![vendor manager screenshot](assets/vendor%20manager.png)
+![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
 
 ```mermaid
 graph TD;
@@ -785,7 +785,7 @@ A label sheet can be created directly from the commission field to support alloc
 
 Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#tools) and used for vendor evaluation.
 
-![orders screenshot](assets/orders.png)
+![orders screenshot](http://toh.erroronline.one/caro/orders.png)
 
 ```mermaid
 graph TD;
@@ -874,7 +874,7 @@ Sample checks are added to the records. Defined authorized users can revoke the 
 
 ## Tools
 
-![sample tools menu](assets/tools%20menu.png)
+![sample tools menu](http://toh.erroronline.one/caro/tools%20menu.png)
 
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit) and support recurring calculations.
 
@@ -892,7 +892,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * regulatory issues
 * risks
 
-![audit screenshot](assets/audit.png)
+![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 
 [Content](#content)
 

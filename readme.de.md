@@ -48,7 +48,7 @@ Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 1
 
 Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln anstelle von Sonderanfertigungen, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
 
-![landing page screenshot](assets/landing%20page%20de.png)
+![landing page screenshot](http://toh.erroronline.one/caro/landing%20page%20de.png)
 
 ## Vorgesehene Zielsetzungen für ISO 13485
 * ISO 13485 4.1.2 Risikobasierter Ansatz
@@ -237,7 +237,7 @@ Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selb
 * Innerhalb der Formulare für die Vorkommnisaufzeichnungen können Links z.B. zu den [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) eingefügt werden um die erforderlichen Codes zu finden.
 * Es können Textvorschläge für den Einkauf erstellt werden um Nachrichten zur Anforderung regulatorischer Unterlagen für Produkte mit besonderer Aufmerksamkeit oder eines erneuerten Zertifikats vorzubereiten.
 
-![sample form screenshot](assets/sample%20form%20de.png)
+![sample form screenshot](http://toh.erroronline.one/caro/sample%20form%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -245,7 +245,7 @@ Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selb
 
 ## Anwendung
 
-![sample application menu](assets/application%20menu%20de.png)
+![sample application menu](http://toh.erroronline.one/caro/application%20menu%20de.png)
 
 ### Nutzer
 Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden.
@@ -280,7 +280,7 @@ Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutze
 
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
 
-![user screenshot](assets/profile%20de.png)
+![user screenshot](http://toh.erroronline.one/caro/profile%20de.png)
 
 ```mermaid
 graph TD;
@@ -325,12 +325,12 @@ Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenhe
 
 ## Kommunikation
 
-![sample communication menu](assets/communication%20menu%20de.png)
+![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20de.png)
 
 ### Unterhaltungen
 Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
 
-![conversation screenshot](assets/conversation.png)
+![conversation screenshot](http://toh.erroronline.one/caro/conversation.png)
 
 [Übersicht](#übersicht)
 
@@ -365,7 +365,7 @@ Bei der Erstellung von Textvorschlägen können die Textbausteine individuell so
 
 Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwischenablage eingefügt.
 
-![text recommendation screenshot](assets/text%20recommendation.png)
+![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation.png)
 
 ```mermaid
 graph TD;
@@ -403,7 +403,7 @@ graph TD;
 
 ## Aufzeichnungen
 
-![sample records menu](assets/records%20menu%20de.png)
+![sample records menu](http://toh.erroronline.one/caro/records%20menu%20de.png)
 
 ### Formulare
 Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Es ist (ohne größere Nachforschungen betrieben zu haben) nicht erkenntlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: die Dokumente und internen Formulare sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies dient dem Ziel einer papierlosen Lösung bereits ausreichend, dennoch sind zusätzlich Exporte als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
@@ -420,7 +420,7 @@ Formulare können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fäl
 
 Formulare können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche).
 
-![form composer screenshot](assets/forms.png)
+![form composer screenshot](http://toh.erroronline.one/caro/forms.png)
 
 ```mermaid
 graph TD;
@@ -465,7 +465,7 @@ Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet 
 
 Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesbarer Form steht und der sich auch auf Exporten wiederfindet. Um den Arbeitsfluss zu verbessern können Aufkleberbögen erstellt werden, mit deren Hilfe zum Beispiel Produkte und exportierte Fomulare manuell gekennzeichnet werden können. Das Scannen des Codes reduziert eine Fehlerwahrscheinlichkeit bei der Zuordnung. Der Identifikator kann ebenfalls genutzt werden um Daten von anderen Aufzeichnungen zu importieren, beispielsweise bei der Übernahme von vergleichbaren Datensätzen anderer Versorgungsbereiche.
 
-![sample identifier code](assets/sample%20identifier%20code.png)
+![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code.png)
 
 Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
@@ -477,7 +477,7 @@ Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten
 * Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
 * andererseits bedeutet dies mehr Aufmerksamkeit auf die vergebenen Rollen und wer im Falle von Anfragen tatsächlich vollständige Daten exportiert.
 
-![record screenshot](assets/records.png)
+![record screenshot](http://toh.erroronline.one/caro/records.png)
 
 ```mermaid
 graph TD;
@@ -540,13 +540,13 @@ Dabei werden Ursache und Auswirkungen erfasst, die Einstrittwahrscheinlichkeit u
 
 Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#werkzeuge) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung. 
 
-![risk screenshot](assets/risks.png)
+![risk screenshot](http://toh.erroronline.one/caro/risks.png)
 
 [Übersicht](#übersicht)
 
 ## Kalender
 
-![sample calendar menu](assets/calendar%20menu%20de.png)
+![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu%20de.png)
 
 Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
@@ -570,7 +570,7 @@ Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des 
 
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
-![calendar screenshot](assets/calendar.png)
+![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
 
 ```mermaid
 graph TD;
@@ -633,7 +633,7 @@ graph TD;
 
 ## Dateien
 
-![sample files menu](assets/files%20menu%20de.png)
+![sample files menu](http://toh.erroronline.one/caro/files%20menu%20de.png)
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
@@ -643,13 +643,13 @@ Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen,
 
 Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden.
 
-![files screenshot](assets/files.png)
+![files screenshot](http://toh.erroronline.one/caro/files.png)
 
 [Übersicht](#übersicht)
 
 ## Einkauf
 
-![sample purchase menu](assets/purchase%20menu%20de.png)
+![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20de.png)
 
 ### Lieferanten- und Artikelverwaltung
 Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der Impoert von Preislisten nutzt den [CSV-Prozessor](#csv-prozessor).
@@ -671,7 +671,7 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 
 Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [setup.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
-![vendor manager screenshot](assets/vendor%20manager.png)
+![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
 
 ```mermaid
 graph TD;
@@ -741,7 +741,7 @@ Aus den in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen 
 
 Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) exportiert und für die Lieferantenbewertung genutzt werden.
 
-![orders screenshot](assets/orders%20de.png)
+![orders screenshot](http://toh.erroronline.one/caro/orders%20de.png)
 
 ```mermaid
 graph TD;
@@ -828,7 +828,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer k
 
 ## Werkzeuge
 
-![sample tools menu](assets/tools%20menu%20de.png)
+![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20de.png)
 
 Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, der Betrachtung von STL-Dateien und der Unterstützung bei wiederkehrenden Berechnungen zur Verfügung.
 
@@ -846,7 +846,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 * regulatorische Anforderungen
 * Risiken
 
-![audit screenshot](assets/audit.png)
+![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 
 [Übersicht](#übersicht)
 
