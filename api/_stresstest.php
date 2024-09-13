@@ -40,7 +40,7 @@ class STRESSTEST{
 	 * identifying prefixes for creation and safe deletion
 	 */
 	public $_prefix = 'UVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY';
-	public $_number = 1000;
+	public $_number = 10000;
 
 	public function __construct($method){
 		$options = [
@@ -84,6 +84,7 @@ class STRESSTEST{
 		}
 		echo $i. " schedule entries done, please check the application for performance";
 	}
+
 	public function deleteCalendarEvents(){
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
@@ -99,14 +100,50 @@ class STRESSTEST{
 		}
 		echo count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted';
 	}
+
 	public function createRecords(){
+		$this->_currentdate->modify('-6 month');
+		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		for ($i = 0; $i < $this->_number;$i++){
+			if (!($i % intval($this->_number/12/30))) {
+				$this->_currentdate->modify('+1 day');
+			}
+			$form = array_rand($forms);
+			$identifier = 'wolfgang' . $this->_prefix . intval($i % intval($this->_number/12));
 
+			$content = [];
+			$names = ['abc','def','ghi','jkl','mno','pqr','stu','vwx','yz'];
+			foreach(array_rand($names, 4) as $component){
+				$content[$names[$component]] = 'sdf' . random_int(1000,100000000); 
+			}
+
+			SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+				'values' => [
+					':context' => 'casedocumentation',
+					':form_name' => $forms[$form]['name'],
+					':form_id' => $forms[$form]['id'],
+					':identifier' => $identifier,
+					':author' => 'error on line 1',
+					':author_id' => 2,
+					':content' => json_encode($content),
+					':entry_timestamp' => $this->_currentdate->format('Y-m-d H:i:s'),
+					':record_type' => 'treatment'
+				]
+			]);
+		}
+		echo $i. " records done, please check the application for performance";
 	}
-	public function deleteRecords(){}
 
+	public function deleteRecords(){
+		$deletion = [
+			'mysql' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'",
+			'sqlsrv' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'"
+		];
+		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[INI['sql']['use']]);
+		echo $del . ' entries with prefix ' . $this->_prefix . ' deleted';
+	}
 }
+
 $stresstest = new STRESSTEST(REQUEST[0]);
-
 exit();
-
 ?>
