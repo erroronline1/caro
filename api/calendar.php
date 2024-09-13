@@ -895,13 +895,18 @@ class CALENDAR extends API {
 							]
 						];
 					}
-					$events[] = [
-						'type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('calendar.timesheet_monthly_summary'),
-							'onpointerup' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
-						]
-					];
+					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['application']['timezone']));
+					if ($thisMonthsEvents = $calendar->getWithinDateRange($today->modify('first day of this month')->format('Y-m-d'), $today->modify('last day of this month')->format('Y-m-d'))) {
+						$timesheetentries = false;
+						foreach($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
+						if ($timesheetentries) $events[] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('calendar.timesheet_monthly_summary'),
+								'onpointerup' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
+							]
+						];
+					}
 
 					$result['render']['content'][] = $events;
 
