@@ -40,6 +40,7 @@
     * [Frontend design](#frontend-design)
     * [Backend design](#backend-design)
     * [Integrations tests](#integration-test)
+    * [Stress tests](#stress-test)
     * [Deployment process](#deployment-process)
 * [API documentation](#api-documentation)
     * [Request flow](#request-flow)
@@ -1521,6 +1522,13 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 * signature_pad
 
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
+
+## Stress test
+
+Can be performed with ./api/_stresstest.php. 10000 calendar-events or records can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested.
+During creation the products database has been evaluated ([1](#server-setup), [2](#miscellaneous)).
+
+[Content](#content)
 
 ## Deployment process
 
