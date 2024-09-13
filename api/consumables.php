@@ -113,6 +113,80 @@ class CONSUMABLES extends API {
 	}
 
 	/**
+	 *                       _           _         _ _     _   
+	 *   ___ _ _ ___ ___ ___| |_ ___ ___|_|___ ___| |_|___| |_ 
+	 *  | -_|_'_| . | . |  _|  _| . |  _| |  _| -_| | |_ -|  _|
+	 *  |___|_,_|  _|___|_| |_| |  _|_| |_|___|___|_|_|___|_|  
+	 *          |_|             |_|
+	 * exports the pricelist and filter, the latter simply generated if not provided
+	 */
+	public function exportpricelist(){
+		if (!PERMISSION::permissionFor('products')) $this->response([], 401);
+		$products = [];
+		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+			'values' => [
+				':id' => intval($this->_requestedID)
+			]
+		]);
+		$vendor = $vendor ? $vendor[0] : [];
+		if (!$vendor) $this->response([
+			'response' => [
+				'msg' => LANG::GET('consumables.error_vendor_not_found'),
+				'type' => 'error'
+			]]);
+		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+			'values' => [
+				':ids' => $this->_requestedID
+			]
+		]);
+		if (!$products) $this->response([
+			'response' => [
+				'msg' => LANG::GET('consumables.edit_vendor_pricelist_empty'),
+				'type' => 'error'
+			]]);
+
+		// create csv
+		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention'];
+		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelist.csv';
+		$file = fopen($tempFile, 'w');
+		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+		fputcsv($file, $columns,
+			INI['csv']['dialect']['separator'],
+			INI['csv']['dialect']['enclosure'],
+			INI['csv']['dialect']['escape']);
+		foreach($products as $row) {
+			fputcsv($file, array_map(fn($column) => $row[$column], $columns),
+			INI['csv']['dialect']['separator'],
+			INI['csv']['dialect']['enclosure'],
+			INI['csv']['dialect']['escape']);
+		}
+		fclose($file);
+		$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
+			'href' => substr($tempFile, 1),
+			'download' => pathinfo($tempFile)['basename']
+		];
+		// create stupid filter for export files if none is provided
+		$vendor['pricelist'] = $vendor['pricelist'] ? json_decode($vendor['pricelist'], true): [];
+		$filter = isset($vendor['pricelist']['filter']) && json_decode($vendor['pricelist']['filter'], true) ? json_decode($vendor['pricelist']['filter'], true) : [
+			'filesettings' => [
+				'headerrowindex' => 0,
+				'columns' => $columns
+			]
+		];
+		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelistfilter.txt';
+		$file = fopen($tempFile, 'w');
+		fwrite($file, json_encode($filter, JSON_PRETTY_PRINT));
+		fclose($file);
+		$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
+			'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+			'download' => pathinfo($tempFile)['basename']
+		];
+		$this->response([
+			'links' => $downloadfiles
+		]);
+	}
+
+	/**
 	 *   _                                 _   _
 	 *  |_|___ ___ ___ ___ ___ ___ ___ ___| |_|_|___ ___
 	 *  | |   |  _| . |  _| . | . |  _| .'|  _| | . |   |
@@ -500,11 +574,11 @@ class CONSUMABLES extends API {
 					'id' => null,
 					'vendor_id' => null,
 					'vendor_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor')),
-					'article_no' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no')),
+					'article_no' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no')) ? : '',
 					'article_name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name')),
-					'article_alias' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')),
-					'article_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')),
-					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')),
+					'article_alias' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')) ? : '',
+					'article_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')) ? : '',
+					'article_ean' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')) ? : '',
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0,
 					'protected' => 0,
 					'trading_good' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0,
@@ -567,13 +641,13 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias'));
+				$product['article_alias'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_alias')) ? : '';
 				if (!PERMISSION::permissionFor('productslimited')){
 					$product['vendor_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) && UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) !== LANG::GET('consumables.edit_product_vendor_select_default') ? UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor_select')) : UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_vendor'));
-					$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no'));
+					$product['article_no'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_no')) ? : '';
 					$product['article_name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_name'));
-					$product['article_unit'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit'));
-					$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean'));
+					$product['article_unit'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_unit')) ? : '';
+					$product['article_ean'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_ean')) ? : '';
 					$product['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_active')) === LANG::GET('consumables.edit_product_isactive') ? 1 : 0;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_article_trading_good')) ? 1 : 0;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_product_expiry_date')) ? 1 : 0;
@@ -1878,6 +1952,18 @@ class CONSUMABLES extends API {
 							]
 						]]
 					);
+					// add pricelist export button
+					if ($vendor['id'] && $vendorproducts) $result['render']['content'][4][] = [
+						[
+							'type' => 'button',
+							'attributes' => [
+								'value' => LANG::GET('consumables.edit_vendor_pricelist_export'),
+								'type' => 'button',
+								'onpointerup' => "api.purchase('get', 'exportpricelist', " . $vendor['id']. ")"
+							],
+							'hint' => LANG::GET('consumables.edit_vendor_pricelist_export_hint')
+						]
+					];
 
 					// mail vendor e.g. requesting documents regarding products with special attention
 					// requires text chunks though
