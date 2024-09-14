@@ -1288,20 +1288,16 @@ class CONSUMABLES extends API {
 		foreach($vendorproducts as $row){
 			if ($row['has_expiry_date']) {
 				if (!array_key_exists($row['vendor_name'], $expiryproducts)) $expiryproducts[$row['vendor_name']] = [];
-				$expiryproducts[$row['vendor_name']][] = $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : '');
+				$expiryproducts[$row['vendor_name']][$row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : '')] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
 			}
 		}
 		if ($expiryproducts){
 			$result['render']['content'][] = [];
 			foreach($expiryproducts as $vendor => $products){
-				$productlist = '';
-				foreach ($products as $product){
-					$productlist .= $product . "\n";
-				}
 				$result['render']['content'][1][] = [
-					'type' => 'textblock',
+					'type' => 'links',
 					'description' => $vendor,
-					'content' => $productlist
+					'content' => $products
 				];
 			}
 		}
