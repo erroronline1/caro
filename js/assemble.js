@@ -1653,6 +1653,10 @@ export class Assemble {
 		return this.input("text");
 	}
 
+	text_copy() {
+		return this.input("text");
+	}
+
 	textarea() {
 		/*{
 			type: 'textarea',

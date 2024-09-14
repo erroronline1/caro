@@ -503,6 +503,7 @@ class TEXTTEMPLATE extends API {
 								'attributes' => [
 									'value' => LANG::GET('texttemplate.edit_template_save'),
 									'type' => 'button',
+									'data-type' => 'submitbutton',
 									'onpointerup' => "new Dialog({type: 'confirm', header: '" .
 										LANG::GET("texttemplate.edit_template_save") .
 										"', options:{" .
@@ -688,7 +689,8 @@ class TEXTTEMPLATE extends API {
 				'attributes' => [
 					'type' => 'button',
 					'value' => LANG::GET('texttemplate.use_refresh'),
-					'onpointerup' => '_client.texttemplate.update();'
+					'onpointerup' => '_client.texttemplate.update();',
+					'data-type' => 'generateupdate'
 				],
 				'hint' => LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
 			];

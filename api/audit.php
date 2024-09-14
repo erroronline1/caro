@@ -352,7 +352,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -452,7 +453,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -577,7 +579,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -641,7 +644,8 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => LANG::GET('audit.record_export_xlsx'),
-						'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+						'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 					]
 				]
 			];
@@ -789,7 +793,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -868,7 +873,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -958,7 +964,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -1067,7 +1074,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];
@@ -1257,7 +1265,8 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')"
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
 				]
 			]
 		];

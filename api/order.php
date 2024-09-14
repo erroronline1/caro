@@ -379,7 +379,7 @@ class ORDER extends API {
 
 					$copy = [
 						[
-							'type' => 'text',
+							'type' => 'text_copy',
 							'attributes' => [
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
 								'name' => LANG::GET('order.ordernumber_label'),
@@ -389,7 +389,7 @@ class ORDER extends API {
 							'hint' => LANG::GET('order.copy_value')
 						],
 						[
-							'type' => 'text',
+							'type' => 'text_copy',
 							'attributes' => [
 								'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
 								'name' => LANG::GET('order.commission'),

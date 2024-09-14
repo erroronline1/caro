@@ -415,7 +415,8 @@ class FILE extends API {
 										'type' => 'button',
 										'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
 										'class' => 'inlinebutton',
-										'data-filtered' => $file['path']
+										'data-filtered' => $file['path'],
+										'data-type' => 'copy'
 									]
 								],
 								[
@@ -595,7 +596,8 @@ class FILE extends API {
 											'value' => LANG::GET('file.manager_copy_path'),
 											'type' => 'button',
 											'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
-											'class' => 'inlinebutton'
+											'class' => 'inlinebutton',
+											'data-type' => 'copy'
 										]
 									],
 									[

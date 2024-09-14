@@ -502,15 +502,17 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => LANG::GET('calendar.month_previous'),
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'schedule', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'schedule', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
+							'data-type' => 'toleft'
 						]
 					],
 					[
 						'type' => 'button',
 						'attributes' => [
-							'value' => LANG::GET('calendar.month_next'),
+							'value' => LANG::GET('calendar.month_next') . ' ',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'schedule', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'schedule', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
+							'data-type' => 'toright'
 						]
 					],
 				];
@@ -823,17 +825,19 @@ class CALENDAR extends API {
 					[
 						'type' => 'button',
 						'attributes' => [
-							'value' => 'previous',
+							'value' => LANG::GET('calendar.month_previous'),
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
+							'data-type' => 'toleft'
 						]
 					],
 					[
 						'type' => 'button',
 						'attributes' => [
-							'value' => 'next',
+							'value' => LANG::GET('calendar.month_next') . ' ',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')"
+							'onpointerup' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
+							'data-type' => 'toright'
 						]
 					],
 				];

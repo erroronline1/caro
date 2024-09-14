@@ -1002,15 +1002,19 @@ class RECORD extends API {
 						if (isset($includedForms[$form]) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
-								'value' => LANG::GET('record.record_append_form'),
-								'onpointerup' => "api.record('get', 'form', '" . $includedForms[$form] . "', '" . $this->_requestedID . "')"
+								'title' => LANG::GET('record.record_append_form'),
+								'onpointerup' => "api.record('get', 'form', '" . $includedForms[$form] . "', '" . $this->_requestedID . "')",
+								'data-type' => 'additem',
+								'class' => 'inlinebutton'
 							]
 						]);
 						array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
-								'value' => LANG::GET('record.record_form_export'),
-								'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')"
+								'title' => LANG::GET('record.record_form_export'),
+								'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')",
+								'data-type' => 'download',
+								'class' => 'inlinebutton'
 							]
 						]);
 					}
@@ -1067,14 +1071,16 @@ class RECORD extends API {
 								'type' => 'button',
 								'attributes' => [
 									'value' => LANG::GET('record.record_full_export'),
-									'onpointerup' => "api.record('get', 'fullexport', '" . $this->_requestedID . "')"
-								]
+									'onpointerup' => "api.record('get', 'fullexport', '" . $this->_requestedID . "')",
+									'data-type' => 'download'
+									]
 							], [
 								'type' => 'button',
 								'attributes' => [
 									'value' => LANG::GET('record.record_simplified_export'),
-									'onpointerup' => "api.record('get', 'simplifiedexport', '" . $this->_requestedID . "')"
-								]
+									'onpointerup' => "api.record('get', 'simplifiedexport', '" . $this->_requestedID . "')",
+									'data-type' => 'download'
+									]
 							]
 						]);
 					
