@@ -85,7 +85,6 @@
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 
-
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
@@ -279,6 +278,7 @@ Beside the apps architecture you will still have to set up your quality manageme
 * Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.
 * Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities.
 * Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.
+* Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a [CSV-filter](#csv-processor) with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments.
 
 ![sample form screenshot](http://toh.erroronline.one/caro/sample%20form.png)
 
