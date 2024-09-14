@@ -396,7 +396,7 @@ graph TD;
     select4-->chunks3[(Textbausteine)];
     select5-->chunks3;
     chunks3 -->edittemplate[Vorlage bearbeiten];
-    edittemplate -->|Vorlage hinzurüfen|chunks3;
+    edittemplate -->|Vorlage hinzufügen|chunks3;
 ```
 
 [Übersicht](#übersicht)
