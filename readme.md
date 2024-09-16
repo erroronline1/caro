@@ -906,6 +906,7 @@ The audit module gathers data from the application in regards of proofing lists 
     * Desktop pcs
     * Mobile devices
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
+    * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
 Tested server environments:
