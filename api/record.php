@@ -193,9 +193,11 @@ class RECORD extends API {
 		foreach($this->_payload as $key => &$value){
 			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 				$identifier = $value;
+				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
 				unset ($this->_payload->$key);
-				$possibledate = substr($identifier, -16);
 				try {
+					
+					$possibledate = substr($identifier, -16);
 					new DateTime($possibledate);
 				}
 				catch (Exception $e){
