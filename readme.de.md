@@ -860,6 +860,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
     * Desktop PCs
     * mobile Geräte
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
+    * Druckerzugang für alle Endgeräte
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
 
 Getestete Serverumgebungen:
