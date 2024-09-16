@@ -157,7 +157,7 @@ Export for signature compliance
 			"type": "checkbox",
 			"description": "Schweigepflichtentbindung",
 			"content": {
-				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass ich meinen oben genannten Leistungserbringer von der Schweigepflicth gegenüber meinem Kostenträger entbinde": []
+				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass ich meinen oben genannten Leistungserbringer von der Schweigepflicht gegenüber meinem Kostenträger entbinde": []
 			}
 		}
 	],
@@ -165,7 +165,7 @@ Export for signature compliance
 		{
 			"type": "signature",
 			"attributes": { 
-				"name": "Unterschrift"
+				"name": "Datum, Unterschrift"
 			}
 		}
 	]
