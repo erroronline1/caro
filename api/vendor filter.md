@@ -223,7 +223,8 @@ delete . from headers, replace specialchars
 	"modify": {
 		"add": {
 			"trading_good": "0"
-		},"conditional_or": [
+		},
+		"conditional_or": [
 			["trading_good", "1", ["article_name", "socke|strumpf|ckchen|kniestr|shirt|body|hose"]]
 		],
 		"rewrite": [{
@@ -270,6 +271,12 @@ delete unreqired columns
 		"columns": ["Material", "Bezeichnung"]
 	},
 	"modify": {
+		"add": {
+			"has_expiry_date": "0"
+		},
+		"conditional_or": [
+			["has_expiry_date", "1", ["Bezeichnung", "trikotschlauch"]]
+		],
 		"rewrite": [{
 			"article_no": ["Material"],
 			"article_name": ["Bezeichnung"],
@@ -621,7 +628,8 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 			"has_expiry_date": "0"
 		},
 		"conditional_or": [
-			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]]
+			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]],
+			["has_expiry_date", "1", ["Bezeichnung", "neofast"]],
 		],
 		"replace":[
 			["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5", "L5-6", "L6", "L6-7", "L7", "L7-8", "L8", "L8-9", "L9", "LC0", "LC0-C1", "LC1", "LC1-C2", "LC2", "LC2-C3", "LC3", "LC3-C4", "LC4", "LC4-C5", "LC5", "LA1", "LA1-A2", "LA2", "LA2-A3", "LA3", "LA3-A4", "LA4"],
@@ -674,8 +682,8 @@ join tables
 		},
 		"conditional_or": [
 			["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
-			["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|85h.+|636K.+"]],
-			["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen"]]
+			["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|617s\\d=|85h.+|636K.+|616T111|453h10|646m453"]],
+			["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]]
 		],
 		"rewrite": [{
 			"article_no": ["Material"],
@@ -932,10 +940,12 @@ delete . from headers, replace specialchars and whitespaces
 	"modify": {
 		"add": {
 			"trading_good": "0",
+			"has_expiry_date": "0",
 			"special_attention": "0"
 		},
 		"conditional_or": [
 			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]],
+			["has_expiry_date", "1", ["Bezeichnung", "silikonspray|sekundenkleber"]],
 			["special_attention", "1", ["Bezeichnung", "varioform|streifydur|streifylast|PET glasklar|streifyflex"]]
 		],
 		"rewrite": [{
@@ -1078,10 +1088,11 @@ delete . from headers, replace specialchars and whitespaces
 	"modify": {
 		"add": {
 			"trading_good": "0",
+			"has_expiry_date": "0",
 			"special_attention": "0"
 		},
 		"conditional_or": [
-			["trading_good", "1", ["Beschreibung", "^bob|^daho|liner|philadelphia"]]
+			["trading_good", "1", ["Beschreibung", "^bob|^daho|liner|philadelphia"]],
 			["special_attention", "1", ["Beschreibung", "thermoflex"]]
 		],
 		"rewrite": [{
