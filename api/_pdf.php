@@ -148,7 +148,7 @@ class PDF{
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'], 1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
@@ -184,18 +184,18 @@ class PDF{
 								$pdf->Image('.' . $value, null, $pdf->GetY() + 4, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
 								$pdf->Ln(INI['pdf']['exportimage']['maxheight'] + 4);
 							} else { // text type
-								$pdf->MultiCell(133, 4, $value, 0, '', 0, 1, 63, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+								$pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							}
 						else { // text, number, etc
 							$height = 5;
 							$pdf->SetFontSize(0); // variable font size
-							$pdf->TextField($key, 133, $height, [], [], 63, $pdf->GetY() + 4);
+							$pdf->TextField($key, 133, $height, [], [], 65, $pdf->GetY() + 4);
 							$pdf->Ln($height + 5);
 						}
 					} else { // textarea
 						$height = 31;
 						$pdf->SetFontSize(0); // variable font size
-						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value, 'dv' => $value], 63, $pdf->GetY() + 4);
+						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value, 'dv' => $value], 65, $pdf->GetY() + 4);
 						$pdf->Ln($height + 5);
 					}
 					$pdf->SetFontSize($originalFontSize);
@@ -203,9 +203,9 @@ class PDF{
 				if (gettype($value) === 'array'){
 					foreach($value as $option){
 						$pdf->SetFontSize(14);
-						$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 63, $pdf->GetY() + 4);
+						$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 65, $pdf->GetY() + 4);
 						$pdf->SetFontSize($originalFontSize);
-						$pdf->MultiCell(50, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 65, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						$pdf->MultiCell(133, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 67, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 						$pdf->Ln(-7);
 					}
 				}
