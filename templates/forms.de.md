@@ -15,13 +15,13 @@
 
 ## Basisdaten
 ```json
-{
+[
 	[
 		{
-			"type": "scanner",
+			"type": "identify",
 			"attributes": {
 				"name": "Vorgang"
-			},
+			}
 		},
 		{
 			"type": "text",
@@ -32,31 +32,31 @@
 		},
 		{
 			"type": "textarea",
-			"attributes": { 
+			"attributes": {
 				"name": "Adresse"
 			}
 		},
 		{
 			"type": "tel",
 			"attributes": {
-				"name": "Telefonnummer",
+				"name": "Telefonnummer"
 			}
 		},
 		{
 			"type": "email",
 			"attributes": {
-				"name": "eMailadresse",
+				"name": "eMailadresse"
 			}
 		},
 		{
 			"type": "text",
 			"attributes": {
-				"name": "Kostenträger",
+				"name": "Kostenträger"
 			}
 		},
 		{
 			"type": "textarea",
-			"attributes": { 
+			"attributes": {
 				"name": "Info"
 			},
 			"hint": "Kontaktperson, Adressbesonderheiten"
@@ -65,40 +65,48 @@
 	[
 		{
 			"type": "textarea",
-			"attributes": { 
+			"attributes": {
 				"name": "Leistung, Produkt oder Verordnungstext"
 			}
 		},
 		{
-			"type": "textarea",
-			"attributes": { 
+			"type": "text",
+			"attributes": {
 				"name": "Verordner"
 			},
 			"hint": "namentlich"
 		}
 	]
-}
+]
 ```
 [Content](#content)
 
 ## Datenverarbeitung, Auftragserteilung, Schweigepflichtentbindung
 Export for signature compliance
 ```json
-{
+[
 	[
 		{
-			"type": "textblock",
-			"description": "Datenverarbeitung durch und Auftragserteilung an"
-			"content": "Universitätsklinikum Heidelberg, Zentrum für Orthopädie, Unfallchirurgie und Paraplegiologie\\nAbteilung Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg"
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
 		},
 		{
 			"type": "textblock",
-			"description": "Information zur Datenverarbeitung"
+			"description": "Datenverarbeitung durch und Auftragserteilung an",
+			"content": "Universitätsklinikum Heidelberg, Zentrum für Orthopädie, Unfallchirurgie und Paraplegiologie\\nAbteilung Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg"
+		}
+	],
+	[
+		{
+			"type": "textblock",
+			"description": "Information zur Datenverarbeitung",
 			"content": "Die Bereitstellung und Verarbeitung Ihrer Daten ist im Rahmen Ihrer Versorgung in unserem Haus erforderlich und Bestandteil des Behandlungsvertrags. Bei Bedarf stellen wir Ihnen diese Informationen auch in einem größeren Ausdruck zur Verfügung. Allgemein gilt die Erklärung zur Datenverarbeitung und Datenschutz des Universitätsklinikums Heidelberg.\\nVerarbeitungszwecke im Rahmen Ihrer Hilfsmittelversorgung: Hilfsmittelversorgung, Patientenverwaltung und Abrechnung, interdisziplinäre Konferenzen zur Analyse und Erörterung von Diagnostik und Therapie, Versorgungsdokumentation, Erstellung von Berichten und Stellungnahmen, Qualitätssicherung in Versorgung und ihrer Organisation, Unterrichtung von Mit-/Weiterversorgern im erforderlichen Umfang, Eingabe der Adressdaten und ggf. Rufnummer an Versanddienstleister, Kontaktaufnahme auch hinsichtlich eines Erinnerungsservices nach Versorgungsabschluss."
 		},
 		{
 			"type": "textblock",
-			"description": "Auftragserteilung"
+			"description": "Auftragserteilung",
 			"content": "Ich wurde darüber aufgeklärt, dass mir die Wahl eines Leistungserbringers zur Anfertigung bzw. Versorgung mit einem Hilfsmittel freisteht. In diesem Rahmen beauftrage ich den oben genannten Leistungserbringer. Ich wurde vor Inanspruchnahme der Leistung/en darüber beraten, welche/s Hilfsmittel und zusätzliche/n Leistung/en nach § 33 SGB V für die konkrete Versorgungssituation im Einzelfall geeignet und notwendig ist/sind. Ich bin über die Möglichkeit einer aufzahlungsfreien Versorgung, die der vertragsärztlichen Verordnung entspricht und ihren Zweck voll erfüllt, informiert worden. Die gesetzliche Zuzahlung bleibt davon unberührt. Maß- und Sonderanfertigungen sowie gebrauchte Hilfsmittel sind vom Rückgabe- und Umtauschrecht ausgeschlossen. Die Informationen zur Datenverarbeitung habe ich zur Kenntnis genommen und akzeptiere sie. Ich bin darüber aufgeklärt, dass Lieferungen bevorzugt persönlich erfolgen sollen."
 		},
 		{
@@ -110,18 +118,58 @@ Export for signature compliance
 		{
 			"type": "checkbox",
 			"description": "Kostenübernahmeerklärung",
-			"attributes": {
-				"name": "Kostenübernahmeerklärung"
-			},
 			"content": {
 				"Eine Kostenübernahme kann ich persönlich nicht erteilen und möchte die Kostenübernahme durch meinen Kostenträger (gilt auch für postOP-Versorgungen).": [],
 				"Ich habe mich nach eingehender Beratung auf eigenen Wunsch für die Versorgung mit einem aufzahlungsfreien Produkt entschieden.": [],
 				"Ich wünsche für mich die medizinische Leistung sofort. Deshalb erteile ich den Auftrag mich, unabhängig von einer Kostenzusage meines Kostenträgers, sofort zu versorgen. Sollte meine Krankenkasse die Bezahlung ganz oder teilweise nicht übernehmen, werde ich die Kosten in der Höhe des Kostenvoranschlages an meinen Kostenträger selbst tragen und bezahlen.": [],
 				"Ich habe mich nach eingehender Beratung und Auswahl verschiedener Leistungen auf eigenen Wunsch für eine abweichende Versorgungsalternative mit Aufzahlung entschieden und bestätige hiermit die Kosten sowie etwaige Folgekosten, welche durch die höherwertige Leistung ausgelöst werden, selbst zu tragen.": []
 			}
+		},
+		{
+			"type": "text",
+			"attributes": { 
+				"name": "Ausführung, Leistung mit Aufzahlung"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": { 
+				"name": "Voraussichtliche Kosten"
+			}
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Weiterleitung persönlicher Daten and andere Mit-/Weiterversorger",
+			"content": {
+				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass alle für den Mit-/Weiterversorger meines Hilfsmittels notwendigen personenbezogenen Daten an diesen weitergeleitet werden dürfen.": []
+			}
+		}
+	],
+	[
+		{
+			"type": "textblock",
+			"description": "Schweigepflichtentbindung gegenüber dem Kostenträger",
+			"content": "Um für Ihr Hilfsmittel die Kostenzusage Ihres Kostenträgers zu erhalten, übermitteln wir diesem einen Kostenvoranschlag und eine Stellungnahme mit weiterführenden Informationen (u. a. Name, Versicherungsnummer, Diagnose, Angaben zur Erforderlichkeit). Die Stellungnahme wird entweder gleich der Beantragung beigelegt oder aber auf Anfrage seitens Ihres Kostenträgers zugeschickt. Hierzu ist Ihre Einwilligung und Schweigepflichtentbindung erforderlich. Die Einwilligung ist freiwillig, Vorgangsbezogen und für zukünftige Übermittlungen widerruflich. Ohne Ihre Einwilligung ist mit einer zeitlichen Verzögerung bei der Bearbeitung Ihrer Krankenkasse zu rechnen. Möglicherweise kann es dadurch sogar zu einer Ablehnung der Hilfsmittelversorgung kommen."
+		},
+		{
+			"type": "checkbox",
+			"description": "Schweigepflichtentbindung",
+			"content": {
+				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass ich meinen oben genannten Leistungserbringer von der Schweigepflicth gegenüber meinem Kostenträger entbinde": []
+			}
+		}
+	],
+	[
+		{
+			"type": "signature",
+			"attributes": { 
+				"name": "Unterschrift"
+			}
 		}
 	]
-}
+]
 ```
 [Content](#content)
 
