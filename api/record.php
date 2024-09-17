@@ -826,6 +826,7 @@ class RECORD extends API {
 				foreach($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
+						if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
 						unset ($this->_payload->$key);
 						$possibledate = substr($identifier, -16);
 						try {
@@ -842,7 +843,12 @@ class RECORD extends API {
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 				}
 				if (!$identifier) {
-					$identifier = $form_name . ' ' . $entry_timestamp;
+					if (!in_array($context, array_keys(LANGUAGEFILE['formcontext']['identify']))) $identifier = $form_name . ' ' . $entry_timestamp;
+					else $this->response([
+						'response' => [
+							'msg' => LANG::GET('record.record_error'),
+							'type' => 'error'
+						]]);
 				}
 				$entry_timestamp .= ':00'; // append seconds for database format
 
