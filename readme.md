@@ -85,6 +85,11 @@
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 
+#### bugs
+* import incomplete?
+* <br/><b>Warning</b>:  Trying to access array offset on value of type bool in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>869</b><br /><br/><b>Deprecated</b>:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>869</b><br /><br/><b>Warning</b>:  Trying to access array offset on value of type null in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>869</b><br /><br/><b>Warning</b>:  foreach() argument must be of type array|object, null given in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>852</b> on saving form with unapproved component
+* pdf: multiline description vs single line textfield
+
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
