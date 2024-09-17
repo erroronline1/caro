@@ -31,6 +31,12 @@
 			}
 		},
 		{
+			"type": "date",
+			"attributes": {
+				"name": "Geburtsdatum",
+			}
+		},
+		{
 			"type": "textarea",
 			"attributes": {
 				"name": "Adresse"
@@ -157,7 +163,7 @@ Export for signature compliance
 			"type": "checkbox",
 			"description": "Schweigepflichtentbindung",
 			"content": {
-				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass ich meinen oben genannten Leistungserbringer von der Schweigepflicht gegenüber meinem Kostenträger entbinde": []
+				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass ich meinen oben genannten Leistungserbringer von der Schweigepflicht gegenüber meinem Kostenträger entbinde.": []
 			}
 		}
 	],
@@ -185,6 +191,70 @@ Export for signature compliance
 
 ## Empfangsbestätigung
 ```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "textblock",
+			"description": "Empfangsbestätigung",
+			"content": "Hiermit bestätige ich, dass ich die folgenden Hilfsmittel vom Leistungserbringer Universitätsklinikum Heidelberg, Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg, erhalten habe:"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Hilfsmittel"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Abgabe",
+			"content": {
+				"zum dauerhaften Verbleib": [],
+				"miet-/leihweise": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "enthaltene Miet-/Leihkomponenten"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Erklärung",
+			"content": {
+				"Ich erkläre hiermit, dass ich das Hilfsmittel in ordnungsgemäßem, gebrauchsfähigem Zustand empfangen habe.": [],
+				"Ich erkläre hiermit, dass ich darüber aufgeklärt wurde, dass ausstehende Arbeiten zur Finalisierung meines Hilfsmittels keinen Einfluss auf die Funktion haben und ich eine postalische Zusendung nach Abschluss dieser Arbeiten ausdrücklich wünsche.": [],
+				"Eine ausreichende Unterweisung in Gebrauch, Funktionsweise und Risiken durch den Leistungserbringer habe ich erhalten. Mit der Passform, Ausführung, Funktion und Einweisung bin ich zufrieden, soweit ich dies z. Zt. beurteilen kann. Eine Gebrauchsanweisung und die darin enthaltene Konformitätserklärung wurden mir ausgehändigt. Ich verpflichte mich das Hilfsmittel nur zum bestimmungsgemäßen Gebrauch zu verwenden, pfleglich zu behandeln sowie Hinweise in der Gebrauchsanweisung zu beachten.": [],
+				"Die oben aufgeführten Artikel die mir miet- oder leihweise überlassen wurden, wie z.B. Miet-/Leihorthesen, Miet-/Leihpassteile, Leihorthesenschuhe, usw., werde ich bis zum unten genannten Datum persönlich oder ausreichend frankiert an den Leistungserbringer zurückgeben. Bei einer verspäteten Rückgabe können mir die miet- oder leihweise überlassenen Hilfsmittel oder Komponenten in Rechnung gestellt werden.": [],
+				"Das Hilfsmittel wird mit einer Sonderfreigabe zur Probe zur Nutzung übergeben. Nach Ablauf des nebenstehenden Datums ist das Tragen dieses Hilfsmittels untersagt. Das Nichtbeachten geschieht auf eigenes Risiko. Im derzeitigen Zustand ist das Hilfsmittel nicht für starke Belastungen wie Sport und/oder schwere körperliche Aktivitäten zugelassen. Die endgültige Fertigstellung erfolgt erst nach beendeter Testphase. Ich wurde darüber aufgeklärt, dass ich nach Ablauf der Testphase das Hilfsmittel umgehend zur Endfertigung an das Unternehmen zurückgeben muss. Mir sind die Risiken bei der Benutzung des Hilfsmittels im Testzustand ausreichend dargelegt worden.": []
+			}
+		},
+		{
+			"type": "date",
+			"attributes":{
+				"name": "Testversorgung, Versorgung im Probezustand bis"
+			}
+		},
+		{
+			"type": "date",
+			"attributes":{
+				"name": "Rückgabe der Miet-/ Leihteile bis"
+			}
+		},
+		{
+			"type": "signature",
+			"attributes": { 
+				"name": "Datum, Unterschrift"
+			}
+		}
+	]
+]
 ```
 [Content](#content)
 
