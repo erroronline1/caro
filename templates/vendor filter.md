@@ -124,6 +124,12 @@ delete first two columns and rows
 		"columns": ["NeueArtikelNummer", "Bezeichnung", "GTIN"]
 	},
 	"modify": {
+		"add": {
+			"special_attention": "0"
+		},
+		"conditional_or": [
+			["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband"]],
+		],
 		"rewrite": [{
 			"article_no": ["NeueArtikelNummer"],
 			"article_name": ["Bezeichnung"],
@@ -299,7 +305,12 @@ replace . and specialchars in header
 	},
 	"modify": {
 		"add": {
-			"trading_good": "1"
+			"trading_good": "1",
+			"special_attention": "0"
+		},
+		"conditional_or": [
+			["special_attention", "1", ["Bezeichnung", "noppenhaft"]],
+		],
 		},
 		"replace":[
 			["EAN-Nummer", "\\.", ""]
@@ -488,10 +499,12 @@ modify product description for:
 	],
 	"modify": {
 		"add": {
-			"trading_good": "0"
+			"trading_good": "0",
+			"has_expiry_date": "0"
 		},
 		"conditional_or": [
-			["trading_good", "1", ["BEZEICHNUNG", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]]
+			["trading_good", "1", ["BEZEICHNUNG", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]],
+			["has_expiry_date", "1", ["BEZEICHNUNG", "solvent"]],
 		],
 		"replace":[
 			["ART-NR", "(I-4443|I-CL63|I-CW63|I-CL43|I-CW43|I-CL53)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40],
@@ -946,7 +959,7 @@ delete . from headers, replace specialchars and whitespaces
 		"conditional_or": [
 			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]],
 			["has_expiry_date", "1", ["Bezeichnung", "silikonspray|sekundenkleber"]],
-			["special_attention", "1", ["Bezeichnung", "varioform|streifydur|streifylast|PET glasklar|streifyflex"]]
+			["special_attention", "1", ["Bezeichnung", "kon-gel|varioform|streifydur|streifylast|PET glasklar|streifyflex|drell|jaquard|satine|elastinova|bandagengurt"]]
 		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
