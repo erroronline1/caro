@@ -79,13 +79,14 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
+* assemble estimate widget with modal passing product search -> possible repurpose for order and products instead of inline display (pass destination? value or node)
 
 #### records considerations
 * linked files on separate external path, input type convert to link
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 
-#### bugs
+#### issues
 * import incomplete?
 * <br/><b>Warning</b>:  Trying to access array offset on value of type bool in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>869</b><br /><br/><b>Deprecated</b>:  json_decode(): Passing null to parameter #1 ($json) of type string is deprecated in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>869</b><br /><br/><b>Warning</b>:  Trying to access array offset on value of type null in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>869</b><br /><br/><b>Warning</b>:  foreach() argument must be of type array|object, null given in <b>C:\inetpub\wwwroot\caro\api\form.php</b>on line<b>852</b> on saving form with unapproved component
 * pdf: multiline description vs single line textfield
