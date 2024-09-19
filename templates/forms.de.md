@@ -5,6 +5,7 @@
 * [Kunststofffertigungsauftrag](#kunststofffertigungsauftrag)
 * [Silikonfertigungsauftrag](#silikonfertigungsauftrag)
 * [Empfangsbestätigung](#empfangsbestätigung)
+* [Erlaubnis zur Ausstellung und Veröffentlichung](#erlaubnis-zur-ausstellung-und-veröffentlichung)
 
 ### Prosthetics 2
 * [Anamnese Prothetik II](#anamnese-prothetik-ii)
@@ -245,6 +246,78 @@ Export for signature compliance
 			"type": "date",
 			"attributes":{
 				"name": "Rückgabe der Miet-/ Leihteile bis"
+			}
+		},
+		{
+			"type": "signature",
+			"attributes": { 
+				"name": "Datum, Unterschrift"
+			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Erlaubnis zur Ausstellung und Veröffentlichung
+```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "textblock",
+			"description": "Empfangsbestätigung",
+			"content": "Hiermit erteile ich dem Universitätsklinikum Heidelberg die Erlaubnis zur Ausstellung bzw. der Veröffentlichung der von mir, bzw. meinem Kind gefertigten Foto- und / oder Videoaufnahmen. Diese Erklärung kann jederzeit ohne Angaben von Gründen für künftige Veröffentlichungen widerrufen werden. Dies hat keinen Einfluss auf die Versorgung. Mir ist bewusst, dass bereits erfolgte Veröffentlichungen nachträglich nicht zurückgenommen werden können. Insbesondere bei der Veröffentlichung im Internet entzieht sich die weitere Verbreitung durch Kopien dem Zugriff durch das Universitätsklinikum Heidelberg.\\n \\nDie von mir / meinem Kind gemachten Aufnahmen sollen zu Zwecken der Presse- und Öffentlichkeitsarbeit des Universitätsklinikums Heidelberg verwendet werden. Ich habe die diesbezüglichen Erläuterungen verstanden, und mir wurde ausreichend Gelegenheit gegeben, Fragen zu stellen."
+		},
+		{
+			"type": "checkbox",
+			"description": "Erlaubnis zur Veröffentlichung von Aufnahmen in",
+			"content": {
+				"Fachzeitschriften": [],
+				"Zeitungsberichten": [],
+				"Vorträgen": [],
+				"Messen": [],
+				"Poster": [],
+				"Internet": [],
+				"Sonstiges": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Sonstiges"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Erlaubnis zur Veröffentlichung einmalig für"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Onlineveröffentlichung",
+			"content": {
+				"Hiermit erteile ich dem Universitätsklinikum Heidelberg meine Einwilligung, die von mir / meinem Kind gemachten Aufnahmen im Rahmen der Presse- und Öffentlichkeitsarbeit des Universitätsklinikums insbesondere in Print- und Onlinemedien zu verbreiten und zu veröffentlichen. Meine Einwilligung umfasst auch das Recht, die Aufnahmen zu bearbeiten und zu retuschieren, soweit dadurch keine Persönlichkeitsrechte verletzt werden.": []
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Gesicht",
+			"content": {
+				"kenntlich": [],
+				"geschwärzt": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Verhältnis zum Patienten"
 			}
 		},
 		{
