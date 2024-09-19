@@ -170,9 +170,11 @@ class PDF{
 		foreach($content['content'] as $form => $entries){
 			$pdf->SetFont('helvetica', '', 12); // font size
 			$pdf->MultiCell(150, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$keyY = $pdf->GetY();
 			foreach($entries as $key => $value){
 				$pdf->SetFont('helvetica', 'B', 10); // font size
-				$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
+				$pdf->MultiCell(50, 4, $key."-".$pdf->GetY()."-". $keyY, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
+				$keyY = $pdf->GetY();
 				$pdf->SetFont('helvetica', '', 10); // font size
 				$originalFontSize = $pdf->getFontSizePt();
 				if (gettype($value) === 'string'){
@@ -189,7 +191,7 @@ class PDF{
 						else { // text, number, etc
 							$height = 5;
 							$pdf->SetFontSize(0); // variable font size
-							$pdf->TextField($key, 133, $height, [], [], 65, $pdf->GetY() + 4);
+							$pdf->TextField($key, 133, $height, [], ['v' => $value, 'dv' => $value], 65, $pdf->GetY() + 4);
 							$pdf->Ln($height + 5);
 						}
 					} else { // textarea
@@ -200,7 +202,7 @@ class PDF{
 					}
 					$pdf->SetFontSize($originalFontSize);
 				}
-				if (gettype($value) === 'array'){
+				if (gettype($value) === 'array'){ // checkbox, radio
 					foreach($value as $option){
 						$pdf->SetFontSize(14);
 						$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 65, $pdf->GetY() + 4);
@@ -209,6 +211,7 @@ class PDF{
 						$pdf->Ln(-7);
 					}
 				}
+				if ($pdf->GetY() < $keyY) $pdf->SetY($keyY);
 			}
 		}
 		// move pointer to last page
