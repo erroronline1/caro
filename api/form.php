@@ -1019,15 +1019,15 @@ class FORM extends API {
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
-		// prepare existing component list
+		// prepare existing component list of fully approved
 		$cd = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
 		$hidden = [];
 		foreach($cd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!array_key_exists($row['name'], $componentoptions) && !in_array($row['name'], $hidden)) {
+			if (!array_key_exists($row['name'], $componentoptions) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
-				$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-				$componentoptions[$row['name'] . ' - ' . $approved] = ['value' => $row['id']];
+				//$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+				$componentoptions[$row['name'] . ' - ' . LANG::GET('assemble.approve_approved')] = ['value' => $row['id']];
 			}
 		}
 
