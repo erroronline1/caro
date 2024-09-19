@@ -1,7 +1,7 @@
 # Content
 ### Common
 * [Basisdaten](#basisdaten)
-* [Datenverarbeitung, Auftragserteilung, Schweigepflichtentbindung](#datenverarbeitung-auftragserteilung-schweigepflichtentbindung)
+* [Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung](#datenverarbeitung--auftragserteilung--schweigepflichtentbindung)
 * [Kunststofffertigungsauftrag](#kunststofffertigungsauftrag)
 * [Silikonfertigungsauftrag](#silikonfertigungsauftrag)
 * [Empfangsbestätigung](#empfangsbestätigung)
@@ -88,7 +88,7 @@
 ```
 [Content](#content)
 
-## Datenverarbeitung, Auftragserteilung, Schweigepflichtentbindung
+## Datenverarbeitung- Auftragserteilung- Schweigepflichtentbindung
 Export for signature compliance
 ```json
 [
@@ -102,14 +102,14 @@ Export for signature compliance
 		{
 			"type": "textblock",
 			"description": "Datenverarbeitung durch und Auftragserteilung an",
-			"content": "Universitätsklinikum Heidelberg, Zentrum für Orthopädie, Unfallchirurgie und Paraplegiologie\\\nAbteilung Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg"
+			"content": "Universitätsklinikum Heidelberg, Zentrum für Orthopädie, Unfallchirurgie und Paraplegiologie \\nAbteilung Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg"
 		}
 	],
 	[
 		{
 			"type": "textblock",
 			"description": "Information zur Datenverarbeitung",
-			"content": "Die Bereitstellung und Verarbeitung Ihrer Daten ist im Rahmen Ihrer Versorgung in unserem Haus erforderlich und Bestandteil des Behandlungsvertrags. Bei Bedarf stellen wir Ihnen diese Informationen auch in einem größeren Ausdruck zur Verfügung. Allgemein gilt die Erklärung zur Datenverarbeitung und Datenschutz des Universitätsklinikums Heidelberg.\\\nVerarbeitungszwecke im Rahmen Ihrer Hilfsmittelversorgung: Hilfsmittelversorgung, Patientenverwaltung und Abrechnung, interdisziplinäre Konferenzen zur Analyse und Erörterung von Diagnostik und Therapie, Versorgungsdokumentation, Erstellung von Berichten und Stellungnahmen, Qualitätssicherung in Versorgung und ihrer Organisation, Unterrichtung von Mit-/Weiterversorgern im erforderlichen Umfang, Eingabe der Adressdaten und ggf. Rufnummer an Versanddienstleister, Kontaktaufnahme auch hinsichtlich eines Erinnerungsservices nach Versorgungsabschluss."
+			"content": "Die Bereitstellung und Verarbeitung Ihrer Daten ist im Rahmen Ihrer Versorgung in unserem Haus erforderlich und Bestandteil des Behandlungsvertrags. Bei Bedarf stellen wir Ihnen diese Informationen auch in einem größeren Ausdruck zur Verfügung. Allgemein gilt die Erklärung zur Datenverarbeitung und Datenschutz des Universitätsklinikums Heidelberg. \\nVerarbeitungszwecke im Rahmen Ihrer Hilfsmittelversorgung: Hilfsmittelversorgung, Patientenverwaltung und Abrechnung, interdisziplinäre Konferenzen zur Analyse und Erörterung von Diagnostik und Therapie, Versorgungsdokumentation, Erstellung von Berichten und Stellungnahmen, Qualitätssicherung in Versorgung und ihrer Organisation, Unterrichtung von Mit-/Weiterversorgern im erforderlichen Umfang, Eingabe der Adressdaten und ggf. Rufnummer an Versanddienstleister, Kontaktaufnahme auch hinsichtlich eines Erinnerungsservices nach Versorgungsabschluss."
 		},
 		{
 			"type": "textblock",
