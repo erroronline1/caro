@@ -226,6 +226,12 @@ class RECORD extends API {
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
 					$subcontent = printable($subs, $payload, $enumerate);
+					foreach($subcontent['enumerate'] as $name => $number){
+						if (isset($enumerate[$name])){
+							$enumerate[$name]++;
+						}
+						else $enumerate[$name] = 1;	
+					}
 					$content['content'] = array_merge($content['content'], $subcontent['content']);
 					$content['images'] = array_merge($content['images'], $subcontent['images']);
 				}
@@ -278,16 +284,19 @@ class RECORD extends API {
 					}
 				}
 			}
+			$content['enumerate'] = $enumerate;
 			return $content;
 		};
 		$componentscontent = [];
+		$enumerate = [];
 		foreach(explode(',', $form['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			$component['content'] = json_decode($component['content'], true);
 
-			$printablecontent = printable($component['content']['content'], $this->_payload);
+			$printablecontent = printable($component['content']['content'], $this->_payload, $enumerate);
 			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
 			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
+			$enumerate = $printablecontent['enumerate'];
 		}
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
