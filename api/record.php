@@ -245,9 +245,9 @@ class RECORD extends API {
 					}
 					else $name = $subs['attributes']['name'];
 					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
-					if ($enumerate[$name]>1) $name .= '(' . $enumerate[$name] . ')';
 
 					$postname = str_replace(' ', '_', $name);
+					if ($enumerate[$name]>1) $postname .= '(' . $enumerate[$name] . ')';
 
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = [];
