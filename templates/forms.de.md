@@ -307,8 +307,10 @@ Export for signature compliance
 			}
 		},
 		{
-			"type": "checkbox",
-			"description": "Gesicht",
+			"type": "radio",
+			"attributes": {
+				"name": "Gesicht"
+			},
 			"content": {
 				"kenntlich": [],
 				"geschwärzt": []
