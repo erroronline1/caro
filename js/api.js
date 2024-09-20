@@ -1065,7 +1065,7 @@ export const api = {
 										input.checked = Object.keys(data.data).includes(inputname) && data.data[inputname] === input.value;
 									} else if (input.type === "checkbox") {
 										groupname = input.dataset.grouped.replaceAll(" ", "_");
-										input.checked = Object.keys(data.data).includes(groupname) && data.data[groupname].split(", ").includes(input.name);
+										input.checked = Object.keys(data.data).includes(groupname) && data.data[groupname].split(" | ").includes(input.name);
 									} else {
 										if (Object.keys(data.data).includes(inputname)) input.value = data.data[inputname];
 									}

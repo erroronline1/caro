@@ -172,7 +172,7 @@ const _ = {
 				}
 			}
 			for (const [group, values] of Object.entries(groups)) {
-				fields.append(group, values.join(", "));
+				fields.append(group, values.join(" | "));
 			}
 		} else {
 			fields = {};
