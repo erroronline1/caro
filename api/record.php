@@ -979,6 +979,7 @@ class RECORD extends API {
 				}
 
 				foreach($content['content'] as $form => $entries){
+					if ($form === LANG::GET('record.record_retype_pseudoform_name')) continue;
 					$body[] = [
 						[
 							'type' => 'textblock',
@@ -1054,6 +1055,24 @@ class RECORD extends API {
 							'description' => LANG::GET('record.record_append_missing_form'),
 							'content' => $recommended
 						]];
+				}
+				// append record_retype_pseudoform
+				if (isset($content['content'][LANG::GET('record.record_retype_pseudoform_name')])){
+					$entries = $content['content'][LANG::GET('record.record_retype_pseudoform_name')];
+					$body[] = [
+						[
+							'type' => 'textblock',
+							'description' => LANG::GET('record.record_retype_pseudoform_name')
+						]
+					];
+					foreach($entries as $key => $value){
+						array_push($body[count($body) -1],
+							[
+								'type' => 'textblock',
+								'description' => $key,
+								'linkedcontent' => $value
+							]); 
+					}
 				}
 		
 				$return['render']['content'] = $body;
