@@ -250,7 +250,7 @@ class RECORD extends API {
 					if ($enumerate[$name]>1) $postname .= '(' . $enumerate[$name] . ')';
 
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
-						$content['content'][$name] = [];
+						$content['content'][$name] = ['type' => 'selection', 'value' => []];
 						foreach($subs['content'] as $key => $v){
 							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
 							$selected = '';
@@ -258,30 +258,30 @@ class RECORD extends API {
 								($subs['type'] !== 'checkbox' && $key === UTILITY::propertySet($payload, $postname)) ||
 								($subs['type'] === 'checkbox' && in_array($key, explode(', ', UTILITY::propertySet($payload, $postname))))
 								)) $selected = '_____';
-							$content['content'][$name][] = $selected . $key;
+							$content['content'][$name]['value'][] = $selected . $key;
 						}
 					}
 					elseif ($subs['type']==='textblock'){
-						$content['content'][$name] = isset($subs['content']) ? $subs['content'] : '';
+						$content['content'][$name] = ['type' => 'textblock', 'value' => isset($subs['content']) ? $subs['content'] : ''];
 					}
 					elseif ($subs['type']==='textarea'){
-						$content['content'][$name] = UTILITY::propertySet($payload, $postname) ? : str_repeat(" \n", 2);
+						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
 					}
 					elseif ($subs['type']==='signature'){
-						$content['content'][$name] = str_repeat(" \n", 2);
+						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
 					}
 					elseif ($subs['type']==='image'){
-						$content['content'][$name] = $subs['attributes']['url'];
+						$content['content'][$name] = ['type'=> 'image', 'value' => $subs['attributes']['url']];
 						$file = pathinfo($subs['attributes']['url']);
 						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 							$content['images'][] = $subs['attributes']['url'];
 						}
 					}
 					elseif ($subs['type']==='range'){
-						$content['content'][$name] = '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '');
+						$content['content'][$name] = ['type' => 'textblock', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
 					}
 					else {
-						if (isset($name)) $content['content'][$name] = UTILITY::propertySet($payload, $postname) ? : ' ';
+						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
 					}
 				}
 			}

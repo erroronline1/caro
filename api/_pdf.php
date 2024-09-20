@@ -173,45 +173,42 @@ class PDF{
 			$keyY = $pdf->GetY();
 			foreach($entries as $key => $value){
 				$pdf->SetFont('helvetica', 'B', 10); // font size
-				$pdf->MultiCell(50, 4, $key."-".$pdf->GetY()."-". $keyY, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
-				$keyY = $pdf->GetY();
+				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
 				$pdf->SetFont('helvetica', '', 10); // font size
 				$originalFontSize = $pdf->getFontSizePt();
-				if (gettype($value) === 'string'){
-					preg_match('/[\n\r]/m', $value, $lines);
-					if (count($lines)<1) {
-						if (trim($value))
-							if (array_key_exists($form, $content['images']) && in_array($value, $content['images'][$form])) { // image type
-								$imagedata = pathinfo($value);
-								$pdf->Image('.' . $value, null, $pdf->GetY() + 4, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
-								$pdf->Ln(INI['pdf']['exportimage']['maxheight'] + 4);
-							} else { // text type
-								$pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
-							}
-						else { // text, number, etc
-							$height = 5;
-							$pdf->SetFontSize(0); // variable font size
-							$pdf->TextField($key, 133, $height, [], ['v' => $value, 'dv' => $value], 65, $pdf->GetY() + 4);
-							$pdf->Ln($height + 5);
+				switch ($value['type']){
+					case 'textblock':
+						$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						break;
+					case 'image':
+						if (array_key_exists($form, $content['images']) && in_array($value['value'], $content['images'][$form])) {
+							$imagedata = pathinfo($value['value']);
+							$pdf->Image('.' . $value['value'], null, $pdf->GetY() + 4, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+							$pdf->Ln(INI['pdf']['exportimage']['maxheight'] + 4);
 						}
-					} else { // textarea
+						break;
+					case 'selection':
+						foreach($value['value'] as $option){
+							$pdf->SetFontSize(14);
+							$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 65, $pdf->GetY() + 4);
+							$pdf->SetFontSize($originalFontSize);
+							$pdf->MultiCell(133, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 67, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+							$pdf->Ln(-7);
+						}
+						$pdf->Ln(max([1, $nameLines - 1 - count($value['value'])]) * 5);
+						break;
+					case 'multiline':
 						$height = 31;
 						$pdf->SetFontSize(0); // variable font size
-						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value, 'dv' => $value], 65, $pdf->GetY() + 4);
-						$pdf->Ln($height + 5);
-					}
-					$pdf->SetFontSize($originalFontSize);
+						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
+						$pdf->Ln($height + max([1, $nameLines - 1]) * 5);
+						break;
+					default:
+						$height = 5;
+						$pdf->SetFontSize(0); // variable font size
+						$pdf->TextField($key, 133, $height, [], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
+						$pdf->Ln($height + max([1, $nameLines - 1]) * 5);
 				}
-				if (gettype($value) === 'array'){ // checkbox, radio
-					foreach($value as $option){
-						$pdf->SetFontSize(14);
-						$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 65, $pdf->GetY() + 4);
-						$pdf->SetFontSize($originalFontSize);
-						$pdf->MultiCell(133, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 67, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
-						$pdf->Ln(-7);
-					}
-				}
-				if ($pdf->GetY() < $keyY) $pdf->SetY($keyY);
 			}
 		}
 		// move pointer to last page
