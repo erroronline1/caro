@@ -221,16 +221,19 @@ class RECORD extends API {
 			'date' => LANG::GET('record.form_export_exported', [':date' => $this->_currentdate->format('y-m-d H:i')])
 		];
 
+		function enumerate($name, $enumerate = [], $number = 1){
+			if (isset($enumerate[$name])) $enumerate[$name] += $number;
+			else $enumerate[$name] = $number;	
+			return $enumerate;
+		}
+
 		function printable($element, $payload, $enumerate = []){
 			$content = ['content' => [], 'images' => []];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
 					$subcontent = printable($subs, $payload, $enumerate);
 					foreach($subcontent['enumerate'] as $name => $number){
-						if (isset($enumerate[$name])){
-							$enumerate[$name]++;
-						}
-						else $enumerate[$name] = 1;	
+						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
 					}
 					$content['content'] = array_merge($content['content'], $subcontent['content']);
 					$content['images'] = array_merge($content['images'], $subcontent['images']);
@@ -241,19 +244,17 @@ class RECORD extends API {
 						$name = $subs['description'];
 					}
 					else $name = $subs['attributes']['name'];
-					if (isset($enumerate[$name])){
-						$enumerate[$name]++;
-						$name .= '(' . $enumerate[$name] . ')';
-					}
-					else $enumerate[$name] = 1;
+					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
+					if ($enumerate[$name]>1) $name .= '(' . $enumerate[$name] . ')';
 
 					$postname = str_replace(' ', '_', $name);
 
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = [];
 						foreach($subs['content'] as $key => $v){
+							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
 							$selected = '';
-							if (UTILITY::propertySet($payload, $name) && (
+							if (UTILITY::propertySet($payload, $postname) && (
 								($subs['type'] !== 'checkbox' && $key === UTILITY::propertySet($payload, $postname)) ||
 								($subs['type'] === 'checkbox' && in_array($key, explode(', ', UTILITY::propertySet($payload, $postname))))
 								)) $selected = '_____';
