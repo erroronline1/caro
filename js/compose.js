@@ -120,7 +120,7 @@ export const compose_helper = {
 				}
 				if (elementName === LANG.GET("assemble.compose_context_identify") && sibling.checked) {
 					element.attributes.required = true;
-					element.attributes.multiple = false;
+					delete element.attributes.multiple;
 					element.type = "identify";
 					document.getElementById("setIdentify").disabled = true;
 					document.getElementById("setIdentify").checked = false;
