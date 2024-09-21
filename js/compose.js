@@ -622,8 +622,7 @@ export const compose_helper = {
 
 					let sibling = targetform.childNodes[0].nextSibling,
 						setTo,
-						elementName,
-						value;
+						elementName;
 					const setName = {
 						name: ["select", "scanner", "radio", "photo", "file", "signature"],
 						description: ["links", "checkbox"],
@@ -1170,6 +1169,10 @@ export class Compose extends Assemble {
 		this.currentElement.content[LANG.GET("assemble.compose_required")] = {
 			name: LANG.GET("assemble.compose_required"),
 		};
+		if (type.type === "productselection")
+			this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
+				name: LANG.GET("assemble.compose_multiple"),
+			};
 		if (type.type === "textarea")
 			this.currentElement.content[LANG.GET("assemble.compose_texttemplate")] = {
 				name: LANG.GET("assemble.compose_texttemplate"),
@@ -1256,6 +1259,13 @@ export class Compose extends Assemble {
 			type: "photo",
 			description: LANG.GET("assemble.compose_photo"),
 			multiple: "optional",
+		});
+	}
+
+	compose_productselection() {
+		return this.compose_input({
+			type: "productselection",
+			description: LANG.GET("assemble.compose_productselection"),
 		});
 	}
 

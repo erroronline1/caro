@@ -751,6 +751,10 @@ class FORM extends API {
 						'description' => LANG::GET('assemble.compose_email')
 					]], [[
 						'form' => true,
+						'type' => 'compose_productselection',
+						'description' => LANG::GET('assemble.compose_productselection')
+					]], [[
+						'form' => true,
 						'type' => 'compose_range',
 						'description' => LANG::GET('assemble.compose_range')
 					]], [[
