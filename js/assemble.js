@@ -392,7 +392,7 @@ export class Assemble {
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
-		this.names = {};
+		this.names = setup.names || {};
 		this.composer = setup.composer;
 	}
 	/**
@@ -418,12 +418,12 @@ export class Assemble {
 					},
 				},
 			]);
-		} else if (this.composer === "photoOrScanner") this.section = formerSibling.parentNode;
+		} else if (this.composer === "elementClone") this.section = formerSibling.parentNode;
 		else if (!this.composer) this.section = document.createElement("div");
 
 		this.assembledPanels = this.processContent();
 
-		if (!(nextSibling || formerSibling || returnOnlyNodes || this.composer) || this.composer === "photoOrScanner") {
+		if (!(nextSibling || formerSibling || returnOnlyNodes || this.composer)) {
 			this.section.append(...this.assembledPanels);
 			return this.section;
 		} else if (nextSibling) {
@@ -1394,8 +1394,8 @@ export class Assemble {
 		addbutton.onpointerup = function () {
 			new Assemble({
 				content: [[photoElementClone]],
-				composer: "photoOrScanner",
-			}).initializeSection(null, hint.length ? hint : resetbutton);
+				composer: "elementClone",
+			}).initializeSection(null, hint.length ? hint[0] : resetbutton);
 		};
 		addbutton.setAttribute("data-type", "additem");
 		addbutton.classList.add("inlinebutton");
@@ -1411,11 +1411,14 @@ export class Assemble {
 			numeration: anything resulting in true to prevent enumeration
 			attributes: {
 				name: 'variable name' // will be used as an accessible placeholder
+				multiple: bool // on changing the input field another appends
 			}
 		}*/
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
-			button = document.createElement("button");
+			button = document.createElement("button"),
+			hint = [...this.hint()];
+		const productselectionClone = structuredClone(this.currentElement);
 		input.type = "text";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = "off";
@@ -1426,15 +1429,30 @@ export class Assemble {
 		label.classList.add("input-label", "productselection");
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.multiple) {
+			input.onchange = () => { // arrow function for reference of this.names
+				if (input.value) {
+					productselectionClone.attributes.name = productselectionClone.attributes.name.replace(/\(\d+\)$/gm, "");
+					new Assemble({
+						content: [[productselectionClone]],
+						composer: "elementClone",
+						names: this.names,
+					}).initializeSection(null, hint.length ? hint[0] : button);
+				}
+			};
+		}
 		input = this.apply_attributes(this.currentElement.attributes, input);
 
 		button.classList.add("productselection");
 		button.dataset.type = "search";
-		button.onpointerup = new Function(
-			"new Dialog({type: 'input', header: '" +
-				LANG.GET("consumables.edit_product_search") +
-				"', render:" +
-				JSON.stringify([
+		button.onpointerup = function () {
+			const options = {};
+			options[LANG.GET("assemble.compose_form_cancel")] = false;
+			options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({
+				type: "input",
+				header: LANG.GET("consumables.edit_product_search"),
+				render: [
 					[
 						{
 							type: "scanner",
@@ -1448,26 +1466,26 @@ export class Assemble {
 								id: "productsearch",
 							},
 						},
-						{ type: "hidden", 
-							attributes: { 
-								name: "_selectedproduct", 
-								id: "_selectedproduct" } },
+						{
+							type: "hidden",
+							attributes: {
+								name: "_selectedproduct",
+								id: "_selectedproduct",
+							},
+						},
 						{ type: "hr" },
 					],
-				]) +
-				", " +
-				"options:{" +
-				"'" +
-				LANG.GET("assemble.compose_form_cancel") +
-				"': false," +
-				"'" +
-				LANG.GET("assemble.compose_form_confirm") +
-				"': {value: true, class: 'reducedCTA'}," +
-				"}}).then(response => { console.log(response); document.getElementById('" +
-				input.id +
-				"').value = response._selectedproduct})"
-		);
-		return [...this.icon(), input, button, label, ...this.hint()];
+				],
+				options: options,
+			}).then((response) => {
+				if (response) {
+					const inputfield = document.getElementById(input.id);
+					inputfield.value = response._selectedproduct;
+					inputfield.dispatchEvent(new Event("change"));
+				}
+			});
+		};
+		return [...this.icon(), input, button, label, ...hint];
 	}
 
 	radio() {
@@ -1568,7 +1586,7 @@ export class Assemble {
 					if (multiple) {
 						new Assemble({
 							content: [[scannerElementClone]],
-							composer: "photoOrScanner",
+							composer: "elementClone",
 						}).initializeSection(null, button);
 					}
 				}
