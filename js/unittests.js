@@ -169,15 +169,27 @@ export function rendertest(element) {
 						description: "Informative text",
 						content: "...to inform users about important things",
 					},
-					{ type: "file", attributes: { name: "Add an upload for files" }, hint: "You can opt for multiple file selection" },
+					{
+						type: "file",
+						attributes: {
+							name: "Add an upload for files",
+							multiple: true,
+						},
+						hint: "You can opt for multiple file selection",
+					},
 					{
 						type: "photo",
-						attributes: { name: "Contribute photos right from your camera" },
+						attributes: {
+							name: "Contribute photos right from your camera",
+							multiple: true,
+						},
 						hint: "Desktop opens another file dialog though",
 					},
 					{
 						type: "signature",
-						attributes: { name: "Add a signature pad" },
+						attributes: {
+							name: "Add a signature pad",
+						},
 						hint: "Unfortunately this is not certified, so keep a good measure",
 					},
 				],
@@ -200,7 +212,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "number",
-						attributes: { name: "A number input" },
+						attributes: {
+							name: "A number input",
+						},
 						hint: "By the way: all fields can be optional set to be required, so storing the form is possible with provided input only!",
 					},
 					{
@@ -225,8 +239,9 @@ export function rendertest(element) {
 						type: "productselection",
 						attributes: {
 							name: "Product selector",
+							multiple: true,
 						},
-						hint: "Opens a dialog to select from the product database",
+						hint: "Opens a dialog to select from the product database. If created as multiple another one will be appended.",
 					},
 				],
 				[
@@ -377,8 +392,9 @@ export function rendertest(element) {
 						type: "productselection",
 						attributes: {
 							name: "Produktwähler",
+							multiple: true,
 						},
-						hint: "Öffnet einen Dialog um ein Procukt aus der Datenbank auszuwählen",
+						hint: "Öffnet einen Dialog um ein Produkt aus der Datenbank auszuwählen. Bei Mehrfachauswahl erscheint nach der Eingabe ein weiteres Feld.",
 					},
 				],
 				[
@@ -403,7 +419,11 @@ export function rendertest(element) {
 						type: "checkbox",
 						description: "Wähle aus mehreren Optionen auf einen Blick aus",
 						hint: "Am besten aber nicht mehr als 8 Optionen, sonst wird es unübersichtlich",
-						content: { "Das ist toll": {}, "Das ist großartig": {}, "Das ist Fabelhaft": { checked: true } },
+						content: {
+							"Das ist toll": {},
+							"Das ist großartig": {},
+							"Das ist Fabelhaft": { checked: true },
+						},
 					},
 					{
 						type: "radio",
@@ -458,19 +478,29 @@ export function rendertest(element) {
 					},
 					{
 						type: "search",
-						attributes: { name: "Search input" },
+						attributes: {
+							name: "Search input",
+						},
 						hint: "Search keyboard and looking glass icon. As seen in new orders.",
 					},
 					{
 						type: "filtered",
-						attributes: { name: "Filter input" },
+						attributes: {
+							name: "Filter input",
+						},
 						hint: "Search keyboard and funnel icon. As seen in record summaries.",
 					},
 					{
 						type: "checkbox2text",
-						attributes: { name: "Selected modal checkbox names are chained comma separated, onblur" },
+						attributes: {
+							name: "Selected modal checkbox names are chained comma separated, onblur",
+						},
 						hint: "Makes selections comprehensible while providing a single payload object. As seen in form manager.",
-						content: { One: { value: "1" }, Two: { value: 2 }, Three: { value: "Three" } },
+						content: {
+							One: { value: "1" },
+							Two: { value: 2 },
+							Three: { value: "Three" },
+						},
 					},
 					{
 						type: "range",
@@ -527,7 +557,9 @@ export function rendertest(element) {
 						type: "textblock",
 						description: "Highlighted textblock descriptions are possible",
 						content: "Available class options are red, orange, yellow and green",
-						attributes: { class: "green" },
+						attributes: {
+							class: "green",
+						},
 					},
 					{
 						type: "image",
