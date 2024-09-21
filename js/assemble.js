@@ -564,6 +564,7 @@ export class Assemble {
 					},
 				};
 				content = content.concat(this.textblock());
+				console.trace(e);
 			}
 		}
 		return content;
@@ -1401,6 +1402,72 @@ export class Assemble {
 		addbutton.type = "button";
 
 		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
+	}
+
+	productselection() {
+		/*{
+			type: 'productselection',
+			hint: 'somethingsomething...',
+			numeration: anything resulting in true to prevent enumeration
+			attributes: {
+				name: 'variable name' // will be used as an accessible placeholder
+			}
+		}*/
+		let input = document.createElement("input"),
+			label = document.createElement("label"),
+			button = document.createElement("button");
+		input.type = "text";
+		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
+		input.autocomplete = "off";
+		input.classList.add("productselection");
+		label.htmlFor = input.id;
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
+		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
+		label.classList.add("input-label", "productselection");
+
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		input = this.apply_attributes(this.currentElement.attributes, input);
+
+		button.classList.add("productselection");
+		button.dataset.type = "search";
+		button.onpointerup = new Function(
+			"new Dialog({type: 'input', header: '" +
+				LANG.GET("consumables.edit_product_search") +
+				"', render:" +
+				JSON.stringify([
+					[
+						{
+							type: "scanner",
+							destination: "productsearch",
+						},
+						{
+							type: "search",
+							attributes: {
+								name: LANG.GET("consumables.edit_product_search"),
+								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;}",
+								id: "productsearch",
+							},
+						},
+						{ type: "hidden", 
+							attributes: { 
+								name: "_selectedproduct", 
+								id: "_selectedproduct" } },
+						{ type: "hr" },
+					],
+				]) +
+				", " +
+				"options:{" +
+				"'" +
+				LANG.GET("assemble.compose_form_cancel") +
+				"': false," +
+				"'" +
+				LANG.GET("assemble.compose_form_confirm") +
+				"': {value: true, class: 'reducedCTA'}," +
+				"}}).then(response => { console.log(response); document.getElementById('" +
+				input.id +
+				"').value = response._selectedproduct})"
+		);
+		return [...this.icon(), input, button, label, ...this.hint()];
 	}
 
 	radio() {

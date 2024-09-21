@@ -1643,6 +1643,11 @@ class ORDER extends API {
 					break;
 				}
 
+				if ($this->_borrowedModule === 'productselection'){
+					// prepared by assemble.js vendor ids are passed as 'null'-string
+					$vendors = SQLQUERY::EXECUTE($this->_pdo, SQLQUERY::PREPARE('consumables_get_vendor_datalist'));
+					$this->_requestedID = implode('_', array_values(array_column($vendors, 'id')));
+				}
 				$search = SQLQUERY::EXECUTE($this->_pdo, $this->_borrowedModule === 'editconsumables' ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 					'values' => [
 						':search' => $this->_subMethod
@@ -1688,6 +1693,20 @@ class ORDER extends API {
 								'type' => 'tile',
 								'attributes' => [
 									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
+								],
+								'content' => [
+									[
+										'type' => 'textblock',
+										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
+									]
+								]
+							];
+							break;
+						case 'productselection': // form.php, record.php, assemble.js can make good use of this method!
+							$matches[$article][$slide][] = [
+								'type' => 'tile',
+								'attributes' => [
+									'onpointerup' => "document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
 								],
 								'content' => [
 									[

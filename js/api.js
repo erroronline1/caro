@@ -862,18 +862,41 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "productsearch":
-						api.preventDataloss.monitor = false;
-						successFn = function (data) {
-							let list = document.querySelector("hr").previousElementSibling;
-							if (list.previousElementSibling) list.remove();
-							if (data.render.content) {
-								const render = new Assemble(data.render);
-								render.initializeSection("hr");
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							api.preventDataloss.monitor = request[4] === "editconsumables";
-						};
+						switch (request[4]) {
+							case "productselection": //coming from assemble.js
+								successFn = function (data) {
+									let hr = document.querySelector("#inputmodal form article hr");
+									let sibling = hr.nextSibling,
+										deletesibling;
+									if (sibling) {
+										do {
+											deletesibling = sibling;
+											sibling = sibling.nextSibling;
+											deletesibling.remove();
+										} while (sibling);
+									}
+									if (data.render.content) {
+										const render = new Assemble(data.render);
+										render.initializeSection(null, hr);
+										render.processAfterInsertion();
+									}
+									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+								};
+								break;
+							default:
+								api.preventDataloss.monitor = false;
+								successFn = function (data) {
+									let list = document.querySelector("hr").previousElementSibling;
+									if (list.previousElementSibling) list.remove();
+									if (data.render.content) {
+										const render = new Assemble(data.render);
+										render.initializeSection("hr");
+										render.processAfterInsertion();
+									}
+									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+									api.preventDataloss.monitor = request[4] === "editconsumables";
+								};
+						}
 						break;
 					case "filter":
 						successFn = function (data) {
