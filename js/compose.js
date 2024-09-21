@@ -1218,6 +1218,7 @@ export class Compose extends Assemble {
 				name: LANG.GET("assemble.compose_multilist_add_item") + "[]",
 			},
 		};
+		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
 		result = result.concat(...this.text());
 		this.currentElement = {
 			attributes: {
