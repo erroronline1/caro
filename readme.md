@@ -79,7 +79,11 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
-* assemble estimate widget with modal passing product search -> possible repurpose for order and products instead of inline display (pass destination? value or node)
+* assemble estimate widget with modal passing product search
+    * clone on value
+    * selection state currently unclear
+    * compose and import
+* article > article (tile) width styling min/max
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -87,9 +91,6 @@
 * material tracing within documentation
 
 #### issues
-* record import incomplete?
-* pdf: multiline description vs single line textfield, draft: line 170ff
-* form export: contents not passed properly, optimize enumerate, draft: record line 225ff
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
