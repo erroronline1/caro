@@ -784,13 +784,13 @@ input:invalid + label.input_required_alert,
 }
 
 input.productselection {
-	width: calc(93% - 5em);
+	width: calc(95% - 5em);
 	display: inline;
 }
 button.productselection {
 	display: inline-block;
 	width: 5em;
-	margin: 0 1em;
+	margin: 0 0 0 1em;
 }
 
 /*************************** article elements and boxes ******************************/
