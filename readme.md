@@ -79,10 +79,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
-* assemble estimate widget with modal passing product search
-    * clone on value
-    * selection state currently unclear
-    * compose and import
 * article > article (tile) width styling min/max
 
 #### records considerations
@@ -503,6 +499,31 @@ graph TD;
     if named item is not hidden,
     approved and permissions match")
 ```
+
+Available elements for forms are:
+* scanner field, optional as multiple and context identifier
+* textblock for information purpose without input
+* image for including e.g. infographics
+* single line text input
+* multi line text input, optional access to text templates
+* number input. Controls appearance of keypad on mobile devices
+* date input. Controls appearance of input options
+* phone input. Controls appearance of keypad on mobile devices
+* mail input. Controls appearance of keypad on mobile devices
+* product selection input, optional as multiple. Accesses the products database
+* range input, min, max and step optional
+* links
+* multiple selection options
+* single selection options (buttons)
+* single selection options (list)
+* file upload, optional as multiple
+* photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
+* signature field
+* calendar button
+* form link, just for display or to continue transferring identifier
+
+Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import components as JSON-notation.
+
 
 [Content](#content)
 
