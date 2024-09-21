@@ -1542,6 +1542,7 @@ export class Assemble {
 			label,
 			multiple,
 			originaltype = this.currentElement.type;
+		const scannerElementClone = structuredClone(this.currentElement);
 		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
 			multiple = true;
 			// delete for input apply_attributes
@@ -1555,22 +1556,36 @@ export class Assemble {
 			input = document.createElement("input");
 			input.type = "text";
 			input.id = inputid = getNextElementID();
-			input.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			input.placeholder = " "; // to access input:not(:placeholder-shown) query selector
-			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
 			input.autocomplete = input.type === "password" ? "one-time-code" : "off";
 
 			label = document.createElement("label");
 			label.htmlFor = input.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
 			label.classList.add("input-label");
+			
+			if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
+
+			if (multiple) {
+				input.onchange = () => { // arrow function for reference of this.names
+					if (input.value) {
+						scannerElementClone.attributes.name = scannerElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
+						console.log(this.names);
+						new Assemble({
+							content: [[scannerElementClone]],
+							composer: "elementClone",
+							names: this.names,
+						}).initializeSection(null, button);
+					}
+				};
+			}
 			if (input.type === "password") this.currentElement.type = "password"; // for icon
 			result = result.concat([...this.icon(), input, label, ...this.hint()]);
 			this.currentElement.type = originaltype;
 		}
 
 		if (multiple) this.currentElement.attributes.multiple = true;
-		const scannerElementClone = structuredClone(this.currentElement);
 
 		let button = document.createElement("button");
 		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.scan_button")));
@@ -1584,9 +1599,11 @@ export class Assemble {
 				if (response.scanner) {
 					document.getElementById(inputid).value = response.scanner;
 					if (multiple) {
+						scannerElementClone.attributes.name = scannerElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
 						new Assemble({
 							content: [[scannerElementClone]],
 							composer: "elementClone",
+							names: this.names,
 						}).initializeSection(null, button);
 					}
 				}
