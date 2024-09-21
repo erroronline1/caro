@@ -1667,8 +1667,9 @@ class ORDER extends API {
 					$article = intval(count($matches) - 1);
 					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
 						$matches[$article][] = [
-							['type' => 'textblock',
-							'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
+							[
+								'type' => 'textblock',
+								'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
 							]
 						];
 					}
@@ -1703,18 +1704,16 @@ class ORDER extends API {
 							];
 							break;
 						case 'productselection': // form.php, record.php, assemble.js can make good use of this method!
-							$matches[$article][$slide][] = [
-								'type' => 'tile',
+							if (!isset($matches[$article][$slide][1])) $matches[$article][$slide][] = [
+								'type' => 'radio',
 								'attributes' => [
-									'onpointerup' => "document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
+									'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
 								],
-								'content' => [
-									[
-										'type' => 'textblock',
-										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
-									]
-								]
+								'content' => []
 							];
+							$matches[$article][$slide][1]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
+									'onchange' => "if (this.checked) document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
+								];
 							break;
 						default:
 							$incorporationState = '';
