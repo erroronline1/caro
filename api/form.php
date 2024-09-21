@@ -48,7 +48,7 @@ class FORM extends API {
 						'msg' => LANG::GET('assemble.approve_not_saved'),
 						'type' => 'error'
 					]]);
-				$approveas = explode(', ', $approveas);
+				$approveas = explode(' | ', $approveas);
 
 				$approve = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
 					'values' => [
