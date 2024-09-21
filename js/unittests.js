@@ -203,9 +203,31 @@ export function rendertest(element) {
 						attributes: { name: "A number input" },
 						hint: "By the way: all fields can be optional set to be required, so storing the form is possible with provided input only!",
 					},
-					{ type: "date", attributes: { name: "A date field makes input easy with the host systems date selection" } },
-					{ type: "tel", attributes: { name: "The phone number field displays a keypad on mobile" } },
-					{ type: "email", attributes: { name: "An email field does it similar" } },
+					{
+						type: "date",
+						attributes: {
+							name: "A date field makes input easy with the host systems date selection",
+						},
+					},
+					{
+						type: "tel",
+						attributes: {
+							name: "The phone number field displays a keypad on mobile",
+						},
+					},
+					{
+						type: "email",
+						attributes: {
+							name: "An email field does it similar",
+						},
+					},
+					{
+						type: "productselection",
+						attributes: {
+							name: "Product selector",
+						},
+						hint: "Opens a dialog to select from the product database",
+					},
 				],
 				[
 					{
@@ -233,7 +255,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "radio",
-						attributes: { name: "Select only one option from a few at a glance" },
+						attributes: {
+							name: "Select only one option from a few at a glance",
+						},
 						hint: "Less than 8 recommended as well",
 						content: {
 							"Either this": {},
@@ -255,8 +279,18 @@ export function rendertest(element) {
 					},
 				],
 				[
-					{ type: "calendarbutton", attributes: { value: "Add event to calendar" } },
-					{ type: "formbutton", attributes: { value: "Display SILLY FORM" } },
+					{
+						type: "calendarbutton",
+						attributes: {
+							value: "Add event to calendar",
+						},
+					},
+					{
+						type: "formbutton",
+						attributes: {
+							value: "Display SILLY FORM",
+						},
+					},
 				],
 			],
 		},
@@ -275,15 +309,25 @@ export function rendertest(element) {
 						description: "Informativer Text",
 						content: "...um Nutzer über wichtige Dinge zu informieren",
 					},
-					{ type: "file", attributes: { name: "Füge einen Upload für eine Datei hinzu" }, hint: "Du kannst auch einstellen, dass mehrere Dateien gewählt werden können" },
+					{
+						type: "file",
+						attributes: {
+							name: "Füge einen Upload für eine Datei hinzu",
+						},
+						hint: "Du kannst auch einstellen, dass mehrere Dateien gewählt werden können",
+					},
 					{
 						type: "photo",
-						attributes: { name: "Stelle Fotos direkt mit der Kamera zur Verfügung" },
+						attributes: {
+							name: "Stelle Fotos direkt mit der Kamera zur Verfügung",
+						},
 						hint: "Desktop PCs öffnen allerdings eine weitere Dateiauswahl",
 					},
 					{
 						type: "signature",
-						attributes: { name: "Füge ein Unterschriftenfeld hinzu" },
+						attributes: {
+							name: "Füge ein Unterschriftenfeld hinzu",
+						},
 						hint: "Dies ist allerdings nicht zertifiziert, also liegt es bei dir",
 					},
 				],
@@ -306,12 +350,36 @@ export function rendertest(element) {
 					},
 					{
 						type: "number",
-						attributes: { name: "Eine Nummerneingabe" },
+						attributes: {
+							name: "Eine Nummerneingabe",
+						},
 						hint: "Übrigens: alle Felder können als erforderlich markiert werden, dann kann das Formular nur gespeichert werden, wenn alles vollständig ist!",
 					},
-					{ type: "date", attributes: { name: "Ein Datumfeld macht die Eingabe einfach wenn das Gerät eine Auswahl darstellt" } },
-					{ type: "tel", attributes: { name: "Das Telefonnummernfeld zeigt auf mobilen Geräten eine Nummerneingabe an" } },
-					{ type: "email", attributes: { name: "Das gilt auch für ein eMail-Feld" } },
+					{
+						type: "date",
+						attributes: {
+							name: "Ein Datumfeld macht die Eingabe einfach wenn das Gerät eine Auswahl darstellt",
+						},
+					},
+					{
+						type: "tel",
+						attributes: {
+							name: "Das Telefonnummernfeld zeigt auf mobilen Geräten eine Nummerneingabe an",
+						},
+					},
+					{
+						type: "email",
+						attributes: {
+							name: "Das gilt auch für ein eMail-Feld",
+						},
+					},
+					{
+						type: "productselection",
+						attributes: {
+							name: "Produktwähler",
+						},
+						hint: "Öffnet einen Dialog um ein Procukt aus der Datenbank auszuwählen",
+					},
 				],
 				[
 					{
@@ -339,7 +407,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "radio",
-						attributes: { name: "Wähle nur eine Option aus mehreren auf einen Blick" },
+						attributes: {
+							name: "Wähle nur eine Option aus mehreren auf einen Blick",
+						},
 						hint: "Auch hier gilt: weniger ist mehr",
 						content: {
 							"Entweder dies": {},
@@ -361,8 +431,18 @@ export function rendertest(element) {
 					},
 				],
 				[
-					{ type: "calendarbutton", attributes: { value: "Füge ein Ereignis zum Kalender hinzu" } },
-					{ type: "formbutton", attributes: { value: "Zeige TOLLES FORMULAR an" } },
+					{
+						type: "calendarbutton",
+						attributes: {
+							value: "Füge ein Ereignis zum Kalender hinzu",
+						},
+					},
+					{
+						type: "formbutton",
+						attributes: {
+							value: "Zeige TOLLES FORMULAR an",
+						},
+					},
 				],
 			],
 		},
@@ -392,27 +472,53 @@ export function rendertest(element) {
 						hint: "Makes selections comprehensible while providing a single payload object. As seen in form manager.",
 						content: { One: { value: "1" }, Two: { value: 2 }, Three: { value: "Three" } },
 					},
-					{ type: "range", attributes: { name: "Range with datalist", list: "range_datalist", min: 0, max: 4, value: 2 } },
+					{
+						type: "range",
+						attributes: {
+							name: "Range with datalist",
+							list: "range_datalist",
+							min: 0,
+							max: 4,
+							value: 2,
+						},
+					},
 					{
 						type: "datalist",
-						attributes: { id: "range_datalist", class: "rangedatalist" },
+						attributes: {
+							id: "range_datalist",
+							class: "rangedatalist",
+						},
 						content: [{ label: "A" }, { label: "range" }, { label: "with" }, { label: "a" }, { label: "datalist" }],
 						hint: "As seen in user manager.",
 					},
-					{ type: "datalist", attributes: { id: "text_datalist" }, content: ["A", "textinput", "with", "a", "datalist"] },
+					{
+						type: "datalist",
+						attributes: {
+							id: "text_datalist",
+						},
+						content: ["A", "textinput", "with", "a", "datalist"],
+					},
 					{
 						type: "text",
-						attributes: { name: "Text input with datalist", list: "text_datalist" },
+						attributes: {
+							name: "Text input with datalist",
+							list: "text_datalist",
+						},
 						hint: "As seen in new conversation.",
 					},
 					{
 						type: "code",
-						attributes: { name: "Text input with linenumbers" },
+						attributes: {
+							name: "Text input with linenumbers",
+						},
 						hint: "As seen in CSV filter management",
 					},
 					{
 						type: "textarea",
-						attributes: { name: "Text input without linenumbers", rows: 3 },
+						attributes: {
+							name: "Text input without linenumbers",
+							rows: 3,
+						},
 						hint: "As comparison",
 					},
 				],
@@ -424,21 +530,21 @@ export function rendertest(element) {
 						attributes: { class: "green" },
 					},
 					{
-						type: 'image',
+						type: "image",
 						description: "A barcode",
 						attributes: {
-							name: 'Barcode CODE128',
-							barcode: {value:'a CODE128 barcode', format: 'CODE128'},
-						}
+							name: "Barcode CODE128",
+							barcode: { value: "a CODE128 barcode", format: "CODE128" },
+						},
 					},
 					{
-						type: 'image',
+						type: "image",
 						description: "A QR-code",
 						attributes: {
-							name: 'QR code', 
-							qrcode: 'QR code',
-						}
-					}
+							name: "QR code",
+							qrcode: "QR code",
+						},
+					},
 				],
 				[
 					{
@@ -451,11 +557,17 @@ export function rendertest(element) {
 					},
 					{
 						type: "deletebutton",
-						attributes: { value: "A delete button", type: "button" },
+						attributes: {
+							value: "A delete button",
+							type: "button",
+						},
 					},
 					{
 						type: "submitbutton",
-						attributes: { value: "A submit button", type: "button" },
+						attributes: {
+							value: "A submit button",
+							type: "button",
+						},
 						hint: "Submits the parent form",
 					},
 				],
@@ -472,7 +584,15 @@ export function rendertest(element) {
 					},
 					{
 						type: "tile",
-						content: [{ type: "text", attributes: { name: "Any element is possible" }, hint: "Not necessarily sensible though." }],
+						content: [
+							{
+								type: "text",
+								attributes: {
+									name: "Any element is possible",
+								},
+								hint: "Not necessarily sensible though.",
+							},
+						],
 					},
 				],
 				[
@@ -494,9 +614,9 @@ export function rendertest(element) {
 				[
 					{
 						type: "undefined",
-						description: "This is deliberately to fail by the assembler."
-					}
-				]
+						description: "This is deliberately to fail by the assembler.",
+					},
+				],
 			],
 		},
 		app_de: {
@@ -511,41 +631,77 @@ export function rendertest(element) {
 					},
 					{
 						type: "search",
-						attributes: { name: "Sucheingabe" },
+						attributes: {
+							name: "Sucheingabe",
+						},
 						hint: "Suchtastatur und Lupensymbol, Verwendet bei neuen Bestellungen.",
 					},
 					{
 						type: "filtered",
-						attributes: { name: "Filtereingabe" },
+						attributes: {
+							name: "Filtereingabe",
+						},
 						hint: "Suchtastatur und Trichtersymbol, Verwendet bei Doumentationen.",
 					},
 					{
 						type: "checkbox2text",
-						attributes: { name: "Die ausgewählten Optionen des Popups werden mit Kommata verkettet" },
+						attributes: {
+							name: "Die ausgewählten Optionen des Popups werden mit Kommata verkettet",
+						},
 						hint: "Vereinfacht eine Auswahlentscheidung und stellt ein einfaches Datenobjekt bereit, Verwendet in der Formularverwaltung.",
-						content: { One: { value: "1" }, Two: { value: 2 }, Three: { value: "Drei" } },
+						content: {
+							One: { value: "1" },
+							Two: { value: 2 },
+							Three: { value: "Drei" },
+						},
 					},
-					{ type: "range", attributes: { name: "Regler mit Datenliste", list: "range_datalist", min: 0, max: 4, value: 2 } },
+					{
+						type: "range",
+						attributes: {
+							name: "Regler mit Datenliste",
+							list: "range_datalist",
+							min: 0,
+							max: 4,
+							value: 2,
+						},
+					},
 					{
 						type: "datalist",
-						attributes: { id: "range_datalist", class: "rangedatalist" },
+						attributes: {
+							id: "range_datalist",
+							class: "rangedatalist",
+						},
 						content: [{ label: "Ein" }, { label: "Regler" }, { label: "mit" }, { label: "einer" }, { label: "Datenliste" }],
 						hint: "Verwendet in der Nutzerverwaltung.",
 					},
-					{ type: "datalist", attributes: { id: "text_datalist" }, content: ["Eine", "Texteingabe", "mit", "einer", "Datenliste"] },
+					{
+						type: "datalist",
+						attributes: {
+							id: "text_datalist",
+						},
+						content: ["Eine", "Texteingabe", "mit", "einer", "Datenliste"],
+					},
 					{
 						type: "text",
-						attributes: { name: "Texteingabe mit einer Datenliste", list: "text_datalist" },
+						attributes: {
+							name: "Texteingabe mit einer Datenliste",
+							list: "text_datalist",
+						},
 						hint: "Verwendet in Konversationen.",
 					},
 					{
 						type: "code",
-						attributes: { name: "Texteingabe mit Zeilennummerierung" },
+						attributes: {
+							name: "Texteingabe mit Zeilennummerierung",
+						},
 						hint: "Verwendet bei CSV-Filtern",
 					},
 					{
 						type: "textarea",
-						attributes: { name: "Texteingabe ohne Zeilennummerierung", rows: 3 },
+						attributes: {
+							name: "Texteingabe ohne Zeilennummerierung",
+							rows: 3,
+						},
 						hint: "Als Vergleich",
 					},
 				],
@@ -554,24 +710,26 @@ export function rendertest(element) {
 						type: "textblock",
 						description: "Hervorgehobene Textüberschriften sind möglich",
 						content: "Verfügbare CSS-Klassen sind red, orange, yellow and green",
-						attributes: { class: "green" },
+						attributes: {
+							class: "green",
+						},
 					},
 					{
-						type: 'image',
+						type: "image",
 						description: "Ein Barcode",
 						attributes: {
-							name: 'Barcode CODE128',
-							barcode: {value:'Ein CODE128 Barcode', format: 'CODE128'},
-						}
+							name: "Barcode CODE128",
+							barcode: { value: "Ein CODE128 Barcode", format: "CODE128" },
+						},
 					},
 					{
-						type: 'image',
+						type: "image",
 						description: "Ein QR-Code",
 						attributes: {
-							name: 'QR Code',
-							qrcode: 'QR Code',
-						}
-					}
+							name: "QR Code",
+							qrcode: "QR Code",
+						},
+					},
 				],
 				[
 					{
@@ -584,11 +742,17 @@ export function rendertest(element) {
 					},
 					{
 						type: "deletebutton",
-						attributes: { value: "Ein Lösch-Knopf", type: "button" },
+						attributes: {
+							value: "Ein Lösch-Knopf",
+							type: "button",
+						},
 					},
 					{
 						type: "submitbutton",
-						attributes: { value: "Ein Absendeknopf", type: "button" },
+						attributes: {
+							value: "Ein Absendeknopf",
+							type: "button",
+						},
 						hint: "Sendet das umgebende Formular ab",
 					},
 				],
@@ -605,7 +769,15 @@ export function rendertest(element) {
 					},
 					{
 						type: "tile",
-						content: [{ type: "text", attributes: { name: "Jeses Element ist möglich" }, hint: "aber nicht unbedingt sinnvoll." }],
+						content: [
+							{
+								type: "text",
+								attributes: {
+									name: "Jeses Element ist möglich",
+								},
+								hint: "aber nicht unbedingt sinnvoll.",
+							},
+						],
 					},
 				],
 				[
@@ -627,9 +799,9 @@ export function rendertest(element) {
 				[
 					{
 						type: "undefined",
-						description: "Dies soll absichtlich einen Fehler im Assembler erzeugen"
-					}
-				]
+						description: "Dies soll absichtlich einen Fehler im Assembler erzeugen",
+					},
+				],
 			],
 		},
 	};
