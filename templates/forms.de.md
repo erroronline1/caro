@@ -793,7 +793,7 @@ Export for signature compliance
 				"name": "Habitus Kontaktschaft"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Finger/Daumen EV 20.0000 KA": [],
 				"Finger/Daumen FV 20.0010 KA": [],
 				"Partialhand EV 20.0100 KA": [],
@@ -836,7 +836,7 @@ Export for signature compliance
 				"name": "Habitus Linerschaft"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Transcarpal EV 20.0201 KA": [],
 				"Transcarpal WV 20.0211 KA": [],
 				"Handexartikulation EV 20.0301 KA": [],
@@ -865,7 +865,7 @@ Export for signature compliance
 				"name": "Mechanisch Kontaktschaft"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Finger/Daumen EV 20.0020 KA": [],
 				"Finger/Daumen FV 20.0030 KA": [],
 				"Partialhand EV 20.0120 KA": [],
@@ -898,7 +898,7 @@ Export for signature compliance
 				"name": "Mechanisch Linerschaft"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Transcarpal EV 20.0221 KA": [],
 				"Transcarpal WV 20.0231 KA": [],
 				"Handexartikulation EV 20.0321 KA": [],
@@ -927,7 +927,7 @@ Export for signature compliance
 				"name": "Elektrisch Kontaktschaft"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Finger/Daumen EV 20.0040 KA": [],
 				"Finger/Daumen FV 20.0050 KA": [],
 				"Partialhand EV 20.0140 KA": [],
@@ -990,7 +990,7 @@ Export for signature compliance
 				"name": "Elektrisch Linerschaft"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Transcarpal EV 20.0241 KA": [],
 				"Transcarpal WV 20.0251 KA": [],
 				"Transcarpal Testversorgung 20.0261 KA": [],
@@ -1040,6 +1040,7 @@ Export for signature compliance
 				"Tumorversorgung 20.4001 KA": [],
 				"Dysmelieversorgung 20.4002 KA": [],
 				"Habitus Kinderversorgung 20.4003 KA": [],
+				"Myo Kinderversorgung 20.4004 KA": [],
 				"bilateral 20.4005 KA": [],
 				"zusätzliche Dokumentation 20.4006 KA": [],
 				"Gebrauchsschulung fremdsprachlich 20.4017 KA": [],
@@ -1062,7 +1063,7 @@ Export for signature compliance
 				"name": "zusätzlicher Testschaft Habitus"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Partialhand 20.0105 KA": [],
 				"Unterarm lang 20.0405 KA": [],
 				"Unterarm mittellang 20.0505 KA": [],
@@ -1072,8 +1073,8 @@ Export for signature compliance
 				"Oberarm lang 20.0905 KA": [],
 				"Oberarm mittellang 20.1005 KA": [],
 				"Oberarm kurz 20.1105 KA": [],
-				"Oberarm ultrakurz 20.1105 KA": [],
-				"Schulter 20.1105 KA": []
+				"Oberarm ultrakurz 20.1205 KA": [],
+				"Schulter 20.1305 KA": []
 			}
 		},
 		{
@@ -1082,7 +1083,7 @@ Export for signature compliance
 				"name": "zusätzlicher Testschaft Mechanisch"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Partialhand 20.0125 KA": [],
 				"Unterarm lang 20.0425 KA": [],
 				"Unterarm mittellang 20.0525 KA": [],
@@ -1091,9 +1092,7 @@ Export for signature compliance
 				"Ellenbogenexartikulation 20.0825 KA": [],
 				"Oberarm lang 20.0925 KA": [],
 				"Oberarm mittellang 20.1025 KA": [],
-				"Oberarm kurz 20.1125 KA": [],
-				"Oberarm ultrakurz 20.1125 KA": [],
-				"Schulter 20.1125 KA": []
+				"Oberarm kurz 20.1125 KA": []
 			}
 		},
 		{
@@ -1102,7 +1101,7 @@ Export for signature compliance
 				"name": "zusätzlicher Testschaft Elektrisch"
 			},
 			"content": {
-				"nicht gewählt": { "value": " " },
+				"": [],
 				"Partialhand 20.0145 KA": [],
 				"Unterarm lang 20.0445 KA": [],
 				"Unterarm mittellang 20.0545 KA": [],
@@ -1112,8 +1111,8 @@ Export for signature compliance
 				"Oberarm lang 20.0945 KA": [],
 				"Oberarm mittellang 20.1045 KA": [],
 				"Oberarm kurz 20.1145 KA": [],
-				"Oberarm ultrakurz 20.1145 KA": [],
-				"Schulter 20.1145 KA": []
+				"Oberarm ultrakurz 20.1245 KA": [],
+				"Schulter 20.1345 KA": []
 			}
 		},
 		{
@@ -1178,8 +1177,7 @@ Export for signature compliance
 			"content": {
 				"Prepreg 20.4007 KA": [],
 				"Schaftsonderlösungen 20.4008 KA": []
-			},
-			"hint": "Einsatzlimitierungen, Anwenderinformationen, tägliche Kontrolle, Wartungshinweise und -intervalle, Warnhinweise"
+			}
 		},
 		{
 			"type": "text",
@@ -1193,6 +1191,7 @@ Export for signature compliance
 				"name": "Abweichendes Schaftsystem Habitus"
 			},
 			"content": {
+				"": [],
 				"Gießharzkontaktschaft 20.0423 KA": [],
 				"Thermoplastischer Innenschaft Partialhand 20.0102 KA": [],
 				"Thermoplastischer Innenschaft Unterarmprothese 20.0502 KA": [],
@@ -1207,6 +1206,7 @@ Export for signature compliance
 				"name": "Abweichendes Schaftsystem Mechanisch"
 			},
 			"content": {
+				"": [],
 				"Gießharzkontaktschaft 20.0423 KA": [],
 				"Thermoplastischer Innenschaft Partialhand 20.0122 KA": [],
 				"Thermoplastischer Innenschaft Unterarmprothese 20.0522 KA": [],
@@ -1220,10 +1220,12 @@ Export for signature compliance
 				"name": "Abweichendes Schaftsystem Elektrisch"
 			},
 			"content": {
+				"": [],
 				"Gießharzkontaktschaft 20.0423 KA": [],
 				"Thermoplastischer Innenschaft Partialhand 20.0142 KA": [],
 				"Thermoplastischer Innenschaft Unterarmprothese 20.0542 KA": [],
-				"Thermoplastischer Innenschaft Unterarm ultrakurz / Ellenbogenexartikulation 20.0842 KA": [],
+				"Thermoplastischer Innenschaft Unterarm ultrakurz 20.0842 KA": [],
+				"Thermoplastischer Innenschaft Ellenbogenexartikulation 20.0842 KA": [],
 				"Thermoplastischer Innenschaft Oberarm 20.1042 KA": [],
 				"Thermoplastischer Innenschaft Schulter 20.1342 KA": []
 			},
@@ -1231,15 +1233,12 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Mehraufwand Anziehtechnik",
+			"description": "Anziehtechnik",
 			"content": {
 				"Otto Bock Anziehlubricant 633S2": [],
-				"Protheseus BOA PK022013005": [],
-				"Mehraufwand BOA 20.3003 KA": [],
-				"Otto Bock Einzugrohr 99B13=21": [],
-				"Mehraufwand Einzugrohr 20.3000 KA": [],
-				"Otto Bock Rohrventil 12V10": [],
-				"Mehraufwand Ventil 20.3001 KA": [],
+				"Protheseus BOA PK022013005 + 20.3003 KA": [],
+				"Otto Bock Einzugrohr 99B13=21 + 20.3000 KA": [],
+				"Otto Bock Rohrventil 12V10 + 20.3001 KA": [],
 				"Ohnhänderschnalle 20.3002 KA": [],
 				"Uniprox Anziehhilfe 4618 AS": [],
 				"Schlauchbinde 8cm 9757 AS": []
@@ -1282,36 +1281,36 @@ Export for signature compliance
 		{
 			"type": "radio",
 			"attributes": {
-				"name": "Steuerung"
+				"name": "elektrische Steuerung"
 			},
 			"content": {
 				"Össur Remote 50Hz 300mm PL069466B": [],
 				"Össur Remote 50Hz 600mm PL069468B": [],
 				"Otto Bock Compact 50Hz 13E200=50": [],
 				"Otto Bock Compact 60Hz 13E200=60": [],
+				"Otto Bock Lineartransducer 9X52": [],
 				"Otto Bock Elektrodenkabel 300mm 13E129=G300": [],
 				"Otto Bock Elektrodenkabel 1000mm 13E129=G1000": [],
 				"zusätzlicher Myotest 20.3103 KA": [],
 				"zusätzliche Elektrode (ab der 3.) 20.3104 KA": [],
 				"zusätzliches Steuerungselement 20.3101 KA": [],
-				"Schalterinstallation 20.1434 KA": [],
-				"Otto Bock Linear 9X52": [],
 				"Otto Bock Druckschalter 9X37": [],
-				"Otto Bock Kabel für Druckschalter 13E99=1200": []
+				"Otto Bock Kabel für Druckschalter 13E99=1200": [],
+				"Schalterinstallation 20.1434 KA": []
 			}
 		},
 		{
 			"type": "productselection",
 			"attributes": {
-				"name": "Steuerung Artikel",
+				"name": "elektrische Steuerung Artikel",
 				"multiple": true
 			},
-			"hint": "Schalter, Kabel"
+			"hint": "Schalter, Kabel falls abweichend oder zusätzlich erforderlich"
 		},
 		{
 			"type": "text",
 			"attributes": {
-				"name": "Steuerung sonstiges"
+				"name": "elektrische Steuerung sonstiges"
 			},
 			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst, zusätzliche Arbeitszeit für Elektroden"
 		}
@@ -1337,14 +1336,14 @@ Export for signature compliance
 				"name": "Akkusystem Artikel",
 				"multiple": true
 			},
-			"hint": "Schalter, Kabel"
+			"hint": "falls abweichend oder zusätzlich erforderlich"
 		},
 		{
 			"type": "text",
 			"attributes": {
 				"name": "Akkusystem sonstiges"
 			},
-			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst, Arbeitszeit für zusätzliches Akkusystem, etc."
 		}
 	],
 	[
@@ -1365,7 +1364,7 @@ Export for signature compliance
 				"name": "Controller Artikel",
 				"multiple": true
 			},
-			"hint": "Schalter, Kabel"
+			"hint": "falls abweichend oder zusätzlich erforderlich"
 		},
 		{
 			"type": "text",
@@ -1380,9 +1379,9 @@ Export for signature compliance
 			"type": "checkbox",
 			"description": "Schultergelenk",
 			"content": {
-				"exoskelettal 20.0943 KA": [],
 				"Heidelberger Schultergelenk 4362 AS": [],
-				"Otto Bock MovoShoulder Swing 12S6": []
+				"Otto Bock MovoShoulder Swing 12S6": [],
+				"exoskelettal FVK-Verbindungssegment 20.0943 KA": []
 			}
 		},
 		{
@@ -1391,7 +1390,7 @@ Export for signature compliance
 				"name": "Schultergelenk Artikel",
 				"multiple": true
 			},
-			"hint": "z.B. 12S4 mit Eingussring, 12S7 Kugelschultergelenk etc. zzgl. Adapter und Eingussring"
+			"hint": "z.B. 12S4 mit Eingussring, 12S7 Kugelschultergelenk etc. ggf. zzgl. Rohr, Adapter und Eingussring"
 		},
 		{
 			"type": "text",
@@ -1407,17 +1406,15 @@ Export for signature compliance
 			"description": "Ellenbogengelenk",
 			"content": {
 				"MICO Elbow TOH": [],
+				"Heidelberger Ellenbogengelenk 4334 AS": [],
 				"Neuhof Hosmer Schienengelenk 504D09": [],
 				"Mehraufwand umgedrehtes Hosmergelenk 20.3402 KA": [],
-				"Otto Bock AFB Beugehilfe 12K39 + 13G50": [],
-				"Mehraufwand AFB 20.3403 KA": [],
-				"Heidelberger Ellenbogengelenk 4334 AS": [],
-				"Otto Bock ErgoArm E+ 12K50": [],
+				"Otto Bock AFB Beugehilfe 12K39 + 13G50 + 20.3403 KA": [],
+				"Otto Bock ErgoArm+ 12K42": [],
+				"Otto Bock ErgoArm e+ 12K50": [],
 				"Otto Bock AxonArm 12K501": [],
-				"Otto Bock DynamicArm 12K100N": [],
-				"Otto Bock DynamicArm Garantieverlängerung SP-12K100N=3+2": [],
-				"Otto Bock DynamicArm+ 12K110N": [],
-				"Otto Bock DynamicArm+ Garantieverlängerung SP-12K110N=3+2": []
+				"Otto Bock DynamicArm 12K100N + SP-12K100N=3+2": [],
+				"Otto Bock DynamicArm+ 12K110N + SP-12K110N=3+2": []
 			}
 		},
 		{
@@ -1426,7 +1423,7 @@ Export for signature compliance
 				"name": "Ellenbogengelenk Artikel",
 				"multiple": true
 			},
-			"hint": "z.B. 12K6 Passiv, 12R6 Modular TH etc. zzgl. Adapter und Eingussring"
+			"hint": "falls abweichend z.B. 12K6 Passiv, 12R6 Modular TH, 12R7 Modular SH etc. ggf. zzgl. Adapter und Eingussring"
 		},
 		{
 			"type": "text",
@@ -1438,15 +1435,56 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "checkbox",
-			"description": "Handgelenk",
+			"type": "textblock",
+			"description": "Handgelenk"
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Handgelenk habitus",
+				"multiple": true
+			},
 			"content": {
+				"": [],
 				"Gewindeadapter TOH f. Habitus 20.3507 KA": [],
+				"Otto Bock Rohradapter mit Innengewinde 10R2=M12x1.5": [],
+				"Otto Bock Rohradapter mit Innengewinde (Flexion) 10R3=M12x1.5": [],
+				"Neuhof Omega 1/2\" 503B54": [],
+				"Neuhof Omega Zusatzzapfen 9503B54=1": [],
+				"Otto Bock Eingussring Babyhand FV 11D31": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Handgelenk mechanisch",
+				"multiple": true
+			},
+			"content": {
+				"": [],
+				"Gewindeadapter TOH f. Habitus 20.3507 KA": [],
+				"Otto Bock Rohradapter mit Innengewinde 10R2=M12x1.5": [],
+				"Otto Bock Rohradapter mit Innengewinde (Flexion) 10R3=M12x1.5": [],
+				"Neuhof Omega 1/2\" 503B54": [],
+				"Neuhof Omega Zusatzzapfen 9503B54=1": [],
+				"Otto Bock Kugelrasten 10V8": [],
+				"Otto Bock Lochteller 10A43": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Handgelenk elektrisch",
+				"multiple": true
+			},
+			"content": {
+				"": [],
 				"Otto Bock Eingussring für Kinderhand 10S16=34": [],
+				"TASKA Laminiermanschette 45mm TASKA-12BB01": [],
 				"Otto Bock Eingussring QWD 10S1": [],
 				"Otto Bock Kupplungseinsatz/Koaxialstecker 10S4 + 9E169": [],
-				"Otto Bock Rotator 10S17": [],
-				"Mehraufwand Rotator 20.3502 KA": [],
+				"Össur WD-Eingussplatte SA149003": [],
+				"Otto Bock Rotator 10S17 + 20.3502 KA": [],
 				"Otto Bock AxonAdapter (passiv) 9S501": [],
 				"Otto Bock Axon Rotation 9S503": [],
 				"Neuhof Multiflex mit QWD 508Z18": [],
@@ -1461,7 +1499,7 @@ Export for signature compliance
 				"name": "Handgelenk Artikel",
 				"multiple": true
 			},
-			"hint": "z.B. MyolinoWrist 10V51=2 zzgl. (Zusatz-)Adapter und Eingussring"
+			"hint": "falls abweichend z.B. MyolinoWrist 10V51=2 zzgl. (Zusatz-)Adapter und Eingussring"
 		},
 		{
 			"type": "text",
@@ -1473,16 +1511,61 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "checkbox",
-			"description": "Handpassteil",
+			"type": "textblock",
+			"description": "Handpassteil"
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Handpassteil habitus",
+				"multiple": true
+			},
 			"content": {
+				"": [],
 				"ECHO TOH 17061 AS": [],
-				"Mehraufwand Silikonhandschuh 20.3701 KA": [],
-				"Mehraufwand Oberflächenbehandlung 20.3809 KA": [],
+				"Otto Bock Physolino Babyhand 8K5": [],
+				"Neuhof Newlife mit Schaumkern 501B63": [],
+				"Otto Bock passiv Innenhand 8S7": [],
+				"Schubert&Braun ThreeDeeFlex Innenhand 8PW": [],
+				"Neuhof MultiD 1/2\" 502L63": [],
+				"Neuhof TRS-Swinger TD 1/2\" 20966 AS": [],
+				"Neuhof Point Digit (Stk) 500D11": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Handpassteil mechnisch",
+				"multiple": true
+			},
+			"content": {
+				"": [],
+				"Otto Bock MovoHook Aluminium 10A71": [],
+				"Otto Bock MovoHook Stahl 10A81": [],
+				"Otto Bock Einzughand Perlon 8K22": [],
+				"Neuhof Dorrancehook Kindergröße 55054": [],
+				"Neuhof Dorrancehook Erwachsenengröße 55044": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Handpassteil elektrisch",
+				"multiple": true
+			},
+			"content": {
+				"": [],
 				"Otto Bock Kinderhand 8E51": [],
 				"Neuhof ProHand 508D09": [],
 				"Neuhof Arbeitsgreifer ETD2 508D37": [],
-				"Otto Bock VariPlus QWD 8E38=9": []
+				"Otto Bock DMC transcarpal 8E44=6": [],
+				"Otto Bock VariPlus QWD 8E38=9": [],
+				"Össur iLimb PK3 TBX50472 + TBX5017(3-5)": [],
+				"Össur iLimb PK4 (Flexion) TBX50473 + TBX5017(3-5)": [],
+				"TASKA CX QWD TASKA DxFx31-U1 + TASKA-DHEW-03": [],
+				"TASKA CX LP TASKA DxCx31-U1 + TASKA-DHEW-03": [],
+				"TASKA Gen2 QWD TASKA CxFx21-U1 + TASKA-BHEW-03": [],
+				"TASKA Gen LP TASKA CxCx21-U1 + TASKA-BHEW-03": []
 			}
 		},
 		{
@@ -1491,7 +1574,7 @@ Export for signature compliance
 				"name": "Handpassteil Artikel",
 				"multiple": true
 			},
-			"hint": "zzgl. (Zusatz-)Adapter oder Befestigungsrahmen"
+			"hint": "falls abweichend zzgl. Gerantie, (Zusatz-)Adapter oder Befestigungsrahmen"
 		},
 		{
 			"type": "text",
@@ -1506,7 +1589,17 @@ Export for signature compliance
 			"type": "checkbox",
 			"description": "Handschuh",
 			"content": {
-				"ECHO TOH 17061 AS": [],
+				"Otto Bock PVC Myo Kinder 8S20N": [],
+				"Otto Bock PVC Myo Gr.7 8S13N": [],
+				"Otto Bock PVC Myo Erw. 8S11N": [],
+				"Otto Bock PVC habitus 8S4N": [],
+				"Neuhof PVC Realskin 507H09": [],
+				"Neuhof Newlife Myo 507B18": [],
+				"Neuhof Newlife ohne Kern 501B45": [],
+				"Otto Bock Systeminnenhand 8X18": [],
+				"Otto Bock Axon Skin PVC 8S501": [],
+				"Otto Bock Axon Skin Silikon 8S710": [],
+				"Össur iLimb Skin natural (Pack) TBX50126": [],
 				"Mehraufwand Silikonhandschuh 20.3701 KA": [],
 				"Mehraufwand Oberflächenbehandlung 20.3809 KA": []
 			}
@@ -1517,7 +1610,7 @@ Export for signature compliance
 				"name": "Handschuh Artikel",
 				"multiple": true
 			},
-			"hint": "zzgl. (Zusatz-)Adapter oder Befestigungsrahmen"
+			"hint": "falls abweichend"
 		},
 		{
 			"type": "text",
@@ -1576,6 +1669,7 @@ Export for signature compliance
 		}
 	]
 ]
+
 ```
 [Content](#content)
 
