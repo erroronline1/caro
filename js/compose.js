@@ -48,6 +48,7 @@ export const compose_helper = {
 				clonedIds[clone.id] = compose_helper.getNextElementID();
 				clone.id = clonedIds[clone.id];
 			}
+			if ("required" in clone) clone.removeAttribute("required");
 			if ("htmlFor" in clone && Object.keys(clonedIds).includes(clone.htmlFor)) {
 				// does work only if label comes after input
 				clone.htmlFor = clonedIds[clone.htmlFor];
@@ -1196,6 +1197,15 @@ export class Compose extends Assemble {
 	}
 
 	compose_multilist(type) {
+		let cloneSteps;
+		switch (type.type) {
+			case "select":
+				cloneSteps = 5;
+				break;
+			default:
+				cloneSteps = 4;
+		}
+
 		let result = [];
 		this.currentElement = {
 			type: type.type,
@@ -1216,6 +1226,7 @@ export class Compose extends Assemble {
 			type: "text",
 			attributes: {
 				name: LANG.GET("assemble.compose_multilist_add_item") + "[]",
+				required:true,
 			},
 		};
 		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
@@ -1225,17 +1236,22 @@ export class Compose extends Assemble {
 				value: LANG.GET("assemble.compose_multilist_add_item_button"),
 				"data-type": "additem",
 				type: "button",
-				onpointerup: "for (const e of compose_helper.cloneMultipleItems(this, -4, 4)) this.parentNode.insertBefore(e, this);",
+				onpointerup: `for (const e of compose_helper.cloneMultipleItems(this, -${cloneSteps}, ${cloneSteps})) this.parentNode.insertBefore(e, this);`,
 			},
 		};
 		result = result.concat(...this.button());
-		if (type.required !== undefined) {
+		if (type.required !== undefined || type.multiple !== undefined) {
 			this.currentElement = {
 				content: {},
 			};
-			this.currentElement.content[LANG.GET("assemble.compose_required")] = {
-				name: LANG.GET("assemble.compose_required"),
-			};
+			if (type.required !== undefined)
+				this.currentElement.content[LANG.GET("assemble.compose_required")] = {
+					name: LANG.GET("assemble.compose_required"),
+				};
+			if (type.multiple !== undefined)
+				this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
+					name: LANG.GET("assemble.compose_multiple"),
+				};
 			result = result.concat(this.br(), ...this.checkbox());
 		}
 		this.currentElement = {
@@ -1370,6 +1386,7 @@ export class Compose extends Assemble {
 			type: "select",
 			description: LANG.GET("assemble.compose_select"),
 			required: "optional",
+			multiple: "optional",
 		});
 	}
 
