@@ -6,12 +6,16 @@
 * [Silikonfertigungsauftrag](#silikonfertigungsauftrag)
 * [Empfangsbestätigung](#empfangsbestätigung)
 * [Erlaubnis zur Ausstellung und Veröffentlichung](#erlaubnis-zur-ausstellung-und-veröffentlichung)
+* [Versorgungsmaßnahme](#versorgungsmaßnahme)
+* [Versorgungsausführung](#versorgungsausführung)
+* [Konformitätserklärung](#konformitätserklärung)
 
 ### Prosthetics 2
 * [Anamnese Prothetik II](#anamnese-prothetik-ii)
 * [Maßblatt Prothetik II](#maßblatt-prothetik-ii)
 * [Versorgungsplanung Prothetik II](#versorgungsplanung-prothetik-ii)
-* [Versorgungsdokumentation Prothetik II](#versorgungsdokumentation-prothetik-ii)
+* [Checkliste Prothetik II](#checkliste-prothetik-ii)
+* [Abgabeprotokoll Prothetik II](#abgabeprotokoll-prothetik-ii)
 * [Gebrauchsanweisung Prothetik II](#gebrauchsanweisung-prothetik-ii)
 
 ## Basisdaten
@@ -333,8 +337,434 @@ Export for signature compliance
 ```
 [Content](#content)
 
+## Versorgungsmaßnahme
+```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Abdruck / Maßnahme"
+			},
+			"content": {
+				"Gipsabdruck": [],
+				"Maßnahme": [],
+				"Scan": [],
+				"Symphony": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Modellieren"
+			},
+			"content": {
+				"Gips": [],
+				"digital": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Anmerkungen zur Modelltechnik"
+			}
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Anprobeergebnis",
+			"content": {
+				"passgerecht": [],
+				"statikgerecht": [],
+				"funktion gegeben": [],
+				"weitere Anprobe geplant": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Anmerkungen zur Anprobe"
+			},
+			"hint": "z.B. weitere Ergebnisse, Dauer, Vereinbarungen"
+		},
+		{
+			"type": "calendarbutton",
+			"attributes": "Weitere Vorbereitungen planen"
+		}
+	]
+]
+```
+[Content](#content)
+
+## Versorgungsausführung
+```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "definitive Ausführung",
+			"content": {
+				"wie genehmigt": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Abweichungen von Genehmigung"
+			}
+		}
+	],
+	[
+		{
+			"type": "scanner",
+			"description": "Barcode oder UDI-Code scannen",
+			"attributes": {
+				"name": "Passteil / Material",
+				"multiple": true
+			},
+			"hint":"Die Informationen können auch eingegeben werden."
+		},
+		{
+			"type": "photo",
+			"attributes": {
+				"name": "Produktaufkleber",
+				"multiple": true
+			},
+			"hint": "Idealerweise die Aufkleber zuvor, wenn möglich, zusammenlegen"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "sonstige Anmerkungen zur Ausführung"
+			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Konformitätserklärung
+```json
+```
+[Content](#content)
+
 ## Anamnese Prothetik II
 ```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Geschlecht",
+				"required": true
+			},
+			"content": {
+				"weiblich": [],
+				"männlich": [],
+				"divers": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Diagnose"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Ursache"
+			}
+		},
+		{
+			"type": "date",
+			"attributes": {
+				"name": "Datum"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "betroffener Bereich"
+			},
+			"hint": "lang = distales Drittel \\nmittellang = mittleres Drittel \\nkurz = proximales Drittel \\nultrakurz = proximale 15%"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Schulter rechts"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Schulter links"
+			},
+			"hint": "Retro/Ante 40-0-90, Ele 170, Ab/Ad 90-0-45, Ar/Ir 60-0-70, ggf. OB (ohne Befund)"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Ellenbogen rechts"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Ellenbogen links"
+			},
+			"hint": "Ex/Flex 10-0-150, Pro/Sup 90-0-90, ggf. OB (ohne Befund)"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Handwurzel rechts"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Handwurzel links"
+			},
+			"hint": "Ex/Flex 70-0-80, ggf. OB (ohne Befund)"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "versorgungsrelevante Einschränkungen"
+			},
+			"hint": "Begleiterkrankungen, funktionelle Einschränkungen anderer Bereiche, Medikamente, Therapien, Infektionen"
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Gewicht"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Größe"
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Bevorzugte Seite"
+			},
+			"content": {
+				"rechts": [],
+				"links": []
+			}
+		}
+	],
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Stumpfform"
+			},
+			"content": {
+				"zylindrisch": [],
+				"birnenförmig": [],
+				"kegelförmig": [],
+				"unregelmäßig": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Weichteilzustand"
+			},
+			"content": {
+				"muskulös": [],
+				"locker/weich": [],
+				"athrophiert": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Stumpfschwankungen"
+			},
+			"content": {
+				"nein": [],
+				"ja": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "knöcherne Prominenzen"
+			},
+			"content": {
+				"normal": [],
+				"kaum ausgeprägt": [],
+				"stark ausgeprägt": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Narbengewebe"
+			},
+			"hint": "Einziehungen, Rudimente, Spalthaut, etc. mit Lokalisation"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Wundheilung abgeschlossen"
+			},
+			"content": {
+				"nein": [],
+				"ja": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Zusätzliche Läsionen / Druckstellen"
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Belastungsfähigkeit"
+			},
+			"content": {
+				"nein": [],
+				"ja": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Sensibilität"
+			},
+			"content": {
+				"unauffällig": [],
+				"vemehrt": [],
+				"vermindert": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Allergien"
+			},
+			"hint": "Materialien, Lebensmittel"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Schmerzsymptomatik"
+			},
+			"content": {
+				"keine": [],
+				"Stumpfschmerz": [],
+				"Phantomschmerz": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Temperatur"
+			},
+			"content": {
+				"seitengleich": [],
+				"wärmer": [],
+				"kälter": []
+			}
+		},
+		{
+			"type": "range",
+			"attributes": {
+				"name": "Muskelkraft",
+				"min": 0,
+				"max": 5,
+				"step": 0.5
+			},
+			"hint": "0: komplette Lähmung keine Muskelaktivität erkennbar \\n1: sehr schwere Lähmung Muskelaktivität erkennbar ohne Bewegungsausschlag \\n2: schwere Lähmung Bewegung unter Aufhebung der Schwerkraft möglich \\n3: deutliche Lähmung Bewegung ohne Widerstand möglich \\n4: leichte Lähmung Bewegung und Gegenhalt gegen leichten Widerstand möglich \\n5: normale Kraft Bewegung und Gegenhalt gegen Widerstand möglich"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Maßnahmen zur Stumpfformung"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Vorversorgungen"
+			},
+			"hint": "Ggf. Ausführungsbeschreibung"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Tragedauer"
+			}
+		}
+	],
+	[
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Weitere Hilfsmittel"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Wohnumfeld"
+			},
+			"hint": "z.b. Familie, Kinder, pflegebedürftige Angehörige, Wohn-, Betreuungssituation"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Beruf"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Hobbies"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Therapieziel / Patientenerwartung"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Bemerkungen"
+			}
+		}
+	]
+]
 ```
 [Content](#content)
 
@@ -345,11 +775,1109 @@ Export for signature compliance
 
 ## Versorgungsplanung Prothetik II
 ```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "textblock",
+			"description": "Grundposition"
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Habitus Kontaktschaft"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Finger/Daumen EV 20.0000 KA": [],
+				"Finger/Daumen FV 20.0010 KA": [],
+				"Partialhand EV 20.0100 KA": [],
+				"Partialhand WV 20.0110 KA": [],
+				"Transcarpal EV 20.0200 KA": [],
+				"Transcarpal WV 20.0210 KA": [],
+				"Handexartikulation EV 20.0300 KA": [],
+				"Handexartikulation WV 20.0310 KA": [],
+				"Unterarm lang EV 20.0400 KA": [],
+				"Unterarm lang WV 20.0410 KA": [],
+				"Unterarm mittellang EV 20.0500 KA": [],
+				"Unterarm mittellang WV 20.0510 KA": [],
+				"Unterarm kurz EV 20.0600 KA": [],
+				"Unterarm kurz WV 20.0610 KA": [],
+				"Unterarm ultrakurz EV 20.0700 KA": [],
+				"Unterarm ultrakurz WV 20.0710 KA": [],
+				"Unterarm Patschhand 20.5000 KA": [],
+				"Ellenbogenexartikulation EV 20.0800 KA": [],
+				"Ellenbogenexartikulation WV 20.0810 KA": [],
+				"Oberarm lang EV 20.0900 KA": [],
+				"Oberarm lang WV 20.0910 KA": [],
+				"Oberarm mittellang EV 20.1000 KA": [],
+				"Oberarm mittellang WV 20.1010 KA": [],
+				"Oberarm kurz EV 20.1100 KA": [],
+				"Oberarm kurz WV 20.1110 KA": [],
+				"Oberarm ultrakurz EV 20.1200 KA": [],
+				"Oberarm ultrakurz EV 20.1210 KA": [],
+				"Schulter EV 20.1300 KA": [],
+				"Schulter WV 20.1310 KA": [],
+				"Schulterformausgleich Silikon 20.5006 KA": [],
+				"Schulterformausgleich Thmermoplast interim 20.5005 KA": [],
+				"Lenkadaption Kinder 20.5002 KA": [],
+				"Lenkadaption langer Unterarm 20.5003 KA": [],
+				"Lenkadaption kurzer Unterarm 20.5004 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Habitus Linerschaft"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Transcarpal EV 20.0201 KA": [],
+				"Transcarpal WV 20.0211 KA": [],
+				"Handexartikulation EV 20.0301 KA": [],
+				"Handexartikulation WV 20.0311 KA": [],
+				"Unterarm lang EV 20.0401 KA": [],
+				"Unterarm lang WV 20.0411 KA": [],
+				"Unterarm mittellang EV 20.0501 KA": [],
+				"Unterarm mittellang WV 20.0511 KA": [],
+				"Unterarm kurz EV 20.0601 KA": [],
+				"Unterarm kurz WV 20.0611 KA": [],
+				"Unterarm ultrakurz EV 20.0701 KA": [],
+				"Unterarm ultrakurz WV 20.0711 KA": [],
+				"Ellenbogenexartikulation EV 20.0801 KA": [],
+				"Ellenbogenexartikulation WV 20.0811 KA": [],
+				"Oberarm lang EV 20.0901 KA": [],
+				"Oberarm lang WV 20.0911 KA": [],
+				"Oberarm mittellang EV 20.1001 KA": [],
+				"Oberarm mittellang WV 20.1011 KA": [],
+				"Oberarm kurz EV 20.1101 KA": [],
+				"Oberarm kurz WV 20.1111 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Mechanisch Kontaktschaft"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Finger/Daumen EV 20.0020 KA": [],
+				"Finger/Daumen FV 20.0030 KA": [],
+				"Partialhand EV 20.0120 KA": [],
+				"Partialhand WV 20.0130 KA": [],
+				"Transcarpal EV 20.0220 KA": [],
+				"Transcarpal WV 20.0230 KA": [],
+				"Handexartikulation EV 20.0320 KA": [],
+				"Handexartikulation WV 20.0330 KA": [],
+				"Unterarm lang EV 20.0420 KA": [],
+				"Unterarm lang WV 20.0430 KA": [],
+				"Unterarm mittellang EV 20.0520 KA": [],
+				"Unterarm mittellang WV 20.0530 KA": [],
+				"Unterarm kurz EV 20.0620 KA": [],
+				"Unterarm kurz WV 20.0630 KA": [],
+				"Unterarm ultrakurz EV 20.0720 KA": [],
+				"Unterarm ultrakurz WV 20.0730 KA": [],
+				"Ellenbogenexartikulation EV 20.0820 KA": [],
+				"Ellenbogenexartikulation WV 20.0830 KA": [],
+				"Oberarm lang EV 20.0920 KA": [],
+				"Oberarm lang WV 20.0930 KA": [],
+				"Oberarm mittellang EV 20.1020 KA": [],
+				"Oberarm mittellang WV 20.1030 KA": [],
+				"Oberarm kurz EV 20.1120 KA": [],
+				"Oberarm kurz WV 20.1130 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Mechanisch Linerschaft"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Transcarpal EV 20.0221 KA": [],
+				"Transcarpal WV 20.0231 KA": [],
+				"Handexartikulation EV 20.0321 KA": [],
+				"Handexartikulation WV 20.0331 KA": [],
+				"Unterarm lang EV 20.0421 KA": [],
+				"Unterarm lang WV 20.0431 KA": [],
+				"Unterarm mittellang EV 20.0521 KA": [],
+				"Unterarm mittellang WV 20.0531 KA": [],
+				"Unterarm kurz EV 20.0621 KA": [],
+				"Unterarm kurz WV 20.0631 KA": [],
+				"Unterarm ultrakurz EV 20.0721 KA": [],
+				"Unterarm ultrakurz WV 20.0731 KA": [],
+				"Ellenbogenexartikulation EV 20.0821 KA": [],
+				"Ellenbogenexartikulation WV 20.0831 KA": [],
+				"Oberarm lang EV 20.0921 KA": [],
+				"Oberarm lang WV 20.0931 KA": [],
+				"Oberarm mittellang EV 20.1021 KA": [],
+				"Oberarm mittellang WV 20.1031 KA": [],
+				"Oberarm kurz EV 20.1121 KA": [],
+				"Oberarm kurz WV 20.1131 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Elektrisch Kontaktschaft"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Finger/Daumen EV 20.0040 KA": [],
+				"Finger/Daumen FV 20.0050 KA": [],
+				"Partialhand EV 20.0140 KA": [],
+				"Partialhand WV 20.0150 KA": [],
+				"Partialhand Testversorgung 20.0160 KA": [],
+				"Partialhand Fertigstellung 20.0170 KA": [],
+				"Transcarpal EV 20.0240 KA": [],
+				"Transcarpal WV 20.0250 KA": [],
+				"Transcarpal Testversorgung 20.0260 KA": [],
+				"Transcarpal Fertigstellung 20.0270 KA": [],
+				"Handexartikulation EV 20.0340 KA": [],
+				"Handexartikulation WV 20.0350 KA": [],
+				"Handexartikulation Testversorgung 20.0360 KA": [],
+				"Handexartikulation Fertigstellung 20.0370 KA": [],
+				"Unterarm lang EV 20.0440 KA": [],
+				"Unterarm lang WV 20.0450 KA": [],
+				"Unterarm lang Testversorgung 20.0460 KA": [],
+				"Unterarm lang Fertigstellung 20.0470 KA": [],
+				"Unterarm mittellang EV 20.0540 KA": [],
+				"Unterarm mittellang WV 20.0550 KA": [],
+				"Unterarm mittellang Testversorgung 20.0560 KA": [],
+				"Unterarm mittellang Fertigstellung 20.0570 KA": [],
+				"Unterarm kurz EV 20.0640 KA": [],
+				"Unterarm kurz WV 20.0650 KA": [],
+				"Unterarm kurz Testversorgung 20.0660 KA": [],
+				"Unterarm kurz Fertigstellung 20.0670 KA": [],
+				"Unterarm ultrakurz EV 20.0740 KA": [],
+				"Unterarm ultrakurz WV 20.0750 KA": [],
+				"Unterarm ultrakurz Testversorgung 20.0760 KA": [],
+				"Unterarm ultrakurz Fertigstellung 20.0770 KA": [],
+				"Ellenbogenexartikulation EV 20.0840 KA": [],
+				"Ellenbogenexartikulation WV 20.0850 KA": [],
+				"Ellenbogenexartikulation Testversorgung 20.0860 KA": [],
+				"Ellenbogenexartikulation Fertigstellung 20.0870 KA": [],
+				"Oberarm lang EV 20.0940 KA": [],
+				"Oberarm lang WV 20.0950 KA": [],
+				"Oberarm lang Testversorgung 20.0960 KA": [],
+				"Oberarm lang Fertigstellung 20.0970 KA": [],
+				"Oberarm mittellang EV 20.1040 KA": [],
+				"Oberarm mittellang WV 20.1050 KA": [],
+				"Oberarm mittellang Testversorgung 20.1060 KA": [],
+				"Oberarm mittellang Fertigstellung 20.1070 KA": [],
+				"Oberarm kurz EV 20.1140 KA": [],
+				"Oberarm kurz WV 20.1150 KA": [],
+				"Oberarm kurz Testversorgung 20.1160 KA": [],
+				"Oberarm kurz Fertigstellung 20.1170 KA": [],
+				"Oberarm ultrakurz EV 20.1240 KA": [],
+				"Oberarm ultrakurz EV 20.1250 KA": [],
+				"Oberarm ultrakurz Testversorgung 20.1260 KA": [],
+				"Oberarm ultrakurz Fertigstellung 20.1270 KA": [],
+				"Schulter EV 20.1340 KA": [],
+				"Schulter WV 20.1350 KA": [],
+				"Schulter Testversorgung 20.1360 KA": [],
+				"Schulter Fertigstellung 20.1370 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Elektrisch Linerschaft"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Transcarpal EV 20.0241 KA": [],
+				"Transcarpal WV 20.0251 KA": [],
+				"Transcarpal Testversorgung 20.0261 KA": [],
+				"Transcarpal Fertigstellung 20.0271 KA": [],
+				"Handexartikulation EV 20.0341 KA": [],
+				"Handexartikulation WV 20.0351 KA": [],
+				"Handexartikulation Testversorgung 20.0361 KA": [],
+				"Handexartikulation Fertigstellung 20.0371 KA": [],
+				"Unterarm lang EV 20.0441 KA": [],
+				"Unterarm lang WV 20.0451 KA": [],
+				"Unterarm lang Testversorgung 20.0461 KA": [],
+				"Unterarm lang Fertigstellung 20.0471 KA": [],
+				"Unterarm mittellang EV 20.0541 KA": [],
+				"Unterarm mittellang WV 20.0551 KA": [],
+				"Unterarm mittellang Testversorgung 20.0561 KA": [],
+				"Unterarm mittellang Fertigstellung 20.0571 KA": [],
+				"Unterarm kurz EV 20.0641 KA": [],
+				"Unterarm kurz WV 20.0651 KA": [],
+				"Unterarm kurz Testversorgung 20.0661 KA": [],
+				"Unterarm kurz Fertigstellung 20.0671 KA": [],
+				"Unterarm ultrakurz EV 20.0741 KA": [],
+				"Unterarm ultrakurz WV 20.0751 KA": [],
+				"Unterarm ultrakurz Testversorgung 20.0761 KA": [],
+				"Unterarm ultrakurz Fertigstellung 20.0771 KA": [],
+				"Ellenbogenexartikulation EV 20.0841 KA": [],
+				"Ellenbogenexartikulation WV 20.0851 KA": [],
+				"Ellenbogenexartikulation Testversorgung 20.0861 KA": [],
+				"Ellenbogenexartikulation Fertigstellung 20.0871 KA": [],
+				"Oberarm lang EV 20.0941 KA": [],
+				"Oberarm lang WV 20.0951 KA": [],
+				"Oberarm lang Testversorgung 20.0961 KA": [],
+				"Oberarm lang Fertigstellung 20.0971 KA": [],
+				"Oberarm mittellang EV 20.1041 KA": [],
+				"Oberarm mittellang WV 20.1051 KA": [],
+				"Oberarm mittellang Testversorgung 20.1061 KA": [],
+				"Oberarm mittellang Fertigstellung 20.1071 KA": [],
+				"Oberarm kurz EV 20.1141 KA": [],
+				"Oberarm kurz WV 20.1151 KA": [],
+				"Oberarm kurz Testversorgung 20.1161 KA": [],
+				"Oberarm kurz Fertigstellung 20.1171 KA": []
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Mehraufwand zur Grundposition",
+			"content": {
+				"Tumorversorgung 20.4001 KA": [],
+				"Dysmelieversorgung 20.4002 KA": [],
+				"Habitus Kinderversorgung 20.4003 KA": [],
+				"bilateral 20.4005 KA": [],
+				"zusätzliche Dokumentation 20.4006 KA": [],
+				"Gebrauchsschulung fremdsprachlich 20.4017 KA": [],
+				"Unterkunft (6 W, 2 Pers.), pauschalen privat 20.4018 KA": [],
+				"Videodokumentation 20.4011 KA": [],
+				"Demontage der vorhandenen Prothese 20.4012 KA": []
+			},
+			"hint": "Kinderversorgung bis 12. Lj., bei kognitiven Einschränkungen auch bis 18, nicht gleichzeitig mit Dysmelieversorgung verwendbar"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Zusatzinformationen zum Mehraufwand"
+			},
+			"hint": "Arbeitszeiten zu Tumorversorgung, bilateral, ggf. Begründungen"
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "zusätzlicher Testschaft Habitus"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Partialhand 20.0105 KA": [],
+				"Unterarm lang 20.0405 KA": [],
+				"Unterarm mittellang 20.0505 KA": [],
+				"Unterarm kurz 20.0605 KA": [],
+				"Unterarm ultrakurz 20.0705 KA": [],
+				"Ellenbogenexartikulation 20.0805 KA": [],
+				"Oberarm lang 20.0905 KA": [],
+				"Oberarm mittellang 20.1005 KA": [],
+				"Oberarm kurz 20.1105 KA": [],
+				"Oberarm ultrakurz 20.1105 KA": [],
+				"Schulter 20.1105 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "zusätzlicher Testschaft Mechanisch"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Partialhand 20.0125 KA": [],
+				"Unterarm lang 20.0425 KA": [],
+				"Unterarm mittellang 20.0525 KA": [],
+				"Unterarm kurz 20.0625 KA": [],
+				"Unterarm ultrakurz 20.0725 KA": [],
+				"Ellenbogenexartikulation 20.0825 KA": [],
+				"Oberarm lang 20.0925 KA": [],
+				"Oberarm mittellang 20.1025 KA": [],
+				"Oberarm kurz 20.1125 KA": [],
+				"Oberarm ultrakurz 20.1125 KA": [],
+				"Schulter 20.1125 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "zusätzlicher Testschaft Elektrisch"
+			},
+			"content": {
+				"nicht gewählt": { "value": " " },
+				"Partialhand 20.0145 KA": [],
+				"Unterarm lang 20.0445 KA": [],
+				"Unterarm mittellang 20.0545 KA": [],
+				"Unterarm kurz 20.0645 KA": [],
+				"Unterarm ultrakurz 20.0745 KA": [],
+				"Ellenbogenexartikulation 20.0845 KA": [],
+				"Oberarm lang 20.0945 KA": [],
+				"Oberarm mittellang 20.1045 KA": [],
+				"Oberarm kurz 20.1145 KA": [],
+				"Oberarm ultrakurz 20.1145 KA": [],
+				"Schulter 20.1145 KA": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Begründung für zusätzlichen Testschaft"
+			},
+			"hint": "Arbeitszeiten zu Tumorversorgung, bilateral, ggf. Anzahl, Begründungen"
+		},
+		{
+			"type": "checkbox",
+			"description": "Bauteile für Testversorgung",
+			"content": {
+				"Mietgebühren Leihpassteile TOH 20.4016 KA": [],
+				"Handling für Leihhände 20.4019 KA": [],
+				"Otto Bock AxonBus Rotator SMR-PK=51": [],
+				"Otto Bock AxonBus System SMR-PK=55": [],
+				"Otto Bock Systemhand SMR-PK=56": [],
+				"Össur iLimb 11869 AS": [],
+				"Otto Bock BeBionic SMR-PK=53": [],
+				"TASKA 21450 AS": [],
+				"Otto Bock DynamicArm SMR-PK=50": [],
+				"Otto Bock AxonArm SMR-PK=55": []
+			},
+			"hint": "Mitgebühren je Woche"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Zusatzinformationen zur Testversorgung"
+			},
+			"hint": "z.B. Anzahl Wochen"
+		}
+	],
+	[
+		{
+			"type": "textblock",
+			"description": "Schaftsystem"
+		},
+		{
+			"type": "checkbox",
+			"description": "Zusätze am Schaftsystem",
+			"content": {
+				"Kaschierung 75E10": [],
+				"HeiSens Leitspot pro Elektrode 75E80": [],
+				"RTV-Schicht zur Adhäsionssteigerung 75E20": [],
+				"Zusätzliche Gurtverstärkung / Matrix 75E40": [],
+				"Zusätzlicher Narbenausgleich 75E30": []
+			},
+			"hint": "Ein Narbenausgleich ist bereits in der Grundposition enthalten"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Sonstige Zusätze am Schaftsystem"
+			},
+			"hint": "oder ggf. Anzahl"
+		},
+		{
+			"type": "checkbox",
+			"description": "Mehraufwand am Schaftsystem",
+			"content": {
+				"Prepreg 20.4007 KA": [],
+				"Schaftsonderlösungen 20.4008 KA": []
+			},
+			"hint": "Einsatzlimitierungen, Anwenderinformationen, tägliche Kontrolle, Wartungshinweise und -intervalle, Warnhinweise"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Mehrarbeitszeiten für Mehraufwand am Schaftsystem"
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Abweichendes Schaftsystem Habitus"
+			},
+			"content": {
+				"Gießharzkontaktschaft 20.0423 KA": [],
+				"Thermoplastischer Innenschaft Partialhand 20.0102 KA": [],
+				"Thermoplastischer Innenschaft Unterarmprothese 20.0502 KA": [],
+				"Thermoplastischer Innenschaft Unterarm ultrakurz / Ellenbogenexartikulation 20.0802 KA": [],
+				"Thermoplastischer Innenschaft Oberarm 20.1002 KA": [],
+				"Thermoplastischer Innenschaft Schulter 20.1302 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Abweichendes Schaftsystem Mechanisch"
+			},
+			"content": {
+				"Gießharzkontaktschaft 20.0423 KA": [],
+				"Thermoplastischer Innenschaft Partialhand 20.0122 KA": [],
+				"Thermoplastischer Innenschaft Unterarmprothese 20.0522 KA": [],
+				"Thermoplastischer Innenschaft Unterarm ultrakurz / Ellenbogenexartikulation 20.0822 KA": [],
+				"Thermoplastischer Innenschaft Oberarm 20.1022 KA": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Abweichendes Schaftsystem Elektrisch"
+			},
+			"content": {
+				"Gießharzkontaktschaft 20.0423 KA": [],
+				"Thermoplastischer Innenschaft Partialhand 20.0142 KA": [],
+				"Thermoplastischer Innenschaft Unterarmprothese 20.0542 KA": [],
+				"Thermoplastischer Innenschaft Unterarm ultrakurz / Ellenbogenexartikulation 20.0842 KA": [],
+				"Thermoplastischer Innenschaft Oberarm 20.1042 KA": [],
+				"Thermoplastischer Innenschaft Schulter 20.1342 KA": []
+			},
+			"hint": "Bei Abweichungen vom Silikonschaftsystem gemäß Grundposition muss die Kalkulation durch den fachlichen Leiter im Einzelfall um den Aufwand korrigiert werden, KV in jedem Fall zu Ansicht."
+		},
+		{
+			"type": "checkbox",
+			"description": "Mehraufwand Anziehtechnik",
+			"content": {
+				"Otto Bock Anziehlubricant 633S2": [],
+				"Protheseus BOA PK022013005": [],
+				"Mehraufwand BOA 20.3003 KA": [],
+				"Otto Bock Einzugrohr 99B13=21": [],
+				"Mehraufwand Einzugrohr 20.3000 KA": [],
+				"Otto Bock Rohrventil 12V10": [],
+				"Mehraufwand Ventil 20.3001 KA": [],
+				"Ohnhänderschnalle 20.3002 KA": [],
+				"Uniprox Anziehhilfe 4618 AS": [],
+				"Schlauchbinde 8cm 9757 AS": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Anziehtechnik Artikel",
+				"multiple": true
+			},
+			"hint": "falls abweichend"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Anziehtechnik sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Bandage"
+			},
+			"content": {
+				"Haltebandage Silikon 20.1400 KA": [],
+				"Haltebandage Thermoplastisch 20.1204 KA": [],
+				"Haltebandage Textil 20.1404 KA": [],
+				"Haltebandage Textil mit Silikonachselschutz 20.1414 KA": [],
+				"Steuerungsbandage Silikon 20.1420 KA": [],
+				"Steuerungsbandage Textil 20.1424 KA": [],
+				"Steuerungsbandage Textil mit Silikonachselschutz 20.1434 KA": []
+			}
+		}
+	],
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Steuerung"
+			},
+			"content": {
+				"Össur Remote 50Hz 300mm PL069466B": [],
+				"Össur Remote 50Hz 600mm PL069468B": [],
+				"Otto Bock Compact 50Hz 13E200=50": [],
+				"Otto Bock Compact 60Hz 13E200=60": [],
+				"Otto Bock Elektrodenkabel 300mm 13E129=G300": [],
+				"Otto Bock Elektrodenkabel 1000mm 13E129=G1000": [],
+				"zusätzlicher Myotest 20.3103 KA": [],
+				"zusätzliche Elektrode (ab der 3.) 20.3104 KA": [],
+				"zusätzliches Steuerungselement 20.3101 KA": [],
+				"Schalterinstallation 20.1434 KA": [],
+				"Otto Bock Linear 9X52": [],
+				"Otto Bock Druckschalter 9X37": [],
+				"Otto Bock Kabel für Druckschalter 13E99=1200": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Steuerung Artikel",
+				"multiple": true
+			},
+			"hint": "Schalter, Kabel"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Steuerung sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst, zusätzliche Arbeitszeit für Elektroden"
+		}
+	],
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Akkusystem"
+			},
+			"content": {
+				"Otto Bock MyoEnergy Integral Kinder 757B35=1": [],
+				"Otto Bock MyoEnergy Integral 1150mAH 757B35=3": [],
+				"Otto Bock MyoEnergy Integral 3450mAH 757B35=5": [],
+				"Otto Bock MyoCharge 757L35": [],
+				"Neuhof Motion Control zweigeteilt 512B18": [],
+				"zusätzliches Akkusystem 20.30201 KA": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Akkusystem Artikel",
+				"multiple": true
+			},
+			"hint": "Schalter, Kabel"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Akkusystem sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Controller"
+			},
+			"content": {
+				"Otto Bock 7in1 9E420": [],
+				"Otto Bock Myorotronic 13E205": [],
+				"Otto Bock Analogadapter für DynamicArm 13E100": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Controller Artikel",
+				"multiple": true
+			},
+			"hint": "Schalter, Kabel"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Controller sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Schultergelenk",
+			"content": {
+				"exoskelettal 20.0943 KA": [],
+				"Heidelberger Schultergelenk 4362 AS": [],
+				"Otto Bock MovoShoulder Swing 12S6": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Schultergelenk Artikel",
+				"multiple": true
+			},
+			"hint": "z.B. 12S4 mit Eingussring, 12S7 Kugelschultergelenk etc. zzgl. Adapter und Eingussring"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Schultergelenk sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Ellenbogengelenk",
+			"content": {
+				"MICO Elbow TOH": [],
+				"Neuhof Hosmer Schienengelenk 504D09": [],
+				"Mehraufwand umgedrehtes Hosmergelenk 20.3402 KA": [],
+				"Otto Bock AFB Beugehilfe 12K39 + 13G50": [],
+				"Mehraufwand AFB 20.3403 KA": [],
+				"Heidelberger Ellenbogengelenk 4334 AS": [],
+				"Otto Bock ErgoArm E+ 12K50": [],
+				"Otto Bock AxonArm 12K501": [],
+				"Otto Bock DynamicArm 12K100N": [],
+				"Otto Bock DynamicArm Garantieverlängerung SP-12K100N=3+2": [],
+				"Otto Bock DynamicArm+ 12K110N": [],
+				"Otto Bock DynamicArm+ Garantieverlängerung SP-12K110N=3+2": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Ellenbogengelenk Artikel",
+				"multiple": true
+			},
+			"hint": "z.B. 12K6 Passiv, 12R6 Modular TH etc. zzgl. Adapter und Eingussring"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Ellenbogengelenk sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Handgelenk",
+			"content": {
+				"Gewindeadapter TOH f. Habitus 20.3507 KA": [],
+				"Otto Bock Eingussring für Kinderhand 10S16=34": [],
+				"Otto Bock Eingussring QWD 10S1": [],
+				"Otto Bock Kupplungseinsatz/Koaxialstecker 10S4 + 9E169": [],
+				"Otto Bock Rotator 10S17": [],
+				"Mehraufwand Rotator 20.3502 KA": [],
+				"Otto Bock AxonAdapter (passiv) 9S501": [],
+				"Otto Bock Axon Rotation 9S503": [],
+				"Neuhof Multiflex mit QWD 508Z18": [],
+				"Endoskelettalaufnahme für QWD 20.3503 KA": [],
+				"Otto Bock Verschlussautomat mit Gewindeaufnahme 11S47=44": [],
+				"Elastomerring für MyolinoWrist 20.3504 KA": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Handgelenk Artikel",
+				"multiple": true
+			},
+			"hint": "z.B. MyolinoWrist 10V51=2 zzgl. (Zusatz-)Adapter und Eingussring"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Handgelenk sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Handpassteil",
+			"content": {
+				"ECHO TOH 17061 AS": [],
+				"Mehraufwand Silikonhandschuh 20.3701 KA": [],
+				"Mehraufwand Oberflächenbehandlung 20.3809 KA": [],
+				"Otto Bock Kinderhand 8E51": [],
+				"Neuhof ProHand 508D09": [],
+				"Neuhof Arbeitsgreifer ETD2 508D37": [],
+				"Otto Bock VariPlus QWD 8E38=9": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Handpassteil Artikel",
+				"multiple": true
+			},
+			"hint": "zzgl. (Zusatz-)Adapter oder Befestigungsrahmen"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Handpassteil sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Handschuh",
+			"content": {
+				"ECHO TOH 17061 AS": [],
+				"Mehraufwand Silikonhandschuh 20.3701 KA": [],
+				"Mehraufwand Oberflächenbehandlung 20.3809 KA": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Handschuh Artikel",
+				"multiple": true
+			},
+			"hint": "zzgl. (Zusatz-)Adapter oder Befestigungsrahmen"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Handschuh sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Kosmetik",
+			"content": {
+				"elastischer Überzug Unterarm 20.3801 KA": [],
+				"elastischer Überzug Oberarm 20.3802 KA": [],
+				"elastischer Überzug Schulter 20.3803 KA": [],
+				"Silikonschutzüberzug Unterarm 20.3804 + 20.3809 KA": [],
+				"Silikonschutzüberzug Oberarm 20.3804 + 20.3809 KA": [],
+				"Silikonschutzüberzug Schulter 20.3805 + 20.3809 KA": [],
+				"Weichschaumkosmetik Oberarm 20.3807 KA": [],
+				"Weichschaumkosmetik Schulter 20.3808 KA": [],
+				"individuelle Kosmetik Fremdleistung 20.3806 KA": []
+			}
+		},
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Kosmetik Artikel",
+				"multiple": true
+			},
+			"hint": "z.B. 15K10 Weichschaum, 13R9=65 Anschlussscheibe, 13Z157 Carboncover"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Kosmetik sonstiges"
+			},
+			"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
+		}
+	],
+	[
+		{
+			"type": "productselection",
+			"attributes": {
+				"name": "Sonstige Artikel",
+				"multiple": true
+			},
+			"hint": "z.B. 13Z47 Eingussring bei Schaftneuanfertigung"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Sonstige Aufwendungen"
+			}
+		}
+	]
+]
 ```
 [Content](#content)
 
-## Versorgungsdokumentation Prothetik II
+## Checkliste Prothetik II
 ```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "textblock",
+			"description": "Ausgangsprüfung Checkliste"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Ränder"
+			},
+			"content": {
+				"sauber entgratet": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Oberfläche"
+			},
+			"content": {
+				"gereinigt": [],
+				"entfällt": []
+			},
+			"hint": "Anzeichnungen, Klebereste, etc."
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Klebungen"
+			},
+			"content": {
+				"sicher": [],
+				"entfällt": []
+			},
+			"hint": "Randvulkanisation, Haftband, Abdeckungen, etc."
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Gelenk"
+			},
+			"content": {
+				"läuft frei und sperrt zuverlässig": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Verschlüsse oder Bandage"
+			},
+			"content": {
+				"sicher befestigt und gepolstert": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Nähte"
+			},
+			"content": {
+				"sauber und verriegelt": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Schraubverbindungen"
+			},
+			"content": {
+				"gesichert": [],
+				"entfällt": []
+			},
+			"hint": "Schraubensicherung, Drehmoment, etc."
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Steuerung"
+			},
+			"content": {
+				"soweit nachvollziehbar zuverlässig": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Akku"
+			},
+			"content": {
+				"geladen": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Kontakte und Gleitlager"
+			},
+			"content": {
+				"gefettet": [],
+				"entfällt": []
+			},
+			"hint": "Silikonfett, Schmiermittel"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Besonderheiten der Ausführung"
+			},
+			"hint": "spezielle Verklebungen, Kabelverläufe, etc."
+		}
+	],
+	[
+		{
+			"type": "textblock",
+			"description": "Lieferumfang"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Prothesenschaft"
+			},
+			"content": {
+				"abgabebereit": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Prothesenhand"
+			},
+			"content": {
+				"abgabebereit": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Wechselhandschuh(e)"
+			},
+			"content": {
+				"abgabebereit": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Wechselakku(s)"
+			},
+			"content": {
+				"abgabebereit": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Ladegerät"
+			},
+			"content": {
+				"abgabebereit": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Anziehhilfe(n)"
+			},
+			"content": {
+				"abgabebereit": [],
+				"entfällt": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Sonstige abgabebereiten Komponenten"
+			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Abgabeprotokoll Prothetik II
+```json
+[
+	[
+		{
+			"type": "identify",
+			"attributes": {
+				"name": "Vorgang"
+			}
+		},
+		{
+			"type": "textblock",
+			"description": "Abgabeprotokoll"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Anziehtechnik"
+			},
+			"content": {
+				"unterwiesen und geprüft": [],
+				"entfällt": []
+			},
+			"hint": "Nutzung von Anziehhilfe, Verschlusssystem, Weichteilverteilung, etc."
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Bedienung"
+			},
+			"content": {
+				"unterwiesen und geprüft": [],
+				"entfällt": []
+			},
+			"hint": "Ein- und Ausschalten, Ladefunktion, Gelenkarretierung, etc."
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Funktion"
+			},
+			"content": {
+				"unterwiesen und geprüft": [],
+				"entfällt": []
+			},
+			"hint": "Steuerung des Prothesenfußes, Rotationsadapter, Kniegelenksfunktion, Hüftfunktion, Umschaltvorgänge"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Hygienemaßnahmen"
+			},
+			"content": {
+				"unterwiesen und geprüft": [],
+				"entfällt": []
+			},
+			"hint": "Reinigung der Prothesenkomponenten, Hautpflege"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "allgemeine Hinweise"
+			},
+			"content": {
+				"unterwiesen": [],
+				"entfällt": []
+			},
+			"hint": "Einsatzlimitierungen, Anwenderinformationen, tägliche Kontrolle, Wartungshinweise und -intervalle, Warnhinweise"
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Passform und Funktion"
+			},
+			"content": {
+				"gegeben": [],
+				"mangelhaft": []
+			}
+		},
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Versorgungsziel"
+			},
+			"content": {
+				"erreicht": [],
+				"verfehlt": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Bemerkungen zur Abgabe"
+			}
+		}
+	]
+]
 ```
 [Content](#content)
 
@@ -357,4 +1885,3 @@ Export for signature compliance
 ```json
 ```
 [Content](#content)
-
