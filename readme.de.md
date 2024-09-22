@@ -472,7 +472,7 @@ Verfügbare Elemente für Formulare sind:
 * Verknüpfungen (Links)
 * Mehrfachauswahl
 * Einfachauswahl (Buttons)
-* Einfachauswahl (Liste)
+* Einfachauswahl (Liste), optional als Mehrfachauswahl
 * Datei-Upload, optional als Mehrfachauswahl
 * Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
 * Unterschriftenfeld

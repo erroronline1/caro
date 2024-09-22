@@ -1430,7 +1430,8 @@ export class Assemble {
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
-			input.onchange = () => { // arrow function for reference of this.names
+			input.onchange = () => {
+				// arrow function for reference of this.names
 				if (input.value) {
 					productselectionClone.attributes.name = productselectionClone.attributes.name.replace(/\(\d+\)$/gm, "");
 					new Assemble({
@@ -1563,12 +1564,13 @@ export class Assemble {
 			label.htmlFor = input.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
 			label.classList.add("input-label");
-			
+
 			if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
 
 			if (multiple) {
-				input.onchange = () => { // arrow function for reference of this.names
+				input.onchange = () => {
+					// arrow function for reference of this.names
 					if (input.value) {
 						scannerElementClone.attributes.name = scannerElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
 						console.log(this.names);
@@ -1592,7 +1594,8 @@ export class Assemble {
 		button.type = "button";
 		button.setAttribute("data-type", "scanner");
 
-		button.onpointerup = function () {
+		button.onpointerup = () => {
+			// arrow function for reference of this.names
 			new Dialog({
 				type: "scanner",
 			}).then((response) => {
@@ -1652,15 +1655,28 @@ export class Assemble {
 			}
 			attributes: {
 				name: 'variable name'
+				multiple: bool // another on will be appended if selection has value, not a classic multiple selection though
 			},
 		}*/
 		const groups = {};
 		let select = document.createElement("select"),
-			label,
-			selectModal = {};
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+			label = document.createElement("label"),
+			selectModal = {},
+			multiple,
+			selectElementClone,
+			hint = this.hint();
+		if (this.currentElement.attributes.multiple) {
+			multiple = true;
+			delete this.currentElement.attributes.multiple;
+			selectElementClone = structuredClone(this.currentElement);
+		}
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		select.id = getNextElementID();
+		label.htmlFor = select.id;
+		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+		label.classList.add("input-label");
+
+		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
 		for (const [key, element] of Object.entries(this.currentElement.content)) {
@@ -1679,11 +1695,8 @@ export class Assemble {
 			}
 			select.appendChild(optgroup);
 		}
-		label = document.createElement("label");
-		label.htmlFor = select.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
-		label.classList.add("input-label");
-		select.addEventListener("pointerdown", (e) => {
+		select.onpointerdown = (e) => {
+			// arrow function for reference of this.names
 			e.preventDefault();
 			if (!e.target.disabled)
 				new Dialog({
@@ -1693,9 +1706,18 @@ export class Assemble {
 				}).then((response) => {
 					e.target.value = response;
 					e.target.dispatchEvent(new Event("change"));
+					if (multiple) {
+						selectElementClone.attributes.name = selectElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
+						selectElementClone.attributes.multiple = true;
+						new Assemble({
+							content: [[selectElementClone]],
+							composer: "elementClone",
+							names: this.names,
+						}).initializeSection(null, hint ? hint[0] : label);
+					}
 				});
-		});
-		return [...this.icon(), select, label, ...this.hint()];
+		};
+		return [...this.icon(), select, label, ...hint];
 	}
 
 	signature() {

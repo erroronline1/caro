@@ -284,8 +284,9 @@ export function rendertest(element) {
 						type: "select",
 						attributes: {
 							name: "Select one option of many",
+							multiple:true
 						},
-						hint: "This opens a longer list that would otherwise clutter up the screen",
+						hint: "This opens a longer list that would otherwise clutter up the screen, optional multiple ",
 						content: {
 							"Selection one": {},
 							"Selection two": {},
