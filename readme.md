@@ -79,7 +79,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
-* article > article (tile) width styling min/max
 
 #### records considerations
 * linked files on separate external path, input type convert to link
