@@ -1124,6 +1124,13 @@ Export for signature compliance
 			"attributes": {
 				"name": "Anmerkungen zur Maßdokumentation"
 			}
+		},
+		{
+			"type": "photo",
+			"attributes": {
+				"name": "Fotos",
+				"multiple": true
+			}
 		}
 	]
 ]
