@@ -286,7 +286,7 @@ export function rendertest(element) {
 							name: "Select one option of many",
 							multiple:true
 						},
-						hint: "This opens a longer list that would otherwise clutter up the screen, optional multiple ",
+						hint: "This opens a longer list that would otherwise clutter up the screen, optional multiple.",
 						content: {
 							"Selection one": {},
 							"Selection two": {},
@@ -423,7 +423,7 @@ export function rendertest(element) {
 						content: {
 							"Das ist toll": {},
 							"Das ist großartig": {},
-							"Das ist Fabelhaft": { checked: true },
+							"Das ist fabelhaft": { checked: true },
 						},
 					},
 					{
@@ -825,7 +825,7 @@ export function rendertest(element) {
 						{
 							type: "textblock",
 							description: "Dies ist nur eine zusätzlich Verschachtelungsebene",
-							content: "Alle optionen sind möglich. Verwendet in der Nutzerverwaltung.",
+							content: "Alle Optionen sind möglich. Verwendet in der Nutzerverwaltung.",
 						},
 					],
 				],
