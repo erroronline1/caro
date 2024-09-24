@@ -1655,7 +1655,7 @@ export class Assemble {
 			}
 			attributes: {
 				name: 'variable name'
-				multiple: bool // another on will be appended if selection has value, not a classic multiple selection though
+				multiple: bool // another one will be appended if selection has value, not a classic multiple selection though
 			},
 		}*/
 		const groups = {};
@@ -1664,12 +1664,14 @@ export class Assemble {
 			selectModal = {},
 			multiple,
 			selectElementClone,
-			hint = this.hint();
+			hint;
 		if (this.currentElement.attributes.multiple) {
 			multiple = true;
 			delete this.currentElement.attributes.multiple;
 			selectElementClone = structuredClone(this.currentElement);
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + LANG.GET("assemble.select_multiple") : LANG.GET("assemble.select_multiple");
 		}
+		hint = this.hint();
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		select.id = getNextElementID();
 		label.htmlFor = select.id;
