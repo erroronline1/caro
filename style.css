@@ -824,6 +824,7 @@ article > span[data-type] {
 
 .textarea-hint,
 .links-hint,
+.range-hint,
 button + .hint {
 	margin-top: 1em;
 }
@@ -908,8 +909,8 @@ section > div > article {
 	background: none;
 }
 
-
-article > article { /*tile*/
+article > article {
+	/*tile*/
 	width: calc(33% - 1em);
 	min-width: 14em;
 	margin: 0.5em;

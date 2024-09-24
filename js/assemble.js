@@ -1147,12 +1147,11 @@ export class Assemble {
 			}
 		}*/
 		let input = document.createElement("input"),
-			label;
+			label = document.createElement("label");
 		input.type = type;
 		if (type === "password") this.currentElement.type = "password";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
-		label = document.createElement("label");
 		label.htmlFor = input.id;
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
@@ -1505,12 +1504,15 @@ export class Assemble {
 			}
 			hint: 'from 0 to 100 in 20 steps'
 		}*/
-		let input = document.createElement("input");
+		let input = document.createElement("input"),
+			hint = this.hint();
 		input.type = "range";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		this.currentElement.description = this.currentElement.attributes.name;
 		input = this.apply_attributes(this.currentElement.attributes, input);
+		if (hint) hint[0].classList.add("range-hint");
+
 		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
 			let datalist = document.createElement("datalist");
 			let option;
@@ -1525,9 +1527,9 @@ export class Assemble {
 				datalist.appendChild(option);
 			}
 			input.setAttribute("list", datalist.id);
-			return [datalist, ...this.header(), input, ...this.hint()];
+			return [datalist, ...this.header(), input, ...hint];
 		}
-		return [...this.header(), input, ...this.hint()];
+		return [...this.header(), input, ...hint];
 	}
 
 	scanner() {
