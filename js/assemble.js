@@ -1511,7 +1511,7 @@ export class Assemble {
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		this.currentElement.description = this.currentElement.attributes.name;
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		if (hint) hint[0].classList.add("range-hint");
+		if (hint.length) hint[0].classList.add("range-hint");
 
 		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
 			let datalist = document.createElement("datalist");
