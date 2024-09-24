@@ -1,24 +1,26 @@
 # Content
 ### Common
+* [Identifikator](#identifikator)
 * [Basisdaten](#basisdaten)
 * [Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung](#datenverarbeitung--auftragserteilung--schweigepflichtentbindung)
-* [Kunststofffertigungsauftrag](#kunststofffertigungsauftrag)
 * [Silikonfertigungsauftrag](#silikonfertigungsauftrag)
 * [Empfangsbestätigung](#empfangsbestätigung)
 * [Erlaubnis zur Ausstellung und Veröffentlichung](#erlaubnis-zur-ausstellung-und-veröffentlichung)
 * [Versorgungsmaßnahme](#versorgungsmaßnahme)
 * [Versorgungsausführung](#versorgungsausführung)
 * [Konformitätserklärung](#konformitätserklärung)
+* [Vorgangsprotokoll](#vorgangsprotokoll)
 
 ### Prosthetics 2
 * [Anamnese Prothetik II](#anamnese-prothetik-ii)
 * [Maßblatt Prothetik II](#maßblatt-prothetik-ii)
+* [Kunststofffertigungsauftrag Prothetik II](#kunststofffertigungsauftrag-prothetik-ii)
 * [Versorgungsplanung Prothetik II](#versorgungsplanung-prothetik-ii)
 * [Checkliste Prothetik II](#checkliste-prothetik-ii)
 * [Abgabeprotokoll Prothetik II](#abgabeprotokoll-prothetik-ii)
 * [Gebrauchsanweisung Prothetik II](#gebrauchsanweisung-prothetik-ii)
 
-## Basisdaten
+## Identifikator
 ```json
 [
 	[
@@ -27,7 +29,16 @@
 			"attributes": {
 				"name": "Vorgang"
 			}
-		},
+		}
+	]
+]
+```
+[Content](#content)
+
+## Basisdaten
+```json
+[
+	[
 		{
 			"type": "text",
 			"attributes": {
@@ -97,12 +108,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "textblock",
 			"description": "Datenverarbeitung durch und Auftragserteilung an",
@@ -184,13 +189,153 @@ Export for signature compliance
 ```
 [Content](#content)
 
-## Kunststofffertigungsauftrag
-```json
-```
-[Content](#content)
-
 ## Silikonfertigungsauftrag
 ```json
+[
+	[
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Grundposition obere Extremität",
+				"multiple": true
+			},
+			"content": {
+				" ": [],
+				"Liner / Silikonschaft UA OA 75S10": [],
+				"Außenschaft / Schutzüberzug UA OA 75S40": [],
+				"Silikoninlet Schulterschaft 75S50": [],
+				"Silikonschulterkappe 75S60": [],
+				"Silikonbandage 75S70": [],
+				"Handgelenkorthese 75O10": [],
+				"Silikonkompressionshandschuh 75O40": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Grundposition untere Extremität",
+				"multiple": true
+			},
+			"content": {
+				" ": [],
+				"Liner US 75S20": [],
+				"Silikoninnenschaft US 75S25": [],
+				"Liner OS 75S30": [],
+				"Silikoninnenschaft OS 75S35": [],
+				"Silikonhose / Beckenschaft 75S90": [],
+				"Außenschaft / Schutzüberzug US OS 75S45": []
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Polster, Narben, Traktion, Sonstiges",
+				"multiple": true
+			},
+			"content": {
+				" ": [],
+				"HTV-RTV-Polster 75S80": [],
+				"RTV-Polster 75S81": [],
+				"Platte für Traktionsmanschetten 75O70": [],
+				"Steckhülse für Lagerungsschale 75O80": [],
+				"RTV-Grundierung für konfektionierte Dichtlippe 75A90": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Sonstige Grundposition"
+			}
+		}
+	],
+	[
+		{
+			"type": "select",
+			"attributes": {
+				"name": "Zusätze zur Grundposition",
+				"multiple": true
+			},
+			"content": {
+				" ": [],
+				"Gurtband 75A10": [],
+				"Carbonverbund 75A40": [],
+				"Verschraubung 75A50": [],
+				"Dichtmanschette 75A70": [],
+				"Kaschierung 75E10": [],
+				"RTV-Schicht zur Adhäsionssteigerung 75E20": [],
+				"Integrierter kleiner Narbenausgleich 75E30": [],
+				"Matrix 75E40": [],
+				"Integriertes distales Polster zur Druckentlastung 75E70": [],
+				"HeiSens Leitspot pro Elektrode 75E80": [],
+				"Silikon Composite 75E90": [],
+				"Silikonbeschichtung zur Haftungsreduktion 75E100": [],
+				"Individuelle Farbgestaltung 75I10": []
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Reparaturauftrag",
+			"content": {
+				"Reparatur": []
+			},
+			"hint": "Modell erforderlich"
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Reparaturausführung, sonstige Zusätze, ggf. Anzahl"
+			}
+		}
+	],
+	[
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Stärke"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Shore"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Farbe"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Weitere Ausführungen"
+			}
+		},
+		{
+			"type": "photo",
+			"attributes": {
+				"name": "Skizze"
+			}
+		}
+	],
+	[
+		{ "type": "textblock", "description": "Fertigung" },
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Verwendete Materialien im Hautkontakt"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Silikonfertigung erledigt",
+			"content": {
+				"Abgeschlossen": []
+			}
+		}
+	]
+]
 ```
 [Content](#content)
 
@@ -198,12 +343,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "textblock",
 			"description": "Empfangsbestätigung",
@@ -267,12 +406,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "textblock",
 			"description": "Empfangsbestätigung",
@@ -342,12 +475,6 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
-		{
 			"type": "radio",
 			"attributes": {
 				"name": "Abdruck / Maßnahme"
@@ -396,7 +523,9 @@ Export for signature compliance
 		},
 		{
 			"type": "calendarbutton",
-			"attributes": "Weitere Vorbereitungen planen"
+			"attributes": {
+				"value": "Weitere Vorbereitungen planen"
+			}
 		}
 	]
 ]
@@ -407,12 +536,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "checkbox",
 			"description": "definitive Ausführung",
@@ -458,6 +581,36 @@ Export for signature compliance
 
 ## Konformitätserklärung
 ```json
+[
+	[
+		{
+			"type": "textblock",
+			"description": "Konformitätserklärung",
+			"content": "Die Abteilung Technische Orthopädie des Universitätsklinikums Heidelberg, Schlierbacher Landstraße 200a, 69118 Heidelberg, erklärt hiermit alleinverantwortlich, dass die oben genannte Sonderanfertigung für den oben genannten Patienten individuell hergestellt wurde und den grundlegenden Forderungen der EU-Verordnung 2017/745 entspricht. Sollten bestimmte grundlegende Forderungen nicht eingehalten worden sein, so wurden sie aufgeführt. Die entsprechende Produktdokumentation wird aufbewahrt. Diese Konformitätserklärung bezieht sich nur auf die im Rahmen der Sonderanfertigung für den oben genannten Patienten individuell angefertigten Komponenten. Für etwaige konfektionierte Hilfsmittel sind die jeweiligen Hersteller verantwortlich."
+		},
+		{
+			"type": "signature",
+			"attributes": {
+				"name": "Datum, Unterschrift Mitarbeiter"
+			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Vorgangsprotokoll
+```json
+[
+	[
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Protokoll"
+			}
+		},
+	]
+]
 ```
 [Content](#content)
 
@@ -465,12 +618,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "radio",
 			"attributes": {
@@ -770,6 +917,325 @@ Export for signature compliance
 
 ## Maßblatt Prothetik II
 ```json
+[
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Seite"
+			},
+			"content": {
+				"links": [],
+				"rechts": []
+			}
+		}
+	],
+	[
+		{ "type": "textblock", "description": "Vergleichsmaße" },
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Mittelfinger"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Umfang MCP (A)"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Umfang Handgelenk (C)"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Umfang Unterarm prox. Drittel (D)"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Beugefalte - Daumenspitze"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Drehpunkt Ellenbogen - Daumenspitze"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Achsel - Unterseite Unterarm"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Schulterhöhe - Unterseite Unterarm"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Umfang Oberarm (F)"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Sonstige Vergleichsmaße"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Farbe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Handgröße"
+			}
+		}
+	],
+	[
+		{ "type": "textblock", "description": "Unterarmstumpf" },
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Beugefalte - Stumpfende"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Olecranon - Stumpfende"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Umfang Beugefalte - Oberarm abgewinkelt"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Umfang Beugefalte - Olecranon abgewinkelt"
+			}
+		}
+	],
+	[
+		{ "type": "textblock", "description": "Oberarmstumpf" },
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Achsel - Stumpfende"
+			}
+		},
+		{
+			"type": "number",
+			"attributes": {
+				"name": "Länge Schulterhöhe - Stumpfende"
+			}
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Startmaß an",
+			"content": {
+				"Stumpfende": [],
+				"Ellenbogen Beugefalte": [],
+				"Achsel": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß 0"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Umfangsmaß / Höhe"
+			}
+		}
+	],
+	[
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Anmerkungen zur Maßdokumentation"
+			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Kunststofffertigungsauftrag Prothetik II
+```json
+[
+	[
+		{
+			"type": "date",
+			"attributes": {
+				"name": "Fertigstellung bis"
+			}
+		},
+		{
+			"type": "calendarbutton",
+			"attributes": {
+				"value": "Weitere Vorbereitungen planen"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Polster / Inlet",
+			"content": {
+				"komplett": [],
+				"Pads": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Material, Stärke, sonstige Polster"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "Tiefziehverfahren",
+			"content": {
+				"Umlegeverfahren": [],
+				"Tiefziehrahmen": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Material, Stärke"
+			}
+		},
+		{
+			"type": "checkbox",
+			"description": "FVK-Verfahren",
+			"content": {
+				"PrePreg": [],
+				"Acrylguss": [],
+				"Epoxidguss": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Dekopapier, Stoff, Farbe"
+			}
+		}
+	],
+	[
+		{
+			"type": "select",
+			"attributes": {
+				"name": "gemäß Armierungsplan"
+			},
+			"content": {
+				" ":[],
+				"Armierungsplan Prothetik II 5.1": [],
+				"Armierungsplan Prothetik II 5.2": [],
+				"Armierungsplan Prothetik II 5.3": [],
+				"Armierungsplan Prothetik II 5.4": [],
+				"Armierungsplan Prothetik II 5.5": [],
+				"Armierungsplan Prothetik II 5.6": []
+			}
+		},
+		{
+			"type": "formbutton",
+			"attributes": {
+				"value": "Armierungsplan Prothetik II anzeigen",
+				"onpointerup": "api.record('get','displayonly', 'Armierungsplan Prothetik II')"
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "individueller Armierungsplan"
+			}
+		},
+		{
+			"type": "photo",
+			"attributes": {
+				"name": "Skizze"
+			}
+		}
+	],
+	[
+		{
+			"type": "checkbox",
+			"description": "Kunststofffertigung erledigt",
+			"content": {
+				"Abgeschlossen": []
+			}
+		}
+	]
+]
 ```
 [Content](#content)
 
@@ -777,12 +1243,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "textblock",
 			"description": "Grundposition"
@@ -1678,12 +2138,6 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
-		{
 			"type": "textblock",
 			"description": "Ausgangsprüfung Checkliste"
 		},
@@ -1879,12 +2333,6 @@ Export for signature compliance
 ```json
 [
 	[
-		{
-			"type": "identify",
-			"attributes": {
-				"name": "Vorgang"
-			}
-		},
 		{
 			"type": "textblock",
 			"description": "Abgabeprotokoll"
