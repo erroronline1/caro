@@ -1120,6 +1120,12 @@ Export for signature compliance
 	],
 	[
 		{
+			"type": "number",
+			"attributes": {
+				"name": "geplante maximale Reduzierung in %"
+			}
+		},
+		{
 			"type": "textarea",
 			"attributes": {
 				"name": "Anmerkungen zur Maßdokumentation"
