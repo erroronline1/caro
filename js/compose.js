@@ -278,7 +278,7 @@ export const compose_helper = {
 			[...parent.childNodes].forEach((node) => {
 				if (node.draggable) {
 					container = node.children[1];
-					if (container.localName === "article") {
+					if (container && container.localName === "article") {
 						if (container.firstChild.localName === "section") content.push(nodechildren(container.firstChild));
 						else content.push(nodechildren(container));
 					} else {
@@ -1226,7 +1226,7 @@ export class Compose extends Assemble {
 			type: "text",
 			attributes: {
 				name: LANG.GET("assemble.compose_multilist_add_item") + "[]",
-				required:true,
+				required: true,
 			},
 		};
 		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
