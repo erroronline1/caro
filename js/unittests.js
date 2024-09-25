@@ -166,7 +166,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "textsection",
-						description: "Informative text",
+						attributes: {
+							name: "Informative text",
+						},
 						content: "...to inform users about important things",
 					},
 					{
@@ -264,7 +266,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "checkbox",
-						description: "Select from multiple options at a glance",
+						attributes: {
+							name: "Select from multiple options at a glance",
+						},
 						hint: "Best used with less than 8 for a better user experience",
 						content: { "This is great": {}, "This is awesome": {}, "This is superb": { checked: true } },
 					},
@@ -284,7 +288,7 @@ export function rendertest(element) {
 						type: "select",
 						attributes: {
 							name: "Select one option of many",
-							multiple:true
+							multiple: true,
 						},
 						hint: "This opens a longer list that would otherwise clutter up the screen, optional multiple.",
 						content: {
@@ -322,7 +326,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "textsection",
-						description: "Informativer Text",
+						attributes: {
+							name: "Informativer Text",
+						},
 						content: "...um Nutzer über wichtige Dinge zu informieren",
 					},
 					{
@@ -418,7 +424,9 @@ export function rendertest(element) {
 					},
 					{
 						type: "checkbox",
-						description: "Wähle aus mehreren Optionen auf einen Blick aus",
+						attributes: {
+							name: "Wähle aus mehreren Optionen auf einen Blick aus",
+						},
 						hint: "Am besten aber nicht mehr als 8 Optionen, sonst wird es unübersichtlich",
 						content: {
 							"Das ist toll": {},
@@ -556,10 +564,10 @@ export function rendertest(element) {
 				[
 					{
 						type: "textsection",
-						description: "Highlighted textsection descriptions are possible",
 						content: "Available class options are red, orange, yellow and green",
 						attributes: {
 							class: "green",
+							name: "Highlighted textsection descriptions are possible",
 						},
 					},
 					{
@@ -610,7 +618,9 @@ export function rendertest(element) {
 						content: [
 							{
 								type: "textsection",
-								description: "textsection on a tile",
+								attributes: {
+									name: "textsection on a tile",
+								},
 								content: "This is a third width. As seen on landing page.",
 							},
 						],
@@ -632,14 +642,18 @@ export function rendertest(element) {
 					[
 						{
 							type: "textsection",
-							description: "Sliding panels are possible as well",
+							attributes: {
+								name: "Sliding panels are possible as well",
+							},
 							content: "Just try not to distract or obfuscate. Mobile view is just swiping, desktop view has supporting buttons.",
 						},
 					],
 					[
 						{
 							type: "textsection",
-							description: "It's just another layer of nesting",
+							attributes: {
+								name: "It's just another layer of nesting",
+							},
 							content: "All options above are valid. As seen in user manager",
 						},
 					],
@@ -741,10 +755,10 @@ export function rendertest(element) {
 				[
 					{
 						type: "textsection",
-						description: "Hervorgehobene Textüberschriften sind möglich",
 						content: "Verfügbare CSS-Klassen sind red, orange, yellow and green",
 						attributes: {
 							class: "green",
+							name: "Hervorgehobene Textüberschriften sind möglich",
 						},
 					},
 					{
@@ -795,7 +809,9 @@ export function rendertest(element) {
 						content: [
 							{
 								type: "textsection",
-								description: "textsection auf einer Kachel",
+								attributes: {
+									name: "textsection auf einer Kachel",
+								},
 								content: "Dies ist ein Drittel der Breite, Verwendet auf der Startseite",
 							},
 						],
@@ -817,14 +833,18 @@ export function rendertest(element) {
 					[
 						{
 							type: "textsection",
-							description: "Verschiebliche Tafeln sind ebenfalls möglich",
+							attributes: {
+								name: "Verschiebliche Tafeln sind ebenfalls möglich",
+							},
 							content: "Versuche nur möglichst nicht zu verwirren oder abzulenken. Auf mobilen Geräten muss nur gewischt werden, die Desktop-Ansicht hat auch Knöpfe.",
 						},
 					],
 					[
 						{
 							type: "textsection",
-							description: "Dies ist nur eine zusätzlich Verschachtelungsebene",
+							attributes: {
+								name: "Dies ist nur eine zusätzlich Verschachtelungsebene",
+							},
 							content: "Alle Optionen sind möglich. Verwendet in der Nutzerverwaltung.",
 						},
 					],

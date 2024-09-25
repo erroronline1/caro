@@ -237,7 +237,9 @@ class FILE extends API {
 							$matches[$article][] = [
 								[
 									'type' => 'checkbox',
-									'description' => LANG::GET('file.file_list', [':folder' => $folder]),
+									'attributes' => [
+										'name' => LANG::GET('file.file_list', [':folder' => $folder])
+									],
 									'content' => []
 								]
 							];

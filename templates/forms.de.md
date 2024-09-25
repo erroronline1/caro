@@ -49,7 +49,7 @@
 		{
 			"type": "date",
 			"attributes": {
-				"name": "Geburtsdatum",
+				"name": "Geburtsdatum"
 			}
 		},
 		{
@@ -110,19 +110,25 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Datenverarbeitung durch und Auftragserteilung an",
+			"attributes": {
+				"name": "Datenverarbeitung durch und Auftragserteilung an"
+			},
 			"content": "Universitätsklinikum Heidelberg, Zentrum für Orthopädie, Unfallchirurgie und Paraplegiologie \\nAbteilung Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg"
 		}
 	],
 	[
 		{
 			"type": "textsection",
-			"description": "Information zur Datenverarbeitung",
+			"attributes": {
+				"name": "Information zur Datenverarbeitung"
+			},
 			"content": "Die Bereitstellung und Verarbeitung Ihrer Daten ist im Rahmen Ihrer Versorgung in unserem Haus erforderlich und Bestandteil des Behandlungsvertrags. Bei Bedarf stellen wir Ihnen diese Informationen auch in einem größeren Ausdruck zur Verfügung. Allgemein gilt die Erklärung zur Datenverarbeitung und Datenschutz des Universitätsklinikums Heidelberg. \\nVerarbeitungszwecke im Rahmen Ihrer Hilfsmittelversorgung: Hilfsmittelversorgung, Patientenverwaltung und Abrechnung, interdisziplinäre Konferenzen zur Analyse und Erörterung von Diagnostik und Therapie, Versorgungsdokumentation, Erstellung von Berichten und Stellungnahmen, Qualitätssicherung in Versorgung und ihrer Organisation, Unterrichtung von Mit-/Weiterversorgern im erforderlichen Umfang, Eingabe der Adressdaten und ggf. Rufnummer an Versanddienstleister, Kontaktaufnahme auch hinsichtlich eines Erinnerungsservices nach Versorgungsabschluss."
 		},
 		{
 			"type": "textsection",
-			"description": "Auftragserteilung",
+			"attributes": {
+				"name": "Auftragserteilung"
+			},
 			"content": "Ich wurde darüber aufgeklärt, dass mir die Wahl eines Leistungserbringers zur Anfertigung bzw. Versorgung mit einem Hilfsmittel freisteht. In diesem Rahmen beauftrage ich den oben genannten Leistungserbringer. Ich wurde vor Inanspruchnahme der Leistung/en darüber beraten, welche/s Hilfsmittel und zusätzliche/n Leistung/en nach § 33 SGB V für die konkrete Versorgungssituation im Einzelfall geeignet und notwendig ist/sind. Ich bin über die Möglichkeit einer aufzahlungsfreien Versorgung, die der vertragsärztlichen Verordnung entspricht und ihren Zweck voll erfüllt, informiert worden. Die gesetzliche Zuzahlung bleibt davon unberührt. Maß- und Sonderanfertigungen sowie gebrauchte Hilfsmittel sind vom Rückgabe- und Umtauschrecht ausgeschlossen. Die Informationen zur Datenverarbeitung habe ich zur Kenntnis genommen und akzeptiere sie. Ich bin darüber aufgeklärt, dass Lieferungen bevorzugt persönlich erfolgen sollen."
 		},
 		{
@@ -133,7 +139,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Kostenübernahmeerklärung",
+			"attributes": {
+				"name": "Kostenübernahmeerklärung"
+			},
 			"content": {
 				"Eine Kostenübernahme kann ich persönlich nicht erteilen und möchte die Kostenübernahme durch meinen Kostenträger (gilt auch für postOP-Versorgungen).": [],
 				"Ich habe mich nach eingehender Beratung auf eigenen Wunsch für die Versorgung mit einem aufzahlungsfreien Produkt entschieden.": [],
@@ -157,7 +165,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Weiterleitung persönlicher Daten and andere Mit-/Weiterversorger",
+			"attributes": {
+				"name": "Weiterleitung persönlicher Daten and andere Mit-/Weiterversorger"
+			},
 			"content": {
 				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass alle für den Mit-/Weiterversorger meines Hilfsmittels notwendigen personenbezogenen Daten an diesen weitergeleitet werden dürfen.": []
 			}
@@ -166,12 +176,16 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Schweigepflichtentbindung gegenüber dem Kostenträger",
+			"attributes": {
+				"name": "Schweigepflichtentbindung gegenüber dem Kostenträger"
+			},
 			"content": "Um für Ihr Hilfsmittel die Kostenzusage Ihres Kostenträgers zu erhalten, übermitteln wir diesem einen Kostenvoranschlag und eine Stellungnahme mit weiterführenden Informationen (u. a. Name, Versicherungsnummer, Diagnose, Angaben zur Erforderlichkeit). Die Stellungnahme wird entweder gleich der Beantragung beigelegt oder aber auf Anfrage seitens Ihres Kostenträgers zugeschickt. Hierzu ist Ihre Einwilligung und Schweigepflichtentbindung erforderlich. Die Einwilligung ist freiwillig, Vorgangsbezogen und für zukünftige Übermittlungen widerruflich. Ohne Ihre Einwilligung ist mit einer zeitlichen Verzögerung bei der Bearbeitung Ihrer Krankenkasse zu rechnen. Möglicherweise kann es dadurch sogar zu einer Ablehnung der Hilfsmittelversorgung kommen."
 		},
 		{
 			"type": "checkbox",
-			"description": "Schweigepflichtentbindung",
+			"attributes": {
+				"name": "Schweigepflichtentbindung"
+			},
 			"content": {
 				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass ich meinen oben genannten Leistungserbringer von der Schweigepflicht gegenüber meinem Kostenträger entbinde.": []
 			}
@@ -274,7 +288,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Reparaturauftrag",
+			"attributes": {
+				"name": "Reparaturauftrag"
+			},
 			"content": {
 				"Reparatur": []
 			},
@@ -320,7 +336,12 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textsection", "description": "Fertigung" },
+		{
+			"type": "textsection",
+			"attributes": {
+				"name": "Fertigung"
+			}
+		},
 		{
 			"type": "textarea",
 			"attributes": {
@@ -329,7 +350,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Silikonfertigung erledigt",
+			"attributes": {
+				"name": "Silikonfertigung erledigt"
+			},
 			"content": {
 				"Abgeschlossen": []
 			}
@@ -345,7 +368,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Empfangsbestätigung",
+			"attributes": {
+				"name": "Empfangsbestätigung"
+			},
 			"content": "Hiermit bestätige ich, dass ich die folgenden Hilfsmittel vom Leistungserbringer Universitätsklinikum Heidelberg, Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg, erhalten habe:"
 		},
 		{
@@ -356,7 +381,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Abgabe",
+			"attributes": {
+				"name": "Abgabe"
+			},
 			"content": {
 				"zum dauerhaften Verbleib": [],
 				"miet-/leihweise": []
@@ -370,7 +397,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Erklärung",
+			"attributes": {
+				"name": "Erklärung"
+			},
 			"content": {
 				"Ich erkläre hiermit, dass ich das Hilfsmittel in ordnungsgemäßem, gebrauchsfähigem Zustand empfangen habe.": [],
 				"Ich erkläre hiermit, dass ich darüber aufgeklärt wurde, dass ausstehende Arbeiten zur Finalisierung meines Hilfsmittels keinen Einfluss auf die Funktion haben und ich eine postalische Zusendung nach Abschluss dieser Arbeiten ausdrücklich wünsche.": [],
@@ -408,12 +437,16 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Empfangsbestätigung",
+			"attributes": {
+				"name": "Empfangsbestätigung"
+			},
 			"content": "Hiermit erteile ich dem Universitätsklinikum Heidelberg die Erlaubnis zur Ausstellung bzw. der Veröffentlichung der von mir, bzw. meinem Kind gefertigten Foto- und / oder Videoaufnahmen. Diese Erklärung kann jederzeit ohne Angaben von Gründen für künftige Veröffentlichungen widerrufen werden. Dies hat keinen Einfluss auf die Versorgung. Mir ist bewusst, dass bereits erfolgte Veröffentlichungen nachträglich nicht zurückgenommen werden können. Insbesondere bei der Veröffentlichung im Internet entzieht sich die weitere Verbreitung durch Kopien dem Zugriff durch das Universitätsklinikum Heidelberg.\\n \\nDie von mir / meinem Kind gemachten Aufnahmen sollen zu Zwecken der Presse- und Öffentlichkeitsarbeit des Universitätsklinikums Heidelberg verwendet werden. Ich habe die diesbezüglichen Erläuterungen verstanden, und mir wurde ausreichend Gelegenheit gegeben, Fragen zu stellen."
 		},
 		{
 			"type": "checkbox",
-			"description": "Erlaubnis zur Veröffentlichung von Aufnahmen in",
+			"attributes": {
+				"name": "Erlaubnis zur Veröffentlichung von Aufnahmen in"
+			},
 			"content": {
 				"Fachzeitschriften": [],
 				"Zeitungsberichten": [],
@@ -438,7 +471,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Onlineveröffentlichung",
+			"attributes": {
+				"name": "Onlineveröffentlichung"
+			},
 			"content": {
 				"Hiermit erteile ich dem Universitätsklinikum Heidelberg meine Einwilligung, die von mir / meinem Kind gemachten Aufnahmen im Rahmen der Presse- und Öffentlichkeitsarbeit des Universitätsklinikums insbesondere in Print- und Onlinemedien zu verbreiten und zu veröffentlichen. Meine Einwilligung umfasst auch das Recht, die Aufnahmen zu bearbeiten und zu retuschieren, soweit dadurch keine Persönlichkeitsrechte verletzt werden.": []
 			}
@@ -506,7 +541,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Anprobeergebnis",
+			"attributes": {
+				"name": "Anprobeergebnis"
+			},
 			"content": {
 				"passgerecht": [],
 				"statikgerecht": [],
@@ -538,7 +575,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "definitive Ausführung",
+			"attributes": {
+				"name": "definitive Ausführung"
+			},
 			"content": {
 				"wie genehmigt": []
 			}
@@ -585,7 +624,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Konformitätserklärung",
+			"attributes": {
+				"name": "Konformitätserklärung"
+			},
 			"content": "Die Abteilung Technische Orthopädie des Universitätsklinikums Heidelberg, Schlierbacher Landstraße 200a, 69118 Heidelberg, erklärt hiermit alleinverantwortlich, dass die oben genannte Sonderanfertigung für den oben genannten Patienten individuell hergestellt wurde und den grundlegenden Forderungen der EU-Verordnung 2017/745 entspricht. Sollten bestimmte grundlegende Forderungen nicht eingehalten worden sein, so wurden sie aufgeführt. Die entsprechende Produktdokumentation wird aufbewahrt. Diese Konformitätserklärung bezieht sich nur auf die im Rahmen der Sonderanfertigung für den oben genannten Patienten individuell angefertigten Komponenten. Für etwaige konfektionierte Hilfsmittel sind die jeweiligen Hersteller verantwortlich."
 		},
 		{
@@ -931,7 +972,12 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textsection", "description": "Vergleichsmaße" },
+		{
+			"type": "textsection",
+			"attributes": {
+				"name": "Vergleichsmaße"
+			}
+		},
 		{
 			"type": "number",
 			"attributes": {
@@ -1006,7 +1052,12 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textsection", "description": "Unterarmstumpf" },
+		{
+			"type": "textsection",
+			"attributes": {
+				"name": "Unterarmstumpf"
+			}
+		},
 		{
 			"type": "number",
 			"attributes": {
@@ -1033,7 +1084,12 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textsection", "description": "Oberarmstumpf" },
+		{
+			"type": "textsection",
+			"attributes": {
+				"name": "Oberarmstumpf"
+			}
+		},
 		{
 			"type": "number",
 			"attributes": {
@@ -1050,7 +1106,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Startmaß an",
+			"attributes": {
+				"name": "Startmaß an"
+			},
 			"content": {
 				"Stumpfende": [],
 				"Ellenbogen Beugefalte": [],
@@ -1161,7 +1219,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Polster / Inlet",
+			"attributes": {
+				"name": "Polster / Inlet"
+			},
 			"content": {
 				"komplett": [],
 				"Pads": []
@@ -1175,7 +1235,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Tiefziehverfahren",
+			"attributes": {
+				"name": "Tiefziehverfahren"
+			},
 			"content": {
 				"Umlegeverfahren": [],
 				"Tiefziehrahmen": []
@@ -1189,7 +1251,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "FVK-Verfahren",
+			"attributes": {
+				"name": "FVK-Verfahren"
+			},
 			"content": {
 				"PrePreg": [],
 				"Acrylguss": [],
@@ -1242,7 +1306,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Kunststofffertigung erledigt",
+			"attributes": {
+				"name": "Kunststofffertigung erledigt"
+			},
 			"content": {
 				"Abgeschlossen": []
 			}
@@ -1258,7 +1324,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Grundposition"
+			"attributes": {
+				"name": "Grundposition"
+			}
 		},
 		{
 			"type": "select",
@@ -1508,7 +1576,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Mehraufwand zur Grundposition",
+			"attributes": {
+				"name": "Mehraufwand zur Grundposition"
+			},
 			"content": {
 				"Tumorversorgung 20.4001 KA": [],
 				"Dysmelieversorgung 20.4002 KA": [],
@@ -1597,7 +1667,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Bauteile für Testversorgung",
+			"attributes": {
+				"name": "Bauteile für Testversorgung"
+			},
 			"content": {
 				"Mietgebühren Leihpassteile TOH 20.4016 KA": [],
 				"Handling für Leihhände 20.4019 KA": [],
@@ -1623,11 +1695,15 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Schaftsystem"
+			"attributes": {
+				"name": "Schaftsystem"
+			}
 		},
 		{
 			"type": "checkbox",
-			"description": "Zusätze am Schaftsystem",
+			"attributes": {
+				"name": "Zusätze am Schaftsystem"
+			},
 			"content": {
 				"Kaschierung 75E10": [],
 				"HeiSens Leitspot pro Elektrode 75E80": [],
@@ -1646,7 +1722,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Mehraufwand am Schaftsystem",
+			"attributes": {
+				"name": "Mehraufwand am Schaftsystem"
+			},
 			"content": {
 				"Prepreg 20.4007 KA": [],
 				"Schaftsonderlösungen 20.4008 KA": []
@@ -1706,7 +1784,9 @@ Export for signature compliance
 		},
 		{
 			"type": "checkbox",
-			"description": "Anziehtechnik",
+			"attributes": {
+				"name": "Anziehtechnik"
+			},
 			"content": {
 				"Otto Bock Anziehlubricant 633S2": [],
 				"Protheseus BOA PK022013005 + 20.3003 KA": [],
@@ -1850,7 +1930,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Schultergelenk",
+			"attributes": {
+				"name": "Schultergelenk"
+			},
 			"content": {
 				"Heidelberger Schultergelenk 4362 AS": [],
 				"Otto Bock MovoShoulder Swing 12S6": [],
@@ -1876,7 +1958,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Ellenbogengelenk",
+			"attributes": {
+				"name": "Ellenbogengelenk"
+			},
 			"content": {
 				"MICO Elbow TOH": [],
 				"Heidelberger Ellenbogengelenk 4334 AS": [],
@@ -1909,7 +1993,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Handgelenk"
+			"attributes": {
+				"name": "Handgelenk"
+			}
 		},
 		{
 			"type": "select",
@@ -1985,7 +2071,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Handpassteil"
+			"attributes": {
+				"name": "Handpassteil"
+			}
 		},
 		{
 			"type": "select",
@@ -2060,7 +2148,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Handschuh",
+			"attributes": {
+				"name": "Handschuh"
+			},
 			"content": {
 				"Otto Bock PVC Myo Kinder 8S20N": [],
 				"Otto Bock PVC Myo Gr.7 8S13N": [],
@@ -2096,7 +2186,9 @@ Export for signature compliance
 	[
 		{
 			"type": "checkbox",
-			"description": "Kosmetik",
+			"attributes": {
+				"name": "Kosmetik"
+			},
 			"content": {
 				"elastischer Überzug Unterarm 20.3801 KA": [],
 				"elastischer Überzug Oberarm 20.3802 KA": [],
@@ -2152,7 +2244,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Ausgangsprüfung Checkliste"
+			"attributes": {
+				"name": "Ausgangsprüfung Checkliste"
+			}
 		},
 		{
 			"type": "radio",
@@ -2269,7 +2363,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Lieferumfang"
+			"attributes": {
+				"name": "Lieferumfang"
+			}
 		},
 		{
 			"type": "radio",
@@ -2348,7 +2444,9 @@ Export for signature compliance
 	[
 		{
 			"type": "textsection",
-			"description": "Abgabeprotokoll"
+			"attributes": {
+				"name": "Abgabeprotokoll"
+			}
 		},
 		{
 			"type": "radio",

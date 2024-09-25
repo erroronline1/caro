@@ -240,7 +240,7 @@ class RECORD extends API {
 				}
 				else {
 					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton', 'formbutton'])) continue;
-					if (in_array($subs['type'], ['checkbox', 'textsection', 'image'])) {
+					if (in_array($subs['type'], ['image'])) {
 						$name = $subs['description'];
 					}
 					else $name = $subs['attributes']['name'];
@@ -459,7 +459,9 @@ class RECORD extends API {
 			$return['render']['content'][] = [
 				[
 					'type' => 'textsection',
-					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
+					'attributes' => [
+						'name' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
+					]
 				]
 			];
 		}
@@ -680,7 +682,9 @@ class RECORD extends API {
 						[
 							[
 								'type' => 'textsection',
-								'description' => LANG::GET('record.create_identifier_info')
+								'attributes' => [
+									'name' => LANG::GET('record.create_identifier_info')
+								]
 							], [
 								'type' => 'scanner',
 								'hint' => LANG::GET('record.create_identifier_hint'),
@@ -953,7 +957,9 @@ class RECORD extends API {
 				$body[] = [
 					[
 						'type' => 'textsection',
-						'description' => LANG::GET('record.create_identifier'),
+						'attributes' => [
+							'name' => LANG::GET('record.create_identifier')
+						],
 						'content' => $this->_requestedID
 					], [
 						'type' => 'button',
@@ -986,14 +992,18 @@ class RECORD extends API {
 					$body[] = [
 						[
 							'type' => 'textsection',
-							'description' => $form
+							'attributes' => [
+								'name' => $form
+							]
 						]
 					];
 					foreach($entries as $key => $value){
 						array_push($body[count($body) -1],
 							[
 								'type' => 'textsection',
-								'description' => $key,
+								'attributes' => [
+									'name' => $key
+								],
 								'linkedcontent' => $value
 							]); 
 					}
@@ -1065,14 +1075,18 @@ class RECORD extends API {
 					$body[] = [
 						[
 							'type' => 'textsection',
-							'description' => LANG::GET('record.record_retype_pseudoform_name')
+							'attributes' => [
+								'name' => LANG::GET('record.record_retype_pseudoform_name')
+							]
 						]
 					];
 					foreach($entries as $key => $value){
 						array_push($body[count($body) -1],
 							[
 								'type' => 'textsection',
-								'description' => $key,
+								'attributes' => [
+									'name' => $key
+								],
 								'linkedcontent' => $value
 							]); 
 					}
@@ -1129,7 +1143,9 @@ class RECORD extends API {
 					foreach ($content['closed'] as $role => $property){
 						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
 							'type' => 'textsection',
-							'description' => LANG::GET('record.record_closed', [':role' => LANG::GET('permissions.' . $role), ':name' => $property['name'], ':date' => $property['date']])
+							'attributes' => [
+								'name' => LANG::GET('record.record_closed', [':role' => LANG::GET('permissions.' . $role), ':name' => $property['name'], ':date' => $property['date']])
+							]
 						]);
 					}
 
@@ -1159,7 +1175,9 @@ class RECORD extends API {
 						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
 							'type' => 'checkbox',
 							'content' => $approvalposition,
-							'description' => LANG::GET('record.record_mark_as_closed')
+							'attributes' => [
+								'name' => LANG::GET('record.record_mark_as_closed')
+							]
 						]);
 					}
 				}

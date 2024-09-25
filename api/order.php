@@ -512,10 +512,10 @@ class ORDER extends API {
 					];
 					$content[] = [
 						'type' => 'textsection',
-						'description' => LANG::GET('order.ordertype.' . $row['ordertype']),
 						'content' => $text,
 						'attributes' => [
-							'data-type' => $row['ordertype']
+							'data-type' => $row['ordertype'],
+							'name' => LANG::GET('order.ordertype.' . $row['ordertype'])
 						]
 					];
 
@@ -534,9 +534,9 @@ class ORDER extends API {
 						if (array_key_exists('vendor_label', $decoded_order_data) && $special_attention[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
 								'type' => 'textsection',
-								'description' => LANG::GET('consumables.edit_product_special_attention'),
 								'attributes' => [
-									'class' => 'orange'
+									'class' => 'orange',
+									'name' => LANG::GET('consumables.edit_product_special_attention')
 								]
 							];		
 						}}
@@ -664,7 +664,9 @@ class ORDER extends API {
 								// simple groups are not allowed to make records
 								$content[] = [
 									'type' => 'textsection',
-									'description' => LANG::GET('order.incorporation_neccessary_by_user')
+									'attributes' => [
+										'name' => LANG::GET('order.incorporation_neccessary_by_user')
+									]
 								];
 							}
 						}
@@ -673,7 +675,9 @@ class ORDER extends API {
 						if (array_key_exists('vendor_label', $decoded_order_data) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
 								'type' => 'textsection',
-								'description' => LANG::GET('order.incorporation_denied')
+								'attributes' => [
+									'name' => LANG::GET('order.incorporation_denied')
+								]
 							];
 						}
 					}
@@ -681,7 +685,9 @@ class ORDER extends API {
 						if (array_key_exists('vendor_label', $decoded_order_data) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
 								'type' => 'textsection',
-								'description' => LANG::GET('order.incorporation_pending')
+								'attributes' => [
+									'name' => LANG::GET('order.incorporation_pending')
+								]
 							];
 						}
 					}
@@ -702,7 +708,9 @@ class ORDER extends API {
 								// simple groups are not allowed to make records
 								$content[] = [
 									'type' => 'textsection',
-									'description' => LANG::GET('order.sample_check_by_user')
+									'attributes' => [
+										'name' => LANG::GET('order.sample_check_by_user')
+									]
 								];
 							}
 						}
@@ -1141,12 +1149,14 @@ class ORDER extends API {
 							],
 							[
 								'type' => 'textsection',
-								'description' => LANG::GET('order.added_product', [
-									':unit' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : '',
-									':number' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : '',
-									':name' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : '',
-									':vendor' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ''
-								])
+								'attributes' => [
+									'name' => LANG::GET('order.added_product', [
+										':unit' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : '',
+										':number' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : '',
+										':name' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : '',
+										':vendor' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ''
+									])
+								]
 							],
 							[
 								'type' => 'hidden',
@@ -1669,7 +1679,9 @@ class ORDER extends API {
 						$matches[$article][] = [
 							[
 								'type' => 'textsection',
-								'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
+								'attributes' => [
+									'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
+								],
 							]
 						];
 					}
@@ -1730,15 +1742,20 @@ class ORDER extends API {
 								],
 								'content' => [
 									['type' => 'textsection',
-									'description' => $incorporationState,
+									'attributes' => [
+										'name' => $incorporationState
+									],
 									'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 								]
 							];
 					}
 				}
 				if (!$matches[0]) $matches[0][] = [
-					['type' => 'textsection',
-					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
+						],
 					]
 				];
 				$result['render']['content'] = $matches;

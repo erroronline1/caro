@@ -295,10 +295,12 @@ class CONSUMABLES extends API {
 					'content' => [
 						[
 							'type' => 'textsection',
-							'description' => implode(' ', [
-								$product['article_no'] ? : '',
-								$product['article_name'] ? : '',
-								$product['vendor_name'] ? : ''])
+							'attributes' => [
+								'name' => implode(' ', [
+									$product['article_no'] ? : '',
+									$product['article_name'] ? : '',
+									$product['vendor_name'] ? : ''])
+							]
 						], ...$incorporationform
 					],
 					'options' => [
@@ -331,8 +333,11 @@ class CONSUMABLES extends API {
 							$article = intval(count($matches) - 1);
 							if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
 								$matches[$article][] = [
-									['type' => 'textsection',
-									'description' => LANG::GET('order.incorporation_matching_previous'),
+									[
+										'type' => 'textsection',
+										'attributes' => [
+											'name' => LANG::GET('order.incorporation_matching_previous')
+										]
 									]
 								];
 							}
@@ -451,10 +456,12 @@ class CONSUMABLES extends API {
 						[
 							[
 								'type' => 'textsection',
-								'description' => implode(' ', [
-									$product['article_no'],
-									$product['article_name'],
-									$product['vendor_name']])
+								'attributes' => [
+								'name' => implode(' ', [
+										$product['article_no'],
+										$product['article_name'],
+										$product['vendor_name']])
+								]
 							]
 						],
 						...$this->components('mdr_sample_check_form')
@@ -903,7 +910,9 @@ class CONSUMABLES extends API {
 						$result['render']['content'][] = [
 							[
 								'type' => 'textsection',
-								'description' => $product['article_no'] . ' ' . $product['article_name']. ($product['article_alias'] ? ' (' . $product['article_alias'] . ') ' : ' ') . $product['article_unit'],
+								'attributes' => [
+									'name' => $product['article_no'] . ' ' . $product['article_name']. ($product['article_alias'] ? ' (' . $product['article_alias'] . ') ' : ' ') . $product['article_unit']
+								],
 								'content' => $product['vendor_name']
 							],
 							[
@@ -927,7 +936,9 @@ class CONSUMABLES extends API {
 						if ($product['id'] && $product['last_order']){
 							$result['render']['content'][2][] = [
 								'type' => 'textsection',
-								'description' => LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]),
+								'attributes' => [
+									'name' => LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)])
+								],
 							];
 						}
 						if ($product['incorporated'] !== '') {					
@@ -943,14 +954,18 @@ class CONSUMABLES extends API {
 							}
 							$result['render']['content'][2][] = [
 								'type' => 'textsection',
-								'description' => $incorporationState,
+								'attributes' => [
+									'name' => $incorporationState
+								],
 								'content' => $incorporationInfo
 							];
 						}
 						else {
 							$result['render']['content'][2][] = [
 								'type' => 'textsection',
-								'description' => LANG::GET('consumables.edit_product_incorporated_not')
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_product_incorporated_not')
+								]
 							];
 						}
 						if ($documents) {
@@ -1130,7 +1145,9 @@ class CONSUMABLES extends API {
 					if ($product['id'] && $product['last_order']){
 						$result['render']['content'][2][] = [
 							'type' => 'textsection',
-							'description' => LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)])
+							'attributes' => [
+								'name' => LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)])
+							]
 						];
 					}
 
@@ -1170,7 +1187,9 @@ class CONSUMABLES extends API {
 						array_push($result['render']['content'][3],
 							[
 								'type' => 'textsection',
-								'description' => $incorporationState,
+								'attributes' => [
+									'name' => $incorporationState
+								],
 								'content' => $incorporationInfo
 							]);
 						if (PERMISSION::permissionFor('incorporation')){
@@ -1183,7 +1202,9 @@ class CONSUMABLES extends API {
 							if ($similarproducts) $incorporation[LANG::GET('consumables.edit_product_incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 							array_push($result['render']['content'][3], [
 									'type' => 'checkbox',
-									'description' => LANG::GET('order.incorporation_state_approve'),
+									'attributes' => [
+										'name' => LANG::GET('order.incorporation_state_approve')
+									],
 									'content' => $incorporation,
 									'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 								]
@@ -1193,7 +1214,9 @@ class CONSUMABLES extends API {
 					else {
 						$result['render']['content'][3][] = [
 							'type' => 'textsection',
-							'description' => LANG::GET('consumables.edit_product_incorporated_not'),
+							'attributes' => [
+								'name' => LANG::GET('consumables.edit_product_incorporated_not')
+							],
 							'hint' => LANG::GET('consumables.edit_product_similar_hint'),
 						];
 					}
@@ -1736,7 +1759,9 @@ class CONSUMABLES extends API {
 						$result['render']['content'][] = [
 							[
 								'type' => 'textsection',
-								'description' => $vendor['name'],
+								'attributes' => [
+									'name' => $vendor['name']
+								],
 								'content' => implode(" \n", array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) .
 									(array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
 									" \n" . LANG::GET('consumables.information_products_available', [':available' => $available])
@@ -1929,7 +1954,9 @@ class CONSUMABLES extends API {
 						[[
 							[
 								'type' => 'textsection',
-								'description' => LANG::GET('consumables.edit_vendor_pricelist_validity'),
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_vendor_pricelist_validity')
+								],
 								'content' => $vendor['pricelist']['validity']
 							],
 							[
@@ -1976,7 +2003,9 @@ class CONSUMABLES extends API {
 						}
 						$texttemplate[] = [
 							'type' => 'textsection',
-							'description' => LANG::GET('consumables.message_vendor'),
+							'attributes' => [
+								'name' => LANG::GET('consumables.message_vendor')
+							],
 							'content' => $special_attention ? LANG::GET('consumables.message_vendor_hint') : ''
 						];
 						if ($special_attention) $texttemplate[] = [

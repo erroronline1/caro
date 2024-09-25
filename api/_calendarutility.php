@@ -257,13 +257,17 @@ class CALENDARUTILITY {
 					],
 					[
 						'type' => 'checkbox',
-						'description' => LANG::GET('calendar.event_organizational_unit'),
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_organizational_unit')
+						],
 						'content' => $units,
 						'hint' => LANG::GET('calendar.event_organizational_unit_hint')
 					],
 					[
 						'type' => 'checkbox',
-						'description' => LANG::GET('calendar.event_alert_description'),
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_alert_description')
+						],
 						'content' => $alert
 					],
 					[
@@ -382,7 +386,9 @@ class CALENDARUTILITY {
 							]
 						],[
 							'type' => 'checkbox',
-							'description' => LANG::GET('calendar.event_alert_description'),
+							'attributes' => [
+								'name' => LANG::GET('calendar.event_alert_description')
+							],
 							'content' => $alert
 						],[
 							'type' => 'hidden',

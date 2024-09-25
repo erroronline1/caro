@@ -356,7 +356,9 @@ class CALENDAR extends API {
 		$events = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET ('calendar.events_none')
+				'attributes' => [
+					'name' => LANG::GET ('calendar.events_none')
+				]
 			]
 		];
 		if ($dbevents) $events = $this->scheduledEvents($dbevents, $calendar);
@@ -536,11 +538,11 @@ class CALENDAR extends API {
 
 					$events[] = [
 						'type' => 'textsection',
-						'description' => $this->_requestedDate,
 						'content' => $displayabsentmates,
 						'attributes' => [
 							'id' => 'displayspecificdate',
-							'data-type' => 'calendar'
+							'data-type' => 'calendar',
+							'name' => $this->_requestedDate
 						]
 					];
 					$events[] = [
@@ -565,9 +567,9 @@ class CALENDAR extends API {
 							$events = [
 								[
 									'type' => 'textsection',
-									'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
 									'attributes' => [
-										'data-type' => 'calendar'
+										'data-type' => 'calendar',
+										'name' => LANG::GET('calendar.events_assigned_units_uncompleted')
 									]
 								]
 							];
@@ -636,9 +638,9 @@ class CALENDAR extends API {
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'data-type' => $row['alert'] ? 'alert' : 'text'
+							'data-type' => $row['alert'] ? 'alert' : 'text',
+							'name' => $row['subject']
 						],
-						'description' => $row['subject'],
 						'content' => $display
 					],
 					[
@@ -868,11 +870,11 @@ class CALENDAR extends API {
 					}
 					$events[] = [
 						'type' => 'textsection',
-						'description' => $this->_requestedDate,
 						'content' => $displayabsentmates,
 						'attributes' => [
 							'id' => 'displayspecificdate',
-							'data-type' => 'calendar'
+							'data-type' => 'calendar',
+							'name' => $this->_requestedDate
 						]
 					];
 					$displayedEvents = [];
@@ -925,9 +927,9 @@ class CALENDAR extends API {
 							$events = [
 								[
 									'type' => 'textsection',
-									'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
 									'attributes' => [
-										'data-type' => 'calendar'
+										'data-type' => 'calendar',
+										'name' => LANG::GET('calendar.events_assigned_units_uncompleted')
 									]
 								]
 							];
@@ -1007,9 +1009,9 @@ class CALENDAR extends API {
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'data-type' => $row['alert'] ? 'alert' : 'text'
+							'data-type' => $row['alert'] ? 'alert' : 'text',
+							'name' => $row['affected_user']
 						],
-						'description' => $row['affected_user'],
 						'content' => $display,
 						'hint' => $hint ? : null
 					],					

@@ -232,9 +232,9 @@ class RISK extends API {
 						'content' => $damages
 					], [
 						'type' => 'textsection',
-						'description' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below'),
 						'attributes' => [
 							'class' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
+							'name' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
 						]
 					], [
 						'type' => 'textarea',
@@ -260,9 +260,9 @@ class RISK extends API {
 						'content' => $measure_damages
 					], [
 						'type' => 'textsection',
-						'description' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below'),
 						'attributes' => [
 							'class' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
+							'name' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
 						]
 					], [
 						'type' => 'textarea',

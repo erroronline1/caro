@@ -136,7 +136,9 @@ class AUDIT extends API {
 			$current = $links = [];
 			$current[] = [
 				'type' => 'textsection',
-				'description' => strval($year),
+				'attributes' => [
+					'name' => strval($year)
+				],
 				'content' => LANG::GET('audit.complaints_summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
 			];
 			foreach ($cases as $identifier => $property){
@@ -268,7 +270,9 @@ class AUDIT extends API {
 		$formscontent = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.documents_in_use_documents'),
+				'attributes' => [
+					'name' => LANG::GET('audit.documents_in_use_documents')
+				],
 				'content' => ''
 			]
 		];
@@ -306,7 +310,9 @@ class AUDIT extends API {
 
 			$formscontent[] = [
 				'type' => 'textsection',
-				'description' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']]),
+				'attributes' => [
+					'name' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']])
+				],
 				'content' => $entry . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
 			];
 		}
@@ -314,7 +320,9 @@ class AUDIT extends API {
 		$externalcontent = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.documents_in_use_external'),
+				'attributes' => [
+					'name' => LANG::GET('audit.documents_in_use_external')
+				],
 				'content' => ''
 			]
 		];
@@ -323,7 +331,9 @@ class AUDIT extends API {
 				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(INI['application']['timezone']));
 				$externalcontent[] = [
 					'type' => 'textsection',
-					'description' => $file['path'],
+					'attributes' => [
+						'name' => $file['path']
+					],
 					'content' => LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => $date->format('Y-m-d H:i')])
 				];
 			}
@@ -332,7 +342,9 @@ class AUDIT extends API {
 		$bundlescontent = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.documents_in_use_bundles'),
+				'attributes' => [
+					'name' => LANG::GET('audit.documents_in_use_bundles')
+				],
 				'content' => ''
 			]
 		];
@@ -341,7 +353,9 @@ class AUDIT extends API {
 			natsort($formslist);
 			$bundlescontent[] = [
 				'type' => 'textsection',
-				'description' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']]),
+				'attributes' => [
+					'name' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']])
+				],
 				'content' => implode("\n", $formslist)
 			];
 		}
@@ -443,7 +457,9 @@ class AUDIT extends API {
 		if ($orderedunincorporated) $content[] = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.incorporation_warning_description'),
+				'attributes' => [
+					'name' => LANG::GET('audit.incorporation_warning_description')
+				],
 				'content' => LANG::GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
 			]
 		];
@@ -473,7 +489,9 @@ class AUDIT extends API {
 			}
 			$entries[] = [
 				'type' => 'textsection',
-				'description' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name'],
+				'attributes' => [
+					'name' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']
+				],
 				'content' => $incorporationInfo
 			];
 		}
@@ -499,7 +517,7 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($forms); $i++){
 			foreach($forms[$i] as $item){
-				if ($item['type'] === 'textsection') $summary['content'][$item['description']] = $item['content'];	
+				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])) $summary['content'][$item['attributes']['name']] = $item['content'];	
 			}
 		}
 		$downloadfiles = [];
@@ -569,7 +587,9 @@ class AUDIT extends API {
 		if ($unchecked) $content[] = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.mdrsamplecheck_warning_description'),
+				'attributes' => [
+					'name' => LANG::GET('audit.mdrsamplecheck_warning_description')
+				],
 				'content' => LANG::GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
 			]
 		];
@@ -593,11 +613,13 @@ class AUDIT extends API {
 		foreach($checks as $row){
 			$entries[] = [
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.check_description', [
-					':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
-					':date' => $row['date'],
-					':author' => $row['author']
-				]),
+				'attributes' => [
+					'name' => LANG::GET('audit.check_description', [
+						':check' => LANG::GET('audit.checks_type.' . $this->_requestedType),
+						':date' => $row['date'],
+						':author' => $row['author']
+					])
+				],
 				'content' => $row['content']
 			];
 			if(PERMISSION::permissionFor('auditsoperation')) $entries[] = [
@@ -632,7 +654,9 @@ class AUDIT extends API {
 		$content[] = [
 			[
 				'type' => 'textsection',
-				'description' => LANG::GET('audit.orderstatistics_number', [':number' => count($orders)]),
+				'attributes' => [
+					'name' => LANG::GET('audit.orderstatistics_number', [':number' => count($orders)])
+				],
 				'content' => count($orders) ? LANG::GET('audit.orderstatistics_info') : ''
 			]
 		];
@@ -806,7 +830,9 @@ class AUDIT extends API {
 			];
 			else $issues[] = [
 				'type' => 'textsection',
-				'description' => $issue,
+				'attributes' => [
+					'name' => $issue
+				],
 				'content' => LANG::GET('audit.regulatory_warning_content'),
 				'attributes' => [
 					'class' => 'red'
@@ -883,25 +909,29 @@ class AUDIT extends API {
 		foreach($risks as $risk){
 			if ($risk['process'] !== $process) $issues[] = [[
 				'type' => 'textsection',
-				'description' => $risk['process'],
+				'attributes' => [
+					'name' => $risk['process']
+				],
 			]];
 			$process = $risk['process'];
 			$last_edit = json_decode($risk['last_edit'], true);
 			$issues[count($issues)-1][] = [
 				'type' => 'textsection',
-				'description' => $risk['risk'] .
-				" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause'],
-				'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
-				" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
-				" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-				" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
-				" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
-				" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
-				" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
-				" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
-				" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
-				(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
+				'attributes' => [
+					'name' => $risk['risk'] .
+						" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause'],
+						'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
+						" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+						" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+						" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+						" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
+						" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+						" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+						" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+						" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
+						" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
+						(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
+				]
 			];
 		}
 		array_push($content, ...$issues);
@@ -927,7 +957,7 @@ class AUDIT extends API {
 		foreach($issues as $process){
 			foreach($process as $risk){
 				//var_dump($risk);
-				if ($risk['type'] === 'textsection') $summary['content'][$risk['description']] = isset($risk['content']) ? $risk['content'] : ' ';	
+				if ($risk['type'] === 'textsection' && isset($risk['attributes']['name'])) $summary['content'][$risk['attributes']['name']] = isset($risk['content']) ? $risk['content'] : ' ';	
 			}
 		}
 
@@ -994,7 +1024,9 @@ class AUDIT extends API {
 				if ($years){
 					$usercontent = [[
 						'type' => 'textsection',
-						'description' => $user['name'],
+						'attributes' => [
+							'name' => $user['name']
+						],
 					]];
 					foreach($years as $year => $summary){
 						$usercontent[] = [
@@ -1033,7 +1065,7 @@ class AUDIT extends API {
 		for($i = 1; $i < count($experience); $i++){
 			foreach($experience[$i] as $item){
 				if ($item['type'] === 'textsection') {
-					$previous = $item['description'];
+					$previous = $item['attributes']['name'];
 				}
 				if ($item['type'] === 'links') {
 					$summary['content'][$previous] = $item['description'];
@@ -1114,7 +1146,9 @@ class AUDIT extends API {
 			$content[] = [
 				[
 					'type' => 'textsection',
-					'description' => $user['name'],
+					'attributes' => [
+						'name' => $user['name']
+					],
 					'content' => $skillmatrix
 				]
 			];
@@ -1123,7 +1157,7 @@ class AUDIT extends API {
 				return $row['user_id'] === $user_id;
 			})){
 				foreach ($usertrainings as $row){
-					$attributes = [];
+					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
 						if ($expire < $today) $attributes = ['class' => 'red'];
@@ -1134,7 +1168,6 @@ class AUDIT extends API {
 					}
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
@@ -1151,7 +1184,9 @@ class AUDIT extends API {
 			$content = [
 				[
 					'type' => 'textsection',
-					'description' => LANG::GET('audit.userskills_warning_description'),
+					'attributes' => [
+						'name' => LANG::GET('audit.userskills_warning_description')
+					],
 					'content' => implode(', ', $unfulfilledskills)
 				],
 				...$content
@@ -1185,9 +1220,8 @@ class AUDIT extends API {
 			$content[] = [
 				[
 					'type' => 'textsection',
-					'description' => LANG::GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . LANG::GET('skills.' . $skill[0] . '.' . $skill[1]),
 					'content' => $users ? implode(', ', $users) : LANG::GET('audit.skillfulfilment_warning'),
-					'attributes' => $users ? [] : ['class' => 'red']
+					'attributes' => $users ? ['name' => LANG::GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . LANG::GET('skills.' . $skill[0] . '.' . $skill[1])] : ['class' => 'red', 'name' => LANG::GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . LANG::GET('skills.' . $skill[0] . '.' . $skill[1])]
 				]
 			];
 		}
@@ -1214,7 +1248,7 @@ class AUDIT extends API {
 		for($i = 1; $i < count($skills); $i++){
 			foreach($skills[$i] as $item){
 				if ($item['type'] === 'textsection') {
-					$summary['content'][$item['description']] = $item['content'];
+					$summary['content'][$item['attributes']['name']] = $item['content'];
 					$previous = $item['description'];
 				}
 				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
@@ -1285,7 +1319,9 @@ class AUDIT extends API {
 				if ($certificate['validity']) $info .= LANG::GET('consumables.edit_vendor_certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				$vendorlist[] = [
 					'type' => 'textsection',
-					'description' => $vendor['name'],
+					'attributes' => [
+						'name' => $vendor['name']
+					],
 					'content' => $info
 				];
 				
@@ -1324,7 +1360,7 @@ class AUDIT extends API {
 		$previous = ''; // given there's a text followed by links
 		foreach($vendors[1] as $item){
 			if ($item['type'] === 'textsection') {
-				$summary['content'][$item['description']] = $item['content'];
+				$summary['content'][$item['attributes']['name']] = $item['content'];
 				$previous = $item['description'];
 			}
 			if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));

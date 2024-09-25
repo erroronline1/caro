@@ -679,7 +679,9 @@ class TEXTTEMPLATE extends API {
 				}
 				if (count($useblocks)) $inputs[] = [
 					'type' => 'checkbox',
-					'description' => LANG::GET('texttemplate.use_blocks'),
+					'attributes' => [
+						'name' => LANG::GET('texttemplate.use_blocks')
+					],
 					'content' => $useblocks
 				];
 			}

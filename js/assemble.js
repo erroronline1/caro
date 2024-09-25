@@ -557,10 +557,10 @@ export class Assemble {
 			} catch (e) {
 				this.currentElement = {
 					type: "textsection",
-					description: LANG.GET("assemble.error_faulty_widget"),
 					content: JSON.stringify(elements, null, " "),
 					attributes: {
 						class: "red",
+						name: LANG.GET("assemble.error_faulty_widget"),
 					},
 				};
 				content = content.concat(this.textsection());
@@ -775,7 +775,7 @@ export class Assemble {
 	}
 
 	header() {
-		if (this.currentElement.description === undefined) return [];
+		if (!this.currentElement.description) return [];
 		let header = document.createElement("header");
 		header.appendChild(document.createTextNode(this.currentElement.description.replace(/\[\]|DEFAULT_/g, "")));
 		header.setAttribute("data-type", this.currentElement.type);
@@ -903,7 +903,9 @@ export class Assemble {
 	checkbox(radio = null) {
 		/*{
 			type: 'checkbox', or 'radio'
-			description:'checkboxes',
+			attributes:{
+				name: 'checkboxes or radio', // grouping name for checkboxes, formerly description
+			}
 			numeration: anything resulting in true to prevent enumeration
 			content: {
 				'Checkbox 1': {
@@ -915,6 +917,7 @@ export class Assemble {
 			},
 			hint: 'this selection is for...'
 		}*/
+		this.currentElement.description = (this.currentElement.attributes && this.currentElement.attributes.name) ? this.currentElement.attributes.name.replace(/\[\]/g, "") : null;
 		const result = [...this.header()],
 			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
@@ -1216,7 +1219,7 @@ export class Assemble {
 			data-filtered: any
 		}*/
 		let result = [...this.header()];
-		if (this.currentElement.attributes !== undefined) result.push(this.hidden());
+		if (this.currentElement.attributes !== undefined) result.push(this.hidden()); // applying data-filtered for css rules
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);
@@ -1490,7 +1493,6 @@ export class Assemble {
 	}
 
 	radio() {
-		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		return this.checkbox("radioinstead");
 	}
 
@@ -1844,18 +1846,20 @@ export class Assemble {
 	textsection() {
 		/* {
 			type: 'textsection',
-			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
 			linkedcontent: may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>
 			attributes: {
-				attribute: value // applies to header
+				attribute: value, // applies to header
+				name: 'very informative', content of header, former description
 			}
 		}*/
 		let result = [],
 			p,
 			content;
-		if (this.currentElement.description) {
+		if (this.currentElement.attributes && this.currentElement.attributes.name) {
+			this.currentElement.description = this.currentElement.attributes.name;
 			result = result.concat(this.header());
+			delete this.currentElement.attributes.name;
 		}
 		if (this.currentElement.content) {
 			content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);

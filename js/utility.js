@@ -284,12 +284,13 @@ const _client = {
 							},
 							{
 								type: "textsection",
-								description: LANG.GET("order.added_product", {
+								attributes: {
+									name: LANG.GET("order.added_product", {
 									":unit": data[1],
 									":number": data[2],
 									":name": data[3],
 									":vendor": data[5],
-								}),
+								})},
 							},
 							{
 								type: "hidden",

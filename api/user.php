@@ -179,7 +179,9 @@ class USER extends API {
 				$result['render'] = ['content' => [
 						[
 							['type' => 'textsection',
-							'description' => LANG::GET('user.display_user'),
+							'attributes' => [
+								'name' => LANG::GET('user.display_user')
+							],
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
 								LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" .
@@ -237,7 +239,9 @@ class USER extends API {
 				$result['render']['content'][] = [
 					[
 						'type' => 'checkbox',
-						'description' => LANG::GET('user.settings'),
+						'attributes' => [
+							'name' => LANG::GET('user.settings')
+						],
 						'content' => [
 							LANG::GET('user.settings_force_desktop') => [],
 							LANG::GET('user.settings_homeoffice') => [],
@@ -278,18 +282,17 @@ class USER extends API {
 				]);
 				$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				foreach ($trainings as $row){
-					$attributes = [];
+					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
-						if ($expire < $today) $attributes = ['class' => 'red'];
+						if ($expire < $today) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
-							if ($expire < $today) $attributes = ['class' => 'orange'];
+							if ($expire < $today) $attributes['class'] = 'orange';
 						}
 					}
 					$result['render']['content'][0][] = [
 						'type' => 'textsection',
-						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
@@ -688,18 +691,17 @@ class USER extends API {
 				]);
 				$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
 				foreach ($trainings as $row){
-					$attributes = [];
+					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
-						if ($expire < $today) $attributes = ['class' => 'red'];
+						if ($expire < $today) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
-							if ($expire < $today) $attributes = ['class' => 'orange'];
+							if ($expire < $today) $attributes['class'] = 'orange';
 						}
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
@@ -796,13 +798,17 @@ class USER extends API {
 						],
 						[
 							'type' => 'checkbox',
-							'description' => LANG::GET('user.edit_permissions'),
+							'attributes' => [
+								'name' => LANG::GET('user.edit_permissions')
+							],
 							'content' => $permissions,
 							'hint' => LANG::GET('user.edit_permissions_hint')
 						],
 						[
 							'type' => 'checkbox',
-							'description' => LANG::GET('user.edit_units'),
+							'attributes' => [
+								'name' => LANG::GET('user.edit_units')
+							],
 							'content' => $units,
 							'hint' => LANG::GET('user.edit_units_hint')
 						]
@@ -858,7 +864,9 @@ class USER extends API {
 					[
 						[
 							'type' => 'checkbox',
-							'description' => LANG::GET('user.edit_token'),
+							'attributes' => [
+								'name' => LANG::GET('user.edit_token')
+							],
 							'content' => [
 								LANG::GET('user.edit_token_renew') => []
 							]

@@ -76,8 +76,8 @@ export const compose_helper = {
 			elementName,
 			value;
 		const setName = {
-				name: ["select", "scanner", "radio", "photo", "file", "signature"],
-				description: ["links", "checkbox", "textsection"],
+				name: ["select", "scanner", "radio", "photo", "file", "signature", "textselection", "checkbox"],
+				description: ["links"],
 			},
 			buttonValues = {
 				calendarbutton: LANG.GET("planning.event_new"),
@@ -137,7 +137,7 @@ export const compose_helper = {
 				}
 			} else if (["textsection"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_textsection_description")) {
-					if (value) element.description = value;
+					if (value) element.attributes.name = value;
 					else return;
 				}
 				if (elementName === LANG.GET("assemble.compose_textsection_content") && value) {
@@ -220,7 +220,9 @@ export const compose_helper = {
 				[
 					{
 						type: "textsection",
-						description: key,
+						attributes: {
+							name: key,
+						},
 						content: _client.texttemplate.data[key],
 					},
 				],
@@ -447,7 +449,9 @@ export const compose_helper = {
 			for (const key of paragraph) {
 				texts.content.push({
 					type: "textsection",
-					description: key,
+					attributes: {
+						name: key,
+					},
 					content: _client.texttemplate.data[key],
 				});
 				texts.keys.push(key);
@@ -625,8 +629,8 @@ export const compose_helper = {
 						setTo,
 						elementName;
 					const setName = {
-						name: ["select", "scanner", "radio", "photo", "file", "signature"],
-						description: ["links", "checkbox"],
+						name: ["select", "scanner", "radio", "photo", "file", "signature", "checkbox"],
+						description: ["links"],
 					};
 					do {
 						if (!["input", "textarea"].includes(sibling.localName)) {
@@ -670,7 +674,7 @@ export const compose_helper = {
 						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
 						} else if (["textsection"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_textsection_description")) sibling.value = importable.description;
+							if (elementName === LANG.GET("assemble.compose_textsection_description")) sibling.value = importable.attributes.name;
 							if (elementName === LANG.GET("assemble.compose_textsection_content")) if (importable.content) sibling.value = importable.content;
 						} else if (["range"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
@@ -858,8 +862,8 @@ export class Compose extends Assemble {
 			type: "textsection",
 			attributes: {
 				"data-type": "calendarbutton",
+				name: LANG.GET("assemble.compose_calendarbutton"),
 			},
-			description: LANG.GET("assemble.compose_calendarbutton"),
 			content: LANG.GET("assemble.compose_calendarbutton_not_working"),
 		};
 		result = result.concat(...this.textsection());
@@ -1084,8 +1088,8 @@ export class Compose extends Assemble {
 			type: "textsection",
 			attributes: {
 				"data-type": "formbutton",
+				name: LANG.GET("assemble.compose_link_form"),
 			},
-			description: LANG.GET("assemble.compose_link_form"),
 		};
 		result = result.concat(...this.textsection());
 

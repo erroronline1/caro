@@ -200,7 +200,9 @@ class FORM extends API {
 							[
 								'type' => 'checkbox',
 								'content' => $approvalposition,
-								'description' => LANG::GET('assemble.approve_as_select')
+								'attributes' => [
+									'name' => LANG::GET('assemble.approve_as_select')
+								]
 							]
 						]
 					);
@@ -711,7 +713,9 @@ class FORM extends API {
 				],[
 					[[
 						'type' => 'textsection',
-						'description' => LANG::GET('assemble.edit_components_info_description'),
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_components_info_description')
+						],
 						'content' => LANG::GET('assemble.edit_components_info_content')
 					]], [[
 						'form' => true,
@@ -1146,7 +1150,9 @@ class FORM extends API {
 				], [
 					[
 						'type' => 'textsection',
-						'description' => LANG::GET('assemble.edit_forms_info_description'),
+						'attributes' => [
+							'name' => LANG::GET('assemble.edit_forms_info_description')
+						],
 						'content' => LANG::GET('assemble.edit_forms_info_content')
 					], [
 						'type' => 'select',

@@ -132,7 +132,9 @@ class APPLICATION extends API {
 		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
 				'type' => 'textsection',
-				'description' => $description,
+				'attributes' => [
+					'name' => $description,
+				],
 				'content' => strtr($content, $replacements)
 			]];
 		}
@@ -280,39 +282,46 @@ class APPLICATION extends API {
 
 				$result['render']['content'] = [
 					[
-						['type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('application.edit_select_manual_topic'),
-							'onchange' => "api.application('get', 'manual', this.value)"
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => LANG::GET('application.edit_select_manual_topic'),
+								'onchange' => "api.application('get', 'manual', this.value)"
+							],
+							'content' => $options
 						],
-						'content' => $options],
-						['type' => 'text',
-						'attributes' => [
-							'name' => LANG::GET('application.edit_manual_title'),
-							'value' => $entry['title'],
-
-						]
+						[
+							'type' => 'text',
+							'attributes' => [
+								'name' => LANG::GET('application.edit_manual_title'),
+								'value' => $entry['title'],
+							]
 						],
-						['type' => 'textarea',
-						'attributes' => [
-							'rows' => 8,
-							'name' => LANG::GET('application.edit_manual_content'),
-							'value' => $entry['content']
-						]
+						[
+							'type' => 'textarea',
+							'attributes' => [
+								'rows' => 8,
+								'name' => LANG::GET('application.edit_manual_content'),
+								'value' => $entry['content']
+							]
 						],
-						['type' => 'checkbox',
-						'description' => LANG::GET('application.edit_manual_permissions'),
-						'content' => $permissions
+						[
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => LANG::GET('application.edit_manual_permissions')
+							],
+							'content' => $permissions
 						]
 					]
 				];
 				if ($entry['id']) $result['render']['content'][] = [
-						['type' => 'deletebutton',
-						'attributes' => [
-							'value' => LANG::GET('application.edit_manual_delete'),
-							'type' => 'button',
-							'onpointerup' => "if (confirm('" . LANG::GET('application.edit_manual_delete_confirm') . "')) api.application('delete', 'manual', " . $entry['id'] . ")"
-						]
+						[
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => LANG::GET('application.edit_manual_delete'),
+								'type' => 'button',
+								'onpointerup' => "if (confirm('" . LANG::GET('application.edit_manual_delete_confirm') . "')) api.application('delete', 'manual', " . $entry['id'] . ")"
+							]
 						]
 				];
 	
@@ -447,9 +456,9 @@ class APPLICATION extends API {
 					[
 						'type' => 'textsection',
 						'content' => LANG::GET('application.overview_messages', [':number' => $unseen]),
-						'description' => LANG::GET('menu.message_conversations'),
 						'attributes' => [
-							'data-type' => 'message'
+							'data-type' => 'message',
+							'name' => LANG::GET('menu.message_conversations')
 						]
 					]
 				]
@@ -469,9 +478,9 @@ class APPLICATION extends API {
 						[
 							'type' => 'textsection',
 							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed]),
-							'description' => LANG::GET('menu.purchase_approved_orders'),
 							'attributes' => [
-								'data-type' => 'purchase'
+								'data-type' => 'purchase',
+								'name' => LANG::GET('menu.purchase_approved_orders')
 							]
 						]
 					]
@@ -491,9 +500,9 @@ class APPLICATION extends API {
 					[
 						'type' => 'textsection',
 						'content' => LANG::GET('application.overview_cases', [':number' => $number]),
-						'description' => LANG::GET('menu.record_header'),
 						'attributes' => [
-							'data-type' => 'record'
+							'data-type' => 'record',
+							'name' => LANG::GET('menu.record_header')
 						]
 					]
 				]
@@ -512,9 +521,9 @@ class APPLICATION extends API {
 					[
 						'type' => 'textsection',
 						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
-						'description' => LANG::GET('menu.forms_manage_approval'),
 						'attributes' => [
-							'data-type' => 'record'
+							'data-type' => 'record',
+							'name' => LANG::GET('menu.forms_manage_approval')
 						]
 					]
 				]
@@ -533,9 +542,9 @@ class APPLICATION extends API {
 					[
 						'type' => 'textsection',
 						'content' => LANG::GET('consumables.approve_landing_page', [':number' => $unapproved]),
-						'description' => LANG::GET('menu.purchase_incorporated_pending'),
 						'attributes' => [
-							'data-type' => 'purchase'
+							'data-type' => 'purchase',
+							'name' => LANG::GET('menu.purchase_incorporated_pending')
 						]
 					]
 				]
@@ -554,9 +563,9 @@ class APPLICATION extends API {
 					[
 						'type' => 'textsection',
 						'content' => LANG::GET('record.record_complaints_landing_page', [':number' => $complaints]),
-						'description' => LANG::GET('menu.record_header'),
 						'attributes' => [
-							'data-type' => 'record'
+							'data-type' => 'record',
+							'name' => LANG::GET('menu.record_header')
 						]
 					]
 				]
@@ -585,12 +594,16 @@ class APPLICATION extends API {
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'textsection',
-			'description' => LANG::GET('calendar.events_assigned_units'),
+			'attributes' => [
+					'name' => LANG::GET('calendar.events_assigned_units')
+			],
 			'content' => $displayevents
 		];
 		if ($displayabsentmates) $overview[] = [
 			'type' => 'textsection',
-			'description' => LANG::GET('calendar.timesheet_irregular'),
+			'attributes' => [
+					'name' => LANG::GET('calendar.timesheet_irregular')
+			],
 			'content' => $displayabsentmates
 		];
 
@@ -615,7 +628,9 @@ class APPLICATION extends API {
 			if (PERMISSION::permissionIn($row['permissions'])) $topics[]=
 				[[
 					'type' => 'textsection',
-					'description' => $row['title'],
+					'attributes' => [
+						'name' => $row['title']
+					],
 					'content' => $row['content']
 				]];
 		}
