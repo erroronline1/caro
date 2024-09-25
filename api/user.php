@@ -178,7 +178,7 @@ class USER extends API {
 
 				$result['render'] = ['content' => [
 						[
-							['type' => 'textblock',
+							['type' => 'textsection',
 							'description' => LANG::GET('user.display_user'),
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
@@ -288,7 +288,7 @@ class USER extends API {
 						}
 					}
 					$result['render']['content'][0][] = [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
@@ -698,7 +698,7 @@ class USER extends API {
 						}
 					}
 					$skillmatrix[0][] = [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date'],
 						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes

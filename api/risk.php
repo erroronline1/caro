@@ -231,7 +231,7 @@ class RISK extends API {
 						],
 						'content' => $damages
 					], [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below'),
 						'attributes' => [
 							'class' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
@@ -259,7 +259,7 @@ class RISK extends API {
 						],
 						'content' => $measure_damages
 					], [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below'),
 						'attributes' => [
 							'class' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',

@@ -556,14 +556,14 @@ export class Assemble {
 				if (elements.type) content = content.concat(this[elements.type]());
 			} catch (e) {
 				this.currentElement = {
-					type: "textblock",
+					type: "textsection",
 					description: LANG.GET("assemble.error_faulty_widget"),
 					content: JSON.stringify(elements, null, " "),
 					attributes: {
 						class: "red",
 					},
 				};
-				content = content.concat(this.textblock());
+				content = content.concat(this.textsection());
 				console.trace(e);
 			}
 		}
@@ -1841,9 +1841,9 @@ export class Assemble {
 		return [...this.icon(), label, textarea, ...hint];
 	}
 
-	textblock() {
+	textsection() {
 		/* {
-			type: 'textblock',
+			type: 'textsection',
 			description: 'very informative',
 			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
 			linkedcontent: may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>

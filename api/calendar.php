@@ -355,7 +355,7 @@ class CALENDAR extends API {
 		$dbevents = $calendar->search($this->_requestedId);
 		$events = [
 			[
-				'type' => 'textblock',
+				'type' => 'textsection',
 				'description' => LANG::GET ('calendar.events_none')
 			]
 		];
@@ -535,7 +535,7 @@ class CALENDAR extends API {
 					}
 
 					$events[] = [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => $this->_requestedDate,
 						'content' => $displayabsentmates,
 						'attributes' => [
@@ -564,7 +564,7 @@ class CALENDAR extends API {
 						if ($pastEvents){
 							$events = [
 								[
-									'type' => 'textblock',
+									'type' => 'textsection',
 									'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
 									'attributes' => [
 										'data-type' => 'calendar'
@@ -634,7 +634,7 @@ class CALENDAR extends API {
 				'type' => 'tile',
 				'content' => [
 					[
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'attributes' => [
 							'data-type' => $row['alert'] ? 'alert' : 'text'
 						],
@@ -867,7 +867,7 @@ class CALENDAR extends API {
 							) $bulkapproval[] = $row['id'];
 					}
 					$events[] = [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => $this->_requestedDate,
 						'content' => $displayabsentmates,
 						'attributes' => [
@@ -924,7 +924,7 @@ class CALENDAR extends API {
 						if ($pastEvents){
 							$events = [
 								[
-									'type' => 'textblock',
+									'type' => 'textsection',
 									'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
 									'attributes' => [
 										'data-type' => 'calendar'
@@ -1005,7 +1005,7 @@ class CALENDAR extends API {
 				'type' => 'tile',
 				'content' => [
 					[
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'attributes' => [
 							'data-type' => $row['alert'] ? 'alert' : 'text'
 						],

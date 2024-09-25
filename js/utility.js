@@ -283,7 +283,7 @@ const _client = {
 								},
 							},
 							{
-								type: "textblock",
+								type: "textsection",
 								description: LANG.GET("order.added_product", {
 									":unit": data[1],
 									":number": data[2],

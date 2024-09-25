@@ -511,7 +511,7 @@ class ORDER extends API {
 							]
 					];
 					$content[] = [
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => LANG::GET('order.ordertype.' . $row['ordertype']),
 						'content' => $text,
 						'attributes' => [
@@ -533,7 +533,7 @@ class ORDER extends API {
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($special_attention, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $special_attention[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => LANG::GET('consumables.edit_product_special_attention'),
 								'attributes' => [
 									'class' => 'orange'
@@ -663,7 +663,7 @@ class ORDER extends API {
 							} else {
 								// simple groups are not allowed to make records
 								$content[] = [
-									'type' => 'textblock',
+									'type' => 'textsection',
 									'description' => LANG::GET('order.incorporation_neccessary_by_user')
 								];
 							}
@@ -672,7 +672,7 @@ class ORDER extends API {
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($incorporationdenied, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => LANG::GET('order.incorporation_denied')
 							];
 						}
@@ -680,7 +680,7 @@ class ORDER extends API {
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($pendingincorporation, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							$content[] = [
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => LANG::GET('order.incorporation_pending')
 							];
 						}
@@ -701,7 +701,7 @@ class ORDER extends API {
 							} else {
 								// simple groups are not allowed to make records
 								$content[] = [
-									'type' => 'textblock',
+									'type' => 'textsection',
 									'description' => LANG::GET('order.sample_check_by_user')
 								];
 							}
@@ -1140,7 +1140,7 @@ class ORDER extends API {
 								]
 							],
 							[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => LANG::GET('order.added_product', [
 									':unit' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : '',
 									':number' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : '',
@@ -1472,10 +1472,10 @@ class ORDER extends API {
 						}
 						array_push($result['render']['content'], [
 							[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'content' => $items,
 							],[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'content' => $info,
 							], [
 								'type' => 'checkbox',
@@ -1668,7 +1668,7 @@ class ORDER extends API {
 					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
 						$matches[$article][] = [
 							[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
 							]
 						];
@@ -1683,7 +1683,7 @@ class ORDER extends API {
 								],
 								'content' => [
 									[
-										'type' => 'textblock',
+										'type' => 'textsection',
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
 									]
 								]
@@ -1697,7 +1697,7 @@ class ORDER extends API {
 								],
 								'content' => [
 									[
-										'type' => 'textblock',
+										'type' => 'textsection',
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
 									]
 								]
@@ -1729,7 +1729,7 @@ class ORDER extends API {
 									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
 								],
 								'content' => [
-									['type' => 'textblock',
+									['type' => 'textsection',
 									'description' => $incorporationState,
 									'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 								]
@@ -1737,7 +1737,7 @@ class ORDER extends API {
 					}
 				}
 				if (!$matches[0]) $matches[0][] = [
-					['type' => 'textblock',
+					['type' => 'textsection',
 					'description' => LANG::GET('order.add_product_search_matches', [':number' => count($search)]),
 					]
 				];

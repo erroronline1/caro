@@ -240,7 +240,7 @@ class RECORD extends API {
 				}
 				else {
 					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton', 'formbutton'])) continue;
-					if (in_array($subs['type'], ['checkbox', 'textblock', 'image'])) {
+					if (in_array($subs['type'], ['checkbox', 'textsection', 'image'])) {
 						$name = $subs['description'];
 					}
 					else $name = $subs['attributes']['name'];
@@ -264,8 +264,8 @@ class RECORD extends API {
 							$content['content'][$name]['value'][] = $selected . $key;
 						}
 					}
-					elseif ($subs['type']==='textblock'){
-						$content['content'][$name] = ['type' => 'textblock', 'value' => isset($subs['content']) ? $subs['content'] : ''];
+					elseif ($subs['type']==='textsection'){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
 					}
 					elseif ($subs['type']==='textarea'){
 						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
@@ -281,7 +281,7 @@ class RECORD extends API {
 						}
 					}
 					elseif ($subs['type']==='range'){
-						$content['content'][$name] = ['type' => 'textblock', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
+						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
 					}
 					else {
 						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
@@ -375,7 +375,7 @@ class RECORD extends API {
 					if ($saveable = saveable($subs)) return true;
 				}
 				else {
-					if (!in_array($subs['type'], ['textblock', 'image', 'links', 'hidden', 'button'])) return true;
+					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'hidden', 'button'])) return true;
 				}
 			}
 			return $saveable;
@@ -458,7 +458,7 @@ class RECORD extends API {
 		else {
 			$return['render']['content'][] = [
 				[
-					'type' => 'textblock',
+					'type' => 'textsection',
 					'description' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
 				]
 			];
@@ -679,7 +679,7 @@ class RECORD extends API {
 					'content'=>[
 						[
 							[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => LANG::GET('record.create_identifier_info')
 							], [
 								'type' => 'scanner',
@@ -802,7 +802,7 @@ class RECORD extends API {
 		];
 		else $return['render'] =[
 			[
-				'type' => 'textblock',
+				'type' => 'textsection',
 				'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
 			]
 		];
@@ -952,7 +952,7 @@ class RECORD extends API {
 				$content = $this->summarizeRecord('full', PERMISSION::permissionFor('recordsretyping'));
 				$body[] = [
 					[
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => LANG::GET('record.create_identifier'),
 						'content' => $this->_requestedID
 					], [
@@ -985,14 +985,14 @@ class RECORD extends API {
 					if ($form === LANG::GET('record.record_retype_pseudoform_name')) continue;
 					$body[] = [
 						[
-							'type' => 'textblock',
+							'type' => 'textsection',
 							'description' => $form
 						]
 					];
 					foreach($entries as $key => $value){
 						array_push($body[count($body) -1],
 							[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => $key,
 								'linkedcontent' => $value
 							]); 
@@ -1064,14 +1064,14 @@ class RECORD extends API {
 					$entries = $content['content'][LANG::GET('record.record_retype_pseudoform_name')];
 					$body[] = [
 						[
-							'type' => 'textblock',
+							'type' => 'textsection',
 							'description' => LANG::GET('record.record_retype_pseudoform_name')
 						]
 					];
 					foreach($entries as $key => $value){
 						array_push($body[count($body) -1],
 							[
-								'type' => 'textblock',
+								'type' => 'textsection',
 								'description' => $key,
 								'linkedcontent' => $value
 							]); 
@@ -1128,7 +1128,7 @@ class RECORD extends API {
 					$approvalposition = [];
 					foreach ($content['closed'] as $role => $property){
 						array_unshift($return['render']['content'][count($return['render']['content']) - 1], [
-							'type' => 'textblock',
+							'type' => 'textsection',
 							'description' => LANG::GET('record.record_closed', [':role' => LANG::GET('permissions.' . $role), ':name' => $property['name'], ':date' => $property['date']])
 						]);
 					}

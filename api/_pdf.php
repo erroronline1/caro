@@ -177,7 +177,7 @@ class PDF{
 				$pdf->SetFont('helvetica', '', 10); // font size
 				$originalFontSize = $pdf->getFontSizePt();
 				switch ($value['type']){
-					case 'textblock':
+					case 'textsection':
 						$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 						break;
 					case 'image':

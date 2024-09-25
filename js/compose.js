@@ -77,7 +77,7 @@ export const compose_helper = {
 			value;
 		const setName = {
 				name: ["select", "scanner", "radio", "photo", "file", "signature"],
-				description: ["links", "checkbox", "textblock"],
+				description: ["links", "checkbox", "textsection"],
 			},
 			buttonValues = {
 				calendarbutton: LANG.GET("planning.event_new"),
@@ -135,12 +135,12 @@ export const compose_helper = {
 						}
 					}
 				}
-			} else if (["textblock"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_textblock_description")) {
+			} else if (["textsection"].includes(element.type)) {
+				if (elementName === LANG.GET("assemble.compose_textsection_description")) {
 					if (value) element.description = value;
 					else return;
 				}
-				if (elementName === LANG.GET("assemble.compose_textblock_content") && value) {
+				if (elementName === LANG.GET("assemble.compose_textsection_content") && value) {
 					element.content = value;
 				}
 			} else if (["formbutton"].includes(element.type)) {
@@ -219,7 +219,7 @@ export const compose_helper = {
 			content: [
 				[
 					{
-						type: "textblock",
+						type: "textsection",
 						description: key,
 						content: _client.texttemplate.data[key],
 					},
@@ -446,7 +446,7 @@ export const compose_helper = {
 			let texts = { content: [], keys: [] };
 			for (const key of paragraph) {
 				texts.content.push({
-					type: "textblock",
+					type: "textsection",
 					description: key,
 					content: _client.texttemplate.data[key],
 				});
@@ -669,9 +669,9 @@ export const compose_helper = {
 							}
 						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
-						} else if (["textblock"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_textblock_description")) sibling.value = importable.description;
-							if (elementName === LANG.GET("assemble.compose_textblock_content")) if (importable.content) sibling.value = importable.content;
+						} else if (["textsection"].includes(importable.type)) {
+							if (elementName === LANG.GET("assemble.compose_textsection_description")) sibling.value = importable.description;
+							if (elementName === LANG.GET("assemble.compose_textsection_content")) if (importable.content) sibling.value = importable.content;
 						} else if (["range"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
 							if (elementName === LANG.GET("assemble.compose_range_min")) sibling.value = importable.attributes.min;
@@ -855,14 +855,14 @@ export class Compose extends Assemble {
 	compose_calendarbutton() {
 		let result = [this.br()];
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
 				"data-type": "calendarbutton",
 			},
 			description: LANG.GET("assemble.compose_calendarbutton"),
 			content: LANG.GET("assemble.compose_calendarbutton_not_working"),
 		};
-		result = result.concat(...this.textblock());
+		result = result.concat(...this.textsection());
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_calendarbutton"),
@@ -1081,13 +1081,13 @@ export class Compose extends Assemble {
 			options = {};
 
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
 				"data-type": "formbutton",
 			},
 			description: LANG.GET("assemble.compose_link_form"),
 		};
-		result = result.concat(...this.textblock());
+		result = result.concat(...this.textsection());
 
 		this.currentElement = {
 			type: "select",
@@ -1158,7 +1158,7 @@ export class Compose extends Assemble {
 		};
 		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
@@ -1216,7 +1216,7 @@ export class Compose extends Assemble {
 		};
 		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
@@ -1305,7 +1305,7 @@ export class Compose extends Assemble {
 		};
 		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
@@ -1409,7 +1409,7 @@ export class Compose extends Assemble {
 		};
 		result = result.concat(...this.text());
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
@@ -1473,12 +1473,12 @@ export class Compose extends Assemble {
 		});
 	}
 
-	compose_textblock() {
+	compose_textsection() {
 		let result = [];
 		this.currentElement = {
-			type: "textblock",
+			type: "textsection",
 			attributes: {
-				name: LANG.GET("assemble.compose_textblock_description"),
+				name: LANG.GET("assemble.compose_textsection_description"),
 				required: true,
 			},
 		};
@@ -1486,14 +1486,14 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textarea",
 			attributes: {
-				name: LANG.GET("assemble.compose_textblock_content"),
+				name: LANG.GET("assemble.compose_textsection_content"),
 				rows: 5,
 			},
 		};
 		result = result.concat(...this.textarea());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_textblock"),
+				value: LANG.GET("assemble.compose_textsection"),
 				"data-type": "addblock",
 			},
 		};

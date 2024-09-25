@@ -521,7 +521,7 @@ export const api = {
 					const dialog = {
 						type: "input",
 						render: [
-							{ type: "textblock", content: data.log.join("\n") },
+							{ type: "textsection", content: data.log.join("\n") },
 							{ type: "links", content: data.links },
 						],
 					};

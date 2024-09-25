@@ -710,7 +710,7 @@ class FORM extends API {
 					]
 				],[
 					[[
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => LANG::GET('assemble.edit_components_info_description'),
 						'content' => LANG::GET('assemble.edit_components_info_content')
 					]], [[
@@ -719,8 +719,8 @@ class FORM extends API {
 						'description' => LANG::GET('assemble.compose_scanner')
 					]], [[
 						'form' => true,
-						'type' => 'compose_textblock',
-						'description' => LANG::GET('assemble.compose_textblock')
+						'type' => 'compose_textsection',
+						'description' => LANG::GET('assemble.compose_textsection')
 					]], [[
 						'form' => true,
 						'type' => 'compose_image',
@@ -1145,7 +1145,7 @@ class FORM extends API {
 					]
 				], [
 					[
-						'type' => 'textblock',
+						'type' => 'textsection',
 						'description' => LANG::GET('assemble.edit_forms_info_description'),
 						'content' => LANG::GET('assemble.edit_forms_info_content')
 					], [

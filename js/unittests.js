@@ -165,7 +165,7 @@ export function rendertest(element) {
 						},
 					},
 					{
-						type: "textblock",
+						type: "textsection",
 						description: "Informative text",
 						content: "...to inform users about important things",
 					},
@@ -321,7 +321,7 @@ export function rendertest(element) {
 						},
 					},
 					{
-						type: "textblock",
+						type: "textsection",
 						description: "Informativer Text",
 						content: "...um Nutzer über wichtige Dinge zu informieren",
 					},
@@ -555,8 +555,8 @@ export function rendertest(element) {
 				],
 				[
 					{
-						type: "textblock",
-						description: "Highlighted textblock descriptions are possible",
+						type: "textsection",
+						description: "Highlighted textsection descriptions are possible",
 						content: "Available class options are red, orange, yellow and green",
 						attributes: {
 							class: "green",
@@ -609,8 +609,8 @@ export function rendertest(element) {
 						type: "tile",
 						content: [
 							{
-								type: "textblock",
-								description: "Textblock on a tile",
+								type: "textsection",
+								description: "textsection on a tile",
 								content: "This is a third width. As seen on landing page.",
 							},
 						],
@@ -631,14 +631,14 @@ export function rendertest(element) {
 				[
 					[
 						{
-							type: "textblock",
+							type: "textsection",
 							description: "Sliding panels are possible as well",
 							content: "Just try not to distract or obfuscate. Mobile view is just swiping, desktop view has supporting buttons.",
 						},
 					],
 					[
 						{
-							type: "textblock",
+							type: "textsection",
 							description: "It's just another layer of nesting",
 							content: "All options above are valid. As seen in user manager",
 						},
@@ -740,7 +740,7 @@ export function rendertest(element) {
 				],
 				[
 					{
-						type: "textblock",
+						type: "textsection",
 						description: "Hervorgehobene Textüberschriften sind möglich",
 						content: "Verfügbare CSS-Klassen sind red, orange, yellow and green",
 						attributes: {
@@ -794,8 +794,8 @@ export function rendertest(element) {
 						type: "tile",
 						content: [
 							{
-								type: "textblock",
-								description: "Textblock auf einer Kachel",
+								type: "textsection",
+								description: "textsection auf einer Kachel",
 								content: "Dies ist ein Drittel der Breite, Verwendet auf der Startseite",
 							},
 						],
@@ -816,14 +816,14 @@ export function rendertest(element) {
 				[
 					[
 						{
-							type: "textblock",
+							type: "textsection",
 							description: "Verschiebliche Tafeln sind ebenfalls möglich",
 							content: "Versuche nur möglichst nicht zu verwirren oder abzulenken. Auf mobilen Geräten muss nur gewischt werden, die Desktop-Ansicht hat auch Knöpfe.",
 						},
 					],
 					[
 						{
-							type: "textblock",
+							type: "textsection",
 							description: "Dies ist nur eine zusätzlich Verschachtelungsebene",
 							content: "Alle Optionen sind möglich. Verwendet in der Nutzerverwaltung.",
 						},

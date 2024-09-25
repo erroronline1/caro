@@ -1429,7 +1429,7 @@ button[data-type="submitbutton"]::before {
 	mask-image: url("./media/copy.svg");
 }
 
-[data-type="textblock"]::before {
+[data-type="textsection"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/info-circle.svg");
 	mask-image: url("./media/info-circle.svg");

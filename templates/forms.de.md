@@ -109,19 +109,19 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Datenverarbeitung durch und Auftragserteilung an",
 			"content": "Universitätsklinikum Heidelberg, Zentrum für Orthopädie, Unfallchirurgie und Paraplegiologie \\nAbteilung Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg"
 		}
 	],
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Information zur Datenverarbeitung",
 			"content": "Die Bereitstellung und Verarbeitung Ihrer Daten ist im Rahmen Ihrer Versorgung in unserem Haus erforderlich und Bestandteil des Behandlungsvertrags. Bei Bedarf stellen wir Ihnen diese Informationen auch in einem größeren Ausdruck zur Verfügung. Allgemein gilt die Erklärung zur Datenverarbeitung und Datenschutz des Universitätsklinikums Heidelberg. \\nVerarbeitungszwecke im Rahmen Ihrer Hilfsmittelversorgung: Hilfsmittelversorgung, Patientenverwaltung und Abrechnung, interdisziplinäre Konferenzen zur Analyse und Erörterung von Diagnostik und Therapie, Versorgungsdokumentation, Erstellung von Berichten und Stellungnahmen, Qualitätssicherung in Versorgung und ihrer Organisation, Unterrichtung von Mit-/Weiterversorgern im erforderlichen Umfang, Eingabe der Adressdaten und ggf. Rufnummer an Versanddienstleister, Kontaktaufnahme auch hinsichtlich eines Erinnerungsservices nach Versorgungsabschluss."
 		},
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Auftragserteilung",
 			"content": "Ich wurde darüber aufgeklärt, dass mir die Wahl eines Leistungserbringers zur Anfertigung bzw. Versorgung mit einem Hilfsmittel freisteht. In diesem Rahmen beauftrage ich den oben genannten Leistungserbringer. Ich wurde vor Inanspruchnahme der Leistung/en darüber beraten, welche/s Hilfsmittel und zusätzliche/n Leistung/en nach § 33 SGB V für die konkrete Versorgungssituation im Einzelfall geeignet und notwendig ist/sind. Ich bin über die Möglichkeit einer aufzahlungsfreien Versorgung, die der vertragsärztlichen Verordnung entspricht und ihren Zweck voll erfüllt, informiert worden. Die gesetzliche Zuzahlung bleibt davon unberührt. Maß- und Sonderanfertigungen sowie gebrauchte Hilfsmittel sind vom Rückgabe- und Umtauschrecht ausgeschlossen. Die Informationen zur Datenverarbeitung habe ich zur Kenntnis genommen und akzeptiere sie. Ich bin darüber aufgeklärt, dass Lieferungen bevorzugt persönlich erfolgen sollen."
 		},
@@ -165,7 +165,7 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Schweigepflichtentbindung gegenüber dem Kostenträger",
 			"content": "Um für Ihr Hilfsmittel die Kostenzusage Ihres Kostenträgers zu erhalten, übermitteln wir diesem einen Kostenvoranschlag und eine Stellungnahme mit weiterführenden Informationen (u. a. Name, Versicherungsnummer, Diagnose, Angaben zur Erforderlichkeit). Die Stellungnahme wird entweder gleich der Beantragung beigelegt oder aber auf Anfrage seitens Ihres Kostenträgers zugeschickt. Hierzu ist Ihre Einwilligung und Schweigepflichtentbindung erforderlich. Die Einwilligung ist freiwillig, Vorgangsbezogen und für zukünftige Übermittlungen widerruflich. Ohne Ihre Einwilligung ist mit einer zeitlichen Verzögerung bei der Bearbeitung Ihrer Krankenkasse zu rechnen. Möglicherweise kann es dadurch sogar zu einer Ablehnung der Hilfsmittelversorgung kommen."
 		},
@@ -320,7 +320,7 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textblock", "description": "Fertigung" },
+		{ "type": "textsection", "description": "Fertigung" },
 		{
 			"type": "textarea",
 			"attributes": {
@@ -344,7 +344,7 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Empfangsbestätigung",
 			"content": "Hiermit bestätige ich, dass ich die folgenden Hilfsmittel vom Leistungserbringer Universitätsklinikum Heidelberg, Technische Orthopädie, Schlierbacher Landstraße 200a, 69118 Heidelberg, erhalten habe:"
 		},
@@ -407,7 +407,7 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Empfangsbestätigung",
 			"content": "Hiermit erteile ich dem Universitätsklinikum Heidelberg die Erlaubnis zur Ausstellung bzw. der Veröffentlichung der von mir, bzw. meinem Kind gefertigten Foto- und / oder Videoaufnahmen. Diese Erklärung kann jederzeit ohne Angaben von Gründen für künftige Veröffentlichungen widerrufen werden. Dies hat keinen Einfluss auf die Versorgung. Mir ist bewusst, dass bereits erfolgte Veröffentlichungen nachträglich nicht zurückgenommen werden können. Insbesondere bei der Veröffentlichung im Internet entzieht sich die weitere Verbreitung durch Kopien dem Zugriff durch das Universitätsklinikum Heidelberg.\\n \\nDie von mir / meinem Kind gemachten Aufnahmen sollen zu Zwecken der Presse- und Öffentlichkeitsarbeit des Universitätsklinikums Heidelberg verwendet werden. Ich habe die diesbezüglichen Erläuterungen verstanden, und mir wurde ausreichend Gelegenheit gegeben, Fragen zu stellen."
 		},
@@ -584,7 +584,7 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Konformitätserklärung",
 			"content": "Die Abteilung Technische Orthopädie des Universitätsklinikums Heidelberg, Schlierbacher Landstraße 200a, 69118 Heidelberg, erklärt hiermit alleinverantwortlich, dass die oben genannte Sonderanfertigung für den oben genannten Patienten individuell hergestellt wurde und den grundlegenden Forderungen der EU-Verordnung 2017/745 entspricht. Sollten bestimmte grundlegende Forderungen nicht eingehalten worden sein, so wurden sie aufgeführt. Die entsprechende Produktdokumentation wird aufbewahrt. Diese Konformitätserklärung bezieht sich nur auf die im Rahmen der Sonderanfertigung für den oben genannten Patienten individuell angefertigten Komponenten. Für etwaige konfektionierte Hilfsmittel sind die jeweiligen Hersteller verantwortlich."
 		},
@@ -931,7 +931,7 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textblock", "description": "Vergleichsmaße" },
+		{ "type": "textsection", "description": "Vergleichsmaße" },
 		{
 			"type": "number",
 			"attributes": {
@@ -1006,7 +1006,7 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textblock", "description": "Unterarmstumpf" },
+		{ "type": "textsection", "description": "Unterarmstumpf" },
 		{
 			"type": "number",
 			"attributes": {
@@ -1033,7 +1033,7 @@ Export for signature compliance
 		}
 	],
 	[
-		{ "type": "textblock", "description": "Oberarmstumpf" },
+		{ "type": "textsection", "description": "Oberarmstumpf" },
 		{
 			"type": "number",
 			"attributes": {
@@ -1257,7 +1257,7 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Grundposition"
 		},
 		{
@@ -1622,7 +1622,7 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Schaftsystem"
 		},
 		{
@@ -1908,7 +1908,7 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Handgelenk"
 		},
 		{
@@ -1984,7 +1984,7 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Handpassteil"
 		},
 		{
@@ -2151,7 +2151,7 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Ausgangsprüfung Checkliste"
 		},
 		{
@@ -2268,7 +2268,7 @@ Export for signature compliance
 	],
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Lieferumfang"
 		},
 		{
@@ -2347,7 +2347,7 @@ Export for signature compliance
 [
 	[
 		{
-			"type": "textblock",
+			"type": "textsection",
 			"description": "Abgabeprotokoll"
 		},
 		{
