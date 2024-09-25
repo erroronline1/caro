@@ -809,6 +809,7 @@ export class Assemble {
 	}
 
 	names_numerator(name, dontnumerate = undefined) {
+		// consider record.php exportform-method too on changing
 		if (dontnumerate || [...name.matchAll(/\[\]/g)].length) return name;
 		if (name in this.names) {
 			this.names[name] += 1;

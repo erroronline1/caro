@@ -247,7 +247,10 @@ class RECORD extends API {
 					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
 
 					$postname = str_replace(' ', '_', $name);
-					if ($enumerate[$name]>1) $postname .= '(' . $enumerate[$name] . ')';
+					if ($enumerate[$name] > 1) {
+						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
+						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> does only work with fixed component content, not dynamic created multiple fields
+					}
 
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = ['type' => 'selection', 'value' => []];
