@@ -1447,9 +1447,9 @@ class RECORD extends API {
 										"'" . LANG::GET('general.cancel_button') . "': false,".
 										"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
 										"}}).then(response => { if (response) api.record('post','retype', null, _client.application.dialogToFormdata(response))})"
-										. "\">" . LANG::GET('record.record_export_type', [':type' => $entry['type']]) . '</a>';
+										. "\">" . LANG::GET('record.record_export_type', [':type' => LANGUAGEFILE['record']['record_type'][$entry['type']]]) . '</a>';
 									}
-									else $addendum = ' ' . LANG::GET('record.record_export_type', [':type' => $entry['type']]);
+									else $addendum = ' ' . LANG::GET('record.record_export_type', [':type' => LANGUAGEFILE['record']['record_type'][$entry['type']]]);
 								}
 								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . $addendum . ")\n";
 								break;
