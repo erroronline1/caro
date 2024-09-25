@@ -502,7 +502,7 @@ graph TD;
 
 Available elements for forms are:
 * scanner field, optional as multiple and context identifier
-* textsection for information purpose without input
+* text section for information purpose without input
 * image for including e.g. infographics
 * single line text input
 * multi line text input, optional access to text templates

@@ -459,7 +459,7 @@ graph TD;
 
 Verfügbare Elemente für Formulare sind:
 * Scannerfeld, optional als Mehrfachauswahl und Identifikator
-* textsection für informative Zwecke ohne Eingabe
+* Textabschnitt für informative Zwecke ohne Eingabe
 * Bild um beispielsweise Informationgrafiken einzubinden
 * einfaches Textfeld
 * mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge
