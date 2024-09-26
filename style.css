@@ -1255,6 +1255,13 @@ button[data-type="image"]::before {
 	mask-image: url("./media/image.svg");
 }
 
+button[data-type="import"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/arrow-alt-from-bottom.svg");
+	mask-image: url("./media/arrow-alt-from-bottom.svg");
+}
+
 [data-type="links"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/link.svg");

@@ -266,7 +266,7 @@ export const compose_helper = {
 	 * creates a component by comparing the contents of newFormComponents and the actual order from view (after reordering/dragging)
 	 * @returns object|null
 	 */
-	composeNewComponent: function () {
+	composeNewComponent: function (raw_import = false) {
 		// set dragged/dropped order of elements - wohoo, recursion!
 		let isForm = false,
 			componentContent = [],
@@ -302,7 +302,7 @@ export const compose_helper = {
 			approve: approve,
 		};
 		if (isForm) answer.form = {};
-		if (name && componentContent && approve && approve !== "0") return answer;
+		if (raw_import || (name && componentContent && approve && approve !== "0")) return answer;
 		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), "error");
 		return null;
 	},
@@ -1361,6 +1361,14 @@ export class Compose extends Assemble {
 					"', render:'" +
 					LANG.GET("assemble.compose_raw_json_error") +
 					"'})}",
+			},
+		};
+		result = result.concat(...this.button());
+		this.currentElement = {
+			attributes: {
+				value: LANG.GET("assemble.compose_raw_import"),
+				"data-type": "import",
+				onpointerup: "let component = compose_helper.composeNewComponent(true); document.getElementById('_compose_raw').value = component ? JSON.stringify(component.content, null, 4) : ''; document.getElementById('_compose_raw').dispatchEvent(new Event('keyup'));",
 			},
 		};
 		result = result.concat(...this.button());
