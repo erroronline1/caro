@@ -638,11 +638,11 @@ export const compose_helper = {
 							continue;
 						}
 						elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
-						if (elementName === LANG.GET("assemble.compose_texttemplate") && importable.texttemplates) sibling.checked = true;
 						if (elementName === LANG.GET("assemble.compose_field_hint") && importable.hint) sibling.value = importable.hint;
-						if (elementName === LANG.GET("assemble.compose_required") && "required" in importable.attributes && importable.attributes.required) sibling.checked = true;
-						if (elementName === LANG.GET("assemble.compose_multiple") && "multiple" in importable.attributes && importable.attributes.multiple) sibling.checked = true;
-						if (elementName === LANG.GET("assemble.compose_context_identify") && importable.type === "identify") sibling.checked = true;
+						if (elementName === LANG.GET("assemble.compose_texttemplate")) sibling.checked = Boolean(importable.texttemplates);
+						if (elementName === LANG.GET("assemble.compose_required")) sibling.checked = Boolean("required" in importable.attributes && importable.attributes.required);
+						if (elementName === LANG.GET("assemble.compose_multiple")) sibling.checked = Boolean("multiple" in importable.attributes && importable.attributes.multiple);
+						if (elementName === LANG.GET("assemble.compose_context_identify")) sibling.checked = Boolean(importable.type === "identify");
 
 						if (["links", "radio", "select", "checkbox"].includes(importable.type)) {
 							if (elementName === LANG.GET("assemble.compose_multilist_name")) {
@@ -1081,8 +1081,7 @@ export class Compose extends Assemble {
 
 	compose_formbutton() {
 		let result = [this.br()],
-			forms = this.currentElement.content,
-			options = {};
+			forms = this.currentElement.content;
 
 		this.currentElement = {
 			type: "textsection",
@@ -1201,15 +1200,6 @@ export class Compose extends Assemble {
 	}
 
 	compose_multilist(type) {
-		let cloneSteps;
-		switch (type.type) {
-			case "select":
-				cloneSteps = 5;
-				break;
-			default:
-				cloneSteps = 4;
-		}
-
 		let result = [];
 		this.currentElement = {
 			type: type.type,
@@ -1233,16 +1223,16 @@ export class Compose extends Assemble {
 				required: true,
 			},
 		};
-		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
 		result = result.concat(...this.text());
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_multilist_add_item_button"),
 				"data-type": "additem",
 				type: "button",
-				onpointerup: `for (const e of compose_helper.cloneMultipleItems(this, -${cloneSteps}, ${cloneSteps})) this.parentNode.insertBefore(e, this);`,
+				onpointerup: "for (const e of compose_helper.cloneMultipleItems(this, -4, 4)) this.parentNode.insertBefore(e, this);",
 			},
 		};
+		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
 		result = result.concat(...this.button());
 		if (type.required !== undefined || type.multiple !== undefined) {
 			this.currentElement = {
