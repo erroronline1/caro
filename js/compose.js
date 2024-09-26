@@ -474,6 +474,25 @@ export const compose_helper = {
 		allowDrop: function (evnt) {
 			evnt.preventDefault();
 		},
+		contextMenu: function (evnt) {
+			evnt.preventDefault();
+			console.log(evnt);
+			evnt.target.classList.add("composehighlight");
+			const options = {};
+			options[LANG.GET("assemble.compose_form_cancel")] = false;
+			options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({
+				type: "input",
+				header: "delete highlighted element",
+				render: [[{ type: "textsection", attributes: { name: "todo" } }]],
+				options: options,
+			}).then((response) => {
+				evnt.target.classList.remove("composehighlight");
+				if (response) {
+				}
+			});
+			return false;
+		},
 		drag: function (evnt) {
 			evnt.dataTransfer.setData("text", evnt.target.id);
 			this.stopParentDropEvent = false;
@@ -701,6 +720,7 @@ export const compose_helper = {
 		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
 		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
 		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
+		element.setAttribute("oncontextmenu", "compose_helper.dragNdrop.contextMenu(event)");
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -1368,7 +1388,8 @@ export class Compose extends Assemble {
 			attributes: {
 				value: LANG.GET("assemble.compose_raw_import"),
 				"data-type": "import",
-				onpointerup: "let component = compose_helper.composeNewComponent(true); document.getElementById('_compose_raw').value = component ? JSON.stringify(component.content, null, 4) : ''; document.getElementById('_compose_raw').dispatchEvent(new Event('keyup'));",
+				onpointerup:
+					"let component = compose_helper.composeNewComponent(true); document.getElementById('_compose_raw').value = component ? JSON.stringify(component.content, null, 4) : ''; document.getElementById('_compose_raw').dispatchEvent(new Event('keyup'));",
 			},
 		};
 		result = result.concat(...this.button());

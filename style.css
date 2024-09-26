@@ -793,6 +793,9 @@ button.productselection {
 	margin: 0 0 0 1em;
 }
 
+.composehighlight{
+	border: 1px solid var(--red) !important;
+}
 /*************************** article elements and boxes ******************************/
 
 article > header {
