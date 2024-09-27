@@ -1126,6 +1126,21 @@ dialog a:not([data-type])::before {
 	margin: 0 0.75em 0.2em 0;
 }
 
+[data-multiple]::after{
+	content: "";
+	display: inline-block;
+	height: .75em;
+	width: 0.75em;
+	position: absolute;
+	margin-left: -.15em;
+	margin-top: 2.2em;
+	background-size: cover;
+	background-image: none;
+	background-color: var(--disabled);
+	-webkit-mask-image: url("./media/clone.svg");
+	mask-image: url("./media/clone.svg");
+}
+
 main a:not([data-type])::before,
 dialog a:not([data-type])::before {
 	background-color: var(--cta_darker);
