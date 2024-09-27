@@ -476,21 +476,109 @@ export const compose_helper = {
 		},
 		contextMenu: function (evnt) {
 			evnt.preventDefault();
-			console.log(evnt);
-			evnt.target.classList.add("composehighlight");
-			const options = {};
-			options[LANG.GET("assemble.compose_form_cancel")] = false;
-			options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({
-				type: "input",
-				header: "delete highlighted element",
-				render: [[{ type: "textsection", attributes: { name: "todo" } }]],
-				options: options,
-			}).then((response) => {
-				evnt.target.classList.remove("composehighlight");
-				if (response) {
+			evnt.dataTransfer = new DataTransfer();
+			console.log(evnt.target);
+			evnt.dataTransfer.setData("text", evnt.target.id);
+			for (const element of document.querySelectorAll(".contextmenu")) element.remove();
+			let div = document.createElement("div"),
+				button,
+				target,
+				targetClone;
+			// determine target:
+			// target is element
+			if (evnt.target.classList.contains("draggableFormElement")) target = evnt.target; // draggable element container
+			else if (evnt.target.parentNode.classList.contains("draggableFormElement")) target = evnt.target.parentNode; // draggable element container content
+			// target is container
+			else if (["main", "section"].includes(evnt.target.parentNode.localName)) target = evnt.target; // draggable div container
+			else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) target = evnt.target.parentNode; // draggable div container content
+			div.classList.add("contextmenu");
+			div.style.left = evnt.clientX + "px";
+			div.style.top = window.scrollY + evnt.clientY - 10 + "px";
+
+			const img = document.createElement("img");
+			img.classList.add("close");
+			img.src = "./media/times.svg";
+			img.onpointerup = () => {
+				div.remove();
+			};
+			div.append(img);
+
+			// to top
+			button = document.createElement("button");
+			button.type = "button";
+			button.classList.add("discreetButton");
+			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_2top")));
+			button.onpointerup = () => {
+				if (target.previousElementSibling && target.previousElementSibling.draggable) {
+					targetClone = target.cloneNode(true);
+					target.parentNode.insertBefore(targetClone, target.parentNode.children[0]);
+					target.remove();
 				}
-			});
+				div.remove();
+			};
+			div.append(button);
+
+			// one up
+			button = document.createElement("button");
+			button.type = "button";
+			button.classList.add("discreetButton");
+			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_1up")));
+			button.onpointerup = () => {
+				if (target.previousElementSibling && target.previousElementSibling.draggable) {
+					targetClone = target.cloneNode(true);
+					target.parentNode.insertBefore(targetClone, target.previousElementSibling);
+					target.remove();
+				}
+				div.remove();
+			};
+			div.append(button);
+
+			// one down
+			button = document.createElement("button");
+			button.type = "button";
+			button.classList.add("discreetButton");
+			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_1down")));
+			button.onpointerup = () => {
+				if (target.nextElementSibling) {
+					targetClone = target.cloneNode(true);
+					target.nextElementSibling.after(targetClone);
+					target.remove();
+				}
+				div.remove();
+			};
+			div.append(button);
+
+			// to bottom
+			button = document.createElement("button");
+			button.type = "button";
+			button.classList.add("discreetButton");
+			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_2bottom")));
+			button.onpointerup = () => {
+				targetClone = target.cloneNode(true);
+				target.parentNode.append(targetClone);
+				target.remove();
+				div.remove();
+			};
+			div.append(button);
+
+			// delete target
+			button = document.createElement("button");
+			button.type = "button";
+			button.classList.add("discreetButton");
+			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_delete")));
+			let options = {};
+			(options[LANG.GET("general.cancel_button")] = false),
+				(options[LANG.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
+				(button.onpointerup = () => {
+					new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_context_delete"), options: options }).then((confirmation) => {
+						if (confirmation) {
+							compose_helper.dragNdrop.drop_delete(evnt);
+						}
+						div.remove();
+					});
+				});
+			div.append(button);
+			document.querySelector("body").append(div);
 			return false;
 		},
 		drag: function (evnt) {
@@ -546,7 +634,7 @@ export const compose_helper = {
 			// dropping on hr for reordering
 			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
 				// no section insertion
-				// handle only if dropped within the reorder area				console.log('hello');
+				// handle only if dropped within the reorder area
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
 				droppedUpon.firstChild.classList.remove("insertionAreaHover");
 				this.stopParentDropEvent = true;

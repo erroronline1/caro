@@ -793,9 +793,6 @@ button.productselection {
 	margin: 0 0 0 1em;
 }
 
-.composehighlight{
-	border: 1px solid var(--red) !important;
-}
 /*************************** article elements and boxes ******************************/
 
 article > header {
@@ -851,7 +848,8 @@ canvas {
 }
 
 article,
-main > form > article {
+main > form > article,
+.contextmenu {
 	margin: 1em 0;
 	padding: 1em;
 	width: 100%;
@@ -861,6 +859,21 @@ main > form > article {
 	background-color: var(--article);
 	box-shadow: var(--shadow);
 	transition: ease 0.2s;
+}
+.contextmenu {
+	width: fit-content;
+	display: block;
+	z-index: 10;
+	position: absolute;
+	padding-top: 2.5em;
+
+	img.close {
+		width: 1.5em;
+		height: 1.5em;
+		position: absolute;
+		top: 1em;
+		right: 1em;
+	}
 }
 
 section {
