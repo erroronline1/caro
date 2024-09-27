@@ -611,7 +611,7 @@ export class Assemble {
 				behaviour: "smooth",
 			});
 		});
-		toleft.setAttribute("data-type", "toleft");
+		toleft.dataset.type = "toleft";
 		toleft.classList.add("inlinebutton");
 		toleft.type = "button";
 		indicators.appendChild(toleft);
@@ -633,7 +633,7 @@ export class Assemble {
 				behaviour: "smooth",
 			});
 		});
-		toright.setAttribute("data-type", "toright");
+		toright.dataset.type = "toright";
 		toright.classList.add("inlinebutton");
 		toright.type = "button";
 		indicators.appendChild(toright);
@@ -770,7 +770,8 @@ export class Assemble {
 	icon() {
 		const br = document.createElement("br"),
 			span = document.createElement("span");
-		span.setAttribute("data-type", this.currentElement.type);
+		span.dataset.type = this.currentElement.type;
+		if (this.currentElement.attributes && this.currentElement.attributes.multiple) span.dataset.multiple = "multiple";
 		return [br, span];
 	}
 
@@ -778,7 +779,7 @@ export class Assemble {
 		if (!this.currentElement.description) return [];
 		let header = document.createElement("header");
 		header.appendChild(document.createTextNode(this.currentElement.description.replace(/\[\]|DEFAULT_/g, "")));
-		header.setAttribute("data-type", this.currentElement.type);
+		header.dataset.type = this.currentElement.type;
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		return [header];
 	}
@@ -917,7 +918,7 @@ export class Assemble {
 			},
 			hint: 'this selection is for...'
 		}*/
-		this.currentElement.description = (this.currentElement.attributes && this.currentElement.attributes.name) ? this.currentElement.attributes.name.replace(/\[\]/g, "") : null;
+		this.currentElement.description = this.currentElement.attributes && this.currentElement.attributes.name ? this.currentElement.attributes.name.replace(/\[\]/g, "") : null;
 		const result = [...this.header()],
 			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
@@ -1027,14 +1028,14 @@ export class Assemble {
 			};
 		label.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
 		label.type = "button";
-		label.setAttribute("data-type", "file");
+		label.dataset.type = "file";
 		label.classList.add("inlinebutton");
 		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
 
 		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		button.appendChild(document.createTextNode("Reset"));
 		button.type = "button";
-		button.setAttribute("data-type", "reset");
+		button.dataset.type = "reset";
 		button.classList.add("inlinebutton");
 		return [...this.header(), input, label, button, ...this.hint()];
 	}
@@ -1172,30 +1173,32 @@ export class Assemble {
 				if (value.checked != undefined && value.checked) inputvalue.push(key);
 			}
 			input.value = inputvalue.join(", ");
-			input.onpointerup = new Function(
-				"new Dialog({type: 'input', header: '" +
-					this.currentElement.attributes.name.replace(/\[\]/g, "") +
-					"', render:" +
-					JSON.stringify([
+			let currentElement=this.currentElement;
+			input.onpointerup = () => {
+				const options = {};
+				options[LANG.GET("assemble.compose_form_cancel")] = false;
+				options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
+				new Dialog({
+					type: "input",
+					header: currentElement.attributes.name.replace(/\[\]/g, ""),
+					render: [
 						[
 							{
 								type: "checkbox",
-								content: this.currentElement.content,
+								content: currentElement.content,
 							},
 						],
-					]) +
-					", " +
-					"options:{" +
-					"'" +
-					LANG.GET("assemble.compose_form_cancel") +
-					"': false," +
-					"'" +
-					LANG.GET("assemble.compose_form_confirm") +
-					"': {value: true, class: 'reducedCTA'}," +
-					"}}).then(response => { const e = document.getElementById('" +
-					input.id +
-					"'); if (Object.keys(response).length) { e.value = Object.keys(response).join(', ');}; e.dispatchEvent(new Event('change')); e.blur();})"
-			);
+					],
+					options: options,
+				}).then((response) => {
+					const e = document.getElementById(input.id);
+					if (Object.keys(response).length) {
+						e.value = Object.keys(response).join(", ");
+					}
+					e.dispatchEvent(new Event("change"));
+					e.blur();
+				});
+			};
 		}
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
@@ -1380,7 +1383,7 @@ export class Assemble {
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		button.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
 		button.type = "button";
-		button.setAttribute("data-type", "photo");
+		button.dataset.type = "photo";
 		button.classList.add("inlinebutton");
 		button.appendChild(document.createTextNode(LANG.GET("assemble.photo_choose")));
 
@@ -1388,7 +1391,7 @@ export class Assemble {
 
 		resetbutton.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
 		resetbutton.appendChild(document.createTextNode(LANG.GET("assemble.reset")));
-		resetbutton.setAttribute("data-type", "reset");
+		resetbutton.dataset.type = "reset";
 		resetbutton.classList.add("inlinebutton");
 		resetbutton.type = "button";
 
@@ -1400,7 +1403,7 @@ export class Assemble {
 				composer: "elementClone",
 			}).initializeSection(null, hint.length ? hint[0] : resetbutton);
 		};
-		addbutton.setAttribute("data-type", "additem");
+		addbutton.dataset.type = "additem";
 		addbutton.classList.add("inlinebutton");
 		addbutton.type = "button";
 
@@ -1597,7 +1600,7 @@ export class Assemble {
 		let button = document.createElement("button");
 		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.scan_button")));
 		button.type = "button";
-		button.setAttribute("data-type", "scanner");
+		button.dataset.type = "scanner";
 
 		button.onpointerup = () => {
 			// arrow function for reference of this.names
@@ -1623,7 +1626,7 @@ export class Assemble {
 			let button = document.createElement("button");
 			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.compose_merge")));
 			button.type = "button";
-			button.setAttribute("data-type", "merge");
+			button.dataset.type = "merge";
 			button.onpointerup = function () {
 				if (document.getElementById(inputid).value) api.record("get", "import", document.getElementById(inputid).value);
 			};
@@ -1667,6 +1670,7 @@ export class Assemble {
 		let select = document.createElement("select"),
 			label = document.createElement("label"),
 			selectModal = {},
+			icon = this.icon(),
 			multiple,
 			selectElementClone,
 			hint;
@@ -1724,7 +1728,7 @@ export class Assemble {
 					}
 				});
 		};
-		return [...this.icon(), select, label, ...hint];
+		return [...icon, select, label, ...hint];
 	}
 
 	signature() {
