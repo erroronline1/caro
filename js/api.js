@@ -1091,6 +1091,55 @@ export const api = {
 										input.checked = Object.keys(data.data).includes(groupname) && data.data[groupname].split(" | ").includes(input.name);
 									} else {
 										if (Object.keys(data.data).includes(inputname)) input.value = data.data[inputname];
+										// append multiple text-/number inputs / selects / productselections that have been added dynamically
+										let dynamicMultiples = Object.keys(data.data)
+											.filter((name) => {
+												return name.match(new RegExp(String.raw`${inputname}\(\d+\)$`, "g"));
+											})
+											.sort();
+										if (dynamicMultiples.length) {
+											let type = input.previousSibling.dataset.type,
+												element = input.nextSibling, // label
+												clone = { type: type, attributes: { name: null } },
+												content = {};
+											if (input.attributes.multiple) clone.attributes.multiple = true;
+											if (input.attributes.required) clone.attributes.required = true;
+											if (input.attributes["data-loss"]) clone.attributes["data-loss"] = input.attributes["data-loss"].value;
+											if (input.attributes.title) clone.attributes.title = input.attributes.title.value;
+											switch (type) {
+												case "select":
+													for (const opt of input.children) {
+														if (opt.localName === "optgroup") {
+															for (const option of opt.children) {
+																content[option.innerHTML] = [];
+															}
+														} else content[opt.innerHTML] = [];
+													}
+													break;
+												default:
+													clone.attributes.value = null;
+											}
+											dynamicMultiples.forEach((name) => {
+												if (element.nextSibling && element.nextSibling.classList.contains("hint")) element = element.nextSibling;
+												clone.attributes.name = name.replaceAll("_", " ");
+												clone.attributes.value = data.data[name];
+												switch (type) {
+													case "select":
+														Object.keys(content).forEach((key) => {
+															if (key === data.data[name]) content[key].selected = true;
+															else delete content[key].selected;
+														});
+														clone.content = content;
+														break;
+													case "productselection":
+													case "scanner":
+														element = element.nextSibling; // button
+														break;
+												}
+												new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
+												element = document.getElementsByName(name.replaceAll("_", " "))[0].nextSibling; // label
+											});
+										}
 									}
 								}
 							}
