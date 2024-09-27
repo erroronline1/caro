@@ -1124,55 +1124,8 @@ Export for signature compliance
 		{
 			"type": "text",
 			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
-			}
-		},
-		{
-			"type": "text",
-			"attributes": {
-				"name": "Umfangsmaß / Höhe"
+				"name": "Umfangsmaß / Höhe",
+				"multiple": true
 			}
 		}
 	],

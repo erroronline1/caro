@@ -477,7 +477,6 @@ export const compose_helper = {
 		contextMenu: function (evnt) {
 			evnt.preventDefault();
 			evnt.dataTransfer = new DataTransfer();
-			console.log(evnt.target);
 			evnt.dataTransfer.setData("text", evnt.target.id);
 			for (const element of document.querySelectorAll(".contextmenu")) element.remove();
 			let div = document.createElement("div"),
@@ -1281,7 +1280,7 @@ export class Compose extends Assemble {
 		this.currentElement.content[LANG.GET("assemble.compose_required")] = {
 			name: LANG.GET("assemble.compose_required"),
 		};
-		if (type.type === "productselection")
+		if (type.multiple)
 			this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
 				name: LANG.GET("assemble.compose_multiple"),
 			};
@@ -1372,6 +1371,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "number",
 			description: LANG.GET("assemble.compose_number"),
+			multiple: "optional",
 		});
 	}
 
@@ -1387,6 +1387,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "productselection",
 			description: LANG.GET("assemble.compose_productselection"),
+			multiple: "optional",
 		});
 	}
 
@@ -1581,6 +1582,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "text",
 			description: LANG.GET("assemble.compose_text"),
+			multiple: "optional",
 		});
 	}
 

@@ -1166,8 +1166,10 @@ export class Assemble {
 			}
 		}*/
 		let input = document.createElement("input"),
-			label = document.createElement("label");
+			label = document.createElement("label"),
+			hint = this.hint();
 		input.type = type;
+		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
@@ -1177,6 +1179,19 @@ export class Assemble {
 		label.classList.add("input-label");
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.multiple) {
+			input.onchange = () => {
+				// arrow function for reference of this.names
+				if (input.value) {
+					inputClone.attributes.name = inputClone.attributes.name.replace(/\(\d+\)$/gm, "");
+					new Assemble({
+						content: [[inputClone]],
+						composer: "elementClone",
+						names: this.names,
+					}).initializeSection(null, hint.length ? hint[0] : label);
+				}
+			};
+		}
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (type === "email") input.multiple = true;
 
@@ -1216,7 +1231,7 @@ export class Assemble {
 		}
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
-		return [...this.icon(), input, label, ...this.hint()];
+		return [...this.icon(), input, label, ...hint];
 	}
 
 	links() {
@@ -1601,7 +1616,6 @@ export class Assemble {
 					// arrow function for reference of this.names
 					if (input.value) {
 						scannerElementClone.attributes.name = scannerElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
-						console.log(this.names);
 						new Assemble({
 							content: [[scannerElementClone]],
 							composer: "elementClone",
