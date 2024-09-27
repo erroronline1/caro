@@ -170,7 +170,11 @@ export class Dialog {
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
-			img.onpointerup = new Function("const scanner = document.querySelector('video'); if (scanner) scanner.srcObject.getTracks()[0].stop(); document.getElementById('" + modal + "').close()");
+			img.onpointerup = () => {
+				const scanner = document.querySelector("video");
+				if (scanner) scanner.srcObject.getTracks()[0].stop();
+				document.getElementById(modal).close();
+			};
 			form.append(img);
 			if (this.header || this.render || this.icon) {
 				const header = document.createElement("header");
@@ -799,9 +803,13 @@ export class Assemble {
 	}
 
 	apply_attributes(setup, node) {
-		for (const [key, attribute] of Object.entries(setup)) {
+		for (let [key, attribute] of Object.entries(setup)) {
 			if (events.includes(key)) {
-				if (attribute) node[key] = new Function(attribute);
+				if (attribute) {
+					// strip anonymous function wrapping, tabs and linebreaks if applicable
+					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|^\t{1,}|\n/gm, " ").slice(0, -1);
+					node[key] = new Function(attribute);
+				}
 			} else {
 				if (attribute) node.setAttribute(key, attribute);
 			}
@@ -1026,13 +1034,19 @@ export class Assemble {
 					  LANG.GET("assemble.file_rechoose")
 					: LANG.GET("assemble.file_choose");
 			};
-		label.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
+		label.onpointerup = () => {
+			document.getElementById(input.id).click();
+		};
 		label.type = "button";
 		label.dataset.type = "file";
 		label.classList.add("inlinebutton");
 		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
 
-		button.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		button.onpointerup = () => {
+			let e = document.getElementById(input.id);
+			e.value = "";
+			e.dispatchEvent(new Event("change"));
+		};
 		button.appendChild(document.createTextNode("Reset"));
 		button.type = "button";
 		button.dataset.type = "reset";
@@ -1173,7 +1187,7 @@ export class Assemble {
 				if (value.checked != undefined && value.checked) inputvalue.push(key);
 			}
 			input.value = inputvalue.join(", ");
-			let currentElement=this.currentElement;
+			let currentElement = this.currentElement;
 			input.onpointerup = () => {
 				const options = {};
 				options[LANG.GET("assemble.compose_form_cancel")] = false;
@@ -1381,7 +1395,9 @@ export class Assemble {
 		input.capture = true;
 		input.onchange = changeEvent;
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		button.onpointerup = new Function("document.getElementById('" + input.id + "').click();");
+		button.onpointerup = () => {
+			document.getElementById(input.id).click();
+		};
 		button.type = "button";
 		button.dataset.type = "photo";
 		button.classList.add("inlinebutton");
@@ -1389,7 +1405,11 @@ export class Assemble {
 
 		img.classList.add("photoupload");
 
-		resetbutton.onpointerup = new Function("let e=document.getElementById('" + input.id + "'); e.value=''; e.dispatchEvent(new Event('change'));");
+		resetbutton.onpointerup = () => {
+			let e = document.getElementById(input.id);
+			e.value = "";
+			e.dispatchEvent(new Event("change"));
+		};
 		resetbutton.appendChild(document.createTextNode(LANG.GET("assemble.reset")));
 		resetbutton.dataset.type = "reset";
 		resetbutton.classList.add("inlinebutton");

@@ -1337,7 +1337,9 @@ export class Compose extends Assemble {
 				value: LANG.GET("assemble.compose_multilist_add_item_button"),
 				"data-type": "additem",
 				type: "button",
-				onpointerup: "for (const e of compose_helper.cloneMultipleItems(this, -4, 4)) this.parentNode.insertBefore(e, this);",
+				onpointerup: function () {
+					for (const e of compose_helper.cloneMultipleItems(this, -4, 4)) this.parentNode.insertBefore(e, this);
+				}.toString(),
 			},
 		};
 		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
@@ -1463,12 +1465,14 @@ export class Compose extends Assemble {
 			attributes: {
 				value: LANG.GET("assemble.compose_raw"),
 				"data-type": "addblock",
-				onpointerup:
-					"if (document.getElementById('_compose_raw').value) try {compose_helper.importComponent({content:JSON.parse(document.getElementById('_compose_raw').value)})} catch(e){ new Dialog({type:'alert', header:'" +
-					LANG.GET("assemble.compose_raw") +
-					"', render:'" +
-					LANG.GET("assemble.compose_raw_json_error") +
-					"'})}",
+				onpointerup: function () {
+					if (document.getElementById("_compose_raw").value)
+						try {
+							compose_helper.importComponent({ content: JSON.parse(document.getElementById("_compose_raw").value) });
+						} catch (e) {
+							new Dialog({ type: "alert", header: LANG.GET("assemble.compose_raw"), render: LANG.GET("assemble.compose_raw_json_error") });
+						}
+				}.toString(),
 			},
 		};
 		result = result.concat(...this.button());
@@ -1476,8 +1480,11 @@ export class Compose extends Assemble {
 			attributes: {
 				value: LANG.GET("assemble.compose_raw_import"),
 				"data-type": "import",
-				onpointerup:
-					"let component = compose_helper.composeNewComponent(true); document.getElementById('_compose_raw').value = component ? JSON.stringify(component.content, null, 4) : ''; document.getElementById('_compose_raw').dispatchEvent(new Event('keyup'));",
+				onpointerup: function () {
+					let component = compose_helper.composeNewComponent(true);
+					document.getElementById("_compose_raw").value = component ? JSON.stringify(component.content, null, 4) : "";
+					document.getElementById("_compose_raw").dispatchEvent(new Event("keyup"));
+				}.toString(),
 			},
 		};
 		result = result.concat(...this.button());
