@@ -245,7 +245,7 @@ class RECORD extends API {
 					}
 					else $name = $subs['attributes']['name'];
 					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
-
+					$originName = $name;
 					$postname = str_replace(' ', '_', $name);
 					if ($enumerate[$name] > 1) {
 						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
@@ -259,7 +259,7 @@ class RECORD extends API {
 							$selected = '';
 
 							// dynamic multiple select
-							$dynamicMultiples = preg_grep("/" . $postname . "\(\d+\)/m", array_keys((array)$payload));
+							$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
 							foreach($dynamicMultiples as $matchkey => $submitted){
 								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
 							}
@@ -292,9 +292,9 @@ class RECORD extends API {
 					}
 					else {
 						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
-						$dynamicMultiples = preg_grep("/" . $name . "\(\d+\)/m", array_keys((array)$payload));
-						foreach($dynamicMultiples as $key => $value){
-							$content['content'][$value] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $value) ? : ''];
+						$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
+						foreach($dynamicMultiples as $matchkey => $submitted){
+							$content['content'][$submitted] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $submitted) ? : ''];
 						}
 					}
 				}
