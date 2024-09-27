@@ -249,7 +249,7 @@ class RECORD extends API {
 					$postname = str_replace(' ', '_', $name);
 					if ($enumerate[$name] > 1) {
 						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
-						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> does only work with fixed component content, not dynamic created multiple fields
+						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 					}
 
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
@@ -257,8 +257,15 @@ class RECORD extends API {
 						foreach($subs['content'] as $key => $v){
 							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
 							$selected = '';
+
+							// dynamic multiple select
+							$dynamicMultiples = preg_grep("/" . $postname . "\(\d+\)/m", array_keys((array)$payload));
+							foreach($dynamicMultiples as $matchkey => $submitted){
+								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
+							}
+	
 							if (UTILITY::propertySet($payload, $postname) && (
-								($subs['type'] !== 'checkbox' && $key === UTILITY::propertySet($payload, $postname)) ||
+								($subs['type'] !== 'checkbox' && $key == UTILITY::propertySet($payload, $postname)) ||
 								($subs['type'] === 'checkbox' && in_array($key, explode(' | ', UTILITY::propertySet($payload, $postname))))
 								)) $selected = '_____';
 							$content['content'][$name]['value'][] = $selected . $key;
@@ -285,6 +292,10 @@ class RECORD extends API {
 					}
 					else {
 						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
+						$dynamicMultiples = preg_grep("/" . $name . "\(\d+\)/m", array_keys((array)$payload));
+						foreach($dynamicMultiples as $key => $value){
+							$content['content'][$value] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $value) ? : ''];
+						}
 					}
 				}
 			}
