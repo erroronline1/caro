@@ -858,6 +858,7 @@ class RECORD extends API {
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
+					if ($value === "...") unset($this->_payload->$key); // e.g. empty selections
 				}
 				if (!$identifier) {
 					if (!in_array($context, array_keys(LANGUAGEFILE['formcontext']['identify']))) $identifier = $form_name . ' ' . $entry_timestamp;
