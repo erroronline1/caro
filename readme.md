@@ -80,6 +80,7 @@
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * fix pagebreak for form exports
+* fix record import, append only if name nor already taken
 
 #### records considerations
 * linked files on separate external path, input type convert to link
