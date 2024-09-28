@@ -288,33 +288,32 @@ graph TD;
     application((Anwendung))-->login[Anmeldung];
     login-->scan_code;
     scan_code{Code scannen}-->user_db[(Nutzerdatenbank)];
-    user_db-->|gefunden|logged_in[angemeldet];
+    user_db-->|gefunden|permission{Berechtigung};
     user_db-->|nicht gefunden|login;
-    logged_in-->manage_users((Nutzerverwaltung));
-    manage_users-->new_user[neuer Nutzer];
-    manage_users-->edit_user[Nutzer bearbeiten];
-    new_user-->user_settings["Namen, Berechtigungen,
+
+    permission-..->manage_users((Nutzerverwaltung));
+    manage_users-..->new_user[neuer Nutzer];
+    manage_users-.->edit_user[edit user];
+    new_user-.->user_settings["Namen, Berechtigungen,
     Bereiche, Profilbild, Bestellberechtigungs-PIN,
-    Fähigkeiten, Schulungen, Anmelde-Token
-    bearbeiten"];
-    edit_user-->user_settings;
-    user_settings-->export_token[Token exportieren];
-    export_token-->user(((Nutzer)));
-    user-->login;
-    user_settings-->user;
+    Fähigkeiten, Schulungen, Anmelde-Token, Dokumente,
+    Arbeitszeiten, Urlaubstage bearbeiten"];
+    edit_user-.->user_settings;
+    edit_user-.->export_token[Token exportieren];
+    user_settings-.->user_db;
+    edit_user-.->delete_user[Nutzer löschen];
+    delete_user-.->user_db;
 
-    logged_in-->own_profile((Profil));
-    own_profile-->profile["Informationen einsehen,
+    permission==>own_profile((eigenes Profil));
+    own_profile==>profile["Informationen einsehen,
     Profilbild und Anwendungeinstellungen anpassen"];
-    profile-->user;
+    profile==>user_db;
 
-    edit_user-->delete_user[Nutzer löschen];
-    delete_user-->user;
-
-    user-->|PIN vorhanden|orders((Bestellungen freigeben))
-    user-->|berechtigt|authorized(("Inhalte gemäß
+    permission-->|PIN vorhanden|orders(("Bestellungen
+    freigeben"));
+    permission-->|Berechtigungen|authorized(("Inhalte gemäß
     Berechtigung einsehen"))
-    user-->|Bereiche|units(("Inhalte gemäß
+    permission-->|Bereiche|units(("Inhalte gemäß
     Bereichen einsehen"))
 ```
 
@@ -370,34 +369,36 @@ Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwische
 
 ```mermaid
 graph TD;
-    textrecommendation(("Textvorschlag")) -->select[Vorlage auswählen];
-    select -->chunks[(Textbausteine)];
-    chunks-->|"Wiedergabe des neuesten
-    Bausteins nach Name"|display["Darstellung des Textvorschlags
-    und der Eingabefelder"];
-    display -->|Eingabe|render(vorbereiteter Text);
+    textrecommendation(("Textvorschlag"))==>select[Vorlage auswählen];
+    select===>chunks[("Datenbank mit
+    Bausteinen und Vorlagen")];
+    chunks==>|"Wiedergabe der neuesten
+    Vorlage nach Name"|display["Darstellung des
+    Textvorschlags und
+    der Eingabefelder"];
+    display==>|Eingabe und Aktualisierung|render(vorbereiteter Text);
 
     managechunks(("Textabschnitte
-    verwalten")) -->select2["Wahl des neuesten nach
-    Name oder Neuanlage"];
-    managechunks-->select3["beliebige Auswahl
+    verwalten"))--->select2["Wahl des neuesten
+    nach Name oder Neuanlage"];
+    managechunks-->select3["Beliebige Auswahl
     oder Neuanlage"];
-    select2-->chunks2[(Textbausteine)];
-    select3-->chunks2;
-    chunks2 -->editchunk[Baustein bearbeiten];
-    editchunk -->type{Typ};
-    type -->|Ersatz|chunks2;
-    type -->|Text|chunks2;
+    select2-->chunks;
+    select3--->chunks;
+    chunks--->editchunk[Abschnitt bearbeiten];
+    editchunk-->type{Typ};
+    type--->|"Ersatz hinzufügen"|chunks;
+    type-->|"Text hinzufügen"|chunks;
     
-    managetemplates(("Textvorlagen
-    verwalten")) -->select4["Wahl des neuesten nach
-    Name oder Neuanlage"];
-    managetemplates-->select5["beliebige Auswahl
+    managetemplate(("Textvorlagen
+    bearbeiten"))-..->select4["Wahl des neuesten
+    nach Name oder Neuanlage"];
+    managetemplate-.->select5["Beliebige Auswahl
     oder Neuanlage"];
-    select4-->chunks3[(Textbausteine)];
-    select5-->chunks3;
-    chunks3 -->edittemplate[Vorlage bearbeiten];
-    edittemplate -->|Vorlage hinzufügen|chunks3;
+    select4-.->chunks;
+    select5-..->chunks;
+    chunks-...->edittemplate[Vorlage bearbeiten];
+    edittemplate-.->|Vorlage hinzufügen|chunks;
 ```
 
 [Übersicht](#übersicht)
@@ -426,33 +427,47 @@ Formulare können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit 
 ```mermaid
 graph TD;
     manage_components(("Komponenten
-    verwalten"))-->|neue Komponente|edit_component["Inhalte bearbeiten,
-    hinzufügen oder
-    sortieren"];
-    manage_components-->|bestehende Komponente|edit_component;
-    edit_component-->|speichern|new_forms_database[("neuen Datensatz zur
-    Formulardatenbank hinzufügen")];
+    verwalten"))===>select["Wahl der neuesten Komponente
+    nach Name"];
+    select==>forms_database[("Formulardatenbank
+    mit Komponenten,
+    Formularen, Paketen")];
+    manage_components==>select2["beliebige Komponente"];
+    select2==>forms_database;
+    manage_components==>|"neue Komponenten"|edit_component["Inhalte bearbeiten,
+    hinzufügen oder sortieren"];
+    forms_database==>|"bestehende Komponente"|edit_component;
+    edit_component==>save[speichern];
+    save===>|"neue Version,
+    Nachricht mit Freigabeaufforderung"|forms_database;
 
     manage_forms(("Formulare
-    verwalten"))-->|neues Formular|edit_form["Formular bearbeiten,
-    Komponenten sortieren"];
-    manage_forms-->|bestehendes Formular|edit_form;
-    edit_form-->add_component[Komponente hinzufügen];
-    add_component-->forms_database[(Formulardatenbank)];
-    forms_database-->|"neueste verfügbare,
-    freigebene Komponente"|edit_form;
-    edit_form-->|speichern|new_forms_database;
-
+    verwalten"))--->select3["Wahl des neuesten Formulars
+    nach Name"];
+    select3-->forms_database;
+    manage_forms-->select4["beliebiges Formular"];
+    select4-->forms_database;
+    manage_forms-->|neues Formular|edit_form["Formular bearbeiten,
+    Komponenten hinzufügen oder sortieren"];
+    forms_database-->|"bestehendes Formular"|edit_form;
+    edit_form-->save;
+    save--->|"neue Version,
+    Nachricht mit Freigabeaufforderung"|forms_database;
+    
     manage_bundles(("Formularpakete
-    verwalten"))-->|neues Paket|edit_bundle["Paket verwalten"];
-    manage_bundles-->|besteheden Paket|edit_bundle;
-    edit_bundle-->add_form[Formular hinzufügen];
-    add_form-->forms_database2[(Formulardatenbank)];
-    forms_database2-->|"neuestes verfübares,
-    freigebenes Formular"|edit_bundle;
-    edit_bundle-->|speichern|new_forms_database
+    verwalten"))-..->select5["Wahl des neuesten Pakets
+    nach Name"];
+    select5-.->forms_database;
+    manage_bundles-.->select6["beliebiges Paket"];
+    select6-->forms_database;
+    manage_bundles-.->|neues Paket|edit_bundle["Paket bearbeiten,
+    Formulare hinzufügen oder sortieren"];
+    forms_database-.->|"bestehendes Paket"|edit_bundle;
+    edit_bundle-..->save;
+    save-..->|"neue Version,
+    Nachricht mit Freigabeaufforderung"|forms_database;
 
-    new_forms_database-->returns("gibt auf Anfrage nur den neuesten Datensatz heraus,
+    forms_database o----o returns("gibt auf Anfrage nur den neuesten Datensatz heraus,
     sofern dieser nicht verborgen,
     vollständig freigegeben ist und die Berechtigungen übereinstimmen")
 ```
@@ -507,54 +522,55 @@ Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten
 
 ```mermaid
 graph TD;
-    records((Aufzeichnungen))-->identifiersheet(("Erstelle einen Aufkleberbogen
+    identifiersheet(("Erstelle einen Aufkleberbogen
     mit Identifikatoren"));
     identifiersheet-->input[Eingabedaten];
     input-->|Absenden|print("Bogen ausdrucken und
     an Mitarbeiter aushändigen");
 
-    records-->fillform((Formular ausfüllen));
-    fillform-->selectform[Formular wählen];
-    selectform-->forms[(Formulare)];
-    forms-->|"neuestes Fomular nach Name ausgeben
-    sofern Berechtigungen übereinstimmen "|displayform[Formular anzeigen];
-    displayform-->inputdata[Dateneingabe];
-    inputdata-->|neuen Datensatz mit Formularname speichern|recorddb[(Aufzeichnungsdatenbank)];
-    displayform-->idimport[Import mit Identifikator];
-    idimport-->recorddb2[(Aufzeichnungsdatenbank)];
-    recorddb2-->selectbyid[erhalte alle Datensätze mit Identifikator];
-    selectbyid-->|füge neueste Datensätze ein|inputdata;
-    displayform-->|Exportberechtigung|exportform[exportiere editierbares PFD]
+    fillform((Formular ausfüllen))=========>selectform[Formular wählen];
+    selectform==>form_db[("Formular-
+    datenbank")];
+    form_db==>|"neuestes Fomular nach Name ausgeben
+    sofern Berechtigungen übereinstimmen"|displayform[Formular anzeigen];
+    displayform==>inputdata[Dateneingabe];
+    inputdata==>|"neuen Datensatz mit Formularname speichern"|record_db[("Aufzeichnungs-
+    datenbank")];
 
-    print-.->idimport;
+    displayform==>idimport[Import mit Identifikator];
+    idimport==>record_db;
+    record_db==>selectbyid[erhalte alle Datensätze mit Identifikator];
+    selectbyid==>|füge neueste Datensätze ein|inputdata;
+    displayform===>|Exportberechtigung|exportform[exportiere editierbares PDF]
 
-    records-->summaries((Dokumentationen));
-    summaries-->recorddb3[(Aufzeichnungsdatenbank)]
-    recorddb3-->|"nicht vollständig abgeschlossen und
-    innerhalb der Grenzmenge"|displayids[Anzeige des Identifikators];
-    recorddb3-->|Filter trifft zu|displayids;
+    print o-.-o idimport;
+
+    summaries(("Dokumentationen"))----->record_db;
+    record_db-->displayids["Zeige Identifikatoren,
+    nicht abgeschlossen oder
+    Filter zutreffend"];
     displayids-->|Auswahl|summary["zeige Zusammenfassung an
     sofern Berechtigungen übereinstimmen"];
     summary-->close[abschließen];
     close-->complaint{Reklamation};
     complaint-->|ja|complaintclose[Verantwortliche Person, Bereichsleiter UND QMB];
-    complaintclose-->recorddb3;
+    complaintclose-->record_db;
     complaint-->|nein|nocomplaintclose[Bereichsleiter oder Leitung];
-    nocomplaintclose-->recorddb3;
+    nocomplaintclose-->record_db;
     summary-->export[exportieren];
     export-->pdf("Zusammenfassung als PDF,
-    angehängte Dateien");
+    angehängte Dateie");
     summary-->matchbundles[Abgleich mit Formular-Paketen];
     matchbundles-->missing{fehlendes Formular};
-    missing-->|ja|appenddata[Formular hinzufügen];
-    appenddata-->forms;
+    missing==>|ja|appenddata[Formular hinzufügen];
+    appenddata==>displayform;
     missing-->|nein|nonemissing(Statusbenachrichtigung);
     summary-->retype[Aufzeichnungstyp ändern];
-    retype-->recorddb3;
+    retype-->record_db;
 
-    recorddb3-->notification((Benachrichtigungen));
-    notification-->|"nicht abgeschlossen,
-    letzter Eintrag vor X Tagen"|message(Nachricht an Benutzer der Bereiche)
+    notification((Benachrichtigungen))-....->record_db;
+    record_db-..->|"nicht abgeschlossen,
+    letzter Eintrag vor X Tagen"|message(Nachricht an Benutzer der Bereiche);
 ```
 
 [Übersicht](#übersicht)
@@ -600,60 +616,67 @@ Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exporti
 
 ```mermaid
 graph TD;
-    scheduling((Planung))-->select_day[Auswahl Tag];
-    scheduling-->search[Suche];
-    select_day-->database[(Kalenderdatenbank)];
-    select_day-->add[hinzufügen];
-    add-->database;
-    search-->database;
-    database-->matches["Ergebnisse zugewiesener
-    Bereiche anzeigen"];
-    matches-->permission{"Administrator,
+    scheduling((Planung))===>select_day[Auswahl Tag];
+    scheduling==>search[Suche];
+    select_day==>database[("Kalenderdatenbank
+    Typ Planung")];
+    select_day==>add[hinzufügen];
+    add==>database;
+    search==>database;
+    database==>matches("Ergebnisse zugewiesener
+    Bereiche anzeigen");
+    matches==>permission{"Administrator,
     Leitung, QMB,
     Bereichsleiter"};
-    permission-->|ja|edit[ändern oder löschen];
-    permission-->|nein|complete[abschließen];
-    edit-->complete;
-    database-->alert["Mitarbeiter ausgewählter Bereiche
+    permission==>|ja|edit[ändern oder löschen];
+    permission==>|nein|complete[abschließen];
+    edit==>complete;
+    database==>alert["Mitarbeiter ausgewählter Bereiche
     einmalig benachrichtigen"]
-
-    landing_page((Startseite))-->summary["Kalenderwoche,
-    aktuell geplante Ereignisse,
-    nicht abgeschlossene vergangene Ereignisse"];
-    summary-->select_day
 
     timesheet((Zeiterfassung))-->select_day2[Auswahl Tag];
     select_day2-->add2[hinzufügen];
     add2-->usertype{Nutzertyp};
-    usertype-->|jeder|own[eigene Einträge];
-    usertype-->|Personalverwaltung, Bereichsleiter|foreign[eigene und fremde Einträge];
-    own-->database2;
+    usertype-->any["jeder:
+    eigene Einträge"];
+    usertype-->foreign["Personalverwaltung, Bereichsleiter:
+    eigene und fremde Einträge"];
+    any-->database2;
     foreign-->database2;
-    select_day2-->database2[(Kalenderdatenbank)];
+    select_day2-->database2[("Kalenderdatenbank
+    Typ Zeiterfassung")];
     database2-->alert;
     database2-->entrytype{Eintragstyp};
     entrytype-->|regulärer Arbeitstag|usertype2{Nutzertyp};
-    usertype2-->|betroffener Nutzer|display_edit["Anzeige,
+    usertype2-->|betroffener Nutzer|display_edit("Anzeige,
     Änderung,
     Löschung,
-    falls nicht abgeschlossen"];
-    usertype2-->|Bereichsleiter, Leitung, Administrator|display_close["Anzeige,
+    falls nicht abgeschlossen");
+    usertype2-->|Bereichsleiter, Leitung, Administrator|display_close("Anzeige,
     abschließen,
-    wiedereröffnen"];
+    wiedereröffnen");
     entrytype-->|Dienstfrei|usertype3{Nutzertyp};
     usertype3-->usertype2;
-    usertype3-->|Personalverwaltung|display_only[Anzeige]
+    usertype3-->|Personalverwaltung|display_only(Anzeige)
     
-    database2-->export[Export];
+    database2-->export[Export des gewählten Monats];
     export-->permission2{Berechtigung};
-    permission2-->|Leitung, Personalverwaltung|fullexport["vollständiger Export
-    aller Zeiterfassungen
-    des gewählten Monats"];
-    permission2-->|Bereichsleiter|partexport["Export aller Zeiterfassungen
-    zugewiesener Bereiche
-    des gewählten Monats"];
-    permission2-->|Mitarbeiter|ownexport["Export der eigenen Zeiterfassung
-    des gewählten Monats"]
+    permission2-->fullexport["Leitung, Personalverwaltung, Admin:
+    vollständiger Export
+    aller Zeiterfassungen"];
+    permission2-->partexport["Bereichsleiter:
+    Export aller Zeiterfassungen
+    zugewiesener Bereiche"];
+    permission2-->ownexport["Mitarbeiter:
+    Export der eigenen Zeiterfassung"]
+
+    landing_page((Startseite))-....->database;
+    landing_page-......->database2;
+    database-.->summary("Kalenderwoche,
+    aktuell geplante Ereignisse,
+    nicht abgeschlossene vergangene Ereignisse, Mitarbeiter dienstbefreit");
+    database2-.->summary;
+    summary-......->select_day
 ```
 [Übersicht](#übersicht)
 
@@ -701,52 +724,64 @@ Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf di
 
 ```mermaid
 graph TD;
-    manage_vendors((Lieferanten))-->edit_vendor[bestehenden Lieferanten bearbeiten];
+    manage_vendors((Lieferanten))--->edit_vendor[bestehenden Lieferanten bearbeiten];
+    edit_vendor-->vendor_db[("Lieferanten-
+    datenbank")];
     manage_vendors-->new_vendor[neuer Lieferant];
-    edit_vendor-->add_vinfo["Dokumente hinzufügen
+    vendor_db-->add_vinfo["Dokumente hinzufügen
     Informationen aktualisieren,
     Preislistenfilter festlegen"];
     new_vendor-->add_vinfo;
+    add_vinfo-->vendor_db;
+    add_vinfo-->inactivate_vendor[Lieferant deaktivieren];
+    inactivate_vendor-.->delete_all_products[alle Produkte löschen];
     add_vinfo-->import_pricelist[Preisliste importieren];
-    import_pricelist-->delete_all_products[alle Artikel löschen];
+    import_pricelist-->delete_all_products;
     delete_all_products-->has_docs2{"Dokumente vorhanden,
     Einführung erfolgt,
     Stichprobenprüfung erfolgt,
     (geschützt)"};
-    has_docs2-->|ja|update[Aktualisierung nach Artikelnummer];
+    delete_all_products-...->has_docs{"Dokumente vorhanden,
+    Einführung erfolgt,
+    Stichprobenprüfung erfolgt,
+    (geschützt)"};
+    has_docs2-->|ja|update["Aktualisierung nach Artikelnummer"];
+    update-->product_db[("Produkt-
+    datenbank")];
     has_docs2-->|nein|delete[Löschung];
-    delete-->|Einfügen aus Preisliste|orderable(bestellbar);
-    delete-->|nicht in Preisliste enthalten|inorderable(nicht bestellbar)
-    update-->orderable;
-
-    manage_products((Produkte))-->edit_product[bestehendes Produkt bearbeiten];
-    manage_products-->add_product[neues Produkt];
-    add_product-->select_vendor[(Lieferanten Auswählen)];
-    select_vendor-->add_pinfo["Dokumente hinzufügen,
-    Information aktualiseren"];
-    add_pinfo-->known_vendor;
-
-    edit_product-->similar{ähnlie Produkte auswählen};
-    similar-->add_pinfo["Dokumente hinzufügen,
+    delete-->|Wiedereinfügung aus Preisliste|product_db;
+    
+    manage_products((Produkte))==>edit_product[bestehendes Produkt bearbeiten];
+    edit_product==>product_db;
+    product_db==>add_pinfo["Dokumente hinzufügen,
     Informationen aktualisieren"];
-    similar-->database[("aktualisiere gewählte Produkte
+    manage_products==>add_product[neues Produkt hinzufügen];
+    add_product==>select_vendor[Lieferanten wählen];
+    select_vendor==>vendor_db;
+    vendor_db==>known_vendor{Lieferant in Datenbank};
+    known_vendor==>|ja|add_pinfo;
+    known_vendor==>|nein|new_vendor
+
+    add_pinfo==>product_db;
+
+    edit_product==>similar{ähnliche Produkte auswählen};
+    similar==>update2["aktualisiere gewählte Produkte
     innerhalb der Datenbank,
     setze Verfügbarkeit,
     Handelware,
-    entziehe Einführung")];
-    known_vendor{Lieferant in Datenbank}-->|ja|add_pinfo;
-    known_vendor-->|nein|new_vendor
-    edit_product-->delete_product(lösche Produkt);
-    delete_product-->has_docs{"Produkt hat Dokumente
-    wurde eingeführt,
-    wurde stichprobengeprüft
-    (geschützt)"};
-    has_docs-->|nein|product_deleted["Produkt gelöscht"];
-    has_docs-->|yes|product_inactive["deaktiviere Produkt"];
-    database-->|inaktiv|product_inactive
-    product_deleted-->inorderable;
-    product_inactive-->inorderable;
-    edit_product-->product_inactive;
+    entziehe Einführung"];
+    update2==>product_db;
+    edit_product==>delete_product(Produkt löschen);
+    delete_product==>has_docs;
+    has_docs==>|nein|product_deleted["Produkt löschen"];
+    has_docs==>|ja|product_inactive["Produkt deaktivieren"];
+    product_deleted==>product_db;
+    product_inactive==>product_db;
+
+    product_db o-..-o state{Status};
+    state-.->|aktiv|orderable[bestellbar];
+    state-.->|inaktiv|inorderable[nicht bestellbar];
+    state-.->|gelöscht|inorderable;
 ```
 
 [Übersicht](#übersicht)
@@ -771,12 +806,16 @@ Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzl
 
 ```mermaid
 graph TD;
-    new_order((neue Bestellung))-->search_products[(Artikelsuche)];
-    search_products-->product_found{Artikel gefunden};
-    product_found-->|yes|add_product[zur Bestellung hinzufügen];
-    new_order-->add_manually[manuelle Angabe];
+    new_order((neue Bestellung))-->search_products[Artikelsuche];
+    search_products-->product_db[("Produkt-
+    datenbank")];
+    product_db-->product_found{Artikel gefunden};
+    product_found-->|ja|add_product["Artikel zur
+    Bestellung hinzufügen"];
+    new_order-->add_manually[manuell hinzufügen];
     product_found-->|nein|add_manually;
-    product_found-->|nein|manage_products((Produkte bearbeiten));
+    product_found---->|nein|manage_products(("Produkte
+    bearbeiten"));
     add_manually-->add_product;
     add_product-->search_products;
     add_product-->add_info["Bereich wählen,
@@ -784,68 +823,78 @@ graph TD;
     Dateien anhängen"];
     add_info-->approve_order{Bestellung freigeben};
     approve_order-->|mit Unterschrift|approved_orders(("freigegebene Bestellungen
-    nur von eigenen Bereichen,
-    außer Einkauf"));
+    (nur von eigenen Bereichen, außer Einkäufer oder Admin)"));
     approve_order-->|mit PIN|approved_orders;
     approve_order-->|nein|prepared_orders(("vorbereitete Bestellungen,
     nur von eigenen Bereichen,
     außer bestellberechtigt
     und Bereich ausgewählt"));
 
-    approved_orders-->process_order{Bestellung bearbeiten};
-    process_order-->disapprove[zurückweisen];
-    disapprove-->append_message[Nachricht anhängen];
-    append_message-->message_unit["alle Bereichsmitarbeiter
-    benachrichtigen"];
-    disapprove-->message_unit;
-    message_unit-->prepared_orders;
+    approved_orders==>process_order{Bestellung bearbeiten};
 
-    process_order-->|nicht eingeführt|incorporate;
-    incorporate-->incorporate_similar{"ähnliche Produkte"};
-    incorporate_similar-->|ja|select_similar["ähnliche wählen,
+    process_order=====>regulatory{"regulatorische Anforderungen
+    sofern anwendbar"};
+    regulatory==>incorporate[Produkteinführung];
+    incorporate==>incorporate_similar{"ähnline Artikel"};
+    incorporate_similar==>|ja|select_similar["ähnliche wählen,
     Daten anfügen"];
-    select_similar-->productdb[(Produktdatenbank)]
-    incorporate_similar-->|nein|insert_data[Daten anfügen];
-    insert_data-->productdb;
-    productdb-->checksdb[(Prüfungsdatenbank)];
+    select_similar==>productdb[("Produkt-
+    datenbank")]
+    incorporate_similar==>|nein|insert_data[Daten anfügen];
+    insert_data==>productdb;
+    productdb==>checksdb[("Prüfungs-
+    datenbank")];
+    regulatory==>sample_check[Stichprobenprüfung];
+    sample_check==>productdb;
 
-    process_order-->|Stichprobenprüfung erforderlich|sample_check[Stichprobenprüfung];
-    sample_check-->productdb;
+    process_order===>cancel_order[Storno];
+    cancel_order==>rewrite_cancel[in Stornierung umwandeln];
+    rewrite_cancel==>approved_orders;
 
-    process_order-->mark[markieren];
-    mark-->|bestellt|order_type{Bestellart};
-    order_type-->|Bestellung|auto_delete[automatische Lösung
-    nach x Tagen];
-    order_type-->|Rücksendung|auto_delete;
-    order_type-->|Service|auto_delete;
-    order_type-->|Storno|order_deleted(Bestellung gelöscht)
-    mark-->|ausgeliefert|auto_delete;
-    mark-->|archiviert|delete[manuelle Löschung];
-    process_order-->|löschen|delete;
-    process_order-->cancel_order[Storno];
-    cancel_order-->rewrite_cancel[in Stornierung umwandeln];
-    rewrite_cancel-->approved_orders;
-    process_order-->return_order[Rücksendung];
-    return_order-->clone_order["Bestellung kopieren,
+    process_order===>return_order[Rücksendung];
+    return_order==>clone_order["Bestellung kopieren,
     als Rücksendung markieren"];
-    clone_order-->approved_orders
-    delete-->delete_permission{"Berechtigung zur Löschung"};
-    delete_permission-->|Bereichsmitarbeiter|order_deleted;
-    delete_permission-->|Einkauf, unbearbeitete Bestellung|order_deleted;
-    delete_permission-->|Einkauf, bearbeitete Bestellung|approved_orders;
-    process_order-->update_state[Bestellstatusaktualisierung];
-    update_state-->append_inform["Information angebene,
-    Bereichsmitarbeiter benachrichtigen"];
-    append_inform-->process_order
-    
-    process_order-->|Information anfügen|process_order;
-    process_order-->message((Besteller benachrichtigen))
+    clone_order==>approved_orders
 
-    prepared_orders-->mark_bulk{"Bestellungen für
+    process_order==>disapprove[zurückweisen];
+    disapprove==>|optional Nachricht anfügen|message_unit["alle Bereichsmitarbeiter
+    benachrichtigen"];
+    message_unit==>prepared_orders;
+
+    process_order======>mark{markieren};
+    mark==>|bestellt|order_type{Bestelltyp};
+    order_type==>|Bestellung|auto_delete["automatische Löschung
+    nach x Tagen"];
+    order_type==>|Rücksendung|auto_delete;
+    order_type==>|Service|auto_delete;
+    order_type==>|Storno|order_deleted(Bestellung gelöscht)
+    mark==>|erhalten|auto_delete;
+    mark==>|ausgeliefert|auto_delete;
+    mark==>|archiviert|delete[manuelle Löschung];
+    auto_delete==>order_deleted;
+    
+    process_order==>delete;
+    delete==>delete_permission{"Berechtigung
+    zur Löschung"};
+    delete_permission==>|Bereichsmitarbeiter|order_deleted;
+    delete_permission==>|Einkauf, unbearbeitete Bestellung|order_deleted;
+    delete_permission==>|Einkauf, bearbeitete Bestellung|approved_orders;
+
+    process_order====>update_state[Bestellstatusaktualisierung];
+    update_state==>append_inform["Information angeben,
+    Bereichsmitarbeiter benachrichtigen"];
+    append_inform==>process_order
+    
+    process_order===>add_orderinfo[Information anfügen];
+    add_orderinfo==>process_order;
+    process_order===>message(("Besteller
+    benachrichtigen"))
+
+    prepared_orders-.->mark_bulk{"Bestellungen für
     Freigabe markieren"};
-    mark_bulk-->|ja|approve_order;
-    mark_bulk-->|nein|prepared_orders;
-    prepared_orders-->add_product;
+    mark_bulk-.->|ja|approve_order;
+    mark_bulk-.->|nein|prepared_orders;
+    prepared_orders-.->add_product;
 ```
 Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.
 Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung widerrufen. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus.

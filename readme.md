@@ -332,32 +332,30 @@ graph TD;
     application((application))-->login[login];
     login-->scan_code;
     scan_code{scan code}-->user_db[(user database)];
-    user_db-->|found|logged_in[logged in];
+    user_db-->|found|permission{permission};
     user_db-->|not found|login;
-    logged_in-->manage_users((manage users));
-    manage_users-->new_user[new user];
-    manage_users-->edit_user[edit user];
-    new_user-->user_settings["set name, authorization,
+
+    permission-..->manage_users((manage users));
+    manage_users-..->new_user[new user];
+    manage_users-.->edit_user[edit user];
+    new_user-.->user_settings["set name, authorization,
     unit, photo, order auth pin, skills, trainings,
-    login token, user documents"];
-    edit_user-->user_settings;
-    user_settings-->export_token[export token];
-    export_token-->user(((user)));
-    user-->login;
-    user_settings-->user;
+    login token, user documents, work hours, vacation days"];
+    edit_user-.->user_settings;
+    edit_user-.->export_token[export token];
+    user_settings-.->user_db;
+    edit_user-.->delete_user[delete user];
+    delete_user-.->user_db;
 
-    logged_in-->own_profile((profile));
-    own_profile-->profile["view information,
-    renew photo"];
-    profile-->user;
+    permission==>own_profile((own profile));
+    own_profile==>profile["view information,
+    renew photo, application settings"];
+    profile==>user_db;
 
-    edit_user-->delete_user[delete user];
-    delete_user-->user;
-
-    user-->|has pin|orders((approve orders))
-    user-->|authorized|authorized(("see content based
+    permission-->|has pin|orders((approve orders))
+    permission-->|authorized|authorized(("see content based
     on authorization"))
-    user-->|units|units(("see content based
+    permission-->|units|units(("see content based
     on units"))
 ```
 
@@ -414,33 +412,33 @@ Output will be copied to clipboad on clicking or tapping the output field.
 ```mermaid
 graph TD;
     textrecommendation(("text
-    recommendation")) -->select[select template];
-    select -->chunks[(chunks)];
-    chunks-->|get recent by name|display["display template
+    recommendation"))==>select[select template];
+    select===>chunks[("database containing
+    chunks and arrangements")];
+    chunks==>|"get most recent
+    template by name"|display["display template
     and inputs"];
-    display -->|input|render(rendered text);
+    display==>|input and update|render(rendered text);
 
     managechunks(("manage
-    text chunks")) -->select2["select recent
+    text chunks"))--->select2["select recent
     by name or new"];
-    managechunks(("manage
-    text chunks")) -->select3["select any or new"];
-    select2-->chunks2[(chunks)];
-    select3-->chunks2;
-    chunks2 -->editchunk[edit chunk];
-    editchunk -->type{type};
-    type -->|replacement|chunks2;
-    type -->|text|chunks2;
+    managechunks-->select3["select any or new"];
+    select2-->chunks;
+    select3--->chunks;
+    chunks--->editchunk[edit chunk];
+    editchunk-->type{type};
+    type--->|"add replacement"|chunks;
+    type-->|"add text"|chunks;
     
-    managetemplates(("manage
-    text templates")) -->select4["select recent
+    managetemplate(("manage
+    text templates"))-..->select4["select recent
     by name or new"];
-    managetemplates(("manage
-    text chunks")) -->select5["select any or new"];
-    select4-->chunks3[(chunks)];
-    select5-->chunks3;
-    chunks3 -->edittemplate[edit template];
-    edittemplate -->|add template|chunks3;
+    managetemplate-.->select5["select any or new"];
+    select4-.->chunks;
+    select5-..->chunks;
+    chunks-...->edittemplate[edit template];
+    edittemplate-.->|add template|chunks;
 ```
 
 [Content](#content)
@@ -469,32 +467,58 @@ Forms can have a restricted access to be only visible to defined roles. This way
 ```mermaid
 graph TD;
     manage_components(("manage
-    components"))-->|new component|edit_component["edit content,
+    components"))===>select["select recent
+    component by name"];
+    select==>forms_database[("forms database
+    with components,
+    forms, bundles")];
+    manage_components==>select2["select any
+    component"];
+    select2==>forms_database;
+    manage_components==>|"new
+    component"|edit_component["edit content,
     add widgets,
     reorder"];
-    manage_components(("manage
-    components"))-->|existing component|edit_component;
-    edit_component-->|save|new_forms_database[("append new dataset to
-    forms database")];
+    forms_database==>|"existing
+    component
+    from database"|edit_component;
+    edit_component==>save[save];
+    save===>|"new version,
+    message with approval request"|forms_database;
 
     manage_forms(("manage
-    forms"))-->|new form|edit_form["edit form,
-    reorder components"];
-    manage_forms-->|existing form|edit_form;
-    edit_form-->add_component[add component];
-    add_component-->forms_database[(forms database)];
-    forms_database-->|latest unhidden, approved component|edit_form;
-    edit_form-->|save|new_forms_database;
-
+    forms"))--->select3["select recent
+    form by name"];
+    select3-->forms_database;
+    manage_forms-->select4["select any
+    form"];
+    select4-->forms_database;
+    manage_forms-->|new form|edit_form["edit form,
+    add, reorder components"];
+    forms_database-->|"existing
+    form
+    from database"|edit_form;
+    edit_form-->save;
+    save--->|"new version,
+    message with approval request"|forms_database;
+    
     manage_bundles(("manage
-    bundles"))-->|new bundle|edit_bundle["edit bundle"];
-    manage_bundles-->|existing bundle|edit_bundle;
-    edit_bundle-->add_form[add form];
-    add_form-->forms_database2[(forms database)];
-    forms_database2-->|latest unhidden, approved form|edit_bundle;
-    edit_bundle-->|save|new_forms_database
+    bundles"))-..->select5["select recent
+    bundle by name"];
+    select5-.->forms_database;
+    manage_bundles-.->select6["select any
+    bundle"];
+    select6-->forms_database;
+    manage_bundles-.->|new bundle|edit_bundle["edit bundle,
+    add, reorder forms"];
+    forms_database-.->|"existing
+    bundle
+    from database"|edit_bundle;
+    edit_bundle-..->save;
+    save-..->|"new version,
+    message with approval request"|forms_database;
 
-    new_forms_database-->returns("returns only latest dataset on request
+    forms_database o----oreturns("returns only latest dataset on request
     if named item is not hidden,
     approved and permissions match")
 ```
@@ -550,55 +574,58 @@ If records contain data from restricted forms, summaries will only contain these
 
 ```mermaid
 graph TD;
-    records((records))-->identifiersheet(("create
+    identifiersheet(("create
     identifier
     sheet"));
     identifiersheet-->input[input data];
     input-->|generate|print("print sheet,
     handout to workmates");
 
-    records-->fillform((fill out form));
-    fillform-->selectform[select form];
-    selectform-->forms[(forms)];
-    forms-->|"get recent by name
+    fillform((fill out form))=========>selectform[select form];
+    selectform==>form_db[("form
+    database")];
+    form_db==>|"get recent by name
     if permissions match"|displayform[display form];
-    displayform-->inputdata[add data];
-    inputdata-->|input new dataset with form name|recorddb[(record database)];
-    displayform-->idimport[import by identifier];
-    idimport-->recorddb2[(record database)];
-    recorddb2-->selectbyid[retrieve all with identifier];
-    selectbyid-->|render last appended data|inputdata;
-    displayform-->|permission to export|exportform[export fillable pdf]
+    displayform==>inputdata[add data];
+    inputdata==>|"input new dataset
+    with form name"|record_db[("record
+    database")];
 
-    print-.->idimport;
+    displayform==>idimport[import by identifier];
+    idimport==>record_db;
+    record_db==>selectbyid[retrieve all with identifier];
+    selectbyid==>|render last appended data|inputdata;
+    displayform===>|permission to export|exportform[export fillable pdf]
 
-    records-->summaries((record summary));
-    summaries-->recorddb3[(record database)]
-    recorddb3-->|"not fully closed
-    and within limit"|displayids[display identifier];
-    recorddb3-->|matching filter|displayids;
+    print o-.-o idimport;
+
+    summaries(("record
+    summary"))----->record_db;
+    record_db-->displayids["display identifiers
+    not fully closed
+    or matching filter"];
     displayids-->|select|summary["display summary
     if permissions match"];
     summary-->close[close];
     close-->complaint{complaint};
     complaint-->|yes|complaintclose[prrc, supervisor AND qmo];
-    complaintclose-->recorddb3;
+    complaintclose-->record_db;
     complaint-->|no|nocomplaintclose[supervisor or ceo];
-    nocomplaintclose-->recorddb3;
+    nocomplaintclose-->record_db;
     summary-->export[export];
     export-->pdf("summary as pdf,
     attached files");
     summary-->matchbundles[match with form bundles];
     matchbundles-->missing{missing form};
-    missing-->|yes|appenddata[append form];
-    appenddata-->forms;
+    missing==>|yes|appenddata[append form];
+    appenddata==>displayform;
     missing-->|no|nonemissing(status message);
     summary-->retype[reassign record type];
-    retype-->recorddb3;
+    retype-->record_db;
 
-    recorddb3-->notification((notification));
-    notification-->|"unclosed,
-    last record x days ago"|message(message to units users)
+    notification((notification))-....->record_db;
+    record_db-..->|"unclosed,
+    last record x days ago"|message(message to units users);
 ```
 
 [Content](#content)
@@ -644,59 +671,66 @@ Exports are ordered by user name with exporting user coming first regardless, fo
 
 ```mermaid
 graph TD;
-    scheduling((scheduling))-->select_day[select day];
-    scheduling-->search[search];
-    select_day-->database[(calendar db)];
-    select_day-->add[add];
-    add-->database;
-    search-->database;
-    database-->matches["display matches
-    for assigned units"];
-    matches-->permission{"admin, ceo,
+    scheduling((scheduling))===>select_day[select day];
+    scheduling==>search[search];
+    select_day==>database[("calendar db
+    schedule type")];
+    select_day==>add[add];
+    add==>database;
+    search==>database;
+    database==>matches("display matches
+    for assigned units");
+    matches==>permission{"admin, ceo,
     qmo,
     supervisor"};
-    permission-->|yes|edit[edit or delete];
-    permission-->|no|complete[mark as completed];
-    edit-->complete;
-    database-->alert["alert selected unit members once"]
-
-    landing_page((landing page))-->summary["calendar week,
-    current scheduled events,
-    uncompleted past scheduled events"];
-    summary-->select_day
+    permission==>|yes|edit[edit or delete];
+    permission==>|no|complete[mark as completed];
+    edit==>complete;
+    database==>alert["alert selected unit members once"]
 
     timesheet((timesheet))-->select_day2[select day];
     select_day2-->add2[add];
     add2-->usertype{usertype};
-    usertype-->|any|own[own entries];
-    usertype-->|human ressources, supervisor|foreign[own and third party];
-    own-->database2;
+    usertype-->any["any:
+    own entries"];
+    usertype-->foreign["human ressources, supervisor:
+    own and third party"];
+    any-->database2;
     foreign-->database2;
-    select_day2-->database2[(calendar db)];
+    select_day2-->database2[("calendar db
+    timesheet type")];
     database2-->alert;
     database2-->entrytype{entry type};
     entrytype-->|regular working day|usertype2{usertype};
-    usertype2-->|affected user|display_edit["display
+    usertype2-->|affected user|display_edit("display
     edit, delete
-    if not closed"];
-    usertype2-->|supervisor, ceo, admin|display_close["display
-    close, open"];
+    if not closed");
+    usertype2-->|supervisor, ceo, admin|display_close("display
+    close, open");
     entrytype-->|unavailable|usertype3{usertype};
     usertype3-->usertype2;
-    usertype3-->|human ressources|display_only[display]
+    usertype3-->|human ressources|display_only(display)
     
-    database2-->export[export];
+    database2-->export[export of selected month];
     export-->permission2{permission};
-    permission2-->|admin, ceo, human ressources|fullexport["full export of all
+    permission2-->fullexport["admin, ceo, human ressources:
+    full export of all
+    user timesheets"];
+    permission2-->partexport["supervisor:
+    export of all
     user timesheets
-    for selected month"];
-    permission2-->|supervisor|partexport["export of all
-    user timesheets
-    of assigned units
-    for selected month"];
-    permission2-->|user|ownexport["export of own
-    timesheet display only
-    for selected month"]
+    of assigned units"];
+    permission2-->ownexport["user:
+    export of own
+    timesheet display only"]
+
+    landing_page((landing page))-....->database;
+    landing_page-......->database2;
+    database-.->summary("calendar week,
+    current scheduled events,
+    uncompleted past scheduled events, staff off duty entries");
+    database2-.->summary;
+    summary-......->select_day
 ```
 [Content](#content)
 
@@ -744,56 +778,67 @@ On setting any of these, similar products can be selected to apply this setting 
 
 ```mermaid
 graph TD;
-    manage_vendors((manage vendors))-->edit_vendor[edit existing vendor];
+    manage_vendors((manage vendors))--->edit_vendor[edit existing vendor];
+    edit_vendor-->vendor_db[(vendor database)];
     manage_vendors-->new_vendor[new vendor];
-    edit_vendor-->add_vinfo["add documents,
+    vendor_db-->add_vinfo["add documents,
     update info,
     set pricelist filter"];
     new_vendor-->add_vinfo;
+    add_vinfo-->vendor_db;
+    add_vinfo-->inactivate_vendor[inactivate vendor];
+    inactivate_vendor-.->delete_all_products[delete all products];
     add_vinfo-->import_pricelist[import pricelist];
-    import_pricelist-->delete_all_products[delete all products];
+    import_pricelist-->delete_all_products;
     delete_all_products-->has_docs2{"product
     has documents,
     been incorporated,
     had samplecheck
     (protected)"};
-    has_docs2-->|yes|update[update based on ordernumber];
-    has_docs2-->|no|delete[delete];
-    delete-->|reinserted from pricelist|orderable(orderable);
-    delete-->|not in pricelist|inorderable(not available in orders)
-    update-->orderable;
-
-    manage_products((manage products))-->edit_product[edit existing product];
-    manage_products-->add_product[add new product];
-    add_product-->select_vendor[(select vendor)];
-    select_vendor-->add_pinfo["Add documents,
-    update info"];
-    add_pinfo-->known_vendor;
-
-    edit_product-->similar{select similar products};
-    similar-->add_pinfo["add documents,
-    update info"];
-    similar-->database[("update selected products
-    within database,
-    apply active state,
-    trading good,
-    revoke incorporation")];
-    known_vendor{vendor in database}-->|yes|add_pinfo;
-    known_vendor-->|no|new_vendor
-    edit_product-->delete_product(delete product);
-    delete_product-->has_docs{"product
+    delete_all_products-...->has_docs{"product
     has documents,
     been incorporated,
     had samplecheck
     (protected)"};
-    has_docs-->|no|product_deleted["product
-    deleted"];
-    has_docs-->|yes|product_inactive["deactivate
+    has_docs2-->|yes|update["update based on ordernumber
+    if pricelist import"];
+    update-->product_db[(product database)];
+    has_docs2-->|no|delete[delete];
+    delete-->|reinserted from pricelist|product_db;
+    
+    manage_products((manage products))==>edit_product[edit existing product];
+    edit_product==>product_db;
+    product_db==>add_pinfo["Add documents,
+    update info"];
+    manage_products==>add_product[add new product];
+    add_product==>select_vendor[select vendor];
+    select_vendor==>vendor_db;
+    vendor_db==>known_vendor{vendor in database};
+    known_vendor==>|yes|add_pinfo;
+    known_vendor==>|no|new_vendor
+
+    add_pinfo==>product_db;
+
+    edit_product==>similar{select similar products};
+    similar==>update2["update selected products
+    within database,
+    apply active state,
+    trading good,
+    revoke incorporation"];
+    update2==>product_db;
+    edit_product==>delete_product(delete product);
+    delete_product==>has_docs;
+    has_docs==>|no|product_deleted["delete
     product"];
-    database-->|inactive|product_inactive
-    product_deleted-->inorderable;
-    product_inactive-->inorderable;
-    edit_product-->product_inactive;
+    has_docs==>|yes|product_inactive["deactivate
+    product"];
+    product_deleted==>product_db;
+    product_inactive==>product_db;
+
+    product_db o-..-o state{state};
+    state-.->|active|orderable[orderable];
+    state-.->|inactive|inorderable[inorderable];
+    state-.->|deleted|inorderable;
 ```
 
 [Content](#content)
@@ -818,83 +863,86 @@ Processed orders are also added to a second database with reduced data. This dat
 
 ```mermaid
 graph TD;
-    new_order((new order))-->search_products[(search products)];
-    search_products-->product_found{product found};
+    new_order((new order))-->search_products[search products];
+    search_products-->product_db[(product database)];
+    product_db-->product_found{product found};
     product_found-->|yes|add_product[add product to order];
     new_order-->add_manually[add manually];
     product_found-->|no|add_manually;
-    product_found-->|no|manage_products((manage products));
+    product_found---->|no|manage_products((manage products));
     add_manually-->add_product;
     add_product-->search_products;
     add_product-->add_info["set unit,
     justification,
     add files"];
     add_info-->approve_order{approve order};
-    approve_order-->|by signature|approved_orders(("approved orders,
-    only from own unit
-    unless admin
-    or purchase"));
+    approve_order-->|by signature|approved_orders(("approved orders
+    (from own unit unless admin or purchase)"));
     approve_order-->|by pin|approved_orders;
-    approve_order-->|no|prepared_orders(("prepared orders,
-    only from own unit
-    unless admin or
-    order authorized
-    and selected"));
+    approve_order-->|no|prepared_orders(("prepared orders
+    (from own unit unless admin or
+    order authorized and selected)"));
 
-    approved_orders-->process_order{process order};
-    process_order-->disapprove[disapprove];
-    disapprove-->append_message[append message];
-    append_message-->message_unit[message all unit members];
-    disapprove-->message_unit;
-    message_unit-->prepared_orders;
+    approved_orders==>process_order{process order};
 
-    process_order-->|not incorporated|incorporate;
-    incorporate-->incorporate_similar{"similar
+    process_order=====>regulatory{"regulatory requirement
+    if applicable"};
+    regulatory==>incorporate[incorporate];
+    incorporate==>incorporate_similar{"similar
     products"};
-    incorporate_similar-->|yes|select_similar["select similar,
+    incorporate_similar==>|yes|select_similar["select similar,
     append data"];
-    select_similar-->productdb[(product database)]
-    incorporate_similar-->|no|insert_data[insert data];
-    insert_data-->productdb[(product database)];
-    productdb[(product database)]-->checksdb[(checks database)];
+    select_similar==>productdb[(product database)]
+    incorporate_similar==>|no|insert_data[insert data];
+    insert_data==>productdb;
+    productdb==>checksdb[(checks database)];
+    regulatory==>sample_check[sample check];
+    sample_check==>productdb;
 
-    process_order-->|sample check required|sample_check[sample check];
-    sample_check-->productdb[(product database)];
+    process_order===>cancel_order[cancel order];
+    cancel_order==>rewrite_cancel[rewrite order as cancellation];
+    rewrite_cancel==>approved_orders;
 
-    process_order-->mark[mark];
-    mark-->|processed|order_type{order type};
-    order_type-->|order|auto_delete[auto delete after X days];
-    order_type-->|return|auto_delete;
-    order_type-->|service|auto_delete;
-    order_type-->|cancellation|order_deleted(order deleted)
-    mark-->|delivered|auto_delete;
-    mark-->|archived|delete[delete manually];
-    process_order-->|delete|delete;
-    process_order-->cancel_order[cancel order];
-    cancel_order-->rewrite_cancel[rewrite order as cancellation];
-    rewrite_cancel-->approved_orders;
-    process_order-->return_order[return order];
-    return_order-->clone_order[clone order, set return type];
-    clone_order-->approved_orders
-    delete-->delete_permission{"permission
-    to delete"};
-    delete_permission-->|is admin|order_deleted;
-    delete_permission-->|is unit member|order_deleted;
-    delete_permission-->|purchase member, unprocessed order|order_deleted;
-    delete_permission-->|purchase member, processed order|approved_orders;
-    process_order-->update_state[update state];
-    update_state-->append_inform["append info,
-    message all unit members"];
-    append_inform-->process_order
+    process_order===>return_order[return order];
+    return_order==>clone_order[clone order, set return type];
+    clone_order==>approved_orders
+
+    process_order==>disapprove[disapprove];
+    disapprove==>|append optional message|message_unit[message all unit members];
+    message_unit==>prepared_orders;
+
+    process_order======>mark{mark};
+    mark==>|processed|order_type{order type};
+    order_type==>|order|auto_delete[auto delete after X days];
+    order_type==>|return|auto_delete;
+    order_type==>|service|auto_delete;
+    order_type==>|cancellation|order_deleted(order deleted)
+    mark==>|received|auto_delete;
+    mark==>|delivered|auto_delete;
+    mark==>|archived|delete[delete manually];
+    auto_delete==>order_deleted;
     
-    process_order-->|add info|process_order;
-    process_order-->message((message user))
+    process_order==>delete;
+    delete==>delete_permission{"permission
+    to delete"};
+    delete_permission==>|is unit member|order_deleted;
+    delete_permission==>|purchase member, unprocessed order|order_deleted;
+    delete_permission==>|purchase member, processed order|approved_orders;
 
-    prepared_orders-->mark_bulk{"mark orders
+    process_order====>update_state[update state];
+    update_state==>append_inform["append info,
+    message all unit members"];
+    append_inform==>process_order
+    
+    process_order===>add_orderinfo[add info];
+    add_orderinfo==>process_order;
+    process_order===>message((message user))
+
+    prepared_orders-.->mark_bulk{"mark orders
     for approval"};
-    mark_bulk-->|yes|approve_order;
-    mark_bulk-->|no|prepared_orders;
-    prepared_orders-->add_product;
+    mark_bulk-.->|yes|approve_order;
+    mark_bulk-.->|no|prepared_orders;
+    prepared_orders-.->add_product;
 ```
 Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.
 Sample checks are added to the records. Defined authorized users can revoke the sample check from within the [audit module](#tools). New checks trigger a sytem message to these users.
