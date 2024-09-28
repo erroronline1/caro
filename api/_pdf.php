@@ -174,8 +174,15 @@ class PDF{
 			foreach($entries as $key => $value){
 				$pdf->SetFont('helvetica', 'B', 10); // font size
 				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
+
 				$pdf->SetFont('helvetica', '', 10); // font size
 				$originalFontSize = $pdf->getFontSizePt();
+
+				if ($pdf->GetY() > $pdf->getPageHeight() - INI['pdf']['record']['marginright'] - $nameLines*10) {
+					$pdf->setPage($pdf->getPage() + 1);
+					$pdf->SetY(INI['pdf']['record']['margintop']);
+				}
+
 				switch ($value['type']){
 					case 'textsection':
 						$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
@@ -195,19 +202,19 @@ class PDF{
 							$pdf->MultiCell(133, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 67, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							$pdf->Ln(-7);
 						}
-						$pdf->Ln(max([1, $nameLines - 1 - count($value['value'])]) * 5);
+						$pdf->Ln(max([1, $nameLines - count($value['value'])]) * 5);
 						break;
 					case 'multiline':
 						$height = 31;
 						$pdf->SetFontSize(0); // variable font size
 						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
-						$pdf->Ln($height + max([1, $nameLines - 1]) * 5);
+						$pdf->Ln($height + max([1, $nameLines]) * 5);
 						break;
 					default:
 						$height = 5;
 						$pdf->SetFontSize(0); // variable font size
 						$pdf->TextField($key, 133, $height, [], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
-						$pdf->Ln($height + max([1, $nameLines - 1]) * 5);
+						$pdf->Ln($height + max([1, $nameLines]) * 5);
 				}
 			}
 		}
@@ -340,7 +347,7 @@ class RECORDTCPDF extends TCPDF {
 			if ($width && $height){ // avoid division by zero error for faulty input
 				$right_margin = $width * 20 / $height;
 				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-				$this->Image('../' . $image, $this->getPageDimensions()['wk'] - 10 - $right_margin, 10, '', 20, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$this->Image('../' . $image, $this->getPageWidth() - 10 - $right_margin, 10, '', 20, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
 				$right_margin += 5;
 			}
 		}
@@ -368,22 +375,22 @@ class RECORDTCPDF extends TCPDF {
 	public function Footer() {
 		// Position at 15 mm from bottom
 		$this->SetY(-15);
-		$right_margin = 0;
+		$imageMargin = 0;
 		if ($image = INI['pdf']['record']['footer_image']){
 			list($width, $height, $type, $attr) = getimagesize('../' . $image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				// given the image will always be 10mm high
-				$right_margin = $width * 10 / $height;
+				$imageMargin = $width * 10 / $height;
 				// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-				$this->Image('../' . $image, $this->getPageDimensions()['wk'] - 10 - $right_margin, $this->GetY(), '', 10, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
-				$right_margin += 5;
+				$this->Image('../' . $image, $this->getPageWidth() - 10 - $imageMargin, $this->GetY(), '', 10, '', '', 'R', true, 300, '', false, false, 0, false, false, false);
+				$imageMargin += 5;
 			}
 		}
 		// Set font
 		$this->SetFont('helvetica', 'I', 8);
 		// company contacts and page number
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$this->MultiCell($this->getPageDimensions()['wk'] - INI['pdf']['record']['marginleft'] - 10 - $right_margin, 10, LANG::GET('company.address') . ' | ' . INI['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, INI['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, INI['pdf']['record']['marginbottom'], 'T', true);
+		$this->MultiCell($this->getPageWidth() - INI['pdf']['record']['marginleft'] - 10 - $imageMargin, 10, LANG::GET('company.address') . ' | ' . INI['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, INI['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, INI['pdf']['record']['marginbottom'], 'T', true);
 	}
 }
 
