@@ -60,6 +60,7 @@
     * [Tool endpoints](#tool-endpoints)
     * [User endpoints](#user-endpoints)
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
+    * [Terms of service for using the application](#terms-of-service-for-using-the-application)
     * [Web Application](#web-application)
     * [Backend](#backend)
 * [Risk assessment](#risk-assessment)
@@ -3258,6 +3259,20 @@ Sample response
 # Statement on technical guidelines on data security
 This software aims to match as much relevant aspects of security measures as reasonable and possible. The software is *not* responsible for the infrastructure though. Running the neccessary servers, backups, networks device user registration, etc. are within the duties of your IT-department.
 
+## Terms of service for using the application
+
+### Data safety
+This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application my be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token inform a user of following permission groups immediately: :permissions (*as defined within setup.ini for permissions->users*)
+
+### Your data
+This application is part of quality management control. Your data is necessary for documentation and ressource management. You can check your data within your profile. Some data may have to be set by a member of the administration, other can be set and appended by yourself. In case your account is deleted, sent messages and common used information (orders, checks, approvals, your name as author and contributor to documentation) remain within the system due to legitimate interest of consistent documentation and operational procedures.
+
+### Device permissions
+This application requests permission to use a camera and send notifications. Camera access may be neccessary to append photos to documentation and scan 2D-codes. Latter can be achieved by a dedicated terminal device. You may not be able to log in without this permission and limit your documentation abilities. Notifications inform about new in-app messages and support a better work condition. You may revoke the permissions through the browser settings.
+
+### Feedback
+If you experience any issues with data security or application usage contact :issue_mail (*as defined within setup.ini for application->issue_mail*) immidiately providing details and a response address.
+
 ### Encryption statement
 > **Unfortunately there appears to be no reasonable way to encrypt data by the application architecture considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for all interchangeable staff members is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures either have to depend on unreachability for the network from outside where frontend and backend are supposed to run within a closed network (LAN, restricted WiFi, VPN), or Transparent Data Encryption / Disk Level Encryption on the server and client side which both are a matter of responsibility of the operator of the infrastructure. Data in transit is encrypted for the application relies on an SSL-connection at all times.**
 
@@ -3291,17 +3306,17 @@ I welcome any constructive input on this topic.
 
 ### 3.1.1 Prüfaspekt (1): Anwendungszweck
 * O.Purp_1 Der Hersteller MUSS die rechtmäßigen Zwecke der Web-Anwendung und die Verarbeitung von personenbezogenen Daten offenlegen (etwa in der Beschreibung der Nutzungsbedingungen der Web-Anwendung) und den Nutzer spätestens bei der erstmaligen Nutzung der Anwendung darüber informieren.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Purp_2 Die Web-Anwendung DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
     > Only active and intentional user input is processed and stored.
 * O.Purp_3 Die Web-Anwendung MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Purp_4 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von der Web-Anwendung oder dem Hintergrundsystem erfasst, erhalten oder genutzt werden.
     > Only active and intentional user input is processed and stored.
 * O.Purp_5 Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden.
-    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the terms of service, to be acknowledged on login.
+    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login.
 * O.Purp_6 Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
-    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the terms of service, to be acknowledged on login. All individual system information can be accessed through the profile.
+    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login. All individual system information can be accessed through the profile.
 * O.Purp_7 Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
     > [List of third party software](#ressources)
 * O.Purp_8 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten vollumfänglich infrandormieren und sein Einverständnis einholen (OPT-IN).
@@ -3323,7 +3338,7 @@ I welcome any constructive input on this topic.
 * O.Arch_6 Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden.
     > Used languages and are solely limited to HTML, CSS, JavaScript and PHP. Contents are delivered by the backend only.
 * O.Arch_7 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
-    > Terms of service have to be confirmed on login. These contain an eMail address.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
 * O.Arch_8 Die Web-Anwendung MUSS beim Start die Aktualität des genutzten Web-Browsers prüfen. Wenn die Installation eines sicherheitsrelevanten Updates noch nicht erfolgt ist, DARF die Web-Anwendung KEINEN Zugriff auf sensible Daten ermöglichen.
     > The operator of the infrastructure is responsible for browser actuality. How is that supposed to work anyway?
 * O.Arch_9 Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und X-Frame-Options.
@@ -3351,7 +3366,7 @@ I welcome any constructive input on this topic.
 * O.Source_10 Die Web-Anwendung MUSS Maßnahmen vorsehen, die verhindern, dass Funktionalitäten, die nicht in der Entwicklungshoheit des Herstellers liegen, in die WebAnwendung eingeschleust und zur Ausführung gebracht werden.
     > Inputs are sanitized and masked by default.
 * O.Source_11 Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten.
-    > Sensitive data is always handled as PUT or POST. [API documendation](#api-documentation)
+    > Sensitive data is always handled as PUT or POST. [API documentation](#api-documentation)
 
 ### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
 * O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen.
@@ -3374,11 +3389,16 @@ I welcome any constructive input on this topic.
 ### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
 > [Encryption statement](#encryption-statement)
 
-* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
+* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden.
+    > Encrypted data uses a server-side SHA-encrypted key for user validation.
 * O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
+    > Encryption, where applicable, uses SHA-256 algorithm for encryption.
 * O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen.
+    > Encrypted data uses a server-side SHA-encrypted key for user validation.
 * O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt werden. 
+    > Encrypted data uses a server-side SHA-encrypted key for user validation.
 * O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
+    > Encryption, where applicable, uses SHA-256 algorithm for encryption.
 
 ### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
 * O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden einer Anwendungssitzung dokumentieren.
@@ -3420,7 +3440,7 @@ I welcome any constructive input on this topic.
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
     > Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters.
 * O.Pass_2 Für die Einrichtung der Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
-    > Login tokes are always generated by the system on request of an authorized administrative user.
+    > Login tokens are always generated by the system on request of an authorized administrative user.
 * O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
     > Login tokens can be renewed by authorized administrative users.
 * O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden.
@@ -3432,7 +3452,7 @@ I welcome any constructive input on this topic.
 * O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
     > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively.
 * O.Data_2 Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Data_3 Die Web-Anwendung DARF Ressourcen, die einen Zugriff auf sensible Daten ermöglichen, gegenüber Dritten NICHT verfügbar machen.
     > There are no interfaces outside of the closed environment.
 * O.Data_4 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus in der Web-Anwendung gehalten werden.
@@ -3446,24 +3466,25 @@ I welcome any constructive input on this topic.
 * O.Data_8 Bei der Erhebung von sensiblen Daten durch die Verwendung von Aufnahmegeräten (z.B. Kamera), MUSS vorgebeugt werden, dass andere Anwendungen darauf Zugriff erlangen könnten, etwa über eine Mediengalerie.
     > Camera pictures are not stored in shared folders and exist only as form data before submission.
 * O.Data_9 Bei der Eingabe sensibler Daten über die Tastatur SOLL die Web-Anwendung unterbinden, dass Aufzeichnungen für Dritte erkennbar werden. 
+    > The operator of the infrastructure is responsible to prevent malware on terminal devices.
 * O.Data_10 Bei der Eingabe sensibler Daten SOLL der Export in die Zwischenablage unterbunden werden. Die Anwendung KANN alternativ eine eigene Zwischenablage implementieren, welche vor dem Zugriff durch andere Anwendungen geschützt ist.
     > Content is not selectable by default. Clipboard activites are implemented on insensitive data only.
 * O.Data_11 Sensible Daten DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, exportiert werden.
     > Data exports happen in other modules than inputs. Data is always sanitized and processed before exports.
 * O.Data_12 Durch die Web-Anwendung kann der Zugriff für Dritte und die Speicherung des Bildschirms (z. B. Screenshots und Anzeigen für das App-Switching) nicht unterbunden werden. Über die Nutzungsbedingungen MUSS der Nutzer darüber informiert werden, dass sensible Daten über Screenshots oder Anzeigen für das App-Switching kompromittiert werden können.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Data_13 Über die Nutzungsbedingungen der Web-Anwendung MUSS der Nutzer über das Risiko informiert werden, welches damit verbunden ist, dass im gesperrten Zustand des Endgeräts die Verbindung zum Hintergrundsystem weiter geöffnet bleibt, wenn der Nutzer sich nicht explizit ausgeloggt hat.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Data_14 Die Web-Anwendung SOLL sicherstellen, dass bei ihrer Beendigung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen im Web-Browser nicht mehr zugreifbar sind. Dies schließt insbesondere Cookies und Webstorage mit ein.
     > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling)
 * O.Data_15 Die Web-Anwendung MUSS dem Nutzer die Möglichkeit geben, dass bei endgültiger Beendigung der Nutzung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig gelöscht bzw. unzugänglich gemacht werden.
     > Authorized users can delete users permanently.
 * O.Data_16 Für alle Cookies, auf die nicht mittels JavaScript zugegriffen wird, MUSS das HTTP-OnlyFlag verwendet werden. 
-    > Only a session cookie is created.
+    > Only a session cookie is created. Respective flags are set.
 * O.Data_17 Für alle Cookies, die sensible Daten enthalten, MUSS das Secure-Flag gesetzt sein.
     > [Installation](#installation)
 * O.Data_18 Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion abgeschaltet sein.
-    > All inputs lack autocomplete by default.
+    > All inputs are rendered without autocomplete by default.
 * O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
     > Only a session cookie is created, IndexedDB has same-origin principle by default.
 
@@ -3479,23 +3500,23 @@ I welcome any constructive input on this topic.
 * O.Plat_2 Die Web-Anwendung DARF Berechtigungen, die für die Erfüllung ihres primären Zwecks nicht notwendig sind, NICHT einfordern.
     > Requested permissions involve camera access for scanning qr-codes and occasionally adding pictures for medical device documentation, as well as notifications to alert on new messages within the application.
 * O.Plat_3 Die Web-Anwendung MUSS den Nutzer auf den rechtmäßigen Zweck der anzufragenden Berechtigungen und auf die Auswirkungen hinweisen, die eintreten, falls der Nutzer diese nicht gewährt.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Plat_4 Die Web-Anwendung DARF KEINE sensiblen Daten in erweiterten Meldungen oder Benachrichtigungen, die nicht vom Nutzer explizit eingeschaltet wurden (siehe O.Plat_5), anzeigen.
     > Notifications only alert on a number of new messages and contain no further data.
 * O.Plat_5 Die Web-Anwendung KANN dem Nutzer die Optionen bieten, erweiterte Meldungen und Benachrichtigungen, ggf. auch mit sensiblen Inhalten, anzuzeigen. Bei Werkseinstellung MUSS diese deaktiviert sein.
-    > This is not applicable
+    > This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
 * O.Plat_6 Die Web-Anwendung MUSS das Nachladen von Inhalten auf Quellen beschränken, die unter der Kontrolle des Herstellers sind oder durch den Hersteller autorisiert wurden.
     > Lazyloading is not implemented, all contents are delivered by the backend only.
 * O.Plat_7 Die Web-Anwendung MUSS den Nutzer über das Risiko informieren, dass ggf. nach Beendigung der Web-Anwendung nutzerspezifischen Daten im Arbeitsspeicher verbleiben können.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Plat_8 Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch den Nutzer umsetzbar sind. 
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 
 ### 3.1.11 Prüfaspekt (11): Resilienz
 * O.Resi_1 Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Resi_2 Die Web-Anwendung MUSS über die Nutzungsbedingungen dem Nutzer darstellen, welche Risiken für die Daten des Nutzers bei einer Benutzung von Geräten, deren Betriebssystem in keinem vom Betriebssystemhersteller vorgesehenen Betriebszustand ist, bestehen. 
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 
 [Content](#content)
 
@@ -3506,7 +3527,7 @@ I welcome any constructive input on this topic.
 * O.Purp_1 Das Hintergrundsystem DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
     > Only active and intentional user input is processed and stored.
 * O.Purp_2 Das Hintergrundsystem MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
-    > Terms of service have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Purp_3 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von dem Hintergrundsystem verarbeitet werden.
     > Only active and intentional user input is processed and stored.
 * O.Purp_4 Das Hintergrundsystem MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden.
@@ -3534,7 +3555,7 @@ I welcome any constructive input on this topic.
 * O.Arch_7 Das Hintergrundsystem MUSS alle Anfragen der Anwendung über eine vollständig dokumentierte API entgegennehmen. Es DARF KEINE nicht dokumentierten Zugriffsmöglichkeiten enthalten.
     > [Api documentation](#api-documentation)
 * O.Arch_8 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
-    > Terms of service have to be confirmed on login. These containan eMail address.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These containan eMail address.
 * O.Arch_9 Das Hintergrundsystem MUSS so implementiert sein, dass ungewollte Zugriffe über eventuelle Management-Schnittstellen effektiv unterbunden werden. Insbesondere bei externem Hosting (s. Kapitel 2.3.2) und Cloud-Diensten (s. Kapitel 2.3.3) MUSS sichergestellt werden, dass der Betreiber Zugriffsmöglichkeiten zwischen verschiedenen Kunden unterbindet.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 * O.Arch_10 Dienste, die das Hintergrundsystem zur Verfügung stellt, SOLLEN nur mit den notwendigen Rechten ausgeführt werden. Dienste, die von außen erreichbar sind, DÜRFEN NICHT mit Administrator-, System- bzw. Root-Rechten laufen.
@@ -3591,7 +3612,7 @@ I welcome any constructive input on this topic.
     > Data sharing does not occur.
 
 ### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung 
-> [Encryption statement](#encryption-statement)
+> [Encryption statement](#encryption-statement), also see [cryptographic measures for frontend](#315-prüfaspekt-5-kryptographische-umsetzung)
 
 * O.Cryp_1 Beim Einsatz von Verschlüsselung in der Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
 * O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
@@ -3604,7 +3625,7 @@ I welcome any constructive input on this topic.
 
 ### 3.1.5.1 Zufallszahlen
 * O.Rand_1 Alle Zufallswerte MÜSSEN über einen starken kryptographischen Zufallszahlengenerator erzeugt werden, welcher mit ausreichend Entropie geseedet wurde (vgl. [TR02102-1]).
-    > Random values for tokes are created by PHPs random_int() and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
+    > Random values for tokens are created by PHPs random_int() and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
 
 ### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
 * O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau (vgl. [TR03107-1]), zur Autorisierung (Rollenkonzept) und zum Beenden von Sitzungen dokumentieren. Das Konzept MUSS hierbei auch Kommunikationsverbindungen innerhalb eines Hintergrundsystem-Netzwerkes berücksichtigen.
@@ -3654,7 +3675,7 @@ I welcome any constructive input on this topic.
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
     > Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
 * O.Pass_2 Für die Einrichtung einer Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
-    > Login tokes are always generated by the system on request of an authorized administrative user.
+    > Login tokens are always generated by the system on request of an authorized administrative user.
 * O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
     > Login tokens can be renewed by authorized administrative users.
 * O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden ohne das Passwort selbst zu protokollieren. 
