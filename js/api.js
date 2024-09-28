@@ -1136,7 +1136,7 @@ export const api = {
 														element = element.nextSibling; // button
 														break;
 												}
-												new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
+												if (!document.getElementsByName(name.replaceAll("_", " "))[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
 												element = document.getElementsByName(name.replaceAll("_", " "))[0].nextSibling; // label
 											});
 										}
