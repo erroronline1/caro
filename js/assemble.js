@@ -1184,6 +1184,7 @@ export class Assemble {
 				// arrow function for reference of this.names
 				if (input.value) {
 					inputClone.attributes.name = inputClone.attributes.name.replace(/\(\d+\)$/gm, "");
+					delete inputClone.attributes.value;
 					new Assemble({
 						content: [[inputClone]],
 						composer: "elementClone",
@@ -1475,11 +1476,12 @@ export class Assemble {
 				// arrow function for reference of this.names
 				if (input.value) {
 					productselectionClone.attributes.name = productselectionClone.attributes.name.replace(/\(\d+\)$/gm, "");
+					delete productselectionClone.attributes.value;
 					new Assemble({
 						content: [[productselectionClone]],
 						composer: "elementClone",
 						names: this.names,
-					}).initializeSection(null, hint.length ? hint[0] : button);
+					}).initializeSection(null, hint.length ? hint[0] : label);
 				}
 			};
 		}
