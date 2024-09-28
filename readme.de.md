@@ -461,25 +461,26 @@ Verfügbare Elemente für Formulare sind:
 * Scannerfeld, optional als Mehrfachauswahl und Identifikator
 * Textabschnitt für informative Zwecke ohne Eingabe
 * Bild um beispielsweise Informationgrafiken einzubinden
-* einfaches Textfeld
+* einfaches Textfeld, optional als Mehrfachauswahl
 * mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge
-* Nummernfeld. Steuert das Erscheinungbild der Tastatur auf mobilen Geräten
+* Nummernfeld, optional als Mehrfachauswahl. Steuert das Erscheinungbild der Tastatur auf mobilen Geräten
 * Datumsfeld. Steuert das Erscheinungbild der Eingabeoptionen
 * Telefonnummernfeld. Steuert das Erscheinungsbild der Tastatur auf mobilen Geräten
-* eMail-Adressenfels. Steuert das Erscheinungsbild der Testatur auf mobilen Geräten
+* eMail-Adressenfeld. Steuert das Erscheinungsbild der Testatur auf mobilen Geräten
 * Produktauswahlfeld, optional als Mehrfachauswahl. Hat Zugriff auf die Artikeldatenbank
 * Schieberegler, Mindest-, Höchstwert und Schritte optional
 * Verknüpfungen (Links)
 * Mehrfachauswahl
 * Einfachauswahl (Buttons)
-* Einfachauswahl (Liste), optional als Mehrfachauswahl
+* Einfachauswahl (Liste), optional als Mehrfachauswahl. Einträge werden stets alphabetisch geordnet.
 * Datei-Upload, optional als Mehrfachauswahl
 * Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
 * Unterschriftenfeld
 * Kalenderschaltfläche
 * Formularverknüpfung, nur zur Ansicht oder als Weiterleitung mit übernahme eines Identifikators 
 
-Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren.
+Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren.
+Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
 
 [Übersicht](#übersicht)
 

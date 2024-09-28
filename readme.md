@@ -79,8 +79,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
-* fix pagebreak for form exports
-* fix record import, append only if name nor already taken
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -505,9 +503,9 @@ Available elements for forms are:
 * scanner field, optional as multiple and context identifier
 * text section for information purpose without input
 * image for including e.g. infographics
-* single line text input
+* single line text input, optional as multiple
 * multi line text input, optional access to text templates
-* number input. Controls appearance of keypad on mobile devices
+* number input, optional as multiple. Controls appearance of keypad on mobile devices
 * date input. Controls appearance of input options
 * phone input. Controls appearance of keypad on mobile devices
 * mail input. Controls appearance of keypad on mobile devices
@@ -516,14 +514,15 @@ Available elements for forms are:
 * links
 * multiple selection options
 * single selection options (buttons)
-* single selection options (list), optional as multiple
+* single selection options (list), optional as multiple. Entries will always be ordered alphabeticaly.
 * file upload, optional as multiple
 * photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
 * signature field
 * calendar button
 * form link, just for display or to continue transferring identifier
 
-Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import components as JSON-notation.
+Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
+Form fields declared as multiple will only show up in form exports if they have a value. Their name will be extended by a numeration in parentheses.
 
 
 [Content](#content)
