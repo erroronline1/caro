@@ -1460,6 +1460,7 @@ class ORDER extends API {
 				if (count($organizational_orders)){
 					foreach($organizational_orders as $order){ // order
 						$items = $info = '';
+						$order_attributes = [];
 						$processedOrderData = json_decode($order['order_data'], true);
 						foreach ($processedOrderData as $key => $value){ // data
 							if (is_array($value)){
@@ -1475,7 +1476,13 @@ class ORDER extends API {
 							} else {
 								if ($key==='attachments') continue;
 								if ($key==='organizational_unit') $value = LANG::GET('units.' . $value);
-								if ($key==='order_type') $value = LANG::GET('order.ordertype.' . $value);
+								if ($key==='order_type') {
+									$order_attributes = [
+										'name' => LANG::GET('order.ordertype.' . $value),
+										'data-type' => $value
+									];
+									$value = LANG::GET('order.ordertype.' . $value);
+								}
 
 								$info .= LANG::GET('order.' . $key) . ': ' . $value . "\n";
 							}
@@ -1483,6 +1490,7 @@ class ORDER extends API {
 						array_push($result['render']['content'], [
 							[
 								'type' => 'textsection',
+								'attributes' => $order_attributes,
 								'content' => $items,
 							],[
 								'type' => 'textsection',
