@@ -75,6 +75,8 @@
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
+* tidy products with expiry dates
+* tidy products with special attention
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -85,10 +87,12 @@
 * linked files on separate external path, input type convert to link
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
+* review max display option for summary overview
 
 #### issues
-* regulatory issues within audit
-* display risks within audit
+* still accessible inactive file bundles
+* review external documents linking
+
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -766,7 +770,7 @@ Defined authorized users (e.g. *purchase assistant*) can edit the alias definiti
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
-Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter will be generated if not defined. 
+Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined. **Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!**
 
 While editing products, one can edit the
 * *trading good*-setting,
@@ -1281,6 +1285,25 @@ You can, of course, decide to go the extra mile and apply any additional filter,
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates and required special attention.
 
 *special_attention* will be displayed within approved orders and is intended to inform about required batch number allocation for products with skin contact by default. This can be customized to anything within the language file.
+
+### Default filter on export
+If not provided a simple import filter will be generated on export of pricelists. As described within [vendor and product management](#vendor-and-product-management), this may be reasonable if no initial pricelist is imported and primarily edited within the application. In this case the information on reimport is processed without conditions, filters and changes. This kind of filter can not be applied on vendor pricelists and will result in an error message.
+```js
+{
+    "filesettings": {
+        "headerrowindex": 0,
+        "columns": [
+            "article_no",
+            "article_name",
+            "article_unit", 
+            "article_ean", 
+            "trading_good",
+            "has_expiry_date",
+            "special_attention"
+        ]
+    }
+}
+```
 
 [Content](#content)
 

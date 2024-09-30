@@ -831,12 +831,10 @@ class AUDIT extends API {
 			else $issues[] = [
 				'type' => 'textsection',
 				'attributes' => [
+					'class' => 'red',
 					'name' => $issue
 				],
-				'content' => LANG::GET('audit.regulatory_warning_content'),
-				'attributes' => [
-					'class' => 'red'
-				]
+				'content' => LANG::GET('audit.regulatory_warning_content')
 			];
 		}
 		$content[] = $issues;
@@ -919,19 +917,19 @@ class AUDIT extends API {
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => $risk['risk'] .
-						" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause'],
-						'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
-						" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
-						" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-						" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
-						" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
-						" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
-						" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-						" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
-						" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
-						" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
-						(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
-				]
+					" \n" . LANG::GET('risk.cause') . ': ' . $risk['cause']
+				],
+				'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
+				" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+				" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+				" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
+				" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
+				" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
+				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
+				" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
+				(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
 			];
 		}
 		array_push($content, ...$issues);
