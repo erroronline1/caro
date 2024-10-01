@@ -1762,7 +1762,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => $vendor['name']
 								],
-								'content' => implode(" \n", array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) .
+								'content' => implode(" \n", array_filter(array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info']), Fn($value) => boolval($value))) .
 									(array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
 									" \n" . LANG::GET('consumables.information_products_available', [':available' => $available])
 							],[
