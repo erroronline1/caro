@@ -282,7 +282,10 @@ class RISK extends API {
 							'rows' => 4
 						],
 						'hint' => (isset($last_edit['user'])) ? LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): ''
-					], [
+					]
+				];
+				if (boolval($risk['id']) && PERMISSION::permissionFor('riskmanagement')) {
+					$result['render']['content'][count($result['render']['content']) -1][] = [
 						'type' => 'deletebutton',
 						'attributes' => [
 							'value' => LANG::GET('risk.delete_button'),
@@ -290,11 +293,10 @@ class RISK extends API {
 							'onpointerup' => $risk['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('risk.delete_confirm_header') ."', options:{".
 								"'".LANG::GET('risk.delete_cancel')."': false,".
 								"'".LANG::GET('risk.delete_confirm')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) api.risk('delete', 'risk', ". $risk['id'] . ")})" : '',
-							'disabled' => boolval($risk['id']) && PERMISSION::permissionFor('riskmanagement')
+								"}}).then(confirmation => {if (confirmation) api.risk('delete', 'risk', ". $risk['id'] . ")})" : ''
 						]
-					]
-				];
+					];
+				}
 
 				if (PERMISSION::permissionFor('riskmanagement')) $result['render']['form'] = [
 					'data-usecase' => 'risk',
