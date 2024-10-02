@@ -159,6 +159,7 @@ class USER extends API {
 
 				$units = $primary_unit = [];
 				foreach(explode(',', $user['units']) as $unit){
+					if (!$unit) continue;
 					$primary_unit[LANG::GET('units.' . $unit)] = ['name' => LANG::PROPERTY('user.settings_primary_unit')];
 					$units[] = LANG::GET('units.' . $unit);
 				}
@@ -175,7 +176,6 @@ class USER extends API {
 						}
 					}
 				}
-
 				$result['render'] = ['content' => [
 						[
 							['type' => 'textsection',
@@ -184,7 +184,7 @@ class USER extends API {
 							],
 							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
-								LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" .
+								($units ? LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" : '') .
 								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '') .
 								(array_key_exists('initialovertime', $user['app_settings']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
 								(array_key_exists('weeklyhours', $user['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
@@ -262,15 +262,19 @@ class USER extends API {
 							LANG::GET('user.settings_theme_aurora') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
 							LANG::GET('user.settings_theme_dark') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
 						]
-					], [
+					]
+				];
+				if ($units) {
+					$result['render']['content'][count($result['render']['content'])-1][] = [
 						'type' => 'radio',
 						'attributes' => [
 							'name' => LANG::GET('user.settings_primary_unit')
 						],
 						'hint' => LANG::GET('user.settings_hint'),
 						'content' => $primary_unit
-					]
-				];
+					];
+				}
+
 				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
 				if (array_key_exists('homeoffice', $user['app_settings']) && $user['app_settings']['homeoffice']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
 
