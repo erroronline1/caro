@@ -3789,7 +3789,7 @@ I welcome any constructive input on this topic.
     * v2.3.8
     * \> 4k stars
     * \> 900 forks
-    * slightly modified for multi-language integration of applications language model, use regex search `return".+?"` and `throw".*?"` to find language chunks to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en.ini, language.de.ini or applicable language files 
+    * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en.ini, language.de.ini or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * v5.0.1
