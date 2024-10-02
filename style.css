@@ -770,15 +770,16 @@ input:invalid + label.input_required_alert,
 	border: 2px solid var(--red) !important;
 }
 
-[data-type="toleft"],
-[data-type="toright"] {
+/* section swipe buttons */
+[data-type="toleft"].inlinebutton,
+[data-type="toright"].inlinebutton {
 	display: none;
 }
 
 /* Large devices such as laptops (1024px and up) */
 @media only screen and (min-width: 64em) {
-	[data-type="toleft"],
-	[data-type="toright"] {
+	[data-type="toleft"].inlinebutton,
+	[data-type="toright"].inlinebutton {
 		display: inline-block;
 	}
 }
@@ -928,7 +929,7 @@ section > div > article {
 article > article {
 	/*tile*/
 	width: calc(33% - 1em);
-	min-width: 14em;
+	min-width: 13em;
 	margin: 0.5em;
 	height: max-content;
 	vertical-align: top;
