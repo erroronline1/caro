@@ -74,9 +74,12 @@ class FILE extends API {
 			]
 		];
 		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
+		$external = array_map(Fn($path) => substr($path, 1),$this->activeexternalfiles());
+
 		foreach($bundles as $row) {
-			$list=[];
+			$list = [];
 			foreach (json_decode($row['content'], true) as $file => $path){
+				if (stristr($path, INI['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
 				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
 			];
 			}
