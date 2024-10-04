@@ -320,7 +320,10 @@ class APPLICATION extends API {
 							'attributes' => [
 								'value' => LANG::GET('application.edit_manual_delete'),
 								'type' => 'button',
-								'onpointerup' => "if (confirm('" . LANG::GET('application.edit_manual_delete_confirm') . "')) api.application('delete', 'manual', " . $entry['id'] . ")"
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('application.edit_manual_delete_confirm') ."', options: {".
+								"'".LANG::GET('general.cancel_button')."': false,".
+								"'".LANG::GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
+									"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"
 							]
 						]
 				];
