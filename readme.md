@@ -97,6 +97,7 @@
 * complete qr scanner translation for throw".*?"
 * textarea, text values on form export
 * manual editor, delete confirmation, delete sql value type (varchar false)
+* current documents in use export styling
 
 
 # Aims
