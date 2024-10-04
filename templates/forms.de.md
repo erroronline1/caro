@@ -216,7 +216,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				" ": [],
+				"...": [],
 				"Liner / Silikonschaft UA OA 75S10": [],
 				"Außenschaft / Schutzüberzug UA OA 75S40": [],
 				"Silikoninlet Schulterschaft 75S50": [],
@@ -233,7 +233,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				" ": [],
+				"...": [],
 				"Liner US 75S20": [],
 				"Silikoninnenschaft US 75S25": [],
 				"Liner OS 75S30": [],
@@ -249,7 +249,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				" ": [],
+				"...": [],
 				"HTV-RTV-Polster 75S80": [],
 				"RTV-Polster 75S81": [],
 				"Platte für Traktionsmanschetten 75O70": [],
@@ -272,7 +272,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				" ": [],
+				"...": [],
 				"Gurtband 75A10": [],
 				"Carbonverbund 75A40": [],
 				"Verschraubung 75A50": [],
@@ -664,6 +664,16 @@ Export for signature compliance
 		{
 			"type": "checkbox",
 			"attributes": {
+				"name": "Übergangsregelung"
+			},
+			"content": {
+				"Das Produkt ist bereits zuvor eingeführt worden": []
+			},
+			"hint": "Du bestätigst damit eigenverantwortlich, dass die erforderlichen Prüfungen und Unterlagen bereits vorliegen."
+		},
+		{
+			"type": "checkbox",
+			"attributes": {
 				"name": "Produkteinführung"
 			},
 			"content": {
@@ -675,6 +685,12 @@ Export for signature compliance
 				"Zertifizierung erforderlich": [],
 				"Anpassung Risikoanalyse erforderlich": [],
 				"Arbeitsanweisung erforderlich": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Ersatz für"
 			}
 		}
 	]
@@ -1322,7 +1338,7 @@ Export for signature compliance
 				"name": "gemäß Armierungsplan"
 			},
 			"content": {
-				" ":[],
+				"...":[],
 				"Armierungsplan Prothetik II 5.1": [],
 				"Armierungsplan Prothetik II 5.2": [],
 				"Armierungsplan Prothetik II 5.3": [],
@@ -1382,7 +1398,7 @@ Export for signature compliance
 				"name": "Habitus Kontaktschaft"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Finger/Daumen EV 20.0000 KA": [],
 				"Finger/Daumen FV 20.0010 KA": [],
 				"Partialhand EV 20.0100 KA": [],
@@ -1425,7 +1441,7 @@ Export for signature compliance
 				"name": "Habitus Linerschaft"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Transcarpal EV 20.0201 KA": [],
 				"Transcarpal WV 20.0211 KA": [],
 				"Handexartikulation EV 20.0301 KA": [],
@@ -1454,7 +1470,7 @@ Export for signature compliance
 				"name": "Mechanisch Kontaktschaft"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Finger/Daumen EV 20.0020 KA": [],
 				"Finger/Daumen FV 20.0030 KA": [],
 				"Partialhand EV 20.0120 KA": [],
@@ -1487,7 +1503,7 @@ Export for signature compliance
 				"name": "Mechanisch Linerschaft"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Transcarpal EV 20.0221 KA": [],
 				"Transcarpal WV 20.0231 KA": [],
 				"Handexartikulation EV 20.0321 KA": [],
@@ -1516,7 +1532,7 @@ Export for signature compliance
 				"name": "Elektrisch Kontaktschaft"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Finger/Daumen EV 20.0040 KA": [],
 				"Finger/Daumen FV 20.0050 KA": [],
 				"Partialhand EV 20.0140 KA": [],
@@ -1579,7 +1595,7 @@ Export for signature compliance
 				"name": "Elektrisch Linerschaft"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Transcarpal EV 20.0241 KA": [],
 				"Transcarpal WV 20.0251 KA": [],
 				"Transcarpal Testversorgung 20.0261 KA": [],
@@ -1654,7 +1670,7 @@ Export for signature compliance
 				"name": "zusätzlicher Testschaft Habitus"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Partialhand 20.0105 KA": [],
 				"Unterarm lang 20.0405 KA": [],
 				"Unterarm mittellang 20.0505 KA": [],
@@ -1674,7 +1690,7 @@ Export for signature compliance
 				"name": "zusätzlicher Testschaft Mechanisch"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Partialhand 20.0125 KA": [],
 				"Unterarm lang 20.0425 KA": [],
 				"Unterarm mittellang 20.0525 KA": [],
@@ -1692,7 +1708,7 @@ Export for signature compliance
 				"name": "zusätzlicher Testschaft Elektrisch"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Partialhand 20.0145 KA": [],
 				"Unterarm lang 20.0445 KA": [],
 				"Unterarm mittellang 20.0545 KA": [],
@@ -1790,7 +1806,7 @@ Export for signature compliance
 				"name": "Abweichendes Schaftsystem Habitus"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Gießharzkontaktschaft 20.0423 KA": [],
 				"Thermoplastischer Innenschaft Partialhand 20.0102 KA": [],
 				"Thermoplastischer Innenschaft Unterarmprothese 20.0502 KA": [],
@@ -1805,7 +1821,7 @@ Export for signature compliance
 				"name": "Abweichendes Schaftsystem Mechanisch"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Gießharzkontaktschaft 20.0423 KA": [],
 				"Thermoplastischer Innenschaft Partialhand 20.0122 KA": [],
 				"Thermoplastischer Innenschaft Unterarmprothese 20.0522 KA": [],
@@ -1819,7 +1835,7 @@ Export for signature compliance
 				"name": "Abweichendes Schaftsystem Elektrisch"
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Gießharzkontaktschaft 20.0423 KA": [],
 				"Thermoplastischer Innenschaft Partialhand 20.0142 KA": [],
 				"Thermoplastischer Innenschaft Unterarmprothese 20.0542 KA": [],
@@ -2052,7 +2068,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Gewindeadapter TOH f. Habitus 20.3507 KA": [],
 				"Otto Bock Rohradapter mit Innengewinde 10R2=M12x1.5": [],
 				"Otto Bock Rohradapter mit Innengewinde (Flexion) 10R3=M12x1.5": [],
@@ -2068,7 +2084,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Gewindeadapter TOH f. Habitus 20.3507 KA": [],
 				"Otto Bock Rohradapter mit Innengewinde 10R2=M12x1.5": [],
 				"Otto Bock Rohradapter mit Innengewinde (Flexion) 10R3=M12x1.5": [],
@@ -2085,7 +2101,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Otto Bock Eingussring für Kinderhand 10S16=34": [],
 				"TASKA Laminiermanschette 45mm TASKA-12BB01": [],
 				"Otto Bock Eingussring QWD 10S1": [],
@@ -2130,7 +2146,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"ECHO TOH 17061 AS": [],
 				"Otto Bock Physolino Babyhand 8K5": [],
 				"Neuhof Newlife mit Schaumkern 501B63": [],
@@ -2148,7 +2164,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Otto Bock MovoHook Aluminium 10A71": [],
 				"Otto Bock MovoHook Stahl 10A81": [],
 				"Otto Bock Einzughand Perlon 8K22": [],
@@ -2163,7 +2179,7 @@ Export for signature compliance
 				"multiple": true
 			},
 			"content": {
-				"": [],
+				"...": [],
 				"Otto Bock Kinderhand 8E51": [],
 				"Neuhof ProHand 508D09": [],
 				"Neuhof Arbeitsgreifer ETD2 508D37": [],
