@@ -130,6 +130,7 @@ $queries = [
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`active` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -358,6 +359,7 @@ $queries = [
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	active tinyint NOT NULL" .
 				");"
