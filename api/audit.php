@@ -313,7 +313,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']])
 				],
-				'content' => $entry . "\n \n" . implode("\n \n", $componentlist) . "\n \n" . implode("\n", $regulatory_context)
+				'content' => $entry . "\n" . implode("\n", $componentlist) . "\n" . implode("\n", $regulatory_context)
 			];
 		}
 
@@ -397,7 +397,7 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($forms); $i++){
 			foreach($forms[$i] as $item){
-				$summary['content'][$item['description']] = $item['content'];	
+				$summary['content'][$item['attributes']['name']] = $item['content'];	
 			}
 		}
 		$downloadfiles = [];
