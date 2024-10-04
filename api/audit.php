@@ -1158,10 +1158,10 @@ class AUDIT extends API {
 					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
-						if ($expire < $today) $attributes = ['class' => 'red'];
+						if ($expire < $today) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
-							if ($expire < $today) $attributes = ['class' => 'orange'];
+							if ($expire < $today) $attributes['class'] = 'orange';
 						}
 					}
 					$content[count($content) - 1][] = [
@@ -1245,7 +1245,7 @@ class AUDIT extends API {
 
 		for($i = 1; $i < count($skills); $i++){
 			foreach($skills[$i] as $item){
-				if ($item['type'] === 'textsection') {
+				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])) {
 					$summary['content'][$item['attributes']['name']] = $item['content'];
 					$previous = $item['attributes']['name'];
 				}
