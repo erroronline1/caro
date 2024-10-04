@@ -71,7 +71,7 @@ class NOTIFICATION extends API {
 			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['application']['timezone']));
 			else continue;
 			if ($validity > $today) continue;
-			// check for open reminders. if none add a new
+			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
 			$reminders = $calendar->search(LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]));
 			$open = false;
 			foreach($reminders as $reminder){
