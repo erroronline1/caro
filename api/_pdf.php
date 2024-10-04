@@ -109,20 +109,24 @@ class PDF{
 		
 		foreach($content['content'] as $form => $entries){
 			$pdf->SetFont('helvetica', '', 12); // font size
-			$pdf->MultiCell(150, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$pdf->MultiCell(145, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			foreach($entries as $key => $value){
 				$pdf->SetFont('helvetica', 'B', 10); // font size
 				$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 				$pdf->SetFont('helvetica', '', 10); // font size
-				$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				$pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			}
 			if (array_key_exists($form, $content['images'])){
 				$ln = 0;
 				foreach ($content['images'][$form] as $image){
 					$imagedata = pathinfo($image);
+					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
 					$pdf->SetFont('helvetica', 'B', 10); // font size
 					$pdf->MultiCell(50, INI['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-					$pdf->Image('.' . $image, null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+					if ($img_width && INI['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / INI['pdf']['exportimage']['maxheight']))
+						$pdf->Image('.' . $image, null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+					else
+						$pdf->Image('.' . $image, null, null, 145, 0, '', '', 'R', true, 300, 'R');
 					$pdf->Ln(INI['pdf']['exportimage']['maxheight']);
 				}
 			}
@@ -169,7 +173,7 @@ class PDF{
 		
 		foreach($content['content'] as $form => $entries){
 			$pdf->SetFont('helvetica', '', 12); // font size
-			$pdf->MultiCell(150, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$pdf->MultiCell(145, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			$keyY = $pdf->GetY();
 			foreach($entries as $key => $value){
 				$pdf->SetFont('helvetica', 'B', 10); // font size
@@ -309,7 +313,7 @@ class PDF{
 				if (array_key_exists(0, $row) && $row[0][1]) $pdf->SetTextColor(192, 192, 192);
 				$pdf->MultiCell(50, 2, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 				$pdf->SetTextColor(0, 0, 0);
-				$pdf->MultiCell(150, 2, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				$pdf->MultiCell(145, 2, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			}
 
 		}
