@@ -396,8 +396,12 @@ class SQLQUERY {
 
 
 		'file_bundles_post' => [
-			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :content, :active)",
-			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, content, active) VALUES (:name, CURRENT_TIMESTAMP, :content, :active)"
+			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, author, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :active)",
+			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, author, content, active) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :active)"
+		],
+		'file_bundles_put' => [
+			'mysql' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, active = :active WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, active = :active WHERE id = :id"
 		],
 		'file_bundles_datalist' => [
 			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",

@@ -140,10 +140,53 @@ class FILE extends API {
 				$active = LANG::PROPERTY('file.edit_bundle_active');
 				$isactive = $this->_payload->$active === LANG::GET('file.edit_active_bundle') ? 1 : 0;
 				unset ($this->_payload->$active);
+				// unset grouped checkbox submits
+				$cmpstrings = preg_split('/:folder/', LANG::GET('file.file_list')); // extract plain immutable strings
+				foreach($this->_payload as $key => $value){
+					$match = true;
+					foreach($cmpstrings as $cmp) if (!stristr($key, str_replace(' ', '_', $cmp))) $match = false;
+					if ($match) unset ($this->_payload->{$key});
+				}
+
+				if (!$name || !$this->_payload) $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => LANG::GET('file.edit_bundle_not_saved'),
+						'type' => 'error'
+					]]);
+
+				$existingbundle = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get', [
+					'values' => [
+						':name' => $name
+					]
+				]);
+				$existingbundle = $existingbundle ? $existingbundle[0] : null;
+				if ($existingbundle) {
+					if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_put', [
+						'values' => [
+						':author' => $_SESSION['user']['name'],
+						':content' => json_encode($this->_payload),
+						':id' => $existingbundle['id'],
+						':active' => $isactive
+						]
+					])) $this->response([
+							'response' => [
+								'name' => $name,
+								'msg' => LANG::GET('file.edit_bundle_saved', [':name' => $name]),
+								'type' => 'success'
+							]]);
+						else $this->response([
+							'response' => [
+								'name' => false,
+								'msg' => LANG::GET('file.edit_bundle_not_saved'),
+								'type' => 'error'
+							]]);	
+				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_post', [
 					'values' => [
 					':name' => $name,
+					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($this->_payload),
 					':active' => $isactive
 					]
@@ -260,7 +303,8 @@ class FILE extends API {
 						'attributes'=>[
 							'name'=> LANG::GET('file.edit_save_bundle'),
 							'value' => $bundle['name']
-						]
+						],
+						'hint' => $bundle['name'] ? LANG::GET('file.last_edit', [':user' => $bundle['author'], ':date' => $bundle['date']]): ''
 					],
 					[
 						'type' => 'radio',
