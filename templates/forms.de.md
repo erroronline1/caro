@@ -10,6 +10,8 @@
 * [Versorgungsausführung](#versorgungsausführung)
 * [Konformitätserklärung](#konformitätserklärung)
 * [Vorgangsprotokoll](#vorgangsprotokoll)
+* [Produkteinführung](#produkteinführung)
+* [Stichprobenprüfung](#stichprobenprüfung)
 
 ### Prosthetics 2
 * [Anamnese Prothetik II](#anamnese-prothetik-ii)
@@ -649,7 +651,100 @@ Export for signature compliance
 			"attributes": {
 				"name": "Protokoll"
 			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Produkteinführung
+```json
+[
+	[
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Produkteinführung"
+			},
+			"content": {
+				"Sicherheitsdatenblatt": [],
+				"Preis/Leistung angemessen": [],
+				"Lagerplatz vorhanden": [],
+				"Lagerbedingungen erfüllbar": [],
+				"Min/Max Bestand erforderlich": [],
+				"Zertifizierung erforderlich": [],
+				"Anpassung Risikoanalyse erforderlich": [],
+				"Arbeitsanweisung erforderlich": []
+			}
+		}
+	]
+]
+```
+[Content](#content)
+
+## Stichprobenprüfung
+```json
+[
+	[
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Allgemein"
+			},
+			"content": {
+				"CE-Kennzeichnung mit aktueller EU-Konformitätserklärung": [],
+				"Sonderanfertigungskennzeichnung": [],
+				"Angabe des Handelsnamens": [],
+				"Angabe worum es sich handelt": [],
+				"Hinweis auf Medizinprodukt": [],
+				"UDI-Code vorhanden": [],
+				"Haltbarkeitsdatum oder Herstellungsdatum und Verwendungszeitraum": [],
+				"Lagerungs- und Handhabungsbedingungen": []
+			}
 		},
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Erforderliche Angaben der Gebrauchsanweisung"
+			},
+			"content": {
+				"Produktname": [],
+				"Hersteller und Anschrift": [],
+				"Zweckbestimmung und Indikation": [],
+				"Kontraindikationen": [],
+				"vorgesehene Anwender": [],
+				"Restrisiken und Nebenwirkungen": [],
+				"Klinischer Nutzen": [],
+				"Leistungsmerkmale": [],
+				"Schulungen oder Qualifikation zur prüfung durch Fachpersonal": [],
+				"Nutzungshinweise für Anwender": [],
+				"Aufbereitungsverfahren sofern zum Wiedereinsatz vorgesehen": [],
+				"Lagerungs- und Handhabungshinweise": []
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Ausstellungsdatum/Version der Gebrauchsanweisung"
+			}
+		},
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Angaben sofern zutreffend"
+			},
+			"content": {
+				"Angaben zur Sterilität": [],
+				"Hinweis auf Einmalprodukt": [],
+				"Zusammensetzung": [],
+				"Biologische Inhaltsstoffe": [],
+				"Erforderliche Vorbehandlungen": [],
+				"Prüfung der Installation": [],
+				"Instandhaltungsmaßnahmen, Ersatz von Verbrauchskomponenten, Kalibrationsmaßnahmen": [],
+				"Wahl und Einschränkungen von kombinierbaren Produkten": [],
+				"Warnungen, Vorsichshinweise, Maßnahmenempfehlungen oder Verwendungsbeschränkungen sofern zurteffend": []
+			}
+		}
 	]
 ]
 ```
@@ -2187,7 +2282,6 @@ Export for signature compliance
 		}
 	]
 ]
-
 ```
 [Content](#content)
 
