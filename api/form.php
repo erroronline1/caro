@@ -191,12 +191,23 @@ class FORM extends API {
 						}
 						if ($alert) $return['response'] = ['msg' => $alert, 'type' => 'info'];
 					}
+
+					$formproperties = LANG::GET('assemble.compose_component_author', [':author' => $approve['author'], ':date' => substr($approve['date'], 1, -3)]);
+					if ($approve['alias']) $formproperties .= "\n" . LANG::GET('assemble.edit_form_alias') . ': ' . $approve['alias'];
+					if ($approve['regulatory_context']) $formproperties .= "\n" . LANG::GET('assemble.compose_form_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => LANGUAGEFILE['regulatory'][$context], explode(',', $approve['regulatory_context'])));
+					if ($approve['restricted_access']) $formproperties .= "\n" . LANG::GET('assemble.edit_form_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => LANGUAGEFILE['permissions'][$context], explode(',', $approve['restricted_access'])));
+					if ($approve['permitted_export']) $formproperties .= "\n" . LANG::GET('assemble.edit_form_permitted_export');
+
 					array_push($return['render']['content'], 
 						[
 							[
 								'type' => 'hr'
 							]
 						], [
+							[
+								'type' => 'textsection',
+								'content' => $formproperties
+							],							
 							[
 								'type' => 'checkbox',
 								'content' => $approvalposition,
@@ -901,7 +912,7 @@ class FORM extends API {
 				if ($exists && $exists['content'] == implode(',', $this->_payload->content)) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
 						'values' => [
-							':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : '',
+							':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
 							':context' => $this->_payload->context,
 							':hidden' => intval($this->_payload->hidden),
 							':regulatory_context' => implode(',', $regulatory_context),
@@ -924,7 +935,7 @@ class FORM extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
 					'values' => [
 						':name' => $this->_payload->name,
-						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): '',
+						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): $this->_payload->alias,
 						':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
 						':author' => $_SESSION['user']['name'],
 						':content' => implode(',', $this->_payload->content),
