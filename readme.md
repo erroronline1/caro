@@ -95,6 +95,7 @@
 * still accessible inactive file bundles
 * review external documents linking
 * complete qr scanner translation for throw".*?"
+* textarea, text values on form export
 
 
 # Aims
