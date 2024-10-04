@@ -262,7 +262,7 @@ class PDF{
 			if (gettype($value) === 'array') {
 				$value = implode("\n", array_keys($value));
 			}
-			$pdf->MultiCell(150, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 		}
 		// move pointer to last page
 		$pdf->lastPage();
