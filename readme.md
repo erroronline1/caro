@@ -96,6 +96,7 @@
 * review external documents linking
 * complete qr scanner translation for throw".*?"
 * textarea, text values on form export
+* manual editor, delete confirmation, delete sql value type (varchar false)
 
 
 # Aims
