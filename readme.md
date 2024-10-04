@@ -88,6 +88,8 @@
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 * review max display option for summary overview
+* display form properties within approve (context, exportable, etc)
+* samplecheck on incorporation for eligible products only
 
 #### issues
 * still accessible inactive file bundles
