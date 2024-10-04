@@ -1066,7 +1066,7 @@ class AUDIT extends API {
 					$previous = $item['attributes']['name'];
 				}
 				if ($item['type'] === 'links') {
-					$summary['content'][$previous] = $item['description'];
+					$summary['content'][$previous] = $item['attributes']['name'];
 					$summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
 				}
 			}
@@ -1247,7 +1247,7 @@ class AUDIT extends API {
 			foreach($skills[$i] as $item){
 				if ($item['type'] === 'textsection') {
 					$summary['content'][$item['attributes']['name']] = $item['content'];
-					$previous = $item['description'];
+					$previous = $item['attributes']['name'];
 				}
 				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
 			}
@@ -1359,7 +1359,7 @@ class AUDIT extends API {
 		foreach($vendors[1] as $item){
 			if ($item['type'] === 'textsection') {
 				$summary['content'][$item['attributes']['name']] = $item['content'];
-				$previous = $item['description'];
+				$previous = $item['attributes']['name'];
 			}
 			if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
 		}
