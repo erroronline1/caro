@@ -71,7 +71,6 @@
 ## development
 
 #### purchase considerations
-* order only assigned units selecteable?
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
@@ -81,24 +80,21 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
+* recall option (how?)
+* post-market surveillance (how?)
+* post-market evaluation (how?)
+* product lifespans -> transfer to product manuals? (how?)
 
 #### records considerations
 * linked files on separate external path, input type convert to link
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
 * review max display option for summary overview
-* display form properties within approve (context, exportable, etc)
-* samplecheck on incorporation for eligible products only
 
 #### issues
-* still accessible inactive file bundles
-* review external documents linking
-* complete qr scanner translation for throw".*?"
-* textarea, text values on form export
-* manual editor, delete confirmation, delete sql value type (varchar false)
-* current documents in use export styling
-
+* review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
+* textarea, text values on form export -> works on apache, observe on iis 
+* manual editor, delete sql value type (varchar false)
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
