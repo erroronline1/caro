@@ -306,6 +306,7 @@ class RECORD extends API {
 		$enumerate = [];
 		foreach(explode(',', $form['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
+			if (!$component) continue;
 			$component['content'] = json_decode($component['content'], true);
 
 			$printablecontent = printable($component['content']['content'], $this->_payload, $enumerate);
