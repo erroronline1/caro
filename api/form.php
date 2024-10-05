@@ -479,65 +479,146 @@ class FORM extends API {
 				$component_approve = $component['approve'];
 				unset($component['approve']);
 
-				// put hidden attribute if anything else remains the same
-				// get latest approved by name
-				$exists = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID);
-				if ($exists && json_decode($exists['content'], true) == $component) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
-						'values' => [
-							':alias' => '',
-							':context' => 'component',
-							':hidden' => $component_hidden,
-							':regulatory_context' => '',
-							':id' => $exists['id'],
-							':permitted_export' => NULL,
-							':restricted_access' => NULL
-						]
-					])) $this->response([
-							'response' => [
-								'name' => $component_name,
-								'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $component_name]),
-								'type' => 'success'
-							]]);	
+				/**
+				 * uploads files and populates component image widgets with the final path and file name
+				 * @param array $content payload $component['content]
+				 * @param string $component_name passed for scope
+				 * @param string $timestamp YmdHis passed for scope
+				 * 
+				 * @return array $content altered
+				 */
+				function fileupload($content, $component_name, $timestamp){
+					// recursively replace images with actual $_FILES content according to content nesting
+					if (array_key_exists('composedComponent_files', $_FILES)){
+						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
+						$uploaded_files = [];
+						foreach($uploads as $path){
+							UTILITY::resizeImage($path, INI['limits']['form_image'], UTILITY_IMAGE_REPLACE);
+							// retrieve actual filename with prefix dropped to compare to upload filename
+							// boundary is underscore, actual underscores within uploaded file name will be reinserted
+							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
+							$uploaded_files[$filename] = substr($path, 1);
+						}
+						function replace_images($element, $uploaded_filearray){
+							$result = [];
+							foreach($element as $sub){
+								if (array_is_list($sub)){
+									$result[] = replace_images($sub, $uploaded_filearray);
+								} else {
+									if ($sub['type'] === 'image'){
+										preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
+										$filename = $fakefilename[0][count($fakefilename[0])-1];
+										if ($filename && array_key_exists($filename, $uploaded_filearray)){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
+											$sub['attributes']['name'] = $filename;
+											$sub['attributes']['url'] = $uploaded_filearray[$filename];
+										}
+									}
+									$result[] = $sub;
+								}
+							}
+							return $result;
+						}
+						$content = replace_images($content, $uploaded_files);
+					}
+					return $content;
 				}
 
+				// recursively scan for images within content
+				function usedImages($element, $result = []){
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							array_push($result, ...usedImages($sub, $result));
+						} else {
+							if (array_key_exists('type', $sub) && $sub['type'] === 'image')
+								$result[] = '.' . $sub['attributes']['url'];
+						}
+					}
+					return $result;
+				}
+				
+				// select latest form by name
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
+					'values' => [
+						':name' => $component_name
+					]
+				]);
+				$exists = $exists ? $exists[0] : ['approval' => null];
+				$approved = PERMISSION::fullyapproved('formapproval', $exists['approval']);
+
+				if (isset($exists['id'])){ 
+					if (!$approved) {
+						// update anything, delete unused images, reset approval
+						$component['content'] = fileupload($component['content'], $exists['name'], $exists['date']);
+
+						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
+						$new_images = array_unique(usedImages($component['content']));
+						foreach(array_diff($former_images, $new_images) as $path) UTILITY::delete($path);
+
+						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+							'values' => [
+								':alias' => '',
+								':context' => 'component',
+								':author' => $_SESSION['user']['name'],
+								':content' => json_encode($component),
+								':hidden' => $component_hidden,
+								':approval' => null,
+								':regulatory_context' => '',
+								':permitted_export' => null,
+								':restricted_access' => null,
+								':id' => $exists['id'],
+							]
+						])) $this->response([
+								'response' => [
+									'name' => $exists['name'],
+									'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $exists['name']]),
+									'type' => 'success'
+								]]);
+						else $this->response([
+							'response' => [
+								'name' => false,
+								'msg' => LANG::GET('assemble.edit_component_not_saved'),
+								'type' => 'error'
+							]]);
+					}
+					if ($approved && json_decode($exists['content'], true) == $component) {
+						// update component properties as long as the content remains unchanged
+						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+							'values' => [
+								':alias' => '',
+								':context' => 'component',
+								':author' => $exists['author'],
+								':content' => $exists['content'],
+								':hidden' => $component_hidden,
+								':approval' => $exists['approval'],
+								':regulatory_context' => '',
+								':permitted_export' => null,
+								':restricted_access' => null,
+								':id' => $exists['id'],
+							]
+						])) $this->response([
+								'response' => [
+									'name' => $exists['name'],
+									'msg' => LANG::GET('assemble.edit_component_saved', [':name' => $exists['name']]),
+									'type' => 'success'
+								]]);
+						else $this->response([
+							'response' => [
+								'name' => false,
+								'msg' => LANG::GET('assemble.edit_component_not_saved'),
+								'type' => 'error'
+							]]);
+					}
+				}
+				// until here the component has not existed, or the content of an approved component has been changed resulting in a new version
+
+				// if not updated check if approve is set, not earlier
 				if (!($component_approve = array_search($component_approve, LANGUAGEFILE['units']))) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
 
 				foreach(INI['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 				}
-				// recursively replace images with actual $_FILES content according to content nesting
-				if (array_key_exists('composedComponent_files', $_FILES)){
-					$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $this->_currentdate->format('YmdHis')]);
-					$files=[];
-					foreach($uploads as $path){
-						UTILITY::resizeImage($path, INI['limits']['form_image'], UTILITY_IMAGE_REPLACE);
-						// retrieve actual filename with prefix dropped to compare to upload filename
-						// boundary is underscore, actual underscores within uploaded file name will be reinserted
-						$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
-						$files[$filename] = substr($path, 1);
-					}
-					function replace_images($element, $filearray){
-						$result = [];
-						foreach($element as $sub){
-							if (array_is_list($sub)){
-								$result[] = replace_images($sub, $filearray);
-							} else {
-								if ($sub['type'] === 'image'){
-									preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
-									$filename = $fakefilename[0][count($fakefilename[0])-1];
-									if ($filename && array_key_exists($filename, $filearray)){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
-										$sub['attributes']['name'] = $filename;
-										$sub['attributes']['url'] = $filearray[$filename];
-									}
-								}
-								$result[] = $sub;
-							}
-						}
-						return $result;
-					}
-					$component['content'] = replace_images($component['content'], $files);
-				}
+
+				$component['content'] = fileupload($component['content'], $component_name, $this->_currentdate->format('YmdHis'));
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
 					'values' => [
 						':name' => $component_name,
@@ -597,7 +678,7 @@ class FORM extends API {
 				]);
 				$component = $component ? $component[0] : null;
 				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
-				// recursively check for identifier
+				// recursively delete images
 				function deleteImages($element){
 					foreach($element as $sub){
 						if (array_is_list($sub)){
@@ -906,27 +987,74 @@ class FORM extends API {
 					}
 				}
 				
-				// put hidden attribute, alias (uncritical) or context (user error) if anything else remains the same
-				// get latest approved by name
-				$exists = $this->latestApprovedName('form_form_get_by_name', $this->_payload->name);
-				if ($exists && $exists['content'] == implode(',', $this->_payload->content)) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
-						'values' => [
-							':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
-							':context' => $this->_payload->context,
-							':hidden' => intval($this->_payload->hidden),
-							':regulatory_context' => implode(',', $regulatory_context),
-							':id' => $exists['id'],
-							':permitted_export' => $this->_payload->permitted_export ? : 0,
-							':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
-						]
-					])) $this->response([
+				// select latest form by name
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'form_form_get_by_name', [
+					'values' => [
+						':name' => $this->_payload->name
+					]
+				]);
+				$exists = $exists ? $exists[0] : ['approval' => null];
+				$approved = PERMISSION::fullyapproved('formapproval', $exists['approval']);
+
+				if (isset($exists['id'])){ 
+					if (!$approved) {
+						// update anything, reset approval
+						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+							'values' => [
+								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
+								':context' => $this->_payload->context,
+								':author' => $_SESSION['user']['name'],
+								':content' => implode(',', $this->_payload->content),
+								':hidden' => intval($this->_payload->hidden),
+								':approval' => null,
+								':regulatory_context' => implode(',', $regulatory_context),
+								':permitted_export' => $this->_payload->permitted_export ? : 0,
+								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
+								':id' => $exists['id'],
+							]
+						])) $this->response([
+								'response' => [
+									'name' => $this->_payload->name,
+									'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+									'type' => 'success'
+								]]);
+						else $this->response([
 							'response' => [
-								'name' => $this->_payload->name,
-								'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
-								'type' => 'success'
-							]]);	
+								'name' => false,
+								'msg' => LANG::GET('assemble.edit_form_not_saved'),
+								'type' => 'error'
+							]]);
+					}
+					if ($approved && $exists['content'] == implode(',', $this->_payload->content)) {
+						// update form properties as long as the content remains unchanged
+						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+							'values' => [
+								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
+								':context' => $this->_payload->context,
+								':author' => $exists['author'],
+								':content' => $exists['content'],
+								':hidden' => intval($this->_payload->hidden),
+								':approval' => $exists['approval'],
+								':regulatory_context' => implode(',', $regulatory_context),
+								':permitted_export' => $this->_payload->permitted_export ? : 0,
+								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
+								':id' => $exists['id'],
+							]
+						])) $this->response([
+								'response' => [
+									'name' => $this->_payload->name,
+									'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+									'type' => 'success'
+								]]);
+						else $this->response([
+							'response' => [
+								'name' => false,
+								'msg' => LANG::GET('assemble.edit_form_not_saved'),
+								'type' => 'error'
+							]]);
+					}
 				}
+				// until here the form has not existed, or the content of an approved form has been changed resulting in a new version
 
 				// if not updated check if approve is set, not earlier
 				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
