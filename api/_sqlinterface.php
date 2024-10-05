@@ -447,8 +447,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
 		],
 		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, hidden = :hidden, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
 		],
 		'form_put_approve' => [
 			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",
@@ -487,8 +487,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
 		],
 		'form_delete' => [
-			'mysql' => "DELETE FROM caro_form WHERE id = :id AND approval = ''",
-			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND approval = ''"
+			'mysql' => "DELETE FROM caro_form WHERE id = :id AND IFNULL(approval, '') = ''",
+			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id AND ISNULL(approval, '') = ''"
 		],
 
 
