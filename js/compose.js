@@ -306,7 +306,7 @@ export const compose_helper = {
 			approve: approve,
 		};
 		if (isForm) answer.form = {};
-		if (raw_import || (name && componentContent && approve && approve !== "0")) return answer;
+		if (raw_import || (name && componentContent)) return answer;
 		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), "error");
 		return null;
 	},
