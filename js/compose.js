@@ -149,18 +149,22 @@ export const compose_helper = {
 					else return;
 				}
 			} else if (["image"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_image_description") && value) element.description = value;
-				if (elementName === LANG.GET("assemble.compose_image") && value) {
-					element.attributes = {
-						name: value,
-						url: URL.createObjectURL(sibling.files[0]),
-					};
-					// add component structure to multipart form
-					const input = document.createElement("input");
-					input.type = "file";
-					input.name = "composedComponent_files[]";
-					input.files = sibling.files;
-					document.querySelector("[data-usecase=component_editor_form]").append(input);
+				if (elementName === LANG.GET("assemble.compose_image_description")) {
+					if (value) element.description = value;
+				}
+				if (elementName === LANG.GET("assemble.compose_image")) {
+					if (value) {
+						element.attributes = {
+							name: value,
+							url: URL.createObjectURL(sibling.files[0]),
+						};
+						// add component structure to multipart form
+						const input = document.createElement("input");
+						input.type = "file";
+						input.name = "composedComponent_files[]";
+						input.files = sibling.files;
+						document.querySelector("[data-usecase=component_editor_form]").append(input);
+					} else return;
 				}
 			} else if (["range"].includes(element.type)) {
 				if (elementName === LANG.GET("assemble.compose_simple_element")) {
