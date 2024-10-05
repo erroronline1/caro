@@ -41,6 +41,7 @@ export const assemble_helper = {
 				link.href = blobUrl;
 				link.download = name + ".png";
 				link.click();
+				URL.revokeObjectURL(blobUrl);
 			},
 			"image/png",
 			1
@@ -515,6 +516,7 @@ export class Assemble {
 					imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
 				});
 				img.dispatchEvent(new Event("load"));
+				URL.revokeObjectURL(img.src);
 			}
 		}
 	}
@@ -811,7 +813,13 @@ export class Assemble {
 				if (attribute) {
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
 					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|^\t{1,}|\n/gm, " ").slice(0, -1);
-					node[key] = new Function(attribute);
+					try {
+						node[key] = new Function(attribute);
+					}
+					catch (e){
+						new Toast(e, "error", 10000);
+						console.trace(attribute, e);
+					}
 				}
 			} else {
 				if (attribute) node.setAttribute(key, attribute);
@@ -1145,13 +1153,14 @@ export class Assemble {
 		result.push(canvas);
 
 		if (!this.currentElement.attributes.imageonly) {
-			//this tile does not process attributes, therefore they can be reassigned
+			// this tile does not process attributes, therefore they can be reassigned
+			// escape \ for fakepath to avoid SyntaxError: malformed Unicode character escape sequence for filenames starting with u or other supposed control characters during new image type creation within composer
 			this.currentElement.attributes = {
 				value: this.currentElement.description,
 				type: "button",
 				class: "inlinebutton",
 				"data-type": this.currentElement.type,
-				onpointerup: 'assemble_helper.exportCanvas("' + canvas.id + '", "' + this.currentElement.attributes.name + '")',
+				onpointerup: "assemble_helper.exportCanvas('" + canvas.id + "', '" + this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, '\\\\fakepath\\\\') + "')",
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
 			result = result.concat(this.button());
@@ -1404,8 +1413,12 @@ export class Assemble {
 				  " " +
 				  LANG.GET("assemble.photo_rechoose")
 				: LANG.GET("assemble.photo_choose");
-			if (this.files.length) this.nextSibling.src = URL.createObjectURL(this.files[0]);
-			else this.nextSibling.src = "";
+			if (this.files.length) {
+				this.nextSibling.src = URL.createObjectURL(this.files[0]);
+				this.nextSibling.onload = () => {
+					URL.revokeObjectURL(this.nextSibling.src);
+				};
+			} else this.nextSibling.src = "";
 		}
 
 		input.type = "file";
