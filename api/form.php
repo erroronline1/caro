@@ -72,6 +72,7 @@ class FORM extends API {
 				require_once('notification.php');
 				$notifications = new NOTIFICATION;
 
+				$pending_approvals = PERMISSION::pending('formapproval', $approve['approval']);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_put_approve', [
 					'values' => [
 						':id' => $approve['id'],
@@ -79,11 +80,11 @@ class FORM extends API {
 					]
 				])) $this->response([
 						'response' => [
-							'msg' => LANG::GET('assemble.approve_saved') . "<br />". (PERMISSION::fullyapproved('formapproval', $approve['approval']) ? LANG::GET('assemble.approve_completed') : LANG::GET('assemble.approve_pending')),
+							'msg' => LANG::GET('assemble.approve_saved') . "<br />". ($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')),
 							'type' => 'success',
 							'reload' => 'approval',
-							],
-							'data' => ['form_approval' => $notifications->forms()]]);
+						],
+						'data' => ['form_approval' => $notifications->forms()]]);
 				else $this->response([
 					'response' => [
 						'msg' => LANG::GET('assemble.approve_not_saved'),
@@ -725,9 +726,17 @@ class FORM extends API {
 				]
 			]);
 			$component = $component ? $component[0] : null;
-			if (!$component) $component = ['id' => '', 'name' =>''];
+			if (!$component) $component = [
+				'id' => '',
+				'name' => '',
+				'approval' => null
+			];
 		} else {
-			if (!$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID)) $component = ['id' => '', 'name' =>''];
+			if (!$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID)) $component = [
+				'id' => '',
+				'name' => '',
+				'approval' => null
+			];
 		}
 		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -744,7 +753,7 @@ class FORM extends API {
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
-		// load approved forms for accasional linking
+		// load approved forms for occasional linking
 		// check for dependencies in forms
 		$approvedforms = $dependedforms = [];
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
@@ -767,6 +776,7 @@ class FORM extends API {
 			$approve['content'][$value] = [];
 		}
 
+		$pending_approvals = PERMISSION::pending('formapproval', $component['approval']);
 		$return['render'] = [
 			'content' => [
 				[
@@ -896,7 +906,8 @@ class FORM extends API {
 					'type' => 'compose_component',
 					'description' => LANG::GET('assemble.compose_component'),
 					'value' => $component['name'],
-					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '<br>' : LANG::GET('assemble.compose_component_name_hint')) .
+					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
+						($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')) . '\n \n' .
 						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
 					'hidden' => $component['name'] ? intval($component['hidden']) : 1,
 					'approve' => $approve
@@ -919,7 +930,7 @@ class FORM extends API {
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
-						'value' => LANG::GET('assemble.edit_delete'),
+						'value' => LANG::GET('assemble.edit_component_delete'),
 						'onpointerup' => "api.form('delete', 'component', " . $component['id'] . ")" 
 					]
 				]
@@ -1149,7 +1160,8 @@ class FORM extends API {
 			'context' => '',
 			'regulatory_context' => '',
 			'permitted_export' => null,
-			'restricted_access' => null
+			'restricted_access' => null,
+			'approval' => null
 		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1186,7 +1198,7 @@ class FORM extends API {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden) && 
 			in_array($form['name'], explode(',', $row['content'])) && 
-			!in_array($form['name'], $dependedbundles)) $dependedbundles[] = $form['name']; 
+			!in_array($form['name'], $dependedbundles)) $dependedbundles[] = $row['name']; 
 		}
 
 		// check for dependencies in approved components (linked forms)
@@ -1245,6 +1257,7 @@ class FORM extends API {
 			if (in_array($value, $form['restricted_access'])) $restricted_access['content'][$translation]['checked'] = true;
 		}
 
+		$pending_approvals = PERMISSION::pending('formapproval', $form['approval']);
 		$return['render'] = [
 			'content' => [
 				[
@@ -1322,9 +1335,10 @@ class FORM extends API {
 							'content' => $contextoptions,
 							'hint' => LANG::GET('assemble.edit_form_context_hint')
 						],
-						'hint' => ($form['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => substr($form['date'], 0, -3)]) . '<br />' : LANG::GET('assemble.compose_component_name_hint')) .
-						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '<br />' : '') .
-						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '<br />' : '')
+						'hint' => ($form['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => substr($form['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
+						($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')) . '\n \n' .
+						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
+						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
 						,
 						'hidden' => $form['name'] ? intval($form['hidden']) : 1,
 						'approve' => $approve,
@@ -1345,7 +1359,7 @@ class FORM extends API {
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
-						'value' => LANG::GET('assemble.edit_delete'),
+						'value' => LANG::GET('assemble.edit_form_delete'),
 						'onpointerup' => "api.form('delete', 'form', " . $form['id'] . ")" 
 					]
 				]
