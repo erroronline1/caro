@@ -218,6 +218,19 @@ class FORM extends API {
 							]
 						]
 					);
+					if (PERMISSION::permissionFor('formcomposer')) {
+						array_push($return['render']['content'][count($return['render']['content']) -1], [
+							[
+								'type' => 'button',
+								'attributes' => [
+									'value' => LANG::GET('assemble.edit_existing'),
+									'type' => 'button',
+									'onpointerup' => "api.form('get', '" . ($approve['context'] === 'component' ? 'component' : 'form') . "_editor', " . $approve['id'] . ")"
+								]
+							]
+						]);
+					}
+
 					$return['render']['form'] = [
 						'data-usecase' => 'approval',
 						'action' => "javascript: api.form('put', 'approval', " . $this->_requestedID . ")",
