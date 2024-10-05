@@ -94,14 +94,14 @@ class CONSUMABLES extends API {
 			}
 			foreach(explode(',', $form['content']) as $usedcomponent) {
 				// get latest approved by name
-				$component = [];
 				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
 					'values' => [
 						':name' => $usedcomponent
 					]
 				]);
 				foreach ($components as $component){
-					if (PERMISSION::fullyapproved('formapproval', $component['approval'])) break;
+					if (!$component['hidden'] && PERMISSION::fullyapproved('formapproval', $component['approval']) && PERMISSION::permissionIn($component['restricted_access'])) break;
+					else $component = [];
 				}
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
