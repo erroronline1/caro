@@ -178,10 +178,11 @@ export const api = {
 	 */
 	update_header: function (string = "") {
 		if (string) document.querySelector("header>h1").innerHTML = string;
-		window.scrollTo({
-			top: 0,
-			behavior: "smooth",
-		});
+		location.hash = "";
+		//window.scrollTo({
+		//	top: 0,
+		//	behavior: "smooth",
+		//});
 	},
 
 	/**
