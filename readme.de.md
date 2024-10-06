@@ -183,7 +183,7 @@ Das oberste Ziel ist die Ausstattung der gesamten Belegschaft oder zumindest von
 Für technische Details siehe [Voraussetzungen](#voraussetzungen).
 
 ## Was es nicht ist
-Abgesehen von einigen architektonische Entscheidungen ist die Anwendung kein voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
+Abgesehen von einigen architektonischen Entscheidungen ist die Anwendung kein voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
 
 Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Preislisten der Lieferanten bestückt und dabei von vorneherein regelmäßig um unwichtige Daten bereinigt werden.
 
@@ -192,7 +192,7 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
 ## Datenintegrität
 Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
 
-Formulardaten und Serveranfragen beinhaltet teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
+Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
 
 Formulare können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nicht um ein dokumentenechtes Verfahren handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
 
@@ -411,7 +411,7 @@ graph TD;
 ### Formulare
 Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Es ist (ohne größere Nachforschungen betrieben zu haben) nicht erkenntlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: die Dokumente und internen Formulare sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies dient dem Ziel einer papierlosen Lösung bereits ausreichend, dennoch sind zusätzlich Exporte als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
 
-Um gelenkte und versionierte Dokumente und Formulare anzulegen müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Formulare anschließend zusammensetzen lassen. Komponenten und Formulare müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Formulare für den jeweiligen Anwendungsfall berücksichtigt wurden.
+Um gelenkte und versionierte Dokumente und Formulare anzulegen, müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Formulare anschließend zusammensetzen lassen. Komponenten und Formulare müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Formulare für den jeweiligen Anwendungsfall berücksichtigt wurden.
 
 Eine Freigabe-Anfrage für Komponenten und Formulare wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der berechtigten Rolle während der Anmeldung in der Anwendung.
 
@@ -579,7 +579,7 @@ graph TD;
 ### Risikomanagement
 Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org).
 
-Dabei werden Ursache und Auswirkungen erfasst, die Einstrittwahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [setup.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt.
+Dabei werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [setup.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt.
 
 Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#werkzeuge) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung. 
 
@@ -687,11 +687,11 @@ graph TD;
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
-Beide Speicherorte bestücken den [STL-Betrachter](#werkzeuge).
+Beide Speicherorte sowie externe Dokumente bestücken den [STL-Betrachter](#werkzeuge).
 
 Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
-Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden.
+Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden.
 
 ![files screenshot](http://toh.erroronline.one/caro/files.png)
 
@@ -702,15 +702,16 @@ Externe Dokumente gemäß IDO 13485 4.2.4 müssen identifiziert und gelenkt werd
 ![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20de.png)
 
 ### Lieferanten- und Artikelverwaltung
-Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der Impoert von Preislisten nutzt den [CSV-Prozessor](#csv-prozessor).
+Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor).
 
 Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
 
 Besondere berechtigte Nutzer (z.B. *Einkaufsassistent*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
 
 Lieferanten können Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
-Die Bearbeitungsansicht für Lieferanten erlaubt die Aufwahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
-Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert. **Erzeugte Filter funktionieren nicht mit Herstellerpreislisten, exportierte Artikellisten funktionieren nicht mit angepassten Filterregeln!**
+Die Bearbeitungsansicht für Lieferanten erlaubt die Auswahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
+Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert.
+> Erzeugte Filter funktionieren nicht mit Herstellerpreislisten, exportierte Artikellisten funktionieren nicht mit angepassten Filterregeln!
 
 Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bearbeitet werden:
 * Handelsware,
@@ -797,11 +798,11 @@ Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich 
 Freigegebene Bestellungen können als *bestellt*, *vollständig erhalten*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert.
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
-Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
-Alle Maßnahmen bieten an eine Nachricht beizfügen.
+Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
+Alle Maßnahmen bieten an eine Nachricht beizufügen.
 Aus den in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen erzeugt werden um bei der internen Auslieferung eine Zuordnung zu unterstützen.
 
-Bearbeitete Bestellunge werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) exportiert und für die Lieferantenbewertung genutzt werden.
+Bearbeitete Bestellungen werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Audit-Modul](#werkzeuge) exportiert und für die Lieferantenbewertung genutzt werden.
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders%20de.png)
 
@@ -898,7 +899,7 @@ graph TD;
     prepared_orders-.->add_product;
 ```
 Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.
-Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung widerrufen. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus.
+Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus. Berechtigte Nutzer können innerhalb des [Audit-Moduls](#werkzeuge) die Prüfung widerrufen.
 
 [Übersicht](#übersicht)
 
@@ -983,12 +984,14 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 * Konfiguration von api/setup.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.ini und _install.default.XX.ini)
 * Auswahl eines Installationskenntworts für die Systemnutzerin.
+
+### Installation
 * Aufruf api/_install.php/*das_gewählte_Installationskennwort*, es erfolgt anschließend eine Weiterleitung - keine Sorge, bei einem erneuten Aufruf passiert nichts.
 * Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 
 ## Laufzeitvariablen
-Manche Variables können wärend der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
+Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der setup.ini
 
 ```
 ; general application settings
@@ -1020,10 +1023,10 @@ hide_offduty_reasons[] = "" ; bitte nicht ändern
 [csv]
 headerrowindex = 0
 dialect["separator"] = ";"
-dialect["enclosure"] = "\"" ; coding environments may mess up colouring after this escaped quote
+dialect["enclosure"] = "\"" ;" coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
 
-;"unzulässige Namen gemäß REGEX-Mustern
+;unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
 names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, MUSS DER ERSTE EINTRAG SEIN, gilt auch für Export-Dateinamen
 names[] = "^.{0,3}$" ; weniger als 4 Zeichen
@@ -1038,6 +1041,7 @@ names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|contex
 idle = 2700 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
 mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
 mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
+open_record_reminder = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
 order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
 sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
 tmp =  24 ; Stunden nach denen Dateien gelöscht werden
@@ -1055,7 +1059,7 @@ form_image = 2048 ; maximale Pixel für längste Seite
 identifier = 128 ; Zeichenlänge für Identifikator, je länger desto komplexer und fehleranfälliger wird der QR-Code. 17 Zeichen werden für einen Zeitstempel automatisch angefügt
 max_records = 128 ; maximal angezeigte offene Dokumentationen
 order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
-qr_errorlevel = 'M'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
+qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 record_image = 2048 ; maximale Pixel für längste Seite
 risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
 user_image = 256 ; maximale Pixel für längste Seite
@@ -1090,6 +1094,7 @@ orderprocessing = "purchase"; Bestellungen bearbeiten
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
 recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen
+recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewollte Datenverbreitung einzuschränken
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
 texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
@@ -1134,13 +1139,14 @@ products_per_slide = 6
 * Es wird nur eine Zeitzone unterstützt.
 
 ## Anpassung
-* Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei _install.default.XX.ini entsprechend der gewünschten Standarsprache angepasst werden.
+* Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei _install.default.XX.ini entsprechend der gewünschten Standardsprache angepasst werden.
 * Manche Teile der setup.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
 * Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX.ini) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
-    * [permission] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in setup.ini berücksichtigt)
+    * [permissions] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in setup.ini berücksichtigt)
     * [units]
     * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
     * [formcontext][anonymous]
+    * [calendar][timesheet_pto]
     * [calendar][timesheet_signature]
     * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
 
@@ -1231,7 +1237,7 @@ Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedin
 *special_attention* wird bei den freigegebenen Bestellungen angezeigt und ist dafür vorgesehen auf eine Vergabe von Chargennummern für Produkte mit Hautkontakt hinzuweisen. Dies kann aber in den Sprachdateien eine beliebige andere Aufgabe erhalten.
 
 ### Standardfilter bei Export
-Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter generiert. Wie bei der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) beschrieben, kann dies sinnvoll sein, sofern anfänglich keine Preisliste importiert wurde und der Artikelstamm eines Lieferanten primät in der Anwendung bearbeitet wurde. In diesem Fall werden die Informationen ohne Bedingungen, Filter und Änderungen reimportiert. Ein solcher Filter kann nicht auf Preislisten von Lieferanten angewendet werden und erzeugt eine Fehlermeldung.
+Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter generiert. Wie bei der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) beschrieben, kann dies sinnvoll sein, sofern anfänglich keine Preisliste importiert wurde und der Artikelstamm eines Lieferanten primär in der Anwendung bearbeitet wurde. In diesem Fall werden die Informationen ohne Bedingungen, Filter und Änderungen reimportiert. Ein solcher Filter kann nicht auf Preislisten von Lieferanten angewendet werden und erzeugt eine Fehlermeldung.
 ```js
 {
     "filesettings": {

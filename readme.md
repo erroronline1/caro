@@ -764,7 +764,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu.png)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. Importing pricelists with filtering makes use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor).
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -772,7 +772,8 @@ Defined authorized users (e.g. *purchase assistant*) can edit the alias definiti
 
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
-Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined. **Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!**
+Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
+>Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
 
 While editing products, one can edit the
 * *trading good*-setting,
@@ -954,7 +955,7 @@ graph TD;
     prepared_orders-.->add_product;
 ```
 Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.
-Sample checks are added to the records. Defined authorized users can revoke the sample check from within the [audit module](#tools). New checks trigger a sytem message to these users.
+Sample checks are added to the records. New checks trigger a sytem message to these users. Defined authorized users can revoke the sample check from within the [audit module](#tools).
 
 [Content](#content)
 
@@ -1053,7 +1054,7 @@ Some variables can be edited during runtime. This applies for all *values* of la
 [application]
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.xx.ini files; user can customize within profile
 issue_mail = "dev@erroronline.one" ; address for application and security issues
-require_complaint_selection = 1 ; 1: yes, 0: no; require selection on records if this is related to a complaint 
+require_record_type_selection = 1 ; 1: yes, 0: no; require selection on records e.g. if this is related to a complaint 
 timezone = "Europe/Berlin" ; timezone for calendar handling
 
 [calendar]
@@ -1078,10 +1079,10 @@ hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty 
 [csv]
 headerrowindex = 0
 dialect["separator"] = ";"
-dialect["enclosure"] = "\"" ; coding environments may mess up colouring after this escaped quote
+dialect["enclosure"] = "\"" ;" coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
 
-;"forbidden names as regex-patterns
+;forbidden names as regex-patterns
 [forbidden]
 names[] = "[^\w\s\d\.\-ÄÖÜäöüß]" ; anything else but word characters, whitespace, decimals, special characters, MUST BE THE FIRST ITEM, serves for export filenames as well
 names[] = "^.{0,3}$" ; less than 4 characters
@@ -1096,6 +1097,7 @@ names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|contex
 idle = 2700 ; SECONDS after which a session expires without intermittend request
 mdr14_sample_interval = 365 ; DAYS until a new sample check is required as default value
 mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
+open_record_reminder = 30 ; DAYS after unclosed records are reminded of via messenger
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
 sharepoint =  48 ; HOURS, after these files will be deleted
 tmp =  24 ; HOURS, after these files will be deleted
@@ -1110,10 +1112,10 @@ records_search_similarity = 20 ; percent
 
 [limits]
 form_image = 2048 ; max pixels on longer side
-identifier = 128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
+identifier =  128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
 max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 order_approvalsignature_image = 2048 ; max pixels on longer side
-qr_errorlevel = 'M'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
+qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 record_image = 2048 ; max pixels on longer side
 risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
 user_image = 256 ; max pixels on longer side
@@ -1128,7 +1130,7 @@ audits = "ceo, qmo, prrc, supervisor" ; access audits
 auditsoperation = "ceo, qmo, prrc" ; export, revoke sample checks, drain order statistics, etc.
 calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert sick days after calling in
-calendarfullaccess = "ceo" ; edit, delete or complete events and entries 
+calendarfullaccess = "ceo" ; edit, delete or complete events and entries
 calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users timesheets in one go, adding foreign timesheet entries
 complaintclosing = "supervisor, qmo, prrc" ; SEE WARNING ABOVE - close case documentation containing a complaint
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
@@ -1146,8 +1148,9 @@ ordercancel = "ceo" ; permission to cancel or return any order beside own unit a
 orderdisplayall = "purchase" ; display all orders by default, not only for own units
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
-productslimited = "purchase_assistant" ; limited editing of products 
+productslimited = "purchase_assistant" ; limited editing of products
 recordsclosing = "ceo, supervisor" ; mark record as closed
+recordsexport = "user"; exporting records, limit if reasonable to reduce risk of data breach
 recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
@@ -1195,10 +1198,11 @@ products_per_slide = 6
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.
 * Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.ini-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
-    * [permission] (has no effect without consideration in role management within setup.ini)
+    * [permissions] (has no effect without consideration in role management within setup.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
     * [formcontext][anonymous]
+    * [calendar][timesheet_pto]
     * [calendar][timesheet_signature]
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
 
