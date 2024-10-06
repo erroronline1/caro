@@ -399,6 +399,7 @@ class TOOL extends API {
 		foreach ($folders as $folder) {
 			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 		}
+		$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
 		$options = ['...' => ['value' => 'null']];
 		foreach ($files as $path){
 			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => $path];
