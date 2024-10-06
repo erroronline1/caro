@@ -633,6 +633,13 @@ export class Assemble {
 			circle.setAttributeNS(null, "cy", "5");
 			circle.setAttributeNS(null, "r", "4");
 			indicator.appendChild(circle);
+			indicator.addEventListener("pointerenter", function (e) {
+				document.getElementById(sectionID).scrollTo({
+					top: 0,
+					left: (document.getElementById(sectionID).scrollWidth / length) * i - 1,
+					behaviour: "smooth",
+				});
+			});
 			indicators.appendChild(indicator);
 		}
 		toright.addEventListener("pointerup", function (e) {
@@ -815,8 +822,7 @@ export class Assemble {
 					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|^\t{1,}|\n/gm, " ").slice(0, -1);
 					try {
 						node[key] = new Function(attribute);
-					}
-					catch (e){
+					} catch (e) {
 						new Toast(e, "error", 10000);
 						console.trace(attribute, e);
 					}
@@ -1160,7 +1166,7 @@ export class Assemble {
 				type: "button",
 				class: "inlinebutton",
 				"data-type": this.currentElement.type,
-				onpointerup: "assemble_helper.exportCanvas('" + canvas.id + "', '" + this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, '\\\\fakepath\\\\') + "')",
+				onpointerup: "assemble_helper.exportCanvas('" + canvas.id + "', '" + this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, "\\\\fakepath\\\\") + "')",
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
 			result = result.concat(this.button());
