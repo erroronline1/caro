@@ -253,7 +253,7 @@ class APPLICATION extends API {
 			case 'GET':
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual_by_id', [
 					'values' => [
-						':id' => $this->_requestedManual
+						':id' => $this->_requestedManual != 'false' ? $this->_requestedManual : null
 					]
 				]);
 				if (!$query) $entry =[
