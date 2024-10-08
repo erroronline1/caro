@@ -107,21 +107,32 @@ class PDF{
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		
+		$height = [
+			'font' => 10,
+		];
+
 		foreach($content['content'] as $form => $entries){
-			$pdf->SetFont('helvetica', '', 12); // font size
-			$pdf->MultiCell(145, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$pdf->SetFont('helvetica', '', $height['font'] + 2); // font size
+			$pdf->MultiCell(140, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			foreach($entries as $key => $value){
-				$pdf->SetFont('helvetica', 'B', 10); // font size
-				$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-				$pdf->SetFont('helvetica', '', 10); // font size
-				$pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				// name column
+				$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+				$pdf->applyCustomPageBreak($nameLines, $height['font']);
+				
+				// values column
+				$pdf->SetFont('helvetica', '', $height['font']); // font size
+				$valueLines = $pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				
+				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
+				$pdf->Ln(($offset - 1) * $height['font'] / 2);
 			}
 			if (array_key_exists($form, $content['images'])){
 				$ln = 0;
 				foreach ($content['images'][$form] as $image){
 					$imagedata = pathinfo($image);
 					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
-					$pdf->SetFont('helvetica', 'B', 10); // font size
+					$pdf->SetFont('helvetica', 'B', $height['font']); // font size
 					$pdf->MultiCell(50, INI['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 					if ($img_width && INI['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / INI['pdf']['exportimage']['maxheight']))
 						$pdf->Image('.' . $image, null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
@@ -171,21 +182,31 @@ class PDF{
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		
+		$height = [
+			'font' => 10,
+
+			'multiline' => 31,
+			'default' => 5
+		];
+
 		foreach($content['content'] as $form => $entries){
-			$pdf->SetFont('helvetica', '', 12); // font size
+			$pdf->SetFont('helvetica', '', $height['font'] + 2); // font size
 			$pdf->MultiCell(145, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			$keyY = $pdf->GetY();
 			foreach($entries as $key => $value){
-				$pdf->SetFont('helvetica', 'B', 10); // font size
-				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
-
-				$pdf->SetFont('helvetica', '', 10); // font size
-				$originalFontSize = $pdf->getFontSizePt();
-
-				if ($pdf->GetY() > $pdf->getPageHeight() - INI['pdf']['record']['marginright'] - $nameLines*10) {
-					$pdf->setPage($pdf->getPage() + 1);
-					$pdf->SetY(INI['pdf']['record']['margintop']);
+				// make sure to write on next page if multiline textfield would reach into footer
+				if ($value['type'] === "multiline" && !$value['value']
+					&& $pdf->GetY() > $pdf->getPageHeight() - INI['pdf']['record']['marginbottom'] - $height['multiline']) {
+						$pdf->AddPage();
+						$pdf->SetY(INI['pdf']['record']['margintop']);
 				}
+				// name column
+				$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);
+				$pdf->applyCustomPageBreak($nameLines, $height['font']);
+
+				// values column
+				$pdf->SetFont('helvetica', '', $height['font']); // font size
 
 				switch ($value['type']){
 					case 'textsection':
@@ -194,31 +215,49 @@ class PDF{
 					case 'image':
 						if (array_key_exists($form, $content['images']) && in_array($value['value'], $content['images'][$form])) {
 							$imagedata = pathinfo($value['value']);
-							$pdf->Image('.' . $value['value'], null, $pdf->GetY() + 4, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
+							$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+							$pdf->MultiCell(50, INI['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+							if ($img_width && INI['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / INI['pdf']['exportimage']['maxheight']))
+								$pdf->Image('.' . $value['value'], null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+							else
+								$pdf->Image('.' . $value['value'], null, null, 145, 0, '', '', 'R', true, 300, 'R');
 							$pdf->Ln(INI['pdf']['exportimage']['maxheight'] + 4);
 						}
 						break;
 					case 'selection':
 						foreach($value['value'] as $option){
+							$pdf->applyCustomPageBreak($nameLines, $height['font']);
+
 							$pdf->SetFontSize(14);
 							$pdf->CheckBox($option, 5, str_starts_with($option, '_____'), [], [], 'OK', 65, $pdf->GetY() + 4);
-							$pdf->SetFontSize($originalFontSize);
+							$pdf->SetFontSize($height['font']);
 							$pdf->MultiCell(133, 4, (str_starts_with($option, '_____') ? substr($option, 5) : $option), 0, '', 0, 1, 67, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							$pdf->Ln(-7);
 						}
 						$pdf->Ln(max([1, $nameLines - count($value['value'])]) * 5);
 						break;
 					case 'multiline':
-						$height = 31;
+						if ($value['value']) { // print value for missing field values on some systems
+							$pdf->SetFont('helvetica', 'I', $height['font']); // font size
+							$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+							$pdf->SetFont('helvetica', '', $height['font']); // font size
+							break;
+						}
 						$pdf->SetFontSize(0); // variable font size
-						$pdf->TextField($key, 133, $height, ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
-						$pdf->Ln($height + max([1, $nameLines]) * 5);
+						$pdf->TextField($key, 133, $height['multiline'], ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
+						$pdf->Ln($height['multiline'] + max([1, $nameLines]) * 5);
 						break;
 					default:
-						$height = 5;
+						if ($value['value']) { // print value for missing field values on some systems
+							$pdf->SetFont('helvetica', 'I', $height['font']); // font size
+							$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+							$pdf->SetFont('helvetica', '', $height['font']); // font size
+							break;
+						}
 						$pdf->SetFontSize(0); // variable font size
-						$pdf->TextField($key, 133, $height, [], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
-						$pdf->Ln($height + max([1, $nameLines]) * 5);
+						$pdf->TextField($key, 133, $height['default'], [], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
+						$pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 				}
 			}
 		}
@@ -259,15 +298,26 @@ class PDF{
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		
+		$height = [
+			'font' => 10,
+		];
+
 		foreach($content['content'] as $key => $value){
-			$pdf->SetFont('helvetica', 'B', 10); // font size
-			$pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-			$pdf->SetFont('helvetica', '', 10); // font size
+			// name column
+			$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+			$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+			$pdf->applyCustomPageBreak($nameLines, $height['font']);
+
+			// values column
+			$pdf->SetFont('helvetica', '', $height['font']); // font size
 			if (gettype($value) === 'array') {
 				$value = implode("\n", array_keys($value));
 			}
-			$pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-		}
+			$valueLines = $pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+
+			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
+			$pdf->Ln(($offset - 1) * $height['font'] / 2);
+}
 		// move pointer to last page
 		$pdf->lastPage();
 
@@ -315,7 +365,6 @@ class PDF{
 				$pdf->SetTextColor(0, 0, 0);
 				$pdf->MultiCell(145, 2, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			}
-
 		}
 		// move pointer to last page
 		$pdf->lastPage();
@@ -338,6 +387,15 @@ class RECORDTCPDF extends TCPDF {
 		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
 		$this->header = $header;
+	}
+
+	// forces pagebreak if content exceeds name or page height
+	public function applyCustomPageBreak($lines, $lineheight) {
+		if ($this->GetY() > $this->getPageHeight() - INI['pdf']['record']['marginbottom'] - $lines * $lineheight) {
+			if ($this->getNumPages() < $this->getPage() + 1) $this->AddPage();
+			$this->SetY(INI['pdf']['record']['margintop']);
+		}
+		if ($this->getNumPages() > $this->getPage()) $this->setPage($this->getPage() + 1);
 	}
 
 	//Page header
