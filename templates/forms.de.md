@@ -810,41 +810,71 @@ Export for signature compliance
 		{
 			"type": "text",
 			"attributes": {
-				"name": "Bewegungsausmaß Schulter rechts"
+				"name": "Bewegungsausmaß Schulter links"
 			}
 		},
 		{
 			"type": "text",
 			"attributes": {
-				"name": "Bewegungsausmaß Schulter links"
+				"name": "Bewegungsausmaß Schulter rechts"
 			},
 			"hint": "Retro/Ante 40-0-90, Ele 170, Ab/Ad 90-0-45, Ar/Ir 60-0-70, ggf. OB (ohne Befund)"
 		},
 		{
-			"type": "text",
+			"type": "checkbox",
 			"attributes": {
-				"name": "Bewegungsausmaß Ellenbogen rechts"
+				"name": "Bewegungsausmaß Schulter ohne Befund"
+			},
+			"content": {
+				"Schulter links": [],
+				"Schulter rechts": []
 			}
 		},
 		{
 			"type": "text",
 			"attributes": {
 				"name": "Bewegungsausmaß Ellenbogen links"
-			},
-			"hint": "Ex/Flex 10-0-150, Pro/Sup 90-0-90, ggf. OB (ohne Befund)"
+			}
 		},
 		{
 			"type": "text",
 			"attributes": {
-				"name": "Bewegungsausmaß Handwurzel rechts"
+				"name": "Bewegungsausmaß Ellenbogen rechts"
+			},
+			"hint": "Ex/Flex 10-0-150, Pro/Sup 90-0-90, ggf. OB (ohne Befund)"
+		},
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Bewegungsausmaß Ellenbogen ohne Befund"
+			},
+			"content": {
+				"Ellenbogen links": [],
+				"Ellenbogen rechts": []
 			}
 		},
 		{
 			"type": "text",
 			"attributes": {
 				"name": "Bewegungsausmaß Handwurzel links"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "Bewegungsausmaß Handwurzel rechts"
 			},
 			"hint": "Ex/Flex 70-0-80, ggf. OB (ohne Befund)"
+		},
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Bewegungsausmaß Handwurzel ohne Befund"
+			},
+			"content": {
+				"Handwurzel links": [],
+				"Handwurzel rechts": []
+			}
 		},
 		{
 			"type": "textarea",
@@ -871,8 +901,8 @@ Export for signature compliance
 				"name": "Bevorzugte Seite"
 			},
 			"content": {
-				"rechts": [],
-				"links": []
+				"links": [],
+				"rechts": []
 			}
 		}
 	],
@@ -934,8 +964,8 @@ Export for signature compliance
 				"name": "Wundheilung abgeschlossen"
 			},
 			"content": {
-				"nein": [],
-				"ja": []
+				"ja": [],
+				"nein": []
 			}
 		},
 		{
@@ -2160,7 +2190,7 @@ Export for signature compliance
 		{
 			"type": "select",
 			"attributes": {
-				"name": "Handpassteil mechnisch",
+				"name": "Handpassteil mechanisch",
 				"multiple": true
 			},
 			"content": {
