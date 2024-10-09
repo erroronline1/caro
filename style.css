@@ -459,6 +459,7 @@ canvas,
 
 textarea {
 	min-height: 13em;
+	margin-bottom: 1em;
 }
 textarea[rows] {
 	min-height: initial;
@@ -823,7 +824,6 @@ article > span[data-type] {
 	margin: 1em 0 0 2.3em;
 }
 
-.textarea-hint,
 .links-hint,
 .range-hint,
 button + .hint {
