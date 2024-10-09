@@ -810,7 +810,7 @@ export class Assemble {
 			div.appendChild(document.createTextNode(part[1]));
 			div.appendChild(document.createElement("br"));
 		}
-		if (["textarea", "links"].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + "-hint");
+		if (["range", "links"].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + "-hint");
 		return [div];
 	}
 
@@ -1195,6 +1195,7 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label");
+		if (type === "number") input.step = ".01";
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
@@ -1576,7 +1577,6 @@ export class Assemble {
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		this.currentElement.description = this.currentElement.attributes.name;
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		if (hint.length) hint[0].classList.add("range-hint");
 
 		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
 			let datalist = document.createElement("datalist");
