@@ -99,6 +99,18 @@
 				"name": "Verordner"
 			},
 			"hint": "namentlich"
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "FIBU Nummer"
+			}
+		},
+		{
+			"type": "text",
+			"attributes": {
+				"name": "EVA Vorgangsnummer"
+			}
 		}
 	]
 ]
