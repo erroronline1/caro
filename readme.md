@@ -68,22 +68,19 @@
 * [License](#license)
 
 
-## development
+## discussion
+
+#### application considerations
+* recall option (how?)
+* post-market surveillance (how?)
+* post-market evaluation (how?)
+* product lifespans -> transfer to product manuals? (how?)
+* statistics on documentation entries
 
 #### purchase considerations
 * general orders select workshop storage number
 * overview orders by commission/justification / vendor
 * batch identifier (product and delivery note number) for ordered items
-* tidy products with expiry dates
-* tidy products with special attention
-
-#### application considerations
-* data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* unittests (frontend)
-* recall option (how?)
-* post-market surveillance (how?)
-* post-market evaluation (how?)
-* product lifespans -> transfer to product manuals? (how?)
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -91,10 +88,27 @@
 * material tracing within documentation
 * review max display option for summary overview
 
+## development
+
+#### purchase considerations
+* tidy products with expiry dates (...and xxx similar products (like consumables ln 267))
+* tidy products with special attention (...and xxx similar products (like consumables ln 267))
+
+#### application considerations
+* data deletion in accordance to dsgvo, eg. recommend deletion after x years?
+* unittests (frontend)
+
+#### records considerations
+* review max display option for summary overview
+* exportform documentation type, 'user'-name field by default, date, time -> available for groups as well?
+* -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
+* retype permission can reassign identifier to merge faulty separate records (watch out attached file handling)
+    * confirmation with checkbox confirming this is not reverseable, write into typechange anyways (rename)
+* recreate outdated forms for compliance reasons
+
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
-* textarea, text values on form export -> works on apache, observe on iis 
-    * possible adobe issue? write content to multicell if value is passed
+* force form submission by passing and validating value on submit button?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
