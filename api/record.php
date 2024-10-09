@@ -1352,8 +1352,8 @@ class RECORD extends API {
 						':author' => $original['author'],
 						':form' => $original['form_name'],
 						':date' => $original['date'],
-						':previoustype' => $original['record_type'],
-						':newtype' => $record_type
+						':previoustype' => LANGUAGEFILE['record']['record_type'][$original['record_type']],
+						':newtype' => LANGUAGEFILE['record']['record_type'][$record_type]
 					])
 				]),
 				':entry_timestamp' => $this->_currentdate->format('Y-m-d H:i:s'),
