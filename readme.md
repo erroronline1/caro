@@ -112,8 +112,8 @@
 
 #### considerations
 * 15 years overall 260000 cases
-* stresstest with 100000 records has response time of 30 seconds for overviews/notifications (landing page, records)
-* -> refactor records to one per case? json content?
+* stresstest with 100000 record items for 1700 cases has response time of 30 seconds for overviews/notifications (landing page, records)
+* -> refactor records to one per case? json content? (_sqlinterface.php, _stresstest.php, audit.php, notification.php, record.php)
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
