@@ -184,15 +184,12 @@ $queries = [
 				"CREATE TABLE IF NOT EXISTS `caro_records` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`form_name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`form_id` int NOT NULL," .
+				"	`record_type` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`author_id` int NOT NULL," .
+				"	`last_user` int NOT NULL," .
+				"	`last_touch` datetime NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`record_type` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`notified` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -413,15 +410,12 @@ $queries = [
 				"CREATE TABLE caro_records (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	context varchar(MAX) NOT NULL," .
-				"	form_name varchar(MAX) NOT NULL," .
-				"	form_id int NOT NULL," .
+				"	record_type varchar(MAX) NULL DEFAULT NULL," .
 				"	identifier varchar(MAX) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	author_id int NOT NULL," .
+				"	last_user int NOT NULL," .
+				"	last_touch smalldatetime NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
-				"	record_type varchar(MAX) NULL DEFAULT NULL," .
 				"	notified tinyint NULL DEFAULT NULL," .
 				");"
 				,

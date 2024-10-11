@@ -104,30 +104,50 @@ class STRESSTEST{
 	public function createRecords(){
 		$this->_currentdate->modify('-12 month');
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		for ($i = 0; $i < $this->_number;$i++){
 			if (!($i % intval($this->_number/12/30))) {
 				$this->_currentdate->modify('+1 day');
 			}
-			$form = array_rand($forms);
-			$identifier = 'wolfgang' . $this->_prefix . intval($i % intval($this->_number/12));
+			$identifier = 'wolfgang' . $this->_prefix . random_int(1, $this->_number);
 
 			$content = [];
 			$names = ['abc','def','ghi','jkl','mno','pqr','stu','vwx','yz'];
 			foreach(array_rand($names, 4) as $component){
-				$content[$names[$component]] = 'sdf' . random_int(1000,100000000); 
+				$content[$names[$component]] = 'sdf' . random_int(1000, 100000000); 
 			}
 
-			SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			$current_record = [];
+			foreach($forms as $form){
+				$current_record[] = [
+					'author' => 'error on line 1',
+					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
+					'form' => $form['id'],
+					'content' => json_encode($content)
+				];
+
+			}
+			if (($record = array_search($identifier, array_column($records, 'identifier'))) !== false){
+				$exists = $records[$record];
+				$records = json_decode($exists['content'], true);
+				$records[] = $current_record;
+				$success = SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+					'values' => [
+						':record_type' => $exists['record_type'] ? : null,
+						':identifier' => $identifier,
+						':last_user' => 2,
+						':content' => json_encode($records),
+						':id' => $exists['id']
+					]
+				]);
+			}
+			else SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
 					':context' => 'casedocumentation',
-					':form_name' => $forms[$form]['name'],
-					':form_id' => $forms[$form]['id'],
+					':record_type' => 'treatment',
 					':identifier' => $identifier,
-					':author' => 'error on line 1',
-					':author_id' => 2,
-					':content' => json_encode($content),
-					':entry_timestamp' => $this->_currentdate->format('Y-m-d H:i:s'),
-					':record_type' => 'treatment'
+					':last_user' => 2,
+					':content' => json_encode($current_record),
 				]
 			]);
 		}

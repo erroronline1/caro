@@ -110,11 +110,6 @@
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
 
-#### considerations
-* 15 years overall 260000 cases
-* stresstest with 100000 record items for 1700 cases has response time of 30 seconds for overviews/notifications (landing page, records)
-* -> refactor records to one per case? json content? (_sqlinterface.php, _stresstest.php, audit.php, notification.php, record.php)
-
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
@@ -1653,7 +1648,7 @@ can be tested and verified importing unittest.js and calling `rendertest('app')`
 
 ## Stress test
 
-Can be performed with ./api/_stresstest.php. 10000 calendar-events or records can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested.
+Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested. On 100000 distributed records the performance did well.  
 During creation the products database has been evaluated ([1](#server-setup), [2](#miscellaneous)).
 
 [Content](#content)

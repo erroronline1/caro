@@ -115,19 +115,13 @@ class AUDIT extends API {
 	 * list and link complaints from records, sum by year
 	 */
 	private function complaints(){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		$entries = $content = [];
 		foreach ($data as $row){
-			if ($row['complaint']){
-				$year = substr($row['date'], 0, 4);
+			if ($row['record_type'] === 'complaint'){
+				$year = substr($row['last_touch'], 0, 4);
 				if (!isset($entries[$year])) $entries[$year] = [];
-				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
-					'values' => [
-						':id' => $row['id']
-						]
-					]);
-				$closed = $closed ? $closed[0] : '';
-				$entries[$year][$row['identifier']] = ['closed' => json_decode($closed['closed'] ? : '', true), 'units' => $row['units']];
+				$entries[$year][$row['identifier']] = ['closed' => json_decode($row['closed'] ? : '', true), 'units' => $row['units']];
 			}
 		}
 		//order by year descending

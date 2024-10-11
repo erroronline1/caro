@@ -117,17 +117,11 @@ class NOTIFICATION extends API {
 	 */
 	public function complaints(){
 		if (!PERMISSION::permissionFor('complaintclosing') && !array_intersect(['ceo'], $_SESSION['user']['permissions'])) return 0;
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		$number = 0;
 		foreach ($data as $row){
-			if ($row['complaint']){
-				$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
-					'values' => [
-						':id' => $row['id']
-						]
-					]);
-				$closed = $closed ? $closed[0] : '';
-				if (PERMISSION::pending('complaintclosing', $closed['closed'])) $number++;
+			if ($row['record_type'] === 'complaint'){
+				if (PERMISSION::pending('complaintclosing', $row['closed'])) $number++;
 			}
 		} 
 		return $number;
@@ -247,30 +241,29 @@ class NOTIFICATION extends API {
 	 * number of unclosed records for assigned units
 	 */
 	public function records(){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_identifiers');
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$number = 0;
 		$alerts = [];
 		foreach ($data as $row){
-			$closed = SQLQUERY::EXECUTE($this->_pdo, 'records_touched', [
-				'values' => [
-					':id' => $row['id']
-					]
-				]);
-			$closed = $closed ? $closed[0] : '';
-			if (($row['complaint'] && !PERMISSION::fullyapproved('complaintclosing', $closed['closed']))
-				|| (!$row['complaint'] && !$closed['closed'])){
+			if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
+				|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
 				// rise counter for unit member
 				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
 				// alert if applicable
-				$last = new DateTime($row['date'], new DateTimeZone(INI['application']['timezone']));
+				$last = new DateTime($row['last_touch'], new DateTimeZone(INI['application']['timezone']));
 				$diff = intval(abs($last->diff($this->_currentdate)->days / INI['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
+					// get last considered form
+					$row['content'] = json_decode($row['content'], true);
+					$lastform = $forms[array_search($row['content'][count($row['content']) - 1]['form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
+
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
 						LANG::GET('record.record_reminder_message', [
 							':days' => $last->diff($this->_currentdate)->days,
-							':date' => substr($closed['date'], 0, -3),
-							':form' => $closed['form_name'],			
+							':date' => substr($row['last_touch'], 0, -3),
+							':form' => $lastform['form_name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 						])
 					);
