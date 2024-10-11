@@ -40,7 +40,7 @@ class STRESSTEST{
 	 * identifying prefixes for creation and safe deletion
 	 */
 	public $_prefix = 'UVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY';
-	public $_number = 10000;
+	public $_number = 20000;
 
 	public function __construct($method){
 		$options = [
@@ -64,7 +64,7 @@ class STRESSTEST{
 	}
 
 	public function createCalendarEvents(){
-		$this->_currentdate->modify('-6 month');
+		$this->_currentdate->modify('-12 month');
 		for ($i = 0; $i < $this->_number;$i++){
 			if (!($i % intval($this->_number/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
@@ -102,7 +102,7 @@ class STRESSTEST{
 	}
 
 	public function createRecords(){
-		$this->_currentdate->modify('-6 month');
+		$this->_currentdate->modify('-12 month');
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		for ($i = 0; $i < $this->_number;$i++){
 			if (!($i % intval($this->_number/12/30))) {
