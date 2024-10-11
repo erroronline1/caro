@@ -664,6 +664,22 @@ Export for signature compliance
 				"name": "Protokoll"
 			}
 		}
+	],
+	[
+		{
+			"type": "photo",
+			"attributes": {
+				"name": "Bildanhang",
+				"multiple": true
+			}
+		},
+		{
+			"type": "file",
+			"attributes": {
+				"name": "Dateianhang",
+				"multiple": true
+			}
+		}
 	]
 ]
 ```
