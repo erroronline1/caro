@@ -101,10 +101,10 @@
 #### records considerations
 * review max display option for summary overview
 * exportform documentation type, 'user'-name field by default, date, time -> available for groups as well?
-* -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
+    * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
 * retype permission can reassign identifier to merge faulty separate records (watch out attached file handling)
-    * confirmation with checkbox confirming this is not reverseable, write into typechange anyways (rename)
-* recreate outdated forms for compliance reasons
+    * display split option beside merged entries (some preserved hidden field-name? merge icon rotated)
+* recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
