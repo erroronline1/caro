@@ -1201,7 +1201,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => LANG::GET('record.record_reidentify'),
-							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_export') . "', render: JSON.parse('" . json_encode(
+							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_reidentify') . "', render: JSON.parse('" . json_encode(
 								[
 									[
 										'type' => 'scanner',
