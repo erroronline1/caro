@@ -512,8 +512,10 @@ Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesb
 Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Paketen geprüft werden.
 
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.
-Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen der Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.
 An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abständen](#laufzeitvariablen) erinnert. Dies erfolgt über eine Nachricht an alle Nutzer der Bereiche des letzten eintragenden Nutzers.
+
+Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen der Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.
+Aufzeichnungen können einen neuen Identifikator erhalten, z.B. bei Schreibfehlern oder einer versehentlichen doppelten Anlage. Im zweiten Fall werden die Aufzeichnungen mit bestehenden zusammengeführt sobald der neue Identifikator bereits genutzt wird. Diese Änderung sowie die Neuvergabe eines Identifikators werden ebenfalls dokumentiert.
 
 Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten, werden diese Datensätze nur dann angezeigt, wenn der anfragende Nutzer auch die Berechtigung zur Verwendung der Formulare hat. Es ist Ermessenssache ob Formularpakete so sinnvoll eingesetzt werden können:
 * Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
@@ -1093,7 +1095,7 @@ orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
 orderprocessing = "purchase"; Bestellungen bearbeiten
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
-recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen
+recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen, Identifikator ändern (z.B. bei versehentlicher doppelter Anlage)
 recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewollte Datenverbreitung einzuschränken
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen

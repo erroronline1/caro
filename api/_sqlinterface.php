@@ -666,6 +666,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier",
 			'sqlsrv' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier"
 		],
+		'records_delete' => [
+			'mysql' => "DELETE FROM caro_records WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_records WHERE id = :id"
+		],
 
 
 

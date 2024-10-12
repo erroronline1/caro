@@ -142,6 +142,7 @@ class RECORD extends API {
 	private function export($summarize = "full"){
 		if (!PERMISSION::permissionFor('recordsexport')) $this->response([], 401);
 		$content = $this->summarizeRecord($summarize);
+		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
 			'href' => PDF::recordsPDF($content)
@@ -1007,6 +1008,7 @@ class RECORD extends API {
 				$body = [];
 				// summarize content
 				$content = $this->summarizeRecord('full', PERMISSION::permissionFor('recordsretyping'));
+				if (!$content) $this->response([], 404);
 				$body[] = [
 					[
 						'type' => 'textsection',
@@ -1179,7 +1181,7 @@ class RECORD extends API {
 					) . "'), options:{".
 					"'" . LANG::GET('general.cancel_button') . "': false,".
 					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => { if (response) api.record('post','retype', null, _client.application.dialogToFormdata(response))})"
+					"}}).then(response => { if (response) api.record('post', 'retype', null, _client.application.dialogToFormdata(response))})"
 					. "\">" . LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . '</a>';
 				}
 				$return['render']['content'][] = [
@@ -1191,7 +1193,45 @@ class RECORD extends API {
 						'linkedcontent' => $typeaction
 					]
 				];
-
+				if (PERMISSION::permissionFor('recordsclosing')){
+					$last_element = count($return['render']['content'])-1;
+					$return['render']['content'][$last_element][] = 
+					[
+						'type' => 'button',
+						'attributes' => [
+							'data-type' => 'merge',
+							'value' => LANG::GET('record.record_reidentify'),
+							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_export') . "', render: JSON.parse('" . json_encode(
+								[
+									[
+										'type' => 'scanner',
+										'hint' => LANG::GET('record.create_identifier_hint'),
+										'attributes' => [
+											'name' => LANG::GET('record.create_identifier'),
+											'maxlength' => INI['limits']['identifier']
+										]
+									],
+									[
+										'type' => 'checkbox',
+										'content' => [
+											LANG::GET('record.record_reidentify_confirm') => ['required' => true] 
+										]
+									],
+									[
+										'type' => 'hidden',
+										'attributes' => [
+											'name' => '_previousIdentifier',
+											'value' => $this->_requestedID
+										]
+									]
+								]
+							) .
+							"'), options:{'" . LANG::GET('general.cancel_button') . "': false,".
+							"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+							"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
+						]
+					];					
+				}
 
 				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
 					$last_element = count($return['render']['content'])-1;
@@ -1406,6 +1446,100 @@ class RECORD extends API {
 	}
 
 	/**
+	 *           _   _         _   _ ___     
+	 *   ___ ___|_|_| |___ ___| |_|_|  _|_ _ 
+	 *  |  _| -_| | . | -_|   |  _| |  _| | |
+	 *  |_| |___|_|___|___|_|_|_| |_|_| |_  |
+	 *                                  |___|
+	 */
+	public function reidentify(){
+		if (!PERMISSION::permissionFor('recordsclosing')) $this->response([], 401);
+		$entry_id = UTILITY::propertySet($this->_payload, '_previousIdentifier');
+		$new_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'));
+		$confirmation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.record_reidentify_confirm'));
+		if (!($entry_id && $new_id && $confirmation)) $this->response([], 406);
+
+		// append timestamp to new id if applicable
+		$possibledate = substr($new_id, -16);
+		try {
+			new DateTime($possibledate);
+		}
+		catch (Exception $e){
+			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+			$new_id .= ' ' . $now->format('Y-m-d H:i');
+		}
+
+		// check if new id (e.g. scanned) is already taken
+		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+			'values' => [
+				':identifier' => $new_id
+			]
+		]);
+		$original = $original ? $original[0] : null;
+
+		$merge = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+			'values' => [
+				':identifier' => $entry_id
+			]
+		]);
+		$merge = $merge ? $merge[0] : null;
+		$merge['content'] = json_decode($merge['content'], true);
+		$merge['content'][] = [
+			'author' => $_SESSION['user']['name'],
+			'date' => $this->_currentdate->format('y-m-d H:i'),
+			'form' => 0,
+			'content' => [
+				LANG::GET('record.record_retype_pseudoform_name') => LANG::GET('record.record_reidentify_content', [
+				':identifier' => $entry_id,
+			])]
+		];
+
+		if (!$original) {
+			// overwrite identifier, append record altering
+
+			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+				'values' => [
+					':record_type' => $merge['record_type'],
+					':identifier' => $new_id,
+					':last_user' => $_SESSION['user']['id'],
+					':content' => json_encode($merge['content']),
+					':id' => $merge['id']
+			]])) $this->response([
+				'response' => [
+					'msg' => LANG::GET('record.record_reidentify_success'),
+					'type' => 'success'
+				]]);
+		}
+		else {
+			$original['content'] = json_decode($original['content'], true);
+			foreach($merge['content'] as $record){
+				$original['content'][] = $record;
+			}
+			usort($original['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
+			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+				'values' => [
+					':record_type' => $original['record_type'],
+					':identifier' => $new_id,
+					':last_user' => $_SESSION['user']['id'],
+					':content' => json_encode($original['content']),
+					':id' => $original['id']
+			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
+				'values' => [
+					':id' => $merge['id']
+			]])) $this->response([
+				'response' => [
+					'msg' => LANG::GET('record.record_reidentify_merged'),
+					'type' => 'success'
+				]]);
+		}
+		$this->response([
+			'response' => [
+				'msg' => LANG::GET('record.record_reidentify_failure'),
+				'type' => 'error'
+			]]);		
+	}
+
+	/**
 	 *           _
 	 *   ___ ___| |_ _ _ ___ ___
 	 *  |  _| -_|  _| | | . | -_|
@@ -1496,6 +1630,7 @@ class RECORD extends API {
 			]
 		]);
 		$data = $data ? $data[0] : null;
+		if (!$data) return false;
 
 		$summary = [
 			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),

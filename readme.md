@@ -102,8 +102,6 @@
 * review max display option for summary overview
 * exportform documentation type, 'user'-name field by default, date, time -> available for groups as well?
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
-* retype permission can reassign identifier to merge faulty separate records (watch out attached file handling)
-    * display split option beside merged entries (some preserved hidden field-name? merge icon rotated)
 * recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
 
 #### issues
@@ -586,8 +584,10 @@ The identifier is always a QR-code with additional readable content that will ap
 Checking for completeness of form bundles can be applied on display of a record summary.
 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
-If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
 Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
+
+If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
+Records can be assigned a new identifier, e.g. on typing errors or accidentally duplicate creation. In the latter case if the new identifier is already in use all records will be merged with the existing one. This action as well as assigning a new identifier will be recorded as well.
 
 If records contain data from restricted forms, summaries will only contain these data if the requesting user has the permission to handle the form as well. It is up to you if it is reasonable to handle form bundles this way:
 * On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
@@ -1163,7 +1163,7 @@ orderdisplayall = "purchase" ; display all orders by default, not only for own u
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products
-recordsclosing = "ceo, supervisor" ; mark record as closed
+recordsclosing = "ceo, supervisor" ; mark record as closed, reassign identifier (e.g. on accidentally duplicate creation)
 recordsexport = "user"; exporting records, limit if reasonable to reduce risk of data breach
 recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
@@ -2980,6 +2980,20 @@ Parameters
 Sample response
 ```
 {"render": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filtered","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
+```
+
+> POST ./api/api.php/record/reidentify/
+
+Sets another identifier or merges if new identifier is already in use
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | current identifier, new identifier, user confirmation |
+
+Sample response
+```
+{"response":{"msg":"Record successfully merged","type":"success"}}
 ```
 
 > POST ./api/api.php/record/retype/
