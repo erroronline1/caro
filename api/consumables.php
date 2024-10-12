@@ -1310,17 +1310,40 @@ class CONSUMABLES extends API {
 		$expiryproducts = [];
 		foreach($vendorproducts as $row){
 			if ($row['has_expiry_date']) {
-				if (!array_key_exists($row['vendor_name'], $expiryproducts)) $expiryproducts[$row['vendor_name']] = [];
-				$expiryproducts[$row['vendor_name']][$row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : '')] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
+				if (!array_key_exists($row['vendor_name'], $expiryproducts)) $expiryproducts[$row['vendor_name']] = [
+					$row['article_name'] => [
+						'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
+						'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
+						'alike' => 0
+					]
+				];
+				else {
+					foreach ($expiryproducts[$row['vendor_name']] as $product => $properties){
+						similar_text($product, $row['article_name'], $percent);
+						if ($percent >= INI['likeliness']['consumables_article_name_similarity']) {
+							$expiryproducts[$row['vendor_name']][$product]['alike']++;
+						}
+						else $expiryproducts[$row['vendor_name']][$row['article_name']] = [
+							'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
+							'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
+							'alike' => 0
+						];
+					}
+				}
 			}
 		}
 		if ($expiryproducts){
 			$result['render']['content'][] = [];
 			foreach($expiryproducts as $vendor => $products){
+				$content = [];
+				foreach($products as $product => $properties){
+					$properties['display'] .= $properties['alike'] > 0 ? ' ' . LANG::GET('consumables.similar_name', [':number' => $properties['alike']]) : '';
+					$content[$properties['display']] = $properties['link'];
+				}
 				$result['render']['content'][1][] = [
 					'type' => 'links',
 					'description' => $vendor,
-					'content' => $products
+					'content' => $content
 				];
 			}
 		}
@@ -1369,17 +1392,41 @@ class CONSUMABLES extends API {
 		$special_attention = [];
 		foreach($vendorproducts as $row){
 			if ($row['special_attention']) {
-				if (!array_key_exists($row['vendor_name'], $special_attention)) $special_attention[$row['vendor_name']] = [];
-				$special_attention[$row['vendor_name']][$row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : '')] = ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"];
+				if (!array_key_exists($row['vendor_name'], $special_attention)) $special_attention[$row['vendor_name']] = [
+					$row['article_name'] => [
+						'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
+						'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
+						'alike' => 0
+					]
+				];
+				else {
+					foreach ($special_attention[$row['vendor_name']] as $product => $properties){
+						similar_text($product, $row['article_name'], $percent);
+						if ($percent >= INI['likeliness']['consumables_article_name_similarity']) {
+							$special_attention[$row['vendor_name']][$product]['alike']++;
+						}
+						else $special_attention[$row['vendor_name']][$row['article_name']] = [
+							'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
+							'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
+							'alike' => 0
+						];
+					}
+				}
 			}
+
 		}
 		if ($special_attention){
 			$result['render']['content'][] = [];
 			foreach($special_attention as $vendor => $products){
+				$content = [];
+				foreach($products as $product => $properties){
+					$properties['display'] .= $properties['alike'] > 0 ? ' ' . LANG::GET('consumables.similar_name', [':number' => $properties['alike']]) : '';
+					$content[$properties['display']] = $properties['link'];
+				}
 				$result['render']['content'][1][] = [
 					'type' => 'links',
 					'description' => $vendor,
-					'content' => $products
+					'content' => $content
 				];
 			}
 		}

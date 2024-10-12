@@ -91,8 +91,6 @@
 ## development
 
 #### purchase considerations
-* tidy products with expiry dates (...and xxx similar products (like consumables ln 267))
-* tidy products with special attention (...and xxx similar products (like consumables ln 267))
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -1120,6 +1118,7 @@ training_renewal = 365 ; DAYS until a training expires, warning per header colou
 ; probability factor for similarity of texts in percent
 [likeliness]
 consumables_article_no_similarity = 70 ; percent
+consumables_article_name_similarity = 80 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; percent
 records_search_similarity = 20 ; percent

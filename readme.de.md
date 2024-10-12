@@ -1052,6 +1052,7 @@ training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in �
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
 [likeliness]
 consumables_article_no_similarity = 70 ; Prozent
+consumables_article_name_similarity = 80 ; Prozent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; Prozent
 records_search_similarity = 20 ; Prozent
