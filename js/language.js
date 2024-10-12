@@ -45,7 +45,7 @@ class Lang {
 		return result;
 	}
 	PROPERTY(request, replace = {}) {
-		return this.GET(request, replace).replaceAll(" ", "_");
+		return this.GET(request, replace).replaceAll(/[\s\.]/g, "_");
 	}
 }
 export var LANG = new Lang();

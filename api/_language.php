@@ -69,13 +69,13 @@ class LANG {
 	}
 	
 	/**
-	 * returns a language specific chunk with whitespaces replaced with underscore as in request parameters
+	 * returns a language specific chunk with whitespaces and periods replaced with underscore as in request parameters
 	 * @param str $request dot separated keys of LANGUAGEFILE
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
 	 * @return str textchunk with replacements with whitespaces replaced with underscore as in request parameters
 	 */
 	public static function PROPERTY($request, $replace=[]){
-		return str_replace(' ', '_', self::GET($request, $replace));
+		return preg_replace('/[\s\.]/', '_', self::GET($request, $replace));
 	}
 }
 ?>
