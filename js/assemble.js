@@ -1530,6 +1530,7 @@ export class Assemble {
 							attributes: {
 								name: LANG.GET("consumables.edit_product_search"),
 								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;}",
+								onblur: "api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;",
 								id: "productsearch",
 							},
 						},
