@@ -2812,7 +2812,7 @@ Sample response
 
 > GET ./api/api.php/record/form/{name}/{identifier}
 
-Returns latest available approved form by {name}. Prefills identifier field if pased.
+Returns latest available approved form by {name}. Prefills identifier field if passed.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2823,6 +2823,21 @@ Parameters
 Sample response
 ```
 {"title": "Kontakt","render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hidden","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hidden","attributes": {"name": "form_name","value": "Kontakt"}},....
+```
+
+> GET ./api/api.php/record/formexport/{identifier}/{name}
+
+Returns a download link to a temporary file with all records for a given form as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | optional | identifier for records |
+| {name} | path parameter | required | form name |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
 ```
 
 > GET ./api/api.php/record/formfilter/{search}
@@ -2969,7 +2984,7 @@ Sample response
 
 > POST ./api/api.php/record/retype/
 
-Returns a download link to a temporary file with the most recent records as a pdf.
+Sets another record type (e.g. from treatment to complaint)
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2993,6 +3008,21 @@ Parameters
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
+```
+
+> GET ./api/api.php/record/simplifiedformexport/{identifier}/{name}
+
+Returns a download link to a temporary file with the most recent records for a given form as a pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | optional | identifier for records |
+| {name} | path parameter | required | form name |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
 ```
 
 [Content](#content)

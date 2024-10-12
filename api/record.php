@@ -1102,10 +1102,13 @@ class RECORD extends API {
 						array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
-								'title' => LANG::GET('record.record_form_export'),
-								'onpointerup' => "api.record('get', 'formexport', '" . $this->_requestedID . "', '" . $form . "')",
+								'title' => LANG::GET('record.record_export'),
 								'data-type' => 'download',
-								'class' => 'inlinebutton'
+								'class' => 'inlinebutton',
+								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_export') . "', render: [" . 
+								"{type:'button', attributes:{value: LANG.GET('record.record_full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'formexport\', \'" . $this->_requestedID . "\', \'" . $form . "\')'}},".
+								"{type:'button', attributes:{value: LANG.GET('record.record_simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedformexport\', \'" . $this->_requestedID . "\', \'" . $form . "\')'}}".
+								"], options:{'" . LANG::GET('general.cancel_button') . "': false}})"
 							]
 						]);
 					}
@@ -1159,7 +1162,7 @@ class RECORD extends API {
 					foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
 						$options[$description] = ['value' => $record_type];
 					}						
-					$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . " ', render: JSON.parse('" . json_encode(
+					$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
 						[[
 							'type' => 'radio',
 							'attributes' => [
@@ -1221,17 +1224,14 @@ class RECORD extends API {
 							[
 								'type' => 'button',
 								'attributes' => [
-									'value' => LANG::GET('record.record_full_export'),
-									'onpointerup' => "api.record('get', 'fullexport', '" . $this->_requestedID . "')",
-									'data-type' => 'download'
-									]
-							], [
-								'type' => 'button',
-								'attributes' => [
-									'value' => LANG::GET('record.record_simplified_export'),
-									'onpointerup' => "api.record('get', 'simplifiedexport', '" . $this->_requestedID . "')",
-									'data-type' => 'download'
-									]
+									'title' => LANG::GET('record.record_export'),
+									'value' => LANG::GET('record.record_export'),
+									'data-type' => 'download',
+									'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_export') . "', render: [" . 
+									"{type:'button', attributes:{value: LANG.GET('record.record_full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
+									"{type:'button', attributes:{value: LANG.GET('record.record_simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
+									"], options:{'" . LANG::GET('general.cancel_button') . "': false}})"
+								]
 							]
 						]);
 					
@@ -1468,6 +1468,17 @@ class RECORD extends API {
 	}
 
 	/**
+	 *       _           _     ___ _       _ ___                                   _   
+	 *   ___|_|_____ ___| |_ _|  _|_|___ _| |  _|___ ___ _____ ___ _ _ ___ ___ ___| |_ 
+	 *  |_ -| |     | . | | | |  _| | -_| . |  _| . |  _|     | -_|_'_| . | . |  _|  _|
+	 *  |___|_|_|_|_|  _|_|_  |_| |_|___|___|_| |___|_| |_|_|_|___|_,_|  _|___|_| |_|  
+	 *              |_|   |___|                                       |_|              
+	 */
+	public function simplifiedformexport(){
+		$this->export('simplifiedform');
+	}
+
+	/**
 	 *                               _                               _
 	 *   ___ _ _ _____ _____ ___ ___|_|___ ___ ___ ___ ___ ___ ___ _| |
 	 *  |_ -| | |     |     | .'|  _| |- _| -_|  _| -_|  _| . |  _| . |
@@ -1505,9 +1516,9 @@ class RECORD extends API {
 		foreach($records as $record){
 			$form = $forms[array_search($record['form'], array_column($forms, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 			if (!PERMISSION::permissionIn($form['restricted_access'])) continue;
-			if ($type === 'form' && ($form['name'] != $this->_formExport)) continue;
+			if (in_array($type, ['form', 'simplifiedform']) && ($form['name'] != $this->_formExport)) continue;
 			if ($record['form'] == 0) { // retype autoform
-				if ($type === 'simplified') continue;
+				if (in_array($type, ['simplified', 'simplifiedform'])) continue;
 				$usedform = LANG::GET('record.record_altering_pseudoform_name');
 			}
 			else $usedform = $form['name'];
@@ -1548,6 +1559,7 @@ class RECORD extends API {
 								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
 								break;
 							case 'simplified':
+							case 'simplifiedform':
 								$summary['content'][$form][$key] = $displayvalue . "\n";
 								break;
 						}

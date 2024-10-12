@@ -1179,6 +1179,7 @@ export const api = {
 					case "fullexport":
 					case "simplifiedexport":
 					case "formexport": // sorry. exports a form with records, not so paperless after all
+					case "simplifiedformexport": // sorry. exports a form with records, not so paperless after all
 					case "matchbundles":
 						//prevent default successFn
 						break;
