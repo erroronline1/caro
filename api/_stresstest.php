@@ -136,6 +136,7 @@ class STRESSTEST{
 						':record_type' => $exists['record_type'] ? : null,
 						':identifier' => $identifier,
 						':last_user' => 2,
+						':last_form' => $form['id'],
 						':content' => json_encode($records),
 						':id' => $exists['id']
 					]
@@ -147,6 +148,7 @@ class STRESSTEST{
 					':record_type' => 'treatment',
 					':identifier' => $identifier,
 					':last_user' => 2,
+					':last_form' => $form['id'],
 					':content' => json_encode($current_record),
 				]
 			]);

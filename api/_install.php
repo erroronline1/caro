@@ -188,6 +188,7 @@ $queries = [
 				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`last_user` int NOT NULL," .
 				"	`last_touch` datetime NOT NULL," .
+				"	`last_form` int NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`notified` tinyint NULL DEFAULT NULL," .
@@ -414,6 +415,7 @@ $queries = [
 				"	identifier varchar(MAX) NOT NULL," .
 				"	last_user int NOT NULL," .
 				"	last_touch smalldatetime NOT NULL," .
+				"	last_form int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	notified tinyint NULL DEFAULT NULL," .

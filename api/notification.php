@@ -255,15 +255,14 @@ class NOTIFICATION extends API {
 				$diff = intval(abs($last->diff($this->_currentdate)->days / INI['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered form
-					$row['content'] = json_decode($row['content'], true);
-					$lastform = $forms[array_search($row['content'][count($row['content']) - 1]['form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
+					$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
 
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
 						LANG::GET('record.record_reminder_message', [
 							':days' => $last->diff($this->_currentdate)->days,
 							':date' => substr($row['last_touch'], 0, -3),
-							':form' => $lastform['form_name'],			
+							':form' => $lastform['name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 						])
 					);

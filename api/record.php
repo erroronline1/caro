@@ -939,6 +939,7 @@ class RECORD extends API {
 								':record_type' => $case['record_type'] ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
+								':last_form' => $form_id,
 								':content' => json_encode($records),
 								':id' => $case['id']
 							]
@@ -951,6 +952,7 @@ class RECORD extends API {
 								':record_type' => $record_type ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
+								':last_form' => $form_id,
 								':content' => json_encode([$current_record]),
 							]
 						]);
@@ -1372,8 +1374,7 @@ class RECORD extends API {
 			}
 
 			// get last considered form
-			$row['content'] = json_decode($row['content'], true);
-			$lastform = $forms[array_search($row['content'][count($row['content']) - 1], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
+			$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
 
 			// add to result
 			$linkdisplay = LANG::GET('record.record_list_touched', [
@@ -1500,6 +1501,7 @@ class RECORD extends API {
 					':record_type' => $merge['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
+					':last_form' => $merge['last_form'],
 					':content' => json_encode($merge['content']),
 					':id' => $merge['id']
 			]])) $this->response([
@@ -1514,11 +1516,17 @@ class RECORD extends API {
 				$original['content'][] = $record;
 			}
 			usort($original['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
+
+			// get last considered form, offset -1 because pseudoform has been added before by default
+			$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+			$lastform = $forms[array_search($original['content'][count($original['content']) - 2]['form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
+	
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 				'values' => [
 					':record_type' => $original['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
+					':last_form' => $lastform['name'],
 					':content' => json_encode($original['content']),
 					':id' => $original['id']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
@@ -1573,6 +1581,7 @@ class RECORD extends API {
 					':record_type' => $record_type,
 					':identifier' => $original['identifier'],
 					':last_user' => $_SESSION['user']['id'],
+					':last_form' => $original['last_form'],
 					':content' => json_encode($original['content']),
 					':id' => $original['id']
 			]])) $this->response([
