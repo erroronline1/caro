@@ -1489,14 +1489,12 @@ class RECORD extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i'),
 			'form' => 0,
 			'content' => [
-				LANG::GET('record.record_retype_pseudoform_name') => LANG::GET('record.record_reidentify_content', [
-				':identifier' => $entry_id,
-			])]
+				LANG::GET('record.record_retype_pseudoform_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
+			]
 		];
 
 		if (!$original) {
 			// overwrite identifier, append record altering
-
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 				'values' => [
 					':record_type' => $merge['record_type'],
