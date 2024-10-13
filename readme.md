@@ -107,6 +107,7 @@
 * force form submission by passing and validating value on submit button?
 * scalability: records datalist for filter on 100k+ entries causes high delay, how to limit this reasonably?
     * e.g ini[likeliness][identifier_pattern] "^.+?[,\s]+.+?\s" for surname, name
+* order reidentify to respective pseudoform
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
