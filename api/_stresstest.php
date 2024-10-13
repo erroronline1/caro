@@ -105,6 +105,7 @@ class STRESSTEST{
 		$this->_currentdate->modify('-12 month');
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+
 		for ($i = 0; $i < $this->_number;$i++){
 			if (!($i % intval($this->_number/12/30))) {
 				$this->_currentdate->modify('+1 day');
@@ -118,6 +119,7 @@ class STRESSTEST{
 			}
 
 			$current_record = [];
+			shuffle($forms);
 			foreach($forms as $form){
 				$current_record[] = [
 					'author' => 'error on line 1',
