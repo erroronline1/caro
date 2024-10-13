@@ -1123,6 +1123,7 @@ consumables_article_no_similarity = 70 ; percent
 consumables_article_name_similarity = 80 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; percent
+record_reidentify_similarity = 50 ; percent, warning on low identifier similarity threshold
 records_search_similarity = 20 ; percent
 
 [limits]

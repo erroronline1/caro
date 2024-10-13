@@ -1197,6 +1197,7 @@ class RECORD extends API {
 				];
 				if (PERMISSION::permissionFor('recordsclosing')){
 					$last_element = count($return['render']['content'])-1;
+					// similar dialog on similarity check within reidentify method
 					$return['render']['content'][$last_element][] = 
 					[
 						'type' => 'button',
@@ -1232,7 +1233,7 @@ class RECORD extends API {
 							"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
 							"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
 						]
-					];					
+					];
 				}
 
 				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
@@ -1458,6 +1459,7 @@ class RECORD extends API {
 		$entry_id = UTILITY::propertySet($this->_payload, '_previousIdentifier');
 		$new_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.create_identifier'));
 		$confirmation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.record_reidentify_confirm'));
+		$thresholdconfirmation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.record_reidentify_similarity_confirm'));
 		if (!($entry_id && $new_id && $confirmation)) $this->response([], 406);
 
 		// append timestamp to new id if applicable
@@ -1470,6 +1472,59 @@ class RECORD extends API {
 			$new_id .= ' ' . $now->format('Y-m-d H:i');
 		}
 
+		// compare identifiers, warn if similarity is too low
+		similar_text($new_id, $entry_id, $percent);
+		if (!$thresholdconfirmation && $percent < INI['likeliness']['record_reidentify_similarity']) {
+					// similar dialog on reidentify button within record method
+					$return = ['render' => ['content' => [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => LANG::GET('record.record_reidentify_warning', [':percent' => INI['likeliness']['record_reidentify_similarity']])
+							],
+							'content' => $entry_id . " \n-> " . $new_id
+						],
+						[
+							'type' => 'button',
+							'attributes' => [
+								'data-type' => 'merge',
+								'value' => LANG::GET('record.record_reidentify'),
+								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_reidentify') . "', render: JSON.parse('" . json_encode(
+									[
+										[
+											'type' => 'scanner',
+											'hint' => LANG::GET('record.create_identifier_hint'),
+											'attributes' => [
+												'name' => LANG::GET('record.create_identifier'),
+												'maxlength' => INI['limits']['identifier'],
+												'value' => $new_id
+											]
+										],
+										[
+											'type' => 'checkbox',
+											'content' => [
+												LANG::GET('record.record_reidentify_confirm') => ['required' => true],
+												LANG::GET('record.record_reidentify_similarity_confirm') => ['required' => true]
+											]
+										],
+										[
+											'type' => 'hidden',
+											'attributes' => [
+												'name' => '_previousIdentifier',
+												'value' => $entry_id
+											]
+										]
+									]
+								) .
+								"'), options:{'" . LANG::GET('general.cancel_button') . "': false,".
+								"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+								"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
+							]
+						]
+					]]];
+					$this->response($return);
+		}
+		
 		// check if new id (e.g. scanned) is already taken
 		$original = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 			'values' => [

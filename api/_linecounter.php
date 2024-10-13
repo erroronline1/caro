@@ -26,4 +26,18 @@ var_dump($lines);
 echo '<br />', $lines['code']+$lines['documentation'], ' lines, ', $byte, ' byte, ', $files, ' files<br />';
 
 //phpinfo();
+
+/*$sim = [
+	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'müller, liese *10.11.2012 oberschenkelorthese 2023-05-02 08:23'],
+	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'müller, liese *10.11.2012 dafo 2023-05-02 08:23'],
+	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'doe, jane *05.03.1958 dafo 2024-02-23 11:44'],
+	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'doe, jane *05.03.1958 mieder 2025-02-23 11:44']
+];
+
+foreach ($sim as $set){
+	similar_text($set[0], $set[1], $percent);
+	var_dump($set, $percent, '<br />');
+}
+*/
+
 ?>
