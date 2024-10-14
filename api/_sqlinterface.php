@@ -644,7 +644,7 @@ class SQLQUERY {
 
 		'records_post' => [
 			'mysql' => "INSERT INTO caro_records (id, context, record_type, identifier, last_user, last_touch, last_form, content, closed, notified) VALUES (NULL, :context, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_form, :content, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_records (id, context, record_type, identifier, last_user, last_touch, last_form, content, closed, notified) VALUES (NULL, :context, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_form, :content, NULL, NULL)"
+			'sqlsrv' => "INSERT INTO caro_records (context, record_type, identifier, last_user, last_touch, last_form, content, closed, notified) VALUES (:context, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_form, :content, NULL, NULL)"
 		],
 		'records_put' => [
 			'mysql' => "UPDATE caro_records SET record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_form = :last_form, content = :content, closed = NULL WHERE id = :id",
