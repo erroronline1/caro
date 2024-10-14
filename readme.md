@@ -101,6 +101,7 @@
 * exportform documentation type, 'user'-name field by default, date, time -> available for groups as well?
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
 * recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
+    * export from composer -> change store syntax for forms to json containing component ids
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
