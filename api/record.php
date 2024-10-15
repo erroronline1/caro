@@ -1195,8 +1195,8 @@ class RECORD extends API {
 						'linkedcontent' => $typeaction
 					]
 				];
+				$last_element = count($return['render']['content'])-1;
 				if (PERMISSION::permissionFor('recordsclosing')){
-					$last_element = count($return['render']['content'])-1;
 					// similar dialog on similarity check within reidentify method
 					$return['render']['content'][$last_element][] = 
 					[
@@ -1235,6 +1235,16 @@ class RECORD extends API {
 						]
 					];
 				}
+				else $return['render']['content'][$last_element][] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => LANG::GET('record.record_reidentify_unauthorized_name')
+						],
+						'content' => LANG::GET('record.record_reidentify_unauthorized_content', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('recordsclosing', true)))])
+					]
+				];
+
 
 				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
 					$last_element = count($return['render']['content'])-1;
