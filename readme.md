@@ -91,10 +91,15 @@
 ## development
 
 #### purchase considerations
+* order information copyable
+* reminder orders ordered but not received, purchase has to call vendor
+* reminder orders received but not delivered, colleagues forgot to mark as delivered
+* partial delivery as option
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
+* scheduling optional user assignment, task category filterable
 
 #### records considerations
 * review max display option for summary overview
@@ -102,14 +107,19 @@
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
 * recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
     * export from composer -> change store syntax for forms to json containing component ids
+* office inputs pseudoform as filter column (insurance requests, insurance approved, treatment in progress, etc)
+* general field attribute copyable
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
 * scalability: records datalist for filter on 100k+ entries causes high delay, how to limit this reasonably?
     * e.g ini[likeliness][identifier_pattern] "^.+?[,\s]+.+?\s" for surname, name
-* order reidentify to respective pseudoform
-* expiry products overviev veeeery slow on 45k products
+* records: order reidentify record to respective pseudoform
+* consumables: expiry products overviev veeeery slow on 45k products
+* order stresstest for excessive linking
+* records: reidentify strip date to enhance total comparison
+* order return json error
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
