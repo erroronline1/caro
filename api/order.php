@@ -246,7 +246,7 @@ class ORDER extends API {
 								':ordertype' => 'return'
 								]
 							])) {
-								$this->_requestedID = $this->pdo->lastInsertId();
+								$this->_requestedID = $this->_pdo->lastInsertId();
 								$result = [
 								'response' => [
 									'id' => $this->_requestedID,
