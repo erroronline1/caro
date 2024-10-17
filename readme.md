@@ -100,6 +100,7 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * scheduling optional user assignment, task category filterable
+* collapsible elements (e.g. orders, display full for purchase, collapsed for everyone else (order number and information hidden))
 
 #### records considerations
 * review max display option for summary overview
