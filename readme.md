@@ -192,7 +192,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
 * ISO 13485 7.4.3 Verification of procured products
-    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [setup.ini](#runtime-variables) file.
+    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.
     * Sample check information is to be enriched through a dedicated form with the respective context. All users (except groups) can gather the required information and commit the check. 
     * Sample checks can be revoked by authorized users.
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
@@ -669,7 +669,7 @@ graph TD;
 ### Risk management
 The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals.
 
-You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [setup.ini](#runtime-variables).
+You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables).
 
 Entries are not persistent but can be exported if desired through the [audit module](#tools). Available entries store and display the user name and date of the last edit. 
 
@@ -809,7 +809,7 @@ While editing products, one can edit the
 * revoke a possible *incorporated*-state and
 * set the product *active and available* or *inactive*.
 
-On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [setup.ini](#runtime-variables)).
+On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
 
@@ -1050,7 +1050,7 @@ Technically the application is being usable on any webserver but this is **not r
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime according to [setup.ini[limits][idle_logout]](#runtime-variables)
+* php.ini session.gc_maxlifetime according to [config.ini[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
     * gd
     * gettext
@@ -1064,7 +1064,7 @@ Technically the application is being usable on any webserver but this is **not r
 
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner) e.g. in directory media/favicon/
-* Set up api/setup.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos.
+* Set up api/config.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos.
 * [Customize](#customisation) your appropriate language-files (language.XX.ini and _install.default.XX.ini)
 * Select an installation password for the system user.
 
@@ -1074,7 +1074,7 @@ Technically the application is being usable on any webserver but this is **not r
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.XX.ini files and some settings in setup.ini
+Some variables can be edited during runtime. This applies for all *values* of language.XX.ini files and some settings in config.ini
 
 ```
 ; general application settings
@@ -1214,7 +1214,7 @@ products_per_slide = 6
 * POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records.
 
 ### Miscellaneous
-* Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within setup.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
+* Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
 * Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for [lack of full safari support](https://caniuse.com/push-api) as time of writing.
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
@@ -1225,9 +1225,9 @@ products_per_slide = 6
 
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.
-* Some parts of the setup.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
+* Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.ini-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
-    * [permissions] (has no effect without consideration in role management within setup.ini)
+    * [permissions] (has no effect without consideration in role management within config.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
     * [formcontext][anonymous]
@@ -1293,7 +1293,7 @@ while setting up a vendor an import rule must be defined like:
     }
 }
 ```
-*headerrowindex* and *dialect* are added with a default value from setup.ini if left out.
+*headerrowindex* and *dialect* are added with a default value from config.ini if left out.
 
 Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
 
@@ -1625,7 +1625,7 @@ There is a UTILITY class handling
 Using these methods for fitting usecases is mandatory. (./api/_utility.php)
 
 There is a PERMISSION class handling
-* permissions as set within setup.ini
+* permissions as set within config.ini
 * full approval check
 * pending approval check
 
@@ -1697,7 +1697,7 @@ graph TD;
     request((request))-->api_js(api.js);
     api_js-->api_php(api.php);
     api_php-->language_php(_language.php);
-    api_php-->setup(setup.ini);
+    api_php-->setup(config.ini);
     api_php-->sql(_sqlinterface.php);
     api_php-->utility_php(_utility.php);
 
@@ -3366,7 +3366,7 @@ This software aims to match as much relevant aspects of security measures as rea
 ## Terms of service for using the application
 
 ### Data safety
-This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application my be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token inform a user of following permission groups immediately: :permissions (*as defined within setup.ini for permissions->users*)
+This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application my be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token inform a user of following permission groups immediately: :permissions (*as defined within config.ini for permissions->users*)
 
 ### Your data
 This application is part of quality management control. Your data is necessary for documentation and ressource management. You can check your data within your profile. Some data may have to be set by a member of the administration, other can be set and appended by yourself. In case your account is deleted, sent messages and common used information (orders, checks, approvals, your name as author and contributor to documentation) remain within the system due to legitimate interest of consistent documentation and operational procedures.
@@ -3375,7 +3375,7 @@ This application is part of quality management control. Your data is necessary f
 This application requests permission to use a camera and send notifications. Camera access may be neccessary to append photos to documentation and scan 2D-codes. Latter can be achieved by a dedicated terminal device. You may not be able to log in without this permission and limit your documentation abilities. Notifications inform about new in-app messages and support a better work condition. You may revoke the permissions through the browser settings.
 
 ### Feedback
-If you experience any issues with data security or application usage contact :issue_mail (*as defined within setup.ini for application->issue_mail*) immidiately providing details and a response address.
+If you experience any issues with data security or application usage contact :issue_mail (*as defined within config.ini for application->issue_mail*) immidiately providing details and a response address.
 
 ### Encryption statement
 > **Unfortunately there appears to be no reasonable way to encrypt data by the application architecture considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for all interchangeable staff members is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures either have to depend on unreachability for the network from outside where frontend and backend are supposed to run within a closed network (LAN, restricted WiFi, VPN), or Transparent Data Encryption / Disk Level Encryption on the server and client side which both are a matter of responsibility of the operator of the infrastructure. Data in transit is encrypted for the application relies on an SSL-connection at all times.**
@@ -3854,7 +3854,7 @@ I welcome any constructive input on this topic.
 | Performance issues (data transfer) | Medium | Medium (application unresponsive) | Create reduced server data scheme, use clients render capabilities | none |
 | Performance issues (database processing) | Medium | Medium (application unresponsive) | Analyse data, combine queries where possible | none |
 | Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
-| Insufficient configuration | Medium | High (application unstable) | Documentation of setup.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
+| Insufficient configuration | Medium | High (application unstable) | Documentation of config.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
 | Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 

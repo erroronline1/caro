@@ -21,7 +21,7 @@
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-define ('INI', parse_ini_file('setup.ini', true));
+define ('INI', parse_ini_file('config.ini', true));
 include_once('_sqlinterface.php');
 
 class UPDATE{
