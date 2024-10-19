@@ -116,7 +116,6 @@
 * force form submission by passing and validating value on submit button?
 * scalability: records datalist for filter on 100k+ entries causes high delay, how to limit this reasonably?
     * e.g ini[likeliness][identifier_pattern] "^.+?[,\s]+.+?\s" for surname, name
-* records: order reidentify record to respective pseudoform
 * consumables: expiry products overviev veeeery slow on 45k products
 * order stresstest for excessive linking
 

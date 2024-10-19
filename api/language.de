@@ -971,6 +971,7 @@ record_complaints_landing_page = ":number nicht abgeschlossene Reklamationen"
 record_retype_header = "Dies ist keine :type? Dann wähle neu!"
 record_altering_pseudoform_name = "Änderungen an der Dokumentation"
 record_retype_pseudoform_name = "Dokumentationstyp"
+record_reidentify_pseudoform_name = "Identifikator"
 record_retype_content = "Die Aufzeichnung wurde von :previoustype zu :newtype geändert"
 
 record_reminder_message = "Es sind :days Tage vergangen seit der letzten Aufzeichnung für :identifier. Die letzte Bearbeitung fand am :date mit :form statt.""

@@ -1051,7 +1051,7 @@ class RECORD extends API {
 				}
 
 				foreach($content['content'] as $form => $entries){
-					if ($form === LANG::GET('record.record_retype_pseudoform_name')) continue;
+					if ($form === LANG::GET('record.record_altering_pseudoform_name')) continue;
 					$body[] = [
 						[
 							'type' => 'textsection',
@@ -1136,13 +1136,13 @@ class RECORD extends API {
 						]];
 				}
 				// append record_retype_pseudoform
-				if (isset($content['content'][LANG::GET('record.record_retype_pseudoform_name')])){
-					$entries = $content['content'][LANG::GET('record.record_retype_pseudoform_name')];
+				if (isset($content['content'][LANG::GET('record.record_altering_pseudoform_name')])){
+					$entries = $content['content'][LANG::GET('record.record_altering_pseudoform_name')];
 					$body[] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => LANG::GET('record.record_retype_pseudoform_name')
+								'name' => LANG::GET('record.record_altering_pseudoform_name')
 							]
 						]
 					];
@@ -1385,7 +1385,7 @@ class RECORD extends API {
 			}
 
 			// get last considered form
-			$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
+			$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')];
 
 			// add to result
 			$linkdisplay = LANG::GET('record.record_list_touched', [
@@ -1565,7 +1565,7 @@ class RECORD extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i:s'),
 			'form' => 0,
 			'content' => [
-				LANG::GET('record.record_retype_pseudoform_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
+				LANG::GET('record.record_reidentify_pseudoform_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
 			]
 		];
 

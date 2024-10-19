@@ -969,6 +969,7 @@ record_complaints_landing_page = ":number open complaints"
 record_retype_header = "This is not a :type? Reselect then!"
 record_altering_pseudoform_name = "Record altering"
 record_retype_pseudoform_name = "Record retyped"
+record_reidentify_pseudoform_name = "Record reidentified"
 record_retype_content = "The record has been retyped from :previoustype to :newtype"
 
 record_reminder_message = "It has been :days days since the last record regarding :identifier. The last edit happened on :date with :form.""
