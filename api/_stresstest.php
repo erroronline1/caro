@@ -37,10 +37,12 @@ class STRESSTEST{
 	public $_currentdate;
 
 	/**
-	 * identifying prefixes for creation and safe deletion
+	 * identifying prefixes for creation and safe deletion, default numbers
 	 */
 	public $_prefix = 'UVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY';
-	public $_number = 20000;
+	public $_caleandarnumber = 20000;
+	public $_recordnumber = 20000;
+	public $_ordernumber = 100;
 
 	public function __construct($method){
 		$options = [
@@ -57,6 +59,11 @@ class STRESSTEST{
 			$this->{$method}();
 		}
 		else {
+			foreach(get_class_vars(get_class($this)) as $varName => $varValue){
+				if (in_array(gettype($varValue), ['string', 'integer']))
+					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
+			}
+			echo '<br />';
 			foreach(get_class_methods($this) as $methodName){
 				if ($methodName !== '__construct') echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
@@ -65,8 +72,8 @@ class STRESSTEST{
 
 	public function createCalendarEvents(){
 		$this->_currentdate->modify('-12 month');
-		for ($i = 0; $i < $this->_number;$i++){
-			if (!($i % intval($this->_number/12/30))) $this->_currentdate->modify('+1 day');
+		for ($i = 0; $i < $this->_caleandarnumber; $i++){
+			if (!($i % intval($this->_caleandarnumber/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 				'values' => [
 					':type' => 'schedule',
@@ -80,7 +87,7 @@ class STRESSTEST{
 					':closed' => '',
 					':alert' => 0
 				]
-				]);
+			]);
 		}
 		echo $i. " schedule entries done, please check the application for performance";
 	}
@@ -106,11 +113,11 @@ class STRESSTEST{
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 
-		for ($i = 0; $i < $this->_number;$i++){
-			if (!($i % intval($this->_number/12/30))) {
+		for ($i = 0; $i < $this->_recordnumber; $i++){
+			if (!($i % intval($this->_recordnumber/12/30))) {
 				$this->_currentdate->modify('+1 day');
 			}
-			$identifier = 'wolfgang' . $this->_prefix . random_int(1, $this->_number);
+			$identifier = 'wolfgang' . $this->_prefix . random_int(1, $this->_recordnumber);
 
 			$content = [];
 			$names = ['abc','def','ghi','jkl','mno','pqr','stu','vwx','yz'];
@@ -165,6 +172,56 @@ class STRESSTEST{
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[INI['sql']['use']]);
 		echo $del . ' entries with prefix ' . $this->_prefix . ' deleted';
+	}
+
+	public function createOrders(){
+		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+			'replacements' => [
+				':ids' => implode(',', array_column($vendors, 'id'))
+			] 
+		]);
+		$orders = [];
+		for ($i = 0; $i < $this->_ordernumber; $i++){
+			$product = $products[array_rand($products)];
+				$orders[] = [
+				':order_data' => json_encode(
+					[
+						'quantity_label' => random_int(1,10),
+						'unit_label' => $product['article_unit'],
+						'ordernumber_label' => $product['article_no'],
+						'productname_label' => $product['article_name'],
+						'barcode_label' => $product['article_ean'],
+						'vendor_label' => $product['vendor_name'],
+						'commission' => 'wolfgang' . $this->_prefix . random_int(1, $this->_ordernumber),
+						'orderer' => 'error on line 1'
+					]
+				),
+				':organizational_unit' => 'prosthetics2',
+				':approval' => '12345',
+				':ordertype' => 'order'
+			];
+		}
+		$order = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('order_post_approved_order'), $orders);
+		foreach ($order as $chunk){
+			try {
+				if (SQLQUERY::EXECUTE($this->_pdo, $chunk));
+			}
+			catch (Exception $e) {
+				echo $e, $chunk;
+				die();
+			}
+		}
+		echo $i. " orders done, please check the application for performance";
+	}
+
+	public function deleteOrders(){
+		$deletion = [
+			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'",
+			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'"
+		];
+		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[INI['sql']['use']]);
+		echo $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
 	}
 }
 
