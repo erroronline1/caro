@@ -173,7 +173,7 @@ class ORDER extends API {
 								'name' => 'productname_label',
 								'vendor' => 'vendor_label',
 								'commission' => 'commission'] as $key => $value){
-								$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
+								$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 							}
 							$messagepayload[':info'] = array_key_exists('additional_info', $decoded_order_data) ? $decoded_order_data['additional_info'] : '';
 							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order', [
@@ -203,7 +203,7 @@ class ORDER extends API {
 									'name' => 'productname_label',
 									'vendor' => 'vendor_label',
 									'commission' => 'commission'] as $key => $value){
-									$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
+									$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 								}
 								$messagepayload[':info'] = array_key_exists('additional_info', $decoded_order_data) ? $decoded_order_data['additional_info'] : '';
 								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_orderstate_change', [
@@ -557,9 +557,9 @@ class ORDER extends API {
 						'name' => 'productname_label',
 						'vendor' => 'vendor_label',
 						'commission' => 'commission'] as $key => $value){
-						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? $decoded_order_data[$value] : '';
+						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 					}
-					$messagepayload[':info'] = array_key_exists('.additional_info', $decoded_order_data) ? $decoded_order_data['additional_info']: '';
+					$messagepayload[':info'] = array_key_exists('.additional_info', $decoded_order_data) ? str_replace("\n", '\\\\n', $decoded_order_data['additional_info']) : '';
 					$messageorderer = UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '';
 
 					$content[] = [
