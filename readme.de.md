@@ -984,7 +984,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 ### Anwendungseinrichtung
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke) z.B. im Verzeichnis media/favicon/
 * Konfiguration von api/config.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade
-* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.ini und _install.default.XX.ini)
+* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX und _install.default.XX)
 * Auswahl eines Installationskenntworts für die Systemnutzerin.
 
 ### Installation
@@ -998,7 +998,7 @@ Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft a
 ```
 ; general application settings
 [application]
-defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.xx.ini-Dateien; Nutzer können im Profil individuell wählen
+defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.XX-Dateien; Nutzer können im Profil individuell wählen
 issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
 require_complaint_selection = 1 ; 1: ja, 0: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
 timezone = "Europe/Berlin" ; Zeitzone für den Kalender
@@ -1145,7 +1145,7 @@ products_per_slide = 6
 ## Anpassung
 * Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei _install.default.XX.ini entsprechend der gewünschten Standardsprache angepasst werden.
 * Manche Teile der config.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
-* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX.ini) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
+* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
     * [permissions] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in config.ini berücksichtigt)
     * [units]
     * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)

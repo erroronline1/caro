@@ -500,7 +500,7 @@ catch (Exception $e){
 		$processing[] = $queries['install'][$driver]['insertions']['user'];
 		// add default manual entries according to set up language
 		$language = INI['application']['defaultlanguage'];
-		if ($file = file_exists('language.' . $language . '.ini') ? 'language.' . $language . '.ini' : false){
+		if ($file = file_exists('_install.default.' . $language) ? '_install.default.' . $language : false){
 			$languagefile = parse_ini_file($file, true);
 			foreach($languagefile['defaultmanual'] as $entry){
 				$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [

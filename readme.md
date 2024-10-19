@@ -1064,7 +1064,7 @@ Technically the application is being usable on any webserver but this is **not r
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner) e.g. in directory media/favicon/
 * Set up api/config.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos.
-* [Customize](#customisation) your appropriate language-files (language.XX.ini and _install.default.XX.ini)
+* [Customize](#customisation) your appropriate language-files (language.XX and _install.default.XX)
 * Select an installation password for the system user.
 
 ### Installation procedure
@@ -1073,12 +1073,12 @@ Technically the application is being usable on any webserver but this is **not r
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.XX.ini files and some settings in config.ini
+Some variables can be edited during runtime. This applies for all *values* of language.XX files and some settings in config.ini
 
 ```
 ; general application settings
 [application]
-defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.xx.ini files; user can customize within profile
+defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX files; user can customize within profile
 issue_mail = "dev@erroronline.one" ; address for application and security issues
 require_record_type_selection = 1 ; 1: yes, 0: no; require selection on records e.g. if this is related to a complaint 
 timezone = "Europe/Berlin" ; timezone for calendar handling
@@ -1099,7 +1099,7 @@ workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same mark
 default_due = 7 ; scheduled events are due in x days by default
 
 hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
-; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.xx.ini to adhere to your company policies regarding data safety
+; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.XX to adhere to your company policies regarding data safety
 
 ; default values for csv processing if left out of filter rules
 [csv]
@@ -1225,7 +1225,7 @@ products_per_slide = 6
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.
 * Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.ini-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
     * [permissions] (has no effect without consideration in role management within config.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
@@ -3866,7 +3866,7 @@ I welcome any constructive input on this topic.
     * v2.3.8
     * \> 4k stars
     * \> 900 forks
-    * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en.ini, language.de.ini or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
+    * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en, language.de or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * v5.0.1

@@ -232,7 +232,7 @@ class USER extends API {
 				}
 
 				$languages = [];
-				foreach(glob('language.*.ini') as $file){
+				foreach(glob('language.*') as $file){
 					$lang = explode('.', $file);
 					$languages[$lang[1]] = (array_key_exists('language', $user['app_settings']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
 				}
