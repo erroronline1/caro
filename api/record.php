@@ -1364,7 +1364,10 @@ class RECORD extends API {
 				similar_text($this->_requestedID, $row['identifier'], $percent);
 				if ($percent < INI['likeliness']['records_search_similarity']) continue;
 			}
-			if (!in_array($row['identifier'], $recorddatalist)) $recorddatalist[] = $row['identifier'];
+			// prefilter record datalist for performance reasons
+			preg_match('/' . INI['likeliness']['records_identifier_pattern']. '/mi', $row['identifier'], $simplified_identifier);
+
+			if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
 			
 			// sort to units
 			if ($row['units']){

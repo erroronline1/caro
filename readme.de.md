@@ -1055,6 +1055,7 @@ consumables_article_no_similarity = 70 ; Prozent
 consumables_article_name_similarity = 80 ; Prozent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; Prozent
+records_identifier_pattern = "^.+?[,\s]+.+?\s" ; z.B. für Nachname, Vorname um die Datalist des Vorgangsfilters zur Leistungsoptimierung vorzuselektieren, vorausgesetzt das Unternehmen kann sich auf einen Standard einigen
 record_reidentify_similarity = 50 ; Prozent, Warnung bei geringer Übereinstimmung neu vergebener Identifikatoren
 records_search_similarity = 20 ; Prozent
 

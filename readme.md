@@ -114,8 +114,6 @@
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
-* scalability: records datalist for filter on 100k+ entries causes high delay, how to limit this reasonably?
-    * e.g ini[likeliness][identifier_pattern] "^.+?[,\s]+.+?\s" for surname, name
 * consumables: expiry products overviev veeeery slow on 45k products
 * order stresstest for excessive linking
 
@@ -1134,6 +1132,7 @@ consumables_article_no_similarity = 70 ; percent
 consumables_article_name_similarity = 80 ; percent
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; percent
+records_identifier_pattern = "^.+?[,\s]+.+?\s" ; e.g. for surname, name to prefilter datalist for record search for performance reasons, given the company decides for a best practice
 record_reidentify_similarity = 50 ; percent, warning on low identifier similarity threshold
 records_search_similarity = 20 ; percent
 
