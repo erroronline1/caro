@@ -27,7 +27,8 @@ echo '<br />', $lines['code']+$lines['documentation'], ' lines, ', $byte, ' byte
 
 //phpinfo();
 
-/*$sim = [
+/*
+$sim = [
 	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'müller, liese *10.11.2012 oberschenkelorthese 2023-05-02 08:23'],
 	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'müller, liese *10.11.2012 dafo 2023-05-02 08:23'],
 	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'doe, jane *05.03.1958 dafo 2024-02-23 11:44'],
@@ -35,6 +36,18 @@ echo '<br />', $lines['code']+$lines['documentation'], ' lines, ', $byte, ' byte
 ];
 
 foreach ($sim as $set){
+
+	$possibledate = [substr($set[0], -16), substr($set[1], -16)];
+	try {
+		new DateTime($possibledate[0]);
+		$set[0] = substr($set[0], 0, -16);
+		new DateTime($possibledate[1]);
+		$set[1] = substr($set[1], 0, -16);
+
+	}
+	catch (Exception $e){
+	}
+
 	similar_text($set[0], $set[1], $percent);
 	var_dump($set, $percent, '<br />');
 }

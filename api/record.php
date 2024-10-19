@@ -1483,56 +1483,66 @@ class RECORD extends API {
 		}
 
 		// compare identifiers, warn if similarity is too low
-		similar_text($new_id, $entry_id, $percent);
+		// strip dates for comparison
+		$similar_new_id = substr($new_id, 0, -16);
+		$possibledate = substr($entry_id, -16);
+		try {
+			new DateTime($possibledate);
+			$similar_entry_id = substr($entry_id, 0, -16);
+		}
+		catch (Exception $e){
+			$similar_entry_id = $entry_id;
+		}
+		similar_text($similar_new_id, $similar_entry_id, $percent);
 		if (!$thresholdconfirmation && $percent < INI['likeliness']['record_reidentify_similarity']) {
-					// similar dialog on reidentify button within record method
-					$return = ['render' => ['content' => [
-						[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => LANG::GET('record.record_reidentify_warning', [':percent' => INI['likeliness']['record_reidentify_similarity']])
-							],
-							'content' => $entry_id . " \n-> " . $new_id
+				// similar dialog on reidentify button within record method
+				$return = ['render' => ['content' => [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => LANG::GET('record.record_reidentify_warning', [':percent' => INI['likeliness']['record_reidentify_similarity']])
 						],
-						[
-							'type' => 'button',
-							'attributes' => [
-								'data-type' => 'merge',
-								'value' => LANG::GET('record.record_reidentify'),
-								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_reidentify') . "', render: JSON.parse('" . json_encode(
+						'content' => $entry_id . " \n-> " . $new_id
+					],
+					[
+						'type' => 'button',
+						'attributes' => [
+							'data-type' => 'merge',
+							'value' => LANG::GET('record.record_reidentify'),
+							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_reidentify') . "', render: JSON.parse('" . json_encode(
+								[
 									[
-										[
-											'type' => 'scanner',
-											'hint' => LANG::GET('record.create_identifier_hint'),
-											'attributes' => [
-												'name' => LANG::GET('record.create_identifier'),
-												'maxlength' => INI['limits']['identifier'],
-												'value' => $new_id
-											]
-										],
-										[
-											'type' => 'checkbox',
-											'content' => [
-												LANG::GET('record.record_reidentify_confirm') => ['required' => true],
-												LANG::GET('record.record_reidentify_similarity_confirm') => ['required' => true]
-											]
-										],
-										[
-											'type' => 'hidden',
-											'attributes' => [
-												'name' => '_previousIdentifier',
-												'value' => $entry_id
-											]
+										'type' => 'scanner',
+										'hint' => LANG::GET('record.create_identifier_hint'),
+										'attributes' => [
+											'name' => LANG::GET('record.create_identifier'),
+											'maxlength' => INI['limits']['identifier'],
+											'value' => $new_id
+										]
+									],
+									[
+										'type' => 'checkbox',
+										'content' => [
+											LANG::GET('record.record_reidentify_confirm') => ['required' => true],
+											LANG::GET('record.record_reidentify_similarity_confirm') => ['required' => true]
+										]
+									],
+									[
+										'type' => 'hidden',
+										'attributes' => [
+											'name' => '_previousIdentifier',
+											'value' => $entry_id
 										]
 									]
-								) .
-								"'), options:{'" . LANG::GET('general.cancel_button') . "': false,".
-								"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-								"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
-							]
+								]
+							) .
+							"'), options:{'" . LANG::GET('general.cancel_button') . "': false,".
+							"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+							"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
 						]
-					]]];
-					$this->response($return);
+					]
+				]]];
+				$this->response($return);
 		}
 		
 		// check if new id (e.g. scanned) is already taken
@@ -1552,7 +1562,7 @@ class RECORD extends API {
 		$merge['content'] = json_decode($merge['content'], true);
 		$merge['content'][] = [
 			'author' => $_SESSION['user']['name'],
-			'date' => $this->_currentdate->format('y-m-d H:i'),
+			'date' => $this->_currentdate->format('y-m-d H:i:s'),
 			'form' => 0,
 			'content' => [
 				LANG::GET('record.record_retype_pseudoform_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
