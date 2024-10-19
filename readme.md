@@ -108,7 +108,7 @@
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
 * recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
     * export from composer -> change store syntax for forms to json containing component ids
-* office inputs pseudoform as filter column (insurance requests, insurance approved, treatment in progress, etc)
+* office inputs pseudoform as filter column (insurance requests, insurance approved, treatment in progress, etc) for improved priority overview
 * general field attribute copyable
 
 #### issues
@@ -116,6 +116,7 @@
 * force form submission by passing and validating value on submit button?
 * consumables: expiry products overviev veeeery slow on 45k products
 * order stresstest shows significant lag for 200+ entries due to excessive linking?
+    * payload is >4mb for 1k orders: reduce payload, pass only values and create a reusable client method for rendering
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
