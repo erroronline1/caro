@@ -935,6 +935,35 @@ article > article {
 	vertical-align: top;
 }
 
+.collapsible {
+	max-height:8em;
+	overflow: hidden;
+	background: linear-gradient(var(--foreground) 50%, var(--article) 100%);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+
+	img.close {
+		width: 1.5em;
+		height: 1.5em;
+		float: right;
+		margin: 0.5em;
+		transition: ease .3s;
+	}
+
+}
+
+.collapsible.extended{
+	max-height: fit-content;
+	background: none;
+	background-clip:none;
+	-webkit-text-fill-color: initial;
+
+	img.close {
+		transform: rotate(45deg)
+	}
+}
+
 .sectionindicator {
 	text-align: center;
 	width: 100%;

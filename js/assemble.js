@@ -983,6 +983,31 @@ export class Assemble {
 		return this.textarea();
 	}
 
+	collapsible() {
+		/*
+		initially collapsed by default, extended if attributes.class = "extended"
+		{
+			type: 'collapsible',
+			attributes : {}, eg. dataset values for filtering
+			content: [] array of any defined type
+		} */
+		let div = document.createElement("div"),
+			img = document.createElement("img");
+		img.classList.add("close");
+		img.src = "./media/plus.svg";
+		img.onpointerup = () => {
+			div.classList.toggle("extended");
+		};
+		div.append(img);
+		if (this.currentElement.attributes !== undefined) div = this.apply_attributes(this.currentElement.attributes, div);
+		div.classList.add("collapsible");
+		for (const element of this.currentElement.content) {
+			this.currentElement = element;
+			div.append(...this[element.type]());
+		}
+		return [div];
+	}
+
 	datalist() {
 		let datalist = document.createElement("datalist");
 		let option;
