@@ -942,6 +942,7 @@ article > article {
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+	transition: ease .3s;
 
 	img.close {
 		width: 1.5em;
@@ -954,7 +955,8 @@ article > article {
 }
 
 .collapsible.extended{
-	max-height: fit-content;
+	max-height: 100em;
+	overflow: auto;
 	background: none;
 	background-clip:none;
 	-webkit-text-fill-color: initial;
