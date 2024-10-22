@@ -369,8 +369,6 @@ class ORDER extends API {
 						':vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''
 					])."\n";
 
-					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info'))
-						$text .= LANG::GET('order.additional_info') . ': ' . $additional_information . "\n \n";
 					$text .= LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']) . "\n";
 					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify'))
 						$text .= LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify . "\n";
@@ -419,6 +417,20 @@ class ORDER extends API {
 							'hint' => LANG::GET('order.copy_or_labelsheet')
 						],
 					];
+
+					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info')){
+						array_splice($copy, 0, 0, [
+							[
+								'type' => 'textarea_copy',
+								'attributes' => [
+									'value' => preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information),
+									'name' => LANG::GET('order.additional_info'),
+									'readonly' => true,
+								],
+								'hint' => LANG::GET('order.copy_value')
+							]
+						]);
+					}
 
 					$status = [];
 					foreach(['ordered', 'received', 'delivered', 'archived'] as $s){
