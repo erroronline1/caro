@@ -1939,6 +1939,11 @@ export class Assemble {
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), this.br()];
 		return [...this.icon(), label, textarea, ...hint];
 	}
+	
+	textarea_copy() {
+		this.currentElement.attributes.onpointerup = "_client.application.toClipboard(this)";
+		return this.textarea();
+	}
 
 	textsection() {
 		/* {

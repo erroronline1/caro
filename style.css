@@ -936,25 +936,24 @@ article > article {
 }
 
 .collapsible {
-	max-height:8em;
+	max-height: 8em;
 	overflow: hidden;
 	background: linear-gradient(var(--foreground) 50%, var(--article) 100%);
 	background-clip: text;
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
-	transition: ease .3s;
+	transition: ease 0.3s;
 
 	img.close {
 		width: 1.5em;
 		height: 1.5em;
 		float: right;
 		margin: 0.5em;
-		transition: all ease .3s;
+		transition: all ease 0.3s;
 	}
-
 }
 
-.collapsible.extended{
+.collapsible.extended {
 	max-height: 100em;
 	overflow: auto;
 	background: linear-gradient(var(--foreground) 0%, var(--foreground) 100%);
@@ -963,7 +962,7 @@ article > article {
 	-webkit-text-fill-color: transparent;
 
 	img.close {
-		transform: rotate(45deg)
+		transform: rotate(45deg);
 	}
 }
 
@@ -1159,13 +1158,13 @@ dialog a:not([data-type])::before {
 	margin: 0 0.75em 0.2em 0;
 }
 
-[data-multiple]::after{
+[data-multiple]::after {
 	content: "";
 	display: inline-block;
-	height: .75em;
+	height: 0.75em;
 	width: 0.75em;
 	position: absolute;
-	margin-left: -.15em;
+	margin-left: -0.15em;
 	margin-top: 2.2em;
 	background-size: cover;
 	background-image: none;
@@ -1494,7 +1493,8 @@ button[data-type="submitbutton"]::before {
 	mask-image: url("./media/pencil.svg");
 }
 
-[data-type="text_copy"]::before {
+[data-type="text_copy"]::before,
+[data-type="textarea_copy"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/copy.svg");
 	mask-image: url("./media/copy.svg");

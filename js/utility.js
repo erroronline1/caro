@@ -158,7 +158,7 @@ const _client = {
 			api.record("post", "identifier", appendDate, formdata);
 		},
 		toClipboard: (node) => {
-			if (node.constructor.name === "HTMLInputElement") {
+			if (["HTMLInputElement", "HTMLTextAreaElement"].includes(node.constructor.name)) {
 				node.select();
 				node.setSelectionRange(0, 99999); // For mobile devices
 				navigator.clipboard.writeText(node.value);
