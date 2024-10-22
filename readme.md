@@ -91,7 +91,6 @@
 ## development
 
 #### purchase considerations
-* order information copyable
 * reminder orders ordered but not received, purchase has to call vendor
 * reminder orders received but not delivered, colleagues forgot to mark as delivered
 * partial delivery as option
@@ -117,6 +116,7 @@
 * consumables: expiry products overviev veeeery slow on 45k products
 * order stresstest shows significant lag for 200+ entries due to excessive linking?
     * payload is >4mb for 1k orders: reduce payload, pass only values and create a reusable client method for rendering
+    * approximately 5k ordered items for 10 months!
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
