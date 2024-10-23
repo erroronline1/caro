@@ -659,6 +659,36 @@ class ORDER extends API {
 						];
 					}
 
+					// delete order button if authorized
+					if (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])) {
+						$content[] = [
+							'type' => 'deletebutton',
+							'hint' => $autodelete,
+							'attributes' => [
+								'type' => 'button',
+								'value' => LANG::GET('order.delete_prepared_order'),
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
+									"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
+									"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+									"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'approved', " . $row['id'] . ")})"
+		
+							]
+						];
+						$content[] = [
+							'type' => 'br' // to clear after floating delete button
+						];
+					}
+
+					$content = [[
+						'type' => 'collapsible',
+						'attributes' => [
+							'class' => 'em18',
+							'data-filtered' => $row['id']
+						],
+						'content' => $content
+					]];
+					//if (PERMISSION::permissionFor('orderprocessing')) $content[count($content) - 1]['attributes']['class'] .= ' extended';
+
 					// incorporation state
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
@@ -727,37 +757,7 @@ class ORDER extends API {
 						}
 					}
 
-					// delete order button if authorized
-					if (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])) {
-						$content[] = [
-							'type' => 'deletebutton',
-							'hint' => $autodelete,
-							'attributes' => [
-								'type' => 'button',
-								'value' => LANG::GET('order.delete_prepared_order'),
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
-									"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
-									"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'approved', " . $row['id'] . ")})"
-		
-							]
-						];
-						$content[] = [
-							'type' => 'br' // to clear after floating delete button
-						];
-					}
-					if ($content) {
-						$content = [
-							'type' => 'collapsible',
-							'attributes' => [
-								'class' => 'em18',
-								'data-filtered' => $row['id']
-							],
-							'content' => $content
-						];
-						//if (PERMISSION::permissionFor('orderprocessing')) $content['attributes']['class'] .= ' extended';
-						array_push($result['render']['content'], $content);
-					}
+					array_push($result['render']['content'], $content);
 				}
 				break;
 			case 'DELETE':
