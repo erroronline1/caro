@@ -94,7 +94,6 @@
 * reminder orders ordered but not received, purchase has to call vendor
 * reminder orders received but not delivered, colleagues forgot to mark as delivered
 * partial delivery as option
-* collapsed styling and filtered issue (hide collapsible containers)
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
