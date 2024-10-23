@@ -750,7 +750,7 @@ class ORDER extends API {
 						$content = [
 							'type' => 'collapsible',
 							'attributes' => [
-								'class' => 'em13',
+								'class' => 'em18',
 								'data-filtered' => $row['id']
 							],
 							'content' => $content
