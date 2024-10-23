@@ -855,7 +855,7 @@ export class Assemble {
 	 */
 
 	br() {
-		return document.createElement("br");
+		return [document.createElement("br")];
 	}
 
 	button() {
@@ -919,7 +919,7 @@ export class Assemble {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "calendarbutton";
 		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return [this.br(), ...this.button()];
+		return [...this.br(), ...this.button()];
 	}
 
 	cart() {
@@ -1105,7 +1105,7 @@ export class Assemble {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "formbutton";
 		this.currentElement.attributes.type = "button"; // avoid submitting twice
-		return [this.br(), ...this.button()];
+		return [...this.br(), ...this.button()];
 	}
 
 	hidden() {
@@ -1123,11 +1123,11 @@ export class Assemble {
 		input.value = this.currentElement.value;
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
-		return input;
+		return [input];
 	}
 
 	hr() {
-		return document.createElement("hr");
+		return [document.createElement("hr")];
 	}
 
 	identify() {
@@ -1936,10 +1936,10 @@ export class Assemble {
 			div.append(document.createElement("br"));
 			textarea = div;
 		}
-		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), this.br()];
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), ...this.br()];
 		return [...this.icon(), label, textarea, ...hint];
 	}
-	
+
 	textarea_copy() {
 		this.currentElement.attributes.onpointerup = "_client.application.toClipboard(this)";
 		return this.textarea();
