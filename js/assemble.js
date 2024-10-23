@@ -1004,7 +1004,6 @@ export class Assemble {
 		div.classList.add("collapsible");
 		for (const element of this.currentElement.content) {
 			this.currentElement = element;
-			console.log(element);
 			div.append(...this[element.type]());
 		}
 		return [div];
