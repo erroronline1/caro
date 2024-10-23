@@ -353,7 +353,6 @@ class ORDER extends API {
 				]);
 				foreach($order as $row) {
 					$content = [];
-					$text = "\n";
 					$decoded_order_data = json_decode($row['order_data'], true);
 					
 					$content[]=
@@ -361,76 +360,80 @@ class ORDER extends API {
 						'description' => 'filter',
 						'attributes' => ['data-filtered' => $row['id']]];
 
-					$text .= LANG::GET('order.prepared_order_item', [
-						':quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
-						':unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
-						':number' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
-						':name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
-						':vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''
-					])."\n";
-
-					$text .= LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']) . "\n";
+					$order = [
+						'type' => 'textsection',
+						'content' => LANG::GET('order.prepared_order_item', [
+							':quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
+							':unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
+							':number' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
+							':name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
+							':vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''
+						]) . "\n".
+						LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
+						'attributes' => [
+							'data-type' => $row['ordertype'],
+							'name' => LANG::GET('order.ordertype.' . $row['ordertype'])
+						]
+					];
 					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify'))
-						$text .= LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify . "\n";
-					$text .= LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
-					if (!str_contains($row['approval'], 'data:image/png')) $text .= $row['approval'] . "\n";
+						$order['content'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
+					$order['content'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
+					if (!str_contains($row['approval'], 'data:image/png')) $order['content'] .= "\n". $row['approval'];
 
-					$copy = [
-						[
-							'type' => 'text_copy',
-							'attributes' => [
-								'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
-								'name' => LANG::GET('order.ordernumber_label'),
-								'readonly' => true,
-								'onpointerup' => '_client.application.toClipboard(this)'
-							],
-							'hint' => LANG::GET('order.copy_value')
-						],
-						[
-							'type' => 'text_copy',
-							'attributes' => [
-								'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
-								'name' => LANG::GET('order.commission'),
-								'readonly' => true,
-								'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.commission') . "', render:JSON.parse(`" . // backtick ` necessary
-									json_encode(
+					$commission = [
+						'type' => 'text_copy',
+						'attributes' => [
+							'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
+							'name' => LANG::GET('order.commission'),
+							'readonly' => true,
+							'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.commission') . "', render:JSON.parse(`" . // backtick ` necessary
+								json_encode(
+									[
 										[
-											[
-												'type' => 'text',
-												'attributes' => [
-													'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
-													'name' => LANG::GET('order.commission'),
-													'readonly' => true,
-													'onpointerup' => '_client.application.toClipboard(this)'
-												],
-												'hint' => LANG::GET('order.copy_value')
-											], [
-												'type' => 'button',
-												'attributes' => [
-													'value' => LANG::GET('menu.record_create_identifier'),
-													'onpointerup' => "_client.application.postLabelSheet('" . (UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '') . "')"
-												]
+											'type' => 'text',
+											'attributes' => [
+												'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
+												'name' => LANG::GET('order.commission'),
+												'readonly' => true,
+												'onpointerup' => '_client.application.toClipboard(this)'
+											],
+											'hint' => LANG::GET('order.copy_value')
+										], [
+											'type' => 'button',
+											'attributes' => [
+												'value' => LANG::GET('menu.record_create_identifier'),
+												'onpointerup' => "_client.application.postLabelSheet('" . (UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '') . "')"
 											]
 										]
-									) . "`), options:{'" . LANG::GET('general.ok_button') . "': true}})"
-							],
-							'hint' => LANG::GET('order.copy_or_labelsheet')
+									]
+								) . "`), options:{'" . LANG::GET('general.ok_button') . "': true}})"
 						],
+						'hint' => LANG::GET('order.copy_or_labelsheet')
 					];
 
+					$information = [];
 					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info')){
-						array_splice($copy, 0, 0, [
-							[
-								'type' => 'textarea_copy',
-								'attributes' => [
-									'value' => preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information),
-									'name' => LANG::GET('order.additional_info'),
-									'readonly' => true,
-								],
-								'hint' => LANG::GET('order.copy_value')
-							]
-						]);
+					$information = [
+							'type' => 'textarea_copy',
+							'attributes' => [
+								'value' => preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information),
+								'name' => LANG::GET('order.additional_info'),
+								'readonly' => true,
+							],
+							'hint' => LANG::GET('order.copy_value')
+						];
 					}
+
+					$order_number =	[
+						'type' => 'text_copy',
+						'attributes' => [
+							'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
+							'name' => LANG::GET('order.ordernumber_label'),
+							'readonly' => true,
+							'onpointerup' => '_client.application.toClipboard(this)'
+						],
+						'hint' => LANG::GET('order.copy_value')
+					];
 
 					$status = [];
 					foreach(['ordered', 'received', 'delivered', 'archived'] as $s){
@@ -440,7 +443,7 @@ class ORDER extends API {
 						];
 						if (boolval($row[$s])) {
 							$status[LANG::GET('order.' . $s)]['checked'] = true;
-							$text .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
+							$order['content'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
 						switch ($s){
 							case 'ordered':
@@ -515,20 +518,17 @@ class ORDER extends API {
 							"} else this.checked = false;});"
 					];
 
+					$content[] = $order;
+					$content[] = $commission;
+					if ($information) $content[] = $information;
+					$content[] = $order_number;
+
 					if (array_key_exists('barcode_label', $decoded_order_data) && strlen($decoded_order_data['barcode_label'])) $content[] = [
 						'type' => 'image',
 						'attributes' => [
 							'barcode' => ['value' => $decoded_order_data['barcode_label']],
 							'imageonly' => ['width' => '15em', 'height' => '6em']
 							]
-					];
-					$content[] = [
-						'type' => 'textsection',
-						'content' => $text,
-						'attributes' => [
-							'data-type' => $row['ordertype'],
-							'name' => LANG::GET('order.ordertype.' . $row['ordertype'])
-						]
 					];
 
 					if (str_contains($row['approval'], 'data:image/png')){
@@ -587,7 +587,6 @@ class ORDER extends API {
 						],
 						'hint' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null
 					];
-					array_push($content, ...$copy);
 
 					if (array_key_exists('attachments', $decoded_order_data)){
 						$files = [];
@@ -747,7 +746,18 @@ class ORDER extends API {
 							'type' => 'br' // to clear after floating delete button
 						];
 					}
-					array_push($result['render']['content'], $content);
+					if ($content) {
+						$content = [
+							'type' => 'collapsible',
+							'attributes' => [
+								'class' => 'em13',
+								'data-filtered' => $row['id']
+							],
+							'content' => $content
+						];
+						//if (PERMISSION::permissionFor('orderprocessing')) $content['attributes']['class'] .= ' extended';
+						array_push($result['render']['content'], $content);
+					}
 				}
 				break;
 			case 'DELETE':
