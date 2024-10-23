@@ -999,10 +999,12 @@ export class Assemble {
 			div.classList.toggle("extended");
 		};
 		div.append(img);
+		div.classList.add("em8");
 		if (this.currentElement.attributes !== undefined) div = this.apply_attributes(this.currentElement.attributes, div);
 		div.classList.add("collapsible");
 		for (const element of this.currentElement.content) {
 			this.currentElement = element;
+			console.log(element);
 			div.append(...this[element.type]());
 		}
 		return [div];
