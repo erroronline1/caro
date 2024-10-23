@@ -341,7 +341,7 @@ const _client = {
 		},
 		filter: (type = undefined) => {
 			document.querySelectorAll("[data-ordered]").forEach((article) => {
-				article.parentNode.style.display = "none";
+				article.parentNode.parentNode.style.display = "none";
 			});
 			const filters = {
 				ordered: document.querySelectorAll("[data-ordered=true]"),
@@ -350,23 +350,23 @@ const _client = {
 				archived: document.querySelectorAll("[data-archived=true]"),
 			};
 			let display = [...document.querySelectorAll("[data-ordered=false]")].map(function (node) {
-				return node.parentNode;
+				return node.parentNode.parentNode;
 			});
 			if (type === "ordered")
 				display = [...filters.ordered].map(function (node) {
-					return [...filters.received, ...filters.delivered, ...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
+					return [...filters.received, ...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
 			if (type === "received")
 				display = [...filters.received].map(function (node) {
-					return [...filters.delivered, ...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
+					return [...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
 			if (type === "delivered")
 				display = [...filters.delivered].map(function (node) {
-					return [...filters.archived].map((n) => n.parentNode).includes(node.parentNode) ? undefined : node.parentNode;
+					return [...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
 			if (type === "archived")
 				display = [...filters.archived].map(function (node) {
-					return node.parentNode;
+					return node.parentNode.parentNode;
 				});
 			display.forEach((article) => {
 				if (article) article.style.display = "block";
