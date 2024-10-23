@@ -937,12 +937,8 @@ article > article {
 
 .collapsible {
 	overflow: hidden;
-	background: linear-gradient(var(--foreground) 50%, var(--article) 100%);
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
 	transition: ease 0.3s;
-
+	mask-image: linear-gradient(180deg, #000 80%, transparent);
 	img.close {
 		width: 1.5em;
 		height: 1.5em;
@@ -954,17 +950,14 @@ article > article {
 .em8 {
 	max-height: 8em;
 }
-.em13 {
+.em18 {
 	max-height: 13em;
 }
 
 .collapsible.extended {
 	max-height: 100em;
 	overflow: auto;
-	background: none;
-	background-clip: none;
-	-webkit-background-clip: none;
-	-webkit-text-fill-color: initial;
+	mask-image: none;
 
 	img.close {
 		transform: rotate(45deg);
