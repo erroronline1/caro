@@ -34,7 +34,9 @@ const _serviceWorker = {
 			if ("form_approval" in data) {
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.form_approval);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
+				notif = document.querySelector(
+					"[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]"
+				);
 				if (notif) notif.setAttribute("data-notification", data.form_approval);
 			}
 		},
@@ -44,7 +46,9 @@ const _serviceWorker = {
 				let notif;
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
+				notif = document.querySelector(
+					"[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]"
+				);
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
 		},
@@ -54,17 +58,25 @@ const _serviceWorker = {
 				let order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
 				if ("order_unprocessed" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+					notif = document.querySelector(
+						"[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]"
+					);
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 					order_unprocessed = data.order_unprocessed;
 				}
 				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
+					notif = document.querySelector(
+						"[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]"
+					);
 					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
+				if (notif)
+					notif.setAttribute(
+						"data-notification",
+						parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)
+					);
 			}
 		},
 	},
@@ -172,7 +184,8 @@ const _client = {
 			window.calendarFormData = new FormData();
 			units = [];
 			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+				if (value === "unit")
+					units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
 			if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));
@@ -286,11 +299,12 @@ const _client = {
 								type: "textsection",
 								attributes: {
 									name: LANG.GET("order.added_product", {
-									":unit": data[1],
-									":number": data[2],
-									":name": data[3],
-									":vendor": data[5],
-								})},
+										":unit": data[1],
+										":number": data[2],
+										":name": data[3],
+										":vendor": data[5],
+									}),
+								},
 							},
 							{
 								type: "hidden",
@@ -339,6 +353,131 @@ const _client = {
 				};
 			new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
 		},
+		approved: (data = undefined) => {
+			if (!data) return;
+			let content = [],
+				filter = {},
+				order = [],
+				collapsible = [];
+			options = {};
+			filter[LANG.GET("order.untreated")] = { checked: true, onchange: "_client.order.filter()" };
+			filter[LANG.GET("order.ordered")] = { onchange: '_client.order.filter("ordered")' };
+			filter[LANG.GET("order.received")] = { onchange: '_client.order.filter("received")' };
+			filter[LANG.GET("order.delivered")] = { onchange: '_client.order.filter("delivered")' };
+			filter[LANG.GET("order.archived")] = { onchange: '_client.order.filter("archived")' };
+
+			content.push([
+				{
+					type: "radio",
+					attributes: {
+						name: LANG.GET("order.order_filter"),
+					},
+					content: filter,
+				},
+				{
+					type: "filtered",
+					attributes: {
+						name: LANG.GET("order.order_filter_label"),
+						onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
+						onblur: "api.purchase('get', 'filter', this.value); return false;",
+						id: "productsearch",
+					},
+				},
+			]);
+			for (const element of data) {
+				// reinstatiate with order id for filtering
+				collapsible = [{ type: "hidden", description: "filter", attributes: { "data-filtered": element.id } }];
+
+				// append ordertext
+				collapsible.push({
+					type: "textsection",
+					content: element.ordertext,
+					attributes: {
+						"data-type": element.ordertype,
+						name: LANG.GET("order.ordertype." + element.ordertype),
+					},
+				});
+
+				// append commission
+				options = {};
+				options[LANG.GET("general.ok_button")] = true;
+				collapsible.push({
+					type: "text_copy",
+					attributes: {
+						value: element.commission,
+						name: LANG.GET("order.commission"),
+						readonly: true,
+						onpointerup: function () {
+							new Dialog({
+								type: "input",
+								header: LANG.GET("order.commission"),
+								render: [
+									[
+										{
+											type: "text",
+											attributes: {
+												value: element.commission,
+												name: LANG.GET("order.commission"),
+												readonly: true,
+												onpointerup: "_client.application.toClipboard(this)",
+											},
+											hint: LANG.GET("order.copy_value"),
+										},
+										{
+											type: "button",
+											attributes: {
+												value: LANG.GET("menu.record_create_identifier"),
+												onpointerup: function () {
+													_client.application.postLabelSheet(element.commission);
+												},
+											},
+										},
+									],
+								],
+								options: options,
+							});
+						},
+					},
+					hint: LANG.GET("order.copy_or_labelsheet"),
+				});
+
+				// append information
+				if (element.information) {
+					collapsible.push({
+						type: "textarea_copy",
+						attributes: {
+							value: element.information,
+							name: LANG.GET("order.additional_info"),
+							readonly: true,
+						},
+						hint: LANG.GET("order.copy_value"),
+					});
+				}
+
+				// append order number
+				collapsible.push({
+					type: "text_copy",
+					attributes: {
+						value: element.ordernumber,
+						name: LANG.GET("order.ordernumber_label"),
+						readonly: true,
+						onpointerup: "_client.application.toClipboard(this)",
+					},
+					hint: LANG.GET("order.copy_value"),
+				});
+
+				// create order
+				order = [
+					{
+						type: "collapsible",
+						attributes: {
+							class: "em18",
+						},
+						content: collapsible,
+					},
+				];
+			}
+		},
 		filter: (type = undefined) => {
 			document.querySelectorAll("[data-ordered]").forEach((article) => {
 				article.parentNode.parentNode.style.display = "none";
@@ -354,15 +493,25 @@ const _client = {
 			});
 			if (type === "ordered")
 				display = [...filters.ordered].map(function (node) {
-					return [...filters.received, ...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
+					return [...filters.received, ...filters.delivered, ...filters.archived]
+						.map((n) => n.parentNode.parentNode)
+						.includes(node.parentNode.parentNode)
+						? undefined
+						: node.parentNode.parentNode;
 				});
 			if (type === "received")
 				display = [...filters.received].map(function (node) {
-					return [...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
+					return [...filters.delivered, ...filters.archived]
+						.map((n) => n.parentNode.parentNode)
+						.includes(node.parentNode.parentNode)
+						? undefined
+						: node.parentNode.parentNode;
 				});
 			if (type === "delivered")
 				display = [...filters.delivered].map(function (node) {
-					return [...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
+					return [...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode)
+						? undefined
+						: node.parentNode.parentNode;
 				});
 			if (type === "archived")
 				display = [...filters.archived].map(function (node) {
@@ -447,7 +596,10 @@ const _client = {
 			}
 			const placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
 			for (const input of placeholder) {
-				if (input.id in converted_elements) input.value = document.getElementById(converted_elements[input.id]) ? document.getElementById(converted_elements[input.id]).value : "";
+				if (input.id in converted_elements)
+					input.value = document.getElementById(converted_elements[input.id])
+						? document.getElementById(converted_elements[input.id]).value
+						: "";
 			}
 		},
 	},
