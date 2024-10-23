@@ -936,7 +936,6 @@ article > article {
 }
 
 .collapsible {
-	max-height: 8em;
 	overflow: hidden;
 	background: linear-gradient(var(--foreground) 50%, var(--article) 100%);
 	background-clip: text;
@@ -952,14 +951,20 @@ article > article {
 		transition: all ease 0.3s;
 	}
 }
+.em8 {
+	max-height: 8em;
+}
+.em13 {
+	max-height: 13em;
+}
 
 .collapsible.extended {
 	max-height: 100em;
 	overflow: auto;
-	background: linear-gradient(var(--foreground) 0%, var(--foreground) 100%);
-	background-clip: text;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
+	background: none;
+	background-clip: none;
+	-webkit-background-clip: none;
+	-webkit-text-fill-color: initial;
 
 	img.close {
 		transform: rotate(45deg);
