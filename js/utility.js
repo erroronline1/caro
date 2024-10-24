@@ -476,6 +476,22 @@ const _client = {
 						content: collapsible,
 					},
 				];
+
+				// append incorporation button
+				if (element.incorporation) {
+					if (element.incorporation.incorporate)
+						order.push({
+							type: "button",
+							attributes: {
+								value: LANG.GET("order.incorporation"),
+								type: "button",
+								onpointerup:
+									"if (!this.disabled) api.purchase('get', 'incorporation', " +
+									element.incorporation.incorporate +
+									"); this.disabled=true",
+							}
+						});
+				}
 			}
 		},
 		filter: (type = undefined) => {
