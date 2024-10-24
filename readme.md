@@ -1681,7 +1681,7 @@ Response properties are
 * *title* (dynamic page title updates)
 * *user* (user settings on login/reload)
 * *application* (application settings on login/reload)
-* *data* (filtered ids, record imports, notif numbers)
+* *data* (filtered ids, record imports, notif numbers, approved order data to be assembled by _client.order.approved())
 * *response* (state messages, message type, affected ids, redirect path params, names)
 * *log* (csv-filter log)
 * *links* (csv-filter result file)

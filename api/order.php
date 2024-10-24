@@ -286,7 +286,9 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				$result = ['render' => ['content' => [
+				$result = ['data' => [],
+				////////////////////////////////////////////////////
+				'render' => ['content' => [
 					[
 						['type' => 'radio',
 						'attributes' => [
@@ -351,10 +353,38 @@ class ORDER extends API {
 						':organizational_unit' => implode(",", $units)
 					]
 				]);
+				$orderprocessingPermission = PERMISSION::permissionFor('orderprocessing');
 				foreach($order as $row) {
 					$content = [];
 					$decoded_order_data = json_decode($row['order_data'], true);
 					
+					////////////////////////////////////////////////////
+					// data chunks to be assembled by js _client.order.approved()
+					$data = [
+						'id' => $row['id'],
+						'ordertype' => $row['ordertype'],
+						'ordertext' => LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
+						'quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
+						'unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
+						'name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
+						'vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : '',
+						'ordernumber' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
+						'commission' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
+						'information' => null,
+						'addinformation' => PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units),
+						'lastorder' => null,
+						'orderer' => UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '',
+						'orderermessage' => null,
+						'organizationalunit' => $row['organizational_unit'],
+						'statechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
+						'attachments' => [],
+						'autodelete' => null,
+						'incorporation' => [],
+						'samplecheck' => [],
+						'specialattention' => null,
+						'collapsed' => !$orderprocessingPermission
+					];
+
 					$content[]=
 						['type' => 'hidden',
 						'description' => 'filter',
@@ -375,10 +405,16 @@ class ORDER extends API {
 							'name' => LANG::GET('order.ordertype.' . $row['ordertype'])
 						]
 					];
-					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify'))
+					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify')){
+$data['ordertext'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
 						$order['content'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
+					}
+$data['ordertext'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					$order['content'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
-					if (!str_contains($row['approval'], 'data:image/png')) $order['content'] .= "\n". $row['approval'];
+					if (!str_contains($row['approval'], 'data:image/png')) {
+$data['ordertext'] .= "\n". $row['approval'];
+						$order['content'] .= "\n". $row['approval'];
+					}
 
 					$commission = [
 						'type' => 'text_copy',
@@ -413,7 +449,8 @@ class ORDER extends API {
 
 					$information = [];
 					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info')){
-					$information = [
+$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
+						$information = [
 							'type' => 'textarea_copy',
 							'attributes' => [
 								'value' => preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information),
@@ -544,6 +581,7 @@ class ORDER extends API {
 					// inform if special attention is required
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($special_attention, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $special_attention[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+$data['specialattention'] = true;
 							$content[] = [
 								'type' => 'textsection',
 								'attributes' => [
@@ -587,10 +625,12 @@ class ORDER extends API {
 						],
 						'hint' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null
 					];
+$data['lastorder'] = $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null;
 
 					if (array_key_exists('attachments', $decoded_order_data)){
 						$files = [];
 						foreach(explode(',', $decoded_order_data['attachments']) as $file){
+$data['attachments'][pathinfo($file)['basename']] = ['href' => $file];
 							$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
 						}
 						$content[]=[
@@ -693,6 +733,7 @@ class ORDER extends API {
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							if (!in_array('group', $_SESSION['user']['permissions'])){
+$data['incorporation']['item'] = $unincorporated[$tocheck]['id'];
 								$content[] = [
 									'type' => 'button',
 									'attributes' => [
@@ -703,6 +744,7 @@ class ORDER extends API {
 								];
 							} else {
 								// simple groups are not allowed to make records
+$data['incorporation']['state'] = LANG::GET('order.incorporation_neccessary_by_user');
 								$content[] = [
 									'type' => 'textsection',
 									'attributes' => [
@@ -714,6 +756,7 @@ class ORDER extends API {
 					}
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($incorporationdenied, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+$data['incorporation']['state'] = LANG::GET('order.incorporation_denied');
 							$content[] = [
 								'type' => 'textsection',
 								'attributes' => [
@@ -724,6 +767,7 @@ class ORDER extends API {
 					}
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($pendingincorporation, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
+$data['incorporation']['state'] = LANG::GET('order.incorporation_pending');
 							$content[] = [
 								'type' => 'textsection',
 								'attributes' => [
@@ -737,6 +781,7 @@ class ORDER extends API {
 					if (!in_array('group', $_SESSION['user']['permissions']) && array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							if (!in_array('group', $_SESSION['user']['permissions'])){
+$data['samplecheck']['item'] = $sampleCheck[$tocheck]['id'];
 									$content[] = [
 									'type' => 'button',
 									'attributes' => [
@@ -747,6 +792,8 @@ class ORDER extends API {
 								];
 							} else {
 								// simple groups are not allowed to make records
+$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
+		
 								$content[] = [
 									'type' => 'textsection',
 									'attributes' => [
@@ -756,7 +803,7 @@ class ORDER extends API {
 							}
 						}
 					}
-
+array_push($result['data'], $data);
 					array_push($result['render']['content'], $content);
 				}
 				break;

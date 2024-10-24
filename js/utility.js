@@ -34,9 +34,7 @@ const _serviceWorker = {
 			if ("form_approval" in data) {
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.form_approval);
-				notif = document.querySelector(
-					"[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]"
-				);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.form_approval);
 			}
 		},
@@ -46,9 +44,7 @@ const _serviceWorker = {
 				let notif;
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-				notif = document.querySelector(
-					"[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]"
-				);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
 		},
@@ -58,25 +54,17 @@ const _serviceWorker = {
 				let order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
 				if ("order_unprocessed" in data) {
-					notif = document.querySelector(
-						"[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]"
-					);
+					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 					order_unprocessed = data.order_unprocessed;
 				}
 				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector(
-						"[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]"
-					);
+					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-				if (notif)
-					notif.setAttribute(
-						"data-notification",
-						parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)
-					);
+				if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 			}
 		},
 	},
@@ -184,8 +172,7 @@ const _client = {
 			window.calendarFormData = new FormData();
 			units = [];
 			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit")
-					units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+				if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
 			if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));
@@ -391,7 +378,16 @@ const _client = {
 				// append ordertext
 				collapsible.push({
 					type: "textsection",
-					content: element.ordertext,
+					content:
+						LANG.GET("order.prepared_order_item", {
+							":quantity": element.quantity,
+							":unit": element.unit,
+							":number": element.ordernumber,
+							":name": element.name,
+							":vendor": element.vendor,
+						}) +
+						"\n" +
+						element.ordertext,
 					attributes: {
 						"data-type": element.ordertype,
 						name: LANG.GET("order.ordertype." + element.ordertype),
@@ -466,30 +462,194 @@ const _client = {
 					hint: LANG.GET("order.copy_value"),
 				});
 
+				// append special attention information
+				if (element.specialattention)
+					collapsible.push({
+						type: "textsection",
+						attributes: {
+							name: LANG.GET("consumables.edit_product_special_attention"),
+							class: orange,
+						},
+					});
+
+				// append orderer and message option
+				options = { links: {}, buttons: {} };
+				options.buttons[LANG.GET("order.add_information_cancel")] = false;
+				options.buttons[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+				options.links[LANG.GET("order.message_orderer", { ":orderer": element.orderer })] = {
+					href: "javascript:void(0)",
+					"data-type": "input",
+					onpointerup: function () {
+						_client.message.newMessage(
+							LANG.GET("order.message_orderer", { ":orderer": element.orderer }),
+							element.orderer,
+							LANG.GET("order.message", {
+								":quantity": element.quantity,
+								":unit": element.unit,
+								":number": element.ordernumber,
+								":name": element.name,
+								":vendor": element.vendor,
+								":info": element.information,
+							}),
+							options.buttons
+						);
+					},
+				};
+				collapsible.push({
+					type: "links",
+					content: options.links,
+					hint: element.lastorder,
+				});
+
+				// append attachments
+				if (element.attachments) {
+					Object.keys(element.attachments).forEach((key) => {
+						element.attachments[key].target = "_blank";
+					});
+					collapsible.push({
+						type: "links",
+						content: element.attachments,
+					});
+				}
+
+				// append add info button
+				if (element.addinfo) {
+					options = {};
+					options[LANG.GET("order.add_information_cancel")] = false;
+					options[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					collapsible.push({
+						type: "button",
+						attributes: {
+							value: LANG.GET("order.add_information"),
+							type: "button",
+							onpointerup: function () {
+								new Dialog({
+									type: "input",
+									header: LANG.GET("order.add_information"),
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: LANG.GET("order.additional_info"),
+											},
+											hint: LANG.GET("order.add_information_modal_body"),
+										},
+									],
+									options: options,
+								}).then((response) => {
+									if (response) api.purchase("put", "approved", element.id, "addinformation", _client.application.dialogToFormdata(response));
+								});
+							},
+						},
+					});
+				}
+
+				// append statechange
+				if (element.statechange) {
+					options = {};
+					options[LANG.GET("order.add_information_cancel")] = false;
+					options[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					collapsible.push({
+						type: "select",
+						content: element.statechange,
+						numeration: 0,
+						attributes: {
+							name: LANG.GET("order.orderstate_description"),
+							onchange: function () {
+								new Dialog({
+									type: "input",
+									header: LANG.GET("order.orderstate_description") + " " + this.value,
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: LANG.GET("order.additional_info"),
+											},
+											hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units." + element.organizationalunit) }),
+										},
+									],
+									options: options,
+								}).then((response) => {
+									if (response) {
+										response[LANG.GET("order.additional_info")] = LANG.GET("order.orderstate_description") + " - " + this.value + ": " + response[LANG.GET("order.additional_info")];
+										api.purchase("put", "approved", element.id, "addinformation", _client.application.dialogToFormdata(response));
+									}
+								});
+							},
+						},
+					});
+				}
+
+				// append delete button
+				if (element.autodelete) {
+					options = {};
+					options[LANG.GET("order.delete_prepared_order_confirm_cancel")] = false;
+					options[LANG.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
+					collapsible.push({
+						type: "deletebutton",
+						hint: $autodelete,
+						attributes: {
+							type: "button",
+							value: LANG.GET("order.delete_prepared_order"),
+							onpointerup: function () {
+								new Dialog({ type: "confirm", header: LANG.GET("order.delete_prepared_order_confirm_header"), options: options }).then((confirmation) => {
+									if (confirmation) api.purchase("delete", "approved", element.id);
+								});
+							},
+						},
+					});
+					collapsible.push({
+						type: "br", // to clear after floating delete button
+					});
+				}
+
 				// create order
 				order = [
 					{
 						type: "collapsible",
 						attributes: {
-							class: "em18",
+							class: "em18" + (element.collapsed === false ? " extended" : ""),
 						},
 						content: collapsible,
 					},
 				];
 
-				// append incorporation button
+				// append incorporation state
 				if (element.incorporation) {
-					if (element.incorporation.incorporate)
+					if (element.incorporation.item)
 						order.push({
 							type: "button",
 							attributes: {
 								value: LANG.GET("order.incorporation"),
 								type: "button",
-								onpointerup:
-									"if (!this.disabled) api.purchase('get', 'incorporation', " +
-									element.incorporation.incorporate +
-									"); this.disabled=true",
-							}
+								onpointerup: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
+							},
+						});
+					else if (element.incorporation.state)
+						order.push({
+							type: "textsection",
+							attributes: {
+								name: element.incorporation.state,
+							},
+						});
+				}
+				// append sample check state
+				if (element.samplecheck) {
+					if (element.samplecheck.item)
+						order.push({
+							type: "button",
+							attributes: {
+								value: LANG.GET("order.sample_check"),
+								type: "button",
+								onpointerup: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
+							},
+						});
+					else if (element.samplecheck.state)
+						order.push({
+							type: "textsection",
+							attributes: {
+								name: element.samplecheck.state,
+							},
 						});
 				}
 			}
@@ -509,25 +669,15 @@ const _client = {
 			});
 			if (type === "ordered")
 				display = [...filters.ordered].map(function (node) {
-					return [...filters.received, ...filters.delivered, ...filters.archived]
-						.map((n) => n.parentNode.parentNode)
-						.includes(node.parentNode.parentNode)
-						? undefined
-						: node.parentNode.parentNode;
+					return [...filters.received, ...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
 			if (type === "received")
 				display = [...filters.received].map(function (node) {
-					return [...filters.delivered, ...filters.archived]
-						.map((n) => n.parentNode.parentNode)
-						.includes(node.parentNode.parentNode)
-						? undefined
-						: node.parentNode.parentNode;
+					return [...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
 			if (type === "delivered")
 				display = [...filters.delivered].map(function (node) {
-					return [...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode)
-						? undefined
-						: node.parentNode.parentNode;
+					return [...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
 			if (type === "archived")
 				display = [...filters.archived].map(function (node) {
@@ -612,10 +762,7 @@ const _client = {
 			}
 			const placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
 			for (const input of placeholder) {
-				if (input.id in converted_elements)
-					input.value = document.getElementById(converted_elements[input.id])
-						? document.getElementById(converted_elements[input.id]).value
-						: "";
+				if (input.id in converted_elements) input.value = document.getElementById(converted_elements[input.id]) ? document.getElementById(converted_elements[input.id]).value : "";
 			}
 		},
 	},
