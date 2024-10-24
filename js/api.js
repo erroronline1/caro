@@ -954,6 +954,10 @@ export const api = {
 								if (request[1] === "approved") _client.order.filter();
 								api.preventDataloss.start();
 							}
+if (request[1] === "approved" && data.data) {
+	_client.order.approved(data.data);
+	_client.order.filter();
+}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.links !== undefined) {
 								const dialog = {

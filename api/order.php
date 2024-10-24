@@ -376,7 +376,11 @@ class ORDER extends API {
 						'orderer' => UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '',
 						'orderermessage' => null,
 						'organizationalunit' => $row['organizational_unit'],
-						'statechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
+						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
+						'state' => [],
+						'disapprove' => null,
+						'cancel' => null,
+						'return' => null,
 						'attachments' => [],
 						'autodelete' => null,
 						'incorporation' => [],
@@ -474,11 +478,15 @@ $data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_
 
 					$status = [];
 					foreach(['ordered', 'received', 'delivered', 'archived'] as $s){
+if (!isset($data['state'][$s])) $data['state'][$s] = [];
+$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
+
 						$status[LANG::GET('order.' . $s)] = [
 							'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "', this.checked); this.setAttribute('data-".$s."', this.checked.toString());",
 							'data-' . $s => boolval($row[$s]) ? 'true' : 'false',
 						];
 						if (boolval($row[$s])) {
+$data['information'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 							$status[LANG::GET('order.' . $s)]['checked'] = true;
 							$order['content'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
@@ -486,18 +494,22 @@ $data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_
 							case 'ordered':
 							case 'received':
 								if (!PERMISSION::permissionFor('orderprocessing')){
+$data['state'][$s]['disabled'] = true;
 									$status[LANG::GET('order.' . $s)]['disabled'] = true;
 								}
 								break;
 							case 'delivered':	
 							case 'archived':
 								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
+$data['state'][$s]['disabled'] = true;
 									$status[LANG::GET('order.' . $s)]['disabled'] = true;
 								}
 								break;
 						}
 					}
-					if (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])) $status[LANG::GET('order.disapprove')] = [
+					if (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])) {
+$data['disapprove'] = true;
+						$status[LANG::GET('order.disapprove')] = [
 						'data_disapproved' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', render:JSON.parse('" . 
 							json_encode(
@@ -515,8 +527,11 @@ $data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_
 							"if (response !== false) {" .
 							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
 							"} else this.checked = false;});"
-					];
-					if ($row['ordered'] && !($row['received'] || $row['delivered']) && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.cancellation')] = [
+						];
+					}
+					if ($row['ordered'] && !($row['received'] || $row['delivered']) && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) {
+$data['cancel'] = true;
+						$status[LANG::GET('order.cancellation')] = [
 						'data_cancellation' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', render:JSON.parse('" . 
 							json_encode(
@@ -534,8 +549,11 @@ $data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_
 							"if (response !== false) {" .
 							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
-					];
-					if (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) $status[LANG::GET('order.return')] = [
+						];
+					}
+					if (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) {
+$data['return'] = true;
+						$status[LANG::GET('order.return')] = [
 						'data_return' => 'false',
 						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', render:JSON.parse('" . 
 							json_encode(
@@ -553,7 +571,8 @@ $data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_
 							"if (response !== false) {" .
 							"api.purchase('put', 'approved', " . $row['id']. ", 'return', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
 							"} else this.checked = false;});"
-					];
+						];
+					}
 
 					$content[] = $order;
 					$content[] = $commission;

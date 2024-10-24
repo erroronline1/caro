@@ -468,7 +468,7 @@ const _client = {
 						type: "textsection",
 						attributes: {
 							name: LANG.GET("consumables.edit_product_special_attention"),
-							class: orange,
+							class: "orange",
 						},
 					});
 
@@ -539,19 +539,118 @@ const _client = {
 								}).then((response) => {
 									if (response) api.purchase("put", "approved", element.id, "addinformation", _client.application.dialogToFormdata(response));
 								});
-							},
+							}.toString(),
 						},
 					});
 				}
 
-				// append statechange
-				if (element.statechange) {
+				// append state
+				let states = {};
+				for (const [state, attributes] of Object.entries(element.state)) {
+					states[LANG.GET("order." + state)] = {};
+					if (attributes["data-" + state]) states[LANG.GET("order." + state)].checked = true;
+					if (!attributes.disabled) states[LANG.GET("order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+				}
+				if (element.disapprove) {
+					options = {};
+					options[LANG.GET("order.disapprove_message_cancel")] = false;
+					options[LANG.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
+					states[LANG.GET("order.disapprove")] = {
+						data_disapproved: "false",
+						onchange: function () {
+							new Dialog({
+								type: "input",
+								header: LANG.GET("order.disapprove"),
+								render: [
+									{
+										type: "textarea",
+										attributes: {
+											name: LANG.GET("message.message"),
+										},
+										hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units.".element.organizationalunit) }),
+									},
+								],
+								options: options,
+							}).then((response) => {
+								if (response !== false) {
+									api.purchase("put", "approved", element.id, "disapproved", _client.application.dialogToFormdata(response));
+									this.disabled = true;
+									this.setAttribute("data-disapproved", "true");
+								} else this.checked = false;
+							});
+						},
+					};
+				}
+				if (element.cancel) {
+					options = {};
+					options[LANG.GET("order.cancellation_message_cancel")] = false;
+					options[LANG.GET("order.cancellation_message_ok")] = { value: true, class: "reducedCTA" };
+					states[LANG.GET("order.cancellation")] = {
+						data_cancellation: "false",
+						onchange: function () {
+							new Dialog({
+								type: "input",
+								header: LANG.GET("order.cancellation"),
+								render: [
+									{
+										type: "textarea",
+										attributes: {
+											name: LANG.GET("message.message"),
+										},
+										hint: LANG.GET("order.cancellation_message"),
+									},
+								],
+								options: options,
+							}).then((response) => {
+								if (response !== false) {
+									api.purchase("put", "approved", element.id, "cancellation", _client.application.dialogToFormdata(response));
+									this.disabled = true;
+									this.setAttribute("data-cancellation", "true");
+								} else this.checked = false;
+							});
+						},
+					};
+				}
+				if (element.return) {
+					options = {};
+					options[LANG.GET("order.return_message_cancel")] = false;
+					options[LANG.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
+					states[LANG.GET("order.return")] = {
+						data_return: "false",
+						onchange: function () {
+							new Dialog({
+								type: "input",
+								header: LANG.GET("order.return"),
+								render: [
+									{
+										type: "textarea",
+										attributes: {
+											name: LANG.GET("message.message"),
+										},
+										hint: LANG.GET("order.return_message"),
+									},
+								],
+								options: options,
+							}).then((response) => {
+								if (response !== false) {
+									api.purchase("put", "approved", element.id, "return", _client.application.dialogToFormdata(response));
+									this.disabled = true;
+									this.setAttribute("data-return", "true");
+								} else this.checked = false;
+							});
+						},
+					};
+				}
+				collapsible.push({ type: "checkbox", content: states });
+
+				// append orderstatechange
+				if (element.orderstatechange) {
 					options = {};
 					options[LANG.GET("order.add_information_cancel")] = false;
 					options[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "select",
-						content: element.statechange,
+						content: element.orderstatechange,
 						numeration: 0,
 						attributes: {
 							name: LANG.GET("order.orderstate_description"),
@@ -652,8 +751,12 @@ const _client = {
 							},
 						});
 				}
+				content.push(order);
 			}
-		},
+			const render = new Assemble({content:content});
+			document.getElementById("main").replaceChildren(render.initializeSection());
+			render.processAfterInsertion();
+},
 		filter: (type = undefined) => {
 			document.querySelectorAll("[data-ordered]").forEach((article) => {
 				article.parentNode.parentNode.style.display = "none";
