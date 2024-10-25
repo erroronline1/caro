@@ -819,9 +819,12 @@ export class Assemble {
 			if (events.includes(key)) {
 				if (attribute) {
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
-					if (typeof attribute === 'string' && attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|^\t{1,}|\n/gm, " ").slice(0, -1);
+					if (typeof(attribute) === 'function') attribute = attribute.toString();
+					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|\t{1,}|\n/gm, " ").slice(0, -1);
+					if (attribute.startsWith("(")) attribute = attribute.replace(/^.*?\{|\t{1,}|\n|\}$/g, " ").slice(0, -1);
+					attribute = attribute.replace(/^\s.?/gm, "");
 					try {
-						node[key] = attribute;//new Function(attribute);
+						node[key] = new Function(attribute);
 					} catch (e) {
 						new Toast(e, "error", 10000);
 						console.trace(attribute, e);
