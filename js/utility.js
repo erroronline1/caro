@@ -389,8 +389,8 @@ const _client = {
 						"\n" +
 						element.ordertext,
 					attributes: {
-						"data-type": element.ordertype,
 						name: LANG.GET("order.ordertype." + element.ordertype),
+						"data-type": element.ordertype,
 					},
 				});
 
@@ -432,7 +432,7 @@ const _client = {
 								],
 								options: options,
 							});
-						},
+						}.toString(),
 					},
 					hint: LANG.GET("order.copy_or_labelsheet"),
 				});
@@ -489,10 +489,11 @@ const _client = {
 								":number": element.ordernumber,
 								":name": element.name,
 								":vendor": element.vendor,
-								":info": element.information,
-							}),
+								":info": element.information || '',
+								":commission": element.commission
+							}).replace("\\n", "\n"),
 							options.buttons
-						);
+						).toString();
 					},
 				};
 				collapsible.push({
@@ -578,7 +579,7 @@ const _client = {
 									this.setAttribute("data-disapproved", "true");
 								} else this.checked = false;
 							});
-						},
+						}.toString(),
 					};
 				}
 				if (element.cancel) {
@@ -608,7 +609,7 @@ const _client = {
 									this.setAttribute("data-cancellation", "true");
 								} else this.checked = false;
 							});
-						},
+						}.toString(),
 					};
 				}
 				if (element.return) {
@@ -638,7 +639,7 @@ const _client = {
 									this.setAttribute("data-return", "true");
 								} else this.checked = false;
 							});
-						},
+						}.toString(),
 					};
 				}
 				collapsible.push({ type: "checkbox", content: states });
@@ -674,7 +675,7 @@ const _client = {
 										api.purchase("put", "approved", element.id, "addinformation", _client.application.dialogToFormdata(response));
 									}
 								});
-							},
+							}.toString(),
 						},
 					});
 				}
@@ -694,7 +695,7 @@ const _client = {
 								new Dialog({ type: "confirm", header: LANG.GET("order.delete_prepared_order_confirm_header"), options: options }).then((confirmation) => {
 									if (confirmation) api.purchase("delete", "approved", element.id);
 								});
-							},
+							}.toString(),
 						},
 					});
 					collapsible.push({

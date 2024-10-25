@@ -819,9 +819,9 @@ export class Assemble {
 			if (events.includes(key)) {
 				if (attribute) {
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
-					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|^\t{1,}|\n/gm, " ").slice(0, -1);
+					if (typeof attribute === 'string' && attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|^\t{1,}|\n/gm, " ").slice(0, -1);
 					try {
-						node[key] = new Function(attribute);
+						node[key] = attribute;//new Function(attribute);
 					} catch (e) {
 						new Toast(e, "error", 10000);
 						console.trace(attribute, e);
@@ -1249,7 +1249,7 @@ export class Assemble {
 			}
 			input.value = inputvalue.join(", ");
 			let currentElement = this.currentElement;
-			input.onpointerup = () => {
+			input.onpointerup = function () {
 				const options = {};
 				options[LANG.GET("assemble.compose_form_cancel")] = false;
 				options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
@@ -1273,7 +1273,7 @@ export class Assemble {
 					e.dispatchEvent(new Event("change"));
 					e.blur();
 				});
-			};
+			}.toString();
 		}
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
