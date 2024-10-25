@@ -480,7 +480,7 @@ const _client = {
 					collapsible.push({
 						type: "image",
 						attributes: {
-							imageonly: { width: "15em", height: "6em", "margin-top": "-3em" },
+							imageonly: { width: "15em", height: "6em" },
 							name: LANG.GET("order.approval_image"),
 							url: data.approval[element.approval],
 						},
@@ -695,6 +695,7 @@ const _client = {
 
 				// append orderstatechange
 				if (element.orderstatechange && Object.keys(element.orderstatechange).length) {
+					element.orderstatechange["..."] = {};
 					buttons = {};
 					buttons[LANG.GET("order.add_information_cancel")] = false;
 					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
@@ -705,6 +706,7 @@ const _client = {
 						attributes: {
 							name: LANG.GET("order.orderstate_description"),
 							onchange: function () {
+								if (this.value === "...") return false;
 								new Dialog({
 									type: "input",
 									header: LANG.GET("order.orderstate_description") + " " + this.value,
