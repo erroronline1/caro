@@ -461,7 +461,7 @@ const _client = {
 							name: LANG.GET("order.additional_info"),
 							readonly: true,
 						},
-						numeration: 'none',
+						numeration: "none",
 						hint: LANG.GET("order.copy_value"),
 					});
 				}
@@ -521,16 +521,6 @@ const _client = {
 						},
 					});
 
-				// append special attention information
-				if (element.specialattention)
-					collapsible.push({
-						type: "textsection",
-						attributes: {
-							name: LANG.GET("consumables.edit_product_special_attention"),
-							class: "orange",
-						},
-					});
-
 				// append orderer and message option
 				buttons = {};
 				buttons[LANG.GET("order.add_information_cancel")] = false;
@@ -576,6 +566,16 @@ const _client = {
 					content: links,
 					hint: element.lastorder,
 				});
+
+				// append special attention information
+				if (element.specialattention)
+					collapsible.push({
+						type: "textsection",
+						attributes: {
+							name: LANG.GET("consumables.edit_product_special_attention"),
+							class: "orange",
+						},
+					});
 
 				// append attachments
 				if (element.attachments) {
@@ -692,6 +692,7 @@ const _client = {
 							._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 					};
 				}
+				collapsible.push({ type: "br" });
 				collapsible.push({ type: "checkbox", content: states });
 
 				// append orderstatechange
