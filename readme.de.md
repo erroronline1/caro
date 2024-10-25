@@ -797,7 +797,7 @@ Bestellte Artikel erteilen unmittelbar Auskunft über ihren Einführungsstatus o
 
 Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN) gesammelt freigegeben werden.
 
-Freigegebene Bestellungen können als *bestellt*, *vollständig erhalten*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert.
+Freigegebene Bestellungen können als *bestellt*, *vollständig erhalten*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert. Bestellungen die verarbeitet aber noch nicht als erhalten markiert sind werden regelmäßig gemäß [config.ini](#laufzeitvariablen) erinnert um beim Lieferanten ein Lieferdatum zu erfragen. 
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
 Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
@@ -969,7 +969,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
     * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime gemäß [config.CONFIG[limits][idle_logout]](#laufzeitvariablen)
+* php.ini session.gc_maxlifetime gemäß [CONFIG[limits][idle_logout]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
     * gd
     * gettext
@@ -1045,6 +1045,7 @@ mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenpr�
 mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
 open_record_reminder = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
 order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
+order_unreceived = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen
 sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
 tmp =  24 ; Stunden nach denen Dateien gelöscht werden
 training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten

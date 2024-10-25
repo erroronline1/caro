@@ -91,7 +91,6 @@
 ## development
 
 #### purchase considerations
-* reminder orders ordered but not received, purchase has to call vendor
 * reminder orders received but not delivered, colleagues forgot to mark as delivered
 * partial delivery as option
 
@@ -884,7 +883,7 @@ Ordered products identify themself as incorporated or not or whether they are qu
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
 
-Approved orders can be marked as *ordered*, *received*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing.
+Approved orders can be marked as *ordered*, *received*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.
 
 Information can be added anytime.
 Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.
@@ -1123,6 +1122,7 @@ mdr14_sample_interval = 365 ; DAYS until a new sample check is required as defau
 mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
 open_record_reminder = 30 ; DAYS after unclosed records are reminded of via messenger
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+order_unreceived = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
 sharepoint =  48 ; HOURS, after these files will be deleted
 tmp =  24 ; HOURS, after these files will be deleted
 training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews

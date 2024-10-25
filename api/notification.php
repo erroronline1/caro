@@ -225,7 +225,41 @@ class NOTIFICATION extends API {
 	 */
 	public function order(){
 		$unprocessed = 0;
+		$alerts = [];
 		if (PERMISSION::permissionFor('orderprocessing')){
+			$undelivered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unreceived');
+			foreach($undelivered as $order){
+				$last = new DateTime($order['ordered'], new DateTimeZone(CONFIG['application']['timezone']));
+				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['order_unreceived']));
+				if ($order['notified'] < $diff){
+					$decoded_order_data = json_decode($order['order_data'], true);
+					$this->alertUserGroup(
+						['permission' => ['purchase']],
+						LANG::GET('order.alert_unreceived_order', [
+							':days' => $last->diff($this->_currentdate)->days,
+							':ordertype' => LANGUAGEFILE['order']['ordertype'][$order['ordertype']],
+							':quantity' => $decoded_order_data['quantity_label'],
+							':unit' => $decoded_order_data['unit_label'],
+							':number' => $decoded_order_data['ordernumber_label'],
+							':name' => $decoded_order_data['productname_label'],
+							':vendor' => $decoded_order_data['vendor_label'],
+							':commission' => $decoded_order_data['commission'],
+							':orderer' => $decoded_order_data['orderer']
+						])
+					);
+					// prepare alert flags
+					$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
+						[
+							':notified' => $diff,
+							':id' => $order['id']
+						]) . '; ');
+				}
+			}
+			// set alert flags
+			foreach ($alerts as $alert){
+				SQLQUERY::EXECUTE($this->_pdo, $alert);
+			}
+
 			$unprocessed = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed');
 			$unprocessed = $unprocessed ? $unprocessed[0]['num'] : 0;
 		}

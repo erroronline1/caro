@@ -68,6 +68,7 @@ $queries = [
 				"	`delivered` datetime NULL DEFAULT NULL," .
 				"	`archived` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -191,7 +192,7 @@ $queries = [
 				"	`last_form` int NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`notified` tinyint NULL DEFAULT NULL," .
+				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
@@ -293,7 +294,8 @@ $queries = [
 				"	received smalldatetime NULL DEFAULT NULL," .
 				"	delivered smalldatetime NULL DEFAULT NULL," .
 				"	archived smalldatetime NULL DEFAULT NULL," .
-				"	ordertype varchar(MAX) NOT NULL" .
+				"	ordertype varchar(MAX) NOT NULL," .
+				"	notified int NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
@@ -404,7 +406,7 @@ $queries = [
 				"	message varchar(MAX) NOT NULL," .
 				"	timestamp smalldatetime NOT NULL," .
 				"	notified tinyint NULL DEFAULT NULL," .
-				"	seen tinyint NULL DEFAULT NULL," .
+				"	seen tinyint NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
@@ -418,7 +420,7 @@ $queries = [
 				"	last_form int NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
-				"	notified tinyint NULL DEFAULT NULL," .
+				"	notified int NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
