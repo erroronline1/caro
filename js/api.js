@@ -904,7 +904,7 @@ export const api = {
 							if (data.data) {
 								const all = document.querySelectorAll("[data-filtered]");
 								for (const order of all) {
-									order.parentNode.style.display = data.data.includes(order.dataset.filtered) ? "block" : "none";
+									order.parentNode.parentNode.style.display = data.data.includes(order.dataset.filtered) ? "block" : "none";
 								}
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
