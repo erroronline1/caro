@@ -440,19 +440,6 @@ const _client = {
 					hint: LANG.GET("order.copy_or_labelsheet"),
 				});
 
-				// append information
-				if (element.information) {
-					collapsible.push({
-						type: "textarea_copy",
-						attributes: {
-							value: element.information,
-							name: LANG.GET("order.additional_info"),
-							readonly: true,
-						},
-						hint: LANG.GET("order.copy_value"),
-					});
-				}
-
 				// append order number
 				collapsible.push({
 					type: "text_copy",
@@ -464,6 +451,54 @@ const _client = {
 					},
 					hint: LANG.GET("order.copy_value"),
 				});
+
+				// append information
+				if (element.information) {
+					collapsible.push({
+						type: "textarea_copy",
+						attributes: {
+							value: element.information,
+							name: LANG.GET("order.additional_info"),
+							readonly: true,
+						},
+						numeration: 'none',
+						hint: LANG.GET("order.copy_value"),
+					});
+				}
+
+				// append add info button
+				if (element.addinformation) {
+					buttons = {};
+					buttons[LANG.GET("order.add_information_cancel")] = false;
+					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					collapsible.push({
+						type: "button",
+						attributes: {
+							value: LANG.GET("order.add_information"),
+							type: "button",
+							onpointerup: function () {
+								new Dialog({
+									type: "input",
+									header: LANG.GET("order.add_information"),
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: LANG.GET("order.additional_info"),
+											},
+											hint: LANG.GET("order.add_information_modal_body"),
+										},
+									],
+									options: buttons,
+								}).then((response) => {
+									if (response) api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
+								});
+							}
+								.toString()
+								._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
+						},
+					});
+				}
 
 				// display barcode
 				if (element.barcode)
@@ -550,40 +585,6 @@ const _client = {
 					collapsible.push({
 						type: "links",
 						content: element.attachments,
-					});
-				}
-
-				// append add info button
-				if (element.addinformation) {
-					buttons = {};
-					buttons[LANG.GET("order.add_information_cancel")] = false;
-					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
-					collapsible.push({
-						type: "button",
-						attributes: {
-							value: LANG.GET("order.add_information"),
-							type: "button",
-							onpointerup: function () {
-								new Dialog({
-									type: "input",
-									header: LANG.GET("order.add_information"),
-									render: [
-										{
-											type: "textarea",
-											attributes: {
-												name: LANG.GET("order.additional_info"),
-											},
-											hint: LANG.GET("order.add_information_modal_body"),
-										},
-									],
-									options: buttons,
-								}).then((response) => {
-									if (response) api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
-								});
-							}
-								.toString()
-								._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
-						},
 					});
 				}
 
