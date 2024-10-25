@@ -66,10 +66,10 @@ class APPLICATION extends API {
 				],
 				'ini' => [
 					'lifespan' => [
-						'idle' => min(INI['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
 					],
 					'limits' => [
-						'qr_errorlevel' => INI['limits']['qr_errorlevel']
+						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
 					]
 				]]);
 			}
@@ -91,10 +91,10 @@ class APPLICATION extends API {
 					],
 					'ini' => [
 						'lifespan' => [
-							'idle' => min(INI['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+							'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
 						],
 						'limits' => [
-							'qr_errorlevel' => INI['limits']['qr_errorlevel']
+							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
 						]
 					]]);
 			}
@@ -125,9 +125,9 @@ class APPLICATION extends API {
 		];
 		$tos = [];
 		$replacements = [
-			':issue_mail' => INI['application']['issue_mail'],
+			':issue_mail' => CONFIG['application']['issue_mail'],
 			// no use of PERMISSIONS::permissionFor, because this method required a logged in user
-			':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], ['admin', ...preg_split('/\W+/', INI['permissions']['users'])]))
+			':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
 		];
 		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
@@ -175,7 +175,7 @@ class APPLICATION extends API {
 					'permissions' => '',
 				];
 		
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
@@ -216,7 +216,7 @@ class APPLICATION extends API {
 					'permissions' => '',
 				];
 		
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
@@ -588,12 +588,12 @@ class APPLICATION extends API {
 		];
 
 		$displayevents = $displayabsentmates = '';
-		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 		foreach ($thisDaysEvents as $row){
 			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . "\n";
-			if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'textsection',

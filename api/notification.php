@@ -64,11 +64,11 @@ class NOTIFICATION extends API {
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$today->setTime(0, 0);
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'], true);
-			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(INI['application']['timezone']));
+			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(CONFIG['application']['timezone']));
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
@@ -251,8 +251,8 @@ class NOTIFICATION extends API {
 				// rise counter for unit member
 				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
 				// alert if applicable
-				$last = new DateTime($row['last_touch'], new DateTimeZone(INI['application']['timezone']));
-				$diff = intval(abs($last->diff($this->_currentdate)->days / INI['lifespan']['open_record_reminder']));
+				$last = new DateTime($row['last_touch'], new DateTimeZone(CONFIG['application']['timezone']));
+				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered form
 					$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];

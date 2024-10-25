@@ -24,10 +24,10 @@ class PDF{
 	public static function identifierPDF($content){
 		// create a pdf for a label sheet with qr code and plain text
 		// create new PDF document
-		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['labelsheet']['format'], true, 'UTF-8', false);
+		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['labelsheet']['format'], true, 'UTF-8', false);
 
 		// set document information
-		$pdf->SetCreator(INI['system']['caroapp']);
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
 		$pdf->SetTitle(LANG::GET('record.create_identifier'));
 		$pdf->setPrintHeader(false);
@@ -48,9 +48,9 @@ class PDF{
 		$pdf->SetFillColor(255, 255, 255);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$format = TCPDF_STATIC::getPageSizeFromFormat(INI['pdf']['labelsheet']['format']);
-		$rowheight = (($format[1] * 25.4 / 72 ) - (INI['pdf']['labelsheet']['margintop'] + INI['pdf']['labelsheet']['marginbottom']))/ INI['pdf']['labelsheet']['rows'];
-		$columnwidth = ($format[0] * 25.4 / 72 ) / INI['pdf']['labelsheet']['columns'];
+		$format = TCPDF_STATIC::getPageSizeFromFormat(CONFIG['pdf']['labelsheet']['format']);
+		$rowheight = (($format[1] * 25.4 / 72 ) - (CONFIG['pdf']['labelsheet']['margintop'] + CONFIG['pdf']['labelsheet']['marginbottom']))/ CONFIG['pdf']['labelsheet']['rows'];
+		$columnwidth = ($format[0] * 25.4 / 72 ) / CONFIG['pdf']['labelsheet']['columns'];
 		$codesize = min($columnwidth, $rowheight) - 10; // font size
 		$style = array(
 			'border' => 0,
@@ -62,18 +62,18 @@ class PDF{
 			'module_height' => 1 // height of a single module in points
 		);
 
-		for ($row = 0; $row < INI['pdf']['labelsheet']['rows']; $row++){
-			for ($column = 0; $column < INI['pdf']['labelsheet']['columns']; $column++){
-				$pdf->write2DBarcode($content, 'QRCODE,' . INI['limits']['qr_errorlevel'], $column * $columnwidth, $row * $rowheight, $codesize, $codesize, $style, 'N');
-				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === INI['pdf']['labelsheet']['columns'] - 1), $column * $columnwidth + $codesize, $row * $rowheight, true, 0, false, true, 24, 'T', true);
+		for ($row = 0; $row < CONFIG['pdf']['labelsheet']['rows']; $row++){
+			for ($column = 0; $column < CONFIG['pdf']['labelsheet']['columns']; $column++){
+				$pdf->write2DBarcode($content, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth, $row * $rowheight, $codesize, $codesize, $style, 'N');
+				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === CONFIG['pdf']['labelsheet']['columns'] - 1), $column * $columnwidth + $codesize, $row * $rowheight, true, 0, false, true, 24, 'T', true);
 			}
 		}
 		// move pointer to last page
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
-		$filename = preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $content) . '.pdf';
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
+		$filename = preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $content) . '.pdf';
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
 	}
@@ -81,20 +81,20 @@ class PDF{
 	public static function recordsPDF($content){
 		// create a pdf for a record summary
 		// create new PDF document
-		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
+		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
 		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
-		$pdf->SetCreator(INI['system']['caroapp']);
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'], 1);
+		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'], 1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
+		$pdf->SetAutoPageBreak(TRUE, CONFIG['pdf']['record']['marginbottom']); // margin bottom
 		// add a page
 		$pdf->AddPage();
 		// set cell padding
@@ -133,12 +133,12 @@ class PDF{
 					$imagedata = pathinfo($image);
 					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
 					$pdf->SetFont('helvetica', 'B', $height['font']); // font size
-					$pdf->MultiCell(50, INI['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-					if ($img_width && INI['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / INI['pdf']['exportimage']['maxheight']))
-						$pdf->Image('.' . $image, null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+					$pdf->MultiCell(50, CONFIG['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+					if ($img_width && CONFIG['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / CONFIG['pdf']['exportimage']['maxheight']))
+						$pdf->Image('.' . $image, null, null, 0, CONFIG['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
 					else
 						$pdf->Image('.' . $image, null, null, 145, 0, '', '', 'R', true, 300, 'R');
-					$pdf->Ln(INI['pdf']['exportimage']['maxheight']);
+					$pdf->Ln(CONFIG['pdf']['exportimage']['maxheight']);
 				}
 			}
 		}
@@ -146,7 +146,7 @@ class PDF{
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
@@ -154,20 +154,20 @@ class PDF{
 	public static function formsPDF($content){
 		// create a pdf for a form export
 		// create new PDF document
-		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
+		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
 		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
-		$pdf->SetCreator(INI['system']['caroapp']);
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'], 1);
+		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'], 1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
+		$pdf->SetAutoPageBreak(TRUE, CONFIG['pdf']['record']['marginbottom']); // margin bottom
 		// add a page
 		$pdf->AddPage();
 		// set cell padding
@@ -196,9 +196,9 @@ class PDF{
 			foreach($entries as $key => $value){
 				// make sure to write on next page if multiline textfield would reach into footer
 				if ($value['type'] === "multiline" && !$value['value']
-					&& $pdf->GetY() > $pdf->getPageHeight() - INI['pdf']['record']['marginbottom'] - $height['multiline']) {
+					&& $pdf->GetY() > $pdf->getPageHeight() - CONFIG['pdf']['record']['marginbottom'] - $height['multiline']) {
 						$pdf->AddPage();
-						$pdf->SetY(INI['pdf']['record']['margintop']);
+						$pdf->SetY(CONFIG['pdf']['record']['margintop']);
 				}
 				// name column
 				$pdf->SetFont('helvetica', 'B', $height['font']); // font size
@@ -217,12 +217,12 @@ class PDF{
 							$imagedata = pathinfo($value['value']);
 							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
 							$pdf->SetFont('helvetica', 'B', $height['font']); // font size
-							$pdf->MultiCell(50, INI['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-							if ($img_width && INI['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / INI['pdf']['exportimage']['maxheight']))
-								$pdf->Image('.' . $value['value'], null, null, 0, INI['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+							$pdf->MultiCell(50, CONFIG['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+							if ($img_width && CONFIG['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / CONFIG['pdf']['exportimage']['maxheight']))
+								$pdf->Image('.' . $value['value'], null, null, 0, CONFIG['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
 							else
 								$pdf->Image('.' . $value['value'], null, null, 145, 0, '', '', 'R', true, 300, 'R');
-							$pdf->Ln(INI['pdf']['exportimage']['maxheight'] + 4);
+							$pdf->Ln(CONFIG['pdf']['exportimage']['maxheight'] + 4);
 						}
 						break;
 					case 'selection':
@@ -265,7 +265,7 @@ class PDF{
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
@@ -273,20 +273,20 @@ class PDF{
 	public static function auditPDF($content){
 		// create a pdf for a record summary
 		// create new PDF document
-		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
+		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
 		20, null, ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
-		$pdf->SetCreator(INI['system']['caroapp']);
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'],1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
+		$pdf->SetAutoPageBreak(TRUE, CONFIG['pdf']['record']['marginbottom']); // margin bottom
 		// add a page
 		$pdf->AddPage();
 		// set cell padding
@@ -322,7 +322,7 @@ class PDF{
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
@@ -330,20 +330,20 @@ class PDF{
 	public static function timesheetPDF($content){
 		// create a pdf for a timesheet output
 		// create new PDF document
-		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, INI['pdf']['record']['format'], true, 'UTF-8', false, false,
+		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
 		20, null, ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
-		$pdf->SetCreator(INI['system']['caroapp']);
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(INI['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + INI['pdf']['record']['margintop'], INI['pdf']['record']['marginright'],1);
+		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'],1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, INI['pdf']['record']['marginbottom']); // margin bottom
+		$pdf->SetAutoPageBreak(TRUE, CONFIG['pdf']['record']['marginbottom']); // margin bottom
 		// set cell padding
 		$pdf->setCellPaddings(5, 1, 5, 1);
 		// set cell margins
@@ -370,7 +370,7 @@ class PDF{
 		$pdf->lastPage();
 
 		//Close and output PDF document
-		UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
@@ -391,9 +391,9 @@ class RECORDTCPDF extends TCPDF {
 
 	// forces pagebreak if content exceeds name or page height
 	public function applyCustomPageBreak($lines, $lineheight) {
-		if ($this->GetY() > $this->getPageHeight() - INI['pdf']['record']['marginbottom'] - $lines * $lineheight) {
+		if ($this->GetY() > $this->getPageHeight() - CONFIG['pdf']['record']['marginbottom'] - $lines * $lineheight) {
 			if ($this->getNumPages() < $this->getPage() + 1) $this->AddPage();
-			$this->SetY(INI['pdf']['record']['margintop']);
+			$this->SetY(CONFIG['pdf']['record']['margintop']);
 		}
 		if ($this->getNumPages() > $this->getPage()) $this->setPage($this->getPage() + 1);
 	}
@@ -403,7 +403,7 @@ class RECORDTCPDF extends TCPDF {
 		// Title
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$right_margin = 0;
-		if ($image = INI['pdf']['record']['header_image']){
+		if ($image = CONFIG['pdf']['record']['header_image']){
 			// given the image will always be 20mm high
 			list($width, $height, $type, $attr) = getimagesize('../' . $image);
 			if ($width && $height){ // avoid division by zero error for faulty input
@@ -428,7 +428,7 @@ class RECORDTCPDF extends TCPDF {
 				'module_width' => 1, // width of a single module in points
 				'module_height' => 1 // height of a single module in points
 			);
-			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,' . INI['limits']['qr_errorlevel'], 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
+			$this->write2DBarcode($this->qrcodecontent, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], 10, 10, $this->qrcodesize, $this->qrcodesize, $style, 'N');
 			$this->MultiCell(50, $this->qrcodesize, $this->qrcodecontent, 0, '', 0, 0, 10 + $this->qrcodesize, 10, true, 0, false, true, 24, 'T', true);
 		}
 	}
@@ -438,7 +438,7 @@ class RECORDTCPDF extends TCPDF {
 		// Position at 15 mm from bottom
 		$this->SetY(-15);
 		$imageMargin = 0;
-		if ($image = INI['pdf']['record']['footer_image']){
+		if ($image = CONFIG['pdf']['record']['footer_image']){
 			list($width, $height, $type, $attr) = getimagesize('../' . $image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				// given the image will always be 10mm high
@@ -452,7 +452,7 @@ class RECORDTCPDF extends TCPDF {
 		$this->SetFont('helvetica', 'I', 8);
 		// company contacts and page number
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$this->MultiCell($this->getPageWidth() - INI['pdf']['record']['marginleft'] - 10 - $imageMargin, 10, LANG::GET('company.address') . ' | ' . INI['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, INI['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, INI['pdf']['record']['marginbottom'], 'T', true);
+		$this->MultiCell($this->getPageWidth() - CONFIG['pdf']['record']['marginleft'] - 10 - $imageMargin, 10, LANG::GET('company.address') . ' | ' . CONFIG['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, CONFIG['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, CONFIG['pdf']['record']['marginbottom'], 'T', true);
 	}
 }
 

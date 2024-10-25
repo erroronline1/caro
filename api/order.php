@@ -279,7 +279,7 @@ class ORDER extends API {
 				// delete old received unarchived orders
 				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_delivered', [
 					'values' => [
-						':date_time' => date('Y-m-d h:i:s', time() - (INI['lifespan']['order'] * 24 * 3600)),
+						':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order'] * 24 * 3600)),
 					]
 				]);
 				foreach ($old as $row){
@@ -1115,7 +1115,7 @@ class ORDER extends API {
 				}
 				if (array_key_exists(LANG::PROPERTY('order.add_approval_signature'), $_FILES) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
-					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, INI['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
+					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 				}
 				$approvedIDs = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.bulk_approve_order'));
 				if (!$approval) $this->response([], 401);
@@ -1318,7 +1318,7 @@ class ORDER extends API {
 		}
 		if (array_key_exists(LANG::PROPERTY('order.add_approval_signature'), $_FILES) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
-			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, INI['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
+			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 		}
 
 		// initiate data
@@ -1412,7 +1412,7 @@ class ORDER extends API {
 						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 					}
 					$article = intval(count($matches) - 1);
-					if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
+					if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
 						$matches[$article][] = [
 							[
 								'type' => 'textsection',

@@ -25,7 +25,7 @@ class SQLQUERY {
 	 * @return string sql query
 	 */
 	public static function PREPARE($context){
-		return self::QUERIES[$context][INI['sql'][INI['sql']['use']]['driver']];
+		return self::QUERIES[$context][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 	}
 
 	/**
@@ -43,7 +43,7 @@ class SQLQUERY {
 	 */
 	public static function EXECUTE($_pdo, $query = '', $parameters = ['values' => [], 'replacements' => []]){
 		// retrive query matching sql driver, else process raw query
-		if (array_key_exists($query, self::QUERIES)) $query = self::QUERIES[$query][INI['sql'][INI['sql']['use']]['driver']];
+		if (array_key_exists($query, self::QUERIES)) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 		
 		// substitute NULL values, int values and mask/sanitize values
 		if (array_key_exists('values', $parameters) && $parameters['values']){
@@ -107,7 +107,7 @@ class SQLQUERY {
 		if ($query){
 			$chunkIndex = count($chunks) - 1;
 			if (array_key_exists($chunkIndex, $chunks)){
-				if (strlen($chunks[$chunkIndex] . $query) < INI['sql'][INI['sql']['use']]['packagesize']) $chunks[$chunkIndex] .= $query;
+				if (strlen($chunks[$chunkIndex] . $query) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $chunks[$chunkIndex] .= $query;
 				else $chunks[] = $query;
 			}
 			else $chunks[] = $query;
@@ -140,7 +140,7 @@ class SQLQUERY {
 				$item = strtr($values, $item);
 				if (count($chunkeditems)){
 					$index = count($chunkeditems) - 1;
-					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$chunkeditems[$index]])) < INI['sql'][INI['sql']['use']]['packagesize']){
+					if (strlen($query . ' VALUES ' . implode(',', [$item, ...$chunkeditems[$index]])) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']){
 						$chunkeditems[$index][] = $item;
 					}
 					else $chunkeditems[] = [$item];
@@ -333,19 +333,19 @@ class SQLQUERY {
 		],
 		'consumables_get_valid_checked' => [
 			'mysql' => "SELECT prod.vendor_id AS vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['lifespan']['mdr14_sample_interval'] . " ) DAY ) ) ) "
-				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['lifespan']['mdr14_sample_interval'] . " )",
+				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " ) DAY ) ) ) "
+				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " )",
 			'sqlsrv' => "SELECT prod.vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
-				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['lifespan']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
-				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . INI['lifespan']['mdr14_sample_interval'] . ") "
+				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
+				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") "
 		],
 		'consumables_get_not_reusable_checked' => [
 			'mysql' => "SELECT prod.id AS id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['lifespan']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
-				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['lifespan']['mdr14_sample_reusable'] . " )",
+				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
+				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " )",
 			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
-				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['lifespan']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
-				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . INI['lifespan']['mdr14_sample_reusable'] . ") "
+				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
+				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") "
 		],
 		'consumables_get_last_checked' => [
 			'mysql' => "SELECT prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "

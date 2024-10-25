@@ -20,7 +20,7 @@
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-define ('INI', parse_ini_file('config.ini', true));
+define ('CONFIG', parse_ini_file('config.ini', true));
 @define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
 include_once('_sqlinterface.php');
 
@@ -49,11 +49,11 @@ class STRESSTEST{
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 		];
-		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password'], $options);
+		$this->_pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		$this->_currentdate = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		if (method_exists($this, $method)) {
 			echo '<a href="../_stresstest.php">back</a><br />';
 			$this->{$method}();
@@ -170,7 +170,7 @@ class STRESSTEST{
 			'mysql' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'",
 			'sqlsrv' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'"
 		];
-		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[INI['sql']['use']]);
+		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
 		echo $del . ' entries with prefix ' . $this->_prefix . ' deleted';
 	}
 
@@ -220,7 +220,7 @@ class STRESSTEST{
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'"
 		];
-		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[INI['sql']['use']]);
+		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
 		echo $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
 	}
 }

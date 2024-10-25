@@ -79,7 +79,7 @@ class FILE extends API {
 		foreach($bundles as $row) {
 			$list = [];
 			foreach (json_decode($row['content'], true) as $file => $path){
-				if (stristr($path, INI['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
+				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
 				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
 			];
 			}
@@ -111,7 +111,7 @@ class FILE extends API {
 		$matches = [];
 		foreach($bundles as $row) {
 			similar_text($this->_requestedFolder, $row['name'], $percent);
-			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = strval($row['id']);
+			if ($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = strval($row['id']);
 		}
 		$this->response([
 			'data' => $matches
@@ -279,7 +279,7 @@ class FILE extends API {
 							$filePerSlide = 0;
 						}
 						$article = intval(count($matches) - 1);
-						if (empty($filePerSlide++ % INI['splitresults']['bundle_files_per_slide'])){
+						if (empty($filePerSlide++ % CONFIG['splitresults']['bundle_files_per_slide'])){
 							$matches[$article][] = [
 								[
 									'type' => 'checkbox',
@@ -447,7 +447,7 @@ class FILE extends API {
 								$regulatory_context[$value] = ['value' => $key];
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
-							$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(INI['application']['timezone']));
+							$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
@@ -525,7 +525,7 @@ class FILE extends API {
 			case 'POST':
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, LANG::PROPERTY('file.manager_new_folder')));
 				if ($new_folder){
-					foreach(INI['forbidden']['names'] as $pattern){
+					foreach(CONFIG['forbidden']['names'] as $pattern){
 						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['response' => ['msg' => LANG::GET('file.manager_new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 					}
 					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
@@ -568,7 +568,7 @@ class FILE extends API {
 						$content=[];
 						foreach ($folders as $folder){
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
-							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone(INI['application']['timezone']));
+							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone(CONFIG['application']['timezone']));
 							array_push($result['render']['content'][0],
 								[
 									'type' => 'links',
@@ -630,7 +630,7 @@ class FILE extends API {
 						foreach ($files as $file){
 							if ($file) {
 								$file = ['path' => substr($file, 1), 'name' => pathinfo($file)['basename']];
-								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(INI['application']['timezone']));
+								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
@@ -783,7 +783,7 @@ class FILE extends API {
 		$matches = [];
 		foreach ($files as $file){
 			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
-			if ($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
+			if ($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
 		}
 		$this->response([
 			'data' => $matches
@@ -833,11 +833,11 @@ class FILE extends API {
 					foreach ($files as $file){
 						$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
 						$filetime = filemtime($file['path']);
-						if ((time()-$filetime)/3600 > INI['lifespan']['sharepoint']) {
+						if ((time()-$filetime)/3600 > CONFIG['lifespan']['sharepoint']) {
 							UTILITY::delete($file['path']);
 						}
 						else {
-							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + INI['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
+							$name = $file['name'] . ' ' . LANG::GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
 							$display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
 						}
 					}

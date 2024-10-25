@@ -95,7 +95,7 @@ class USER extends API {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-					UTILITY::resizeImage($user['image'], INI['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 				// process settings
@@ -284,14 +284,14 @@ class USER extends API {
 						':ids' => $user['id'] ? : 0
 					]
 				]);
-				$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
 					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
+						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
 							if ($expire < $today) $attributes['class'] = 'orange';
 						}
 					}
@@ -346,7 +346,7 @@ class USER extends API {
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
 
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 		
@@ -409,14 +409,14 @@ class USER extends API {
 					];
 				}
 				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-				UTILITY::resizeImage($user['image'], INI['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+				UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
 				// add user training
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
@@ -479,7 +479,7 @@ class USER extends API {
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
 
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 				
@@ -546,7 +546,7 @@ class USER extends API {
 				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-					UTILITY::resizeImage($user['image'], INI['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 
@@ -554,7 +554,7 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
@@ -693,14 +693,14 @@ class USER extends API {
 						':ids' => $user['id'] ? : 0
 					]
 				]);
-				$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
 					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
+						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
 							if ($expire < $today) $attributes['class'] = 'orange';
 						}
 					}

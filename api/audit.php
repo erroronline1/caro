@@ -198,7 +198,7 @@ class AUDIT extends API {
 			]
 		]);
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -322,7 +322,7 @@ class AUDIT extends API {
 		];
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
-				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(INI['application']['timezone']));
+				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 				$externalcontent[] = [
 					'type' => 'textsection',
 					'attributes' => [
@@ -378,7 +378,7 @@ class AUDIT extends API {
 	 */
 	private function exportforms(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -498,7 +498,7 @@ class AUDIT extends API {
 	 */
 	private function exportincorporation(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -709,7 +709,7 @@ class AUDIT extends API {
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
 			if ($order['received']){
-				$datetimezone = new DateTimeZone(INI['application']['timezone']);
+				$datetimezone = new DateTimeZone(CONFIG['application']['timezone']);
 				$now = new DateTime('now', $datetimezone);
 				$ordered = new DateTime($order['ordered'], $datetimezone);
 				$received = new DateTime($order['received'], $datetimezone);
@@ -798,7 +798,7 @@ class AUDIT extends API {
 		// get active external documents
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
-				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(INI['application']['timezone']));
+				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 				foreach(explode(',', $file['regulatory_context']) as $context){
 					$regulatory[$context][$file['path'] . ' (' . $date->format('Y-m-d H:i') . ')'] = ['href' => substr($file['path'], 1)];
 				}
@@ -841,7 +841,7 @@ class AUDIT extends API {
 	 */
 	private function exportregulatory(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.regulatory') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.regulatory') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -916,11 +916,11 @@ class AUDIT extends API {
 				'content' => LANG::GET('risk.effect') . ': ' . $risk['effect'] .
 				" \n" . LANG::GET('risk.probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
 				" \n" . LANG::GET('risk.damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-				" \n" . ($risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . ($risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
 				" \n" . LANG::GET('risk.measure') . ': ' . $risk['measure'] .
 				" \n" . LANG::GET('risk.measure_probability') . ': ' . (isset(LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability']-1]) ? LANGUAGEFILE['risk']['probabilities'][$risk['measure_probability'] - 1] : LANGUAGEFILE['risk']['probabilities'][count(LANGUAGEFILE['risk']['probabilities']) - 1]) .
 				" \n" . LANG::GET('risk.measure_damage') . ': ' . (isset(LANGUAGEFILE['risk']['damages'][$risk['measure_damage']-1]) ? LANGUAGEFILE['risk']['damages'][$risk['measure_damage'] - 1] : LANGUAGEFILE['risk']['damages'][count(LANGUAGEFILE['risk']['damages']) - 1]) .
-				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
+				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')) .
 				" \n" . LANG::GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
 				" \n" . LANG::GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
 				(isset($last_edit['user']) ? " \n" . LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
@@ -936,7 +936,7 @@ class AUDIT extends API {
 	 */
 	private function exportrisks(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.risks') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.risks') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -1043,7 +1043,7 @@ class AUDIT extends API {
 	 */
 	private function exportuserexperience(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.userexperience') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.userexperience') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -1118,7 +1118,7 @@ class AUDIT extends API {
 			]
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
-		$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		foreach ($users as $user){
 			if ($user['id'] < 2) continue;
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
@@ -1151,10 +1151,10 @@ class AUDIT extends API {
 				foreach ($usertrainings as $row){
 					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(INI['application']['timezone']));
+						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . INI['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
 							if ($expire < $today) $attributes['class'] = 'orange';
 						}
 					}
@@ -1226,7 +1226,7 @@ class AUDIT extends API {
 	 */
 	private function exportuserskills(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.userskills') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.userskills') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
@@ -1339,7 +1339,7 @@ class AUDIT extends API {
 	 */
 	private function exportvendors(){
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.vendors') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.vendors') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],

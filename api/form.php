@@ -60,7 +60,7 @@ class FORM extends API {
 
 				$approve['approval'] = $approve['approval'] ? json_decode($approve['approval'], true) : []; 
 				$tobeapprovedby = PERMISSION::permissionFor('formapproval', true);
-				$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+				$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.' . $permission), $approveas)){
 						$approve['approval'][$permission] = [
@@ -300,7 +300,7 @@ class FORM extends API {
 						]]);	
 				}
 
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 				}
 
@@ -507,7 +507,7 @@ class FORM extends API {
 						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
 						$uploaded_files = [];
 						foreach($uploads as $path){
-							UTILITY::resizeImage($path, INI['limits']['form_image'], UTILITY_IMAGE_REPLACE);
+							UTILITY::resizeImage($path, CONFIG['limits']['form_image'], UTILITY_IMAGE_REPLACE);
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
 							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
@@ -628,7 +628,7 @@ class FORM extends API {
 				// if not updated check if approve is set, not earlier
 				if (!($component_approve = array_search($component_approve, LANGUAGEFILE['units']))) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
 
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 				}
 
@@ -966,7 +966,7 @@ class FORM extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!$this->_payload->context) $this->response(['response' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 				}
 

@@ -52,7 +52,7 @@ class RECORD extends API {
 		foreach($bd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if ($this->_requestedID) similar_text($this->_requestedID, $row['name'], $percent);
-			if (!in_array($row['name'], $hidden) && (!$this->_requestedID || $percent >= INI['likeliness']['file_search_similarity'])) {
+			if (!in_array($row['name'], $hidden) && (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity'])) {
 				if (($forms = $row['content'] ? explode(',', $row['content']) : false) !== false){
 					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
 					foreach ($forms as $key => $formname){
@@ -113,7 +113,7 @@ class RECORD extends API {
 		if (!$data) $this->response([], 204);
 		$data['closed'] = $data['closed'] ? json_decode($data['closed'], true) : [];
 
-		$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+		$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$data['closed'][$this->_passedIdentify] = [
 			'name' => $_SESSION['user']['name'],
 			'date' => $time->format('Y-m-d H:i')
@@ -187,7 +187,7 @@ class RECORD extends API {
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+			$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 			$entry_timestamp = $now->format('Y-m-d H:i');
 		}
 
@@ -213,7 +213,7 @@ class RECORD extends API {
 		}
 		if (!$identifier) $identifier = in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null;
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
@@ -421,7 +421,7 @@ class RECORD extends API {
 		];
 
 		if (isset($return['render']['form'])) {
-			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+			$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 			$defaults = [
 				[
 					'type' => 'date',
@@ -442,7 +442,7 @@ class RECORD extends API {
 			if (in_array($form['context'], ['casedocumentation'])) {
 				$options = [];
 				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
-					$options[$value] = boolval(INI['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
+					$options[$value] = boolval(CONFIG['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
 				}
 				$defaults[] = [
 					'type' => 'radio',
@@ -517,7 +517,7 @@ class RECORD extends API {
 							if (is_array($subs[$property])){ // links, checkboxes,etc
 								foreach(array_keys($subs[$property]) as $key) {
 									similar_text($search, $key, $percent);
-									if ($percent >= INI['likeliness']['file_search_similarity']) {
+									if ($percent >= CONFIG['likeliness']['file_search_similarity']) {
 										return true;
 									}
 								}
@@ -544,7 +544,7 @@ class RECORD extends API {
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
 				foreach ($terms as $term){
 					similar_text($this->_requestedID, $term, $percent);
-					if (($percent >= INI['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
+					if (($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
 						$matches[] = strval($row['id']);
 						continue;
 					}
@@ -660,7 +660,7 @@ class RECORD extends API {
 						new DateTime($possibledate);
 					}
 					catch (Exception $e){
-						$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+						$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 						if ($this->_appendDate) $content .= ' ' . $now->format('Y-m-d H:i');
 					}
 				}
@@ -703,7 +703,7 @@ class RECORD extends API {
 								'hint' => LANG::GET('record.create_identifier_hint'),
 								'attributes' => [
 									'name' => LANG::GET('record.create_identifier'),
-									'maxlength' => INI['limits']['identifier']
+									'maxlength' => CONFIG['limits']['identifier']
 								]
 							]
 						]
@@ -862,7 +862,7 @@ class RECORD extends API {
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-					$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+					$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 					$entry_timestamp = $now->format('Y-m-d H:i');
 				}
 
@@ -902,14 +902,14 @@ class RECORD extends API {
 					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_currentdate->format('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
-								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[$i], INI['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
 
 								if (array_key_exists($fileinput, $attachments)) $attachments[$fileinput][]= substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
 							}
 						}
 						else {
-							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[0], INI['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+							if (in_array(strtolower(pathinfo($uploaded[0])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[0], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
 							$attachments[$fileinput] = [substr($uploaded[0], 1)];
 						}
 					}
@@ -1211,7 +1211,7 @@ class RECORD extends API {
 										'hint' => LANG::GET('record.create_identifier_hint'),
 										'attributes' => [
 											'name' => LANG::GET('record.create_identifier'),
-											'maxlength' => INI['limits']['identifier']
+											'maxlength' => CONFIG['limits']['identifier']
 										]
 									],
 									[
@@ -1362,10 +1362,10 @@ class RECORD extends API {
 			// limit search to similarity
 			if ($this->_requestedID){
 				similar_text($this->_requestedID, $row['identifier'], $percent);
-				if ($percent < INI['likeliness']['records_search_similarity']) continue;
+				if ($percent < CONFIG['likeliness']['records_search_similarity']) continue;
 			}
 			// prefilter record datalist for performance reasons
-			preg_match('/' . INI['likeliness']['records_identifier_pattern']. '/mi', $row['identifier'], $simplified_identifier);
+			preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $row['identifier'], $simplified_identifier);
 
 			if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
 			
@@ -1383,7 +1383,7 @@ class RECORD extends API {
 			$closed = json_decode($row['closed'] ? : '', true);
 			if (!$this->_requestedID && (($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $closed))
 				|| (!$row['record_type'] === 'complaint' && $closed)
-				|| count($contexts[$row['context']][$targets[$target]]) > INI['limits']['max_records'])) {
+				|| count($contexts[$row['context']][$targets[$target]]) > CONFIG['limits']['max_records'])) {
 				continue;
 			}
 
@@ -1428,7 +1428,7 @@ class RECORD extends API {
 					'description' => LANG::GET('record.record_scan')
 				], [
 					'type' => 'filtered',
-					'hint' => LANG::GET('record.record_filter_hint', [':max' => INI['limits']['max_records']]),
+					'hint' => LANG::GET('record.record_filter_hint', [':max' => CONFIG['limits']['max_records']]),
 					'attributes' => [
 						'id' => 'recordfilter',
 						'name' => LANG::GET('record.record_filter'),
@@ -1481,7 +1481,7 @@ class RECORD extends API {
 			new DateTime($possibledate);
 		}
 		catch (Exception $e){
-			$now = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+			$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 			$new_id .= ' ' . $now->format('Y-m-d H:i');
 		}
 
@@ -1497,13 +1497,13 @@ class RECORD extends API {
 			$similar_entry_id = $entry_id;
 		}
 		similar_text($similar_new_id, $similar_entry_id, $percent);
-		if (!$thresholdconfirmation && $percent < INI['likeliness']['record_reidentify_similarity']) {
+		if (!$thresholdconfirmation && $percent < CONFIG['likeliness']['record_reidentify_similarity']) {
 				// similar dialog on reidentify button within record method
 				$return = ['render' => ['content' => [
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => LANG::GET('record.record_reidentify_warning', [':percent' => INI['likeliness']['record_reidentify_similarity']])
+							'name' => LANG::GET('record.record_reidentify_warning', [':percent' => CONFIG['likeliness']['record_reidentify_similarity']])
 						],
 						'content' => $entry_id . " \n-> " . $new_id
 					],
@@ -1519,7 +1519,7 @@ class RECORD extends API {
 										'hint' => LANG::GET('record.create_identifier_hint'),
 										'attributes' => [
 											'name' => LANG::GET('record.create_identifier'),
-											'maxlength' => INI['limits']['identifier'],
+											'maxlength' => CONFIG['limits']['identifier'],
 											'value' => $new_id
 										]
 									],
@@ -1718,7 +1718,7 @@ class RECORD extends API {
 		if (!$data) return false;
 
 		$summary = [
-			'filename' => preg_replace('/' . INI['forbidden']['names'][0] . '/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
 			'content' => [],
 			'files' => [],

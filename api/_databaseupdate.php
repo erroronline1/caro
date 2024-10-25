@@ -21,7 +21,7 @@
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-define ('INI', parse_ini_file('config.ini', true));
+define ('CONFIG', parse_ini_file('config.ini', true));
 include_once('_sqlinterface.php');
 
 class UPDATE{
@@ -33,10 +33,10 @@ class UPDATE{
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 		];
-		$this->_pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password'], $options);
+		$this->_pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
-		$this->driver = INI['sql'][INI['sql']['use']]['driver'];
+		$this->driver = CONFIG['sql'][CONFIG['sql']['use']]['driver'];
 	}
 
 	public function update(){

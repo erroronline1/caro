@@ -69,8 +69,8 @@ class CSVFILTER extends API {
 						'type' => 'error'
 					]]);
 				$content['filesetting']['source'] = $inputfile;
-				if (!array_key_exists('dialect', $content['filesetting'])) $content['filesetting']['dialect'] = INI['csv']['dialect'];
-				$content['filesetting']['encoding'] = INI['likeliness']['csvprocessor_source_encoding'];
+				if (!array_key_exists('dialect', $content['filesetting'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
+				$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
 
 				$comparefileindex = 0;
 				foreach($content['filter'] as &$filtertype){
@@ -93,7 +93,7 @@ class CSVFILTER extends API {
 				]);
 
 				// clear up tmp folder
-				UTILITY::tidydir('tmp', INI['lifespan']['tmp']);
+				UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 
 				//create and write to file
 				$downloadfiles=[];
@@ -309,7 +309,7 @@ class CSVFILTER extends API {
 						]]);	
 				}
 
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('csvfilter.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 				}
 

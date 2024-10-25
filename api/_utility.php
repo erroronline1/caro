@@ -60,7 +60,7 @@ class UTILITY {
 		$allowed = false;
 		if (gettype($paths) === 'string') $paths=[$paths];
 		foreach ($paths as $path) {
-			foreach (array_keys(INI['fileserver']) as $fileserver){
+			foreach (array_keys(CONFIG['fileserver']) as $fileserver){
 				if (stristr($path, self::directory($fileserver))) $allowed = true;
 			}
 			if (!$allowed) return false;
@@ -92,7 +92,7 @@ class UTILITY {
 	 * @return string directory
 	 */
 	public static function directory($request, $replace = []){
-		if (!array_key_exists($request, INI['fileserver'])){
+		if (!array_key_exists($request, CONFIG['fileserver'])){
 			return '../fileserver';
 		}
 		$patterns = [];
@@ -107,7 +107,7 @@ class UTILITY {
 			$patterns[] = '/\/:\w{1,}/';
 			$replacements[] = '';
 		}
-		return '../' . preg_replace($patterns, $replacements, INI['fileserver'][$request]);
+		return '../' . preg_replace($patterns, $replacements, CONFIG['fileserver'][$request]);
 	}
 
 	/**
@@ -562,13 +562,13 @@ class PERMISSION {
 	 */
 	public static function permissionFor($function = '', $returnvalues = false){
 		if (!array_key_exists('user', $_SESSION) || !array_key_exists('permissions', $_SESSION['user'])) return [];
-		if (array_key_exists($function, INI['permissions'])){
+		if (array_key_exists($function, CONFIG['permissions'])){
 			if (!$returnvalues) {
 				// limited functions don't include admin by default
-				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
-				return boolval(array_intersect(['admin', ...preg_split('/\W+/', INI['permissions'][$function])], $_SESSION['user']['permissions']));
+				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', CONFIG['permissions'][$function])], $_SESSION['user']['permissions']));
+				return boolval(array_intersect(['admin', ...preg_split('/\W+/', CONFIG['permissions'][$function])], $_SESSION['user']['permissions']));
 			}
-			return preg_split('/\W+/', INI['permissions'][$function]);
+			return preg_split('/\W+/', CONFIG['permissions'][$function]);
 		}
 		var_dump('permission ' . $function . ' not found in setup.ini file');
 	}

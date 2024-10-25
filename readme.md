@@ -99,7 +99,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * scheduling optional user assignment, task category filterable
-* collapsible elements (e.g. orders, display full for purchase, collapsed for everyone else (order number and information hidden))
 
 #### records considerations
 * review max display option for summary overview
@@ -1048,7 +1047,7 @@ Technically the application is being usable on any webserver but this is **not r
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime according to [config.ini[limits][idle_logout]](#runtime-variables)
+* php.ini session.gc_maxlifetime according to [config.CONFIG[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
     * gd
     * gettext

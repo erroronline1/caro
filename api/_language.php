@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$language = INI['application']['defaultlanguage'];
+$language = CONFIG['application']['defaultlanguage'];
 if (array_key_exists('user', $_SESSION) && array_key_exists('language', $_SESSION['user']['app_settings'])) $language = $_SESSION['user']['app_settings']['language'];
-$file = file_exists('language.' . $language) ? 'language.' . $language : 'language.' . INI['application']['defaultlanguage'];
+$file = file_exists('language.' . $language) ? 'language.' . $language : 'language.' . CONFIG['application']['defaultlanguage'];
 
 define ('LANGUAGEFILE', parse_ini_file($file, true));
 
@@ -39,7 +39,7 @@ class LANG {
 	 */
 	public static function GET($request, $replace = [], $forceDefault = false){
 		$request = explode('.', $request);
-		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . INI['application']['defaultlanguage'], true); 
+		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . CONFIG['application']['defaultlanguage'], true); 
 
 		if (!array_key_exists($request[0], $languagefile) ||
 			!array_key_exists($request[1], $languagefile[$request[0]]) ||

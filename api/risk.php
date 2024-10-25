@@ -42,7 +42,7 @@ class RISK extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
-				$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				$risk = [
 					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
 					':risk' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk')),
@@ -78,7 +78,7 @@ class RISK extends API {
 				break;
 			case 'PUT':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
-				$date = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				$risk = [
 					':id' => intval($this->_requestedID),
 					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
@@ -233,8 +233,8 @@ class RISK extends API {
 					], [
 						'type' => 'textsection',
 						'attributes' => [
-							'class' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
-							'name' => $risk['probability'] * $risk['damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
+							'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
+							'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
 						]
 					], [
 						'type' => 'textarea',
@@ -261,8 +261,8 @@ class RISK extends API {
 					], [
 						'type' => 'textsection',
 						'attributes' => [
-							'class' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? 'red' : 'green',
-							'name' => $risk['measure_probability'] * $risk['measure_damage'] > INI['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
+							'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
+							'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
 						]
 					], [
 						'type' => 'textarea',

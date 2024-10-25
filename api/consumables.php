@@ -151,14 +151,14 @@ class CONSUMABLES extends API {
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 		fputcsv($file, $columns,
-			INI['csv']['dialect']['separator'],
-			INI['csv']['dialect']['enclosure'],
-			INI['csv']['dialect']['escape']);
+			CONFIG['csv']['dialect']['separator'],
+			CONFIG['csv']['dialect']['enclosure'],
+			CONFIG['csv']['dialect']['escape']);
 		foreach($products as $row) {
 			fputcsv($file, array_map(fn($column) => $row[$column], $columns),
-			INI['csv']['dialect']['separator'],
-			INI['csv']['dialect']['enclosure'],
-			INI['csv']['dialect']['escape']);
+			CONFIG['csv']['dialect']['separator'],
+			CONFIG['csv']['dialect']['enclosure'],
+			CONFIG['csv']['dialect']['escape']);
 		}
 		fclose($file);
 		$downloadfiles[LANG::GET('csvfilter.use_filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
@@ -220,7 +220,7 @@ class CONSUMABLES extends API {
 				if ($denied) $approve['_denied'] = true;
 
 				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('formapproval', true)];
-				$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+				$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (in_array($permission, $_SESSION['user']['permissions'])){
 						$approve[$permission] = [
@@ -268,7 +268,7 @@ class CONSUMABLES extends API {
 				foreach($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
-					if ($percent >= INI['likeliness']['consumables_article_no_similarity']) {
+					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
 					}
 				}
@@ -325,13 +325,13 @@ class CONSUMABLES extends API {
 					if (!in_array($identifyproduct, $hideduplicates)){
 						foreach ($check['content'] as $information){
 							similar_text($information, $product['article_no'], $article_no_percent);
-							if ($article_no_percent >= INI['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== LANG::GET('order.incorporation_revoked')) $probability['article_no'][] = $check['id'];
+							if ($article_no_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== LANG::GET('order.incorporation_revoked')) $probability['article_no'][] = $check['id'];
 							similar_text($information, $product['vendor_name'], $vendor_name_percent);
-							if ($vendor_name_percent >= INI['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== LANG::GET('order.incorporation_revoked')) $probability['vendor_name'][] = $check['id'];
+							if ($vendor_name_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== LANG::GET('order.incorporation_revoked')) $probability['vendor_name'][] = $check['id'];
 						}
 						if (array_intersect($probability['article_no'], $probability['vendor_name'])){
 							$article = intval(count($matches) - 1);
-							if (empty($productsPerSlide++ % INI['splitresults']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
 								$matches[$article][] = [
 									[
 										'type' => 'textsection',
@@ -666,7 +666,7 @@ class CONSUMABLES extends API {
 						if (in_array(LANG::GET('consumables.edit_product_incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
 						else {
 							$product['incorporated'] = json_decode($product['incorporated'], true);
-							$time = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+							$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 							foreach(LANGUAGEFILE['permissions'] as $permission => $translation){
 								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
 									'name' => $_SESSION['user']['name'],
@@ -811,7 +811,7 @@ class CONSUMABLES extends API {
 					$file = pathinfo($path);
 					$article_no = explode('_', $file['filename'])[2];
 					similar_text($article_no, $product['article_no'], $percent);
-					if ($percent >= INI['likeliness']['consumables_article_no_similarity']) 
+					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) 
 						$documents[$file['basename']] = ['target' => '_blank', 'href' => substr($path,1)];
 				}
 				// select all products from selected vendor
@@ -824,7 +824,7 @@ class CONSUMABLES extends API {
 				foreach($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
-					if ($percent >= INI['likeliness']['consumables_article_no_similarity']) {
+					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
 					}
 				}
@@ -1320,7 +1320,7 @@ class CONSUMABLES extends API {
 				else {
 					foreach ($expiryproducts[$row['vendor_name']] as $product => $properties){
 						similar_text($product, $row['article_name'], $percent);
-						if ($percent >= INI['likeliness']['consumables_article_name_similarity']) {
+						if ($percent >= CONFIG['likeliness']['consumables_article_name_similarity']) {
 							$expiryproducts[$row['vendor_name']][$product]['alike']++;
 						}
 						else $expiryproducts[$row['vendor_name']][$row['article_name']] = [
@@ -1402,7 +1402,7 @@ class CONSUMABLES extends API {
 				else {
 					foreach ($special_attention[$row['vendor_name']] as $product => $properties){
 						similar_text($product, $row['article_name'], $percent);
-						if ($percent >= INI['likeliness']['consumables_article_name_similarity']) {
+						if ($percent >= CONFIG['likeliness']['consumables_article_name_similarity']) {
 							$special_attention[$row['vendor_name']][$product]['alike']++;
 						}
 						else $special_attention[$row['vendor_name']][$row['article_name']] = [
@@ -1449,7 +1449,7 @@ class CONSUMABLES extends API {
 		if (gettype($substring) === 'array') $substring = implode(',', $substring);
 		return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
 			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
-			"new Dialog({type: '" . $type . "', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => INI['likeliness']['consumables_article_no_similarity']]) . 
+			"new Dialog({type: '" . $type . "', header: '" . LANG::GET('consumables.edit_product_batch', [':percent' => CONFIG['likeliness']['consumables_article_no_similarity']]) . 
 			"', render: [{type: 'checkbox', content: similarproducts}], options:{".
 			"'".LANG::GET('consumables.edit_product_delete_confirm_cancel')."': false,".
 			"'".LANG::GET('consumables.edit_product_batch_confirm')."': {value: true, class: 'reducedCTA'}".
@@ -1471,9 +1471,9 @@ class CONSUMABLES extends API {
 	private function update_pricelist($file, $filter, $vendorID){
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
-		$filter['filesetting']['encoding'] = INI['likeliness']['csvprocessor_source_encoding'];
-		if (!array_key_exists('headerrowindex', $filter['filesetting'])) $filter['filesetting']['headerrowindex'] = INI['csv']['headerrowindex'];
-		if (!array_key_exists('dialect', $filter['filesetting'])) $filter['filesetting']['dialect'] = INI['csv']['dialect'];
+		$filter['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
+		if (!array_key_exists('headerrowindex', $filter['filesetting'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
+		if (!array_key_exists('dialect', $filter['filesetting'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
@@ -1600,7 +1600,7 @@ class CONSUMABLES extends API {
 					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . $this->_currentdate->format('Ymd')
 				];
 				
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
 				// ensure valid json for filters
@@ -1656,10 +1656,10 @@ class CONSUMABLES extends API {
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'));
-				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval')) ? : INI['lifespan']['mdr14_sample_interval'];
-				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval_reusable')) ? : INI['lifespan']['mdr14_sample_reusable'];
+				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval')) ? : CONFIG['lifespan']['mdr14_sample_interval'];
+				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_samplecheck_interval_reusable')) ? : CONFIG['lifespan']['mdr14_sample_reusable'];
 
-				foreach(INI['forbidden']['names'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $vendor['name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('consumables.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 				}
 
@@ -2010,14 +2010,14 @@ class CONSUMABLES extends API {
 								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
-									'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : INI['lifespan']['mdr14_sample_interval']
+									'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['mdr14_sample_interval']
 								]
 							],
 							[
 								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
-									'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : INI['lifespan']['mdr14_sample_reusable']
+									'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['mdr14_sample_reusable']
 								]
 							]
 						]]

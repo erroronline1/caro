@@ -163,8 +163,8 @@ class CALENDAR extends API {
 					];
 				}
 				
-				$span_start = new DateTime($entry['span_start'], new DateTimeZone(INI['application']['timezone']));
-				$span_end = new DateTime($entry['span_end'], new DateTimeZone(INI['application']['timezone']));
+				$span_start = new DateTime($entry['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+				$span_end = new DateTime($entry['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
 					&& !array_key_exists($day->format('Y-m-d'), $timesheets[$entry['affected_user_id']]['days'])){
@@ -269,7 +269,7 @@ class CALENDAR extends API {
 				$rows[] = [
 					[$user['name'], false],
 					LANG::GET('calendar.export_sheet_subject', [
-						':appname' => INI['system']['caroapp'],
+						':appname' => CONFIG['system']['caroapp'],
 						':id' => $user['user_id'],
 						':units' => $user['units'],
 						':weeklyhours' => $user['weeklyhours'],
@@ -403,8 +403,8 @@ class CALENDAR extends API {
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start'], new DateTimeZone(INI['application']['timezone']));
-					$due->modify('+' . INI['calendar']['default_due'] . ' months');
+					$due = new DateTime($event[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
 				if ($newid = $calendar->post($event)) $this->response([
@@ -437,8 +437,8 @@ class CALENDAR extends API {
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => LANG::GET('calendar.event_error_missing'), 'type' => 'error']]);
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start'], new DateTimeZone(INI['application']['timezone']));
-					$due->modify('+' . INI['calendar']['default_due'] . ' months');
+					$due = new DateTime($event[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
 				if ($calendar->put($event)) $this->response([
@@ -519,7 +519,7 @@ class CALENDAR extends API {
 					],
 				];
 				if (!$this->_requestedDate){
-					$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+					$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 					$this->_requestedDate = $today->format('Y-m-d');
 				}
 				if ($this->_requestedDate){
@@ -533,7 +533,7 @@ class CALENDAR extends API {
 					$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 					foreach ($thisDaysEvents as $id => $row){
 						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
-						if ($row['type'] === 'timesheet' && !in_array($row['subject'], INI['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+						if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 					}
 
 					$events[] = [
@@ -556,7 +556,7 @@ class CALENDAR extends API {
 					if ($thisDaysEvents) array_push($events, ...$this->scheduledEvents($thisDaysEvents, $calendar));
 					$result['render']['content'][] = $events;
 
-					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['application']['timezone']));
+					$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
 					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 					if ($pastEvents) {
 						$uncompleted = [];
@@ -613,8 +613,8 @@ class CALENDAR extends API {
 	private function scheduledEvents($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone(INI['application']['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone(INI['application']['timezone']));
+			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 			if (!array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || $row['type'] !== 'schedule' ) continue;
 			$display = LANG::GET('calendar.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
 				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
@@ -844,7 +844,7 @@ class CALENDAR extends API {
 					],
 				];
 				if (!$this->_requestedDate){
-					$today = new DateTime('now', new DateTimeZone(INI['application']['timezone']));
+					$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 					$this->_requestedDate = $today->format('Y-m-d');
 				}
 
@@ -860,7 +860,7 @@ class CALENDAR extends API {
 					foreach ($thisDaysEvents as $id => $row){
 						if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
 						if ($row['type'] === 'timesheet'
-							&& !in_array($row['subject'], INI['calendar']['hide_offduty_reasons'])
+							&& !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons'])
 							&& array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 						if ($row['type'] === 'timesheet'
 							&& !$row['closed']
@@ -901,7 +901,7 @@ class CALENDAR extends API {
 							]
 						];
 					}
-					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['application']['timezone']));
+					$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
 					if ($thisMonthsEvents = $calendar->getWithinDateRange($today->modify('first day of this month')->format('Y-m-d'), $today->modify('last day of this month')->format('Y-m-d'))) {
 						$timesheetentries = false;
 						foreach($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
@@ -916,7 +916,7 @@ class CALENDAR extends API {
 
 					$result['render']['content'][] = $events;
 
-					$today = new DateTime($this->_requestedDate, new DateTimeZone(INI['application']['timezone']));
+					$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
 					$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 					if ($pastEvents) {
 						$uncompleted = [];
@@ -975,8 +975,8 @@ class CALENDAR extends API {
 	 private function timesheetEntries($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone(INI['application']['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone(INI['application']['timezone']));
+			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 			if ($row['type'] !== 'timesheet'
 				|| !($row['affected_user_id'] === $_SESSION['user']['id']
 				|| PERMISSION::permissionFor('calendarfulltimesheetexport')

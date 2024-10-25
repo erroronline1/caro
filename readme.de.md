@@ -969,7 +969,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
     * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime gemäß [config.ini[limits][idle_logout]](#laufzeitvariablen)
+* php.ini session.gc_maxlifetime gemäß [config.CONFIG[limits][idle_logout]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
     * gd
     * gettext

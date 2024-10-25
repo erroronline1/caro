@@ -20,10 +20,10 @@
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-define('INI', parse_ini_file('setup.ini', true));
+define('CONFIG', parse_ini_file('setup.ini', true));
 define('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
 
-$pdo = new PDO( INI['sql'][INI['sql']['use']]['driver'] . ':' . INI['sql'][INI['sql']['use']]['host'] . ';' . INI['sql'][INI['sql']['use']]['database']. ';' . INI['sql'][INI['sql']['use']]['charset'], INI['sql'][INI['sql']['use']]['user'], INI['sql'][INI['sql']['use']]['password']);
+$pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password']);
 
 $queries = [
 	'precheck' => [
@@ -251,7 +251,7 @@ $queries = [
 				,
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . INI['system']['caroapp'] . "', 'admin', '', '" . REQUEST[0] . "', '', 'media/favicon/ios/256.png', '', '');",
+				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . REQUEST[0] . "', '', 'media/favicon/ios/256.png', '', '');",
 				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
 			]
 		]
@@ -477,14 +477,14 @@ $queries = [
 				,
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . INI['system']['caroapp'] . "', 'admin', '', '" . REQUEST[0] . "', '', 'media/favicon/ios/256.png', '', '');",
+				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . REQUEST[0] . "', '', 'media/favicon/ios/256.png', '', '');",
 				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
 			]
 		]
 	]
 ];
 
-$driver = INI['sql'][INI['sql']['use']]['driver'];
+$driver = CONFIG['sql'][CONFIG['sql']['use']]['driver'];
 
 $devupdate = false;
 try {
@@ -499,7 +499,7 @@ catch (Exception $e){
 		// add default user
 		$processing[] = $queries['install'][$driver]['insertions']['user'];
 		// add default manual entries according to set up language
-		$language = INI['application']['defaultlanguage'];
+		$language = CONFIG['application']['defaultlanguage'];
 		if ($file = file_exists('_install.default.' . $language) ? '_install.default.' . $language : false){
 			$languagefile = parse_ini_file($file, true);
 			foreach($languagefile['defaultmanual'] as $entry){
