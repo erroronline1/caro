@@ -493,8 +493,8 @@ const _client = {
 								":commission": element.commission
 							}).replace("\\n", "\n"),
 							options.buttons
-						).toString();
-					},
+						);
+					}.toString(),
 				};
 				collapsible.push({
 					type: "links",
