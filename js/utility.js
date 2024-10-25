@@ -372,7 +372,7 @@ const _client = {
 					},
 				},
 			]);
-			for (const element of data) {
+			for (const element of data.order) {
 				// reinstatiate with order id for filtering
 				collapsible = [{ type: "hidden", description: "filter", attributes: { "data-filtered": element.id } }];
 
@@ -464,6 +464,27 @@ const _client = {
 					},
 					hint: LANG.GET("order.copy_value"),
 				});
+
+				// display barcode
+				if (element.barcode)
+					collapsible.push({
+						type: "image",
+						attributes: {
+							imageonly: { width: "15em", height: "6em" },
+							barcode: { value: element.barcode },
+						},
+					});
+
+				// display approval signature
+				if (element.approval)
+					collapsible.push({
+						type: "image",
+						attributes: {
+							imageonly: { width: "15em", height: "6em", "margin-top": "-3em" },
+							name: LANG.GET("order.approval_image"),
+							url: data.approval[element.approval],
+						},
+					});
 
 				// append special attention information
 				if (element.specialattention)
