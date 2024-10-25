@@ -345,8 +345,9 @@ const _client = {
 			let content = [],
 				filter = {},
 				order = [],
-				collapsible = [];
-			options = {};
+				collapsible = [],
+				buttons = {},
+				links = {};
 			filter[LANG.GET("order.untreated")] = { checked: true, onchange: "_client.order.filter()" };
 			filter[LANG.GET("order.ordered")] = { onchange: '_client.order.filter("ordered")' };
 			filter[LANG.GET("order.received")] = { onchange: '_client.order.filter("received")' };
@@ -395,8 +396,8 @@ const _client = {
 				});
 
 				// append commission
-				options = {};
-				options[LANG.GET("general.ok_button")] = true;
+				buttons = {};
+				buttons[LANG.GET("general.ok_button")] = true;
 				collapsible.push({
 					type: "text_copy",
 					attributes: {
@@ -412,7 +413,7 @@ const _client = {
 										{
 											type: "text",
 											attributes: {
-												value: element.commission,
+												value: "element.commission",
 												name: LANG.GET("order.commission"),
 												readonly: true,
 												onpointerup: "_client.application.toClipboard(this)",
@@ -424,15 +425,17 @@ const _client = {
 											attributes: {
 												value: LANG.GET("menu.record_create_identifier"),
 												onpointerup: function () {
-													_client.application.postLabelSheet(element.commission);
+													_client.application.postLabelSheet("element.commission");
 												},
 											},
 										},
 									],
 								],
-								options: options,
+								options: buttons,
 							});
-						}.toString(),
+						}
+							.toString()
+							._replaceArray(["element.commission", "buttons"], [element.commission, JSON.stringify(buttons)]),
 					},
 					hint: LANG.GET("order.copy_or_labelsheet"),
 				});
@@ -473,10 +476,11 @@ const _client = {
 					});
 
 				// append orderer and message option
-				options = { links: {}, buttons: {} };
-				options.buttons[LANG.GET("order.add_information_cancel")] = false;
-				options.buttons[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
-				options.links[LANG.GET("order.message_orderer", { ":orderer": element.orderer })] = {
+				buttons = {};
+				buttons[LANG.GET("order.add_information_cancel")] = false;
+				buttons[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+				links = {};
+				links[LANG.GET("order.message_orderer", { ":orderer": element.orderer })] = {
 					href: "javascript:void(0)",
 					"data-type": "input",
 					onpointerup: function () {
@@ -489,16 +493,21 @@ const _client = {
 								":number": "element.ordernumber",
 								":name": "element.name",
 								":vendor": "element.vendor",
-								":info": "element.information" || '',
-								":commission": "element.commission"
+								":info": "element.information" || "",
+								":commission": "element.commission",
 							}).replace("\\n", "\n"),
-							options.buttons
+							buttons
 						);
-					}.toString()._replaceArray(["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "options.buttons"], [element.orderer, element.quantity, element.unit, element.ordernumber, element.name, element.vendor, element.information, element.commission, JSON.stringify(options.buttons)]),
+					}
+						.toString()
+						._replaceArray(
+							["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "buttons"],
+							[element.orderer, element.quantity, element.unit, element.ordernumber, element.name, element.vendor, element.information, element.commission, JSON.stringify(buttons)]
+						),
 				};
 				collapsible.push({
 					type: "links",
-					content: options.links,
+					content: links,
 					hint: element.lastorder,
 				});
 
@@ -515,9 +524,9 @@ const _client = {
 
 				// append add info button
 				if (element.addinfo) {
-					options = {};
-					options[LANG.GET("order.add_information_cancel")] = false;
-					options[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					buttons = {};
+					buttons[LANG.GET("order.add_information_cancel")] = false;
+					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "button",
 						attributes: {
@@ -536,11 +545,13 @@ const _client = {
 											hint: LANG.GET("order.add_information_modal_body"),
 										},
 									],
-									options: options,
+									options: buttons,
 								}).then((response) => {
-									if (response) api.purchase("put", "approved", element.id, "addinformation", _client.application.dialogToFormdata(response));
+									if (response) api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
 								});
-							}.toString(),
+							}
+								.toString()
+								._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 						},
 					});
 				}
@@ -553,9 +564,9 @@ const _client = {
 					if (!attributes.disabled) states[LANG.GET("order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				if (element.disapprove) {
-					options = {};
-					options[LANG.GET("order.disapprove_message_cancel")] = false;
-					options[LANG.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
+					buttons = {};
+					buttons[LANG.GET("order.disapprove_message_cancel")] = false;
+					buttons[LANG.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
 					states[LANG.GET("order.disapprove")] = {
 						data_disapproved: "false",
 						onchange: function () {
@@ -568,24 +579,26 @@ const _client = {
 										attributes: {
 											name: LANG.GET("message.message"),
 										},
-										hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units.".element.organizationalunit) }),
+										hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units." + "element.organizationalunit") }),
 									},
 								],
-								options: options,
+								options: buttons,
 							}).then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", element.id, "disapproved", _client.application.dialogToFormdata(response));
+									api.purchase("put", "approved", "element.id", "disapproved", _client.application.dialogToFormdata(response));
 									this.disabled = true;
 									this.setAttribute("data-disapproved", "true");
 								} else this.checked = false;
 							});
-						}.toString(),
+						}
+							.toString()
+							._replaceArray(["element.organizationalunit", "element.id", "buttons"], [element.organizationalunit, element.id, JSON.stringify(buttons)]),
 					};
 				}
 				if (element.cancel) {
-					options = {};
-					options[LANG.GET("order.cancellation_message_cancel")] = false;
-					options[LANG.GET("order.cancellation_message_ok")] = { value: true, class: "reducedCTA" };
+					buttons = {};
+					buttons[LANG.GET("order.cancellation_message_cancel")] = false;
+					buttons[LANG.GET("order.cancellation_message_ok")] = { value: true, class: "reducedCTA" };
 					states[LANG.GET("order.cancellation")] = {
 						data_cancellation: "false",
 						onchange: function () {
@@ -601,21 +614,23 @@ const _client = {
 										hint: LANG.GET("order.cancellation_message"),
 									},
 								],
-								options: options,
+								options: buttons,
 							}).then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", element.id, "cancellation", _client.application.dialogToFormdata(response));
+									api.purchase("put", "approved", "element.id", "cancellation", _client.application.dialogToFormdata(response));
 									this.disabled = true;
 									this.setAttribute("data-cancellation", "true");
 								} else this.checked = false;
 							});
-						}.toString(),
+						}
+							.toString()
+							._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 					};
 				}
 				if (element.return) {
-					options = {};
-					options[LANG.GET("order.return_message_cancel")] = false;
-					options[LANG.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
+					buttons = {};
+					buttons[LANG.GET("order.return_message_cancel")] = false;
+					buttons[LANG.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
 					states[LANG.GET("order.return")] = {
 						data_return: "false",
 						onchange: function () {
@@ -631,24 +646,26 @@ const _client = {
 										hint: LANG.GET("order.return_message"),
 									},
 								],
-								options: options,
+								options: buttons,
 							}).then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", element.id, "return", _client.application.dialogToFormdata(response));
+									api.purchase("put", "approved", "element.id", "return", _client.application.dialogToFormdata(response));
 									this.disabled = true;
 									this.setAttribute("data-return", "true");
 								} else this.checked = false;
 							});
-						}.toString(),
+						}
+							.toString()
+							._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 					};
 				}
 				collapsible.push({ type: "checkbox", content: states });
 
 				// append orderstatechange
 				if (element.orderstatechange) {
-					options = {};
-					options[LANG.GET("order.add_information_cancel")] = false;
-					options[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					buttons = {};
+					buttons[LANG.GET("order.add_information_cancel")] = false;
+					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "select",
 						content: element.orderstatechange,
@@ -665,26 +682,28 @@ const _client = {
 											attributes: {
 												name: LANG.GET("order.additional_info"),
 											},
-											hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units." + element.organizationalunit) }),
+											hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units." + "element.organizationalunit") }),
 										},
 									],
-									options: options,
+									options: buttons,
 								}).then((response) => {
 									if (response) {
 										response[LANG.GET("order.additional_info")] = LANG.GET("order.orderstate_description") + " - " + this.value + ": " + response[LANG.GET("order.additional_info")];
-										api.purchase("put", "approved", element.id, "addinformation", _client.application.dialogToFormdata(response));
+										api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
 									}
 								});
-							}.toString(),
+							}
+								.toString()
+								._replaceArray(["element.organizationalunit", "element.id", "buttons"], [element.organizationalunit, element.id, JSON.stringify(buttons)]),
 						},
 					});
 				}
 
 				// append delete button
 				if (element.autodelete) {
-					options = {};
-					options[LANG.GET("order.delete_prepared_order_confirm_cancel")] = false;
-					options[LANG.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
+					buttons = {};
+					buttons[LANG.GET("order.delete_prepared_order_confirm_cancel")] = false;
+					buttons[LANG.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "deletebutton",
 						hint: $autodelete,
@@ -692,10 +711,12 @@ const _client = {
 							type: "button",
 							value: LANG.GET("order.delete_prepared_order"),
 							onpointerup: function () {
-								new Dialog({ type: "confirm", header: LANG.GET("order.delete_prepared_order_confirm_header"), options: options }).then((confirmation) => {
-									if (confirmation) api.purchase("delete", "approved", element.id);
+								new Dialog({ type: "confirm", header: LANG.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
+									if (confirmation) api.purchase("delete", "approved", "element.id");
 								});
-							}.toString(),
+							}
+								.toString()
+								._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 						},
 					});
 					collapsible.push({
@@ -754,10 +775,10 @@ const _client = {
 				}
 				content.push(order);
 			}
-			const render = new Assemble({content:content});
+			const render = new Assemble({ content: content });
 			document.getElementById("main").replaceChildren(render.initializeSection());
 			render.processAfterInsertion();
-},
+		},
 		filter: (type = undefined) => {
 			document.querySelectorAll("[data-ordered]").forEach((article) => {
 				article.parentNode.parentNode.style.display = "none";
