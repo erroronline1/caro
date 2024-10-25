@@ -286,7 +286,7 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				$result = ['data' => [],
+				$result = ['data' => ['order' => [], 'approval' => []],
 				////////////////////////////////////////////////////
 				'render' => ['content' => [
 					[
@@ -354,6 +354,9 @@ class ORDER extends API {
 					]
 				]);
 				$orderprocessingPermission = PERMISSION::permissionFor('orderprocessing');
+foreach($order as $row){
+	if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $result['data']['approval'])) $result['data']['approval'][] = $row['approval'];
+}
 				foreach($order as $row) {
 					$content = [];
 					$decoded_order_data = json_decode($row['order_data'], true);
@@ -366,10 +369,12 @@ class ORDER extends API {
 						'ordertext' => LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
 						'quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
 						'unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
+						'barcode' => UTILITY::propertySet((object) $decoded_order_data, 'barcode_label') ? : '',
 						'name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
 						'vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : '',
 						'ordernumber' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
 						'commission' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
+						'approval' => null,
 						'information' => null,
 						'addinformation' => PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units),
 						'lastorder' => null,
@@ -419,6 +424,9 @@ $data['ordertext'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'
 $data['ordertext'] .= "\n". $row['approval'];
 						$order['content'] .= "\n". $row['approval'];
 					}
+else{
+	$data['approval'] = array_search($row['approval'], $result['data']['approval']);
+}
 
 					$commission = [
 						'type' => 'text_copy',
@@ -822,7 +830,7 @@ $data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
 							}
 						}
 					}
-array_push($result['data'], $data);
+array_push($result['data']['order'], $data);
 					array_push($result['render']['content'], $content);
 				}
 				break;
@@ -1166,18 +1174,18 @@ array_push($result['data'], $data);
 					[
 						[
 							[
-								'type' => 'signature',
+								'type' => 'number',
 								'attributes' => [
-									'name' => LANG::GET('order.add_approval_signature')
+									'name' => LANG::GET('user.edit_order_authorization'),
+									'type' => 'password'
 								]
 							]
 						],
 						[
 							[
-								'type' => 'number',
+								'type' => 'signature',
 								'attributes' => [
-									'name' => LANG::GET('user.edit_order_authorization'),
-									'type' => 'password'
+									'name' => LANG::GET('order.add_approval_signature')
 								]
 							]
 						]
@@ -1624,17 +1632,18 @@ array_push($result['data'], $data);
 						array_push($result['render']['content'], [
 							[
 								[
-									'type' => 'signature',
-									'attributes' => [
-										'name' => LANG::GET('order.add_approval_signature')
-									]
-								]
-							], [
-								[
 									'type' => 'number',
 									'attributes' => [
 										'name' => LANG::GET('user.edit_order_authorization'),
 										'type' => 'password'
+									]
+								]
+							],
+							[
+								[
+									'type' => 'signature',
+									'attributes' => [
+										'name' => LANG::GET('order.add_approval_signature')
 									]
 								]
 							]
