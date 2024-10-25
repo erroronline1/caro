@@ -4,10 +4,10 @@ $byte = 0;
 $files = 0;
 foreach (['../', '../js', '../api', '../templates'] as $dir){
 	foreach (scandir($dir) as $file){
-		if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md'])) continue;
+		if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','de','en'])) continue;
 		$files++;
 		foreach(file($dir.'/'.$file) as $row){
-			if (in_array(pathinfo($file)['extension'], ['php','ini'])){
+			if (in_array(pathinfo($file)['extension'], ['php','ini','de','en'])){
 				$lines['backend']++;
 				$lines['code']++;
 			}
