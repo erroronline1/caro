@@ -26,6 +26,16 @@ String.prototype.contains = function (values) {
 	return _.contains(this, values);
 }; // to use intitive with string
 
+String.prototype._replaceArray = function(find, replace) {
+	var replaceString = this;
+	var regex; 
+	for (var i = 0; i < find.length; i++) {
+		regex = new RegExp(find[i], "g");
+		replaceString = replaceString.replace(regex, replace[i]);
+	}
+	return replaceString;
+};
+
 var httpResponse = {
 	100: "Continue",
 	101: "Switching Protocols",
