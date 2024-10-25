@@ -481,20 +481,20 @@ const _client = {
 					"data-type": "input",
 					onpointerup: function () {
 						_client.message.newMessage(
-							LANG.GET("order.message_orderer", { ":orderer": element.orderer }),
-							element.orderer,
+							LANG.GET("order.message_orderer", { ":orderer": "element.orderer" }),
+							"element.orderer",
 							LANG.GET("order.message", {
-								":quantity": element.quantity,
-								":unit": element.unit,
-								":number": element.ordernumber,
-								":name": element.name,
-								":vendor": element.vendor,
-								":info": element.information || '',
-								":commission": element.commission
+								":quantity": "element.quantity",
+								":unit": "element.unit",
+								":number": "element.ordernumber",
+								":name": "element.name",
+								":vendor": "element.vendor",
+								":info": "element.information" || '',
+								":commission": "element.commission"
 							}).replace("\\n", "\n"),
 							options.buttons
 						);
-					}.toString(),
+					}.toString()._replaceArray(["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "options.buttons"], [element.orderer, element.quantity, element.unit, element.ordernumber, element.name, element.vendor, element.information, element.commission, JSON.stringify(options.buttons)]),
 				};
 				collapsible.push({
 					type: "links",
