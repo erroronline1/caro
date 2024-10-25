@@ -42,7 +42,7 @@ class STRESSTEST{
 	public $_prefix = 'UVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY';
 	public $_caleandarnumber = 20000;
 	public $_recordnumber = 20000;
-	public $_ordernumber = 100;
+	public $_ordernumber = 1000;
 
 	public function __construct($method){
 		$options = [
@@ -198,7 +198,7 @@ class STRESSTEST{
 					]
 				),
 				':organizational_unit' => 'prosthetics2',
-				':approval' => '12345',
+				':approval' => 'verified py pin',
 				':ordertype' => 'order'
 			];
 		}
