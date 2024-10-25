@@ -374,7 +374,6 @@ class ORDER extends API {
 						'addinformation' => PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units),
 						'lastorder' => null,
 						'orderer' => UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '',
-						'orderermessage' => null,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
 						'state' => [],
