@@ -523,7 +523,7 @@ const _client = {
 				}
 
 				// append add info button
-				if (element.addinfo) {
+				if (element.addinformation) {
 					buttons = {};
 					buttons[LANG.GET("order.add_information_cancel")] = false;
 					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
@@ -560,7 +560,8 @@ const _client = {
 				let states = {};
 				for (const [state, attributes] of Object.entries(element.state)) {
 					states[LANG.GET("order." + state)] = {};
-					if (attributes["data-" + state]) states[LANG.GET("order." + state)].checked = true;
+					for (const [attribute, value] of Object.entries(attributes)) states[LANG.GET("order." + state)][attribute] = value;
+					if (attributes["data-" + state] === "true") states[LANG.GET("order." + state)].checked = true;
 					if (!attributes.disabled) states[LANG.GET("order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				if (element.disapprove) {
@@ -662,7 +663,7 @@ const _client = {
 				collapsible.push({ type: "checkbox", content: states });
 
 				// append orderstatechange
-				if (element.orderstatechange) {
+				if (element.orderstatechange && Object.keys(element.orderstatechange).length) {
 					buttons = {};
 					buttons[LANG.GET("order.add_information_cancel")] = false;
 					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
@@ -700,13 +701,13 @@ const _client = {
 				}
 
 				// append delete button
-				if (element.autodelete) {
+				if (element.delete) {
 					buttons = {};
 					buttons[LANG.GET("order.delete_prepared_order_confirm_cancel")] = false;
 					buttons[LANG.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "deletebutton",
-						hint: $autodelete,
+						hint: element.autodelete,
 						attributes: {
 							type: "button",
 							value: LANG.GET("order.delete_prepared_order"),

@@ -381,6 +381,7 @@ class ORDER extends API {
 						'cancel' => null,
 						'return' => null,
 						'attachments' => [],
+						'delete' => PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']),
 						'autodelete' => null,
 						'incorporation' => [],
 						'samplecheck' => [],
