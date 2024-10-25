@@ -523,7 +523,17 @@ const _client = {
 						.toString()
 						._replaceArray(
 							["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "buttons"],
-							[element.orderer, element.quantity, element.unit, element.ordernumber, element.name, element.vendor, element.information, element.commission, JSON.stringify(buttons)]
+							[
+								element.orderer,
+								element.quantity,
+								element.unit ? element.unit.replaceAll('"', '\\"') : "",
+								element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
+								element.name ? element.name.replaceAll('"', '\\"') : "",
+								element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
+								element.information ? element.information.replaceAll('"', '\\"') : "",
+								element.commission ? element.commission.replaceAll('"', '\\"') : "",
+								JSON.stringify(buttons),
+							]
 						),
 				};
 				collapsible.push({
