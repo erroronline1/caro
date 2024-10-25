@@ -286,30 +286,7 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				$result = ['data' => ['order' => [], 'approval' => []],
-				////////////////////////////////////////////////////
-				'render' => ['content' => [
-					[
-						['type' => 'radio',
-						'attributes' => [
-							'name' => LANG::GET('order.order_filter')
-						],
-						'content' => [
-							LANG::GET('order.untreated')=>['checked' => true, 'onchange' => '_client.order.filter()'],
-							LANG::GET('order.ordered')=>['onchange' => '_client.order.filter("ordered")'],
-							LANG::GET('order.received')=>['onchange' => '_client.order.filter("received")'],
-							LANG::GET('order.delivered')=>['onchange' => '_client.order.filter("delivered")'],
-							LANG::GET('order.archived')=>['onchange' => '_client.order.filter("archived")'],
-						]],
-						['type' => 'filtered',
-						'attributes' => [
-							'name' => LANG::GET('order.order_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
-							'onblur' => "api.purchase('get', 'filter', this.value); return false;",
-							'id' => 'productsearch'
-						]]
-					]
-				]]];
+				$result = ['data' => ['order' => [], 'approval' => []]];
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
@@ -354,11 +331,11 @@ class ORDER extends API {
 					]
 				]);
 				$orderprocessingPermission = PERMISSION::permissionFor('orderprocessing');
-foreach($order as $row){
-	if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $result['data']['approval'])) $result['data']['approval'][] = $row['approval'];
-}
+				// create array with reusable images to reduce payload 
+				foreach($order as $row){
+					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $result['data']['approval'])) $result['data']['approval'][] = $row['approval'];
+				}
 				foreach($order as $row) {
-					$content = [];
 					$decoded_order_data = json_decode($row['order_data'], true);
 					
 					////////////////////////////////////////////////////
@@ -382,9 +359,9 @@ foreach($order as $row){
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
 						'state' => [],
-						'disapprove' => null,
-						'cancel' => null,
-						'return' => null,
+						'disapprove' => (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])),
+						'cancel' => ($row['ordered'] && !($row['received'] || $row['delivered']) && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
+						'return' => (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
 						'attachments' => [],
 						'delete' => PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']),
 						'autodelete' => null,
@@ -394,444 +371,99 @@ foreach($order as $row){
 						'collapsed' => !$orderprocessingPermission
 					];
 
-					$content[]=
-						['type' => 'hidden',
-						'description' => 'filter',
-						'attributes' => ['data-filtered' => $row['id']]];
+					if (array_key_exists('ordernumber_label', $decoded_order_data) && array_key_exists('vendor_label', $decoded_order_data)){					
+						$nmbr = array_filter(array_column($allproducts, 'article_no'), fn($number)=> $number === $decoded_order_data['ordernumber_label']);
+						$vndr = array_filter(array_column($allproducts, 'vendor_name'), fn($vendor)=> $vendor === $decoded_order_data['vendor_label']);
+						if ($productmatch = array_intersect($nmbr,$vndr)) $product = $allproducts[array_intersect($nmbr, $vndr)[0]];
+						else $product = null;
+					}
+					else $product = null;
 
-					$order = [
-						'type' => 'textsection',
-						'content' => LANG::GET('order.prepared_order_item', [
-							':quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
-							':unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
-							':number' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
-							':name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
-							':vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : ''
-						]) . "\n".
-						LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
-						'attributes' => [
-							'data-type' => $row['ordertype'],
-							'name' => LANG::GET('order.ordertype.' . $row['ordertype'])
-						]
-					];
+					$data['lastorder'] = $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null;
+
 					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify')){
-$data['ordertext'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
-						$order['content'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
+						$data['ordertext'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
 					}
-$data['ordertext'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
-					$order['content'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
+					$data['ordertext'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) {
-$data['ordertext'] .= "\n". $row['approval'];
-						$order['content'] .= "\n". $row['approval'];
+						$data['ordertext'] .= "\n". $row['approval'];
+					} else {
+						$data['approval'] = array_search($row['approval'], $result['data']['approval']);
 					}
-else{
-	$data['approval'] = array_search($row['approval'], $result['data']['approval']);
-}
 
-					$commission = [
-						'type' => 'text_copy',
-						'attributes' => [
-							'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
-							'name' => LANG::GET('order.commission'),
-							'readonly' => true,
-							'onpointerup' => "new Dialog({type:'input', header:'" . LANG::GET('order.commission') . "', render:JSON.parse(`" . // backtick ` necessary
-								json_encode(
-									[
-										[
-											'type' => 'text',
-											'attributes' => [
-												'value' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
-												'name' => LANG::GET('order.commission'),
-												'readonly' => true,
-												'onpointerup' => '_client.application.toClipboard(this)'
-											],
-											'hint' => LANG::GET('order.copy_value')
-										], [
-											'type' => 'button',
-											'attributes' => [
-												'value' => LANG::GET('menu.record_create_identifier'),
-												'onpointerup' => "_client.application.postLabelSheet('" . (UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '') . "')"
-											]
-										]
-									]
-								) . "`), options:{'" . LANG::GET('general.ok_button') . "': true}})"
-						],
-						'hint' => LANG::GET('order.copy_or_labelsheet')
-					];
-
-					$information = [];
 					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info')){
-$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
-						$information = [
-							'type' => 'textarea_copy',
-							'attributes' => [
-								'value' => preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information),
-								'name' => LANG::GET('order.additional_info'),
-								'readonly' => true,
-							],
-							'hint' => LANG::GET('order.copy_value')
-						];
+						$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
 					}
 
-					$order_number =	[
-						'type' => 'text_copy',
-						'attributes' => [
-							'value' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
-							'name' => LANG::GET('order.ordernumber_label'),
-							'readonly' => true,
-							'onpointerup' => '_client.application.toClipboard(this)'
-						],
-						'hint' => LANG::GET('order.copy_value')
-					];
-
-					$status = [];
 					foreach(['ordered', 'received', 'delivered', 'archived'] as $s){
-if (!isset($data['state'][$s])) $data['state'][$s] = [];
-$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
-
-						$status[LANG::GET('order.' . $s)] = [
-							'onchange' => "api.purchase('put', 'approved', " . $row['id']. ", '" . $s . "', this.checked); this.setAttribute('data-".$s."', this.checked.toString());",
-							'data-' . $s => boolval($row[$s]) ? 'true' : 'false',
-						];
+						if (!isset($data['state'][$s])) $data['state'][$s] = [];
+						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
-$data['information'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
-							$status[LANG::GET('order.' . $s)]['checked'] = true;
-							$order['content'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
+							$data['ordertext'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
 						}
 						switch ($s){
 							case 'ordered':
 							case 'received':
 								if (!PERMISSION::permissionFor('orderprocessing')){
-$data['state'][$s]['disabled'] = true;
-									$status[LANG::GET('order.' . $s)]['disabled'] = true;
+								$data['state'][$s]['disabled'] = true;
 								}
 								break;
 							case 'delivered':	
 							case 'archived':
 								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
-$data['state'][$s]['disabled'] = true;
-									$status[LANG::GET('order.' . $s)]['disabled'] = true;
+									$data['state'][$s]['disabled'] = true;
 								}
 								break;
 						}
-					}
-					if (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])) {
-$data['disapprove'] = true;
-						$status[LANG::GET('order.disapprove')] = [
-						'data_disapproved' => 'false',
-						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.disapprove') . "', render:JSON.parse('" . 
-							json_encode(
-								[
-									[
-										'type' => 'textarea',
-										'attributes' => [
-											'name' => LANG::GET('message.message')
-										],
-										'hint' => LANG::GET('order.disapprove_message', [':unit' => LANG::GET('units.' . $row['organizational_unit'])])
-									]
-								]
-							 ) . "'), " .
-							"options:{'" . LANG::GET('order.disapprove_message_cancel') . "': false, '" . LANG::GET('order.disapprove_message_ok') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
-							"if (response !== false) {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'disapproved', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-disapproved', 'true');" .
-							"} else this.checked = false;});"
-						];
-					}
-					if ($row['ordered'] && !($row['received'] || $row['delivered']) && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) {
-$data['cancel'] = true;
-						$status[LANG::GET('order.cancellation')] = [
-						'data_cancellation' => 'false',
-						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.cancellation') . "', render:JSON.parse('" . 
-							json_encode(
-								[
-									[
-										'type' => 'textarea',
-										'attributes' => [
-											'name' => LANG::GET('message.message')
-										],
-										'hint' => LANG::GET('order.cancellation_message')
-									]
-								]
-							 ) . "'), " .
-							"options:{'" . LANG::GET('order.cancellation_message_cancel') . "': false, '" . LANG::GET('order.cancellation_message_ok') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
-							"if (response !== false) {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'cancellation', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
-							"} else this.checked = false;});"
-						];
-					}
-					if (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))) {
-$data['return'] = true;
-						$status[LANG::GET('order.return')] = [
-						'data_return' => 'false',
-						'onchange' => "new Dialog({type:'input', header:'" . LANG::GET('order.return') . "', render:JSON.parse('" . 
-							json_encode(
-								[
-									[
-										'type' => 'textarea',
-										'attributes' => [
-											'name' => LANG::GET('message.message')
-										],
-										'hint' => LANG::GET('order.return_message')
-									]
-								]
-							 ) . "'), " .
-							"options:{'" . LANG::GET('order.return_message_cancel') . "': false, '" . LANG::GET('order.return_message_ok') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
-							"if (response !== false) {" .
-							"api.purchase('put', 'approved', " . $row['id']. ", 'return', _client.application.dialogToFormdata(response)); this.disabled=true; this.setAttribute('data-cancellation', 'true');" .
-							"} else this.checked = false;});"
-						];
-					}
-
-					$content[] = $order;
-					$content[] = $commission;
-					if ($information) $content[] = $information;
-					$content[] = $order_number;
-
-					if (array_key_exists('barcode_label', $decoded_order_data) && strlen($decoded_order_data['barcode_label'])) $content[] = [
-						'type' => 'image',
-						'attributes' => [
-							'barcode' => ['value' => $decoded_order_data['barcode_label']],
-							'imageonly' => ['width' => '15em', 'height' => '6em']
-							]
-					];
-
-					if (str_contains($row['approval'], 'data:image/png')){
-						$content[]=[
-							'type' => 'image',
-							'attributes' => [
-								'imageonly' => ['width' => '15em', 'height' => '6em', 'margin-top' => '-3em'],
-								'name' => LANG::GET('order.approval_image'),
-								'url' => $row['approval']],
-						];
 					}
 
 					// inform if special attention is required
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($special_attention, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $special_attention[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-$data['specialattention'] = true;
-							$content[] = [
-								'type' => 'textsection',
-								'attributes' => [
-									'class' => 'orange',
-									'name' => LANG::GET('consumables.edit_product_special_attention')
-								]
-							];		
-						}}
-
-					if (array_key_exists('ordernumber_label', $decoded_order_data) && array_key_exists('vendor_label', $decoded_order_data))
-						$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
-							'values' => [
-								':article_no' => $decoded_order_data['ordernumber_label'],
-								':vendor' => $decoded_order_data['vendor_label']
-							]
-						]);
-					$product = $product ? $product[0] : null;
-
-					$messagepayload=[];
-					foreach (['quantity'=> 'quantity_label',
-						'unit' => 'unit_label',
-						'number' => 'ordernumber_label',
-						'name' => 'productname_label',
-						'vendor' => 'vendor_label',
-						'commission' => 'commission'] as $key => $value){
-						$messagepayload[':' . $key] = array_key_exists($value, $decoded_order_data) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
+							$data['specialattention'] = true;
+						}
 					}
-					$messagepayload[':info'] = array_key_exists('.additional_info', $decoded_order_data) ? str_replace("\n", '\\\\n', $decoded_order_data['additional_info']) : '';
-					$messageorderer = UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '';
-
-					$content[] = [
-						'type' => 'links',
-						'content' => [
-							LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) => ['href' => 'javascript:void(0)', 'data-type' => 'input', 'onpointerup' => "
-							_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $messageorderer]) ."', '" . 
-							$messageorderer . "', '" . 
-							LANG::GET('order.message', $messagepayload) . "', {".
-								"'".LANG::GET('order.add_information_cancel')."': false,".
-								"'".LANG::GET('order.message_to_orderer')."': {value: true, class: 'reducedCTA'},".
-								"})"]
-						],
-						'hint' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null
-					];
-$data['lastorder'] = $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null;
 
 					if (array_key_exists('attachments', $decoded_order_data)){
-						$files = [];
 						foreach(explode(',', $decoded_order_data['attachments']) as $file){
-$data['attachments'][pathinfo($file)['basename']] = ['href' => $file];
-							$files[pathinfo($file)['basename']] = ['href' => $file, 'target' => '_blank'];
+							$data['attachments'][pathinfo($file)['basename']] = ['href' => $file];
 						}
-						$content[]=[
-							['type' => 'links',
-							'description' => LANG::GET('order.attached_files'),
-							'content' => $files]
-						];
 					}
-
-					if (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units)) $content[]=[
-						'type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('order.add_information'),
-							'type' => 'button',
-							'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_information') ."', render: JSON.parse('" . 
-								json_encode(
-									[
-										[
-											'type' => 'textarea',
-											'attributes' => [
-												'name' => LANG::GET('order.additional_info')
-											],
-											'hint' => LANG::GET('order.add_information_modal_body')
-										]
-									]
-								 ) . "'), options:{".
-								"'".LANG::GET('order.add_information_cancel')."': false,".
-								"'".LANG::GET('order.add_information_ok')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(response => {if (response) api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', _client.application.dialogToFormdata(response))})"
-						]
-					];
-
-					$content[] = [
-						'type' => 'checkbox',
-						'content' => $status
-					];
-					$autodelete = '';
-					if ($row['delivered'] && $row['received'] && !$row['archived']){
-						$autodelete = LANG::GET('order.autodelete', [':date' => date('Y-m-d', strtotime($row['received']) + (INI['lifespan']['order'] * 24 * 3600)), ':unit' => LANG::GET('units.' . $row['organizational_unit'])]);
-					}
-
-					// add statechange if applicable
-					if ($row['ordered'] && !$row['received']  && !$row['delivered'] && (PERMISSION::permissionFor('orderaddinfo') || array_intersect([$row['organizational_unit']], $units))) {
-						$content[] = [
-							'type' => 'select',
-							'content' => $statechange,
-							'numeration' => '0',
-							'attributes' => [
-								'name' => LANG::GET('order.orderstate_description'),
-								'onchange' => "new Dialog({type: 'input', header: LANG.GET('order.orderstate_description') + ' ' + this.value, render: JSON.parse('" . 
-									json_encode(
-										[
-											[
-												'type' => 'textarea',
-												'attributes' => [
-													'name' => LANG::GET('order.additional_info')
-												],
-												'hint' => LANG::GET('order.disapprove_message', [':unit' => LANG::GET('units.' . $row['organizational_unit'])])
-												]
-										]
-									 ) . "'), options:{".
-									"'".LANG::GET('order.add_information_cancel')."': false,".
-									"'".LANG::GET('order.add_information_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(response => {if (response) {response[LANG.GET('order.additional_info')] = LANG.GET('order.orderstate_description') + ' - ' + this.value + ': ' + response[LANG.GET('order.additional_info')]; api.purchase('put', 'approved', " . $row['id']. ", 'addinformation', _client.application.dialogToFormdata(response))}})"
-							]
-						];
-					}
-
-					// delete order button if authorized
-					if (PERMISSION::permissionFor('ordercancel') || array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])) {
-						$content[] = [
-							'type' => 'deletebutton',
-							'hint' => $autodelete,
-							'attributes' => [
-								'type' => 'button',
-								'value' => LANG::GET('order.delete_prepared_order'),
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
-									"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
-									"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'approved', " . $row['id'] . ")})"
-		
-							]
-						];
-						$content[] = [
-							'type' => 'br' // to clear after floating delete button
-						];
-					}
-
-					$content = [[
-						'type' => 'collapsible',
-						'attributes' => [
-							'class' => 'em18',
-							'data-filtered' => $row['id']
-						],
-						'content' => $content
-					]];
-					//if (PERMISSION::permissionFor('orderprocessing')) $content[count($content) - 1]['attributes']['class'] .= ' extended';
 
 					// incorporation state
 					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							if (!in_array('group', $_SESSION['user']['permissions'])){
-$data['incorporation']['item'] = $unincorporated[$tocheck]['id'];
-								$content[] = [
-									'type' => 'button',
-									'attributes' => [
-										'value' => LANG::GET('order.incorporation'),
-										'type' => 'button',
-										'onpointerup' => "if (!this.disabled) api.purchase('get', 'incorporation', " . $unincorporated[$tocheck]['id'] . "); this.disabled=true"
-									]
-								];
+								$data['incorporation']['item'] = $unincorporated[$tocheck]['id'];
 							} else {
 								// simple groups are not allowed to make records
-$data['incorporation']['state'] = LANG::GET('order.incorporation_neccessary_by_user');
-								$content[] = [
-									'type' => 'textsection',
-									'attributes' => [
-										'name' => LANG::GET('order.incorporation_neccessary_by_user')
-									]
-								];
+								$data['incorporation']['state'] = LANG::GET('order.incorporation_neccessary_by_user');
 							}
 						}
 					}
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($incorporationdenied, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-$data['incorporation']['state'] = LANG::GET('order.incorporation_denied');
-							$content[] = [
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => LANG::GET('order.incorporation_denied')
-								]
-							];
+							$data['incorporation']['state'] = LANG::GET('order.incorporation_denied');
 						}
 					}
 					elseif (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($pendingincorporation, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-$data['incorporation']['state'] = LANG::GET('order.incorporation_pending');
-							$content[] = [
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => LANG::GET('order.incorporation_pending')
-								]
-							];
+							$data['incorporation']['state'] = LANG::GET('order.incorporation_pending');
 						}
 					}
 					
 					// request MDR §14 sample check
-					if (!in_array('group', $_SESSION['user']['permissions']) && array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
+					if (array_key_exists('ordernumber_label', $decoded_order_data) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
 						if (array_key_exists('vendor_label', $decoded_order_data) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
 							if (!in_array('group', $_SESSION['user']['permissions'])){
-$data['samplecheck']['item'] = $sampleCheck[$tocheck]['id'];
-									$content[] = [
-									'type' => 'button',
-									'attributes' => [
-										'value' => LANG::GET('order.sample_check'),
-										'type' => 'button',
-										'onpointerup' => "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " . $sampleCheck[$tocheck]['id'] . "); this.disabled=true"
-									]
-								];
+								$data['samplecheck']['item'] = $sampleCheck[$tocheck]['id'];
 							} else {
 								// simple groups are not allowed to make records
-$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
-		
-								$content[] = [
-									'type' => 'textsection',
-									'attributes' => [
-										'name' => LANG::GET('order.sample_check_by_user')
-									]
-								];
+								$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
 							}
 						}
 					}
-array_push($result['data']['order'], $data);
-					array_push($result['render']['content'], $content);
+					array_push($result['data']['order'], $data);
 				}
 				break;
 			case 'DELETE':
