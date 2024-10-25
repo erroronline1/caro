@@ -116,7 +116,8 @@
 * consumables: expiry products overviev veeeery slow on 45k products
 * order stresstest shows significant lag for 200+ entries due to excessive linking?
     * payload is >4mb for 1k orders: reduce payload, pass only values and create a reusable client method for rendering
-    * approximately 5k ordered items for 10 months!
+    * approximately 500 ordered items per month!
+    * > down to <1mb, still needing approximately 15 seconds to calculate and render
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1661,7 +1662,7 @@ can be tested and verified importing unittest.js and calling `rendertest('app')`
 
 ## Stress test
 
-Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested. On 100000 distributed records the performance did well.  
+Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested. On 100000 distributed records the performance did well.  
 During creation the products database has been evaluated ([1](#server-setup), [2](#miscellaneous)).
 
 [Content](#content)
@@ -2628,7 +2629,7 @@ Sample response
 
 > GET ./api/api.php/order/approved/
 
-Returns aprovved orders by product.
+Returns approved orders as data.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2637,7 +2638,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "radio","attributes": {"name": "Filter"},"content": {"Unprocessed": {"checked": true,"onchange": "_client.order.filter()"},"Order processed": {"onchange": "_client.order.filter(\"ordered\")"},"Received in full": {"onchange": "_client.order.filter(\"received\")"},"Archived": {"onchange": "_client.order.filter(\"archived\")"}}},{"type": "search","attributes": {"name": "Or filter by term","onkeypress": "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",....
+{"data":{"order":[{"id":22321,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2024-10-25 21:34:23 \n12345\nOrder processed: 2024-10-25 22:48:26","quantity":7,"unit":"ST","barcode":"4032767176687","name":"Anschlusskappe f\u00fcr Fu\u00dfh\u00fclle 2C4=*(C-Walk 1C40), dunkelbraun","vendor":"Otto Bock","ordernumber":"2C11=L29-30\/15","commission":"wolfgangUVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY955","approval":null,"information":"daksjhof wgo 4islfdsdfg","addinformation":true,"lastorder":null,"orderer":"error on line 1","organizationalunit":"prosthetics2","orderstatechange":{"select changed order state":[],"not deliverable":[],"delivery date announced":[],"delivery date changed":[]},"state":{"ordered":{"data-ordered":"true"},"received":{"data-received":"false"},"delivered":{"data-delivered":"false"},"archived":{"data-archived":"false"}},"disapprove":false,"cancel":true,"return":false....
 ```
 
 > PUT ./api/api.php/order/approved/{id}/{update}/{state}
