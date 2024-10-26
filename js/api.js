@@ -204,6 +204,7 @@ export const api = {
 				if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = { idle: 0 };
 				const remaining = api.session_timeout.stop - new Date().getTime();
 				if (api._settings.ini.lifespan.idle > 0 && remaining > 0) {
+					document.querySelector("header>div:nth-of-type(2)").style.display = "none";
 					api.session_timeout.render((100 * remaining) / (api._settings.ini.lifespan.idle * 1000), remaining);
 					return;
 				}
