@@ -231,9 +231,9 @@ class NOTIFICATION extends API {
 			foreach($undelivered as $order){
 				$update = false;
 				$decoded_order_data = null;
-				$ordered = new DateTime($order['ordered'], new DateTimeZone(CONFIG['application']['timezone']));
+				$ordered = new DateTime($order['ordered'] ? : '', new DateTimeZone(CONFIG['application']['timezone']));
 				$receive_interval = intval(abs($ordered->diff($this->_currentdate)->days / CONFIG['lifespan']['order_unreceived']));
-				if ($order['notified_received'] < $receive_interval){
+				if ($order['ordered'] && $order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['permission' => ['purchase']],
@@ -252,7 +252,7 @@ class NOTIFICATION extends API {
 					$update = true;
 				} else $receive_interval = $order['notified_received'];
 
-				$received = new DateTime($order['received'], new DateTimeZone(CONFIG['application']['timezone']));
+				$received = new DateTime($order['received'] ? : '', new DateTimeZone(CONFIG['application']['timezone']));
 				$delivery_interval = intval(abs($received->diff($this->_currentdate)->days / CONFIG['lifespan']['order_undelivered']));
 				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
