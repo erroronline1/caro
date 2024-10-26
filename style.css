@@ -724,6 +724,14 @@ p {
 	width: calc(100% - 2em);
 }
 
+/*textsection*/
+p {
+	user-select: all;
+	a {
+		user-select:none;
+	}
+}
+
 main > form > button {
 	box-shadow: var(--shadow);
 }
