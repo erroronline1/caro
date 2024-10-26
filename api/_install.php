@@ -64,7 +64,9 @@ $queries = [
 				"	`approval` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`approved` datetime NOT NULL," .
 				"	`ordered` datetime NULL DEFAULT NULL," .
+				"	`partially_received` datetime NULL DEFAULT NULL," .
 				"	`received` datetime NULL DEFAULT NULL," .
+				"	`partially_delivered` datetime NULL DEFAULT NULL," .
 				"	`delivered` datetime NULL DEFAULT NULL," .
 				"	`archived` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -76,6 +78,7 @@ $queries = [
 				"	`order_id` int NOT NULL," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`ordered` datetime NULL DEFAULT NULL," .
+				"	`partially_received` datetime NULL DEFAULT NULL," .
 				"	`received` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`order_id`)" .
@@ -291,7 +294,9 @@ $queries = [
 				"	approval varchar(MAX) NOT NULL," .
 				"	approved smalldatetime NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
+				"	partially_received smalldatetime NULL DEFAULT NULL," .
 				"	received smalldatetime NULL DEFAULT NULL," .
+				"	partially_delivered smalldatetime NULL DEFAULT NULL," .
 				"	delivered smalldatetime NULL DEFAULT NULL," .
 				"	archived smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(MAX) NOT NULL," .
@@ -304,6 +309,7 @@ $queries = [
 				"	order_id int NOT NULL," .
 				"	order_data varchar(MAX) NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
+				"	partially_received smalldatetime NULL DEFAULT NULL," .
 				"	received smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(MAX) NOT NULL" .
 				");"

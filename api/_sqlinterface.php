@@ -84,8 +84,8 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
-		//var_dump($query);
 		$statement = $_pdo->prepare($query);
+		//var_dump($statement->queryString);
 
 		//$statement->execute($parameters['values']);
 		//var_dump($statement->debugDumpParams());
@@ -560,16 +560,24 @@ class SQLQUERY {
 		],
 
 		'order_post_approved_order' => [
-			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, received, delivered, archived, ordertype, notified) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, :ordertype, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, received, delivered, archived, ordertype, notified) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, :ordertype, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL)"
 		],
 		'order_put_approved_order_ordered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id"
 		],
+		'order_put_approved_order_partially_received' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET partially_received = :state WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET partially_received = :state WHERE id = :id"
+		],
 		'order_put_approved_order_received' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET received = :state WHERE id = :id"
+		],
+		'order_put_approved_order_partially_delivered' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET partially_delivered = :state WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET partially_delivered = :state WHERE id = :id"
 		],
 		'order_put_approved_order_delivered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET delivered = :state WHERE id = :id",
@@ -584,8 +592,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data WHERE id = :id"
 		],
 		'order_put_approved_order_cancellation' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, received = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 
 		'order_get_approved_order_by_unit' => [
@@ -627,13 +635,18 @@ class SQLQUERY {
 
 
 
-		'order_post_order_statistics' => [
-			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, received, ordertype) VALUES (:order_id, :order_data, :ordered, :received, :ordertype)",
-			'sqlsrv' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype)"
+/*		'order_post_order_statistics' => [
+			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, :ordered, :partially_received, :received, :ordertype)",
+			'sqlsrv' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype)"
 		],
 		'order_put_order_statistics' => [
-			'mysql' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = :received, ordertype = :ordertype WHERE order_id = :order_id",
-			'sqlsrv' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype WHERE order_id = :order_id"
+			'mysql' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, partially_received = :partially_received, received = :received, ordertype = :ordertype WHERE order_id = :order_id",
+			'sqlsrv' => "UPDATE caro_consumables_order_statistics SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype WHERE order_id = :order_id"
+		],
+*/
+		'order_post_order_statistics' => [
+			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, :ordered, :partially_received, :received, :ordertype) ON DUPLICATE KEY UPDATE order_data = :order_data, partially_received = :partially_received, received = :received, ordertype = :ordertype",
+			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING (SELECT :order_id AS order_id, :order_data AS order_data, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :partially_received, 120) AS partially_received, CONVERT(SMALLDATETIME, :received, 120) AS received, :ordertype AS ordertyle) AS source (order_id, order_data, ordered, partially_received, received, ordertype) ON (target.order_id = source.order_id ) WHEN MATCHED THEN UPDATE SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype WHERE order_id = :order_id WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype)"
 		],
 		'order_get_order_statistics' => [
 			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",

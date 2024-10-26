@@ -698,8 +698,9 @@ class AUDIT extends API {
 			'ordernumber_label' => LANG::GET('order.ordernumber_label'),
 			'productname_label' => LANG::GET('order.productname_label'),
 			'additional_info' => LANG::GET('order.additional_info'),
-			'ordered' => LANG::GET('order.ordered'),
-			'received' => LANG::GET('order.received'),
+			'ordered' => LANG::GET('order.order.ordered'),
+			'partially_received' => LANG::GET('order.order.partially_received'),
+			'received' => LANG::GET('order.order.received'),
 			'deliverytime' => LANG::GET('audit.order_statistics_delivery_time_column')
 		];
 

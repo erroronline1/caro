@@ -951,13 +951,12 @@ export const api = {
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
-								if (request[1] === "approved") _client.order.filter();
 								api.preventDataloss.start();
 							}
-if (request[1] === "approved" && data.data) {
-	_client.order.approved(data.data);
-	_client.order.filter();
-}
+							if (request[1] === "approved" && data.data) {
+								_client.order.approved(data.data);
+								_client.order.filter();
+							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.links !== undefined) {
 								const dialog = {
@@ -984,7 +983,7 @@ if (request[1] === "approved" && data.data) {
 				}
 				break;
 			case "put":
-				if (["ordered", "received", "delivered", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
+				if (["ordered", "partially_received", "received", "partially_delivered", "delivered", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
 					if (typeof request[4] === "object") {
 						payload = request[4];
 						delete request[4];

@@ -56,7 +56,7 @@ class ORDER extends API {
 				$order = $order ? $order[0] : null;
 				if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
 				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
-				if (in_array($this->_subMethod, ['ordered', 'received', 'delivered', 'archived'])){
+				if (in_array($this->_subMethod, ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'])){
 					switch ($this->_subMethod){
 						case 'ordered':
 							if ($order['ordertype'] === 'cancellation'){
@@ -91,8 +91,14 @@ class ORDER extends API {
 							}
 							else $query = 'order_put_approved_order_ordered';
 							break;
+						case 'partially_received':
+							$query = 'order_put_approved_order_partially_received';
+							break;
 						case 'received':
 							$query = 'order_put_approved_order_received';
+							break;
+						case 'partially_delivered':
+							$query = 'order_put_approved_order_partially_delivered';
 							break;
 						case 'delivered':
 							$decoded_order_data = json_decode($order['order_data'], true);
@@ -166,7 +172,7 @@ class ORDER extends API {
 								]
 							]);
 							// inform user group
-							$messagepayload=[];
+							$messagepayload = [];
 							foreach (['quantity'=> 'quantity_label',
 								'unit' => 'unit_label',
 								'number' => 'ordernumber_label',
@@ -193,7 +199,6 @@ class ORDER extends API {
 									':id' => intval($this->_requestedID)
 								]
 							]);
-							$this->_subMethod = 'add_information_confirmation';
 							if (str_starts_with(UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info')), LANG::GET('order.orderstate_description'))){
 								// inform user group
 								$messagepayload = [];
@@ -234,8 +239,8 @@ class ORDER extends API {
 							}
 							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.received') . ': ' . $order['received'];
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.delivered') . ': ' . $order['delivered'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.received') . ': ' . $order['received'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.delivered') . ': ' . $order['delivered'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 
 							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
@@ -266,7 +271,7 @@ class ORDER extends API {
 				}
 				$result = isset($result) ? $result: [
 					'response' => [
-						'msg' => LANG::GET('order.ora_set', [':type' => LANG::GET('order.' . $this->_subMethod)]),
+						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? LANG::GET('order.order.' . $this->_subMethod): LANG::GET('order.ora_set', [':type' => LANG::GET('order.order.' . $this->_subMethod)]),
 						'type' => 'info'
 					],
 					'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
@@ -384,7 +389,7 @@ class ORDER extends API {
 					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify')){
 						$data['ordertext'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
 					}
-					$data['ordertext'] .= "\n" .LANG::GET('order.approved') . ': ' . $row['approved'] . ' ';
+					$data['ordertext'] .= "\n" .LANG::GET('order.order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) {
 						$data['ordertext'] .= "\n". $row['approval'];
 					} else {
@@ -395,20 +400,22 @@ class ORDER extends API {
 						$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
 					}
 
-					foreach(['ordered', 'received', 'delivered', 'archived'] as $s){
+					foreach(['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'] as $s){
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
-							$data['ordertext'] .= "\n" . LANG::GET('order.' . $s) . ': ' . $row[$s];
+							$data['ordertext'] .= "\n" . LANG::GET('order.order.' . $s) . ': ' . $row[$s];
 						}
 						switch ($s){
 							case 'ordered':
+							case 'partially_received':
 							case 'received':
 								if (!PERMISSION::permissionFor('orderprocessing')){
 								$data['state'][$s]['disabled'] = true;
 								}
 								break;
-							case 'delivered':	
+							case 'partially_delivered':	
+							case 'delivered':
 							case 'archived':
 								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
 									$data['state'][$s]['disabled'] = true;
@@ -860,7 +867,7 @@ class ORDER extends API {
 
 				// cart-content has a twin within utility.js _client.order.addProduct() method
 				if ($order['items']){
-					$items=[];
+					$items = [];
 					for ($i = 0; $i < count($order['items']); $i++){
 						array_push($items,
 						[
@@ -967,14 +974,14 @@ class ORDER extends API {
 						':id' => intval($this->_requestedID)
 					]
 				])) {
-					$result=[
+					$result = [
 					'response' => [
 						'id' => false,
 						'msg' => LANG::GET('order.deleted'),
 						'type' => 'success'
 					]];
 				}
-				else $result=[
+				else $result = [
 					'response' => [
 						'id' => $this->_requestedID,
 						'msg' => LANG::GET('order.failed_delete'),
@@ -1012,7 +1019,6 @@ class ORDER extends API {
 		]);
 		$order = $order ? $order[0] : null;
 		if (!$order) return;
-		
 		// minimize order data
 		$order['order_data'] = json_decode($order['order_data'], true);
 		foreach($order['order_data'] as $key => $value){
@@ -1027,16 +1033,19 @@ class ORDER extends API {
 		$order['order_data'] = json_encode($order['order_data']);
 		
 		// update or insert order statistics
-		if (SQLQUERY::EXECUTE($this->_pdo, 'order_put_order_statistics', [
-				'values' => [
-					':order_data' => $order['order_data'],
-					':ordertype' => $order['ordertype'],
-					':order_id' => intval($order_id)
-				],
-				'replacements' => [
-					':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
-				]
-			]) === false) SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+/*		$insert = null;
+		$update = SQLQUERY::EXECUTE($this->_pdo, 'order_put_order_statistics', [
+			'values' => [
+				':order_data' => $order['order_data'],
+				':ordertype' => $order['ordertype'],
+				':order_id' => intval($order_id)
+			],
+			'replacements' => [
+				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
+				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
+			]
+			]);
+		if ($update === false) $insert = SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
 				'values' => [
 					':order_id' => intval($order_id),
 					':order_data' => $order['order_data'],
@@ -1044,9 +1053,23 @@ class ORDER extends API {
 					':ordertype' => $order['ordertype']
 				],
 				'replacements' => [
+					':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
 					':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
 				]
 			]);
+*/		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+			'values' => [
+				':order_id' => intval($order_id),
+				':order_data' => $order['order_data'],
+				':ordered' => $order['ordered'],
+				':ordertype' => $order['ordertype']
+			],
+			'replacements' => [
+				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
+				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
+			]
+		]);
+//		var_dump($update, $insert);
 	}
 	
 	/**
@@ -1074,7 +1097,7 @@ class ORDER extends API {
 			]) . '; ';
 		}
 		if (SQLQUERY::EXECUTE($this->_pdo, $query)) {
-			$result=[
+			$result = [
 			'response' => [
 				'id' => false,
 				'msg' => LANG::GET('order.saved'),
@@ -1082,7 +1105,7 @@ class ORDER extends API {
 			]];
 			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
 		}
-		else $result=[
+		else $result = [
 			'response' => [
 				'id' => false,
 				'msg' => LANG::GET('order.failed_save'),
@@ -1124,7 +1147,7 @@ class ORDER extends API {
 				$order_data = ['items' => []];
 
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
-				$index=0;
+				$index = 0;
 				foreach ($orders as $order){
 					if (array_search($order['id'], $approvedIDs) === false) continue;
 
@@ -1169,7 +1192,7 @@ class ORDER extends API {
 				}
 				$result = ['render' => ['content' => []]];
 				if ($_SESSION['user']['orderauth']){
-					$organizational_units=[];
+					$organizational_units = [];
 					foreach(LANGUAGEFILE['units'] as $unit => $description){
 						$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
 						//$organizational_units[$description]['checked'] = true;
@@ -1202,9 +1225,9 @@ class ORDER extends API {
 									])."\n";
 								}
 							} else {
-								if ($key==='attachments') continue;
-								if ($key==='organizational_unit') $value = LANG::GET('units.' . $value);
-								if ($key==='order_type') {
+								if ($key === 'attachments') continue;
+								if ($key === 'organizational_unit') $value = LANG::GET('units.' . $value);
+								if ($key === 'order_type') {
 									$order_attributes = [
 										'name' => LANG::GET('order.ordertype.' . $value),
 										'data-type' => $value
@@ -1297,9 +1320,9 @@ class ORDER extends API {
 	 *  |_|
 	 */
 	private function processOrderForm(){
-		$unset=LANG::PROPERTY('consumables.edit_product_search');
+		$unset = LANG::PROPERTY('consumables.edit_product_search');
 		unset ($this->_payload->$unset);
-		$unset=LANG::PROPERTY('consumables.edit_product_vendor_select');
+		$unset = LANG::PROPERTY('consumables.edit_product_vendor_select');
 		unset ($this->_payload->$unset);
 
 		// detect approval

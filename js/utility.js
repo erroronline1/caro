@@ -348,11 +348,13 @@ const _client = {
 				collapsible = [],
 				buttons = {},
 				links = {};
-			filter[LANG.GET("order.untreated")] = { checked: true, onchange: "_client.order.filter()" };
-			filter[LANG.GET("order.ordered")] = { onchange: '_client.order.filter("ordered")' };
-			filter[LANG.GET("order.received")] = { onchange: '_client.order.filter("received")' };
-			filter[LANG.GET("order.delivered")] = { onchange: '_client.order.filter("delivered")' };
-			filter[LANG.GET("order.archived")] = { onchange: '_client.order.filter("archived")' };
+			filter[LANG.GET("order.order.unprocessed")] = { checked: true, onchange: "_client.order.filter()" };
+			filter[LANG.GET("order.order.ordered")] = { onchange: '_client.order.filter("ordered")' };
+			filter[LANG.GET("order.order.partially_received")] = { onchange: '_client.order.filter("partially_received")' };
+			filter[LANG.GET("order.order.received")] = { onchange: '_client.order.filter("received")' };
+			filter[LANG.GET("order.order.partially_delivered")] = { onchange: '_client.order.filter("partially_delivered")' };
+			filter[LANG.GET("order.order.delivered")] = { onchange: '_client.order.filter("delivered")' };
+			filter[LANG.GET("order.order.archived")] = { onchange: '_client.order.filter("archived")' };
 
 			content.push([
 				{
@@ -591,10 +593,38 @@ const _client = {
 				// append state
 				let states = {};
 				for (const [state, attributes] of Object.entries(element.state)) {
-					states[LANG.GET("order." + state)] = {};
-					for (const [attribute, value] of Object.entries(attributes)) states[LANG.GET("order." + state)][attribute] = value;
-					if (attributes["data-" + state] === "true") states[LANG.GET("order." + state)].checked = true;
-					if (!attributes.disabled) states[LANG.GET("order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+					states[LANG.GET("order.order." + state)] = {};
+					for (const [attribute, value] of Object.entries(attributes)) states[LANG.GET("order.order." + state)][attribute] = value;
+					if (attributes["data-" + state] === "true") states[LANG.GET("order.order." + state)].checked = true;
+					if (!attributes.disabled) states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+				}
+				if (!states[LANG.GET("order.order.partially_received")].disabled) {
+					buttons = {};
+					buttons[LANG.GET("order.add_information_cancel")] = false;
+					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					states[LANG.GET("order.order.partially_received")].onchange = function () {
+						api.purchase("put", "approved", "element.id", "partially_received", this.checked);
+						this.setAttribute("data-partially_received", this.checked.toString());
+						if (this.checked)
+							new Dialog({
+								type: "input",
+								header: LANG.GET("order.add_information"),
+								render: [
+									{
+										type: "textarea",
+										attributes: {
+											name: LANG.GET("order.additional_info"),
+										},
+										hint: LANG.GET("order.add_information_modal_body"),
+									},
+								],
+								options: buttons,
+							}).then((response) => {
+								if (response) api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
+							});
+					}
+						.toString()
+						._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]);
 				}
 				if (element.disapprove) {
 					buttons = {};
@@ -821,29 +851,30 @@ const _client = {
 			});
 			const filters = {
 				ordered: document.querySelectorAll("[data-ordered=true]"),
+				partially_received: document.querySelectorAll("[data-partially_received=true]"),
 				received: document.querySelectorAll("[data-received=true]"),
+				partially_delivered: document.querySelectorAll("[data-partially_delivered=true]"),
 				delivered: document.querySelectorAll("[data-delivered=true]"),
 				archived: document.querySelectorAll("[data-archived=true]"),
 			};
 			let display = [...document.querySelectorAll("[data-ordered=false]")].map(function (node) {
 				return node.parentNode.parentNode;
 			});
-			if (type === "ordered")
-				display = [...filters.ordered].map(function (node) {
-					return [...filters.received, ...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
+			if (type) {
+				let hide = [],
+					ignore = true;
+				for (const [key, nodes] of Object.entries(filters)) {
+					if (type === key) {
+						ignore = false;
+						continue;
+					}
+					if (ignore) continue;
+					hide = hide.concat(...nodes);
+				}
+				display = [...filters[type]].map(function (node) {
+					return [...hide].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
 				});
-			if (type === "received")
-				display = [...filters.received].map(function (node) {
-					return [...filters.delivered, ...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
-				});
-			if (type === "delivered")
-				display = [...filters.delivered].map(function (node) {
-					return [...filters.archived].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
-				});
-			if (type === "archived")
-				display = [...filters.archived].map(function (node) {
-					return node.parentNode.parentNode;
-				});
+			}
 			display.forEach((article) => {
 				if (article) article.style.display = "block";
 			});
