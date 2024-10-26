@@ -1,4 +1,4 @@
-;"=SUM(B2:B365)";"=ROUND(B1/((365-30-5-12-104)*7.7/12), 2)"
+;"=SUM(B:B)";"=ROUND(B1/((365-30-5-12-104)*7.7/12), 2)"
 22.9.23;5;"ui"
 25.9.23;2;"ui"
 29.9.23;5;"ui, ui-assembler"
@@ -182,3 +182,4 @@
 19.10.24;4;"record-api, stress-test, ui-assembler, unittests"
 24.10.24;3;"order-api"
 25.10.24;6;"order-api"
+26.10.24;6;"order-api"
