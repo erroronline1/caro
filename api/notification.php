@@ -188,7 +188,7 @@ class NOTIFICATION extends API {
 				':user' => $_SESSION['user']['id']
 			]
 		]);
-		$unnotified = $unnotified ? $unnotified[0]['number'] : 0;
+		$unnotified = $unnotified ? intval($unnotified[0]['number']) : 0;
 		SQLQUERY::EXECUTE($this->_pdo, 'message_put_notified', [
 			'values' => [
 				':user' => $_SESSION['user']['id']
@@ -211,7 +211,7 @@ class NOTIFICATION extends API {
 				':user' => $_SESSION['user']['id']
 			]
 		]);
-		$unseen = $unseen ? $unseen[0]['number'] : 0;
+		$unseen = $unseen ? intval($unseen[0]['number']) : 0;
 		return $unseen;
 	}
 
@@ -288,7 +288,7 @@ class NOTIFICATION extends API {
 			}
 
 			$unprocessed = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unprocessed');
-			$unprocessed = $unprocessed ? $unprocessed[0]['num'] : 0;
+			$unprocessed = $unprocessed ? intval($unprocessed[0]['num']) : 0;
 		}
 		return $unprocessed;
 	}
