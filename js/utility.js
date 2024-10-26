@@ -598,7 +598,7 @@ const _client = {
 					if (attributes["data-" + state] === "true") states[LANG.GET("order.order." + state)].checked = true;
 					if (!attributes.disabled) states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
-				if (!states[LANG.GET("order.order.partially_received")].disabled) {
+				if (states[LANG.GET("order.order.partially_received")] && !states[LANG.GET("order.order.partially_received")].disabled) {
 					buttons = {};
 					buttons[LANG.GET("order.add_information_cancel")] = false;
 					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
