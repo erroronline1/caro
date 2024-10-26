@@ -955,6 +955,7 @@ export const api = {
 								api.preventDataloss.start();
 							}
 							if (request[1] === "approved" && data.data) {
+								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								_client.order.approved(data.data);
 								_client.order.filter();
 							}
