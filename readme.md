@@ -91,8 +91,6 @@
 ## development
 
 #### purchase considerations
-* reminder orders received but not delivered, colleagues forgot to mark as delivered
-* partial delivery as option
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -106,7 +104,6 @@
 * recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
     * export from composer -> change store syntax for forms to json containing component ids
 * office inputs pseudoform as filter column (insurance requests, insurance approved, treatment in progress, etc) for improved priority overview
-* general field attribute copyable
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1122,6 +1119,7 @@ mdr14_sample_interval = 365 ; DAYS until a new sample check is required as defau
 mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
 open_record_reminder = 30 ; DAYS after unclosed records are reminded of via messenger
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+order_undelivered = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery
 order_unreceived = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
 sharepoint =  48 ; HOURS, after these files will be deleted
 tmp =  24 ; HOURS, after these files will be deleted

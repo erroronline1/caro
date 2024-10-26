@@ -70,7 +70,8 @@ $queries = [
 				"	`delivered` datetime NULL DEFAULT NULL," .
 				"	`archived` datetime NULL DEFAULT NULL," .
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`notified` int NULL DEFAULT NULL," .
+				"	`notified_received` int NULL DEFAULT NULL," .
+				"	`notified_delivered` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -300,7 +301,8 @@ $queries = [
 				"	delivered smalldatetime NULL DEFAULT NULL," .
 				"	archived smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(MAX) NOT NULL," .
-				"	notified int NULL DEFAULT NULL" .
+				"	notified_received int NULL DEFAULT NULL," .
+				"	notified_delivered int NULL DEFAULT NULL" .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .

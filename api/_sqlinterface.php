@@ -560,8 +560,8 @@ class SQLQUERY {
 		],
 
 		'order_post_approved_order' => [
-			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)"
 		],
 		'order_put_approved_order_ordered' => [
 			'mysql' => "UPDATE caro_consumables_approved_orders SET ordered = :state WHERE id = :id",
@@ -624,13 +624,13 @@ class SQLQUERY {
 			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 		],
-		'order_get_approved_unreceived' => [
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND received IS NULL",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND received IS NULL",
+		'order_get_approved_unreceived_undelivered' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (received IS NULL OR delivered IS NULL)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (received IS NULL OR delivered IS NULL)",
 		],
 		'order_notified' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET notified = :notified WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET notified = :notified WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id"
 		],
 
 

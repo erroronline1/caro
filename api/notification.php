@@ -227,16 +227,18 @@ class NOTIFICATION extends API {
 		$unprocessed = 0;
 		$alerts = [];
 		if (PERMISSION::permissionFor('orderprocessing')){
-			$undelivered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unreceived');
+			$undelivered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unreceived_undelivered');
 			foreach($undelivered as $order){
-				$last = new DateTime($order['ordered'], new DateTimeZone(CONFIG['application']['timezone']));
-				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['order_unreceived']));
-				if ($order['notified'] < $diff){
+				$update = false;
+				$decoded_order_data = null;
+				$ordered = new DateTime($order['ordered'], new DateTimeZone(CONFIG['application']['timezone']));
+				$receive_interval = intval(abs($ordered->diff($this->_currentdate)->days / CONFIG['lifespan']['order_unreceived']));
+				if ($order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['permission' => ['purchase']],
 						LANG::GET('order.alert_unreceived_order', [
-							':days' => $last->diff($this->_currentdate)->days,
+							':days' => $ordered->diff($this->_currentdate)->days,
 							':ordertype' => LANGUAGEFILE['order']['ordertype'][$order['ordertype']],
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => $decoded_order_data['unit_label'],
@@ -247,13 +249,38 @@ class NOTIFICATION extends API {
 							':orderer' => $decoded_order_data['orderer']
 						])
 					);
-					// prepare alert flags
-					$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
-						[
-							':notified' => $diff,
-							':id' => $order['id']
-						]) . '; ');
-				}
+					$update = true;
+				} else $receive_interval = $order['notified_received'];
+
+				$received = new DateTime($order['received'], new DateTimeZone(CONFIG['application']['timezone']));
+				$delivery_interval = intval(abs($received->diff($this->_currentdate)->days / CONFIG['lifespan']['order_undelivered']));
+				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
+					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
+					$this->alertUserGroup(
+						['unit' => [$order['organizational_unit']]],
+						LANG::GET('order.alert_undelivered_order', [
+							':days' => $received->diff($this->_currentdate)->days,
+							':ordertype' => '<a href="javascript:void(0);" onpointerup="api.purchase(\'get\', \'approved\')"> ' . LANGUAGEFILE['order']['ordertype'][$order['ordertype']] . '</a>',
+							':quantity' => $decoded_order_data['quantity_label'],
+							':unit' => $decoded_order_data['unit_label'],
+							':number' => $decoded_order_data['ordernumber_label'],
+							':name' => $decoded_order_data['productname_label'],
+							':vendor' => $decoded_order_data['vendor_label'],
+							':commission' => $decoded_order_data['commission'],
+							':receival' => $order['received']
+						])
+					);
+					$update = true;
+				} else $delivery_interval = $order['notified_delivered'];
+
+				// prepare alert flags
+				if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
+					[
+						':notified_received' => $receive_interval ? : 'NULL',
+						':notified_delivered' => $delivery_interval ? : 'NULL',
+						':id' => $order['id']
+					]) . '; ');
+
 			}
 			// set alert flags
 			foreach ($alerts as $alert){
