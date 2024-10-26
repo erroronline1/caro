@@ -408,13 +408,21 @@ class ORDER extends API {
 						}
 						switch ($s){
 							case 'ordered':
-							case 'partially_received':
 							case 'received':
 								if (!PERMISSION::permissionFor('orderprocessing')){
 								$data['state'][$s]['disabled'] = true;
 								}
 								break;
-							case 'partially_delivered':	
+							case 'partially_received':
+								if ($row['received'] || !PERMISSION::permissionFor('orderprocessing')){
+									$data['state'][$s]['disabled'] = true;
+									}
+								break;
+							case 'partially_delivered':
+								if ($row['delivered'] || !(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
+									$data['state'][$s]['disabled'] = true;
+								}
+								break;
 							case 'delivered':
 							case 'archived':
 								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
@@ -1033,31 +1041,7 @@ class ORDER extends API {
 		$order['order_data'] = json_encode($order['order_data']);
 		
 		// update or insert order statistics
-/*		$insert = null;
-		$update = SQLQUERY::EXECUTE($this->_pdo, 'order_put_order_statistics', [
-			'values' => [
-				':order_data' => $order['order_data'],
-				':ordertype' => $order['ordertype'],
-				':order_id' => intval($order_id)
-			],
-			'replacements' => [
-				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
-				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
-			]
-			]);
-		if ($update === false) $insert = SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
-				'values' => [
-					':order_id' => intval($order_id),
-					':order_data' => $order['order_data'],
-					':ordered' => $order['ordered'],
-					':ordertype' => $order['ordertype']
-				],
-				'replacements' => [
-					':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
-					':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
-				]
-			]);
-*/		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
 			'values' => [
 				':order_id' => intval($order_id),
 				':order_data' => $order['order_data'],
@@ -1069,7 +1053,6 @@ class ORDER extends API {
 				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
 			]
 		]);
-//		var_dump($update, $insert);
 	}
 	
 	/**
