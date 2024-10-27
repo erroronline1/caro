@@ -102,6 +102,18 @@ anonymous[descriptions] = "Process or work instruction"
 notdisplayedinrecords[mdr_sample_check_form] = "MDR §14 Sample Check"
 notdisplayedinrecords[product_incorporation_form] = "Product incorporation"
 
+; administrative case state
+; generates a pseudoform to check states by given permission levels
+; and makes unclosed records filterable by given states within overview
+; checkbox options with a low level key according to formcontext high level keys
+; record_pseudoform_{low level key} translation must be set in [record]
+[casestate]
+casedocumentation[reimbursement] = "Reimbursement requested"
+casedocumentation[inquiry] = "Cost bearer inquiry pending"
+casedocumentation[production] = "Production tasked"
+casedocumentation[granted] = "Reimbursement granted"
+casedocumentation[settled] = "Settled"
+
 ; all keys are hardcoded
 [general]
 submit_button = "Submit"
@@ -979,6 +991,10 @@ record_retype_content = "The record has been retyped from :previoustype to :newt
 
 record_reminder_message = "It has been :days days since the last record regarding :identifier. The last edit happened on :date with :form.""
 Help continuing or close the record."
+
+record_casestate_set = ":casestate set"
+record_casestate_revoked = ":casestate revoked"
+record_pseudoform_casedocumentation = "Case state"
 
 ; all keys are hardcoded
 [risk]

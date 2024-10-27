@@ -879,7 +879,7 @@ const _client = {
 				if (article) article.style.display = "block";
 			});
 		},
-		performIncorporation(formdata, productid) {
+		performIncorporation: (formdata, productid)=> {
 			const check = [],
 				submit = new FormData();
 			for (const [key, value] of Object.entries(formdata)) {
@@ -894,7 +894,7 @@ const _client = {
 				api.purchase("post", "incorporation", productid, submit);
 			} else new Toast(LANG.GET("order.incorporation_failure"), "error");
 		},
-		performSampleCheck(formdata, productid) {
+		performSampleCheck: (formdata, productid)=>{
 			const check = [];
 			for (const [key, value] of Object.entries(formdata)) {
 				if (value && value !== "on") check.push(key + ": " + value);
@@ -906,6 +906,10 @@ const _client = {
 				formdata.append("content", result);
 				api.purchase("post", "mdrsamplecheck", productid, formdata);
 			} else new Toast(LANG.GET("order.sample_check_failure"), "error");
+		},
+	},
+	record:{
+		casestatefilter: (casestate) =>{
 		},
 	},
 	texttemplate: {

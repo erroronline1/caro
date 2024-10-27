@@ -30,13 +30,16 @@ class RECORD extends API {
 	private $_appendDate = null;
 	private $_passedIdentify = null;
 	private $_formExport = null;
+	private $_caseState = null;
+	private $_caseStateBoolean = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
 
 		$this->_requestedID = $this->_appendDate = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_passedIdentify = $this->_formExport = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
+		$this->_passedIdentify = $this->_formExport = $this->_caseState = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
+		$this->_caseStateBoolean = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -95,6 +98,79 @@ class RECORD extends API {
 	}
 
 	/**
+	 *                       _       _       
+	 *   ___ ___ ___ ___ ___| |_ ___| |_ ___ 
+	 *  |  _| .'|_ -| -_|_ -|  _| .'|  _| -_|
+	 *  |___|__,|___|___|___|_| |__,|_| |___|
+	 *
+	 */
+	public function casestate($context = null, $type = 'checkbox', $action = [], $checked = []){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'PUT':
+				if (array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
+
+				$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+					'values' => [
+						':identifier' => $this->_requestedID
+					]
+				]);
+				$case = $case ? $case[0] : null;
+				if ($case){
+					$current_record = [
+						'author' => $_SESSION['user']['name'],
+						'date' => $this->_currentdate->format('Y-m-d H:i:s'),
+						'form' => 0,
+						'content' => json_encode([
+							LANG::GET('record.record_pseudoform_' . $case['context']) => LANG::GET($this->_caseStateBoolean === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANGUAGEFILE['casestate'][$case['context']][$this->_caseState]])
+						])
+					];
+					$records = json_decode($case['content'], true);
+					$records[] = $current_record;
+					$case_state = json_decode($case['case_state'] ? : '', true);
+					if ($this->_caseStateBoolean === 'true') $case_state[$this->_caseState] = true;
+					else unset($case_state[$this->_caseState]);
+					if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+						'values' => [
+							':case_state' => json_encode($case_state) ? : null,
+							':record_type' => $case['record_type'] ? : null,
+							':identifier' => $this->_requestedID,
+							':last_user' => $_SESSION['user']['id'],
+							':last_form' => 0,
+							':content' => json_encode($records),
+							':id' => $case['id']
+						]
+					])) $this->response([
+						'response' => [
+							'msg' => LANG::GET($this->_caseStateBoolean === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANGUAGEFILE['casestate'][$case['context']][$this->_caseState]]),
+							'type' => 'success'
+						]]);
+				}
+				$this->response([
+					'response' => [
+						'msg' => LANG::GET('record.record_error'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				if (!isset(LANGUAGEFILE['casestate'][$context])) return;
+				$content = [];
+				$checked = json_decode($checked ? : '', true);
+				foreach(LANGUAGEFILE['casestate'][$context] as $state => $translation){
+					$content[$translation] = $action;
+					$content[$translation]['data-casestate'] = $state;
+					if (isset($checked[$state])) $content[$translation]['checked'] = true; 
+				}
+				return [
+					'type' => $type,
+					'attributes' => [
+						'name' => LANG::GET('record.record_pseudoform_' . $context)
+					],
+					'content' => $content
+				];
+		}
+	}
+
+	 /**
 	 *       _
 	 *   ___| |___ ___ ___
 	 *  |  _| | . |_ -| -_|
@@ -113,10 +189,9 @@ class RECORD extends API {
 		if (!$data) $this->response([], 204);
 		$data['closed'] = $data['closed'] ? json_decode($data['closed'], true) : [];
 
-		$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$data['closed'][$this->_passedIdentify] = [
 			'name' => $_SESSION['user']['name'],
-			'date' => $time->format('Y-m-d H:i')
+			'date' => $this->_currentdate->format('Y-m-d H:i')
 		];
 
 		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
@@ -187,8 +262,7 @@ class RECORD extends API {
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-			$entry_timestamp = $now->format('Y-m-d H:i');
+			$entry_timestamp = $this->_currentdate->format('Y-m-d H:i');
 		}
 
 		foreach($this->_payload as $key => &$value){
@@ -421,20 +495,19 @@ class RECORD extends API {
 		];
 
 		if (isset($return['render']['form'])) {
-			$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 			$defaults = [
 				[
 					'type' => 'date',
 					'attributes' => [
 						'name' => 'DEFAULT_' . LANG::GET('record.record_date'),
-						'value' => $now->format('Y-m-d'),
+						'value' => $this->_currentdate->format('Y-m-d'),
 						'required' => true
 					]
 				], [
 					'type' => 'time',
 					'attributes' => [
 						'name' => 'DEFAULT_' . LANG::GET('record.record_time'),
-						'value' => $now->format('H:i'),
+						'value' => $this->_currentdate->format('H:i'),
 						'required' => true
 					]
 				]
@@ -660,8 +733,7 @@ class RECORD extends API {
 						new DateTime($possibledate);
 					}
 					catch (Exception $e){
-						$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-						if ($this->_appendDate) $content .= ' ' . $now->format('Y-m-d H:i');
+						if ($this->_appendDate) $content .= ' ' . $this->_currentdate->format('Y-m-d H:i');
 					}
 				}
 				if ($content){
@@ -686,7 +758,7 @@ class RECORD extends API {
 				]]);
 				break;
 			case 'GET':
-				$result=['render' =>
+				$result = ['render' =>
 				[
 					'form' => [
 						'data-usecase' => 'record',
@@ -862,8 +934,7 @@ class RECORD extends API {
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-					$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-					$entry_timestamp = $now->format('Y-m-d H:i');
+					$entry_timestamp = $this->_currentdate->format('Y-m-d H:i');
 				}
 
 				foreach($this->_payload as $key => &$value){
@@ -936,6 +1007,7 @@ class RECORD extends API {
 						$records[] = $current_record;
 						$success = SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 							'values' => [
+								':case_state' => $case['case_state'] ? : null,
 								':record_type' => $case['record_type'] ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
@@ -1026,6 +1098,16 @@ class RECORD extends API {
 						]
 					]
 				];
+				$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+					'values' => [
+						':identifier' => $this->_requestedID
+					]
+				]);
+				$data = $data ? $data[0] : null;
+				if ($casestate = $this->casestate($data['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked)"], $data['case_state'])){
+					$body[] = [$casestate];
+				}
+
 				// get form recommendations
 				$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
 				$hidden = $bundles = [];
@@ -1452,7 +1534,14 @@ class RECORD extends API {
 					]];
 				}
 			}
-			if ($contextcolumns) $contextrows[] = $contextcolumns;
+			if ($contextcolumns) {
+				$context = explode('.', $context);
+				if ($casestate = $this->casestate($context[count($context) - 1], 'radio', ['onchange' => "console.log(this)"])){
+					$contextrows[] = [$casestate];
+				}
+
+				$contextrows[] = $contextcolumns;
+			}
 		}
 		array_push($content, ...$contextrows);
 
@@ -1481,8 +1570,7 @@ class RECORD extends API {
 			new DateTime($possibledate);
 		}
 		catch (Exception $e){
-			$now = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-			$new_id .= ' ' . $now->format('Y-m-d H:i');
+			$new_id .= ' ' . $this->_currentdate->format('Y-m-d H:i');
 		}
 
 		// compare identifiers, warn if similarity is too low
@@ -1576,6 +1664,7 @@ class RECORD extends API {
 			// overwrite identifier, append record altering
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 				'values' => [
+					':case_state' => $merge['case_state'] ? : null,
 					':record_type' => $merge['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
@@ -1601,6 +1690,7 @@ class RECORD extends API {
 	
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 				'values' => [
+					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $original['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
@@ -1656,6 +1746,7 @@ class RECORD extends API {
 
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 				'values' => [
+					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $record_type,
 					':identifier' => $original['identifier'],
 					':last_user' => $_SESSION['user']['id'],

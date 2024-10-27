@@ -88,7 +88,7 @@ prosthetics_II[training_schedules] = "Schulungspläne"
 prosthetics_II[outpatient_support] = "Ambulanzbetreuung"
 prosthetics_II[quality_control] = "Qualitätskontrolle"
 
-; formular kontekte - hier definiert im sinne der sprachliche anpassung
+; formular kontexte - hier definiert im sinne der sprachliche anpassung
 ; die wiederholte verwndung von schlüssel muss unabhängig vom ersten schlüssel vermieden werden
 ; übersetzungen sollten sich unterscheiden um verwirrung zu vermeiden
 ; keine verbotenen begriffe verwenden, wie sie in config.ini festgelegt sind
@@ -101,6 +101,18 @@ anonymous[generalrecords] = "Allgemeine Dokumentation"
 anonymous[descriptions] = "Verfahrens- oder Arbeitsanweisung"
 notdisplayedinrecords[mdr_sample_check_form] = "MDR §14 Stichprobenprüfung"
 notdisplayedinrecords[product_incorporation_form] = "Produkteinführung"
+
+; administrative fall-bearbeitungsstände
+; erzeugt ein pseudoformular um entsprechende bearbeitungsstände durch berechtigte nutzer anzugeben
+; und ermöglicht die filterung unabgeschlossener aufzeichnnungen nach dem jeweiligen status in der übersicht
+; die optionen sind mit dem basisschlüssel gemäß endschlüssel der formkontexts verknüpft
+; record_pseudoform_{basisschlüssel} übersetzung muss bei [record] angelegt sein
+[casestate]
+casedocumentation[reimbursement] = "Reimbursement requested"
+casedocumentation[inquiry] = "Cost bearer inquiry pending"
+casedocumentation[granted] = "Reimbursement granted"
+casedocumentation[production] = "Production tasked"
+casedocumentation[settled] = "Settled"
 
 ; alle schlüssel sind fest einprogrammiert
 [general]
@@ -981,6 +993,10 @@ record_retype_content = "Die Aufzeichnung wurde von :previoustype zu :newtype ge
 
 record_reminder_message = "Es sind :days Tage vergangen seit der letzten Aufzeichnung für :identifier. Die letzte Bearbeitung fand am :date mit :form statt.""
 Hilf bei der Weiterbearbeitung oder schließe den Fall ab."
+
+record_casestate_set = ":casestate bestätigt"
+record_casestate_revoked = ":casestate zurückgezogen"
+record_pseudoform_casedocumentation = "Fall Status"
 
 ; alle schlüssel sind fest einprogrammiert
 [risk]
