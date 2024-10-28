@@ -1309,29 +1309,27 @@ class CONSUMABLES extends API {
 		]);
 		$expiryproducts = [];
 		foreach($vendorproducts as $row){
-			if ($row['has_expiry_date']) {
-				if (!array_key_exists($row['vendor_name'], $expiryproducts)) $expiryproducts[$row['vendor_name']] = [
-					$row['article_name'] => [
-						'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
-						'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
-						'alike' => 0
-					]
+			if ($row['has_expiry_date']){
+				if (!array_key_exists($row['vendor_name'], $expiryproducts)) $expiryproducts[$row['vendor_name']] = [];
+				$expiryproducts[$row['vendor_name']][$row['article_name']] = [
+					'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
+					'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
+					'alike' => 0
 				];
-				else {
-					foreach ($expiryproducts[$row['vendor_name']] as $product => $properties){
-						similar_text($product, $row['article_name'], $percent);
-						if ($percent >= CONFIG['likeliness']['consumables_article_name_similarity']) {
-							$expiryproducts[$row['vendor_name']][$product]['alike']++;
-						}
-						else $expiryproducts[$row['vendor_name']][$row['article_name']] = [
-							'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
-							'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
-							'alike' => 0
-						];
+			}
+		}
+		foreach ($expiryproducts as $vendor => &$products){
+			foreach ($products as $productname => &$property){
+				foreach ($products as $productname2 => &$property2){
+					similar_text($productname, $productname2, $percent);
+					if ($percent >= CONFIG['likeliness']['consumables_article_name_similarity']) {
+						$property['alike']++;
+						unset($property2);
 					}
 				}
 			}
 		}
+
 		if ($expiryproducts){
 			$result['render']['content'][] = [];
 			foreach($expiryproducts as $vendor => $products){
