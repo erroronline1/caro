@@ -1311,7 +1311,8 @@ class CONSUMABLES extends API {
 		foreach($vendorproducts as $row){
 			if ($row['has_expiry_date']){
 				if (!array_key_exists($row['vendor_name'], $expiryproducts)) $expiryproducts[$row['vendor_name']] = [];
-				$expiryproducts[$row['vendor_name']][$row['article_name']] = [
+				$expiryproducts[$row['vendor_name']][] = [
+					'name' => $row['article_name'],
 					'display' => $row['article_no'] . ' ' .$row['article_name'] . ($row['article_alias'] ? ' (' . $row['article_alias'] . ')' : ''),
 					'link' => ['href' => "javascript:api.purchase('get', 'product', " . $row['id'] . ")"],
 					'alike' => 0
@@ -1319,12 +1320,14 @@ class CONSUMABLES extends API {
 			}
 		}
 		foreach ($expiryproducts as $vendor => &$products){
-			foreach ($products as $productname => &$property){
-				foreach ($products as $productname2 => &$property2){
-					similar_text($productname, $productname2, $percent);
-					if ($percent >= CONFIG['likeliness']['consumables_article_name_similarity']) {
-						$property['alike']++;
-						unset($property2);
+			foreach ($products as $p1 => &$product){
+				foreach ($products as $p2 => $product2){
+					if ($p1 != $p2){
+						similar_text($product['name'], $product2['name'], $percent);
+						if ($percent >= CONFIG['likeliness']['consumables_article_name_similarity']) {
+							$product['alike']++;
+							unset($products[$p2]);
+						}
 					}
 				}
 			}
@@ -1334,9 +1337,9 @@ class CONSUMABLES extends API {
 			$result['render']['content'][] = [];
 			foreach($expiryproducts as $vendor => $products){
 				$content = [];
-				foreach($products as $product => $properties){
-					$properties['display'] .= $properties['alike'] > 0 ? ' ' . LANG::GET('consumables.similar_name', [':number' => $properties['alike']]) : '';
-					$content[$properties['display']] = $properties['link'];
+				foreach($products as $product){
+					$product['display'] .= $product['alike'] > 0 ? ' ' . LANG::GET('consumables.similar_name', [':number' => $product['alike']]) : '';
+					$content[$product['display']] = $product['link'];
 				}
 				$result['render']['content'][1][] = [
 					'type' => 'links',
