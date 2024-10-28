@@ -837,7 +837,7 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "products_with_expiry_dates", "products_with_special_attention", "exportpricelist"].includes(request[0]))
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "exportpricelist"].includes(request[0]))
 			request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
@@ -856,8 +856,6 @@ export const api = {
 				pendingincorporations: LANG.GET("menu.purchase_incorporated_pending"),
 				vendorinformation: LANG.GET("menu.purchase_vendor_information"),
 				productinformation: LANG.GET("menu.purchase_product_information"),
-				products_with_expiry_dates: LANG.GET("menu.purchase_products_with_expiry_dates"),
-				products_with_special_attention: LANG.GET("menu.purchase_products_with_special_attention"),
 			};
 		if (request[2] === LANG.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {

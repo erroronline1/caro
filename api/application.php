@@ -392,8 +392,6 @@ class APPLICATION extends API {
 				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
 				LANG::GET('menu.purchase_vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
 				LANG::GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"],
-				LANG::GET('menu.purchase_products_with_expiry_dates') => ['onpointerup' => "api.purchase('get', 'products_with_expiry_dates')"],
-				LANG::GET('menu.purchase_products_with_special_attention') => ['onpointerup' => "api.purchase('get', 'products_with_special_attention')"],
 			],
 			LANG::GET('menu.tools_header') => [
 				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],

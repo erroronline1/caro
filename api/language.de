@@ -724,8 +724,6 @@ purchase_prepared_orders = "Vorbereitete Bestellungen"
 purchase_approved_orders = "Freigegebene Bestellungen"
 purchase_vendor = "Lieferanten"
 purchase_product = "Produkte"
-purchase_products_with_expiry_dates = "Produkte mit Verfallsdaten"
-purchase_products_with_special_attention = "Produkte mit Hautkontakt"
 purchase_incorporated_pending = "Laufende Produkteinführungen"
 
 files_header = "Dateien"

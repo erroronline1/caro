@@ -722,8 +722,6 @@ purchase_prepared_orders = "Prepared orders"
 purchase_approved_orders = "Approved orders"
 purchase_vendor = "Vendors"
 purchase_product = "Products"
-purchase_products_with_expiry_dates = "Products with expiry dates"
-purchase_products_with_special_attention = "Products with skin contact"
 purchase_incorporated_pending = "Pending incorporations"
 
 files_header = "Files"

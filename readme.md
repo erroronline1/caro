@@ -107,7 +107,6 @@
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
-* consumables: expiry products overviev veeeery slow on 45k products
 * order stresstest shows significant lag for 200+ entries due to excessive linking?
     * payload is >4mb for 1k orders: reduce payload, pass only values and create a reusable client method for rendering
     * approximately 500 ordered items per month!
@@ -2075,34 +2074,6 @@ Similar to vendor.
 Sample response
 ```
 {"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
-```
-
-> GET ./api/api.php/consumables/products_with_expiry_dates/{id}
-
-Returns a list of products grouped by vendor that have been flagged as having an expiry date.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | vendor id to filter |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textsection","attributes":{"name":Otto Bock"},"content":"633S2 Procomfort-Gel\n"}]]}}
-```
-
-> GET ./api/api.php/consumables/products_with_special_attention/{id}
-
-Returns a list of products grouped by vendor that have been flagged as needing special attention.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | vendor id to filter |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"... all vendors":{"value":"0"},"neuhof":{"value":2},"Otto Bock":{"value":1}},"attributes":{"id":"productsearchvendor","name":"Filter vendors","onchange":"api.purchase('get', 'products_with_expiry_dates', this.value)"}}],[{"type":"textsection","attributes":{"name":"Otto Bock"},"content":"633S2 Procomfort-Gel\n"}]]}}
 ```
 
 > GET ./api/api.php/consumables/vendor/{name|id}
