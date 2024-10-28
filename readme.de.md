@@ -1101,6 +1101,7 @@ orderprocessing = "purchase"; Bestellungen bearbeiten
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; Artikel anlegen und bearbeiten, mindestens die gleichen Gruppen wie incorporation
 productslimited = "purchase_assistant" ; eingeschränkte Bearbeitung von Artikeln 
 recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeichnen, Identifikator ändern (z.B. bei versehentlicher doppelter Anlage)
+recordscasestate = "ceo, supervisor, office" ; Fall-Stände bearbeiten
 recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewollte Datenverbreitung einzuschränken
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen

@@ -103,7 +103,6 @@
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
 * recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
     * export from composer -> change store syntax for forms to json containing component ids
-* office inputs pseudoform as filter column (insurance requests, insurance approved, treatment in progress, etc) for improved priority overview
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1174,6 +1173,7 @@ orderdisplayall = "purchase" ; display all orders by default, not only for own u
 orderprocessing = "purchase"; process orders
 products = "ceo, qmo, purchase, purchase_assistant, prrc" ; add and edit products; needs at least the same as incorporation
 productslimited = "purchase_assistant" ; limited editing of products
+recordscasestate = "ceo, supervisor, office" ; set casestates
 recordsclosing = "ceo, supervisor" ; mark record as closed, reassign identifier (e.g. on accidentally duplicate creation)
 recordsexport = "user"; exporting records, limit if reasonable to reduce risk of data breach
 recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
@@ -2791,6 +2791,22 @@ Parameters
 Sample response
 ```
 {"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'form', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'form', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'form', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'form', 'restricted documentation')"}}}]}}
+```
+
+> PUT ./api/api.php/record/casestate/{identifier}/{state}/{bool}
+
+Marks all database entries with passed identifier as closed.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for records |
+| {state} | path parameter | required | as defined within languagefiles |
+| {bool} | path parameter | required | true or false |
+
+Sample response
+```
+{"response":{"msg":"Reimbursement granted set","type":"success"}}
 ```
 
 > PUT ./api/api.php/record/close/{identifier}
