@@ -107,7 +107,7 @@ class RECORD extends API {
 	public function casestate($context = null, $type = 'checkbox', $action = [], $checked = []){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				if (array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
+				if (!PERMISSION::permissionFor('recordscasestate') || array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 				$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 					'values' => [
@@ -158,7 +158,8 @@ class RECORD extends API {
 				foreach(LANGUAGEFILE['casestate'][$context] as $state => $translation){
 					$content[$translation] = $action;
 					$content[$translation]['data-casestate'] = $state;
-					if (isset($checked[$state])) $content[$translation]['checked'] = true; 
+					if (isset($checked[$state])) $content[$translation]['checked'] = true;
+					if (!PERMISSION::permissionFor('recordscasestate') && $type === 'checkbox') $content[$translation]['disabled'] = true;
 				}
 				return [
 					'type' => $type,
@@ -1478,7 +1479,14 @@ class RECORD extends API {
 				':date' => substr($row['last_touch'], 0, -3),
 				':form' => $lastform['name']
 				]) . ($row['record_type'] === 'complaint' ? ' *' : '');
-			$contexts[$row['context']][$targets[$target]][$linkdisplay] = ['href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"];
+			$contexts[$row['context']][$targets[$target]][$linkdisplay] = [
+				'href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"
+			];
+			// apply case state if applicable
+			$case_state = json_decode($row['case_state'] ? : '', true) ? : [];
+			foreach($case_state as $case => $state){
+				$contexts[$row['context']][$targets[$target]][$linkdisplay]['data-'.$case] = $state;
+			}
 		}
 		// delete double entries
 		foreach($contexts as &$context){
@@ -1536,7 +1544,7 @@ class RECORD extends API {
 			}
 			if ($contextcolumns) {
 				$context = explode('.', $context);
-				if ($casestate = $this->casestate($context[count($context) - 1], 'radio', ['onchange' => "console.log(this)"])){
+				if ($casestate = $this->casestate($context[count($context) - 1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"])){
 					$contextrows[] = [$casestate];
 				}
 
