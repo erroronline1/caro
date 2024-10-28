@@ -513,7 +513,7 @@ const _client = {
 					});
 
 				// display approval signature
-				if (element.approval)
+				if (element.approval != null)
 					collapsible.push({
 						type: "image",
 						attributes: {
