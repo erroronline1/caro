@@ -108,11 +108,11 @@ notdisplayedinrecords[product_incorporation_form] = "Produkteinführung"
 ; die optionen sind mit dem basisschlüssel gemäß endschlüssel der formkontexts verknüpft
 ; record_pseudoform_{basisschlüssel} übersetzung muss bei [record] angelegt sein
 [casestate]
-casedocumentation[reimbursement] = "Reimbursement requested"
-casedocumentation[inquiry] = "Cost bearer inquiry pending"
-casedocumentation[granted] = "Reimbursement granted"
-casedocumentation[production] = "Production tasked"
-casedocumentation[settled] = "Settled"
+casedocumentation[reimbursement] = "Beantragt"
+casedocumentation[inquiry] = "Offene Anfrage des Kostenträgers"
+casedocumentation[granted] = "Genehmigt"
+casedocumentation[production] = "Fertigung beauftragt"
+casedocumentation[settled] = "Abgerechnet"
 
 ; alle schlüssel sind fest einprogrammiert
 [general]

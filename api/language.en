@@ -110,8 +110,8 @@ notdisplayedinrecords[product_incorporation_form] = "Product incorporation"
 [casestate]
 casedocumentation[reimbursement] = "Reimbursement requested"
 casedocumentation[inquiry] = "Cost bearer inquiry pending"
-casedocumentation[production] = "Production tasked"
 casedocumentation[granted] = "Reimbursement granted"
+casedocumentation[production] = "Production tasked"
 casedocumentation[settled] = "Settled"
 
 ; all keys are hardcoded
