@@ -575,31 +575,6 @@ class AUDIT extends API {
 	}
 
 	/**
-	 *   _     _           _                                 _
-	 *  | |___| |_ ___ ___| |_ ___ ___ ___ ___ ___ _ _ ___ _| |___ ___ _____ ___
-	 *  | | .'|  _| -_|_ -|  _| .'| . | . |  _| . | | | -_| . |   | .'|     | -_|
-	 *  |_|__,|_| |___|___|_| |__,|  _|  _|_| |___|\_/|___|___|_|_|__,|_|_|_|___|
-	 *                            |_| |_|
-	 * returns the latest approved form, component by name from query
-	 * @param string $query as defined within sqlinterface
-	 * @param string $name
-	 * @return array|bool either query row or false
-	 */
-	private function latestApprovedName($query = '', $name = ''){
-		// get latest approved by name
-		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
-			'values' => [
-				':name' => $name
-			]
-		]);
-		foreach ($elements as $element){
-			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
-		}
-		return false;
-	}
-
-
-	/**
 	 *           _                       _         _           _
 	 *   _____ _| |___ ___ ___ _____ ___| |___ ___| |_ ___ ___| |_
 	 *  |     | . |  _|_ -| .'|     | . | | -_|  _|   | -_|  _| '_|
