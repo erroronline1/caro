@@ -968,7 +968,7 @@ export class Compose extends Assemble {
 	 */
 
 	compose_calendarbutton() {
-		let result = [this.br()];
+		let result = [...this.br()];
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
@@ -1191,7 +1191,7 @@ export class Compose extends Assemble {
 	}
 
 	compose_formbutton() {
-		let result = [this.br()],
+		let result = [...this.br()],
 			forms = this.currentElement.content;
 
 		this.currentElement = {
@@ -1223,7 +1223,7 @@ export class Compose extends Assemble {
 		this.currentElement.content[LANG.GET("assemble.compose_link_form_continue")] = {
 			required: true,
 		};
-		result = result.concat(this.br(), ...this.radio());
+		result = result.concat(...this.br(), ...this.radio());
 
 		this.currentElement = {
 			attributes: {
@@ -1243,14 +1243,14 @@ export class Compose extends Assemble {
 				name: LANG.GET("assemble.compose_image_description"),
 			},
 		};
-		result = result.concat(...this.text(), this.br());
+		result = result.concat(...this.text(), ...this.br());
 		this.currentElement = {
 			type: "photo",
 			attributes: {
 				name: LANG.GET("assemble.compose_image"),
 			},
 		};
-		result = result.concat(...this.photo(), this.br());
+		result = result.concat(...this.photo(), ...this.br());
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_image"),
@@ -1292,7 +1292,7 @@ export class Compose extends Assemble {
 			this.currentElement.content[LANG.GET("assemble.compose_texttemplate")] = {
 				name: LANG.GET("assemble.compose_texttemplate"),
 			};
-		result = result.concat(this.br(), ...this.checkbox());
+		result = result.concat(...this.br(), ...this.checkbox());
 		this.currentElement = {
 			attributes: {
 				value: type.description,
@@ -1359,7 +1359,7 @@ export class Compose extends Assemble {
 				this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
 					name: LANG.GET("assemble.compose_multiple"),
 				};
-			result = result.concat(this.br(), ...this.checkbox());
+			result = result.concat(...this.br(), ...this.checkbox());
 		}
 		this.currentElement = {
 			attributes: {
@@ -1518,6 +1518,7 @@ export class Compose extends Assemble {
 			type: "signature",
 			description: LANG.GET("assemble.compose_signature"),
 			required: "optional",
+			hint: LANG.GET("assemble.compose_signature_hint"),
 		});
 	}
 
@@ -1536,6 +1537,7 @@ export class Compose extends Assemble {
 			attributes: {
 				name: LANG.GET("assemble.compose_field_hint"),
 			},
+			hint: type.hint ? type.hint : null,
 		};
 		result = result.concat(...this.text());
 		if (type.required !== undefined) {
@@ -1545,12 +1547,13 @@ export class Compose extends Assemble {
 			this.currentElement.content[LANG.GET("assemble.compose_required")] = {
 				name: LANG.GET("assemble.compose_required"),
 			};
-			result = result.concat(this.br(), ...this.checkbox());
+			result = result.concat(...this.br(), ...this.checkbox());
 		}
 
 		this.currentElement = {
 			type: "checkbox",
 			content: {},
+
 		};
 		if (type.multiple !== undefined) {
 			this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
@@ -1563,7 +1566,7 @@ export class Compose extends Assemble {
 				id: "setIdentify",
 			};
 		}
-		if (Object.keys(this.currentElement.content).length) result = result.concat(this.br(), ...this.checkbox());
+		if (Object.keys(this.currentElement.content).length) result = result.concat(...this.br(), ...this.checkbox());
 
 		this.currentElement = {
 			attributes: {

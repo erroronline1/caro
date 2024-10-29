@@ -256,6 +256,7 @@ compose_range_step_hint = "Positive numerische Werte, Kommazahlen oder buchstäb
 compose_file = "Füge einen Datei-Upload hinzu"
 compose_photo = "Füge einen Foto-Upload hinzu"
 compose_signature = "Füge ein Unterschriftenfeld hinzu"
+compose_signature_hint = "Zur Erinnerung: die Unterschrift ist mangels Zertifizierung nicht dokumentensicher"
 compose_scanner = "Füge ein Scannerfeld hinzu"
 compose_calendarbutton = "Füge eine Kalenderschaltfläche hinzu"
 compose_calendarbutton_not_working = "Diese Schalfläche kann im Bearbeitungsmodus nicht verwendet werden, öffnet in freigegebenen Formularen aber einen Dialog um Kalendereinträge zu erstellen."

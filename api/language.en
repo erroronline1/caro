@@ -256,6 +256,7 @@ compose_range_step_hint = "Positive numerical values, float values or literally 
 compose_file = "Add a file upload"
 compose_photo = "Add a photo upload"
 compose_signature = "Add a signature pad"
+compose_signature_hint = "Remember this signature not being document proof for lacking certification"
 compose_scanner = "Add a scanner field"
 compose_calendarbutton = "Add a calendar button"
 compose_calendarbutton_not_working = "This button does not work in component- or form-editor but will open a dialog to contribute an event to the calendar on actual approved forms."
