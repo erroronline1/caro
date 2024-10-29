@@ -416,6 +416,11 @@ documents_in_use_external = "Externe Dokumente in Nutzung"
 documents_in_use_bundles = "Pakete und zugehörige Formulare"
 documents_in_use_approved = "Freigegeben von :permission :name am :date"
 
+forms_date = "Datum"
+forms_time = "Zeit"
+forms_update_button = "Aktualisiere gültige Dokumente zum angebenen Zeitpunkt"
+forms_export_timestamp = "am :timestamp"
+
 mdrsamplecheck_warning_description = "Manche Lieferanten haben Produkte die für eine Stichprobenprüfung in Frage kommen!"
 mdrsamplecheck_warning_content = "Beobachte Bestellungen von folgenden Lieferanten und sensibilisiere für die Beachtung: :vendors"
 incorporation_warning_description = "Manche bestellten Produkte benötigen noch eine Produkteinführung!"

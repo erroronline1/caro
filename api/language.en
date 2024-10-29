@@ -416,6 +416,11 @@ documents_in_use_external = "External documents in use"
 documents_in_use_bundles = "Bundles in use with respective forms"
 documents_in_use_approved = ":permission :name approved on :date"
 
+forms_date = "Date"
+forms_time = "Time"
+forms_update_button = "Update documents in use at the given date/time"
+forms_export_timestamp = "on :timestamp"
+
 mdrsamplecheck_warning_description = "Some vendors have products that qualify for a sample check!"
 mdrsamplecheck_warning_content = "Observe orders from following vendors and sensitise for compliance: :vendors"
 incorporation_warning_description = "Some ordered products still have to be incorporated!"
@@ -440,6 +445,7 @@ complaints_summary = ":number complaints within this year, of those :closed reco
 complaints_case_description = ":identifier within one of units :units"
 complaints_closed = ", marked as closed"
 
+; all keys are hardcoded
 [calendar]
 month_previous = "previous month"
 month_next = "next month"
@@ -608,6 +614,7 @@ approve_landing_page = ":number incomplete incorporations"
 
 information_vendor = "Vendors"
 information_products_available = ":available available products in database"
+
 similar_name = "and :number with a similar name"
 
 ; all keys are hardcoded

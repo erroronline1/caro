@@ -101,8 +101,7 @@
 * review max display option for summary overview
 * exportform documentation type, 'user'-name field by default, date, time -> available for groups as well?
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
-* recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
-    * export from composer -> change store syntax for forms to json containing component ids
+* after displaying form approvals on given date/time maybe recreate outdated forms for compliance reasons, hint that this is not the current version if newer approved exist
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1787,7 +1786,7 @@ Sample response
 {"response":{"msg":"Order statistics have been deleted.","type":"success"}}
 ```
 
-> GET ./api/api.php/audit/checks/{type}
+> GET ./api/api.php/audit/checks/{type}/{date}/{time}
 
 Returns selection of available checks, given type the result of the selected type.
 
@@ -1795,13 +1794,15 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | optional | adds contents based on given type to response |
+| {date} | path parameter | optional | e.g. forms validity limited to date/time |
+| {time} | path parameter | optional | e.g. forms validity limited to date/time |
 
 Sample response
 ```
 {"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
-> GET ./api/api.php/audit/export/{type}
+> GET ./api/api.php/audit/export/{type}/{date}/{time}
 
 Returns a download link to a temporary file based on type.
 
@@ -1809,6 +1810,8 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | defines the response, none if omitted |
+| {date} | path parameter | optional | e.g. forms validity limited to date/time |
+| {time} | path parameter | optional | e.g. forms validity limited to date/time |
 
 Sample response
 ```
