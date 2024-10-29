@@ -250,7 +250,6 @@ class AUDIT extends API {
 
 		$this->_requestedDate = $this->_requestedDate ? : $this->_currentdate->format('Y-m-d');
 		$this->_requestedTime = $this->_requestedTime ? : $this->_currentdate->format('H:i:59');
-		$requestedTimestamp = $this->_requestedDate . ' ' . $this->_requestedTime;
 
 		function latestApprovedComponent($components, $requestedTimestamp, $name = ''){
 			if (!$name) return false;
@@ -266,7 +265,7 @@ class AUDIT extends API {
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = $currentforms = [];
 		foreach($forms as $form){
-			if (!PERMISSION::fullyapproved('formapproval', $form['approval']) || $form['date'] >= $requestedTimestamp) continue;
+			if (!PERMISSION::fullyapproved('formapproval', $form['approval']) || $form['date'] >= $this->_requestedDate . ' ' . $this->_requestedTime) continue;
 			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
 		}
@@ -302,6 +301,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
+					'data-type' => 'generateupdate',
 					'value' => LANG::GET('audit.forms_update_button'),
 					'onpointerup' => "api.audit('get', 'checks', 'forms', document.getElementById('_forms_date').value, document.getElementById('_forms_time').value)"
 				]
@@ -311,7 +311,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => LANG::GET('audit.documents_in_use_documents')
 				],
-				'content' => LANG::GET('audit.forms_export_timestamp', [':timestamp' => $requestedTimestamp])
+				'content' => LANG::GET('audit.forms_export_timestamp', [':timestamp' => $this->_requestedDate . ' ' . $this->_requestedTime])
 			]
 		];
 
@@ -328,7 +328,7 @@ class AUDIT extends API {
 			}
 			// display component approval
 			foreach(explode(',', $form['content'] ? : '') as $used_component_name){
-				if ($cmpnnt = latestApprovedComponent($components, $requestedTimestamp, $used_component_name)){
+				if ($cmpnnt = latestApprovedComponent($components, $this->_requestedDate . ' ' . $this->_requestedTime, $used_component_name)){
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
 					$entry .= " \n" . $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
 					foreach($cmpnnt['approval'] as $position => $data){
@@ -350,6 +350,40 @@ class AUDIT extends API {
 					'name' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']])
 				],
 				'content' => $entry
+			];
+			$formscontent[] = [
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'data-type' => 'download',
+					'value' => LANG::GET('record.form_export'),
+					'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.form_export') . "', render: JSON.parse('" . json_encode(
+						[
+							[
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']])
+								],
+							],
+							[
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => '_maxFormTimestamp',
+									'value' => $this->_requestedDate . ' ' . $this->_requestedTime
+								]
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => 'form_id',
+									'value' => $form['id']
+								]
+							]
+						]
+					) . "'), options:{".
+					"'" . LANG::GET('general.cancel_button') . "': false,".
+					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+					"}}).then(response => {if (response) api.record('post', 'exportform', null, _client.application.dialogToFormdata(response))})"
+				]
 			];
 		}
 

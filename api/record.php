@@ -248,10 +248,13 @@ class RECORD extends API {
 
 		$context = $form_id = null;
 		$identifier = null;
-		if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
+		//if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
 		if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
 		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
+
+		// used by audit for export of outdated forms
+		if ($maxFormTimestamp = UTILITY::propertySet($this->_payload, '_maxFormTimestamp')) unset($this->_payload->_maxFormTimestamp);
 
 		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
 			'values' => [
@@ -260,6 +263,7 @@ class RECORD extends API {
 		]);
 		$form = $form ? $form[0] : null;
 		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
+		if ($form['date'] >= $maxFormTimestamp) $this->response([], 409);
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
@@ -381,7 +385,7 @@ class RECORD extends API {
 		$componentscontent = [];
 		$enumerate = [];
 		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
+			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent, $maxFormTimestamp);
 			if (!$component) continue;
 			$component['content'] = json_decode($component['content'], true);
 
@@ -843,7 +847,9 @@ class RECORD extends API {
 	 * @param string $name
 	 * @return array|bool either query row or false
 	 */
-	private function latestApprovedName($query = '', $name = ''){
+	private function latestApprovedName($query = '', $name = '', $requestedTimestamp = null){
+		$requestedTimestamp = $requestedTimestamp ? : $this->_currentdate->format('Y-m-d') . ' ' . $this->_currentdate->format('H:i:59');
+
 		// get latest approved by name
 		$element = [];
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
@@ -853,7 +859,7 @@ class RECORD extends API {
 		]);
 		foreach ($elements as $element){
 			if (!$element['hidden'] && in_array($element['context'], ['bundle'])) return $element;
-			if (!$element['hidden'] && PERMISSION::fullyapproved('formapproval', $element['approval']) && PERMISSION::permissionIn($element['restricted_access'])) return $element;
+			if (!$element['hidden'] && PERMISSION::fullyapproved('formapproval', $element['approval']) && PERMISSION::permissionIn($element['restricted_access']) && $element['date'] <= $requestedTimestamp) return $element;
 		}
 		return false;
 	}
