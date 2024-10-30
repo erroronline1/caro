@@ -158,7 +158,7 @@ $queries = [
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`hidden` tinyint NOT NULL," .
+				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`approval` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`permitted_export` tinyint NULL DEFAULT NULL," .
@@ -391,7 +391,7 @@ $queries = [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL," .
+				"	hidden varchar(MAX) NULL DEFAULT NULL," .
 				"	approval varchar(MAX) NULL DEFAULT NULL," .
 				"	regulatory_context varchar(MAX) NULL DEFAULT NULL," .
 				"	permitted_export tinyint NULL DEFAULT NULL," .

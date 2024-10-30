@@ -101,8 +101,6 @@
 * review max display option for summary overview
 * exportform documentation type, 'user'-name field by default, date, time -> available for groups as well?
     * -> reconsider availability of forms and records for groups, just no database entries or mandatory name field
-* audit: make sure elements are not hidden to be displayed within current documents in use (e.g. set incorporation component to hidden)
-* set form/component hidden attribute to datetime instead of boolean
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

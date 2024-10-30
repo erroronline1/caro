@@ -286,7 +286,7 @@ class FORM extends API {
 						'values' => [
 							':alias' => $exists['alias'],
 							':context' => $exists['context'],
-							':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_hidden')) === LANG::PROPERTY('assemble.edit_bundle_hidden_hidden')? 1 : 0,
+							':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_hidden')) === LANG::PROPERTY('assemble.edit_bundle_hidden_hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 							':id' => $exists['id'],
 							':regulatory_context' => '',
 							':permitted_export' => null,
@@ -354,7 +354,7 @@ class FORM extends API {
 					'date' => '',
 					'author' => '',
 					'content' => '',
-					'hidden' => 0
+					'hidden' => NULL
 				];
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
@@ -465,7 +465,11 @@ class FORM extends API {
 						],
 						'hint' => LANG::GET('assemble.edit_bundle_hidden_hint')
 					];
-					if ($bundle['hidden']) $hidden['content'][LANG::GET('assemble.edit_bundle_hidden_hidden')]['checked'] = true;
+					if ($bundle['hidden']) {
+						$bundle['hidden'] = json_decode($bundle['hidden'], true);
+						$hidden['content'][LANG::GET('assemble.edit_bundle_hidden_hidden')]['checked'] = true;
+						$hidden['hint'] .= ' ' . LANG::GET('assemble.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $bundle['hidden']['date']]);
+					}
 					array_push($return['render']['content'][1], $hidden);
 				}
 
@@ -574,7 +578,7 @@ class FORM extends API {
 								':context' => 'component',
 								':author' => $_SESSION['user']['name'],
 								':content' => json_encode($component),
-								':hidden' => $component_hidden,
+								':hidden' => $component_hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -602,7 +606,7 @@ class FORM extends API {
 								':context' => 'component',
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $component_hidden,
+								':hidden' => $component_hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -763,7 +767,8 @@ class FORM extends API {
 				$options[$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
 			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		// load approved forms for occasional linking
@@ -917,12 +922,11 @@ class FORM extends API {
 				],
 				[[
 					'type' => 'compose_component',
-					'description' => LANG::GET('assemble.compose_component'),
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
 						($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')) . '\n \n' .
 						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
-					'hidden' => $component['name'] ? intval($component['hidden']) : 1,
+					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : 1,
 					'approve' => $approve
 				]],
 				[[
@@ -1029,7 +1033,7 @@ class FORM extends API {
 								':context' => $this->_payload->context,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
-								':hidden' => intval($this->_payload->hidden),
+								':hidden' => boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : NULL,
 								':approval' => null,
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? : 0,
@@ -1057,7 +1061,7 @@ class FORM extends API {
 								':context' => $this->_payload->context,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => intval($this->_payload->hidden),
+								':hidden' =>  boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : NULL,
 								':approval' => $exists['approval'],
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? : 0,
@@ -1188,7 +1192,8 @@ class FORM extends API {
 				$formoptions[$row['name']] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
 			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
+			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		// prepare existing component list of fully approved
@@ -1337,7 +1342,6 @@ class FORM extends API {
 				], [
 					[
 						'type' => 'compose_form',
-						'description' => LANG::GET('assemble.compose_form'),
 						'value' => $form['name'] ? : '',
 						'alias' => [
 							'name' => LANG::GET('assemble.edit_form_alias'),
@@ -1353,7 +1357,7 @@ class FORM extends API {
 						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
 						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
 						,
-						'hidden' => $form['name'] ? intval($form['hidden']) : 1,
+						'hidden' => $form['name'] ? json_decode($form['hidden'] ? : '', true) : null,
 						'approve' => $approve,
 						'regulatory_context' => $regulatory_context ? : ' ',
 						'permitted_export' => $permitted_export,
@@ -1387,7 +1391,7 @@ class FORM extends API {
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
 					$component['content']['name'] = $usedcomponent;
-					$component['content']['hidden'] = boolval(intval($component['hidden']));
+					$component['content']['hidden'] = json_decode($component['hidden'] ? : '', true);
 					$return['render']['components'][] = $component['content'];
 				}
 			}

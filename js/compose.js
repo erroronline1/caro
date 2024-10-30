@@ -1021,7 +1021,7 @@ export class Compose extends Assemble {
 			alias = this.currentElement.alias,
 			context = this.currentElement.context,
 			prefilled = Boolean(this.currentElement.value),
-			hidden = Boolean(this.currentElement.hidden),
+			hidden = this.currentElement.hidden,
 			approve = this.currentElement.approve,
 			regulatory_context = this.currentElement.regulatory_context,
 			permitted_export = this.currentElement.permitted_export,
@@ -1111,12 +1111,12 @@ export class Compose extends Assemble {
 		}
 		if (prefilled) {
 			const options = {};
-			options[LANG.GET("assemble.edit_component_form_hidden_visible")] = !hidden
+			options[LANG.GET("assemble.edit_component_form_hidden_visible")] = !(hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 				  }
 				: {};
-			options[LANG.GET("assemble.edit_component_form_hidden_hidden")] = hidden
+			options[LANG.GET("assemble.edit_component_form_hidden_hidden")] = (hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 						"data-hiddenradio": "ComponentHidden",
@@ -1126,7 +1126,14 @@ export class Compose extends Assemble {
 				  };
 			this.currentElement = {
 				type: "radio",
-				hint: std.hidden.hint,
+				hint:
+					std.hidden.hint +
+					((hidden && Object.keys(hidden).length)
+						? " " + LANG.GET("assemble.edit_hidden_set", {
+								":name": hidden.name,
+								":date": hidden.date,
+						  })
+						: ""),
 				attributes: {
 					name: std.hidden.name,
 				},
@@ -1553,7 +1560,6 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "checkbox",
 			content: {},
-
 		};
 		if (type.multiple !== undefined) {
 			this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
