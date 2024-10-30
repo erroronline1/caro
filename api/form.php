@@ -926,7 +926,7 @@ class FORM extends API {
 					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
 						($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')) . '\n \n' .
 						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
-					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : 1,
+					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
 					'approve' => $approve
 				]],
 				[[
