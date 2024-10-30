@@ -255,6 +255,7 @@ class RECORD extends API {
 
 		// used by audit for export of outdated forms
 		if ($maxFormTimestamp = UTILITY::propertySet($this->_payload, '_maxFormTimestamp')) unset($this->_payload->_maxFormTimestamp);
+		else $maxFormTimestamp = $this->_currentdate->format('Y-m-d H:i:s');
 
 		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
 			'values' => [
@@ -451,13 +452,22 @@ class RECORD extends API {
 			}
 			return $content;
 		};
+		$has_components = false;
 		foreach(explode(',', $form['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
 			if ($component){
+				$has_components = true;
 				$component['content'] = json_decode($component['content'], true);
 				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
 			}
 		}
+		if (!$has_components) array_push($return['render']['content'], [[
+			'type' => 'textsection',
+			'attributes' => [
+				'class' => 'orange',
+				'name' => LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formcomposer', true)))])
+			]
+		]]);
 
 		// check if a submit button is applicable
 		function saveable($element){
@@ -859,7 +869,13 @@ class RECORD extends API {
 		]);
 		foreach ($elements as $element){
 			if (!$element['hidden'] && in_array($element['context'], ['bundle'])) return $element;
-			if (!$element['hidden'] && PERMISSION::fullyapproved('formapproval', $element['approval']) && PERMISSION::permissionIn($element['restricted_access']) && $element['date'] <= $requestedTimestamp) return $element;
+			if (PERMISSION::fullyapproved('formapproval', $element['approval']) && 
+				PERMISSION::permissionIn($element['restricted_access']) && 
+				$element['date'] <= $requestedTimestamp) {
+					$element['hidden'] = json_decode($element['hidden'] ? : '', true); 
+					if(!$element['hidden'] || $element['hidden']['date'] > $requestedTimestamp) return $element;
+					else return false;
+				}
 		}
 		return false;
 	}

@@ -376,6 +376,7 @@ error_component_not_found = "Component :name could not be found in database, ple
 error_form_not_found = "Form :name could not be found in database, please try something else."
 error_bundle_not_found = "Bundle :name could not be found in database, please try something else."
 error_faulty_widget = "This element does not adhere to the allowed syntax:"
+error_no_approved_components = "It seems all contents of this document have been deactivated. Please inform any of :permission to clean things up!"
 
 edit_existing_bundle_select = "Edit existing latest bundle"
 edit_existing_bundle_all = "Edit any existing bundle"
@@ -391,9 +392,9 @@ edit_bundle_hidden_visible = "visible"
 edit_bundle_hidden_hidden = "hidden"
 edit_bundle_hidden_hint = "Hidden bundles are not reachable"
 edit_bundle_saved = "Hidden bundles are not reachable"
-edit_bundle_hidden_hint = "Hidden bundles are not reachable"
-edit_bundle_saved = "Form bundle :name has been saved"
 edit_bundle_not_saved = "Form bundle could not been saved"
+
+edit_hidden_set = "Hidden on :date by :name"
 
 ; all keys are hardcoded
 [audit]

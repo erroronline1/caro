@@ -256,7 +256,12 @@ class AUDIT extends API {
 			// get latest approved by name
 			$named_components = array_filter($components, Fn($component) => $component['name'] === $name);
 			foreach ($named_components as $component){
-				if (PERMISSION::fullyapproved('formapproval', $component['approval']) && $component['date'] <= $requestedTimestamp) return $component;
+				if (PERMISSION::fullyapproved('formapproval', $component['approval']) && 
+					$component['date'] <= $requestedTimestamp) {
+						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
+						if (!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp) return $component;
+						else return false;
+					}
 			}
 			return false;
 		}
@@ -327,8 +332,10 @@ class AUDIT extends API {
 				]) . "\n";
 			}
 			// display component approval
+			$has_components = false;
 			foreach(explode(',', $form['content'] ? : '') as $used_component_name){
 				if ($cmpnnt = latestApprovedComponent($components, $this->_requestedDate . ' ' . $this->_requestedTime, $used_component_name)){
+					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
 					$entry .= " \n" . $cmpnnt['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
 					foreach($cmpnnt['approval'] as $position => $data){
@@ -351,6 +358,10 @@ class AUDIT extends API {
 				],
 				'content' => $entry
 			];
+			if (!$has_components) {
+				$formscontent[count($formscontent) - 1]['attributes']['class'] = 'orange';
+				$formscontent[count($formscontent) - 1]['content'] .="\n \n" . LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formcomposer', true)))]);
+			}
 			$formscontent[] = [
 				'type' => 'button',
 				'attributes' => [
