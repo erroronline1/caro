@@ -188,7 +188,7 @@ class STRESSTEST{
 				':order_data' => json_encode(
 					[
 						'quantity_label' => random_int(1,10),
-						'unit_label' => $product['article_unit'],
+						'unit_label' => random_int(0,1) ? $product['article_unit'] : '',
 						'ordernumber_label' => $product['article_no'],
 						'productname_label' => $product['article_name'],
 						'barcode_label' => $product['article_ean'],

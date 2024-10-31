@@ -383,14 +383,12 @@ const _client = {
 					type: "textsection",
 					content:
 						LANG.GET("order.prepared_order_item", {
-							":quantity": element.quantity,
-							":unit": element.unit,
-							":number": element.ordernumber,
-							":name": element.name,
-							":vendor": element.vendor,
-						}) +
-						"\n" +
-						element.ordertext,
+							":quantity": element.quantity ? element.quantity : "",
+							":unit": element.unit ? element.unit : "",
+							":number": element.ordernumber ? element.ordernumber : "",
+							":name": element.name ? element.name : "",
+							":vendor": element.vendor ? element.vendor : "",
+						}) + (element.ordertext ? "\n" + element.ordertext : ""),
 					attributes: {
 						name: LANG.GET("order.ordertype." + element.ordertype),
 						"data-type": element.ordertype,
@@ -398,61 +396,65 @@ const _client = {
 				});
 
 				// append commission
-				buttons = {};
-				buttons[LANG.GET("general.ok_button")] = true;
-				collapsible.push({
-					type: "text_copy",
-					attributes: {
-						value: element.commission,
-						name: LANG.GET("order.commission"),
-						readonly: true,
-						onpointerup: function () {
-							new Dialog({
-								type: "input",
-								header: LANG.GET("order.commission"),
-								render: [
-									[
-										{
-											type: "text",
-											attributes: {
-												value: "element.commission",
-												name: LANG.GET("order.commission"),
-												readonly: true,
-												onpointerup: "_client.application.toClipboard(this)",
+				if (element.commission) {
+					buttons = {};
+					buttons[LANG.GET("general.ok_button")] = true;
+					collapsible.push({
+						type: "text_copy",
+						attributes: {
+							value: element.commission,
+							name: LANG.GET("order.commission"),
+							readonly: true,
+							onpointerup: function () {
+								new Dialog({
+									type: "input",
+									header: LANG.GET("order.commission"),
+									render: [
+										[
+											{
+												type: "text",
+												attributes: {
+													value: "element.commission",
+													name: LANG.GET("order.commission"),
+													readonly: true,
+													onpointerup: "_client.application.toClipboard(this)",
+												},
+												hint: LANG.GET("order.copy_value"),
 											},
-											hint: LANG.GET("order.copy_value"),
-										},
-										{
-											type: "button",
-											attributes: {
-												value: LANG.GET("menu.record_create_identifier"),
-												onpointerup: function () {
-													_client.application.postLabelSheet("element.commission");
+											{
+												type: "button",
+												attributes: {
+													value: LANG.GET("menu.record_create_identifier"),
+													onpointerup: function () {
+														_client.application.postLabelSheet("element.commission");
+													},
 												},
 											},
-										},
+										],
 									],
-								],
-								options: buttons,
-							});
-						}
-							.toString()
-							._replaceArray(["element.commission", "buttons"], [element.commission, JSON.stringify(buttons)]),
-					},
-					hint: LANG.GET("order.copy_or_labelsheet"),
-				});
+									options: buttons,
+								});
+							}
+								.toString()
+								._replaceArray(["element.commission", "buttons"], [element.commission, JSON.stringify(buttons)]),
+						},
+						hint: LANG.GET("order.copy_or_labelsheet"),
+					});
+				}
 
 				// append order number
-				collapsible.push({
-					type: "text_copy",
-					attributes: {
-						value: element.ordernumber,
-						name: LANG.GET("order.ordernumber_label"),
-						readonly: true,
-						onpointerup: "_client.application.toClipboard(this)",
-					},
-					hint: LANG.GET("order.copy_value"),
-				});
+				if (element.ordernumber) {
+					collapsible.push({
+						type: "text_copy",
+						attributes: {
+							value: element.ordernumber,
+							name: LANG.GET("order.ordernumber_label"),
+							readonly: true,
+							onpointerup: "_client.application.toClipboard(this)",
+						},
+						hint: LANG.GET("order.copy_value"),
+					});
+				}
 
 				// append information
 				if (element.information) {
@@ -524,50 +526,52 @@ const _client = {
 					});
 
 				// append orderer and message option
-				buttons = {};
-				buttons[LANG.GET("order.add_information_cancel")] = false;
-				buttons[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
-				links = {};
-				links[LANG.GET("order.message_orderer", { ":orderer": element.orderer })] = {
-					href: "javascript:void(0)",
-					"data-type": "input",
-					onpointerup: function () {
-						_client.message.newMessage(
-							LANG.GET("order.message_orderer", { ":orderer": "element.orderer" }),
-							"element.orderer",
-							LANG.GET("order.message", {
-								":quantity": "element.quantity",
-								":unit": "element.unit",
-								":number": "element.ordernumber",
-								":name": "element.name",
-								":vendor": "element.vendor",
-								":info": "element.information" || "",
-								":commission": "element.commission",
-							}).replace("\\n", "\n"),
-							buttons
-						);
-					}
-						.toString()
-						._replaceArray(
-							["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "buttons"],
-							[
-								element.orderer,
-								element.quantity,
-								element.unit ? element.unit.replaceAll('"', '\\"') : "",
-								element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
-								element.name ? element.name.replaceAll('"', '\\"') : "",
-								element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
-								element.information ? element.information.replaceAll('"', '\\"') : "",
-								element.commission ? element.commission.replaceAll('"', '\\"') : "",
-								JSON.stringify(buttons),
-							]
-						),
-				};
-				collapsible.push({
-					type: "links",
-					content: links,
-					hint: element.lastorder,
-				});
+				if (element.orderer) {
+					buttons = {};
+					buttons[LANG.GET("order.add_information_cancel")] = false;
+					buttons[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+					links = {};
+					links[LANG.GET("order.message_orderer", { ":orderer": element.orderer })] = {
+						href: "javascript:void(0)",
+						"data-type": "input",
+						onpointerup: function () {
+							_client.message.newMessage(
+								LANG.GET("order.message_orderer", { ":orderer": "element.orderer" }),
+								"element.orderer",
+								LANG.GET("order.message", {
+									":quantity": "element.quantity",
+									":unit": "element.unit",
+									":number": "element.ordernumber",
+									":name": "element.name",
+									":vendor": "element.vendor",
+									":info": "element.information" || "",
+									":commission": "element.commission",
+								}).replace("\\n", "\n"),
+								buttons
+							);
+						}
+							.toString()
+							._replaceArray(
+								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "buttons"],
+								[
+									element.orderer,
+									element.quantity,
+									element.unit ? element.unit.replaceAll('"', '\\"') : "",
+									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
+									element.name ? element.name.replaceAll('"', '\\"') : "",
+									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
+									element.information ? element.information.replaceAll('"', '\\"') : "",
+									element.commission ? element.commission.replaceAll('"', '\\"') : "",
+									JSON.stringify(buttons),
+								]
+							),
+					};
+					collapsible.push({
+						type: "links",
+						content: links,
+						hint: element.lastorder ? element.lastorder : null,
+					});
+				}
 
 				// append special attention information
 				if (element.specialattention)
@@ -626,7 +630,7 @@ const _client = {
 						.toString()
 						._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]);
 				}
-				if (element.disapprove) {
+				if (element.disapprove && element.organizationalunit) {
 					buttons = {};
 					buttons[LANG.GET("order.disapprove_message_cancel")] = false;
 					buttons[LANG.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
@@ -726,7 +730,7 @@ const _client = {
 				collapsible.push({ type: "checkbox", content: states });
 
 				// append orderstatechange
-				if (element.orderstatechange && Object.keys(element.orderstatechange).length) {
+				if (element.orderstatechange && Object.keys(element.orderstatechange).length && element.organizationalunit) {
 					element.orderstatechange["..."] = {};
 					buttons = {};
 					buttons[LANG.GET("order.add_information_cancel")] = false;
@@ -772,7 +776,7 @@ const _client = {
 					buttons[LANG.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "deletebutton",
-						hint: element.autodelete,
+						hint: element.autodelete ? element.autodelete : null,
 						attributes: {
 							type: "button",
 							value: LANG.GET("order.delete_prepared_order"),
@@ -795,7 +799,7 @@ const _client = {
 					{
 						type: "collapsible",
 						attributes: {
-							class: "em18" + (element.collapsed === false ? " extended" : ""),
+							class: "em18" + (!element.collapsed ? " extended" : ""),
 						},
 						content: collapsible,
 					},

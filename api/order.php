@@ -361,18 +361,18 @@ class ORDER extends API {
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
 						'ordertext' => LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
-						'quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : '',
-						'unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : '',
-						'barcode' => UTILITY::propertySet((object) $decoded_order_data, 'barcode_label') ? : '',
-						'name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : '',
-						'vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : '',
-						'ordernumber' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : '',
-						'commission' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : '',
+						'quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : null,
+						'unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : null,
+						'barcode' => UTILITY::propertySet((object) $decoded_order_data, 'barcode_label') ? : null,
+						'name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : null,
+						'vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : null,
+						'ordernumber' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : null,
+						'commission' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : null,
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
 						'lastorder' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null,
-						'orderer' => UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : '',
+						'orderer' => UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : null,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
 						'state' => [],
@@ -480,7 +480,7 @@ class ORDER extends API {
 							}
 						}
 					}
-					array_push($result['data']['order'], $data);
+					array_push($result['data']['order'], array_filter($data, Fn($property)=> boolval($property)));
 				}
 				break;
 			case 'DELETE':
