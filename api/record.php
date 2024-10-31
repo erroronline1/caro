@@ -155,6 +155,9 @@ class RECORD extends API {
 				if (!isset(LANGUAGEFILE['casestate'][$context])) return;
 				$content = [];
 				$checked = json_decode($checked ? : '', true);
+				if ($type==='radio'){
+					$content[LANG::GET('record.record_casestate_filter_all')] = ['onchange' => "_client.record.casestatefilter(undefined)"];
+				}
 				foreach(LANGUAGEFILE['casestate'][$context] as $state => $translation){
 					$content[$translation] = $action;
 					$content[$translation]['data-casestate'] = $state;

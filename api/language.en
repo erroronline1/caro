@@ -1001,6 +1001,7 @@ Help continuing or close the record."
 
 record_casestate_set = ":casestate set"
 record_casestate_revoked = ":casestate revoked"
+record_casestate_filter_all = "All"
 record_pseudoform_casedocumentation = "Case state"
 
 ; all keys are hardcoded

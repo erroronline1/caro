@@ -911,11 +911,12 @@ const _client = {
 	record: {
 		casestatefilter: (casestate) => {
 			document.querySelectorAll("article>a").forEach((anchor) => {
-				anchor.style.display = "none";
+				anchor.style.display = casestate ? "none" : "block";
 			});
-			document.querySelectorAll("[data-" + casestate + "]").forEach((anchor) => {
-				anchor.style.display = "block";
-			});
+			if (casestate)
+				document.querySelectorAll("[data-" + casestate + "]").forEach((anchor) => {
+					anchor.style.display = "block";
+				});
 		},
 	},
 	texttemplate: {

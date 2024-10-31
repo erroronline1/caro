@@ -1001,6 +1001,7 @@ Hilf bei der Weiterbearbeitung oder schließe den Fall ab."
 
 record_casestate_set = ":casestate bestätigt"
 record_casestate_revoked = ":casestate zurückgezogen"
+record_casestate_filter_all = "Alle"
 record_pseudoform_casedocumentation = "Fall Status"
 
 ; alle schlüssel sind fest einprogrammiert
