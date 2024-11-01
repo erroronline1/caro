@@ -298,8 +298,8 @@ class RECORD extends API {
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => LANG::GET('record.record_export_form', [':form' => $form['name'], ':date' => substr($form['date'], 0, -3)]),
-			'date' => LANG::GET('record.form_export_exported', [':date' => $this->_currentdate->format('y-m-d H:i')])
+			'title' => $form['name'],
+			'date' => LANG::GET('record.form_export_exported', [':version' => substr($form['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
