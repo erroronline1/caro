@@ -248,8 +248,10 @@ class RECORD extends API {
 	 *          |_|
 	 */
 	public function exportform(){
-		$form_id = $identifier = null;
-		if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->form_id);
+		$form_id = $identifier = $context = null;
+		if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->_form_id);
+		if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
+		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_type_description')});
 		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
 
@@ -400,6 +402,13 @@ class RECORD extends API {
 			if ($printablecontent['fillable']) $fillable = true;
 		}
 		if ($fillable){
+			if (in_array($form['context'], ['casedocumentation'])) {
+				$type = ['type' => 'selection', 'value' => []];
+				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
+					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
+				}
+				$summary['content'] = array_merge([LANG::GET('record.record_type_description') => $type], $summary['content']);
+			}
 			$summary['content'] = array_merge([LANG::GET('record.form_export_by') => [
 				'type' => 'text',
 				'value' => ''
