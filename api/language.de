@@ -930,7 +930,7 @@ form_export = "Exportiere das Formular als PDF"
 form_export_hint = "Dateien, Fotos, Links oder Hinweise werden nicht ausgegeben."
 form_export_identifier = "Aufkleber hier platzieren"
 form_export_exported = "V:version, exportiert am :date"
-form_export_by = "Beurteilt / ausgefüllt von"
+form_export_by = "Beurteilt / ausgefüllt von, am"
 form_export_proceed = "Öffne den Link und drucke das Formular aus. Du bist verantwortlich für die Aktualität etwaiger Verbreitungen."
 form_export_permission = "Falls du ein gedrucktes Formular benötigst, frage jemanden mit einer der folgenden Berechtigungen: :permissions"
 
