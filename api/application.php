@@ -64,7 +64,7 @@ class APPLICATION extends API {
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 				],
-				'ini' => [
+				'config' => [
 					'lifespan' => [
 						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
 					],
@@ -89,7 +89,7 @@ class APPLICATION extends API {
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
 					],
-					'ini' => [
+					'config' => [
 						'lifespan' => [
 							'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
 						],
@@ -119,9 +119,8 @@ class APPLICATION extends API {
 					]
 				]
 			],
-			'application' => [
-				'session_timeout_seconds' => 0
-			]
+			'user' => [],
+			'config' => []
 		];
 		$tos = [];
 		$replacements = [
