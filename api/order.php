@@ -468,7 +468,7 @@ class ORDER extends API {
 							$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
 						}
 					}
-					array_push($result['data']['order'], array_filter($data, Fn($property)=> boolval($property)));
+					array_push($result['data']['order'], array_filter($data, fn($property)=> $property || $property === 0));
 				}
 				break;
 			case 'DELETE':
@@ -1143,7 +1143,7 @@ class ORDER extends API {
 				if ($result['response']['msg'] === LANG::GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
-							':id' => implode(",", array_map(Fn($id) => intval($id), $approvedIDs))
+							':id' => implode(",", array_map(fn($id) => intval($id), $approvedIDs))
 						]
 					]);
 				}
