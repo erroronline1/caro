@@ -460,9 +460,9 @@ class ORDER extends API {
 					}
 					
 					// request MDR §14 sample check
-					if ($product && array_search($product['id'], $sampleCheck, 'article_no') !== false){
+					if ($product && array_search($product['id'], array_column($sampleCheck, 'id')) !== false){
 						if (!in_array('group', $_SESSION['user']['permissions'])){
-							$data['samplecheck']['item'] = $sampleCheck[$tocheck]['id'];
+							$data['samplecheck']['item'] = $product['id'];
 						} else {
 							// simple groups are not allowed to make records
 							$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
