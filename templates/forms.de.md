@@ -377,6 +377,7 @@ Export for signature compliance
 [Content](#content)
 
 ## Empfangsbestätigung
+Export for signature compliance
 ```json
 [
 	[
@@ -446,6 +447,7 @@ Export for signature compliance
 [Content](#content)
 
 ## Erlaubnis zur Ausstellung und Veröffentlichung
+Export for signature compliance
 ```json
 [
 	[
