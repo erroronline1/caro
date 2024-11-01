@@ -930,6 +930,7 @@ form_export = "Export form as PDF"
 form_export_hint = "File and photo inputs as well as links and hints are ommitted."
 form_export_identifier = "Place label here"
 form_export_exported = "Exported on :date"
+form_export_by = "Assessed / filled in by"
 form_export_proceed = "Open the link and print the form. You are responsible for currency of version distribution."
 form_export_permission = "If you need a form printed out ask someone with one of the following permissions: :permissions"
 

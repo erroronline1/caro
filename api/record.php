@@ -248,11 +248,8 @@ class RECORD extends API {
 	 *          |_|
 	 */
 	public function exportform(){
-
-		$context = $form_id = null;
-		$identifier = null;
-		//if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
-		if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
+		$form_id = $identifier = null;
+		if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->form_id);
 		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
 
@@ -267,7 +264,7 @@ class RECORD extends API {
 		]);
 		$form = $form ? $form[0] : null;
 		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
-		if ($form['date'] >= $maxFormTimestamp) $this->response([], 409);
+		if (!$form || $form['date'] >= $maxFormTimestamp) $this->response([], 409);
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
@@ -312,7 +309,7 @@ class RECORD extends API {
 		}
 
 		function printable($element, $payload, $enumerate = []){
-			$content = ['content' => [], 'images' => []];
+			$content = ['content' => [], 'images' => [], 'fillable' => false];
 			foreach($element as $subs){
 				if (!array_key_exists('type', $subs)){
 					$subcontent = printable($subs, $payload, $enumerate);
@@ -321,6 +318,7 @@ class RECORD extends API {
 					}
 					$content['content'] = array_merge($content['content'], $subcontent['content']);
 					$content['images'] = array_merge($content['images'], $subcontent['images']);
+					$content['fillable'] = $subcontent['fillable'];
 				}
 				else {
 					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton', 'formbutton'])) continue;
@@ -335,7 +333,7 @@ class RECORD extends API {
 						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
 						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 					}
-
+					if (!in_array($subs['type'], ['textsection', 'image'])) $content['fillable'] = true;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = ['type' => 'selection', 'value' => []];
 						foreach($subs['content'] as $key => $v){
@@ -386,8 +384,10 @@ class RECORD extends API {
 			$content['enumerate'] = $enumerate;
 			return $content;
 		};
+
 		$componentscontent = [];
 		$enumerate = [];
+		$fillable = false;
 		foreach(explode(',', $form['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent, $maxFormTimestamp);
 			if (!$component) continue;
@@ -397,6 +397,13 @@ class RECORD extends API {
 			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
 			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
 			$enumerate = $printablecontent['enumerate'];
+			if ($printablecontent['fillable']) $fillable = true;
+		}
+		if ($fillable){
+			$summary['content'] = array_merge([LANG::GET('record.form_export_by') => [
+				'type' => 'text',
+				'value' => ''
+			]], $summary['content']);
 		}
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
@@ -494,19 +501,19 @@ class RECORD extends API {
 			[
 				'type' => 'hidden',
 				'attributes' => [
-					'name' => 'context',
+					'name' => '_context',
 					'value' => $form['context']
 				]
 			], [
 				'type' => 'hidden',
 				'attributes' => [
-					'name' => 'form_name',
+					'name' => '_form_name',
 					'value' => $form['name']
 				]
 			], [
 				'type' => 'hidden',
 				'attributes' => [
-					'name' => 'form_id',
+					'name' => '_form_id',
 					'value' => $form['id']
 				]
 			]
@@ -951,9 +958,9 @@ class RECORD extends API {
 
 				$context = $form_name = $form_id = null;
 				$identifier = '';
-				if ($context = UTILITY::propertySet($this->_payload, 'context')) unset($this->_payload->context);
-				if ($form_name = UTILITY::propertySet($this->_payload, 'form_name')) unset($this->_payload->form_name);
-				if ($form_id = UTILITY::propertySet($this->_payload, 'form_id')) unset($this->_payload->form_id);
+				if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
+				if ($form_name = UTILITY::propertySet($this->_payload, '_form_name')) unset($this->_payload->_form_name);
+				if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->_form_id);
 				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_type_description')});
