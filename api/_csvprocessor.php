@@ -719,8 +719,14 @@ class Listprocessor {
 				// create sorting key by matched patterns, mandatory translated if applicable
 				$sorting = '';
 				foreach ($this->_setting['split'] as $key => $pattern){
-					preg_match_all('/' . $pattern . '/m', $row[$key], $match);
-					if (count($match)) $sorting += implode(' ', $match);
+					preg_match_all('/' . $pattern . '/mi', $row[$key], $match, PREG_OFFSET_CAPTURE);
+					// "special company" matched by (special).+(company).+ or by .*
+					// (.+) may be critical for matching line end as well and having indifferent results
+					foreach($match as $index => $submatch){
+						if (count($match)>1 && $index === 0) continue;
+						if (!trim($submatch[0][0])) continue;
+						$sorting .= ' ' . $submatch[0][0];
+					}
 				}
 				$sorting = trim($sorting);
 				if (!array_key_exists($sorting, $split_list)) $split_list[$sorting] = [$row];
