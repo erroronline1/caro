@@ -1245,7 +1245,7 @@ Vendor pricelists must have an easy structure to be importable. It may need addi
 while setting up a vendor an import rule must be defined like:
 ```js
 {
-    "filesettings": {
+    "filesetting": {
         "headerrowindex": 0,
         "dialect": {
             "separator": ";",
@@ -1316,7 +1316,7 @@ You can as well define all products as trading goods and set to 0 conditionally 
 If not provided a simple import filter will be generated on export of pricelists. As described within [vendor and product management](#vendor-and-product-management), this may be reasonable if no initial pricelist is imported and primarily edited within the application. In this case the information on reimport is processed without conditions, filters and changes. This kind of filter can not be applied on vendor pricelists and will result in an error message.
 ```js
 {
-    "filesettings": {
+    "filesetting": {
         "headerrowindex": 0,
         "columns": [
             "article_no",

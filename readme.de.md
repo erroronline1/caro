@@ -1177,7 +1177,7 @@ Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar 
 Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden ähnlich:
 ```js
 {
-    "filesettings": {
+    "filesetting": {
         "headerrowindex": 0,
         "dialect": {
             "separator": ";",
@@ -1248,7 +1248,7 @@ Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedin
 Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter generiert. Wie bei der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) beschrieben, kann dies sinnvoll sein, sofern anfänglich keine Preisliste importiert wurde und der Artikelstamm eines Lieferanten primär in der Anwendung bearbeitet wurde. In diesem Fall werden die Informationen ohne Bedingungen, Filter und Änderungen reimportiert. Ein solcher Filter kann nicht auf Preislisten von Lieferanten angewendet werden und erzeugt eine Fehlermeldung.
 ```js
 {
-    "filesettings": {
+    "filesetting": {
         "headerrowindex": 0,
         "columns": [
             "article_no",
