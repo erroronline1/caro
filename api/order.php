@@ -302,18 +302,18 @@ class ORDER extends API {
 				$pendingincorporation = [];
 				$special_attention = [];
 				foreach($allproducts as $product) {
-					if ($product['special_attention']) $special_attention[] = ['id' => $product['id'], 'article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+					if ($product['special_attention']) $special_attention[] = $product['id'];
 					if ($product['incorporated'] === '') {
-						$unincorporated[] = ['id' => $product['id'], 'article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+						$unincorporated[] = $product['id'];
 						continue;
 					}
 					$product['incorporated'] = json_decode($product['incorporated'], true);
 					if (array_key_exists('_denied', $product['incorporated'])) {
-						$incorporationdenied[] = ['article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+						$incorporationdenied[] = $product['id'];
 						continue;
 					}
 					elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
-						$pendingincorporation[] = ['article_no' => $product['article_no'], 'vendor_name' => $product['vendor_name']];
+						$pendingincorporation[] = $product['id'];
 					}
 				}
 
@@ -348,14 +348,16 @@ class ORDER extends API {
 				foreach($order as $row) {
 					$decoded_order_data = json_decode($row['order_data'], true);
 					
-					if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'] )){					
+					$product = null;
+					if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'] )){
 						$nmbr = array_filter(array_column($allproducts, 'article_no'), fn($number)=> $number === $decoded_order_data['ordernumber_label']);
-						$vndr = array_filter(array_column($allproducts, 'vendor_name'), fn($vendor)=> $vendor === $decoded_order_data['vendor_label']);
-						if ($productmatch = array_intersect($nmbr,$vndr)) $product = $allproducts[$productmatch[0]];
-						else $product = null;
+						foreach($nmbr as $key => $value){
+							if ($allproducts[$key]['vendor_name'] === $decoded_order_data['vendor_label']) {
+								$product = $allproducts[$key];
+								break;
+							}
+						}
 					}
-					else $product = null;
-
 					// data chunks to be assembled by js _client.order.approved()
 					$data = [
 						'id' => $row['id'],
@@ -384,7 +386,7 @@ class ORDER extends API {
 						'autodelete' => null,
 						'incorporation' => [],
 						'samplecheck' => [],
-						'specialattention' => null,
+						'specialattention' => $product ? array_search($product['id'], $special_attention) !== false : null,
 						'collapsed' => !$permission['orderprocessing']
 					];
 
@@ -434,13 +436,7 @@ class ORDER extends API {
 						}
 					}
 
-					// inform if special attention is required
-					if (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($special_attention, 'article_no'))) !== false){
-						if (isset($decoded_order_data['vendor_label']) && $special_attention[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							$data['specialattention'] = true;
-						}
-					}
-
+					// order attachments
 					if (isset($decoded_order_data['attachments'])){
 						foreach(explode(',', $decoded_order_data['attachments']) as $file){
 							$data['attachments'][pathinfo($file)['basename']] = ['href' => $file];
@@ -448,36 +444,28 @@ class ORDER extends API {
 					}
 
 					// incorporation state
-					if (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
-						if (isset($decoded_order_data['vendor_label']) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							if (!in_array('group', $_SESSION['user']['permissions'])){
-								$data['incorporation']['item'] = $unincorporated[$tocheck]['id'];
-							} else {
-								// simple groups are not allowed to make records
-								$data['incorporation']['state'] = LANG::GET('order.incorporation_neccessary_by_user');
-							}
+					if ($product && array_search($product['id'], $unincorporated) !== false){
+						if (!in_array('group', $_SESSION['user']['permissions'])){
+							$data['incorporation']['item'] = $product['id'];
+						} else {
+							// simple groups are not allowed to make records
+							$data['incorporation']['state'] = LANG::GET('order.incorporation_neccessary_by_user');
 						}
 					}
-					elseif (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($incorporationdenied, 'article_no'))) !== false){
-						if (isset($decoded_order_data['vendor_label']) && $incorporationdenied[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							$data['incorporation']['state'] = LANG::GET('order.incorporation_denied');
-						}
+					elseif ($product && array_search($product['id'], $incorporationdenied) !== false){
+						$data['incorporation']['state'] = LANG::GET('order.incorporation_denied');
 					}
-					elseif (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($pendingincorporation, 'article_no'))) !== false){
-						if (isset($decoded_order_data['vendor_label']) && $pendingincorporation[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							$data['incorporation']['state'] = LANG::GET('order.incorporation_pending');
-						}
+					elseif ($product && array_search($product['id'], $pendingincorporation) !== false){
+						$data['incorporation']['state'] = LANG::GET('order.incorporation_pending');
 					}
 					
 					// request MDR §14 sample check
-					if (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($sampleCheck, 'article_no'))) !== false){
-						if (isset($decoded_order_data['vendor_label']) && $sampleCheck[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label']){
-							if (!in_array('group', $_SESSION['user']['permissions'])){
-								$data['samplecheck']['item'] = $sampleCheck[$tocheck]['id'];
-							} else {
-								// simple groups are not allowed to make records
-								$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
-							}
+					if ($product && array_search($product['id'], $sampleCheck, 'article_no') !== false){
+						if (!in_array('group', $_SESSION['user']['permissions'])){
+							$data['samplecheck']['item'] = $sampleCheck[$tocheck]['id'];
+						} else {
+							// simple groups are not allowed to make records
+							$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
 						}
 					}
 					array_push($result['data']['order'], array_filter($data, Fn($property)=> boolval($property)));

@@ -40,7 +40,7 @@
     * [Frontend design](#frontend-design)
     * [Backend design](#backend-design)
     * [Integrations tests](#integration-test)
-    * [Stress tests](#stress-test)
+    * [Stress test and performance](#stress-test-and-performance)
     * [Deployment process](#deployment-process)
 * [API documentation](#api-documentation)
     * [Request flow](#request-flow)
@@ -1652,9 +1652,15 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
 
-## Stress test
+## Stress test and performance
 
-Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested. On 100000 distributed records the performance did well.  
+Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested.
+
+During developement following outcomes could be noted:
+* 100k distributed records perform well, landing page loads in about 3s.
+* 100k calendar events perform well, landing page loads in about 3s.
+* 1k approved orders process in about 5s on the server side and 5s on the client side. Cross-linking impedes performance enhancements.
+
 During creation the products database has been evaluated ([1](#server-setup), [2](#miscellaneous)).
 
 [Content](#content)

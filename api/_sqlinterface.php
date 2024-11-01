@@ -312,8 +312,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) IN (:ids) AND prod.vendor_id = dist.id"
 		],
 		'consumables_get_products_incorporation_attention' => [
-			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.vendor_id = dist.id"
+			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, prod.last_order AS last_order, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id",
+			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, prod.last_order AS last_order, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id"
 		],
 		'consumables_get_product_search' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id",
