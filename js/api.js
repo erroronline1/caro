@@ -22,7 +22,7 @@ import { compose_helper } from "./compose.js";
 export const api = {
 	_settings: {
 		user: {},
-		ini: {},
+		config: {},
 	},
 
 	/**
@@ -197,15 +197,15 @@ export const api = {
 	session_timeout: {
 		circle: null,
 		init: function () {
-			if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = { idle: 0 };
-			this.stop = new Date().getTime() + api._settings.ini.lifespan.idle * 1000;
+			if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
+			this.stop = new Date().getTime() + api._settings.config.lifespan.idle * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			api.session_timeout.interval = setInterval(function () {
-				if (!("lifespan" in api._settings.ini)) api._settings.ini.lifespan = { idle: 0 };
+				if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
 				const remaining = api.session_timeout.stop - new Date().getTime();
-				if (api._settings.ini.lifespan.idle > 0 && remaining > 0) {
+				if (api._settings.config.lifespan.idle > 0 && remaining > 0) {
 					document.querySelector("header>div:nth-of-type(2)").style.display = "none";
-					api.session_timeout.render((100 * remaining) / (api._settings.ini.lifespan.idle * 1000), remaining);
+					api.session_timeout.render((100 * remaining) / (api._settings.config.lifespan.idle * 1000), remaining);
 					return;
 				}
 				api.session_timeout.render(0);
@@ -263,7 +263,7 @@ export const api = {
 					await api.application("get", "language");
 					await api.application("get", "menu");
 					api._settings.user = data.user || {};
-					api._settings.ini = data.ini || {};
+					api._settings.config = data.config || {};
 					if (data.user) _serviceWorker.register();
 					else {
 						clearInterval(_serviceWorker.notif.interval);

@@ -474,7 +474,7 @@ export class Assemble {
 					{
 						text: image.content,
 						size: 1024,
-						ecLevel: api._settings.ini.limits && api._settings.ini.limits.qr_errorlevel ? api._settings.ini.limits.qr_errorlevel : "M",
+						ecLevel: api._settings.config.limits && api._settings.config.limits.qr_errorlevel ? api._settings.config.limits.qr_errorlevel : "M",
 						background: null,
 						fill: "#000000",
 						radius: 1,
