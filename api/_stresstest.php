@@ -142,6 +142,7 @@ class STRESSTEST{
 				$records[] = $current_record;
 				$success = SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 					'values' => [
+						':case_state' => null,
 						':record_type' => $exists['record_type'] ? : null,
 						':identifier' => $identifier,
 						':last_user' => 2,
