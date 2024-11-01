@@ -35,11 +35,11 @@ class RECORD extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = $this->_appendDate = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_passedIdentify = $this->_formExport = $this->_caseState = array_key_exists(3, REQUEST) ? REQUEST[3] : '';
-		$this->_caseStateBoolean = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_requestedID = $this->_appendDate = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_passedIdentify = $this->_formExport = $this->_caseState = isset(REQUEST[3]) ? REQUEST[3] : '';
+		$this->_caseStateBoolean = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -313,7 +313,7 @@ class RECORD extends API {
 		function printable($element, $payload, $enumerate = []){
 			$content = ['content' => [], 'images' => [], 'fillable' => false];
 			foreach($element as $subs){
-				if (!array_key_exists('type', $subs)){
+				if (!isset($subs['type'])){
 					$subcontent = printable($subs, $payload, $enumerate);
 					foreach($subcontent['enumerate'] as $name => $number){
 						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
@@ -452,7 +452,7 @@ class RECORD extends API {
 		function setidentifier($element, $identify, $calendar){
 			$content = [];
 			foreach($element as $subs){
-				if (!array_key_exists('type', $subs)){
+				if (!isset($subs['type'])){
 					$content[] = setidentifier($subs, $identify, $calendar);
 				}
 				else {
@@ -492,7 +492,7 @@ class RECORD extends API {
 		function saveable($element){
 			$saveable = false;
 			foreach($element as $subs){
-				if (!array_key_exists('type', $subs)){
+				if (!isset($subs['type'])){
 					if ($saveable = saveable($subs)) return true;
 				}
 				else {
@@ -585,7 +585,7 @@ class RECORD extends API {
 				]
 			];
 		}
-		if (array_key_exists('type', $return['render']['content'][0][0])) array_push($return['render']['content'][0], ...$context);
+		if (isset($return['render']['content'][0][0]['type'])) array_push($return['render']['content'][0], ...$context);
 		else array_push($return['render']['content'][0][0], ...$context);
 		$this->response($return);
 	}
@@ -615,29 +615,27 @@ class RECORD extends API {
 		function findInComponent($element, $search){
 			$found = false;
 			foreach($element as $subs){
-				if (!array_key_exists('type', $subs)){
-					$found = findInComponent($subs, $search);
+				if (!isset($subs['type'])){
+					if ($found = findInComponent($subs, $search)) return true;
 				}
 				else {
+					$comparisons = [];
 					foreach (['description', 'content', 'hint'] as $property){
-						if (array_key_exists($property, $subs)){
-							if (is_array($subs[$property])){ // links, checkboxes,etc
-								foreach(array_keys($subs[$property]) as $key) {
-									similar_text($search, $key, $percent);
-									if ($percent >= CONFIG['likeliness']['file_search_similarity']) {
-										return true;
-									}
-								}
+						if (isset($subs[$property])){
+							if (is_array($subs[$property])){ // links, checkboxes, etc
+								foreach(array_keys($subs[$property]) as $key) $comparisons[] = $key;
 							}
-							else {
-								if (stristr($subs[$property], $search) !== false) return true;
-							}
+							else $comparisons[] = $subs[$property];
 						}
 					}
-					if (array_key_exists('attributes', $subs)){
+					if (isset($subs['attributes'])){
 						foreach (['name', 'value'] as $property){
-							if (array_key_exists($property, $subs['attributes']) && stristr($subs['attributes'][$property], $search) !== false) return true;
+							if (isset($subs['attributes'][$property])) $comparisons[] = $subs['attributes'][$property];
 						}
+					}
+					foreach($comparisons as $term) {
+						similar_text($search, $term, $percent);
+						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity']) return true;
 					}
 				}
 			}
@@ -653,22 +651,21 @@ class RECORD extends API {
 					similar_text($this->_requestedID, $term, $percent);
 					if (($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
 						$matches[] = strval($row['id']);
-						continue;
+						break;
 					}
-					foreach(explode(',', $row['regulatory_context']) as $context) {
-						if (stristr(LANG::GET('regulatory.' . $context), $this->_requestedID) !== false) {
+				}
+				foreach(explode(',', $row['regulatory_context']) as $context) {
+					if (stristr(LANG::GET('regulatory.' . $context), $this->_requestedID) !== false) {
+						$matches[] = strval($row['id']);
+						break;	
+					}
+				}
+				foreach(explode(',', $row['content']) as $usedcomponent) {
+					if ($component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent)){
+						$component['content'] = json_decode($component['content'], true);
+						if (findInComponent($component['content']['content'], $this->_requestedID)) {
 							$matches[] = strval($row['id']);
-							continue;	
-						}
-					}
-					foreach(explode(',', $row['content']) as $usedcomponent) {
-						$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
-						if ($component){
-							$component['content'] = json_decode($component['content'], true);
-							if (findInComponent($component['content']['content'], $this->_requestedID)) {
-								$matches[] = strval($row['id']);
-								break;
-							}
+							break;
 						}
 					}
 				}
@@ -726,7 +723,7 @@ class RECORD extends API {
 		foreach ($forms as $context => $list){
 			$contexttranslation = '';
 			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
-				if (array_key_exists($context, $contexts)){
+				if (isset($contexts[$context])){
 					$contexttranslation = $contexts[$context];
 					break;
 				}
@@ -1017,7 +1014,7 @@ class RECORD extends API {
 							for($i = 0; $i < count($files['name']); $i++){
 								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::resizeImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
 
-								if (array_key_exists($fileinput, $attachments)) $attachments[$fileinput][]= substr($uploaded[$i], 1);
+								if (isset($attachments[$fileinput])) $attachments[$fileinput][]= substr($uploaded[$i], 1);
 								else $attachments[$fileinput] = [substr($uploaded[$i], 1)];
 							}
 						}
@@ -1194,7 +1191,7 @@ class RECORD extends API {
 								'linkedcontent' => $value
 							]); 
 					}
-					if (array_key_exists($form, $content['images'])){
+					if (isset($content['images'][$form])){
 						foreach ($content['images'][$form] as $image){
 							$imagedata = pathinfo($image);
 							array_push($body[count($body) -1],
@@ -1208,7 +1205,7 @@ class RECORD extends API {
 							]); 
 						}
 					}
-					if (array_key_exists($form, $content['files'])){
+					if (isset($content['files'][$form])){
 						array_push($body[count($body) -1],
 						[
 							'type' => 'links',
@@ -1501,7 +1498,7 @@ class RECORD extends API {
 			foreach(LANGUAGEFILE['formcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
-			if (!array_key_exists($row['context'], $contexts)) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
+			if (!isset($contexts[$row['context']])) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
 
 			// skip if fully closed or max_records is exceeded
 			$closed = json_decode($row['closed'] ? : '', true);
@@ -1536,7 +1533,7 @@ class RECORD extends API {
 				if ($previouslydeleted) {
 					unset($context['unassigned'][$identifier]['style']);
 				}
-				if (array_key_exists($identifier, $context['units']) || array_key_exists($identifier, $context['other'])) {
+				if (isset($context['units'][$identifier]) || isset($context['other'][$identifier])) {
 					unset ($context['unassigned'][$identifier]);
 					$previouslydeleted = true;
 				}
@@ -1882,12 +1879,12 @@ class RECORD extends API {
 				$usedform = LANG::GET('record.record_altering_pseudoform_name');
 			}
 			else $usedform = $form['name'];
-			if (!array_key_exists($usedform, $accumulatedcontent)) $accumulatedcontent[$usedform] = [];
+			if (!isset($accumulatedcontent[$usedform])) $accumulatedcontent[$usedform] = [];
 
 			if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 			foreach($record['content'] as $key => $value){
 				$key = str_replace('_', ' ', $key);
-				if (!array_key_exists($key, $accumulatedcontent[$usedform])) $accumulatedcontent[$usedform][$key] = [];
+				if (!isset($accumulatedcontent[$usedform][$key])) $accumulatedcontent[$usedform][$key] = [];
 				$accumulatedcontent[$usedform][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
 			}
 		} 
@@ -1904,11 +1901,11 @@ class RECORD extends API {
 						if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
 							$file = pathinfo($entry['value']);
 							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-								if (!array_key_exists($form, $summary['images'])) $summary['images'][$form] = [];
+								if (!isset($summary['images'][$form])) $summary['images'][$form] = [];
 								$summary['images'][$form][] = $entry['value'];
 							}
 							else {
-								if (!array_key_exists($form, $summary['files'])) $summary['files'][$form] = [];
+								if (!isset($summary['files'][$form])) $summary['files'][$form] = [];
 								$summary['files'][$form][$file['basename']] = ['href' => $entry['value']];
 							}
 							$displayvalue = $file['basename'];
