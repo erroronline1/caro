@@ -101,6 +101,7 @@ class CSVFILTER extends API {
 					case 'csv':
 						foreach($datalist->_list as $subsetname => $subset){
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
+							$subsetname = preg_replace(CONFIG['forbidden']['names'][0], '_', $subsetname);
 							$tempFile = UTILITY::directory('tmp') . '/' . time() . $subsetname . '.csv';
 							$file = fopen($tempFile, 'w');
 							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
