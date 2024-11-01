@@ -521,6 +521,8 @@ Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten
 * Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
 * andererseits bedeutet dies mehr Aufmerksamkeit auf die vergebenen Rollen und wer im Falle von Anfragen tatsächlich vollständige Daten exportiert.
 
+Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp) werden ebenfalls aufgezeichnet. Da es sich hierbei um systemseitige Aktionen handelt werden Aufzeichnungen in der nutzerseitig gewählten Sprache gespeichert. Dies kann zu einer Sprachmischung führen!
+
 ![record screenshot](http://toh.erroronline.one/caro/records.png)
 
 ```mermaid

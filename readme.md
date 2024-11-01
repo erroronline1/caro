@@ -593,6 +593,8 @@ If records contain data from restricted forms, summaries will only contain these
 * On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
 * on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
+All alterings on records (reidentification, retyping) are recorded as well. Since these are system side actions, records will be stored in the user set language. This may result in a mixed language record!
+  
 ![record screenshot](http://toh.erroronline.one/caro/records.png)
 
 ```mermaid
