@@ -1143,7 +1143,6 @@ products_per_slide = 6
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
-* Die Produktdatenbank und anhängige Funktionen (Bestellungen, Artikelsuche) haben eine Bearbeitungszeit von etwa 0,5 Sekunden pro 100k Einträgen. Bei 1m Einträgen kann dies zu einer Verzögerung von bis zu 5 Sekunden führen.
 * Es wird nur eine Zeitzone unterstützt.
 
 ## Anpassung
@@ -1528,7 +1527,7 @@ Ein beliebiges Beispiel:
 [Übersicht](#übersicht)
 
 # Code Design Vorlagen
-Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse liegt in der englischsprachigen Beschreibung vor.
+Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse, Integration-Tests, Stress-Tests und Performancebewertungen sowie des Deployment-Prozesses liegt in der englischsprachigen Beschreibung vor.
 
 [Übersicht](#übersicht)
 

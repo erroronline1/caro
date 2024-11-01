@@ -1211,7 +1211,6 @@ products_per_slide = 6
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
-* The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay.
 * Only one timezone is supported.
 
 ## Customisation
@@ -1660,8 +1659,7 @@ During developement following outcomes could be noted:
 * 100k distributed records perform well, landing page loads in about 3s.
 * 100k calendar events perform well, landing page loads in about 3s.
 * 1k approved orders process in about 5s on the server side and 5s on the client side. Cross-linking impedes performance enhancements.
-
-During creation the products database has been evaluated ([1](#server-setup), [2](#miscellaneous)).
+* The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
 [Content](#content)
 
