@@ -193,16 +193,16 @@ class CALENDARUTILITY {
 	 * @return string dialog script
 	 */
 	public function dialog($columns = []){
-		if (!array_key_exists(':type', $columns)) return;
+		if (!isset($columns[':type'])) return;
 		// fill up default values
-		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!array_key_exists($str, $columns)) $columns[$str] = '';
-		foreach([':id', ':alert'] as $int) if (!array_key_exists($int, $columns)) $columns[$int] = 0;
-		foreach([':author_id', ':affected_user_id'] as $user) if (!array_key_exists($user, $columns)) $columns[$user] = $_SESSION['user']['id'];
+		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
+		foreach([':id', ':alert'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
+		foreach([':author_id', ':affected_user_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
 
 		// prepare lists and datetime types for modification 
 		$units = [];
 		foreach(LANGUAGEFILE['units'] as $unit => $description){
-			$units[$description] = (in_array($unit, explode(',', $columns[':organizational_unit'])) || (!$columns[':organizational_unit'] && array_key_exists('primaryUnit', $_SESSION['user']['app_settings']) && $unit === $_SESSION['user']['app_settings']['primaryUnit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
+			$units[$description] = (in_array($unit, explode(',', $columns[':organizational_unit'])) || (!$columns[':organizational_unit'] && isset($_SESSION['user']['app_settings']['primaryUnit']) && $unit === $_SESSION['user']['app_settings']['primaryUnit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
 
 		$affected_users = $affected_unit_users = [];
@@ -375,14 +375,14 @@ class CALENDARUTILITY {
 							'type' => 'time',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_break_time'),
-								'value' => array_key_exists('break', $misc) ? $misc['break'] : '',
+								'value' => isset($misc['break']) ? $misc['break'] : '',
 								'required' => true
 							]
 						],[
 							'type' => 'text',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_pto_note'),
-								'value' => array_key_exists('note', $misc) ? $misc['note'] : '',
+								'value' => isset($misc['note']) ? $misc['note'] : '',
 							]
 						],[
 							'type' => 'checkbox',
@@ -398,13 +398,13 @@ class CALENDARUTILITY {
 							]
 						]
 					]);
-				if (array_key_exists('homeoffice', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['homeoffice'])
+				if (isset($_SESSION['user']['app_settings']['homeoffice']) && $_SESSION['user']['app_settings']['homeoffice'])
 					array_splice($inputs, 7, 0, [
 						[
 							'type' => 'time',
 							'attributes' => [
 								'name' => LANG::GET('calendar.timesheet_homeoffice'),
-								'value' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
+								'value' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
 								'required' => true
 							]
 						]
@@ -667,7 +667,7 @@ class CALENDARUTILITY {
 		// prepare all users eligible for timetracking due to average weekly hours set
 		foreach ($users as $row => $user){
 			$user['app_settings'] = $users[$row]['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-			if (!$user['app_settings'] || !array_key_exists('weeklyhours', $user['app_settings']) || !$user['app_settings']['weeklyhours']){
+			if (!$user['app_settings'] || !isset($user['app_settings']['weeklyhours']) || !$user['app_settings']['weeklyhours']){
 				unset ($users[$row]);
 				continue;
 			}
@@ -680,14 +680,14 @@ class CALENDARUTILITY {
 				'_leftvacation' => 0,
 				'_projected' => 0,
 				'_performed' => 0,
-				'_overtime' => array_key_exists('initialovertime', $user['app_settings']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
+				'_overtime' => isset($user['app_settings']['initialovertime']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
 				'_pto' => []
 			];
 			// prepare occasionally changing contract settings
 			// create array with start date of changes and applicable value
 			foreach(['weeklyhours', 'annualvacation'] as $setting){
 				$hours_vacation = [];
-				if (array_key_exists($setting, $user['app_settings'])){
+				if (isset($user['app_settings'][$setting])){
 					$settingentries = explode(';', $user['app_settings'][$setting]);
 					natsort($settingentries);
 					foreach($settingentries as $line){
@@ -724,8 +724,8 @@ class CALENDARUTILITY {
 				// calculate and add hours
 				$periods = new DatePeriod($span_start, $minuteInterval, $span_end);
 				$hours = iterator_count($periods) / 60;
-				if (array_key_exists('homeoffice', $misc)) $hours += $this->timeStrToFloat($misc['homeoffice']);
-				if (array_key_exists('break', $misc)) $hours -= $this->timeStrToFloat($misc['break']);
+				if (isset($misc['homeoffice'])) $hours += $this->timeStrToFloat($misc['homeoffice']);
+				if (isset($misc['break'])) $hours -= $this->timeStrToFloat($misc['break']);
 				$users[$row]['timesheet']['_performed'] += $hours;
 			} else {
 				// count off duty days
@@ -739,7 +739,7 @@ class CALENDARUTILITY {
 				}
 				$days = intval($span_start->diff($span_end)->format('%a')) + 1;
 
-				if (!array_key_exists($entry['subject'], $users[$row]['timesheet'])) $users[$row]['timesheet'][$entry['subject']] = 0;
+				if (!isset($users[$row]['timesheet'][$entry['subject']])) $users[$row]['timesheet'][$entry['subject']] = 0;
 				$days -= $this->numberOfNonWorkdays($span_start, $span_end);
 				$users[$row]['timesheet'][$entry['subject']] += $days;
 
@@ -802,7 +802,7 @@ class CALENDARUTILITY {
 					$annualstart->modify('+1 month');
 				}
 			}
-			if (array_key_exists('vacation', $user['timesheet'])) $users[$row]['timesheet']['_leftvacation'] -= $users[$row]['timesheet']['vacation'];
+			if (isset($user['timesheet']['vacation'])) $users[$row]['timesheet']['_leftvacation'] -= $users[$row]['timesheet']['vacation'];
 			$result[] = $users[$row]['timesheet'];
 		}
 		return $result;

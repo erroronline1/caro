@@ -173,8 +173,8 @@ class Listprocessor {
 		$this->_isChild = $isChild;
 		$this->_argument = $argument;
 
-		if (!array_key_exists('processedMonth', $this->_argument)) $this->_argument['processedMonth'] = date('m');
-		if (!array_key_exists('processedYear', $this->_argument)) $this->_argument['processedMonth'] = date('Y');
+		if (!isset($this->_argument['processedMonth'])) $this->_argument['processedMonth'] = date('m');
+		if (!isset($this->_argument['processedYear'])) $this->_argument['processedMonth'] = date('Y');
 
 		if (gettype($this->_setting['filesetting']['source']) === 'string' && is_file($this->_setting['filesetting']['source'])) $this->importFile();
 		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = SplFixedArray::fromArray($this->_setting['filesetting']['source'], true);
@@ -211,7 +211,7 @@ class Listprocessor {
 	 */
 	public function delete($row, $track = null){
 		/* delete row and add tracking to log if applicable */
-		if ($track && array_key_exists('track', $this->_argument)){
+		if ($track && isset($this->_argument['track'])){
 			$thislistrow = $this->_list[$row];
 			if ($thislistrow) {
 				foreach($this->_argument['track'] as $column => $values){
@@ -236,9 +236,9 @@ class Listprocessor {
 		$this->_log[] = '[*] total rows: ' . count($this->_list);
 		$remaining = count(array_filter($this->_list->toArray(), fn($row) => $row ? : false));
 		/* apply filters */
-		if (array_key_exists('filter', $this->_setting)){
+		if (isset($this->_setting['filter'])){
 			foreach ($this->_setting['filter'] as $filter => $listfilter){
-				if (array_key_exists('comment', $listfilter)) 
+				if (isset($listfilter['comment'])) 
 					$this->_log[] = '[*] applying filter: '. $listfilter['apply'] . ' ' . $listfilter['comment'] . '...';
 
 				if (method_exists($this, $listfilter['apply'])) {
@@ -252,7 +252,7 @@ class Listprocessor {
 
 		if ($remaining){
 			/* modify the result list if applicable */
-			if (array_key_exists('modify', $this->_setting)){
+			if (isset($this->_setting['modify'])){
 				$this->modify();
 				$this->_log[] = '[*] modifications done';
 			}
@@ -270,10 +270,10 @@ class Listprocessor {
 					unset($values[$unset]);
 				}
 				$this->_list[$row] = $values;  // SplFixedArray has problems accessing nested elements, must assign array to key directly
-				if (array_key_exists('evaluate', $this->_setting)){
+				if (isset($this->_setting['evaluate'])){
 					foreach ($this->_setting['evaluate'] as $column => $pattern){
 						if (boolval($values[$column]) && boolval(preg_match('/' . $pattern . '/mi', $values[$column]))){
-							if (array_key_exists($column, $evaluate_warning)) $evaluate_warning[$column]++;
+							if (isset($evaluate_warning[$column])) $evaluate_warning[$column]++;
 							else $evaluate_warning[$column] = 1;
 						}			
 					}
@@ -289,7 +289,7 @@ class Listprocessor {
 			$this->split();
 
 			/* add postprocessing message to log if applicable */
-			if (array_key_exists('postProcessing', $this->_setting)){
+			if (isset($this->_setting['postProcessing'])){
 				$this->_log[] = '[*] done! '. $this->_setting['postProcessing'];
 			}
 		} else {
@@ -333,12 +333,12 @@ class Listprocessor {
 	 */
 	public function filter_by_comparison_file($rule){
 		if ($rule['filesetting']['source'] === 'SELF') $rule['filesetting']['source'] = $this->_originallist;
-		if (array_key_exists('translations', $this->_setting)) $rule['translations'] = $this->_setting['translations'];
-		if (array_key_exists('encoding', $this->_setting['filesetting']) && !array_key_exists('encoding', $rule['filesetting'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
-		if (array_key_exists('dialect', $this->_setting['filesetting']) && !array_key_exists('dialect', $rule['filesetting'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
+		if (isset($this->_setting['translations'])) $rule['translations'] = $this->_setting['translations'];
+		if (isset($this->_setting['filesetting']['encoding']) && !isset($rule['filesetting']['encoding'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
+		if (isset($this->_setting['filesetting']['dialect']) && !isset($rule['filesetting']['dialect'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
 		$this->_log[] = '[*] comparing with '. (gettype($rule['filesetting']['source']) === 'string' ? $rule['filesetting']['source'] : 'self');
 		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']], True);
-		if (!array_key_exists(1, $compare_list->_list)) return;
+		if (!isset($compare_list->_list[1])) return;
 		$equals = [];
 		// reduce current list to avoid key errors on unset items
 		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
@@ -349,7 +349,7 @@ class Listprocessor {
 				$corresponds = [];
 				foreach($compare_columns as $column => $cmp_column){
 					if (in_array($self_row[$column], array_column($compare_list->_list[1], $cmp_column))){
-						if (!array_key_exists($index, $corresponds)) $corresponds[$index] = [];
+						if (!isset($corresponds[$index])) $corresponds[$index] = [];
 						$corresponds[$index][] = true;
 					}
 					if ($any_or_all === 'any') break;
@@ -381,9 +381,9 @@ class Listprocessor {
 
 		// transfer values from comparison list to main list
 		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
-		if (array_key_exists('transfer', $rule)){
+		if (isset($rule['transfer'])){
 			foreach ($rule['transfer'] as $newcolumn => $from){
-				if (!array_key_exists($newcolumn, $this->setting['filesetting']['columns'])) $this->setting['filesetting']['columns'][] = $newcolumn;
+				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->setting['filesetting']['columns'][] = $newcolumn;
 				foreach (array_uintersect(array_column($thislistwithoutempty, $column), array_column($compare_list->_list[1], $cmp_column), fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
 					$self_row = $this->_list[$index];						
 					$self_row[$newcolumn] = $cmp_row[$from];
@@ -423,7 +423,7 @@ class Listprocessor {
 			foreach($rule['duplicates']['orderby'] as $k => $column){
 				$orderby[] = $row[$column]; 
 			}
-			if (!array_key_exists($identifier, $duplicates)) $duplicates[$identifier] = [[implode('', $orderby), $i]];
+			if (!isset($duplicates[$identifier])) $duplicates[$identifier] = [[implode('', $orderby), $i]];
 			else array_push($duplicates[$identifier], [implode('', $orderby), $i]);
 		}
 		$descending = $rule['duplicates']['descending'];
@@ -493,10 +493,10 @@ class Listprocessor {
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
-			if (array_key_exists('match', $rule)){
+			if (isset($rule['match'])){
 				$keep = true;
 				$track = [];
-				if (array_key_exists('any', $rule['match'])){
+				if (isset($rule['match']['any'])){
 					foreach($rule['match']['any'] as $column => $filter){
 						$track = [
 							'filter' => 'filter_by_expression',
@@ -510,7 +510,7 @@ class Listprocessor {
 						}
 					}
 				}
-				elseif (array_key_exists('all', $rule['match'])){
+				elseif (isset($rule['match']['all'])){
 					foreach($rule['match']['all'] as $column => $filter){
 						$track = [
 							'filter' => 'filter_by_expression',
@@ -715,7 +715,7 @@ class Listprocessor {
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
-			if (array_key_exists('split', $this->_setting)){
+			if (isset($this->_setting['split'])){
 				// create sorting key by matched patterns, mandatory translated if applicable
 				$sorting = '';
 				foreach ($this->_setting['split'] as $key => $pattern){
@@ -729,10 +729,10 @@ class Listprocessor {
 					}
 				}
 				$sorting = trim($sorting);
-				if (!array_key_exists($sorting, $split_list)) $split_list[$sorting] = [$row];
+				if (!isset($split_list[$sorting])) $split_list[$sorting] = [$row];
 				else array_push($split_list[$sorting], $row);
 			} else {
-				if (!array_key_exists(1, $split_list)) $split_list[1] = [$row];
+				if (!isset($split_list[1])) $split_list[1] = [$row];
 				else array_push($split_list[1], $row);
 			}
 		}
@@ -822,7 +822,7 @@ class Listprocessor {
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
-			if (array_key_exists('columns', rule['data'])){
+			if (isset($rule['data']['columns'])){
 				$match = false;
 				$columns = array_keys($rule['data']['columns']);
 				for($c = 0; $c < count($columns); $c++){
@@ -892,7 +892,7 @@ class Listprocessor {
 							if (is_array($rule)){
 								$expression = [];
 								foreach ($rule as $possible_col){
-									$expression[] = array_key_exists($possible_col, $row) ? $row[$possible_col] : $possible_col;
+									$expression[] = isset($row[$possible_col]) ? $row[$possible_col] : $possible_col;
 								}
 							}
 							else
@@ -943,7 +943,7 @@ class Listprocessor {
 
 								$concatenate = '';
 								foreach ($combine as $column){
-									if (array_key_exists($column, $row)) $concatenate .= $row[$column];
+									if (isset($row[$column])) $concatenate .= $row[$column];
 									else $concatenate .= $column;
 								}
 								$row[$new_column] = $concatenate; // SplFixedArray has problems accessing nested elements, must assign array to key directly
@@ -952,12 +952,12 @@ class Listprocessor {
 						}
 						break;
 					case 'translate':
-						if (!array_key_exists('translations', $this->_setting)) break;
+						if (!isset($this->_setting['translations'])) break;
 						foreach ($this->_list as $i => $row) {
 							if (!$row) continue;
 
 							foreach($modifications as $translate => $translation){
-								if (array_key_exists($row[$rule], $this->_setting['translations'][$rule]))
+								if (isset($this->_setting['translations'][$rule][$row[$rule]]))
 									$row[$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
 							}
 							// SplFixedArray has problems accessing nested elements, must assign array to key directly
@@ -971,7 +971,7 @@ class Listprocessor {
 								$this->_setting['filesetting']['columns'][] = $rule[0];
 							$matches = 0;
 							for ($condition = 2; $condition < count($rule); $condition++){
-								if (array_key_exists($rule[$condition][0], $row) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
+								if (isset($row[$rule[$condition][0]]) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
 							}
 							if ($matches == (count($rule) - 2)) $row[$rule[0]] = $rule[1];
 							else $row[$rule[0]] = strlen($row[$rule[0]]) ? $row[$rule[0]] : '';
@@ -985,7 +985,7 @@ class Listprocessor {
 								$this->_setting['filesetting']['columns'][] = $rule[0];
 							$matches = 0;
 							for ($condition = 2; $condition < count($rule); $condition++){
-								if (array_key_exists($rule[$condition][0], $row) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
+								if (isset($row[$rule[$condition][0]]) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
 							}
 							if ($matches) $row[$rule[0]] = $rule[1];
 							else $row[$rule[0]] = strlen($row[$rule[0]]) ? $row[$rule[0]] : '';

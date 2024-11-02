@@ -76,7 +76,7 @@ class API {
 			session_destroy();
 		}
 		// check if a registered user with valid token is logged in
-		if (array_key_exists('user', $_SESSION)){
+		if (isset($_SESSION['user'])){
 			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => $_SESSION['user']['token']
@@ -96,7 +96,7 @@ class API {
 				$_SESSION['user']['image'] = './' . $result['image'];
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
 				if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
-					&& array_key_exists(1, REQUEST) && REQUEST[1] !== 'login'
+					&& isset(REQUEST[1]) && REQUEST[1] !== 'login'
 					&& $_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')
 				){
 					unset ($this->_payload->_user_cache);
@@ -145,7 +145,7 @@ class API {
 	 */
 	public function alertUserGroup($group = [], $message = ''){
 		$permission = $unit = $recipients = [];
-		if (array_key_exists('permission', $group)){
+		if (isset($group['permission'])){
 			foreach($group['permission'] as $prmssn){
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_permission_group'));
 				$statement->execute([
@@ -154,7 +154,7 @@ class API {
 				array_push($permission, ...array_column($statement->fetchAll(PDO::FETCH_ASSOC), 'id'));
 			}
 		}
-		if (array_key_exists('unit', $group)){
+		if (isset($group['unit'])){
 			foreach($group['unit'] as $unt){
 				$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('application_get_unit_group'));
 				$statement->execute([

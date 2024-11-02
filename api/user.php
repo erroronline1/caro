@@ -27,9 +27,9 @@ class USER extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -91,7 +91,7 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if(isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
@@ -163,7 +163,7 @@ class USER extends API {
 					$primary_unit[LANG::GET('units.' . $unit)] = ['name' => LANG::PROPERTY('user.settings_primary_unit')];
 					$units[] = LANG::GET('units.' . $unit);
 				}
-				if(array_key_exists('primaryUnit', $user['app_settings'])) $primary_unit[LANG::GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
+				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[LANG::GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = '';
@@ -186,11 +186,11 @@ class USER extends API {
 								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
 								($units ? LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" : '') .
 								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '') .
-								(array_key_exists('initialovertime', $user['app_settings']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-								(array_key_exists('weeklyhours', $user['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
-								(array_key_exists('_overtime', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
-								(array_key_exists('annualvacation', $user['app_settings']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
-								(array_key_exists('_leftvacation', $timesheet_stats) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
+								(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
+								(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
+								(isset($timesheet_stats['_overtime']) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
+								(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
+								(isset($timesheet_stats['_leftvacation']) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
 								($skillmatrix ? " \n" . $skillmatrix : '')
 							]
 						],[
@@ -234,7 +234,7 @@ class USER extends API {
 				$languages = [];
 				foreach(glob('language.*') as $file){
 					$lang = explode('.', $file);
-					$languages[$lang[1]] = (array_key_exists('language', $user['app_settings']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
+					$languages[$lang[1]] = (isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
 				}
 				$result['render']['content'][] = [
 					[
@@ -258,9 +258,9 @@ class USER extends API {
 							'name' => LANG::GET('user.settings_theme')
 						],
 						'content' => [
-							LANG::GET('user.settings_theme_light') => (!array_key_exists('theme', $user['app_settings']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
-							LANG::GET('user.settings_theme_aurora') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
-							LANG::GET('user.settings_theme_dark') => (array_key_exists('theme', $user['app_settings']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
+							LANG::GET('user.settings_theme_light') => (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
+							LANG::GET('user.settings_theme_aurora') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
+							LANG::GET('user.settings_theme_dark') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
 						]
 					]
 				];
@@ -275,8 +275,8 @@ class USER extends API {
 					];
 				}
 
-				if (array_key_exists('forceDesktop', $user['app_settings']) && $user['app_settings']['forceDesktop']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
-				if (array_key_exists('homeoffice', $user['app_settings']) && $user['app_settings']['homeoffice']) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
+				if (isset($user['app_settings']['forceDesktop'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
+				if (isset($user['app_settings']['homeoffice'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
 
 
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
@@ -399,7 +399,7 @@ class USER extends API {
 				}
 
 				// save and convert image or create default
-				if (!(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name'])) {
+				if (!(isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name'])) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
 					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
@@ -421,7 +421,7 @@ class USER extends API {
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+					if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
 						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
@@ -534,7 +534,7 @@ class USER extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// save and convert image or create default
-				if ((!(array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_reset_photo'))) {
+				if ((!(isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
 					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
@@ -543,7 +543,7 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if (array_key_exists(LANG::PROPERTY('user.edit_take_photo'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
@@ -559,7 +559,7 @@ class USER extends API {
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					if (array_key_exists(LANG::PROPERTY('user.edit_add_training_document'), $_FILES) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+					if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
 						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
@@ -841,7 +841,7 @@ class USER extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_initial_overtime'),
-									'value' => array_key_exists('initialovertime', $user['app_settings']) ? $user['app_settings']['initialovertime'] : 0
+									'value' => isset($user['app_settings']['initialovertime']) ? $user['app_settings']['initialovertime'] : 0
 								],
 								'hint' => LANG::GET('user.settings_initial_overtime_hint')
 							],
@@ -849,7 +849,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_weekly_hours'),
-									'value' => array_key_exists('weeklyhours', $user['app_settings']) ? str_replace(';', "\n", $user['app_settings']['weeklyhours']) : ''
+									'value' => isset($user['app_settings']['weeklyhours']) ? str_replace(';', "\n", $user['app_settings']['weeklyhours']) : ''
 								],
 								'hint' => LANG::GET('user.settings_weekly_hours_hint')
 							]
@@ -858,7 +858,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('user.settings_annual_vacation'),
-									'value' => array_key_exists('annualvacation', $user['app_settings']) ? str_replace(';', "\n", $user['app_settings']['annualvacation']) : ''
+									'value' => isset($user['app_settings']['annualvacation']) ? str_replace(';', "\n", $user['app_settings']['annualvacation']) : ''
 								],
 								'hint' => LANG::GET('user.settings_annual_vacation_hint')
 							]

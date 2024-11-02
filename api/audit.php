@@ -41,9 +41,9 @@ class AUDIT extends API {
 		parent::__construct();
 		if (!PERMISSION::permissionFor('audits')) $this->response([], 401);
 
-		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_requestedDate = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_requestedTime = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedDate = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedTime = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**

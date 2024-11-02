@@ -26,9 +26,9 @@ class FORM extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -156,7 +156,7 @@ class FORM extends API {
 							if (array_is_list($sub)){
 								array_push($result, ...unrequire($sub));
 							} else {
-								if (array_key_exists('attributes', $sub)){
+								if (isset($sub['attributes'])){
 									unset ($sub['attributes']['required']);
 									unset ($sub['attributes']['data-required']);
 								}
@@ -363,7 +363,7 @@ class FORM extends API {
 				$hidden = [];
 				foreach($bundles as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-						if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
+						if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 							$bundledatalist[] = $row['name'];
 							$options[$row['name']] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
@@ -507,7 +507,7 @@ class FORM extends API {
 				 */
 				function fileupload($content, $component_name, $timestamp){
 					// recursively replace images with actual $_FILES content according to content nesting
-					if (array_key_exists('composedComponent_files', $_FILES)){
+					if (isset($_FILES['composedComponent_files'])){
 						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
 						$uploaded_files = [];
 						foreach($uploads as $path){
@@ -526,7 +526,7 @@ class FORM extends API {
 									if ($sub['type'] === 'image'){
 										preg_match_all('/[\w\s\d\.]+/m', $sub['attributes']['name'], $fakefilename);
 										$filename = $fakefilename[0][count($fakefilename[0])-1];
-										if ($filename && array_key_exists($filename, $uploaded_filearray)){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
+										if ($filename && isset($uploaded_filearray[$filename])){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
 											$sub['attributes']['name'] = $filename;
 											$sub['attributes']['url'] = $uploaded_filearray[$filename];
 										}
@@ -547,7 +547,7 @@ class FORM extends API {
 						if (array_is_list($sub)){
 							array_push($result, ...usedImages($sub, $result));
 						} else {
-							if (array_key_exists('type', $sub) && $sub['type'] === 'image')
+							if (isset($sub['type']) && $sub['type'] === 'image')
 								$result[] = '.' . $sub['attributes']['url'];
 						}
 					}
@@ -702,7 +702,7 @@ class FORM extends API {
 						if (array_is_list($sub)){
 							deleteImages($sub);
 						} else {
-							if (array_key_exists('type', $sub) && $sub['type'] === 'image')
+							if (isset($sub['type']) && $sub['type'] === 'image')
 								UTILITY::delete('.' . $sub['attributes']['url']);
 						}
 					}
@@ -762,7 +762,7 @@ class FORM extends API {
 		$hidden = [];
 		foreach($components as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
 				$options[$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
@@ -779,7 +779,7 @@ class FORM extends API {
 		foreach($fd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) $approvedforms[$row['name']] = []; // prepare for selection
-			if (array_key_exists('content', $component) && !in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+			if (isset($component['content']) && !in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
 				$dependedforms[] = $row['name'];
 			}
 		}
@@ -953,7 +953,7 @@ class FORM extends API {
 				]
 			];
 
-		if (array_key_exists('content', $component)) $return['render']['component'] = json_decode($component['content']);
+		if (isset($component['content'])) $return['render']['component'] = json_decode($component['content']);
 		if ($component['name']) $return['header'] = $component['name'];
 		$this->response($return);
 	}
@@ -981,7 +981,7 @@ class FORM extends API {
 						if (array_is_list($sub)){
 							$hasidentifier = check4identifier($sub, $hasidentifier);
 						} else {
-							if (array_key_exists('type', $sub) && $sub['type'] === 'identify') $hasidentifier = true;
+							if (isset($sub['type']) && $sub['type'] === 'identify') $hasidentifier = true;
 						}
 					}
 					return $hasidentifier;
@@ -1187,7 +1187,7 @@ class FORM extends API {
 		$hidden = [];
 		foreach($fd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!array_key_exists($row['name'], $formoptions) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($formoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$formdatalist[] = $row['name'];
 				$formoptions[$row['name']] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
@@ -1201,7 +1201,7 @@ class FORM extends API {
 		$hidden = [];
 		foreach($cd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!array_key_exists($row['name'], $componentoptions) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($componentoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
 				//$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
 				$componentoptions[$row['name'] . ' - ' . LANG::GET('assemble.approve_approved')] = ['value' => $row['id']];
@@ -1383,7 +1383,7 @@ class FORM extends API {
 			];
 
 		// add used components to response
-		if (array_key_exists('content', $form)) {
+		if (isset($form['content'])) {
 			$return['render']['components'] = [];
 			foreach(explode(',', $form['content']) as $usedcomponent) {
 				// get latest approved by name

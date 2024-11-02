@@ -27,11 +27,11 @@ class TEXTTEMPLATE extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_modal = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_clientimport = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_modal = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_clientimport = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -146,7 +146,7 @@ class TEXTTEMPLATE extends API {
 					if (!in_array($row['type'], ['replacement', 'text'])) continue;
 					$display = LANG::GET('units.' . $row['unit']) . ' ' . LANG::GET('texttemplate.edit_chunk_types.' . $row['type']) . ' ' . $row['name'] . ' (' . $row['language'] . ')';
 
-					if (!array_key_exists($display, $options) && !in_array($row['name'], $hidden)) {
+					if (!isset($options[$display]) && !in_array($row['name'], $hidden)) {
 						$chunkdatalist[] = $row['name'];
 						$options[$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						if ($row['type'] === 'replacement') $insertreplacement[LANG::GET('units.' . $row['unit']) . ' '. $row['name'] . ' (' . $row['language'] . ')'] = ['value' => ':' . $row['name']];
@@ -399,14 +399,14 @@ class TEXTTEMPLATE extends API {
 					if ($row['type'] === 'template'){
 						$display = LANG::GET('units.' . $row['unit']) . ' ' . $row['name'] . ' (' . $row['language'] . ')';
 
-						if (!array_key_exists($display, $options) && !in_array($row['name'], $hidden)) {
+						if (!isset($options[$display]) && !in_array($row['name'], $hidden)) {
 							$templatedatalist[] = $row['name'];
 							$options[$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
 						$alloptions[$display . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					if ($row['type'] === 'text'){
-						if (!array_key_exists(':' . $row['name'], $chunks) && !in_array($row['name'], $hidden)) {
+						if (!isset($chunks[':' . $row['name']]) && !in_array($row['name'], $hidden)) {
 							$insertreplacement[LANG::GET('units.' . $row['unit']) . ' ' . $row['name'] . ' - ' . substr($row['content'], 0, 50) . (strlen($row['content']) > 50 ? '...' : '')] = ['value' => ':' . $row['name']];
 							$chunks[':' . $row['name']] = $row['content'];
 						}
@@ -581,16 +581,16 @@ class TEXTTEMPLATE extends API {
 			if ($row['type'] !== 'template' && !in_array($row['name'], $hidden)) {
 				// prepare in case of template request
 				// set up array for strtr on content
-				if ($row['type']==='text' && !array_key_exists(':' . $row['name'], $texts)) $texts[':' . $row['name']] = $row['content'] . ' ';
+				if ($row['type']==='text' && !isset($texts[':' . $row['name']])) $texts[':' . $row['name']] = $row['content'] . ' ';
 				// set up array with valid replacements
-				if ($row['type']==='replacement' && !array_key_exists(':' . $row['name'], $replacements)) $replacements[':' . $row['name']] = $row['content'];
+				if ($row['type']==='replacement' && !isset($replacements[':' . $row['name']])) $replacements[':' . $row['name']] = $row['content'];
 				// skip for datalist and options 
 				continue;
 			}
 			if ($row['type'] !== 'template') continue;
 			if (!in_array($row['name'], $hidden)) {
 				if (!in_array($row['unit'], $options)) $options[$row['unit']] = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				if (!array_key_exists($row['name'] . ' (' . $row['language'] . ')', $options[$row['unit']])){
+				if (!isset($options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'])){
 					$templatedatalist[] = $row['name'];
 					$options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
@@ -634,7 +634,7 @@ class TEXTTEMPLATE extends API {
 					$add = $texts[$chunk];
 					preg_match_all('/(:[\w\d]+?)(?:\W|$)/m', $add, $placeholders);
 					foreach($placeholders[1] as $ph){
-						if (!array_key_exists($ph, $replacements)) array_push($undefined, $ph);
+						if (!isset($replacements[$ph])) array_push($undefined, $ph);
 					}
 					$content .= $add;
 				}

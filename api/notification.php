@@ -29,7 +29,7 @@ class NOTIFICATION extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 	}
 
 	/**
@@ -94,7 +94,7 @@ class NOTIFICATION extends API {
 		}
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (array_key_exists($event['subject'], LANGUAGEFILE['calendar']['timesheet_pto']) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
 		}
 
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
@@ -142,7 +142,7 @@ class NOTIFICATION extends API {
 			foreach($allproducts as $product) {
 				if ($product['incorporated'] === '') continue;
 				$product['incorporated'] = json_decode($product['incorporated'], true);
-				if (array_key_exists('_denied', $product['incorporated'])) continue;
+				if (isset($product['incorporated']['_denied'])) continue;
 				elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $unapproved++;
 			}
 		}

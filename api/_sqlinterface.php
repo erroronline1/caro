@@ -43,10 +43,10 @@ class SQLQUERY {
 	 */
 	public static function EXECUTE($_pdo, $query = '', $parameters = ['values' => [], 'replacements' => []]){
 		// retrive query matching sql driver, else process raw query
-		if (array_key_exists($query, self::QUERIES)) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
+		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 		
 		// substitute NULL values, int values and mask/sanitize values
-		if (array_key_exists('values', $parameters) && $parameters['values']){
+		if (isset($parameters['values'])){
 			foreach ($parameters['values'] as $key => $value){
 				if ($value === null || $value === false) {
 					$query = strtr($query, [$key => 'NULL']);
@@ -65,7 +65,7 @@ class SQLQUERY {
 		} else $parameters['values'] = [];
 
 		// replace tokens in query that can not be executed
-		if (array_key_exists('replacements', $parameters) && $parameters['replacements']) {
+		if (isset($parameters['replacements'])) {
 			foreach ($parameters['replacements'] as $key => $value){
 				$list = [];
 				if (json_decode($value, true) === null) $list = explode(',', $value); // can't explode csv if json
@@ -106,7 +106,7 @@ class SQLQUERY {
 	public static function CHUNKIFY($chunks, $query = null){
 		if ($query){
 			$chunkIndex = count($chunks) - 1;
-			if (array_key_exists($chunkIndex, $chunks)){
+			if (isset($chunks[$chunkIndex])){
 				if (strlen($chunks[$chunkIndex] . $query) < CONFIG['sql'][CONFIG['sql']['use']]['packagesize']) $chunks[$chunkIndex] .= $query;
 				else $chunks[] = $query;
 			}

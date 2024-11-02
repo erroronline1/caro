@@ -32,7 +32,7 @@ class APPLICATION extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedLogout = $this->_requestedManual = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedLogout = $this->_requestedManual = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -58,7 +58,7 @@ class APPLICATION extends API {
 	 */
 	public function login(){
 		if (!$this->_requestedLogout){
-			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && array_key_exists('user', $_SESSION) && $_SESSION['user']){
+			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && isset($_SESSION['user'])){
 				$this->response(['user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
@@ -361,8 +361,8 @@ class APPLICATION extends API {
 	 */
 	public function menu(){
 		// get permission based menu items
-		if (!array_key_exists('user', $_SESSION)) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
-		$menu=[
+		if (!isset($_SESSION['user'])) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
+		$menu = [
 			LANG::GET('menu.communication_header') => [
 				LANG::GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
 				LANG::GET('menu.message_register') => ['onpointerup' => "api.message('get', 'register')"],
@@ -403,7 +403,7 @@ class APPLICATION extends API {
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
 		// make sure risk management comes after forms 
 		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && array_key_exists('weeklyhours', $_SESSION['user']['app_settings']) && $_SESSION['user']['app_settings']['weeklyhours'])
+		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
 			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
 
 		if (PERMISSION::permissionFor('files')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
@@ -438,7 +438,7 @@ class APPLICATION extends API {
 	 * respond with landing page
 	 */
 	public function start(){
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
 		$tiles = [];
 

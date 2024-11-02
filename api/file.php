@@ -28,10 +28,10 @@ class FILE extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedFolder = $this->_requestedId = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_requestedFile = $this->_accessible = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
+		$this->_requestedFolder = $this->_requestedId = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedFile = $this->_accessible = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
 	/**
@@ -342,7 +342,7 @@ class FILE extends API {
 		if (!PERMISSION::permissionFor('externaldocuments')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('file.manager_new_file')]) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name']) {
 					$files = UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('external_documents'));
 					$insertions = [];
 					foreach($files as $file){
@@ -537,7 +537,7 @@ class FILE extends API {
 						]]);
 				}
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
-				if (array_key_exists(LANG::PROPERTY('file.manager_new_file'), $_FILES) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name'] && $destination) {
+				if (isset($_FILES[LANG::PROPERTY('file.manager_new_file')]) && $_FILES[LANG::PROPERTY('file.manager_new_file')]['tmp_name'] && $destination) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.manager_new_file')], UTILITY::directory('files_documents', [':category' => $destination]));
 					$this->response(['response' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),
@@ -804,7 +804,7 @@ class FILE extends API {
 	public function sharepoint(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (array_key_exists(LANG::PROPERTY('file.sharepoint_upload_header'), $_FILES) && $_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]) && $_FILES[LANG::PROPERTY('file.sharepoint_upload_header')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('file.sharepoint_upload_header')], UTILITY::directory('sharepoint'), [$_SESSION['user']['name']]);
 					$this->response(['response' => [
 						'msg' => LANG::GET('file.manager_new_file_created'),

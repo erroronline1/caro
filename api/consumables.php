@@ -65,9 +65,9 @@ class CONSUMABLES extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -539,7 +539,7 @@ class CONSUMABLES extends API {
 		foreach($allproducts as $product) {
 			if ($product['incorporated'] === '') continue;
 			$product['incorporated'] = json_decode($product['incorporated'], true);
-			if (array_key_exists('_denied', $product['incorporated'])) continue;
+			if (isset($product['incorporated']['_denied'])) continue;
 			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onpointerup' => "api.purchase('get', 'product', " . $product['id'] . ")"];
 		}
 		if ($links){
@@ -604,7 +604,7 @@ class CONSUMABLES extends API {
 				$product['vendor_id'] = $vendor['id'];
 
 				// save documents
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_product_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
+				if (isset($_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_product_documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
@@ -689,7 +689,7 @@ class CONSUMABLES extends API {
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
-				if (PERMISSION::permissionFor('products') && array_key_exists(LANG::PROPERTY('consumables.edit_product_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
+				if (PERMISSION::permissionFor('products') && isset($_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_product_documents_update')]['tmp_name'][0]) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_product_documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
@@ -944,13 +944,13 @@ class CONSUMABLES extends API {
 						if ($product['incorporated'] !== '') {					
 							$product['incorporated'] = json_decode($product['incorporated'], true);
 							$incorporationState = '';
-							if (array_key_exists('_denied', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+							if (isset($product['incorporated']['_denied'])) $incorporationState = LANG::GET('order.incorporation_denied');
 							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
 							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_accepted');
 			
 							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 							foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
-								if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
 							}
 							$result['render']['content'][2][] = [
 								'type' => 'textsection',
@@ -1152,7 +1152,7 @@ class CONSUMABLES extends API {
 					}
 
 					if ($documents) {
-						if (array_key_exists(4, $result['render']['content']))
+						if (isset($result['render']['content'][4]))
 							$result['render']['content'][4] = [
 								[
 									[
@@ -1176,12 +1176,12 @@ class CONSUMABLES extends API {
 					if ($product['incorporated'] !== '') {					
 						$product['incorporated'] = json_decode($product['incorporated'], true);
 						$incorporationState = '';
-						if (array_key_exists('_denied', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+						if (isset($product['incorporated']['_denied'])) $incorporationState = LANG::GET('order.incorporation_denied');
 						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
 
 						$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 						foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
-							if (array_key_exists($permission, $product['incorporated'])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+							if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . LANGUAGEFILE['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
 						}
 
 						array_push($result['render']['content'][3],
@@ -1307,13 +1307,13 @@ class CONSUMABLES extends API {
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $file;
 		$filter['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
-		if (!array_key_exists('headerrowindex', $filter['filesetting'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
-		if (!array_key_exists('dialect', $filter['filesetting'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
+		if (!isset($filter['filesetting']['headerrowindex'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
+		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
 		try {
-			if (!array_key_exists(1, $pricelist->_list)) $this->response([
+			if (!isset($pricelist->_list[1])) $this->response([
 				'response' => [
 					'msg' => implode("\n", $pricelist->_log),
 					'type' => 'error'
@@ -1352,9 +1352,9 @@ class CONSUMABLES extends API {
 					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
 					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
 					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
-					':has_expiry_date' => array_key_exists('has_expiry_date', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
-					':special_attention' => array_key_exists('special_attention', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
 					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
 				]) . '; ');
 			}
@@ -1369,10 +1369,10 @@ class CONSUMABLES extends API {
 					':article_ean' => $pricelist->_list[1][$index]['article_ean'],
 					':active' => 1,
 					':protected' => 0,
-					':trading_good' => array_key_exists('trading_good', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
 					':incorporated' => '',
-					':has_expiry_date' => array_key_exists('has_expiry_date', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
-					':special_attention' => array_key_exists('special_attention', $pricelist->_list[1][$index]) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
@@ -1442,11 +1442,11 @@ class CONSUMABLES extends API {
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
 
 				// save certificate
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd')]);
 				}
 				// save documents
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd')]);
 				}
 
@@ -1502,16 +1502,16 @@ class CONSUMABLES extends API {
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => LANG::GET('consumables.edit_vendor_pricelist_filter_json_error'), 'type' => 'error']]);
 
 				// save certificate
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_certificate_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_certificate_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd')]);
 				}
 				// save documents
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_documents_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd')]);
 				}
 				// update pricelist
 				$pricelistImportError = '';
-				if (array_key_exists(LANG::PROPERTY('consumables.edit_vendor_pricelist_update'), $_FILES) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
+				if (isset($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name']) {
 					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[LANG::PROPERTY('consumables.edit_vendor_pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = LANG::GET('consumables.edit_vendor_pricelist_update_error');
 				}
@@ -1645,7 +1645,7 @@ class CONSUMABLES extends API {
 									'name' => $vendor['name']
 								],
 								'content' => implode(" \n", array_filter(array_map(Fn($key, $value) => $value ? LANG::GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info']), Fn($value) => boolval($value))) .
-									(array_key_exists('validity', $vendor['certificate']) && $vendor['certificate']['validity'] ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
+									(isset($vendor['certificate']['validity']) ? " \n" . LANG::GET('consumables.edit_vendor_certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
 									" \n" . LANG::GET('consumables.information_products_available', [':available' => $available])
 							],[
 								'type' => 'radio',
@@ -1709,7 +1709,7 @@ class CONSUMABLES extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_info'),
-									'value' => array_key_exists('infotext', $vendor['info']) ? $vendor['info']['infotext']: '',
+									'value' => isset($vendor['info']['infotext']) ? $vendor['info']['infotext']: '',
 									'rows' => 8
 								],
 								'hint' => LANG::GET('consumables.edit_vendor_info_hint')
@@ -1717,31 +1717,31 @@ class CONSUMABLES extends API {
 								'type' => 'email',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_mail'),
-									'value' => array_key_exists('mail', $vendor['info']) ? $vendor['info']['mail']: '',
+									'value' => isset($vendor['info']['mail']) ? $vendor['info']['mail']: '',
 								]
 							], [
 								'type' => 'tel',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_phone'),
-									'value' => array_key_exists('phone', $vendor['info']) ? $vendor['info']['phone']: '',
+									'value' => isset($vendor['info']['phone']) ? $vendor['info']['phone']: '',
 								]
 							], [
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_address'),
-									'value' => array_key_exists('address', $vendor['info']) ? $vendor['info']['address']: '',
+									'value' => isset($vendor['info']['address']) ? $vendor['info']['address']: '',
 								]
 							], [
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
-									'value' => array_key_exists('sales_representative', $vendor['info']) ? $vendor['info']['sales_representative']: '',
+									'value' => isset($vendor['info']['sales_representative']) ? $vendor['info']['sales_representative']: '',
 								]
 							], [
 								'type' => 'text',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_customer_id'),
-									'value' => array_key_exists('customer_id', $vendor['info']) ? $vendor['info']['customer_id']: '',
+									'value' => isset($vendor['info']['customer_id']) ? $vendor['info']['customer_id']: '',
 									'id' => 'vendor_customer_id'
 								]
 							], [
@@ -1845,14 +1845,14 @@ class CONSUMABLES extends API {
 								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval'),
-									'value' => array_key_exists('samplecheck_interval', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['mdr14_sample_interval']
+									'value' => isset($vendor['pricelist']['samplecheck_interval']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['mdr14_sample_interval']
 								]
 							],
 							[
 								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('consumables.edit_vendor_samplecheck_interval_reusable'),
-									'value' => array_key_exists('samplecheck_reusable', $vendor['pricelist']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['mdr14_sample_reusable']
+									'value' => isset($vendor['pricelist']['samplecheck_reusable']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['mdr14_sample_reusable']
 								]
 							]
 						]]

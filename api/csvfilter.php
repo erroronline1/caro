@@ -28,9 +28,9 @@ class CSVFILTER extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = $this->_requestedID = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedID = $this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -61,7 +61,7 @@ class CSVFILTER extends API {
 					]]);
 				$content = json_decode($filter['content'], true);
 
-				$inputfile = array_key_exists(LANG::PROPERTY('csvfilter.use_filter_input_file'), $_FILES) ? $_FILES[LANG::PROPERTY('csvfilter.use_filter_input_file')]['tmp_name'] : null;
+				$inputfile = isset($_FILES[LANG::PROPERTY('csvfilter.use_filter_input_file')]) ? $_FILES[LANG::PROPERTY('csvfilter.use_filter_input_file')]['tmp_name'] : null;
 				if (!$inputfile) $this->response([
 					'response' => [
 						'name' => false,
@@ -69,13 +69,13 @@ class CSVFILTER extends API {
 						'type' => 'error'
 					]]);
 				$content['filesetting']['source'] = $inputfile;
-				if (!array_key_exists('dialect', $content['filesetting'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
+				if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 				$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
 
 				$comparefileindex = 0;
 				foreach($content['filter'] as &$filtertype){
 					if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
-						$comparefile = array_key_exists(LANG::PROPERTY('csvfilter.use_filter_compare_file'), $_FILES) && array_key_exists($comparefileindex, $_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]['tmp_name']) ? $_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]['tmp_name'][$comparefileindex] : null;
+						$comparefile = isset($_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]) && isset($_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]['tmp_name'][$comparefileindex]) ? $_FILES[LANG::PROPERTY('csvfilter.use_filter_compare_file')]['tmp_name'][$comparefileindex] : null;
 						if (!$comparefile) $this->response([
 							'response' => [
 								'name' => false,
@@ -179,7 +179,7 @@ class CSVFILTER extends API {
 				$hidden = [];
 				foreach($filters as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
+					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];
 						$options[$row['name']] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
@@ -363,7 +363,7 @@ class CSVFILTER extends API {
 				$dependedtemplates = [];
 				foreach($filters as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!array_key_exists($row['name'], $options) && !in_array($row['name'], $hidden)) {
+					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];
 						$options[$row['name'] ] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}

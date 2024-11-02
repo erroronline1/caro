@@ -31,9 +31,9 @@ class TOOL extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedType = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -156,7 +156,7 @@ class TOOL extends API {
 
 		$result['render'] = ['form' => [
 			'data-usecase' => 'tool_calculator',
-			'action' => "javascript:api.tool('post', 'calculator', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'pow') . "')"
+			'action' => "javascript:api.tool('post', 'calculator', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow') . "')"
 		],
 		'content' => [
 			[
@@ -172,7 +172,7 @@ class TOOL extends API {
 						LANG::GET('tool.calculator_cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
 					]
 				],
-				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'pow'],
+				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
 			]
 		]];
 
@@ -311,7 +311,7 @@ class TOOL extends API {
 
 		$result['render'] = ['form' => [
 			'data-usecase' => 'tool_create_code',
-			'action' => "javascript:api.tool('post', 'code', '" . (array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text') . "')"
+			'action' => "javascript:api.tool('post', 'code', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
 		],
 		'content' => [
 			[
@@ -323,7 +323,7 @@ class TOOL extends API {
 					],
 					'content' => $options
 				],
-				$types[array_key_exists($this->_requestedType, $types) ? $this->_requestedType : 'qrcode_text']['content'],
+				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text']['content'],
 			]
 		]];
 

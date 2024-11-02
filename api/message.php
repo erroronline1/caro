@@ -25,9 +25,9 @@ class MESSAGE extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_conversation = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
+		$this->_conversation = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -281,13 +281,13 @@ class MESSAGE extends API {
 			if ($user['orderauth']) $groups['orderauth'][] = $user['name'];
 			if ($user['units'])
 				foreach(explode(',', $user['units']) as $unit){
-					if (!array_key_exists($unit, $groups['units'])) $groups['units'][$unit] = [];
+					if (!isset($groups['units'][$unit])) $groups['units'][$unit] = [];
 					$groups['units'][$unit][] = $user['name'];
 				}
 			if ($user['permissions'])
 				foreach(explode(',', $user['permissions']) as $permission){
 					if (in_array($permission, ['user', 'group'])) continue;
-					if (!array_key_exists($permission, $groups['permissions'])) $groups['permissions'][$permission] = [];
+					if (!isset($groups['permissions'][$permission])) $groups['permissions'][$permission] = [];
 					$groups['permissions'][$permission][] = $user['name'];
 				}
 		}

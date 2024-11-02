@@ -28,11 +28,11 @@ class ORDER extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = array_key_exists(2, REQUEST) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
-		$this->_subMethod = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_borrowedModule = $this->_subMethodState = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_requestedID = isset(REQUEST[2]) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
+		$this->_subMethod = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_borrowedModule = $this->_subMethodState = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -308,7 +308,7 @@ class ORDER extends API {
 						continue;
 					}
 					$product['incorporated'] = json_decode($product['incorporated'], true);
-					if (array_key_exists('_denied', $product['incorporated'])) {
+					if (isset($product['incorporated']['_denied'])) {
 						$incorporationdenied[] = $product['id'];
 						continue;
 					}
@@ -1108,7 +1108,7 @@ class ORDER extends API {
 						$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 					}
 				}
-				if (array_key_exists(LANG::PROPERTY('order.add_approval_signature'), $_FILES) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
+				if (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
 					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 				}
@@ -1311,7 +1311,7 @@ class ORDER extends API {
 			}
 			unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
 		}
-		if (array_key_exists(LANG::PROPERTY('order.add_approval_signature'), $_FILES) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
+		if (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::resizeImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 		}
@@ -1321,14 +1321,14 @@ class ORDER extends API {
 		
 		// handle attachments
 		$attachments = [];
-		if (array_key_exists(LANG::PROPERTY('order.attach_photo'), $_FILES) && $_FILES[LANG::PROPERTY('order.attach_photo')]['tmp_name'][0]){
+		if (isset($_FILES[LANG::PROPERTY('order.attach_photo')]) && $_FILES[LANG::PROPERTY('order.attach_photo')]['tmp_name'][0]){
 			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
-		if (array_key_exists(LANG::PROPERTY('order.attach_file'), $_FILES) && $_FILES[LANG::PROPERTY('order.attach_file')]['tmp_name'][0]){
+		if (isset($_FILES[LANG::PROPERTY('order.attach_file')]) && $_FILES[LANG::PROPERTY('order.attach_file')]['tmp_name'][0]){
 			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
@@ -1464,7 +1464,7 @@ class ORDER extends API {
 							if ($row['incorporated'] === '') $incorporationState = LANG::GET('order.incorporation_neccessary');
 							else {
 								$row['incorporated'] = json_decode($row['incorporated'], true);
-								if (array_key_exists('_denied', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_denied');
+								if (isset($row['incorporated']['_denied'])) $incorporationState = LANG::GET('order.incorporation_denied');
 								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
 							}
 							$matches[$article][$slide][] = [

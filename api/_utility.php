@@ -92,7 +92,7 @@ class UTILITY {
 	 * @return string directory
 	 */
 	public static function directory($request, $replace = []){
-		if (!array_key_exists($request, CONFIG['fileserver'])){
+		if (!isset(CONFIG['fileserver'][$request])){
 			return '../fileserver';
 		}
 		$patterns = [];
@@ -280,7 +280,7 @@ class UTILITY {
 								$name = str_replace(' ', '_', $name);
 								if (substr($name, -2) == '[]') { //is array
 									$name = substr($name, 0, strlen($name)-2);
-									if (array_key_exists($name, $data)) $data[$name][] = substr($body, 0, strlen($body) - 2);
+									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
 									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
 								}
 								else $data[$name] = substr($body, 0, strlen($body) - 2);
@@ -438,7 +438,7 @@ class UTILITY {
 				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
 					if (!$_FILES[$name[$i]]['tmp_name'][$j]) continue;
 					$file = pathinfo($_FILES[$name[$i]]['name'][$j]);
-					if ($rename && array_key_exists($i, $rename) && $rename[$i]) $file['filename'] = $rename[$i];
+					if ($rename && isset($rename[$i])) $file['filename'] = $rename[$i];
 					$targets[] = self::handle($_FILES[$name[$i]]['tmp_name'][$j], $file['filename'] . '.' . $file['extension'], $i, $prefix, $folder, $replace);
 				}
 			}
@@ -522,7 +522,7 @@ class PERMISSION {
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
 		$approved = true;
 		foreach(self::permissionFor($function, true) as $permission){
-			if (!$approvalcolumn || !array_key_exists($permission, $approvalcolumn)) $approved = false;
+			if (!$approvalcolumn || !isset($approvalcolumn[$permission])) $approved = false;
 		}
 		return $approved;
 	}
@@ -544,7 +544,7 @@ class PERMISSION {
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
 		$pending = [];
 		foreach(self::permissionFor($function, true) as $permission){
-			if (!$approvalcolumn || array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !array_key_exists($permission, $approvalcolumn)) $pending[] = $permission;
+			if (!$approvalcolumn || array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !isset($approvalcolumn[$permission])) $pending[] = $permission;
 		}
 		return $pending;
 	}
@@ -561,8 +561,8 @@ class PERMISSION {
 	 * @return bool|array
 	 */
 	public static function permissionFor($function = '', $returnvalues = false){
-		if (!array_key_exists('user', $_SESSION) || !array_key_exists('permissions', $_SESSION['user'])) return [];
-		if (array_key_exists($function, CONFIG['permissions'])){
+		if (!isset($_SESSION['user']) || !isset($_SESSION['user']['permissions'])) return [];
+		if (isset(CONFIG['permissions'][$function])){
 			if (!$returnvalues) {
 				// limited functions don't include admin by default
 				if (in_array($function, ['productslimited'])) return boolval(array_intersect([...preg_split('/\W+/', CONFIG['permissions'][$function])], $_SESSION['user']['permissions']));

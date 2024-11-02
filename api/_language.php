@@ -18,7 +18,7 @@
  */
 
 $language = CONFIG['application']['defaultlanguage'];
-if (array_key_exists('user', $_SESSION) && array_key_exists('language', $_SESSION['user']['app_settings'])) $language = $_SESSION['user']['app_settings']['language'];
+if (isset($_SESSION['user']) && isset($_SESSION['user']['app_settings']['language'])) $language = $_SESSION['user']['app_settings']['language'];
 $file = file_exists('language.' . $language) ? 'language.' . $language : 'language.' . CONFIG['application']['defaultlanguage'];
 
 define ('LANGUAGEFILE', parse_ini_file($file, true));
@@ -41,9 +41,9 @@ class LANG {
 		$request = explode('.', $request);
 		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . CONFIG['application']['defaultlanguage'], true); 
 
-		if (!array_key_exists($request[0], $languagefile) ||
-			!array_key_exists($request[1], $languagefile[$request[0]]) ||
-			(array_key_exists(2, $request) && !array_key_exists($request[2], $languagefile[$request[0]][$request[1]]))){
+		if (!isset($languagefile[$request[0]]) ||
+			!isset($languagefile[$request[0]][$request[1]]) ||
+			(isset($request[2]) && !isset($languagefile[$request[0]][$request[1]][$request[2]]))){
 			return 'undefined language';
 		}
 		$patterns = [];
@@ -52,7 +52,7 @@ class LANG {
 			$patterns[] = '/' . $pattern . '/';
 			$replacements[] = $replacement;
 		}
-		if (array_key_exists(2, $request)) return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]][$request[2]]);
+		if (isset($request[2])) return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]][$request[2]]);
 		return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]]);
 	}
 

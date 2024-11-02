@@ -33,11 +33,11 @@ class CALENDAR extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!array_key_exists('user', $_SESSION)) $this->response([], 401);
+		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedTimespan = $this->_requestedId = array_key_exists(2, REQUEST) ? REQUEST[2] : null;
-		$this->_requestedDate = $this->_requestedComplete = array_key_exists(3, REQUEST) ? REQUEST[3] : null;
-		$this->_requestedCalendarType = array_key_exists(4, REQUEST) ? REQUEST[4] : null;
+		$this->_requestedTimespan = $this->_requestedId = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedDate = $this->_requestedComplete = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedCalendarType = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -141,11 +141,11 @@ class CALENDAR extends API {
 
 				$stats_month_row = $timesheet_stats_month[$stats_month_row];
 				$stats_all_row = $timesheet_stats_all[array_search($entry['affected_user_id'], array_column($timesheet_stats_all, '_id'))];
-				if (!array_key_exists($entry['affected_user_id'], $timesheets)) {
+				if (!isset($timesheets[$entry['affected_user_id']])) {
 					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
 					$pto = [];
 					foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $translation){
-						if (array_key_exists($key, $stats_month_row)) $pto[$key] = $stats_month_row[$key];
+						if (isset($stats_month_row[$key])) $pto[$key] = $stats_month_row[$key];
 					}
 					$timesheets[$entry['affected_user_id']] = [
 						'name' => $entry['affected_user'],
@@ -167,7 +167,7 @@ class CALENDAR extends API {
 				$span_end = new DateTime($entry['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
-					&& !array_key_exists($day->format('Y-m-d'), $timesheets[$entry['affected_user_id']]['days'])){
+					&& !isset($timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')])){
 					// calculate hours for stored regular working days only
 					$misc = json_decode($entry['misc'], true);
 					if (!strlen($entry['subject'])) {
@@ -175,19 +175,19 @@ class CALENDAR extends API {
 						$lastday = $days[count($days) - 1];  // copy object for down below method usage
 						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
 						$dailyhours = iterator_count($periods) / 60;
-						if (array_key_exists('homeoffice', $misc)) $dailyhours += timeStrToFloat($misc['homeoffice']);
-						if (array_key_exists('break', $misc)) $dailyhours -= timeStrToFloat($misc['break']);
+						if (isset($misc['homeoffice'])) $dailyhours += timeStrToFloat($misc['homeoffice']);
+						if (isset($misc['break'])) $dailyhours -= timeStrToFloat($misc['break']);
 
 						$timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = [
 							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
-							'break' => array_key_exists('break', $misc) ? $misc['break'] : '',
-							'homeoffice' => array_key_exists('homeoffice', $misc) ? $misc['homeoffice'] : '',
-							'note' => array_key_exists('note', $misc) ? $misc['note'] : '',
+							'break' => isset($misc['break']) ? $misc['break'] : '',
+							'homeoffice' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
+							'note' => isset($misc['note']) ? $misc['note'] : '',
 							'hours' => $dailyhours,
 						];
 					}
 					// else state subject
-					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => LANGUAGEFILE['calendar']['timesheet_pto'][$entry['subject']], 'note' => array_key_exists('note', $misc) ? $misc['note'] : ''];
+					else $timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')] = ['subject' => LANGUAGEFILE['calendar']['timesheet_pto'][$entry['subject']], 'note' => isset($misc['note']) ? $misc['note'] : ''];
 				}
 			}
 		}
@@ -195,7 +195,7 @@ class CALENDAR extends API {
 		foreach($timesheets as $id => $user){
 			// append missing dates for overview, after all the output shall be comprehensible
 			foreach ($days as $day){
-				if (!array_key_exists($day->format('Y-m-d'), $user['days'])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
+				if (!isset($user['days'][$day->format('Y-m-d')])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
 				$timesheets[$id]['days'][$day->format('Y-m-d')]['weekday'] = LANGUAGEFILE['general']['weekday'][$day->format('N')];
 				$timesheets[$id]['days'][$day->format('Y-m-d')]['holiday'] = in_array($day->format('Y-m-d'), $holidays) || !in_array($day->format('N'), $calendar->_workdays);
 			}
@@ -279,11 +279,11 @@ class CALENDAR extends API {
 				// days
 				foreach ($user['days'] as $date => $day){
 					$dayinfo = [];
-					if (array_key_exists('subject', $day)) $dayinfo[] = $day['subject'];
+					if (isset($day['subject'])) $dayinfo[] = $day['subject'];
 					foreach(LANGUAGEFILE['calendar']['export_sheet_daily'] as $key => $value){
-						if (array_key_exists($key, $day) && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
+						if (isset($day[$key]) && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
 					}
-					if (array_key_exists('note', $day) && $day['note']) $dayinfo[] = $day['note'];
+					if (isset($day['note'])) $dayinfo[] = $day['note'];
 					
 					$rows[] = [
 						[$day['weekday'] . ' ' . $date, $day['holiday']],
@@ -734,7 +734,7 @@ class CALENDAR extends API {
 					$misc['homeoffice'] = $homeoffice;
 				}
 				$event[':misc'] = json_encode($misc);
-				if (!($event[':span_start'] && $event[':span_end'] && ((array_key_exists('break', $misc) && $misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
 				if ($newid = $calendar->post($event)) $this->response([
 					'response' => [
 						'id' => $newid,
@@ -782,7 +782,7 @@ class CALENDAR extends API {
 				}
 
 				$event[':misc'] = json_encode($misc);
-				if (!($event[':span_start'] && $event[':span_end'] && ((array_key_exists('break', $misc) && $misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
+				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => LANG::GET('calendar.timesheet_error_missing'), 'type' => 'error']]);
 				if ($calendar->put($event)) $this->response([
 					'response' => [
 						'id' => $event[':id'],
@@ -996,8 +996,8 @@ class CALENDAR extends API {
 
 			if ($row['misc']){
 				$misc = json_decode($row['misc'], true);
-				if (!$row['subject'] && array_key_exists('break', $misc)) $display .= LANG::GET('calendar.timesheet_break') . ': ' . $misc['break'] . "\n";
-				if (!$row['subject'] && array_key_exists('homeoffice', $misc)) $display .= LANG::GET('calendar.timesheet_homeoffice') . ': ' . $misc['homeoffice'] . "\n";
+				if (!$row['subject'] && isset($misc['break'])) $display .= LANG::GET('calendar.timesheet_break') . ': ' . $misc['break'] . "\n";
+				if (!$row['subject'] && isset($misc['homeoffice'])) $display .= LANG::GET('calendar.timesheet_homeoffice') . ': ' . $misc['homeoffice'] . "\n";
 				if ($row['author_id'] != $row['affected_user_id']) {
 					$hint = LANG::GET('calendar.timesheet_foreign_contributor') . ': ' . $row['author'] . "\n";
 				}
