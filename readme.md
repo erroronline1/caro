@@ -103,10 +103,6 @@
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
-* order stresstest shows significant lag for 200+ entries due to excessive linking?
-    * payload is >4mb for 1k orders: reduce payload, pass only values and create a reusable client method for rendering
-    * approximately 500 ordered items per month!
-    * > down to <1mb, still needing approximately 15 seconds to calculate and render
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -594,7 +590,7 @@ If records contain data from restricted forms, summaries will only contain these
 * on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
 All alterings on records (reidentification, retyping) are recorded as well. Since these are system side actions, records will be stored in the user set language. This may result in a mixed language record!
-  
+
 ![record screenshot](http://toh.erroronline.one/caro/records.png)
 
 ```mermaid
