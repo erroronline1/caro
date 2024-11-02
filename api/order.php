@@ -363,18 +363,18 @@ class ORDER extends API {
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
 						'ordertext' => LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
-						'quantity' => UTILITY::propertySet((object) $decoded_order_data, 'quantity_label') ? : null,
-						'unit' => UTILITY::propertySet((object) $decoded_order_data, 'unit_label') ? : null,
-						'barcode' => UTILITY::propertySet((object) $decoded_order_data, 'barcode_label') ? : null,
-						'name' => UTILITY::propertySet((object) $decoded_order_data, 'productname_label') ? : null,
-						'vendor' => UTILITY::propertySet((object) $decoded_order_data, 'vendor_label') ? : null,
-						'ordernumber' => UTILITY::propertySet((object) $decoded_order_data, 'ordernumber_label') ? : null,
-						'commission' => UTILITY::propertySet((object) $decoded_order_data, 'commission') ? : null,
+						'quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : null,
+						'unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : null,
+						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
+						'name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : null,
+						'vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : null,
+						'ordernumber' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : null,
+						'commission' => UTILITY::propertySet($decoded_order_data, 'commission') ? : null,
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
 						'lastorder' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null,
-						'orderer' => UTILITY::propertySet((object) $decoded_order_data, 'orderer') ? : null,
+						'orderer' => UTILITY::propertySet($decoded_order_data, 'orderer') ? : null,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
 						'state' => [],
@@ -390,7 +390,7 @@ class ORDER extends API {
 						'collapsed' => !$permission['orderprocessing']
 					];
 
-					if ($orderer_group_identify = UTILITY::propertySet((object) $decoded_order_data, 'orderer_group_identify')){
+					if ($orderer_group_identify = UTILITY::propertySet($decoded_order_data, 'orderer_group_identify')){
 						$data['ordertext'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
 					}
 					$data['ordertext'] .= "\n" .LANG::GET('order.order.approved') . ': ' . $row['approved'] . ' ';
@@ -400,7 +400,7 @@ class ORDER extends API {
 						$data['approval'] = array_search($row['approval'], $result['data']['approval']);
 					}
 
-					if ($additional_information = UTILITY::propertySet((object) $decoded_order_data, 'additional_info')){
+					if ($additional_information = UTILITY::propertySet($decoded_order_data, 'additional_info')){
 						$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
 					}
 
@@ -872,7 +872,7 @@ class ORDER extends API {
 								'type' => 'number',
 								'attributes' => [
 									'name' => LANG::GET('order.quantity_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], 'quantity_label') ? : ' ',
+									'value' => UTILITY::propertySet($order['items'][$i], 'quantity_label') ? : ' ',
 									'min' => '1',
 									'max' => '99999',
 									'required' => true,
@@ -883,10 +883,10 @@ class ORDER extends API {
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => LANG::GET('order.added_product', [
-										':unit' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : '',
-										':number' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : '',
-										':name' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : '',
-										':vendor' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ''
+										':unit' => UTILITY::propertySet($order['items'][$i], 'unit_label') ? : '',
+										':number' => UTILITY::propertySet($order['items'][$i], 'ordernumber_label') ? : '',
+										':name' => UTILITY::propertySet($order['items'][$i], 'productname_label') ? : '',
+										':vendor' => UTILITY::propertySet($order['items'][$i], 'vendor_label') ? : ''
 									])
 								]
 							],
@@ -894,35 +894,35 @@ class ORDER extends API {
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.unit_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], 'unit_label') ? : ' '
+									'value' => UTILITY::propertySet($order['items'][$i], 'unit_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.ordernumber_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], 'ordernumber_label') ? : ' '
+									'value' => UTILITY::propertySet($order['items'][$i], 'ordernumber_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.productname_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], 'productname_label') ? : ' '
+									'value' => UTILITY::propertySet($order['items'][$i], 'productname_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.barcode_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], 'barcode_label') ?  : ' '
+									'value' => UTILITY::propertySet($order['items'][$i], 'barcode_label') ?  : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => LANG::GET('order.vendor_label') . '[]',
-									'value' => UTILITY::propertySet((object) $order['items'][$i], 'vendor_label') ? : ' '
+									'value' => UTILITY::propertySet($order['items'][$i], 'vendor_label') ? : ' '
 								]
 							],
 							[
@@ -1189,11 +1189,11 @@ class ORDER extends API {
 							if (is_array($value)){
 								foreach($value as $item){
 									$items .= LANG::GET('order.prepared_order_item', [
-										':quantity' => UTILITY::propertySet((object) $item, 'quantity_label') ? : '',
-										':unit' => UTILITY::propertySet((object) $item, 'unit_label') ? : '',
-										':number' => UTILITY::propertySet((object) $item, 'ordernumber_label') ? : '',
-										':name' => UTILITY::propertySet((object) $item, 'productname_label') ? : '',
-										':vendor' => UTILITY::propertySet((object) $item, 'vendor_label') ? : ''
+										':quantity' => UTILITY::propertySet($item, 'quantity_label') ? : '',
+										':unit' => UTILITY::propertySet($item, 'unit_label') ? : '',
+										':number' => UTILITY::propertySet($item, 'ordernumber_label') ? : '',
+										':name' => UTILITY::propertySet($item, 'productname_label') ? : '',
+										':vendor' => UTILITY::propertySet($item, 'vendor_label') ? : ''
 									])."\n";
 								}
 							} else {

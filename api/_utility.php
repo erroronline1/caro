@@ -305,12 +305,13 @@ class UTILITY {
 	 *  |_|         |_|             |___|
 	 * shorthand checking for a set property
 	 * 
-	 * @param object $object to look within
+	 * @param object|array $object to look within
 	 * @param string $property to look for
 	 * 
 	 * @return string|bool property value or false
 	 */
 	public static function propertySet($object, $property){
+		if (gettype($object) === 'array') return isset($object[$property]) ? $object[$property] : false;
 		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
 	}
 
