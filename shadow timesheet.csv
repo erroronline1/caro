@@ -187,3 +187,5 @@
 28.10.24;4;"record-api, order-api, consumables-api"
 29.10.24;4;"audit-api, record-api, ui-composer"
 30.10.24;3;"audit-api, record-api, form-api"
+31.10.24;2;"record-api, order-api"
+01.11.24;8;"order-api, csv-processor, templates, record-api, code maintainance"
