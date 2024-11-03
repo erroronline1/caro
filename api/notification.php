@@ -94,7 +94,7 @@ class NOTIFICATION extends API {
 		}
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
 		}
 
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
