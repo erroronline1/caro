@@ -39,7 +39,7 @@ $queries = [
 				"	`span_start` datetime NOT NULL," .
 				"	`span_end` datetime NOT NULL," .
 				"	`author_id` int NOT NULL," .
-				"	`affected_user_id` int NOT NULL," .
+				"	`affected_user_id` int NULL DEFAULT NULL," .
 				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`misc` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -271,7 +271,7 @@ $queries = [
 				"	span_start smalldatetime NOT NULL," .
 				"	span_end smalldatetime NOT NULL," .
 				"	author_id int NOT NULL," .
-				"	affected_user_id int NOT NULL," .
+				"	affected_user_id int NULL DEFAULT NULL," .
 				"	organizational_unit varchar(MAX) NOT NULL," .
 				"	subject varchar(MAX) NOT NULL," .
 				"	misc varchar(MAX) NOT NULL," .

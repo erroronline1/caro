@@ -183,7 +183,7 @@ class CALENDARUTILITY {
 	 * 	':span_start' => string Y-m-d H:i:s,
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
-	 * 	':affected_user_id' => int,
+	 * 	':affected_user_id' => int | null,
 	 * 	':organizational_unit' => str,
 	 * 	':subject' => str,
 	 * 	':misc' => str (e.g. json_encoded whatnot),
@@ -197,7 +197,8 @@ class CALENDARUTILITY {
 		// fill up default values
 		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
 		foreach([':id', ':alert'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
-		foreach([':author_id', ':affected_user_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
+		foreach([':author_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
+		$columns[':affected_user_id'] = isset($columns[':affected_user_id']) ? $columns[':affected_user_id'] : null; 
 
 		// prepare lists and datetime types for modification 
 		$units = [];
@@ -205,16 +206,18 @@ class CALENDARUTILITY {
 			$units[$description] = (in_array($unit, explode(',', $columns[':organizational_unit'])) || (!$columns[':organizational_unit'] && isset($_SESSION['user']['app_settings']['primaryUnit']) && $unit === $_SESSION['user']['app_settings']['primaryUnit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
 
-		$affected_users = $affected_unit_users = [];
+		$affected_users = $affected_unit_users = ['...' => ['value' => '...']];
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		// unset system user
 		array_splice($users, array_search(1, array_column($users, 'id')), 1);
 		// set self to top 
 		$self = array_splice($users, array_search($_SESSION['user']['id'], array_column($users, 'id')), 1);
-		array_splice($users, 0, 0, $self);
+		array_splice($users, 1, 0, $self);
 		foreach($users as $user){
+			if ($user === $self) continue;
 			$affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
 			if (array_intersect(explode(',', $user['units']), $_SESSION['user']['units'])) $affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
+			if ($columns[':affected_user_id'] === $user['id'] && !$columns[':organizational_unit']) $columns[':organizational_unit'] = $user['units'];
 		}
 
 		$alert = $span_start = $span_end = null; 
@@ -264,6 +267,13 @@ class CALENDARUTILITY {
 						'hint' => LANG::GET('calendar.event_organizational_unit_hint')
 					],
 					[
+						'type' => 'select',
+						'content' => $affected_users,
+						'attributes' => [
+							'name' => LANG::GET('calendar.event_affected_user')
+						]
+					],
+					[
 						'type' => 'checkbox',
 						'attributes' => [
 							'name' => LANG::GET('calendar.event_alert_description')
@@ -308,15 +318,17 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_affected_user')
+							'name' => LANG::GET('calendar.event_affected_user'),
+							'required' => true
 						]
 					];
-				} elseif (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])){
+				} elseif (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $columns[':organizational_unit']), $_SESSION['user']['units'])){
 					$inputs[] = [
 						'type' => 'select',
 						'content' => $affected_unit_users,
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_affected_user')
+							'name' => LANG::GET('calendar.event_affected_user'),
+							'required' => true
 						]
 					];
 				} else {
@@ -520,7 +532,7 @@ class CALENDARUTILITY {
 	 * 	':span_start' => string Y-m-d H:i:s,
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
-	 * 	':affected_user_id' => int,
+	 * 	':affected_user_id' => int | null,
 	 * 	':organizational_unit' => str,
 	 * 	':subject' => str,
 	 * 	':misc' => str (e.g. json_encoded whatnot),
@@ -549,7 +561,7 @@ class CALENDARUTILITY {
 	 * 	':span_start' => string Y-m-d H:i:s,
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
-	 * 	':affected_user_id' => int,
+	 * 	':affected_user_id' => int | null,
 	 * 	':organizational_unit' => str,
 	 * 	':subject' => str,
 	 * 	':misc' => str (e.g. json_encoded whatnot),
@@ -590,6 +602,7 @@ class CALENDARUTILITY {
 				$events = $this->getDay($day->format('Y-m-d'));
 				$numbers = 0;
 				foreach ($events as $row){
+					$row['affected_user_units'] = $row['affected_user_units'] ? : $row['organizational_unit'];
 					switch ($type){
 						case 'schedule':
 							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))

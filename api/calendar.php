@@ -343,25 +343,26 @@ class CALENDAR extends API {
 				], [
 					'type' => 'search',
 					'attributes' => [
+						'value' => $this->_requestedId,
 						'id' => 'recordfilter',
 						'name' => LANG::GET('calendar.event_search'),
 						'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
 						'onblur' => "api.calendar('get', 'search', this.value); return false;",
-					]
+					],
+					'hint' => LANG::GET('calendar.event_search_hint'),
 				]
 			]
 		]]];
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$dbevents = $calendar->search($this->_requestedId);
-		$events = [
+		$events = $this->scheduledEvents($dbevents, $calendar) ? : [
 			[
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => LANG::GET ('calendar.events_none')
 				]
 			]
-		];
-		if ($dbevents) $events = $this->scheduledEvents($dbevents, $calendar);
+		] ;
 		$result['render']['content'][] = $events;
 		$this->response($result);
 	}
@@ -389,12 +390,14 @@ class CALENDAR extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user'));
+				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = null;
 				$event = [
 					':type' => 'schedule',
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
 					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $_SESSION['user']['id'],
+					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':subject' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
 					':misc' => '',
@@ -423,12 +426,14 @@ class CALENDAR extends API {
 				break;
 			case 'PUT':
 				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
+				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user'));
+				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = null;
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
 					':span_start' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_date')),
 					':span_end' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_due')),
 					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $_SESSION['user']['id'],
+					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_organizational_unit')),
 					':subject' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_content')),
 					':misc' => '',
@@ -489,7 +494,8 @@ class CALENDAR extends API {
 							'name' => LANG::GET('calendar.event_search'),
 							'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
 							'onblur' => "api.calendar('get', 'search', this.value); return false;",
-							]
+						],
+						'hint' => LANG::GET('calendar.event_search_hint'),
 					]
 				];
 				$result['render']['content'][] = [
@@ -619,6 +625,16 @@ class CALENDAR extends API {
 			$display = LANG::GET('calendar.event_date') . ': ' . $date->format('Y-m-d') . "\n" .
 				LANG::GET('calendar.event_due') . ': ' . $due->format('Y-m-d') . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => LANGUAGEFILE['units'][$unit], explode(',', $row['organizational_unit'])));
+			if ($row['affected_user_id']){
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+					'replacements' => [
+						':id' => $row['affected_user_id'],
+						':name' => ''
+					]
+				]);
+				$user = $user ? $user[0] : null;
+				if ($user['name']) $display .= "\n" . $user['name'];
+			}
 
 			// replace deleted user names
 			if (!$row['author']) $row['author'] = LANG::GET('message.deleted_user');
@@ -706,7 +722,8 @@ class CALENDAR extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
+				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user'));
+				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => $affected_user_id
@@ -753,7 +770,8 @@ class CALENDAR extends API {
 				($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed']))
 				) $this->response([], 401);
 
-				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user')) ? : $_SESSION['user']['id'];
+				$affected_user_id = UTILITY::propertySet($this->_payload, LANG::PROPERTY('calendar.event_affected_user'));
+				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => $affected_user_id

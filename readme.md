@@ -95,7 +95,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* scheduling optional user assignment, task category filterable
 
 #### records considerations
 * review max display option for summary overview
