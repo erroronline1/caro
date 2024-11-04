@@ -271,7 +271,7 @@ class ORDER extends API {
 				}
 				$result = isset($result) ? $result: [
 					'response' => [
-						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? LANG::GET('order.order.' . $this->_subMethod): LANG::GET('order.ora_set', [':type' => LANG::GET('order.order.' . $this->_subMethod)]),
+						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? LANG::GET('order.order.' . $this->_subMethod) : LANG::GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => LANG::GET('order.order.' . $this->_subMethod)]),
 						'type' => 'info'
 					],
 					'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
