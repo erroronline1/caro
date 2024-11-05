@@ -98,6 +98,8 @@
 
 #### records considerations
 * review max display option for summary overview
+* bulk training entries (e.g. audit-module)
+* display records for selected/default unit (not all sorted by default)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
