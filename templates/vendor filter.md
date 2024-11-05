@@ -2,20 +2,22 @@
 
 # content
 * ***[plan b](#plan-b-no-usable-list-or-no-vendor-response)***
-* [aet](#aet)
-* [amt](#amt)
-* [albrecht](#albrecht)
-* [aspen](#aspen)
+* [aet*](#aet)
+* [amt]*(#amt)
+* [albrecht*](#albrecht)
+* [aspen*](#aspen)
 * [basko](#basko)
-* [blatchford](#blatchford)
-* [busch](#busch)
+* [blatchford*](#blatchford)
+* [bort*](#bort)
+* [busch*](#busch)
 * [caroli](#caroli)
-* [erkodent](#erkodent)
+* [erkodent*](#erkodent)
 * [feet control](#feet-control)
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
 * [ihle](#ihle)
 * [juzo](#juzo)
+* [kowsky*](#kowski)
 * [lohmann und rauscher](#lohmann-und-rauscher)
 * [medi](#medi)
 * [minke](#minke)
@@ -29,12 +31,12 @@
 * [ortho systems](#ortho-systems)
 * [otto bock](#otto-bock)
 * [perpedes](#perpedes)
-* [polyform](#polyform)
+* [polyform*](#polyform)
 * [protheseus](#protheseus)
 * [prowalk](#prowalk)
 * [rebotec](#rebotec)
 * [rehaforum](#rehaforum)
-* [ruckgaber](#ruckgaber)
+* [ruckgaber*](#ruckgaber)
 * [russka](#russka)
 * [schein](#schein)
 * [sporlastic](#sporlastic)
@@ -90,7 +92,7 @@ in the output files if it is not possible to edit the following filter according
 				"any": {
 					"STATUS": "true",
 					"BESTELLSTOP": "true",
-					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|basko|blatchford|busch|caroli|erkodent|feet.control|fior.+gentz|gottinger|ihle|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|otto.bock|perpedes|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
+					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|basko|blatchford|bort|busch|caroli|erkodent|feet.control|fior.+gentz|gottinger|ihle|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|otto.bock|perpedes|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
 				}
 			}
 		},
@@ -504,6 +506,10 @@ delete . from headers, replace specialchars
 
 [content](#content)
 
+### bort
+
+[content](#content)
+
 ### busch
 
 [content](#content)
@@ -666,6 +672,10 @@ delete unreqired columns
 	}
 }
 ```
+
+[content](#content)
+
+### kowski
 
 [content](#content)
 
