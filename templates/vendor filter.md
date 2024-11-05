@@ -2,8 +2,15 @@
 
 # content
 * ***[plan b](#plan-b-no-usable-list-or-no-vendor-response)***
+* [aet](#aet)
+* [amt](#amt)
+* [albrecht](#albrecht)
+* [aspen](#aspen)
 * [basko](#basko)
+* [blatchford](#blatchford)
+* [busch](#busch)
 * [caroli](#caroli)
+* [erkodent](#erkodent)
 * [feet control](#feet-control)
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
@@ -22,10 +29,12 @@
 * [ortho systems](#ortho-systems)
 * [otto bock](#otto-bock)
 * [perpedes](#perpedes)
+* [polyform](#polyform)
 * [protheseus](#protheseus)
 * [prowalk](#prowalk)
 * [rebotec](#rebotec)
 * [rehaforum](#rehaforum)
+* [ruckgaber](#ruckgaber)
 * [russka](#russka)
 * [schein](#schein)
 * [sporlastic](#sporlastic)
@@ -81,7 +90,7 @@ in the output files if it is not possible to edit the following filter according
 				"any": {
 					"STATUS": "true",
 					"BESTELLSTOP": "true",
-					"LIEFERANTENNAME": "^$|(basko|caroli|feet.control|fior.+gentz|gottinger|ihle|juzo|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ofa|ortho.reha.neuhof|ortho.systems|otto.bock|perpedes|protheseus|prowalk|rebotec|rehaforum|russka|schein|sporlastic|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
+					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|basko|blatchford|busch|caroli|erkodent|feet.control|fior.+gentz|gottinger|ihle|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|otto.bock|perpedes|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
 				}
 			}
 		},
@@ -407,25 +416,18 @@ import with default filter
 ```
 
 ruthner
-aet /tsm
 aidamed
-albrecht
 alps
-amt aromando
 apm technika
 arthroven
-aspen
 bauerfeind
 bionic germany
 bort
 bsn jobst
 bsn medical
-busch
 cosmesil
 darco
 dirame
-endolite / blatchford
-erkodent
 kowsky
 extremtextil
 feguramed
@@ -444,15 +446,29 @@ orthoservice
 ossenberg
 plastico
 pochert
-polyform
 qualiserve
-ruckgaber
 spannrit
 springer aktiv
 storitec
 teufel
 unyq
 wagner polymertechnik
+
+### aet
+
+[content](#content)
+
+### amt
+
+[content](#content)
+
+### albrecht
+
+[content](#content)
+
+### aspen
+
+[content](#content)
 
 ### basko
 delete . from headers, replace specialchars
@@ -484,6 +500,14 @@ delete . from headers, replace specialchars
 
 [content](#content)
 
+### blatchford
+
+[content](#content)
+
+### busch
+
+[content](#content)
+
 ### caroli
 delete first two columns and rows
 ```json
@@ -508,6 +532,10 @@ delete first two columns and rows
 	}
 }
 ```
+
+[content](#content)
+
+### erkodent
 
 [content](#content)
 
@@ -615,6 +643,8 @@ delete . from headers, replace specialchars
 [content](#content)
 
 ### juzo
+> unusable list for having too much entries. requires alternate implementation
+
 delete unreqired columns
 
 ```json
@@ -953,6 +983,8 @@ modify product description for:
 [content](#content)
 
 ### ofa
+> unusable list for having too much entries. requires alternate implementation
+
 delete . from headers
 
 ```json
@@ -1105,6 +1137,10 @@ join tables
 
 [content](#content)
 
+### polyform
+
+[content](#content)
+
 ### protheseus
 add header on first line
 ```json
@@ -1219,6 +1255,10 @@ delete last row
 	}
 }
 ```
+
+[content](#content)
+
+### ruckgaber
 
 [content](#content)
 
