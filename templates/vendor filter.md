@@ -461,6 +461,39 @@ unyq
 wagner polymertechnik
 
 ### aet
+rewrite header (delivery unit), delete animal-aids, intermediate headers and all rows above header, append aid name to +options
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["schwarz", "Bandagenbezeichnung", "Liefereinheit"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete anything but articles",
+			"keep": true,
+			"match": {
+				"all": {
+					"schwarz": ".+"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"has_expiry_date": "0"
+		},
+		"rewrite": [{
+			"article_no": ["schwarz"],
+			"article_name": ["Bandagenbezeichnung"],
+			"article_unit": ["Liefereinheit"],
+			"article_ean": []
+		}]
+	}
+}
+```
 
 [content](#content)
 
@@ -497,6 +530,7 @@ wagner polymertechnik
 	}
 }
 ```
+
 [content](#content)
 
 ### amt
