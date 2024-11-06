@@ -3,8 +3,8 @@
 # content
 * ***[plan b](#plan-b-no-usable-list-or-no-vendor-response)***
 * [aet*](#aet)
+* [albrecht](#albrecht)
 * [amt]*(#amt)
-* [albrecht*](#albrecht)
 * [arthroven*](#arthroven)
 * [aspen*](#aspen)
 * [basko](#basko)
@@ -464,11 +464,42 @@ wagner polymertechnik
 
 [content](#content)
 
-### amt
-
+### albrecht
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikelbezeichnung", "Artikelnummer", "EAN"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "delete anything but articles",
+			"keep": true,
+			"match": {
+				"all": {
+					"Artikelnummer": ".+"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"has_expiry_date": "0",
+			"article_unit": "Stk"
+		},
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Artikelbezeichnung"],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
 [content](#content)
 
-### albrecht
+### amt
 
 [content](#content)
 
