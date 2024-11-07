@@ -45,6 +45,7 @@
 * [russka](#russka)
 * [schein](#schein)
 * [sporlastic](#sporlastic)
+* [storitec*](#storitec)
 * [streifeneder](#streifeneder)
 * [taska](#taska)
 * [thuasne](#tuasne)
@@ -1448,6 +1449,10 @@ delete . from headers, replace specialchars and whitespaces
 	}
 }
 ```
+
+[content](#content)
+
+### ruckgaber
 
 [content](#content)
 
