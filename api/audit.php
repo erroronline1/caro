@@ -1167,6 +1167,7 @@ class AUDIT extends API {
 			]
 		];
 		$unfulfilledskills = [];
+		$bulkselection = ['...' => ['value' => '']];
 		foreach (LANGUAGEFILE['skills'] as $duty => $skills){
 			if ($duty === 'LEVEL') continue;
 			foreach ($skills as $skill => $skilldescription){
@@ -1184,6 +1185,9 @@ class AUDIT extends API {
 		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		foreach ($users as $user){
 			if ($user['id'] < 2) continue;
+
+			$bulkselection[$user['name']] = [];
+
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			$skillmatrix = '';
 			foreach (LANGUAGEFILE['skills'] as $duty => $skills){
@@ -1235,6 +1239,64 @@ class AUDIT extends API {
 				}	
 			}
 		}
+		// also see user.php
+		$skillmatrix = [
+			[
+				[
+					'type' => 'text',
+					'attributes' => [
+						'name' => LANG::GET('user.edit_add_training')
+					],
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => LANG::GET('user.edit_add_training_date')
+					],
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => LANG::GET('user.edit_add_training_expires')
+					],
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => LANG::GET('user.edit_add_training_experience_points')
+					],
+				], [
+					'type' => 'file',
+					'attributes' => [
+						'name' => LANG::GET('user.edit_add_training_document')
+					],
+					'hint' => LANG::GET('user.edit_add_training_hint')
+				]
+			]
+		];
+
+		$skillmatrix[0][] = [
+			'type' => 'select',
+			'attributes' => [
+				'multiple' => true,
+				'name' => LANG::GET('audit.userskills_bulk_user'),
+				'id' => '_bulkskillupdate'
+			],
+			'content' => $bulkselection
+		];
+		array_splice($content, 1, 0,  [[
+			[
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'value' => LANG::GET('audit.userskills_bulk_training'),
+					'onpointerup' => "new Dialog({type: 'input', header: '" . LANG::GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . json_encode(
+						$skillmatrix
+					) . "'), options:{".
+					"'" . LANG::GET('general.cancel_button') . "': false,".
+					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+					"}}).then(response => {if (response) alert('hello')})"
+				]
+			]
+		]]);
+
 		if ($unfulfilledskills){
 			$content = [
 				[

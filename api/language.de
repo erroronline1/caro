@@ -447,6 +447,9 @@ complaints_summary = ":number Reklamationen in diesem Jahr, von denen :closed al
 complaints_case_description = ":identifier von einem der Bereiche :units"
 complaints_closed = ", als abgeschlossen gekennzeichnet"
 
+userskills_bulk_training = "Schulung für mehrere Mitarbeiter eintragen"
+userskills_bulk_user = "Mitarbeiter"
+
 ; alle schlüssel sind fest einprogrammiert
 [calendar]
 month_previous = "voriger Monat"

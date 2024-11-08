@@ -447,6 +447,9 @@ complaints_summary = ":number complaints within this year, of those :closed reco
 complaints_case_description = ":identifier within one of units :units"
 complaints_closed = ", marked as closed"
 
+userskills_bulk_training = "Apply training to multiple employees"
+userskills_bulk_user = "Employee"
+
 ; all keys are hardcoded
 [calendar]
 month_previous = "previous month"

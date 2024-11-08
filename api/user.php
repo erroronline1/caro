@@ -657,6 +657,7 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
+				// also see adit.php
 				$skillmatrix = [
 					[
 						[
