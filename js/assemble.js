@@ -29,7 +29,8 @@ export function getNextElementID() {
 	return "elementID" + ++ElementID;
 }
 
-const events = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup"];
+const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup"];
+const VOIDVALUES = ['', '...'];
 
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
@@ -816,7 +817,7 @@ export class Assemble {
 
 	apply_attributes(setup, node) {
 		for (let [key, attribute] of Object.entries(setup)) {
-			if (events.includes(key)) {
+			if (EVENTS.includes(key)) {
 				if (attribute) {
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
 					if (typeof(attribute) === 'function') attribute = attribute.toString();
@@ -1814,7 +1815,7 @@ export class Assemble {
 				}).then((response) => {
 					e.target.value = response;
 					e.target.dispatchEvent(new Event("change"));
-					if (multiple) {
+					if (multiple && response && !VOIDVALUES.includes(response)) {
 						selectElementClone.attributes.name = selectElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
 						selectElementClone.attributes.multiple = true;
 						new Assemble({
