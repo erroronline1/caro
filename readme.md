@@ -1774,6 +1774,20 @@ Parameters
 
 ### Audit endpoints
 
+> post ./api/api.php/audit/checks/userskills
+
+Returns userskills after inserting.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | values for database |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"forms"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by forms and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},"Skill fulfilment":{"value":"skillfulfilment"},"User skills and trainings":{"value":"userskills","selected":true},"Vendor list":{"value":"vendors"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}],{"type":"textsection","attributes":{"name":"Some defined skills are not matched!"},....
+```
+
 > DELETE ./api/api.php/audit/checks/{type}
 
 Deletes records. Currently implemented for order statistics only.

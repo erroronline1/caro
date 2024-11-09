@@ -58,6 +58,7 @@ class AUDIT extends API {
 	 */
 	public function checks(){
 		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
 			case 'GET':
 				$result['render'] = ['content' => []];
 				$selecttypes = [];
@@ -1155,6 +1156,36 @@ class AUDIT extends API {
 	 * returns all users with their skills and trainings
 	 */
 	private function userskills(){
+		if ($_SERVER['REQUEST_METHOD']==='POST' && PERMISSION::permissionFor('users')){
+			$training = $users = $requested = [];
+
+			if ($name = UTILITY::propertySet($this->_payload, LANG::PROPERTY('audit.userskills_bulk_user'))) if ($name !== '...' ) $requested[] = $name;
+			for ($i = 1; $i < count((array) $this->_payload); $i++){
+				if ($name = UTILITY::propertySet($this->_payload, LANG::PROPERTY('audit.userskills_bulk_user') . '(' . $i . ')')) if ($name !== '...' ) $requested[] = $name;
+			}
+			$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				'replacements' => [
+					':id' => 0,
+					':name' => implode(',', $requested)
+				]
+			]);
+			if ($users && $training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
+
+				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+				$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
+				$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
+				$training[':experience_points'] = 0;
+				$training[':file_path'] = '';
+
+				foreach ($users as $user){
+					$training[':user_id'] = $user['id'];
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+						'values' => $training
+					]);
+				}
+			}
+		}
+
 		// add export button
 		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
@@ -1258,29 +1289,17 @@ class AUDIT extends API {
 						'name' => LANG::GET('user.edit_add_training_expires')
 					],
 				], [
-					'type' => 'number',
+					'type' => 'select',
 					'attributes' => [
-						'name' => LANG::GET('user.edit_add_training_experience_points')
+						'multiple' => true,
+						'name' => LANG::GET('audit.userskills_bulk_user'),
+						'id' => '_bulkskillupdate'
 					],
-				], [
-					'type' => 'file',
-					'attributes' => [
-						'name' => LANG::GET('user.edit_add_training_document')
-					],
-					'hint' => LANG::GET('user.edit_add_training_hint')
+					'content' => $bulkselection
 				]
 			]
 		];
 
-		$skillmatrix[0][] = [
-			'type' => 'select',
-			'attributes' => [
-				'multiple' => true,
-				'name' => LANG::GET('audit.userskills_bulk_user'),
-				'id' => '_bulkskillupdate'
-			],
-			'content' => $bulkselection
-		];
 		array_splice($content, 1, 0,  [[
 			[
 				'type' => 'button',
@@ -1292,7 +1311,7 @@ class AUDIT extends API {
 					) . "'), options:{".
 					"'" . LANG::GET('general.cancel_button') . "': false,".
 					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => {if (response) alert('hello')})"
+					"}}).then(response => {if (response) api.audit('post', 'checks', 'userskills', _client.application.dialogToFormdata(response))})"
 				]
 			]
 		]]);
