@@ -36,6 +36,7 @@
     * [Anpassung](#anpassung)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [CSV Processor](#csv-prozessor)
+* [Regulatorische Anforderungen an die Software]
 * [Code Design Vorlagen](#code-design-vorlagen)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
@@ -1528,6 +1529,11 @@ Ein beliebiges Beispiel:
 
 [Übersicht](#übersicht)
 
+# Regulatorische Anforderungen an die Software
+Stellungnahmen zu regulatorischen Anforderungen an die Software liegen der englischsprachigen Beschreibung vor.
+
+[Übersicht](#übersicht)
+
 # Code Design Vorlagen
 Eine Beschreibung der Code Design Vorlagen für eine statische Quelltextanalyse, Integration-Tests, Stress-Tests und Performancebewertungen sowie des Deployment-Prozesses liegt in der englischsprachigen Beschreibung vor.
 
@@ -1587,3 +1593,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ![dev](./media/dev.png)
+
+# The team
+
+| Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
+| --------------- | -------------- | ------------- | ----------------------------- |
+| error 'i have the say here' on line 1 | error on line 1 | error 'fancypants' on line 1 | error 'can you do anything right?' on line 1|
+| ![productmanager](./media/productmanager.png) | ![developer](./media/developer.png) | ![designer](./media/designer.png) | ![tester](./media/tester.png) |

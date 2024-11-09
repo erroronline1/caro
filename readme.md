@@ -36,6 +36,13 @@
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [CSV processor](#csv-processor)
+* [Regulatory software requirements](#regulatory-software-requirements)
+    * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
+    * [Data protection](#data-protection)
+    * [General](#general)
+    * [Information security](#information-security)
+    * [Performance evaluation](#performance-evaluation)
+    * [Tec doc](#tech-doc)
 * [Code design patterns](#code-design-patterns)
     * [Frontend design](#frontend-design)
     * [Backend design](#backend-design)
@@ -89,8 +96,6 @@
 * review max display option for summary overview
 
 ## development
-
-https://github.com/DIN-DKE/IEC_62304__openregulatory_templates
 
 #### purchase considerations
 
@@ -1595,6 +1600,131 @@ A generic sample:
 
 [Content](#content)
 
+# Regulatory software requirements
+according to [OpenRegulatory](https://github.com/openregulatory/templates)
+
+This software is not a medical device. But as this software is intended to being used in context with medical device fabrication, relevant regulatory requirements should be addressed nonetheless.
+
+## Clinical evaluation, clinical evaluation plan, clinical evaluation report
+see [OpenRegulatory clinical evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/clinical_evaluation)
+
+Not applicable without clinical use on patients
+
+[Content](#content)
+
+## Data protection
+see [OpenRegulatory data protection requirements](https://github.com/openregulatory/templates/tree/master/templates/data_protection)
+* [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
+* [Terms of service for using the application](#terms-of-service-for-using-the-application)
+* [Web Application](#web-application)
+* [Backend](#backend)
+
+[Content](#content)
+
+## General
+see [OpenRegulatory general requirements](https://github.com/openregulatory/templates/tree/master/templates/general)
+
+Evidences of conformity according to the documents available above:
+* Clinical Evaluation Report: **not applicable**
+* Intended Use: [Aims](#aims)
+* List of Qualified Suppliers: [Ressources](#ressources)
+* MDR General Safety and Performance Requirements Checklist: **not applicable**
+* Medical Device Classification: **not applicable**
+* Medical Devices List: **not applicable**
+* Post-Market Clinical Follow-Up Plan and Report: **not applicable**
+* Quality Management Manual: **not applicable**
+* Risk Management Plan: [Risk assessment](#risk-assessment)
+* Risk Management Report: [Risk assessment](#risk-assessment)
+* Risk Table: [Risk assessment](#risk-assessment)
+* SOP Certification and Product Registration: **not applicable**
+* SOP Change Management: [Deployment process](#deployment-process)
+* SOP Integrated Software Development: **not applicable**
+* Software Development and Maintenance Plan
+* Software Requirements List: [Intended ISO 13485 goals](#intended-iso-13485-goals), [Extras](#extras)
+* Stakeholder Requirements: [Stakeholder requirements](#stakeholder-requirements)
+* System Test Report: [Stress test and performance](#stress-test-and-performance)
+* Technical and Organizational Measures: [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
+* UDI Label: **not applicable**
+* Usability Evaluation Report
+* User Manual: [this document](#caro---cloud-assisted-records-and-operations)
+
+### Stakeholder requirements
+
+Stakeholder identification:
+* User (including CEO, QMO)
+* CEO
+* QMO
+* Operator of infrastructure
+* Developer
+
+Discussed stakeholder requirements:
+| Requirement / issue | Stakeholder | Time | Implementation |
+| ------------------- | ----------- | ---- | -------------- |
+| It can't go on like this | CEO | 2019 | development of a digital application to reduce paperbased operations |
+| No offers obtained | Developer | late 2023 | fine, I'll just do it myself, 2023-10-02 |
+| Device interoperability, network access to central data | User | late 2023 | design as web application; 2023 |
+| IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | support for multiple SQL dialects; 2023-12-23 |
+| Nah, this looks bad | User | 2024-01 | restyling initial draft 2023-01-20 |
+
+[Content](#content)
+
+## Information security
+see [OpenRegulatory information security requirements](https://github.com/openregulatory/templates/tree/master/templates/information_security)
+* see [data protection](#data-protection)
+
+[Content](#content)
+
+## Performance evaluation
+see [OpenRegulatory performance evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/performance_evaluation)
+* [Integration test](#integration-test)
+* [Stress test and performance](#stress-test-and-performance)
+
+[Content](#content)
+
+## Tech doc
+see [OpenRegulatory tech doc requirements](https://github.com/openregulatory/templates/tree/master/templates/techdoc)
+
+Planning & Feasability
+* Intended Use: [Aims](#aims)
+* Medical Device Classification: **not applicable**
+* Product Roadmap: **not essential**
+* Software Development and Maintenance Plan: [Code design patterns](#code-design-patterns)
+* Change Evaluation List
+* Risk Management Plan and Risk Acceptance Matrix: [Risk assessment](#risk-assessment)
+* Clinical Evaluation Plan: **not applicable**
+
+Specification
+* User Needs List: [Stakeholder requirements](#stakeholder-requirements)
+* User Needs Checklist
+* Software Requirements List: [Intended ISO 13485 goals](#intended-iso-13485-goals), [Extras](#extras)
+* List of Hazard-Related Use Scenarios: **not applicable**
+* Risk Table: [Risk assessment](#risk-assessment)
+* Software Requirements Checklist
+* Software Test Plan: [Integration test](#integration-test), [Stress test and performance](#stress-test-and-performance)
+* Usability Test Plan
+
+Development
+* SOUP List: [Ressources](#ressources)
+* Software Architecture: [Modules](#modules), [API documentation](#api-documentation)
+
+Verification and Validation
+* Software Test Results
+* List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
+* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations)
+* Usability Test Protocol
+* Usability Test Report
+* Clinical Evaluation Report: **not applicable**
+* Risk Management Report: [Risk assessment](#risk-assessment)
+
+Product Release
+* GSPR List: **not applicable**
+* PMS (/PMCF) Plan: **not applicable**
+* Software Release Checklist
+* Release Notes
+* Declaration of Conformity: **not applicable**
+
+[Content](#content)
+
 # Code design patterns
 For static code analysis
 
@@ -1653,7 +1783,6 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
 
 ## Stress test and performance
-
 Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested.
 
 During developement following outcomes could be noted:
@@ -1665,7 +1794,6 @@ During developement following outcomes could be noted:
 [Content](#content)
 
 ## Deployment process
-
 * For **installation** see [here](#installation).
 * **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Code files are simply to be uploaded to the server to be available. Before altering tables a backup (BACKUP_caro_table) is created. On creation failure the update is supposed to be aborted.
 * The operator of the infrastructure is responsible for a sufficient **deletion / uninstallation** of the software, especially backend, database and backups.
@@ -3933,4 +4061,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-![dev](./media/dev.png)
+# The team
+
+| Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
+| --------------- | -------------- | ------------- | ----------------------------- |
+| error 'i have the say here' on line 1 | error on line 1 | error 'fancypants' on line 1 | error 'can you do anything right?' on line 1|
+| ![productmanager](./media/productmanager.png) | ![developer](./media/developer.png) | ![designer](./media/designer.png) | ![tester](./media/tester.png) |
