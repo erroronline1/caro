@@ -31,6 +31,7 @@ class RECORD extends API {
 	private $_passedIdentify = null;
 	private $_formExport = null;
 	private $_caseState = null;
+	private $_unit = null;
 	private $_caseStateBoolean = null;
 
 	public function __construct(){
@@ -38,7 +39,7 @@ class RECORD extends API {
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = $this->_appendDate = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_passedIdentify = $this->_formExport = $this->_caseState = isset(REQUEST[3]) ? REQUEST[3] : '';
+		$this->_passedIdentify = $this->_formExport = $this->_caseState = $this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
 		$this->_caseStateBoolean = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
@@ -1471,42 +1472,51 @@ class RECORD extends API {
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		if (!$data) {
 			$result['render']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
-			$this->response($result);		
+			$this->response($result);
 		}
-		$recorddatalist = $contexts = [];
+		$recorddatalist = $contexts = $available_units = [];
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$this->_requestedID = $this->_requestedID==='null' ? null : $this->_requestedID;
 
-		// sort records to user units, others and these that can not be assigned due to deleted user ids
-		$unassigned = [];
-		$targets = array_keys(LANGUAGEFILE['record']['record_list']); // ['units', 'other', 'unassigned']
 		foreach($data as $row){
+			$row['units'] = $row['units'] ? explode(',', $row['units']) : null;
+
 			// limit search to similarity
 			if ($this->_requestedID){
 				similar_text($this->_requestedID, $row['identifier'], $percent);
 				if ($percent < CONFIG['likeliness']['records_search_similarity']) continue;
 			}
+
 			// prefilter record datalist for performance reasons
 			preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $row['identifier'], $simplified_identifier);
-
 			if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
 			
-			// sort to units
+			// continue if record has been closed unless explicitly searched for
+			if (!$this->_requestedID && (($row['record_type'] !== 'complaint' && $row['closed']) ||
+				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
+			) continue;
+
+			// append units of available records 
+			if ($row['units']) array_push($available_units, ...$row['units']);
+			else $available_units[] = null;
+
+			// continue if record does not match selected (or blank) unit
 			if ($row['units']){
-				if (array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $target = 0;
-				else $target = 1;
-			} else $target = 2;
+				if ((!$this->_unit && !array_intersect($row['units'], $_SESSION['user']['units'])) ||
+					($this->_unit && !in_array($this->_unit, $row['units']))
+				) continue;
+			}
+			else if ($this->_unit !== '_unassigned') continue;
+
+
 			foreach(LANGUAGEFILE['formcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
-			if (!isset($contexts[$row['context']])) $contexts[$row['context']] = ['units' => [], 'other' => [], 'unassigned' => []];
-
-			// skip if fully closed or max_records is exceeded
-			$closed = json_decode($row['closed'] ? : '', true);
-			if (!$this->_requestedID && (($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $closed))
-				|| (!$row['record_type'] === 'complaint' && $closed)
-				|| count($contexts[$row['context']][$targets[$target]]) > CONFIG['limits']['max_records'])) {
-				continue;
+			if (isset($contexts[$row['context']])) {
+				// limit results per context to max_records
+				if (count($contexts[$row['context']]) > CONFIG['limits']['max_records']) continue;
 			}
+			else $contexts[$row['context']] = [];
 
 			// get last considered form
 			$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')];
@@ -1517,30 +1527,39 @@ class RECORD extends API {
 				':date' => substr($row['last_touch'], 0, -3),
 				':form' => $lastform['name']
 				]) . ($row['record_type'] === 'complaint' ? ' *' : '');
-			$contexts[$row['context']][$targets[$target]][$linkdisplay] = [
+			$contexts[$row['context']][$linkdisplay] = [
 				'href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"
 			];
+
 			// apply case state if applicable
 			$case_state = json_decode($row['case_state'] ? : '', true) ? : [];
 			foreach($case_state as $case => $state){
-				$contexts[$row['context']][$targets[$target]][$linkdisplay]['data-'.$case] = $state;
+				$contexts[$row['context']][$linkdisplay]['data-' . $case] = $state;
 			}
+			// highlight closed records if passed using filter
+			if ($row['closed'] && ($row['record_type'] !== 'complaint' ||
+				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
+			) $contexts[$row['context']][$linkdisplay]['class'] = 'green';
 		}
-		// delete double entries
-		foreach($contexts as &$context){
-			$previouslydeleted = null;
-			foreach ($context['unassigned'] as $identifier => $attributes){
-				if ($previouslydeleted) {
-					unset($context['unassigned'][$identifier]['style']);
-				}
-				if (isset($context['units'][$identifier]) || isset($context['other'][$identifier])) {
-					unset ($context['unassigned'][$identifier]);
-					$previouslydeleted = true;
-				}
-				else $previouslydeleted = null;
+
+		$organizational_units = [];
+		$available_units = array_unique($available_units);
+		sort($available_units);
+		$assignable = true;
+		$organizational_units[LANG::GET('record.record_mine')] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', document.getElementById('_recordfilter').value || 'null')"];
+		if (!$this->_unit) $organizational_units[LANG::GET('record.record_mine')]['checked'] = true;
+		foreach($available_units as $unit){
+			if (!$unit) {
+				$assignable = false;
+				continue;
 			}
+			$organizational_units[LANGUAGEFILE['units'][$unit]] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', document.getElementById('_recordfilter').value || 'null', '" . $unit . "')"];
+			if ($this->_unit === $unit) $organizational_units[LANGUAGEFILE['units'][$unit]]['checked'] = true;
 		}
-		unset($context); // error otherwise
+		if (!$assignable) {
+			$organizational_units[LANG::GET('record.record_unassigned')] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', document.getElementById('_recordfilter').value || 'null', '_unassigned')"];
+			if ($this->_unit === '_unassigned') $organizational_units[LANG::GET('record.record_unassigned')]['checked'] = true;
+		}
 
 		$content = [
 			[
@@ -1552,44 +1571,45 @@ class RECORD extends API {
 					]
 				], [
 					'type' => 'scanner',
-					'destination' => 'recordfilter',
+					'destination' => '_recordfilter',
 					'description' => LANG::GET('record.record_scan')
 				], [
 					'type' => 'filtered',
 					'hint' => LANG::GET('record.record_filter_hint', [':max' => CONFIG['limits']['max_records']]),
 					'attributes' => [
-						'id' => 'recordfilter',
+						'id' => '_recordfilter',
 						'name' => LANG::GET('record.record_filter'),
 						'list' => 'records',
 						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}",
 						'onblur' => "api.record('get', 'records', this.value); return false;",
+						'value' => $this->_requestedID ? : ''
 						]
 				]
+			],
+			[
+				'type' => 'radio',
+				'attributes' => [
+					'name' => LANG::GET('order.organizational_unit')
+				],
+				'content' => $organizational_units,
+				'hint' => LANG::GET('record.record_assign_hint')
 			]
 		];
-		$contextrows = [];
-		foreach($contexts as $context => $targets){
-			$contextcolumns = [];
-			if ($targets) foreach($targets as $target => $identifiers){
-				if ($identifiers) {
-					$contextcolumns[] = 
-					[[
+		foreach($contexts as $context => $links){
+			if ($links){
+				if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"]))
+					array_push($content, $casestate);
+				array_push($content, [
+					[
 						'type' => 'links',
-						'description' => LANG::GET('record.record_list.' . $target, [':context' => LANG::GET('formcontext.' . $context)]),
-						'content' => $identifiers
-					]];
-				}
+						'description' => LANG::GET('formcontext.' . $context),
+						'content' => $links
+					]
+				]);
 			}
-			if ($contextcolumns) {
-				$context = explode('.', $context);
-				if ($casestate = $this->casestate($context[count($context) - 1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"])){
-					$contextrows[] = [$casestate];
-				}
-
-				$contextrows[] = $contextcolumns;
-			}
+			else array_push($content, $this->noContentAvailable(LANG::GET('message.no_messages')));
 		}
-		array_push($content, ...$contextrows);
+
 
 		$result['render']['content'] = $content;
 		$this->response($result);		

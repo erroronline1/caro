@@ -93,7 +93,6 @@
 * linked files on separate external path, input type convert to link
 * purchase: batch identifier (product and delivery note number) for...
 * material tracing within documentation
-* review max display option for summary overview
 
 ## development
 
@@ -104,9 +103,6 @@
 * unittests (frontend)
 
 #### records considerations
-* review max display option for summary overview
-* bulk training entries (e.g. audit-module)
-* display records for selected/default unit (not all sorted by default)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -3113,18 +3109,19 @@ Sample response
 {"response": {"msg": "The record has been saved.","type": "success"}}
 ```
 
-> GET ./api/api.php/record/records
+> GET ./api/api.php/record/records/{filter}/{unit}
 
 Returns current active records grouped by record type and organizational units.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none |  |  |   |
+| {filter} | path parameter | optional | filter by identifier |
+| {unit} | path parameter | optional | filter by unit |
 
 Sample response
 ```
-{"render": {"content": [[{"type": "datalist","content": ["Sample record","Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33"],"attributes": {"id": "records"}},{"type": "scanner","destination": "recordfilter","description": "Scan identifier to find record"},{"type": "filtered","hint": "A maximum of 128 records will be displayed, but any record will be available if filter matches.",....
+{"render":{"content":[[{"type":"datalist","content":["vorgang 2 ","testuser1 2024-10-27 ","testuser2 2024-10-27 "],"attributes":{"id":"records"}},{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords marked with a * contain some kind of complaint.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","list":"records","onkeypress":"if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}","onblur":"api.record('get', 'records', this.value); return false;","value":""}}],....
 ```
 
 > POST ./api/api.php/record/reidentify/
