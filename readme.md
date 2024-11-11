@@ -1674,8 +1674,12 @@ Discussed stakeholder requirements:
 | Return option for orders | User | 14.04.24 | |
 | Insight of orders from different units | User | 14.04.24 | |
 | Order cancellation | User | 14.04.24 | |
-| Order states with message | User | 14.04.24 | |
-|  | User | 16.10.24 | |
+| Order state changes with message | User | 14.04.24 | |
+| Record states (office), settable, as filter | User | 16.10.24 | |
+| Scheduling with optional user assignment | User | 14.04.24 | |
+| Reminder for orders without receival, purchase to get in touch with vendor | User | 14.04.24 | |
+| Order information (textsection) copyable | User | 14.04.24 | |
+| Partial delivery state for orders | User | 14.04.24 | |
 
 
 [Content](#content)
