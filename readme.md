@@ -1661,6 +1661,22 @@ Discussed stakeholder requirements:
 | Device interoperability, network access to central data | User | late 2023 | design as web application; 2023 |
 | IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | support for multiple SQL dialects; 2023-12-23 |
 | Nah, this looks bad | User | 2024-01 | restyling initial draft 2023-01-20 |
+| Text recommendations | User | 27.03.24 | |
+| Prefill forms | User | 27.03.24 | |
+| Proper article list | User | 27.03.24 | |
+| Optional record export without user name and entry date | User | 27.03.24 | |
+| Optional record export by document | User | 27.03.24 | |
+| Current state of treatments (draft lists) | User | 27.03.24 | |
+| Weekly schedule | User | 27.03.24 | |
+| Reminder of ongoing treatments | User | 27.03.24 | |
+| Group accounts | User | 27.03.24 | |
+| Editing permission for article alias | User | 27.03.24 | |
+| Return option for orders | User | 14.04.24 | |
+| Insight of orders from different units | User | 14.04.24 | |
+| Order cancellation | User | 14.04.24 | |
+| Order states with message | User | 14.04.24 | |
+|  | User | 16.10.24 | |
+
 
 [Content](#content)
 
