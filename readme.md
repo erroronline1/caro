@@ -1659,7 +1659,7 @@ Discussed stakeholder requirements:
 | It can't go on like this | CEO | 2019 | development of a digital application to reduce paperbased operations |
 | No offers obtained | Developer | late 2023 | fine, I'll just do it myself, 2023-10-02 |
 | Device interoperability, network access to central data | User | late 2023 | design as web application; 2023 |
-| Satisfying regulatory requirements, scalability, supported communication and transparency, role management, maximum possible security, shared information, unintrusive implementation of critical tasks into daily workflow (e.g. sample checks) | Developer, QMO | late 2023 | ongoing |
+| Satisfying regulatory requirements (ISO 13485), scalability, supported communication and transparency, role management, maximum possible security, shared information, unintrusive implementation of critical tasks into daily workflow (e.g. sample checks) | QMO | late 2023 | ongoing |
 | IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | support for multiple SQL dialects; 2023-12-23 |
 | Nah, this looks bad | CEO | 2024-01 | css restyling initial draft 2023-01-20 |
 | Text recommendations | User | 2024-03-27 | already satisfied with text recommendations draft; 2024-02-23 |
@@ -1682,6 +1682,7 @@ Discussed stakeholder requirements:
 | Reminder for orders without receival, purchase to get in touch with vendor | User | 2024-10-16 | message notification for unreceived orders; 2024-10-26|
 | Order information (textsection) copyable | User | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
 | Partial delivery state for orders | User | 2024-10-16 | implemented; 2024-10-26 |
+| reminder for received, not marked as delivered, orders | User | 2024-10-16 | implemented; 2024-10-27 |
 
 [Content](#content)
 
