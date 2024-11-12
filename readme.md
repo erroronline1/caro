@@ -1602,14 +1602,14 @@ according to [OpenRegulatory](https://github.com/openregulatory/templates)
 This software is not a medical device. But as this software is intended to being used in context with medical device fabrication, relevant regulatory requirements should be addressed nonetheless.
 
 ## Clinical evaluation, clinical evaluation plan, clinical evaluation report
-see [OpenRegulatory clinical evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/clinical_evaluation)
+according to [OpenRegulatory clinical evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/clinical_evaluation)
 
 Not applicable without clinical use on patients
 
 [Content](#content)
 
 ## Data protection
-see [OpenRegulatory data protection requirements](https://github.com/openregulatory/templates/tree/master/templates/data_protection)
+according to [OpenRegulatory data protection requirements](https://github.com/openregulatory/templates/tree/master/templates/data_protection)
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
 * [Terms of service for using the application](#terms-of-service-for-using-the-application)
 * [Web Application](#web-application)
@@ -1618,7 +1618,7 @@ see [OpenRegulatory data protection requirements](https://github.com/openregulat
 [Content](#content)
 
 ## General
-see [OpenRegulatory general requirements](https://github.com/openregulatory/templates/tree/master/templates/general)
+according to [OpenRegulatory general requirements](https://github.com/openregulatory/templates/tree/master/templates/general)
 
 Evidences of conformity according to the documents described above:
 * Clinical Evaluation Report: **not applicable**
@@ -1647,60 +1647,64 @@ Evidences of conformity according to the documents described above:
 ### Stakeholder requirements
 
 Stakeholder identification:
-* User (including CEO, QMO)
-* CEO
-* QMO
+* User (regular Employees)
+* CEO (Chief executive officer)
+* QMO (Quality management officer)
+* Supervisor
+* Office
+* Purchase
 * Operator of infrastructure
-* Developer
 
 Discussed stakeholder requirements:
 | Requirement / issue | Stakeholder | Time | Implementation |
 | ------------------- | ----------- | ---- | -------------- |
-| It can't go on like this | CEO | 2019 | development of a digital application to reduce paperbased operations |
-| No offers obtained | Developer | late 2023 | fine, I'll just do it myself, 2023-10-02 |
-| Device interoperability, network access to central data | User | late 2023 | design as web application; 2023 |
+| It can't go on like this | CEO | 2019 | Development of a digital application to reduce paperbased operations |
+| No offers obtained | Deputy QMO | late 2023 | Fine, I'll just do it myself, 2023-10-02 |
+| Device interoperability, network access to central data | CEO, QMO | late 2023 | Design as web application; 2023 |
 | Satisfying regulatory requirements (ISO 13485), scalability, supported communication and transparency, role management, maximum possible security, shared information, unintrusive implementation of critical tasks into daily workflow (e.g. sample checks) | QMO | late 2023 | ongoing |
-| IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | support for multiple SQL dialects; 2023-12-23 |
-| Nah, this looks bad | CEO | 2024-01 | css restyling initial draft 2023-01-20 |
-| Text recommendations | User | 2024-03-27 | already satisfied with text recommendations draft; 2024-02-23 |
-| Prefill forms | User | 2024-03-27 | already satisfied with records draft; 2024-03-02 |
-| Proper article list | User | 2024-03-27 | already satisfied with consumables pricelist import draft; 2023-11-10 |
-| Optional record export without user name and entry date | User | 2024-03-27 | implemented as simplified export; 2024-03-29 |
-| Optional record export by document | User | 2024-03-27 | implemented as formwise record export; 2024-03-29 |
-| Current state of treatments (draft lists) | User | 2024-03-27 | implemented as last edit information on records; 2024-08-18 |
-| Weekly schedule | User | 2024-03-27 | early calendar draft; 2024-04-30 |
-| Time tracking | User | 2024-03-27 | early timesheet draft; 2024-05-13 |
-| Reminder of ongoing treatments | User | 2024-03-27 | message notification for unclosed records; 2024-08-24|
-| Group accounts | User | 2024-03-27 | implemented as group user permission; 2024-03-27|
-| Editing permission for article alias | User | 2024-03-27 | implemented purchase_assistant role; 2024-03-27|
-| Return option for orders | User | 2024-04-14 | implemented order returns; 2024-04-20 |
-| Insight of orders from different units | User | 2024-04-14 | insight to prepared orders of other units for authorized users; 2024-04-20 |
-| Order cancellation | User | 2024-04-14 | implemented order cancellation; 2024-04-20 |
-| Order state changes with message | User | 2024-04-14 | implememted order state change with messages; 2024-04-23 |
-| Record states (office), settable, as filter | User | 2024-10-16 | implemented case states with respective permissions; 2024-10-28 |
-| Scheduling with optional user assignment | User | 2024-10-16 | user assignable; 2024-11-03 |
-| Reminder for orders without receival, purchase to get in touch with vendor | User | 2024-10-16 | message notification for unreceived orders; 2024-10-26|
-| Order information (textsection) copyable | User | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
-| Partial delivery state for orders | User | 2024-10-16 | implemented; 2024-10-26 |
-| reminder for received, not marked as delivered, orders | User | 2024-10-16 | implemented; 2024-10-27 |
+| IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | Support for multiple SQL dialects; 2023-12-23 |
+| Nah, this looks bad | CEO | 2024-01 | CSS restyling initial draft 2023-01-20 |
+| Text recommendations | User | 2024-03-27 | Already satisfied with text recommendations draft; 2024-02-23 |
+| Prefill forms | User | 2024-03-27 | Already satisfied with records draft; 2024-03-02 |
+| Proper article list | User | 2024-03-27 | Already satisfied with consumables pricelist import draft; 2023-11-10 |
+| Optional record export without user name and entry date | Supervisor, Office | 2024-03-27 | Implemented as simplified export; 2024-03-29 |
+| Optional record export by document | Supervisor, User | 2024-03-27 | Implemented as formwise record export; 2024-03-29 |
+| Current state of treatments (draft lists) | Supervisor | 2024-03-27 | Implemented as last edit information on records; 2024-08-18 |
+| Weekly schedule | Supervisor | 2024-03-27 | Early calendar draft; 2024-04-30 |
+| Time tracking | User | 2024-03-27 | Early timesheet draft; 2024-05-13 |
+| Reminder of ongoing treatments | Supervisor | 2024-03-27 | Message notification for unclosed records; 2024-08-24|
+| Group accounts | CEO | 2024-03-27 | Implemented as group user permission; 2024-03-27|
+| Editing permission for article alias | Purchase | 2024-03-27 | Implemented purchase_assistant role; 2024-03-27|
+| Return option for orders | Purchase | 2024-04-14 | Implemented order returns; 2024-04-20 |
+| Insight of orders from different units | User | 2024-04-14 | Insight to prepared orders of other units for authorized users; 2024-04-20 |
+| Order cancellation | Purchase | 2024-04-14 | Implemented order cancellation; 2024-04-20 |
+| Order state changes with message | User | 2024-04-14 | Implemented order state change with messages; 2024-04-23 |
+| Record states (office), settable, as filter | Supervisor, Office | 2024-10-16 | Implemented case states with respective permissions; 2024-10-28 |
+| Scheduling with optional user assignment | Supervisor | 2024-10-16 | User assignable; 2024-11-03 |
+| Reminder for orders without receival, purchase to get in touch with vendor | User | 2024-10-16 | Message notification for unreceived orders; 2024-10-26|
+| Order information (textsection) copyable | User, Purchase | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
+| Partial delivery state for orders | User, Purchase | 2024-10-16 | Implemented; 2024-10-26 |
+| Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
 
 [Content](#content)
 
 ## Information security
-see [OpenRegulatory information security requirements](https://github.com/openregulatory/templates/tree/master/templates/information_security)
+according to [OpenRegulatory information security requirements](https://github.com/openregulatory/templates/tree/master/templates/information_security)
 * see [data protection](#data-protection)
 
 [Content](#content)
 
 ## Performance evaluation
-see [OpenRegulatory performance evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/performance_evaluation)
+according to [OpenRegulatory performance evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/performance_evaluation)
+
+Performance evaluation on the product as a medical devide is not applicable. However performance of the application is measured by 
 * [Integration test](#integration-test)
 * [Stress test and performance](#stress-test-and-performance)
 
 [Content](#content)
 
 ## Tech doc
-see [OpenRegulatory tech doc requirements](https://github.com/openregulatory/templates/tree/master/templates/techdoc)
+according to [OpenRegulatory tech doc requirements](https://github.com/openregulatory/templates/tree/master/templates/techdoc)
 
 Planning & Feasability
 * Intended Use: [Aims](#aims)
@@ -1788,7 +1792,7 @@ All requests have to be executed through the api ensuring
 
 Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
 
-Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (sensitive data).
+Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (possible sensitive data).
 
 [Content](#content)
 
