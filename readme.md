@@ -211,7 +211,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * risk analyses.
     * also see [Tools](#tools)
 * ISO 13485 8.4 Data analysis
-    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpeted though.
+    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.
     * [Order](#order), [Tools](#tools)
 
 [Content](#content)
@@ -1620,7 +1620,7 @@ see [OpenRegulatory data protection requirements](https://github.com/openregulat
 ## General
 see [OpenRegulatory general requirements](https://github.com/openregulatory/templates/tree/master/templates/general)
 
-Evidences of conformity according to the documents available above:
+Evidences of conformity according to the documents described above:
 * Clinical Evaluation Report: **not applicable**
 * Intended Use: [Aims](#aims)
 * List of Qualified Suppliers: [Ressources](#ressources)
@@ -1659,28 +1659,29 @@ Discussed stakeholder requirements:
 | It can't go on like this | CEO | 2019 | development of a digital application to reduce paperbased operations |
 | No offers obtained | Developer | late 2023 | fine, I'll just do it myself, 2023-10-02 |
 | Device interoperability, network access to central data | User | late 2023 | design as web application; 2023 |
+| Satisfying regulatory requirements, scalability, supported communication and transparency, role management, maximum possible security, shared information, unintrusive implementation of critical tasks into daily workflow (e.g. sample checks) | Developer, QMO | late 2023 | ongoing |
 | IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | support for multiple SQL dialects; 2023-12-23 |
-| Nah, this looks bad | User | 2024-01 | restyling initial draft 2023-01-20 |
-| Text recommendations | User | 27.03.24 | |
-| Prefill forms | User | 27.03.24 | |
-| Proper article list | User | 27.03.24 | |
-| Optional record export without user name and entry date | User | 27.03.24 | |
-| Optional record export by document | User | 27.03.24 | |
-| Current state of treatments (draft lists) | User | 27.03.24 | |
-| Weekly schedule | User | 27.03.24 | |
-| Reminder of ongoing treatments | User | 27.03.24 | |
-| Group accounts | User | 27.03.24 | |
-| Editing permission for article alias | User | 27.03.24 | |
-| Return option for orders | User | 14.04.24 | |
-| Insight of orders from different units | User | 14.04.24 | |
-| Order cancellation | User | 14.04.24 | |
-| Order state changes with message | User | 14.04.24 | |
-| Record states (office), settable, as filter | User | 16.10.24 | |
-| Scheduling with optional user assignment | User | 14.04.24 | |
-| Reminder for orders without receival, purchase to get in touch with vendor | User | 14.04.24 | |
-| Order information (textsection) copyable | User | 14.04.24 | |
-| Partial delivery state for orders | User | 14.04.24 | |
-
+| Nah, this looks bad | CEO | 2024-01 | css restyling initial draft 2023-01-20 |
+| Text recommendations | User | 2024-03-27 | already satisfied with text recommendations draft; 2024-02-23 |
+| Prefill forms | User | 2024-03-27 | already satisfied with records draft; 2024-03-02 |
+| Proper article list | User | 2024-03-27 | already satisfied with consumables pricelist import draft; 2023-11-10 |
+| Optional record export without user name and entry date | User | 2024-03-27 | implemented as simplified export; 2024-03-29 |
+| Optional record export by document | User | 2024-03-27 | implemented as formwise record export; 2024-03-29 |
+| Current state of treatments (draft lists) | User | 2024-03-27 | implemented as last edit information on records; 2024-08-18 |
+| Weekly schedule | User | 2024-03-27 | early calendar draft; 2024-04-30 |
+| Time tracking | User | 2024-03-27 | early timesheet draft; 2024-05-13 |
+| Reminder of ongoing treatments | User | 2024-03-27 | message notification for unclosed records; 2024-08-24|
+| Group accounts | User | 2024-03-27 | implemented as group user permission; 2024-03-27|
+| Editing permission for article alias | User | 2024-03-27 | implemented purchase_assistant role; 2024-03-27|
+| Return option for orders | User | 2024-04-14 | implemented order returns; 2024-04-20 |
+| Insight of orders from different units | User | 2024-04-14 | insight to prepared orders of other units for authorized users; 2024-04-20 |
+| Order cancellation | User | 2024-04-14 | implemented order cancellation; 2024-04-20 |
+| Order state changes with message | User | 2024-04-14 | implememted order state change with messages; 2024-04-23 |
+| Record states (office), settable, as filter | User | 2024-10-16 | implemented case states with respective permissions; 2024-10-28 |
+| Scheduling with optional user assignment | User | 2024-10-16 | user assignable; 2024-11-03 |
+| Reminder for orders without receival, purchase to get in touch with vendor | User | 2024-10-16 | message notification for unreceived orders; 2024-10-26|
+| Order information (textsection) copyable | User | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
+| Partial delivery state for orders | User | 2024-10-16 | implemented; 2024-10-26 |
 
 [Content](#content)
 
@@ -4057,6 +4058,7 @@ All libraries are embedded locally, do not request outside ressources and do not
 * [indexedDB](https://github.com/jakearchibald/idb)
 * [custom md pdf](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf)
 * [mermaid charts](https://mermaid.js.org/)
+* [recommendations on documenting software](https://github.com/openregulatory)
 
 [Content](#content)
 
