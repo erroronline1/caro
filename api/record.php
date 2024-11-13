@@ -1526,10 +1526,11 @@ class RECORD extends API {
 				':identifier' => $row['identifier'],
 				':date' => substr($row['last_touch'], 0, -3),
 				':form' => $lastform['name']
-				]) . ($row['record_type'] === 'complaint' ? ' *' : '');
+				]);
 			$contexts[$row['context']][$linkdisplay] = [
 				'href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"
 			];
+			if ($row['record_type'] === 'complaint') $contexts[$row['context']][$linkdisplay]['class'] = 'orange';
 
 			// apply case state if applicable
 			$case_state = json_decode($row['case_state'] ? : '', true) ? : [];
