@@ -2,25 +2,25 @@
 
 # content
 * ***[plan b](#plan-b-no-usable-list-or-no-vendor-response)***
-* [aet*](#aet)
+* [aet](#aet)
 * [albrecht](#albrecht)
-* [amt]*(#amt)
-* [arthroven*](#arthroven)
-* [aspen*](#aspen)
+* [amt](#amt)
+* [arthroven](#arthroven)
+* [aspen](#aspen)
 * [basko](#basko)
-* [blatchford*](#blatchford)
-* [bort*](#bort)
-* [busch*](#busch)
+* [blatchford](#blatchford)
+* [bort](#bort)
+* [busch](#busch)
 * [caroli](#caroli)
-* [cosmesil*](#cosmesil)
-* [darco*](#darco)
-* [erkodent*](#erkodent)
+* [cosmesil](#cosmesil)
+* [darco](#darco)
+* [erkodent](#erkodent)
 * [feet control](#feet-control)
 * [fior gentz](#fior-gentz)
 * [gottinger](#gottinger)
 * [ihle](#ihle)
 * [juzo](#juzo)
-* [kowsky*](#kowski)
+* [kowsky](#kowski)
 * [lohmann und rauscher](#lohmann-und-rauscher)
 * [medi](#medi)
 * [minke](#minke)
@@ -32,10 +32,10 @@
 * [ofa](#ofa)
 * [ortho reha neuhof](#ortho-reha-neuhof)
 * [ortho systems](#ortho-systems)
-* [orthoservice*](#orthoservice)
+* [orthoservice](#orthoservice)
 * [otto bock](#otto-bock)
 * [perpedes](#perpedes)
-* [pochert*](#pochert)
+* [pochert](#pochert)
 * [polyform*](#polyform)
 * [protheseus](#protheseus)
 * [prowalk](#prowalk)
@@ -98,7 +98,7 @@ in the output files if it is not possible to edit the following filter according
 				"any": {
 					"STATUS": "true",
 					"BESTELLSTOP": "true",
-					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|basko|blatchford|bort|busch|caroli|erkodent|feet.control|fior.+gentz|gottinger|ihle|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|otto.bock|perpedes|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
+					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|arthroven|aspen|basko|blatchford|bort|busch|caroli|cosmesil|darco|erkodent|feet.control|fior.+gentz|gottinger|ihle|kowsky|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|orthoservice|otto.bock|perpedes|pochert|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|storitec|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
 				}
 			}
 		},
@@ -423,45 +423,6 @@ import with default filter
 }
 ```
 
-ruthner
-aidamed
-alps
-apm technika
-arthroven
-bauerfeind
-bionic germany
-bort
-bsn jobst
-bsn medical
-cosmesil
-darco
-dirame
-kowsky
-extremtextil
-feguramed
-guentherbionics
-hakupa
-halarit (lange + ritter)
-hema
-kaupo
-krewi
-leder haag
-ludwig leiner
-m+w dental
-nexus cnc
-ormed enovis medtech
-orthoservice
-ossenberg
-plastico
-pochert
-qualiserve
-spannrit
-springer aktiv
-storitec
-teufel
-unyq
-wagner polymertechnik
-
 ### aet
 rewrite header (delivery unit), delete animal-aids, intermediate headers and all rows above header, append aid name to +options
 ```json
@@ -536,14 +497,97 @@ rewrite header (delivery unit), delete animal-aids, intermediate headers and all
 [content](#content)
 
 ### amt
+```json
+{
+	"filesetting": {
+		"columns": ["Lager-Artikelnummer AMT", "Bezeichnung", "VE", "EAN/GTIN/UPC"],
+		"headerrowindex": 2
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "filter articles",
+			"keep": true,
+			"match": {
+				"all": {
+					"Bezeichnung": "silicon|silipos"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"special_attention": "1",
+			"has_expiry_date": "0"
+		},
+		"rewrite": [{
+			"article_no": ["Lager-Artikelnummer AMT"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["VE"],
+			"article_ean": ["EAN/GTIN/UPC"]
+		}]
+	}
+}
+```
 
 [content](#content)
 
 ### arthroven
+```json
+{
+	"filesetting": {
+		"columns": ["Artikelnr.", "Artikelbeschreibung", "Einheit", "Barcode"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"has_expiry_date": "0"
+		},
+		"rewrite": [{
+			"article_no": ["Artikelnr."],
+			"article_name": ["Artikelbeschreibung"],
+			"article_unit": ["Einheit"],
+			"article_ean": ["Barcode"]
+		}]
+	}
+}
+```
 
 [content](#content)
 
 ### aspen
+```json
+{
+	"filesetting": {
+		"columns": ["Artikel-Nr.", "Artikelbeschreibung", "EAN/GTIN"],
+		"headerrowindex": 1
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "filter articles",
+			"keep": true,
+			"match": {
+				"all": {
+					"Artikel-Nr.": ".+"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "1",
+		},
+		"rewrite": [{
+			"article_no": ["Artikel-Nr."],
+			"article_name": ["Artikelbeschreibung"],
+			"article_unit": [""],
+			"article_ean": ["EAN/GTIN"]
+		}]
+	}
+}
+```
 
 [content](#content)
 
@@ -578,14 +622,87 @@ delete . from headers, replace specialchars
 [content](#content)
 
 ### blatchford
+```json
+{
+	"filesetting": {
+		"columns": ["Artikel", "Artikelbeschreibung"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "0",
+			"has_expiry_date": "0"
+		},
+		"rewrite": [{
+			"article_no": ["Artikel"],
+			"article_name": ["Artikelbeschreibung"],
+			"article_unit": [""],
+			"article_ean": [""]
+		}]
+	}
+}
+```
 
 [content](#content)
 
 ### bort
+```json
+{
+	"filesetting": {
+		"columns": ["Artikelnr.", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "filter articles",
+			"keep": false,
+			"match": {
+				"any": {
+					"CCL": ".+",
+					"Bezeichnung": "climacare|aktiven|displ..|easylife|knet|hilfe",
+					"Größe": "MAß"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"has_expiry_date": "0"
+		},
+		"conditional_or": [
+			["trading_good", "0", ["Bezeichnung", "ersatz|für|tausch|bezug|luft"], ["Größe", ""]]
+		],
+		"remove": ["CCL"],
+		"rewrite": [{
+			"article_no": ["Artikelnr."],
+			"article_name": ["Bezeichnung", ", ", "Größe", ", ", "Farbe", ", ", "Seite / Ausführung"],
+			"article_unit": ["Einheit"],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
 
 [content](#content)
 
 ### busch
+add article_no header
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "Bezeichnung", "Einheit"],
+		"headerrowindex": 14
+	},
+	"modify": {
+		"rewrite": [{
+			"article_no": ["article_no"],
+			"article_name": ["Bezeichnung"],
+			"article_unit": ["Einheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
 
 [content](#content)
 
@@ -617,14 +734,99 @@ delete first two columns and rows
 [content](#content)
 
 ### cosmesil
+add "article_no", "article_name" to first row
+```json
+{
+	"filesetting": {
+		"columns": ["article_no", "article_name"],
+		"headerrowindex": 0
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "filter articles",
+			"keep": true,
+			"match": {
+				"all": {
+					"article_no": ".+",
+					"article_name": "alsil|techsil"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"special_attention": "1",
+			"has_expiry_date": "0"
+		},
+		"rewrite": [{
+			"article_no": ["article_no"],
+			"article_name": ["article_name"],
+			"article_unit": [""],
+			"article_ean": [""]
+		}]
+	}
+}
+```
 
 [content](#content)
 
 ### darco
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Kategorie", "Produktname", "Produktbezeichnung", "Farbe", "Größenbez.", "Artikel-Nr.", "VE", "EAN 13"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
+		"conditional_or": [
+			["trading_good", "0", ["Kategorie", "zubehör|tapes|Sohlensysteme"]],
+		],
+		"remove": ["Kategorie"],
+		"rewrite": [{
+			"article_no": ["Artikel-Nr"],
+			"article_name": ["Produktname", ", ", "Produktbezeichnung", ", ", "Farbe", ", ", "Größenbez."],
+			"article_unit": ["VE"],
+			"article_ean": ["EAN 13"]
+		}]
+	}
+}
+```
 
 [content](#content)
 
 ### erkodent
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Bestellnr.", "Beschreibung", "Inhalt"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "filter articles",
+			"keep": false,
+			"match": {
+				"any": {
+					"Beschreibung": "^$|einlage",
+				}
+			}
+		}
+	],
+	"modify": {
+		"rewrite": [{
+			"article_no": ["Bestellnr."],
+			"article_name": ["Beschreibung"],
+			"article_unit": ["Inhalt"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
 
 [content](#content)
 
@@ -759,6 +961,29 @@ delete unreqired columns
 [content](#content)
 
 ### kowski
+```json
+{
+	"filesetting": {
+		"columns": ["Plangruppe", "Artikelnummer", "Artikelbezeichnung", "Mengeneinheit"],
+		"headerrowindex": 9
+	},
+	"modify": {
+		"add": {
+			"trading_good": "1"
+		},
+		"conditional_or": [
+			["trading_good", "0", ["Plangruppe", "Ersatzteile|SOA"]]
+		],
+		"remove": ["Plangruppe"],
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Artikelbezeichnung"],
+			"article_unit": ["Mengeneinheit"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
 
 [content](#content)
 
@@ -1175,6 +1400,29 @@ delete . and () from header
 [content](#content)
 
 ### orthoservice
+```json
+{
+	"filesetting": {
+		"columns": ["Artikel-NR", "Bezeichnung1 Artikelname", "Bezeichnung2 = Farbe (falls vorhanden)", "Bezeichnung3 = Langtext (kein muss)", "Bezeichnung4 = Dimensionstext (Größe)", "EAN", "HMV-NR"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "1",
+			"has_expiry_date": "0"
+		},
+		"conditional_or": [
+			["trading_good", "0", ["HMV-NR ", "^komponente|^zubehör"], ["Bezeichnung3 = Langtext (kein muss)", "zubehör"]]
+		],
+		"remove": ["HMV-NR"],
+		"rewrite": [{
+			"article_no": ["Artikel-NR"],
+			"article_name": ["Bezeichnung1 Artikelname", ", ", "Bezeichnung2 = Farbe (falls vorhanden)", ", ", "Bezeichnung3 = Langtext (kein muss)", ", ", "Bezeichnung4 = Dimensionstext (Größe)"],
+			"article_unit": [""],
+			"article_ean": ["EAN"]
+		}]
+	}
+}
+```
 
 [content](#content)
 
@@ -1235,6 +1483,42 @@ join tables
 [content](#content)
 
 ### pochert
+```json
+{
+	"filesetting": {
+		"headerrowindex": 0,
+		"columns": ["Artikelnummer", "Matchcode", "Menge", "VPE"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "drop price scale",
+			"keep": false,
+			"match": {
+				"any": {
+					"Menge": ".+",
+					"Matchcode": "^$|einl[ea]ge|schuh|sandale|sicherheit|rohl.|gr\\.\\d|schild|plakat|aufsteller|muster|katalog|bilderrahmen|kosten|schlag|ziel|leisten|deckso|futter|schl[oö][ßs]{1,}|abs[aä]tz|sohle|fleck|gürtel"
+				}
+			}
+		}
+	],
+	"modify": {
+		"add": {
+			"trading_good": "0"
+		},
+		"conditional_or": [
+			["trading_good", "1", ["name", "Compression|Weste|Peronäusschiene|Stax|liner"]]
+		],
+		"remove": ["Menge"],
+		"rewrite": [{
+			"article_no": ["Artikelnummer"],
+			"article_name": ["Matchcode"],
+			"article_unit": ["VPE"],
+			"article_ean": [""]
+		}]
+	}
+}
+```
 
 [content](#content)
 
