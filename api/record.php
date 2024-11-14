@@ -1530,13 +1530,14 @@ class RECORD extends API {
 			$contexts[$row['context']][$linkdisplay] = [
 				'href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"
 			];
-			if ($row['record_type'] === 'complaint') $contexts[$row['context']][$linkdisplay]['class'] = 'orange';
 
 			// apply case state if applicable
 			$case_state = json_decode($row['case_state'] ? : '', true) ? : [];
 			foreach($case_state as $case => $state){
 				$contexts[$row['context']][$linkdisplay]['data-' . $case] = $state;
 			}
+			// highlight complaints
+			if ($row['record_type'] === 'complaint') $contexts[$row['context']][$linkdisplay]['class'] = 'orange';
 			// highlight closed records if passed using filter
 			if ($row['closed'] && ($row['record_type'] !== 'complaint' ||
 				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
