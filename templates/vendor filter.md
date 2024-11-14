@@ -48,7 +48,7 @@
 * [storitec*](#storitec)
 * [streifeneder](#streifeneder)
 * [taska](#taska)
-* [thuasne](#tuasne)
+* [thuasne*](#thuasne)
 * [tigges](#tigges)
 * [triconmed](#triconmed)
 * [uniprox](#uniprox)
@@ -98,7 +98,7 @@ in the output files if it is not possible to edit the following filter according
 				"any": {
 					"STATUS": "true",
 					"BESTELLSTOP": "true",
-					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|arthroven|aspen|basko|blatchford|bort|busch|caroli|cosmesil|darco|erkodent|feet.control|fior.+gentz|gottinger|ihle|kowsky|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|orthoservice|otto.bock|perpedes|pochert|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|storitec|streifeneder|taska|thuasne|tigges|triconmed|uniprox|werkmeister)"
+					"LIEFERANTENNAME": "^$|(aet|albrecht|amt|arthroven|aspen|basko|blatchford|bort|busch|caroli|cosmesil|darco|erkodent|feet.control|fior.+gentz|gottinger|ihle|kowsky|lohmann.+rauscher|medi|minke|mmib|neatec|nowecare|nowecor|ssur|ortho.reha.neuhof|ortho.systems|orthoservice|otto.bock|perpedes|pochert|polyform|protheseus|prowalk|rebotec|rehaforum|ruckgaber|russka|schein|sporlastic|streifeneder|taska|tigges|triconmed|uniprox|werkmeister)"
 				}
 			}
 		},
