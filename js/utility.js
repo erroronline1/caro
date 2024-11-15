@@ -150,9 +150,11 @@ const _client = {
 				formdata = _.getInputs('[method="dialog"]', true);
 				if (!formdata) return false;
 			}
-			formdata = new FormData();
-			for (const [key, value] of Object.entries(dialogData)) {
-				formdata.append(key, value);
+			else {
+				formdata = new FormData();
+				for (const [key, value] of Object.entries(dialogData)) {
+					formdata.append(key, value);
+				}
 			}
 			return formdata;
 		},
