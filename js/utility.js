@@ -144,8 +144,12 @@ const _client = {
 				input.checked = false;
 			}
 		},
-		dialogToFormdata: (dialogData) => {
-			if (!Object.keys.length) return false;
+		dialogToFormdata: (dialogData = {}) => {
+			let formdata;
+			if (!Object.keys(dialogData).length) {
+				formdata = _.getInputs('[method="dialog"]', true);
+				if (!formdata) return false;
+			}
 			formdata = new FormData();
 			for (const [key, value] of Object.entries(dialogData)) {
 				formdata.append(key, value);
