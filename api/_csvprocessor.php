@@ -624,7 +624,7 @@ class Listprocessor {
 			if ($i++ < $this->_setting['filesetting']['headerrowindex'] + 1) $this->_headers = $row;
 			else {
 				if (boolval(array_diff($this->_setting['filesetting']['columns'], array_intersect($this->_setting['filesetting']['columns'], $this->_headers)))) {
-					$this->_log[] = '[~] File Import Error: not all required columns were found, filter aborted...';					
+					$this->_log[] = '[~] File Import Error: not all required columns were found, filter aborted... Required: ' . implode(', ', $this->_setting['filesetting']['columns']) . '; Found: ' . implode(', ', $this->_headers);
 					break;
 				}
 				// kindly ignore corrupt formatted and empty lines
