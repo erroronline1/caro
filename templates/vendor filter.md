@@ -577,7 +577,7 @@ rewrite header (delivery unit), delete animal-aids, intermediate headers and all
 	],
 	"modify": {
 		"add": {
-			"trading_good": "1",
+			"trading_good": "1"
 		},
 		"rewrite": [{
 			"article_no": ["Artikel-Nr."],
@@ -592,7 +592,6 @@ rewrite header (delivery unit), delete animal-aids, intermediate headers and all
 [content](#content)
 
 ### basko
-delete . from headers, replace specialchars
 ```json
 {
 	"filesetting": {
@@ -719,7 +718,7 @@ delete first two columns and rows
 			"special_attention": "0"
 		},
 		"conditional_or": [
-			["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband"]],
+			["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband"]]
 		],
 		"rewrite": [{
 			"article_no": ["NeueArtikelNummer"],
@@ -776,20 +775,20 @@ add "article_no", "article_name" to first row
 {
 	"filesetting": {
 		"headerrowindex": 0,
-		"columns": ["Kategorie", "Produktname", "Produktbezeichnung", "Farbe", "Größenbez.", "Artikel-Nr.", "VE", "EAN 13"]
+		"columns": ["Kategorie", "Produktname", "Produktbezeichnung", "Farbe", "Größenbez.", "Artikel-Nr.", "VE ", "EAN 13"]
 	},
 	"modify": {
 		"add": {
 			"trading_good": "1"
 		},
 		"conditional_or": [
-			["trading_good", "0", ["Kategorie", "zubehör|tapes|Sohlensysteme"]],
+			["trading_good", "0", ["Kategorie", "zubehör|tapes|Sohlensysteme"]]
 		],
 		"remove": ["Kategorie"],
 		"rewrite": [{
 			"article_no": ["Artikel-Nr"],
 			"article_name": ["Produktname", ", ", "Produktbezeichnung", ", ", "Farbe", ", ", "Größenbez."],
-			"article_unit": ["VE"],
+			"article_unit": ["VE "],
 			"article_ean": ["EAN 13"]
 		}]
 	}
@@ -812,7 +811,7 @@ add "article_no", "article_name" to first row
 			"keep": false,
 			"match": {
 				"any": {
-					"Beschreibung": "^$|einlage",
+					"Beschreibung": "^$|einlage"
 				}
 			}
 		}
@@ -842,7 +841,7 @@ add header
 			"has_expiry_date": "0"
 		},
 		"conditional_or": [
-			["has_expiry_date", "1", ["artnr", "s35sc11_|sansc35_"]],
+			["has_expiry_date", "1", ["artnr", "s35sc11_|sansc35_"]]
 		],
 		"rewrite": [{
 			"article_no": ["artnr"],
@@ -1026,9 +1025,8 @@ replace . and specialchars in header
 			"special_attention": "0"
 		},
 		"conditional_or": [
-			["special_attention", "1", ["Bezeichnung", "noppenhaft"]],
+			["special_attention", "1", ["Bezeichnung", "noppenhaft"]]
 		],
-		},
 		"replace":[
 			["EAN-Nummer", "\\.", ""]
 		],
@@ -1068,7 +1066,7 @@ rewrite pricelist (concat sections (bit of a pita) Beschreibung to Staffel, repa
 			"special_attention": "0"
 		},
 		"conditional_or": [
-			["special_attention", "1", ["Staffel", "pryx|deusith"]],
+			["special_attention", "1", ["Staffel", "pryx|deusith"]]
 		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
@@ -1221,7 +1219,7 @@ modify product description for:
 		},
 		"conditional_or": [
 			["trading_good", "1", ["BEZEICHNUNG", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]],
-			["has_expiry_date", "1", ["BEZEICHNUNG", "solvent"]],
+			["has_expiry_date", "1", ["BEZEICHNUNG", "solvent"]]
 		],
 		"replace":[
 			["ART-NR", "(I-4443|I-CL63|I-CW63|I-CL43|I-CW43|I-CL53)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40],
@@ -1361,7 +1359,7 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 		},
 		"conditional_or": [
 			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]],
-			["has_expiry_date", "1", ["Bezeichnung", "neofast"]],
+			["has_expiry_date", "1", ["Bezeichnung", "neofast"]]
 		],
 		"replace":[
 			["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5", "L5-6", "L6", "L6-7", "L7", "L7-8", "L8", "L8-9", "L9", "LC0", "LC0-C1", "LC1", "LC1-C2", "LC2", "LC2-C3", "LC3", "LC3-C4", "LC4", "LC4-C5", "LC5", "LA1", "LA1-A2", "LA2", "LA2-A3", "LA3", "LA3-A4", "LA4"],
@@ -1403,7 +1401,7 @@ delete . and () from header
 ```json
 {
 	"filesetting": {
-		"columns": ["Artikel-NR", "Bezeichnung1 Artikelname", "Bezeichnung2 = Farbe (falls vorhanden)", "Bezeichnung3 = Langtext (kein muss)", "Bezeichnung4 = Dimensionstext (Größe)", "EAN", "HMV-NR"]
+		"columns": ["Artikel-NR", "Bezeichnung1 Artikelname", "Bezeichnung2 = Farbe (falls vorhanden)", "Bezeichnung3 = Langtext (kein muss)", "Bezeichnung4 = Dimensionstext (Größe)", "EAN", "HMV-NR "]
 	},
 	"modify": {
 		"add": {
@@ -1413,7 +1411,7 @@ delete . and () from header
 		"conditional_or": [
 			["trading_good", "0", ["HMV-NR ", "^komponente|^zubehör"], ["Bezeichnung3 = Langtext (kein muss)", "zubehör"]]
 		],
-		"remove": ["HMV-NR"],
+		"remove": ["HMV-NR "],
 		"rewrite": [{
 			"article_no": ["Artikel-NR"],
 			"article_name": ["Bezeichnung1 Artikelname", ", ", "Bezeichnung2 = Farbe (falls vorhanden)", ", ", "Bezeichnung3 = Langtext (kein muss)", ", ", "Bezeichnung4 = Dimensionstext (Größe)"],
@@ -1736,7 +1734,7 @@ delete . from headers, replace specialchars and whitespaces
 
 [content](#content)
 
-### ruckgaber
+### storitec
 
 [content](#content)
 
