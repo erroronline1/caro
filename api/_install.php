@@ -251,7 +251,8 @@ $queries = [
 				"	`date` date NOT NULL," .
 				"	`expires` date NULL," .
 				"	`experience_points` int NULL," .
-				"	`file_path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`file_path` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -484,7 +485,8 @@ $queries = [
 				"	date date NOT NULL," .
 				"	expires date NULL," .
 				"	experience_points int NULL," .
-				"	file_path varchar(MAX) NULL" .
+				"	file_path varchar(MAX) NULL DEFAULT NULL," .
+				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
 				");"
 				,
 				],

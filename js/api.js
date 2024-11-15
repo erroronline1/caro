@@ -443,8 +443,24 @@ export const api = {
 					};
 				} else payload = _.getInputs("[data-usecase=audit]", true);
 				break;
-		}
-		api.send(method, request, successFn, null, payload, method === "post");
+			case "put":
+				if (4 in request && request[4] && typeof request[4] === "object") {
+					//passed formdata
+					payload = request[4];
+					delete request[4];
+					successFn = function (data) {
+						if (data.render) {
+							api.update_header(title[request[1]] + (request[2] ? " - " + LANG.GET("audit.checks_type." + request[2]) : ""));
+							const render = new Assemble(data.render);
+							document.getElementById("main").replaceChildren(render.initializeSection());
+							render.processAfterInsertion();
+						}
+						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+					};
+				}
+				break;
+			}
+		api.send(method, request, successFn, null, payload, method === "post" || method === 'put');
 	},
 
 	/**

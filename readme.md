@@ -163,6 +163,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).
     * An overview of trainings and skill settings can be viewed within the audit module.
     * Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.
+    * Trainings can be evaluated by defined users with a dedicated form. Due evaluations will be added to schedules.
     * also see [Users](#users), [Tools](#tools)
 * ISO 13485 7.4.1 Procurement process
     * Procurement is guided through the application. Vendors and products can be added into the database.
@@ -994,6 +995,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * complaints
 * regulatory issues
 * risks
+* training evaluation
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 
@@ -1924,7 +1926,7 @@ Parameters
 
 ### Audit endpoints
 
-> post ./api/api.php/audit/checks/userskills
+> POST ./api/api.php/audit/checks/userskills
 
 Returns userskills after inserting.
 
@@ -1983,6 +1985,34 @@ Sample response
 ```
 {"render":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
 ```
+
+> PUT ./api/api.php/audit/trainingevaluation/{id}
+
+Saves evaluations of user trainings
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | training database id | 
+| payload | form data | required | form data |
+ 
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"forms"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by forms and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+```
+
+> GET ./api/api.php/audit/trainingevaluation
+
+Saves evaluations of user trainings
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+
+see PUT
 
 [Content](#content)
 

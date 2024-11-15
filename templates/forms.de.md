@@ -12,6 +12,7 @@
 * [Vorgangsprotokoll](#vorgangsprotokoll)
 * [Produkteinführung](#produkteinführung)
 * [Stichprobenprüfung](#stichprobenprüfung)
+* [Schulungsbewertung](#schulungsbewertung)
 
 ### Prosthetics 2
 * [Anamnese Prothetik II](#anamnese-prothetik-ii)
@@ -794,6 +795,34 @@ Export for signature compliance
 	]
 ]
 ```
+[Content](#content)
+
+## Schulungsbewertung
+```json
+[
+	[
+		{
+			"type": "radio",
+			"attributes": {
+				"name": "Bewertung",
+				"required": true
+			},
+			"content": {
+				"Inhalte wurden umgesetzt. Es gibt keine Auffälligkeiten": [],
+				"Es wurde ein Nachschulungsbedarf festgestellt": [],
+				"Sonstiges, siehe Kommentar": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Kommentar"
+			}
+		}
+	]
+]
+```
+
 [Content](#content)
 
 ## Anamnese Prothetik II

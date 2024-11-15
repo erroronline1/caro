@@ -32,6 +32,7 @@ class AUDIT extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
 	private $_requestedDate = null;
+	private $_requestedID = null;
 	private $_requestedTime = null;
 
 	/**
@@ -42,7 +43,7 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('audits')) $this->response([], 401);
 
 		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_requestedDate = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedDate = $this->_requestedID = isset(REQUEST[3]) ? REQUEST[3] : null;
 		$this->_requestedTime = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
@@ -59,6 +60,7 @@ class AUDIT extends API {
 	public function checks(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 			case 'GET':
 				$result['render'] = ['content' => []];
 				$selecttypes = [];
@@ -80,6 +82,7 @@ class AUDIT extends API {
 					'complaints', // complaints within records
 					'regulatory', // regulatory issues
 					'risks', // risks
+					'trainingevaluation', // training evaluation
 					] as $category){
 						$selecttypes[LANG::GET('audit.checks_type.' . $category)] = ['value' => $category];
 						if ($this->_requestedType === $category) $selecttypes[LANG::GET('audit.checks_type.' . $category)]['selected'] = true;
@@ -1036,6 +1039,128 @@ class AUDIT extends API {
 	}
 	
 	/**
+	 *   _           _     _                     _         _   _         
+	 *  | |_ ___ ___|_|___|_|___ ___ ___ _ _ ___| |_ _ ___| |_|_|___ ___ 
+	 *  |  _|  _| .'| |   | |   | . | -_| | | .'| | | | .'|  _| | . |   |
+	 *  |_| |_| |__,|_|_|_|_|_|_|_  |___|\_/|__,|_|___|__,|_| |_|___|_|_|
+	 *                          |___|   
+	 */
+	private function trainingevaluation(){
+		if ($_SERVER['REQUEST_METHOD']==='PUT' && PERMISSION::permissionFor('trainingevaluation')){
+			$user = null;
+			$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
+				'values' => [
+					':id' => $this->_requestedID
+				]
+			]);
+			$training = $training ? $training[0] : [];
+			if ($training) $user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				'replacements' => [
+					':id' => intval($training['user_id']),
+					':name' => ''
+				]
+			]);
+			$user = $user ? $user[0] : null;
+
+			if ($training && $user &&
+				(PERMISSION::permissionFor('trainingevaluation') &&
+				(array_intersect(array_filter(PERMISSION::permissionFor('trainingevaluation', true), fn($permission) => $permission === 'supervisor'), $_SESSION['user']['permissions']) ||
+				(array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))))
+			) {
+				foreach($this->_payload as $key => &$value){
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					/////////////////////////////////////////
+					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+					////////////////////////////////////////
+					if (!$value || $value == 'on') unset($this->_payload->$key);
+				}
+				SQLQUERY::EXECUTE($this->_pdo, 'user_training_put', [
+					'values' => [
+						':id' => $this->_requestedID,
+						':evaluation' => json_encode([
+							'user' => $_SESSION['user']['name'],
+							'date' => $this->_currentdate->format('Y-m-d H:i'),
+							'content' => (array) $this->_payload
+						])
+					]
+				]);
+			}
+		}
+
+		$content = [];
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		$trainings = $trainings ? array_values($trainings) : [];
+
+		$evaluationform = $this->contextComponents('training_evaluation_form');
+		foreach ($users as $user){
+
+			if (
+				$user['id'] < 2 ||
+				!(PERMISSION::permissionFor('trainingevaluation') &&
+				(array_intersect(array_filter(PERMISSION::permissionFor('trainingevaluation', true), fn($permission) => $permission === 'supervisor'), $_SESSION['user']['permissions']) ||
+				(array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))))
+			) continue;
+
+			$content[] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $user['name']
+					]
+				]
+			];
+			$user_id = $user['id'];
+			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
+				return $row['user_id'] === $user_id;
+			})){
+				foreach ($usertrainings as $row){
+					if ($row['evaluation']) continue;
+					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					if ($row['expires']){
+						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
+						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
+						else {
+							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
+							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
+						}
+					}
+					$content[count($content) - 1][] = [
+						'type' => 'textsection',
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'attributes' => $attributes
+					];
+					if ($row['file_path']) $content[count($content) - 1][] = [
+						'type' => 'links',
+						'content' => [
+							$row['file_path'] => ['href' => $row['file_path']]
+						]
+					];
+					$content[count($content) - 1][] = [
+						'type' => 'button',
+						'attributes' => [
+							'type' => 'button',
+							'value' => LANG::GET('audit.checks_type.trainingevaluation'),
+							'onpointerup' => "new Dialog({type: 'input', header: '" . LANG::GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . json_encode(
+								$evaluationform
+							) . "'), options:{".
+							"'" . LANG::GET('general.cancel_button') . "': false,".
+							"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+							"}}).then(response => {if (response) api.audit('put', 'checks', 'trainingevaluation', '" . $row['id'] . "', _client.application.dialogToFormdata())})"
+						]
+					];
+				}	
+			}
+		}
+
+		return $content;
+	}
+
+	/**
 	 *                                       _
 	 *   _ _ ___ ___ ___ ___ _ _ ___ ___ ___|_|___ ___ ___ ___
 	 *  | | |_ -| -_|  _| -_|_'_| . | -_|  _| | -_|   |  _| -_|
@@ -1185,7 +1310,7 @@ class AUDIT extends API {
 				}
 			}
 		}
-
+		$content = [];
 		// add export button
 		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
 			[
@@ -1213,7 +1338,6 @@ class AUDIT extends API {
 			]
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
-		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		foreach ($users as $user){
 			if ($user['id'] < 2) continue;
 
@@ -1250,15 +1374,25 @@ class AUDIT extends API {
 					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $today) $attributes['class'] = 'red';
+						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $today) $attributes['class'] = 'orange';
+							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
 						}
 					}
+					if ($row['evaluation']){
+						$row['evaluation'] = json_decode($row['evaluation'], true);
+						$evaluation = LANG::GET('audit.userskills_training_evaluation', [
+							':user' => $row['evaluation']['user'],
+							':date' => $row['evaluation']['date'],
+							':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
+						]);
+					} else $evaluation =LANG::GET('audit.userskills_training_evaluation_pending');
+
+
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'] . " \n" . $evaluation,
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [

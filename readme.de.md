@@ -100,6 +100,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
     * Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.
     * Eine Übersicht über die Schulungen und Fähigkeiten ist im Audit-Modul einsehbar.
     * Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Eine Übersicht kann im Audit-Modul exportiert werden.
+    * Schulungen können durch berechtigte Nutzer durch ein eigenes Formular bewertet werden. Fällige Bewertungen werden in den Kalender eingetragen.
     * siehe [Nutzer](#nutzer), [Anpassung](#anpassung), [Werkzeuge](#werkzeuge)
 * ISO 13485 7.4.1 Beschaffungsprozess
     * Die Beschaffung wird durch die Anwendung begleitet. Lieferanten und Produkte können zur Datenbank hinzugefügt werden.
@@ -927,6 +928,7 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 * Reklamationen
 * regulatorische Anforderungen
 * Risiken
+* Schulungsbewertungen
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 

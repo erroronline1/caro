@@ -766,9 +766,17 @@ class SQLQUERY {
 			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file_path)",
 			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file_path) VALUES ( :user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path)"
 		],
+		'user_training_put' => [
+			'mysql' => "UPDATE caro_user_training SET evaluation = :evaluation WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_user_training SET evaluation = :evaluation WHERE id = :id"
+		],
+		'user_training_get' => [
+			'mysql' => "SELECT * FROM caro_user_training WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_user_training WHERE id = :id"
+		],
 		'user_training_get_user' => [
-			'mysql' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids)",
-			'sqlsrv' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids)"
+			'mysql' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids) ORDER BY date, user_id ASC",
+			'sqlsrv' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids) ORDER BY date, user_id ASC"
 		],
 		'user_training_delete' => [
 			'mysql' => "DELETE FROM caro_user_training WHERE id = :id",

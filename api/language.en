@@ -101,6 +101,7 @@ anonymous[generalrecords] = "General company record"
 anonymous[descriptions] = "Process or work instruction"
 notdisplayedinrecords[mdr_sample_check_form] = "MDR §14 Sample Check"
 notdisplayedinrecords[product_incorporation_form] = "Product incorporation"
+notdisplayedinrecords[training_evaluation_form] = "Training evaluation"
 
 ; administrative case state
 ; generates a pseudoform to check states by given permission levels
@@ -412,6 +413,7 @@ checks_type[orderstatistics] = "Order statistics"
 checks_type[complaints] = "Complaints"
 checks_type[regulatory] = "Regulatory issues considered by forms and documents"
 checks_type[risks] = "Risk management"
+checks_type[trainingevaluation] = "Training evaluation"
 check_description = ":check on :date by :author"
 documents_in_use_documents = "Documents in use with respective components"
 documents_in_use_external = "External documents in use"
@@ -449,6 +451,10 @@ complaints_closed = ", marked as closed"
 
 userskills_bulk_training = "Apply training to multiple employees"
 userskills_bulk_user = "Employee"
+userskills_training_evaluation = ":user evaluated this training on :date ""
+:evaluation"
+userskills_training_evaluation_pending = "Evaluation pending"
+userskills_notification_message = "The users :user training for :training is due for evaluation. Please check :module-module or delegate."
 
 ; all keys are hardcoded
 [calendar]

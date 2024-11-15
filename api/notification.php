@@ -92,6 +92,48 @@ class NOTIFICATION extends API {
 					]);		   
 			}
 		}
+
+
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		foreach($trainings as $training){
+			if ($training['evaluation']) continue;
+			$trainingdate = new DateTime($training['date'], new DateTimeZone(CONFIG['application']['timezone']));
+			if (intval(abs($trainingdate->diff($this->_currentdate)->days)) > CONFIG['lifespan']['training_evaluation']){
+				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
+					// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
+					$subject = LANG::GET('audit.userskills_notification_message', [
+						':user' => $users[$user]['name'],
+						':training' => $training['name'],
+						':module' => LANG::GET('menu.audit')
+					]);
+					$reminders = $calendar->search($subject);
+					$open = false;
+					foreach($reminders as $reminder){
+						if (!$reminder['closed']) $open = true;
+					}
+					if (!$open){
+						$calendar->post([
+							':type' => 'schedule',
+							':span_start' => $today->format('Y-m-d H:i:s'),
+							':span_end' => $today->format('Y-m-d H:i:s'),
+							':author_id' => 1,
+							':affected_user_id' => null,
+							':organizational_unit' => 'admin',
+							':subject' => $subject,
+							':misc' => '',
+							':closed' => '',
+							':alert' => 1
+							]);		   		
+					}
+				}
+			}
+		}
+
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
