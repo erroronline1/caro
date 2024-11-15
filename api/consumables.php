@@ -71,48 +71,6 @@ class CONSUMABLES extends API {
 	}
 
 	/**
-	 *                                     _
-	 *   ___ ___ _____ ___ ___ ___ ___ ___| |_ ___
-	 *  |  _| . |     | . | . |   | -_|   |  _|_ -|
-	 *  |___|___|_|_|_|  _|___|_|_|___|_|_|_| |___|
-	 *                |_|
-	 * retrieves most recent approved form for
-	 * sample check or
-	 * incorporation
-	 * and returns the components as body response for modal
-	 */
-	private function components($forContext){
-		$formBody = [];
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_get_by_context', [
-			'values' => [
-				':context' => $forContext
-			]
-		]);
-		if ($forms){
-			foreach($forms as $form){
-				if (PERMISSION::fullyapproved('formapproval', $form['approval'])) break;
-			}
-			foreach(explode(',', $form['content']) as $usedcomponent) {
-				// get latest approved by name
-				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
-					'values' => [
-						':name' => $usedcomponent
-					]
-				]);
-				foreach ($components as $component){
-					if (!$component['hidden'] && PERMISSION::fullyapproved('formapproval', $component['approval']) && PERMISSION::permissionIn($component['restricted_access'])) break;
-					else $component = [];
-				}
-				if ($component){
-					$component['content'] = json_decode($component['content'], true);
-					array_push($formBody, ...$component['content']['content']);
-				}
-			}
-		}
-		return $formBody;
-	}
-
-	/**
 	 *                       _           _         _ _     _   
 	 *   ___ _ _ ___ ___ ___| |_ ___ ___|_|___ ___| |_|___| |_ 
 	 *  | -_|_'_| . | . |  _|  _| . |  _| |  _| -_| | |_ -|  _|
@@ -255,8 +213,8 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
-				$incorporationform = $this->components('product_incorporation_form');
-				if ($product['trading_good']) array_push($incorporationform, ...$this->components('mdr_sample_check_form'));
+				$incorporationform = $this->contextComponents('product_incorporation_form');
+				if ($product['trading_good']) array_push($incorporationform, ...$this->contextComponents('mdr_sample_check_form'));
 
 				// select all products from selected vendor
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -464,7 +422,7 @@ class CONSUMABLES extends API {
 								]
 							]
 						],
-						...$this->components('mdr_sample_check_form')
+						...$this->contextComponents('mdr_sample_check_form')
 					],
 					'options' => [
 						LANG::GET('order.sample_check_cancel') => false,
