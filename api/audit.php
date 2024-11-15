@@ -1301,6 +1301,11 @@ class AUDIT extends API {
 				$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 				$training[':experience_points'] = 0;
 				$training[':file_path'] = '';
+				$training[':evaluation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+					'user' => $_SESSION['user']['name'],
+					'date' => $this->_currentdate->format('Y-m-d H:i'),
+					'content' => [LANG::PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
+				]): null;
 
 				foreach ($users as $user){
 					$training[':user_id'] = $user['id'];
@@ -1430,6 +1435,14 @@ class AUDIT extends API {
 						'id' => '_bulkskillupdate'
 					],
 					'content' => $bulkselection
+				], [
+					'type' => 'checkbox',
+					'attributes' => [
+						'name' => LANG::GET("user.edit_add_training_evaluation")
+					],
+					'content' => [
+						LANG::GET('user.edit_add_training_evaluation_unreasonable') => []
+					]
 				]
 			]
 		];
@@ -1445,7 +1458,7 @@ class AUDIT extends API {
 					) . "'), options:{".
 					"'" . LANG::GET('general.cancel_button') . "': false,".
 					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => {if (response) api.audit('post', 'checks', 'userskills', _client.application.dialogToFormdata(response))})"
+					"}}).then(response => {if (response) api.audit('post', 'checks', 'userskills', _client.application.dialogToFormdata())})"
 				]
 			]
 		]]);

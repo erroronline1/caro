@@ -1281,6 +1281,8 @@ edit_add_training_expires = "Date of expiry"
 edit_add_training_experience_points = "Experience points"
 edit_add_training_document = "Add document"
 edit_add_training_hint = "Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional."
+edit_add_training_evaluation = "Evaluation"
+edit_add_training_evaluation_unreasonable = "Evaluation is unreasonable, this is a mandatory training."
 edit_display_training = "Training"
 edit_delete_training = "Delete training"
 

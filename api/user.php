@@ -421,7 +421,12 @@ class USER extends API {
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+						'user' => $_SESSION['user']['name'],
+						'date' => $this->_currentdate->format('Y-m-d H:i'),
+						'content' => [LANG::PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
+					]): null;
+						if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
 						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
@@ -559,7 +564,12 @@ class USER extends API {
 					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+						'user' => $_SESSION['user']['name'],
+						'date' => $this->_currentdate->format('Y-m-d H:i'),
+						'content' => [LANG::PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
+					]): null;
+						if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
 						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
@@ -680,6 +690,14 @@ class USER extends API {
 							'attributes' => [
 								'name' => LANG::GET('user.edit_add_training_experience_points')
 							],
+						], [
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => LANG::GET("user.edit_add_training_evaluation")
+							],
+							'content' => [
+								LANG::GET('user.edit_add_training_evaluation_unreasonable') => []
+							]
 						], [
 							'type' => 'file',
 							'attributes' => [

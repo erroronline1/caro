@@ -1281,6 +1281,8 @@ edit_add_training_expires = "Ablauf der Gültigkeit"
 edit_add_training_experience_points = "Erfahrungspunkte"
 edit_add_training_document = "Datei hinzufügen"
 edit_add_training_hint = "Ohne einen Titel werden alle anderen Eingaben ignoriert. Ohne Angabe eines Datums wird das heutige verwendet. Ablaufdatum und Erfahrungspunkte sind optional."
+edit_add_training_evaluation = "Bewertung"
+edit_add_training_evaluation_unreasonable = "Eine Schulungsbewertung ist nicht angemessen, da es sich um eine verpflichtende Schulung handelt."
 edit_display_training = "Schulung"
 edit_delete_training = "Schulung löschen"
 
