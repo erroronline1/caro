@@ -195,6 +195,7 @@ class API {
 			foreach($forms as $form){
 				if (PERMISSION::fullyapproved('formapproval', $form['approval'])) break;
 			}
+			if (!PERMISSION::fullyapproved('formapproval', $form['approval'])) return [];
 			foreach(explode(',', $form['content']) as $usedcomponent) {
 				// get latest approved by name
 				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
