@@ -454,7 +454,7 @@ userskills_bulk_user = "Mitarbeiter"
 userskills_training_evaluation = ":user bewertete die Schulung am :date ""
 :evaluation"
 userskills_training_evaluation_pending = "Evaluation pending"
-userskills_notification_message = "Des Mitarbeiters :user Schulung für :training ist für eine Bewertung fällig. Bitte prüfe das im :module-Modul oder delegiere."
+userskills_notification_message = "Des Mitarbeiters :user Schulung für :training vom :date ist für eine Bewertung fällig. Bitte prüfe das im :module-Modul oder delegiere."
 
 ; alle schlüssel sind fest einprogrammiert
 [calendar]

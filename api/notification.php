@@ -109,14 +109,10 @@ class NOTIFICATION extends API {
 					$subject = LANG::GET('audit.userskills_notification_message', [
 						':user' => $users[$user]['name'],
 						':training' => $training['name'],
-						':module' => LANG::GET('menu.audit')
+						':module' => LANG::GET('menu.audit'),
+						':date' => $training['date']
 					]);
-					$reminders = $calendar->search($subject);
-					$open = false;
-					foreach($reminders as $reminder){
-						if (!$reminder['closed']) $open = true;
-					}
-					if (!$open){
+					if (!$calendar->search($subject)){
 						$calendar->post([
 							':type' => 'schedule',
 							':span_start' => $today->format('Y-m-d H:i:s'),
