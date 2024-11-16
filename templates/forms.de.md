@@ -13,6 +13,7 @@
 * [Produkteinführung](#produkteinführung)
 * [Stichprobenprüfung](#stichprobenprüfung)
 * [Schulungsbewertung](#schulungsbewertung)
+* [Lieferantenbewertung](#lieferantenbewertung)
 
 ### Prosthetics 2
 * [Anamnese Prothetik II](#anamnese-prothetik-ii)
@@ -817,6 +818,69 @@ Export for signature compliance
 			"type": "textarea",
 			"attributes": {
 				"name": "Kommentar"
+			}
+		}
+	]
+]
+```
+
+[Content](#content)
+
+## Lieferantenbewertung
+```json
+[
+	[
+		{
+			"type": "checkbox",
+			"attributes": {
+				"name": "Kritikalität der bezogenen Produkte oder Dienstleistungen",
+				"required": true
+			},
+			"content": {
+				"Direkter Einfluss auf die Sicherheit der Medizinprodukte": [],
+				"Indirekter Einfluss auf die Sicherheit der Medizinprodukte": [],
+				"Direkter Einfluss auf die Leistung der Medizinprodukte": [],
+				"Indirekter Einfluss auf die Leistung der Medizinprodukte": [],
+				"Direkter Einfluss auf die regulatorischen Anforderungen der Medizinprodukte": [],
+				"Indirekter Einfluss auf die regulatorischen Anforderungen der Medizinprodukte": [],
+				"Das Unternehmen kann Medizinprodukte nicht ohne die Produkte herstellen":[],
+				"Nur dieser Lieferant kann die Produkte liefern": []
+			}
+		},
+		{
+			"type": "range",
+			"attributes": {
+				"name": "Qualität der Produkte/Dienstleistungen"
+			}
+		},
+		{
+			"type": "range",
+			"attributes": {
+				"name": "kurze Lieferzeit/Pünktlichkeit"
+			}
+		},
+		{
+			"type": "range",
+			"attributes": {
+				"name": "Kooperation"
+			}
+		},
+		{
+			"type": "select",
+			"attributes": {
+				"name": "akkreditiertes QM-System"
+			},
+			"content": {
+				"...": [],
+				"keines": [],
+				"ISO 13485": [],
+				"ISO 9001": []
+			}
+		},
+		{
+			"type": "textarea",
+			"attributes": {
+				"name": "Bemerkung zur Evaluation"
 			}
 		}
 	]
