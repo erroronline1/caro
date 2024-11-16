@@ -295,14 +295,13 @@ class ORDER extends API {
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
-				// get unincorporated
-				$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
 				$allproducts_key = []; // for quicker matching and access
 				$unincorporated = [];
 				$incorporationdenied = [];
 				$pendingincorporation = [];
 				$special_attention = [];
-				foreach($allproducts as $product) {
+				foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention') as $product) {
+					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
 					if ($product['special_attention']) $special_attention[] = $product['id'];
 					if ($product['incorporated'] === '') {
 						$unincorporated[] = $product['id'];
@@ -316,7 +315,6 @@ class ORDER extends API {
 					elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
 						$pendingincorporation[] = $product['id'];
 					}
-					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
 				}
 
 				// get unchecked articles for MDR §14 sample check
@@ -352,8 +350,9 @@ class ORDER extends API {
 					
 					$product = null;
 					if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'] )){
-						if (isset($allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']]))
+						if (isset($allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']])){
 							$product = $allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']];
+						}
 					}
 					// data chunks to be assembled by js _client.order.approved()
 					$data = [
