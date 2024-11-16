@@ -2250,11 +2250,17 @@ Sample response
 {"response":{"msg":"Product Kabinettraspel, halbrund could not be deleted","id":2556,"type":"error"}}
 ```
 
-> GET ./api/api.php/consumables/product/{id}
+> GET ./api/api.php/consumables/product/{id}?{param}
 
 Returns content to create or modify product. If path parameter is provided, the form is prefilled according to database entry.
 
 Returns available information on product if role has no permission to add and edit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id |
+| {param} | query parameter | optional | product information as GET payload to prefill fields on adding unknown products from orders |
 
 Similar to vendor.
 

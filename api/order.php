@@ -383,7 +383,8 @@ class ORDER extends API {
 						'incorporation' => [],
 						'samplecheck' => [],
 						'specialattention' => $product ? array_search($product['id'], $special_attention) !== false : null,
-						'collapsed' => !$permission['orderprocessing']
+						'collapsed' => !$permission['orderprocessing'],
+						'addproduct' => null
 					];
 
 					if ($orderer_group_identify = UTILITY::propertySet($decoded_order_data, 'orderer_group_identify')){
@@ -464,6 +465,12 @@ class ORDER extends API {
 							$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
 						}
 					}
+
+					// request adding unknown product
+					if (PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !$product){
+						$data['addproduct'] = true;
+					}
+
 					array_push($result['data']['order'], array_filter($data, fn($property)=> $property || $property === 0));
 				}
 				break;

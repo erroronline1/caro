@@ -459,8 +459,8 @@ export const api = {
 					};
 				}
 				break;
-			}
-		api.send(method, request, successFn, null, payload, method === "post" || method === 'put');
+		}
+		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
 	},
 
 	/**
@@ -866,8 +866,7 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "exportpricelist"].includes(request[0]))
-			request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "exportpricelist"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,
@@ -972,6 +971,13 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
+					case "product":
+						if (request[2] && typeof request[2] !== "number") {
+							//pass article info as query paramaters for adding unknown articles to database from orders
+							payload = JSON.parse(request[2]);
+							delete request[2];
+						}
+					//no break intentional
 					default:
 						successFn = function (data) {
 							if (data.render) {

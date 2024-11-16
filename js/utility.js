@@ -149,8 +149,7 @@ const _client = {
 			if (!Object.keys(dialogData).length) {
 				formdata = _.getInputs('[method="dialog"]', true);
 				if (!formdata) return false;
-			}
-			else {
+			} else {
 				formdata = new FormData();
 				for (const [key, value] of Object.entries(dialogData)) {
 					formdata.append(key, value);
@@ -848,6 +847,25 @@ const _client = {
 								name: element.samplecheck.state,
 							},
 						});
+				}
+				// append sample check state
+				if (element.addproduct) {
+					order.push({
+						type: "button",
+						attributes: {
+							value: LANG.GET("consumables.edit_product_add_new"),
+							type: "button",
+							onpointerup:
+								"api.purchase('get', 'product', '" +
+								JSON.stringify({
+									article_no: element.ordernumber ? element.ordernumber : "",
+									article_name: element.name ? element.name : "",
+									article_unit: element.unit ? element.unit : "",
+									vendor_name: element.vendor ? element.vendor : "",
+								}) +
+								"');",
+						},
+					});
 				}
 				content.push(order);
 			}
