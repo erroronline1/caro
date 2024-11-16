@@ -97,11 +97,12 @@ prosthetics_II[quality_control] = "Qualitätskontrolle"
 identify[casedocumentation] = "Vorgangsdokumentation" ; patientenversorgung, in zusammenhang mit einem medizinprodukt
 identify[incident] = "Vorkommnis" ; gegebenenfalls meldepflichtige vorkommnisse in zusammenhang mit einem medizinprodukt, im sinne einer verbesserten übersicht von den übrigen vorgängen separiert
 identify[equipmentsurveillance] = "Überwachung von Arbeitsmitteln" ; z.B. je messgerät oder programm
-anonymous[generalrecords] = "Allgemeine Dokumentation"
+identify[generalrecords] = "Allgemeine Dokumentation" ; ermöglicht fortführung von aufzeichnungen zu einem thema
 anonymous[descriptions] = "Verfahrens- oder Arbeitsanweisung"
 notdisplayedinrecords[mdr_sample_check_form] = "MDR §14 Stichprobenprüfung"
 notdisplayedinrecords[product_incorporation_form] = "Produkteinführung"
 notdisplayedinrecords[training_evaluation_form] = "Schulungsbewertung"
+notdisplayedinrecords[vendor_evaluation_form] = "Lieferantenbewertung"
 
 ; administrative fall-bearbeitungsstände
 ; erzeugt ein pseudoformular um entsprechende bearbeitungsstände durch berechtigte nutzer anzugeben
@@ -575,6 +576,7 @@ edit_vendor_isinactive = "inaktiv, lösche Produkte"
 edit_vendor_not_saved = "Lieferant konnte nicht gespeichert werden"
 edit_vendor_saved = "Lieferant :name wurde gespeichert"
 edit_vendor_pricelist_update_error = ", aber die Preisliste konnte nicht importiert werden. Bitte gleiche den Filter mit der Datei ab."
+edit_vendor_last_evaluation = "Letzte Bewertung am :date von :author"
 error_vendor_not_found = "Lieferant :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes."
 error_vendor_forbidden_name = "Der Name :name ist nicht zulässig, bitte versuche etwas anderes."
 message_vendor = "Bereite eine Nachricht an den Lieferanten vor"

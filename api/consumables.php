@@ -1383,11 +1383,10 @@ class CONSUMABLES extends API {
 				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
 				 * thus directories can not be renamed on name changes of vendors
 				 */
-				$vendor_info = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')),
 					'active' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0,
-					'info' => $vendor_info,
+					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_pricelist_filter'))],
 					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name')) . $this->_currentdate->format('Ymd')
@@ -1407,6 +1406,33 @@ class CONSUMABLES extends API {
 				if (isset($_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]) && $_FILES[LANG::PROPERTY('consumables.edit_vendor_documents_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([LANG::PROPERTY('consumables.edit_vendor_documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd')]);
 				}
+
+				// unset all payload variables leaving vendor evaluation inputs
+				foreach ([...array_values($vendor_info),
+					'consumables.edit_existing_vendors',
+					'consumables.edit_existing_vendors_search',
+					'consumables.edit_vendor_name',
+					'consumables.edit_vendor_active',
+					'consumables.edit_vendor_isactive',
+					'consumables.edit_vendor_certificate_validity',
+					'consumables.edit_vendor_pricelist_filter',
+					'consumables.edit_vendor_certificate_update',
+					'consumables.edit_vendor_documents_update'
+				] as $var) {
+					unset($this->_payload->{LANG::PROPERTY($var)});
+				}
+				$evaluation = [];
+				foreach($this->_payload as $key => &$value){
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					/////////////////////////////////////////
+					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+					////////////////////////////////////////
+					if (!$value || $value == 'on') unset($this->_payload->$key);
+					else $evaluation[$key] = $value;
+				}
+				$vendor['evaluation'] = $evaluation;
+				$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
+				$vendor['evaluation']['_date'] = $this-_currentdate->format('Y-m-d');
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
 					'values' => [
@@ -1443,8 +1469,7 @@ class CONSUMABLES extends API {
 
 				$vendor['active'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_active')) === LANG::GET('consumables.edit_vendor_isactive') ? 1 : 0;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_name'));
-				$vendor_info = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
-				$vendor['info'] = $vendor_info;
+				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, LANG::PROPERTY($value)) ? : '', $vendor_info);
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('consumables.edit_vendor_certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
@@ -1484,6 +1509,37 @@ class CONSUMABLES extends API {
 					$vendor['pricelist']['validity'] = '';
 				}
 
+				// unset all payload variables leaving vendor evaluation inputs
+				foreach ([...array_values($vendor_info),
+					'consumables.edit_existing_vendors',
+					'consumables.edit_existing_vendors_search',
+					'consumables.edit_vendor_name',
+					'consumables.edit_vendor_active',
+					'consumables.edit_vendor_isactive',
+					'consumables.edit_vendor_certificate_validity',
+					'consumables.edit_vendor_pricelist_filter',
+					'consumables.edit_vendor_certificate_update',
+					'consumables.edit_vendor_documents_update'
+				] as $var) {
+					unset($this->_payload->{LANG::PROPERTY($var)});
+				}
+				$evaluation = [];
+				foreach($this->_payload as $key => &$value){
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					/////////////////////////////////////////
+					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+					////////////////////////////////////////
+					if (!$value || $value == 'on') unset($this->_payload->$key);
+					else $evaluation[$key] = $value;
+				}
+				$vendor_evaluation_copy = $vendor['evaluation'];
+				if (isset($vendor_evaluation_copy['_author'])) unset($vendor_evaluation_copy['_author'], $vendor_evaluation_copy['_date']);
+				if ($vendor_evaluation_copy != $evaluation) {
+					$vendor['evaluation'] = $evaluation;
+					$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
+					$vendor['evaluation']['_date'] = $this->_currentdate->format('Y-m-d');
+				}
+			
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
 					'values' => [
 						':id' => $vendor['id'],
@@ -1491,7 +1547,8 @@ class CONSUMABLES extends API {
 						':name' => $vendor['name'],
 						':info' => json_encode($vendor['info']),
 						':certificate' => json_encode($vendor['certificate']),
-						':pricelist' => json_encode($vendor['pricelist'])
+						':pricelist' => json_encode($vendor['pricelist']),
+						':evaluation' => json_encode($vendor['evaluation'])
 					]
 				]) !== false) $this->response([
 					'response' => [
@@ -1525,7 +1582,8 @@ class CONSUMABLES extends API {
 					'active' => 0,
 					'info' => '',
 					'certificate' => '{"validity":""}',
-					'pricelist' => '{"validity":"", "filter": ""}'
+					'pricelist' => '{"validity":"", "filter": ""}',
+					'evaluation' => ''
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . LANG::GET('consumables.edit_existing_vendors_new') && !$vendor['id'])
 					$result['response'] = ['msg' => LANG::GET('consumables.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -1631,7 +1689,38 @@ class CONSUMABLES extends API {
 					}
 				}
 				else {
-					// display form for adding a new vendor
+					// display form for adding a new or edit a current vendor
+
+					// prefill evaluation data into valid form
+					function prefill($element, $values){
+						$content = [];
+						foreach($element as $subs){
+							if (!isset($subs['type'])){
+								$content[] = prefill($subs, $values);
+							}
+							else {
+								$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+								if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
+									$settings = explode(' | ', $values[$underscored_name]);
+									foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) $subs['content'][$key]['checked'] = true;
+								}
+								elseif (isset($values[$underscored_name])){
+									$subs['attributes']['value'] = $values[$underscored_name];
+								}
+								$content[] = $subs;
+							}
+						}
+						return $content;
+					};
+					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);
+					$evaluationform = prefill($this->contextComponents('vendor_evaluation_form'), $vendor['evaluation']);
+					if (isset($vendor['evaluation']['_author'])) $evaluationform[0][] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => LANG::GET('consumables.edit_vendor_last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']])
+						]
+					];
+
 					$result['render'] = ['content' => [
 						[
 							[
@@ -1657,61 +1746,64 @@ class CONSUMABLES extends API {
 							]
 						], [
 							[
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_name'),
-									'required' => true,
-									'value' => $vendor['name'] ? : ''
+								[
+									'type' => 'text',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_name'),
+										'required' => true,
+										'value' => $vendor['name'] ? : ''
+									]
+								], [
+									'type' => 'textarea',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_info'),
+										'value' => isset($vendor['info']['infotext']) ? $vendor['info']['infotext']: '',
+										'rows' => 8
+									],
+									'hint' => LANG::GET('consumables.edit_vendor_info_hint')
+								], [
+									'type' => 'email',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_mail'),
+										'value' => isset($vendor['info']['mail']) ? $vendor['info']['mail']: '',
+									]
+								], [
+									'type' => 'tel',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_phone'),
+										'value' => isset($vendor['info']['phone']) ? $vendor['info']['phone']: '',
+									]
+								], [
+									'type' => 'text',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_address'),
+										'value' => isset($vendor['info']['address']) ? $vendor['info']['address']: '',
+									]
+								], [
+									'type' => 'text',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
+										'value' => isset($vendor['info']['sales_representative']) ? $vendor['info']['sales_representative']: '',
+									]
+								], [
+									'type' => 'text',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_customer_id'),
+										'value' => isset($vendor['info']['customer_id']) ? $vendor['info']['customer_id']: '',
+										'id' => 'vendor_customer_id'
+									]
+								], [
+									'type' => 'radio',
+									'attributes' => [
+										'name' => LANG::GET('consumables.edit_vendor_active')
+									],
+									'content' => [
+										LANG::GET('consumables.edit_vendor_isactive') => $isactive,
+										LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
+									]
 								]
-							], [
-								'type' => 'textarea',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_info'),
-									'value' => isset($vendor['info']['infotext']) ? $vendor['info']['infotext']: '',
-									'rows' => 8
-								],
-								'hint' => LANG::GET('consumables.edit_vendor_info_hint')
-							], [
-								'type' => 'email',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_mail'),
-									'value' => isset($vendor['info']['mail']) ? $vendor['info']['mail']: '',
-								]
-							], [
-								'type' => 'tel',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_phone'),
-									'value' => isset($vendor['info']['phone']) ? $vendor['info']['phone']: '',
-								]
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_address'),
-									'value' => isset($vendor['info']['address']) ? $vendor['info']['address']: '',
-								]
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_sales_representative'),
-									'value' => isset($vendor['info']['sales_representative']) ? $vendor['info']['sales_representative']: '',
-								]
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_customer_id'),
-									'value' => isset($vendor['info']['customer_id']) ? $vendor['info']['customer_id']: '',
-									'id' => 'vendor_customer_id'
-								]
-							], [
-								'type' => 'radio',
-								'attributes' => [
-									'name' => LANG::GET('consumables.edit_vendor_active')
-								],
-								'content' => [
-									LANG::GET('consumables.edit_vendor_isactive') => $isactive,
-									LANG::GET('consumables.edit_vendor_isinactive') => $isinactive
-								]
-							]
+							],
+							...$evaluationform,
 						], [
 							[
 								[

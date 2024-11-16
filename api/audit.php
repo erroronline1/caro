@@ -1600,6 +1600,13 @@ class AUDIT extends API {
 				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= LANG::GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
 				$certificate = json_decode($vendor['certificate'], true);
 				if ($certificate['validity']) $info .= LANG::GET('consumables.edit_vendor_certificate_validity') . ' ' . $certificate['validity'] . "\n";
+				if ($vendor['evaluation']){
+					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);
+					$info .= LANG::GET('consumables.edit_vendor_last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']]) . "\n";
+					unset($vendor['evaluation']['_author'], $vendor['evaluation']['_date']);
+					foreach($vendor['evaluation'] as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";
+				}
+
 				$vendorlist[] = [
 					'type' => 'textsection',
 					'attributes' => [

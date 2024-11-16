@@ -177,7 +177,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
         * an alias has been modified
         * it has been ordered 
     * Vendor and product editing is permitted by defined authorized users only.
-    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
+    * Vendor evaluation is implemented within the vendor manager by customizable forms with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
     * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
 * ISO 13485 7.4.3 Verification of procured products
     * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.

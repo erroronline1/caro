@@ -97,11 +97,12 @@ prosthetics_II[quality_control] = "Quality control"
 identify[casedocumentation] = "Case documentation" ; patients treatment process, related to a case of a medical device treatment
 identify[incident] = "Incident" ; occasionally reportable incidents, related to medical device treatment, better overview of cases
 identify[equipmentsurveillance] = "Equipment surveillance" ; track equipment, each their own identifier
-anonymous[generalrecords] = "General company record"
+identify[generalrecords] = "General company record" ; make general records appendable
 anonymous[descriptions] = "Process or work instruction"
 notdisplayedinrecords[mdr_sample_check_form] = "MDR §14 Sample Check"
 notdisplayedinrecords[product_incorporation_form] = "Product incorporation"
 notdisplayedinrecords[training_evaluation_form] = "Training evaluation"
+notdisplayedinrecords[vendor_evaluation_form] = "Vendor evaluation"
 
 ; administrative case state
 ; generates a pseudoform to check states by given permission levels
@@ -575,6 +576,7 @@ edit_vendor_isinactive = "inactive, delete products"
 edit_vendor_not_saved = "Vendor could not be saved"
 edit_vendor_saved = "Vendor :name has been saved"
 edit_vendor_pricelist_update_error = ", but pricelist has not been imported, match filter with file."
+edit_vendor_last_evaluation = "Last evaluation on :date by :author"
 error_vendor_not_found = "Vendor :name could not be found in database, please try something else."
 error_vendor_forbidden_name = "The name :name is not allowed, please use another."
 message_vendor = "Prepare a message to vendor"

@@ -118,6 +118,7 @@ $queries = [
 				"	`certificate` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`pricelist` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`evaluation` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				,
@@ -351,7 +352,8 @@ $queries = [
 				"	info varchar(MAX) NOT NULL," .
 				"	certificate varchar(MAX) NOT NULL," .
 				"	pricelist varchar(MAX) NOT NULL," .
-				"	immutable_fileserver varchar(MAX) NOT NULL" .
+				"	immutable_fileserver varchar(MAX) NOT NULL," .
+				"	evaluation varchar(MAX) NOT NULL," .
 				");"
 				,
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
