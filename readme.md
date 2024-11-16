@@ -1812,7 +1812,7 @@ Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / 
 During developement following outcomes could be noted:
 * 100k distributed records perform well, landing page loads in about 3s.
 * 100k calendar events perform well, landing page loads in about 3s.
-* 1k approved orders process in about 15s on the server side and 5s on the client side on 155k entries within the products database. Cross-linking impedes performance enhancements.
+* 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
 [Content](#content)

@@ -297,6 +297,7 @@ class ORDER extends API {
 					
 				// get unincorporated
 				$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
+				$allproducts_key = []; // for quicker matching and access
 				$unincorporated = [];
 				$incorporationdenied = [];
 				$pendingincorporation = [];
@@ -315,6 +316,7 @@ class ORDER extends API {
 					elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
 						$pendingincorporation[] = $product['id'];
 					}
+					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
 				}
 
 				// get unchecked articles for MDR §14 sample check
@@ -350,13 +352,8 @@ class ORDER extends API {
 					
 					$product = null;
 					if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'] )){
-						$nmbr = array_filter(array_column($allproducts, 'article_no'), fn($number)=> $number === $decoded_order_data['ordernumber_label']);
-						foreach($nmbr as $key => $value){
-							if ($allproducts[$key]['vendor_name'] === $decoded_order_data['vendor_label']) {
-								$product = $allproducts[$key];
-								break;
-							}
-						}
+						if (isset($allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']]))
+							$product = $allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']];
 					}
 					// data chunks to be assembled by js _client.order.approved()
 					$data = [
