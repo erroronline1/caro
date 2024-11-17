@@ -63,9 +63,11 @@ class NOTIFICATION extends API {
 	 */
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$today->setTime(0, 0);
+
+		// schedule certificate request
+		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'], true);
 			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(CONFIG['application']['timezone']));
@@ -93,7 +95,7 @@ class NOTIFICATION extends API {
 			}
 		}
 
-
+		// schedule training evaluation
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 			'replacements' => [
@@ -112,8 +114,13 @@ class NOTIFICATION extends API {
 						':module' => LANG::GET('menu.audit'),
 						':date' => $training['date']
 					]);
-					if (!$calendar->search($subject)){
-						$calendar->post([
+					$reminders = $calendar->search($subject);
+					$open = false;
+					foreach($reminders as $reminder){
+						if (!$reminder['closed']) $open = true;
+					}
+					if (!$open){
+							$calendar->post([
 							':type' => 'schedule',
 							':span_start' => $today->format('Y-m-d H:i:s'),
 							':span_end' => $today->format('Y-m-d H:i:s'),
@@ -126,6 +133,40 @@ class NOTIFICATION extends API {
 							':alert' => 1
 							]);		   		
 					}
+				}
+			}
+		}
+
+		// schedule archived approved orders review
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_archived');
+		$units = [];
+		foreach ($orders as $order){
+			if (!isset($units[$order['organizational_unit']])) $units[$order['organizational_unit']] = 0;
+			$units[$order['organizational_unit']]++;
+		}
+		foreach ($units as $unit => $num){
+			if ($num > CONFIG['limits']['order_approved_archived']) {
+				$subject = LANG::GET('order.alert_achived_limit', [
+					':max' => CONFIG['limits']['order_approved_archived']
+				]);
+				$reminders = $calendar->search($subject);
+				$open = false;
+				foreach($reminders as $reminder){
+					if (!$reminder['closed']) $open = true;
+				}
+				if (!$open){
+					$calendar->post([
+						':type' => 'schedule',
+						':span_start' => $today->format('Y-m-d H:i:s'),
+						':span_end' => $today->format('Y-m-d H:i:s'),
+						':author_id' => 1,
+						':affected_user_id' => null,
+						':organizational_unit' => $unit,
+						':subject' => $subject,
+						':misc' => '',
+						':closed' => '',
+						':alert' => 1
+						]);		   		
 				}
 			}
 		}
