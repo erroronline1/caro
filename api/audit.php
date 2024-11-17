@@ -1155,7 +1155,9 @@ class AUDIT extends API {
 					];
 				}
 			}
-			if (count($content[count($content) - 1]) < 2) unset($content[count($content) - 1]);
+		}
+		foreach($content as $index => $set){
+			if (count($set) < 2) unset($content[$index]);
 		}
 
 		return $content;

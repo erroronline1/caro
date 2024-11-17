@@ -1714,7 +1714,7 @@ class CONSUMABLES extends API {
 						}
 						return $content;
 					};
-					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);
+					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 					$evaluationform = prefill($this->contextComponents('vendor_evaluation_form'), $vendor['evaluation']);
 					if (isset($vendor['evaluation']['_author'])) $evaluationform[0][] = [
 						'type' => 'textsection',
