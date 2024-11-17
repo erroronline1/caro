@@ -1042,7 +1042,7 @@ names[] = "^.{0,3}$" ; weniger als 4 Zeichen
 names[] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
 names[] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle|recordretype|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 [lifespan]
 idle = 2700 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
@@ -1054,6 +1054,7 @@ order_undelivered = 3 ; Tage, nach denen Bereiche daran erinnert werden Ausliefe
 order_unreceived = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen
 sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
 tmp =  24 ; Stunden nach denen Dateien gelöscht werden
+training_evaluation = 62 ; Tage bis an eine Evaluierung erinnert wird
 training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
 
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
@@ -1069,8 +1070,9 @@ records_search_similarity = 20 ; Prozent
 [limits]
 form_image = 2048 ; maximale Pixel für längste Seite
 identifier = 128 ; Zeichenlänge für Identifikator, je länger desto komplexer und fehleranfälliger wird der QR-Code. 17 Zeichen werden für einen Zeitstempel automatisch angefügt
-max_records = 128 ; maximal angezeigte offene Dokumentationen
+max_records = 1024 ; maximal angezeigte offene Dokumentationen
 order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
+order_approved_archived = 512 ; Plant eine Überprüfung der archivierten Bestellungen um aufzuräumen
 qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 record_image = 2048 ; maximale Pixel für längste Seite
 risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
@@ -1111,6 +1113,7 @@ recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewol
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
 texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
+trainingevaluation = "ceo, supervisor" ; Schulungsbewertungen
 users = "ceo, qmo" ; Nutzer anlegen, bearbeiten und löschen
 vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
 

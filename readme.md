@@ -1109,7 +1109,7 @@ names[] = "^.{0,3}$" ; less than 4 characters
 names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[] = "^_" ; names must not start with _
 names[] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle|recordretype|CID|PRD|ECR)$" ; literal terms |-separated
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
 
 [lifespan]
 idle = 2700 ; SECONDS after which a session expires without intermittend request
@@ -1121,6 +1121,7 @@ order_undelivered = 3 ; DAYS, after these unit members will be reminded to mark 
 order_unreceived = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
 sharepoint =  48 ; HOURS, after these files will be deleted
 tmp =  24 ; HOURS, after these files will be deleted
+training_evaluation = 62 ; DAYS until supervisors are reminded to evaluate
 training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews
 
 ; probability factor for similarity of texts in percent
@@ -1136,8 +1137,9 @@ records_search_similarity = 20 ; percent
 [limits]
 form_image = 2048 ; max pixels on longer side
 identifier =  128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
-max_records = 128 ; display of record summaries, more than that will be hidden, still being displayed if filtered
+max_records = 1024 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 order_approvalsignature_image = 2048 ; max pixels on longer side
+order_approved_archived = 512 ; schedules a review to delete unused archived orders to free up space
 qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 record_image = 2048 ; max pixels on longer side
 risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
@@ -1178,6 +1180,7 @@ recordsexport = "user"; exporting records, limit if reasonable to reduce risk of
 recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
+trainingevaluation = "ceo, supervisor" ; evaluate trainings
 users = "ceo, qmo" ; add and edit application users
 vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
 
