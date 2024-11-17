@@ -36,7 +36,7 @@
     * [Anpassung](#anpassung)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [CSV Processor](#csv-prozessor)
-* [Regulatorische Anforderungen an die Software]
+* [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
 * [Code Design Vorlagen](#code-design-vorlagen)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
