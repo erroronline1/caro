@@ -1074,16 +1074,17 @@ class AUDIT extends API {
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 				}
-				SQLQUERY::EXECUTE($this->_pdo, 'user_training_put', [
-					'values' => [
-						':id' => $this->_requestedID,
-						':evaluation' => json_encode([
-							'user' => $_SESSION['user']['name'],
-							'date' => $this->_currentdate->format('Y-m-d H:i'),
-							'content' => (array) $this->_payload
-						])
-					]
-				]);
+				if ((array) $this->_payload)
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_put', [
+						'values' => [
+							':id' => $this->_requestedID,
+							':evaluation' => json_encode([
+								'user' => $_SESSION['user']['name'],
+								'date' => $this->_currentdate->format('Y-m-d H:i'),
+								'content' => (array) $this->_payload
+							])
+						]
+					]);
 			}
 		}
 
@@ -1098,7 +1099,6 @@ class AUDIT extends API {
 
 		$evaluationform = $this->contextComponents('training_evaluation_form');
 		foreach ($users as $user){
-
 			if (
 				$user['id'] < 2 ||
 				!(PERMISSION::permissionFor('trainingevaluation') &&
@@ -1153,8 +1153,9 @@ class AUDIT extends API {
 							"}}).then(response => {if (response) api.audit('put', 'checks', 'trainingevaluation', '" . $row['id'] . "', _client.application.dialogToFormdata())})"
 						]
 					];
-				}	
+				}
 			}
+			if (count($content[count($content) - 1]) < 2) unset($content[count($content) - 1]);
 		}
 
 		return $content;

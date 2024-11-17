@@ -1441,7 +1441,8 @@ class CONSUMABLES extends API {
 						':info' => json_encode($vendor['info']),
 						':certificate' => json_encode($vendor['certificate']),
 						':pricelist' => json_encode($vendor['pricelist']),
-						':immutable_fileserver' => $vendor['immutable_fileserver']
+						':immutable_fileserver' => $vendor['immutable_fileserver'],
+						':evaluation' => $vendor['evaluation']
 					]
 				])) $this->response([
 					'response' => [
@@ -1532,6 +1533,7 @@ class CONSUMABLES extends API {
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 					else $evaluation[$key] = $value;
 				}
+				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 				$vendor_evaluation_copy = $vendor['evaluation'];
 				if (isset($vendor_evaluation_copy['_author'])) unset($vendor_evaluation_copy['_author'], $vendor_evaluation_copy['_date']);
 				if ($vendor_evaluation_copy != $evaluation) {
