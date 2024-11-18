@@ -215,17 +215,17 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.
     * [Order](#order), [Tools](#tools)
 
-| Norm chapter | fulfilled | Method | Reference |
+| Norm chapter | Support | Method | Reference |
 | ---- | ---- | ---- | ---- |
 | 4.1.1 General quality management requirements | | | |
-| 4.1.2 Process regulation | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; Process regulation, sequence and interaction have to be described otherwise | [Risk management](#risk-management) |
+| 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; Process regulation, sequence and interaction have to be described otherwise | [Risk management](#risk-management) |
 | 4.1.3 Process monitoring | | | |
 | 4.1.4 Process control | | | |
 | 4.1.5 Process outsourcing | | | |
 | 4.1.6 Validating use of software | | | |
 | 4.2.1 General record requirements | | | |
 | 4.2.2 Quality management manual | | | |
-| 4.2.3 Medical device file | | | |
+| 4.2.3 Medical device file | structural | | |
 | 4.2.4 Document control | | | |
 | 4.2.5 Record control | | | |
 | 5.1 Management commitment | | | |
@@ -289,6 +289,11 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 | 8.5.2 Corrective measures | | | |
 | 8.5.3 Preventive measures | | | |
 
+Legend:
+* yes: The applications functionality supports all of the chapters requirements
+* structural: Fulfillment is achievable through respective documents
+* partial: The application provides functions to comply to parts of the chapters requirements
+* no: The application does not have supporting functions for this chapter
 
 [Content](#content)
 
