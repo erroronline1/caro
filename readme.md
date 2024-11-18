@@ -218,7 +218,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 | Norm chapter | fulfilled | Method | Reference |
 | ---- | ---- | ---- | ---- |
 | 4.1.1 General quality management requirements | | | |
-| 4.1.2 Process regulation | | | |
+| 4.1.2 Process regulation | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; Process regulation, sequence and interaction have to be described otherwise | [Risk management](#risk-management) |
 | 4.1.3 Process monitoring | | | |
 | 4.1.4 Process control | | | |
 | 4.1.5 Process outsourcing | | | |
