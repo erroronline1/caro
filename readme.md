@@ -289,7 +289,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 | 8.5.2 Corrective measures | | | |
 | 8.5.3 Preventive measures | | | |
 
-Legend:
+Support legend:
 * yes: The applications functionality supports all of the chapters requirements
 * structural: Fulfillment is achievable through respective documents
 * partial: The application provides functions to comply to parts of the chapters requirements
