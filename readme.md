@@ -215,6 +215,81 @@ Data gathering is supposed to be completely digital and finally wants to get rid
     * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.
     * [Order](#order), [Tools](#tools)
 
+| Norm chapter | fulfilled | Method | Reference |
+| ---- | ---- | ---- | ---- |
+| 4.1.1 General quality management requirements | | | |
+| 4.1.2 Process regulation | | | |
+| 4.1.3 Process monitoring | | | |
+| 4.1.4 Process control | | | |
+| 4.1.5 Process outsourcing | | | |
+| 4.1.6 Validating use of software | | | |
+| 4.2.1 General record requirements | | | |
+| 4.2.2 Quality management manual | | | |
+| 4.2.3 Medical device file | | | |
+| 4.2.4 Document control | | | |
+| 4.2.5 Record control | | | |
+| 5.1 Management commitment | | | |
+| 5.2 Customer orientation | | | |
+| 5.3 Quality policy | | | |
+| 5.4.1 Quality goals | | | |
+| 5.4.2 Quality management system planning | | | |
+| 5.5.1 Responsibility and authority | | | |
+| 5.5.2 Management representative | | | |
+| 5.5.3 Internal communication | | | |
+| 5.6.1 General management assessment | | | |
+| 5.6.2 Rating input | | | |
+| 5.6.3 Rating results | | | |
+| 6.1 Provision of resources | | | |
+| 6.2 Human resources | | | |
+| 6.3 Infrastructure | | | |
+| 6.4.1 Working environment | | | |
+| 6.4.2 Contamination control | | | |
+| 7.1 Planning of product realization | | | |
+| 7.2.1 Determination of product requirements | | | |
+| 7.2.2 Evaluation of product requirements | | | |
+| 7.2.3 Customer communication | | | |
+| 7.3.1 General development requirements | | | |
+| 7.3.2 Development planning | | | |
+| 7.3.3 Development input | | | |
+| 7.3.4 Development results | | | |
+| 7.3.5 Development assessment | | | |
+| 7.3.6 Development verification | | | |
+| 7.3.7 Development validation | | | |
+| 7.3.8 Development transfer | | | |
+| 7.3.9 Controlling development changes | | | |
+| 7.3.10 Development files | | | |
+| 7.4.1 Procurement process | | | |
+| 7.4.2 Procurement data | | | |
+| 7.4.3 Verification of procured products | | | |
+| 7.5.1 Control of production and service | | | |
+| 7.5.2 Product cleanliness | | | |
+| 7.5.3 Product installation | | | |
+| 7.5.4 Product maintainance | | | |
+| 7.5.5 Sterile devices requirements | | | |
+| 7.5.6 Validation of production and service | | | |
+| 7.5.7 Validation of sterilization processes and systems | | | |
+| 7.5.8 Product indentification | | | |
+| 7.5.9 Traceability | | | |
+| 7.5.10 Customer property | | | |
+| 7.5.11 Product conservation | | | |
+| 7.6 Surveillance and measuring equipment control | | | |
+| 8.1 General assessment, analysis and improvement processes | | | |
+| 8.2.1 Feedback | | | |
+| 8.2.2 Complaint handling | | | |
+| 8.2.3 Regulatory authorities coverage | | | |
+| 8.2.4 Internal audit | | | |
+| 8.2.5 Process surveillance and assessment | | | |
+| 8.2.6 Product surveillance and assessment | | | |
+| 8.3.1 General non-compliant products control | | | |
+| 8.3.2 Measures on identified non-compliant products in advance of delivery | | | |
+| 8.3.3 Measures on identified non-compliant products after delivery | | | |
+| 8.3.4 Rework | | | |
+| 8.4 Data analysis | | | |
+| 8.5.1 General Improvement | | | |
+| 8.5.2 Corrective measures | | | |
+| 8.5.3 Preventive measures | | | |
+
+
 [Content](#content)
 
 ## Integrated regulatory support
