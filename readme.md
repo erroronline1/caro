@@ -116,105 +116,6 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ![landing page screenshot](http://toh.erroronline.one/caro/landing%20page.png)
 
 ## Intended ISO 13485 goals
-* ISO 13485 4.1.2 Risk based approach
-    * The application has a risk management module to consider, evaluate and handle risks.
-    * also see [Risk management](#risk-management)
-* ISO 13485 4.2.3 Medical device file
-    * All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.
-    * Case documentation forms require a case identifier to ensure respective data is allocated correctly.
-    * also see [Records](#records)
-* ISO 13485 4.2.4 Document control
-    * The application enables you to design reusable form components and forms.
-    * Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).
-    * Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined authorized users only.
-    * Form components and forms need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.
-    * New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.
-    * Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component.
-    * Forms can be exported blank or digitally prefilled by defined authorized users to limit distribution of outdated versions. Authorized form creators can decide for general permission though.
-    * External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting.
-    * also see [Forms](#forms), [Files](#files)
-* ISO 13485 4.2.5 Record control
-    * All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.
-    * Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.
-    * Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.
-    * Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.
-    * also see [Users](#users), [Records](#records)
-* ISO 13485 5.5.1 Responsibility and authority
-    * Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.
-    * Permissions define access to app functions.
-    * Users can be assigned a pin to approve orders.
-    * A user register summarizes all users, also grouped by organizational unit and permission
-    * also see [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables)
-* ISO 13485 5.5.3 Internal communication
-    * The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g.
-        * alerting user groups for approving new form components and forms
-        * alerting user groups about disapproved orders and order state changes
-        * messaging inquiries to ordering users
-        * alerting user groups about scheduled events
-        * alerting about long untouched cases
-    * The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc. 
-    * The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.
-    * The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.
-    * The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.
-    * Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.
-    * also see [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Tools](#tools)
-* ISO 13485 6.2 Human resources
-    * Within user management trainings, expiry dates, experience points and documents can be added.
-    * Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).
-    * An overview of trainings and skill settings can be viewed within the audit module.
-    * Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.
-    * Trainings can be evaluated by defined users with a dedicated form. Due evaluations will be added to schedules.
-    * also see [Users](#users), [Tools](#tools)
-* ISO 13485 7.4.1 Procurement process
-    * Procurement is guided through the application. Vendors and products can be added into the database.
-    * Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.
-    * Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.
-    * Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.
-    * Products are deleted by default on update of the pricelist unless
-        * an incorporation has been made
-        * a sample check has been made
-        * any document to the product has been provided
-        * an alias has been modified
-        * it has been ordered 
-    * Vendor and product editing is permitted by defined authorized users only.
-    * Vendor evaluation is implemented within the vendor manager by customizable forms with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. 
-    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools)
-* ISO 13485 7.4.3 Verification of procured products
-    * MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.
-    * Sample check information is to be enriched through a dedicated form with the respective context. All users (except groups) can gather the required information and commit the check. 
-    * Sample checks can be revoked by authorized users.
-    * also see [Vendor and product management](#vendor-and-product-management), [Order](#order)
-* ISO 13485 7.5.1 Control of production and service
-    * Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.
-    * Form contexts allow the definition as process or work instructions.
-    * The inbuilt calendar assists in scheduling operations.
-    * also see [Forms](#forms), [Records](#records), [Calendar](#calendar)
-* ISO 13485 7.5.8 Product indentification
-    * Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production.
-    * also see [Records](#records)
-* ISO 13485 7.6 Surveillance and measuring equipment control
-    * Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.
-    * Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.
-* ISO 13485 8.2.2 Complaint handling
-    * Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed within the audit module.
-    * Closing records containing a complaint requires action from all defined roles.
-    * see [Tools](#tools)
-* ISO 13485 8.2.4 Internal audit
-    * The audit module aquires data from the application and is partially able to export
-        * records of product incorporation. If currently ordered products miss an incorporation there will be a note.
-        * records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.
-        * a list of current documents in use (forms and their components).
-        * user skills and trainings (with expiries highlighted).
-        * vendor lists with last article update, last MDR sample check and details for certificates (if provided).
-        * order statistics.
-        * complaints.
-        * fulfilment of regulatory issues considered by forms.
-        * risk analyses.
-    * also see [Tools](#tools)
-* ISO 13485 8.4 Data analysis
-    * Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.
-    * [Order](#order), [Tools](#tools)
-
 | Norm chapter | Support | Method | Reference |
 | ---- | ---- | ---- | ---- |
 | 4.1.1 General quality management requirements | | | |
@@ -225,22 +126,22 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 | 4.1.6 Validating use of software | | | |
 | 4.2.1 General record requirements | | | |
 | 4.2.2 Quality management manual | | | |
-| 4.2.3 Medical device file | structural | | |
-| 4.2.4 Document control | | | |
-| 4.2.5 Record control | | | |
+| 4.2.3 Medical device file | structural | &bull; All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.<br/>&bull; Case documentation forms require a case identifier to ensure respective data is allocated correctly. | [Records](#records) |
+| 4.2.4 Document control | yes | &bull; The application enables you to design reusable form components and forms.<br/>&bull; Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).<br/>&bull; Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined authorized users only.<br/>&bull; Form components and forms need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.<br/>&bull; New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.<br/>&bull; Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component. <br/>&bull; Forms can be exported blank or digitally prefilled by defined authorized users to limit distribution of outdated versions. Authorized form creators can decide for general permission though.<br/>&bull; External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting. | [Forms](#forms), [Files](#files) |
+| 4.2.5 Record control | yes | &bull; All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.<br/>&bull; Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.<br/>&bull; Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.<br/>&bull; Accessing any content from the application including confidential personal information of customers requires a personal login from registered users. | [Users](#users), [Records](#records) |
 | 5.1 Management commitment | | | |
 | 5.2 Customer orientation | | | |
 | 5.3 Quality policy | | | |
 | 5.4.1 Quality goals | | | |
 | 5.4.2 Quality management system planning | | | |
-| 5.5.1 Responsibility and authority | | | |
+| 5.5.1 Responsibility and authority | structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A user register summarizes all users, also grouped by organizational unit and permission | [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables) |
 | 5.5.2 Management representative | | | |
-| 5.5.3 Internal communication | | | |
+| 5.5.3 Internal communication | structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new form components and forms, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer. | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Tools](#tools) |
 | 5.6.1 General management assessment | | | |
 | 5.6.2 Rating input | | | |
 | 5.6.3 Rating results | | | |
 | 6.1 Provision of resources | | | |
-| 6.2 Human resources | | | |
+| 6.2 Human resources | structural | &bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed within the audit module.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated form. Due evaluations will be added to schedules. | [Users](#users), [Tools](#tools) |
 | 6.3 Infrastructure | | | |
 | 6.4.1 Working environment | | | |
 | 6.4.2 Contamination control | | | |
@@ -258,42 +159,41 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 | 7.3.8 Development transfer | | | |
 | 7.3.9 Controlling development changes | | | |
 | 7.3.10 Development files | | | |
-| 7.4.1 Procurement process | | | |
+| 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.<br/>&bull; Products are deleted by default on update of the pricelist unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable forms with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.  | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Tools](#tools) |
 | 7.4.2 Procurement data | | | |
-| 7.4.3 Verification of procured products | | | |
-| 7.5.1 Control of production and service | | | |
+| 7.4.3 Verification of procured products | structural | &bull; MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.<br/>&bull; Sample check information is to be enriched through a dedicated form with the respective context. All users (except groups) can gather the required information and commit the check.<br/>&bull; Sample checks can be revoked by authorized users. | [Vendor and product management](#vendor-and-product-management), [Order](#order) |
+| 7.5.1 Control of production and service | | &bull; Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.<br/>&bull; Form contexts allow the definition as process or work instructions.<br/>&bull; The inbuilt calendar assists in scheduling operations. | [Forms](#forms), [Records](#records), [Calendar](#calendar) |
 | 7.5.2 Product cleanliness | | | |
 | 7.5.3 Product installation | | | |
 | 7.5.4 Product maintainance | | | |
 | 7.5.5 Sterile devices requirements | | | |
 | 7.5.6 Validation of production and service | | | |
 | 7.5.7 Validation of sterilization processes and systems | | | |
-| 7.5.8 Product indentification | | | |
+| 7.5.8 Product indentification | structural | &bull; Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production. | [Records](#records) |
 | 7.5.9 Traceability | | | |
 | 7.5.10 Customer property | | | |
 | 7.5.11 Product conservation | | | |
-| 7.6 Surveillance and measuring equipment control | | | |
+| 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable. | [Forms](#forms), [Records](#records), [Calendar](#calendar) |
 | 8.1 General assessment, analysis and improvement processes | | | |
 | 8.2.1 Feedback | | | |
-| 8.2.2 Complaint handling | | | |
+| 8.2.2 Complaint handling | structural | &bull; Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed within the audit module.<br/>&bull; Closing records containing a complaint requires action from all defined roles. | [Records](#records), [Tools](#tools) |
 | 8.2.3 Regulatory authorities coverage | | | |
-| 8.2.4 Internal audit | | | |
+| 8.2.4 Internal audit | partial, structural | The audit module aquires data from the application and is partially able to export<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (forms and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by forms.<br/>&bull; risk analyses. | [Tools](#tools) |
 | 8.2.5 Process surveillance and assessment | | | |
 | 8.2.6 Product surveillance and assessment | | | |
 | 8.3.1 General non-compliant products control | | | |
 | 8.3.2 Measures on identified non-compliant products in advance of delivery | | | |
 | 8.3.3 Measures on identified non-compliant products after delivery | | | |
 | 8.3.4 Rework | | | |
-| 8.4 Data analysis | | | |
+| 8.4 Data analysis | partial, structural | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though. | [Order](#order), [Tools](#tools) |
 | 8.5.1 General Improvement | | | |
 | 8.5.2 Corrective measures | | | |
 | 8.5.3 Preventive measures | | | |
 
 Support legend:
 * yes: The applications functionality supports all of the chapters requirements
-* structural: Fulfillment is achievable through respective documents
 * partial: The application provides functions to comply to parts of the chapters requirements
-* no: The application does not have supporting functions for this chapter
+* structural: Fulfillment is achievable through respective documents
 
 [Content](#content)
 
