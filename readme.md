@@ -3,10 +3,10 @@
 
 ## Content
 * [Aims](#aims)
-    * [Intended regulatory goals](#intended-regulatory-goals)
-    * [Extras](#extras)
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
+    * [Intended regulatory goals](#intended-regulatory-goals)
+    * [Extras](#extras)
     * [Data integrity](#data-integrity)
     * [Tips](#tips)
 * [Modules](#modules)
@@ -115,13 +115,27 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 
 ![landing page screenshot](http://toh.erroronline.one/caro/landing%20page.png)
 
+## Necessary infrastructure 
+You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
+
+Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. After all, administration can not demand going digital without providing a decent infrastructure. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well. 
+
+For technical details see [prerequisites](#prerequisites). 
+
+## What it is not
+Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
+
+The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
+
+Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
+
 ## Intended regulatory goals
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#tools).
 
 Application support legend:
-* yes: The applications functionality supports all of the chapters requirements
-* partial: The application provides functions to comply to parts of the chapters requirements
-* structural: Fulfillment is achievable through respective documents
+* yes: the applications functionality supports all of the chapters requirements
+* partial: the application provides functions to comply to parts of the chapters requirements
+* structural: fulfillment is achievable through respective documents
 
 | Regulatory requirement | Application support | Method | Reference |
 | ---- | ---- | ---- | ---- |
@@ -148,7 +162,7 @@ Application support legend:
 | ISO 13485 5.6.2 Rating input | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
 | ISO 13485 5.6.3 Rating results | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
 | ISO 13485 6.1 Provision of resources | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed within the audit module.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated form. Due evaluations will be added to schedules.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Users](#users), [Tools](#tools) |
+| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed within the audit module.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated form. Due evaluations will be added to schedules.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Tools](#tools) |
 | ISO 13485 6.3 Infrastructure | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context*<br/>&bull; *record with forms with the "Equipment surveillance"-context* | |
 | ISO 13485 6.4.1 Working environment | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
 | ISO 13485 6.4.2 Contamination control | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
@@ -217,20 +231,6 @@ Application support legend:
     * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
 
 [Content](#content)
-
-## Necessary infrastructure 
-You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
-
-Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. After all, administration can not demand going digital without providing a decent infrastructure. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well. 
-
-For technical details see [prerequisites](#prerequisites). 
-
-## What it is not
-Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
-
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
-
-Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
 
 ## Data integrity
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
@@ -1568,7 +1568,7 @@ according to [OpenRegulatory general requirements](https://github.com/openregula
 
 Evidences of conformity according to the documents described above:
 * Clinical Evaluation Report: **not applicable**
-* Intended Use: [Aims](#aims)
+* Intended Use: [Aims](#aims), [Intended regulatory goals](#intended-regulatory-goals)
 * List of Qualified Suppliers: [Ressources](#ressources)
 * MDR General Safety and Performance Requirements Checklist: **not applicable**
 * Medical Device Classification: **not applicable**
@@ -1653,7 +1653,7 @@ Performance evaluation on the product as a medical devide is not applicable. How
 according to [OpenRegulatory tech doc requirements](https://github.com/openregulatory/templates/tree/master/templates/techdoc)
 
 Planning & Feasability
-* Intended Use: [Aims](#aims)
+* Intended Use: [Aims](#aims), [Intended regulatory goals](#intended-regulatory-goals)
 * Medical Device Classification: **not applicable**
 * Product Roadmap: **not essential**
 * Software Development and Maintenance Plan: [Code design patterns](#code-design-patterns)
