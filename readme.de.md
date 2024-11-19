@@ -72,7 +72,7 @@ Anwendungsunterstützung Legende:
 * teilweise: die Anwendung bietet Funktionen um Teilen der Anforderungen des Kapitels zu entsprechen
 * strukturell: die Anforderungen können durch entsprechende Dokumente erfüllt werden
 
-| Regulatorische Anforderung | Anwendungsunterstützung | Methode | Verweis |
+| Regulatorische Anforderung | Anwendungs-unterstützung | Methode | Verweis |
 | ---- | ---- | ---- | ---- |
 | ISO 13485 4.1.1 Allgemeine Anforderungen an das Qualitätsmanagementsystem | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 4.1.2 Prozessfestlegung | teilweise, strukturell | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Risikomanagement](#risikomanagement) |
