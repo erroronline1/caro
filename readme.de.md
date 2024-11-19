@@ -3,13 +3,11 @@
 
 ## Übersicht
 * [Ziele](#ziele)
-    * [Vorgesehene Zielsetzungen für ISO 13485](#vorgesehene-zielsetzungen-für-iso-13485)
-    * [Integrierte regulatorische Unterstützung](#integrierte-regulatorische-unterstützung)
-    * [Extras](#extras)
     * [Erforderliche Infrastruktur](#erforderliche-infrastruktur)
     * [Was es nicht ist](#was-es-nicht-ist)
+    * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
+    * [Extras](#extras)
     * [Datenintegrität](#datenintegrität)
-* [Empfehlungen zur Umsetzung regulatorischer Anforderungen](#empfehlungen-zur-umsetzung-regulatorischer-anforderungen)
     * [Tips](#tips)
 * [Module](#module)
     * [Anwendung](#anwendung)
@@ -52,131 +50,6 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 
 ![landing page screenshot](http://toh.erroronline.one/caro/landing%20page%20de.png)
 
-## Vorgesehene Zielsetzungen für ISO 13485
-* ISO 13485 4.1.2 Risikobasierter Ansatz
-    * Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.
-    * siehe [Risikomanagement](#risikomanagement)
-* ISO 13485 4.2.3 Medizinproduktakte
-    * Alle Aufzeichnungen für Versorgungen laufen zusammen. Exporte beinhalten diese Daten und erreichen damit eine vollständige Dokumentation der Maßnahmen.
-    * Aufzeichnungen für Versorgungen erfordern einen Identifikator um eine Zuordnung sicherzustellen.
-    * siehe [Aufzeichnungen](#aufzeichnungen)
-* ISO 13485 4.2.4 Lenkung von Dokumenten
-    * Die Anwendung ermöglicht es wiederverwendbare Formulare und deren Komponenten zu gestalten.
-    * Nur die jüngsten freigegebenen Komponenten und Formulare sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzwerkverbindung).
-    * Die Erstellung von Komponenten, Formularen, Formular-Paketen und Textvorschlägen ist nur berechtigten Nutzern vorbehalten.
-    * Formulare und deren Komponenten müssen von [berechtigten Nutzern](#nutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Formular selbst freigegeben wurde.
-    * Neue Formulare, deren Komponenten, Formular-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Formulare können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Formulare sind für eine Verwendung nicht erreichbar.
-    * Bilder für Komponenten können nach einer Freigabe nicht mehr gelöscht werden. Ihrem Dateinamen wird der Name der Komponenten und ein Zeitstempel beigefügt. Sie sind dauerhaft auch für ältere Versionen verfügbar, können aber nicht wiederverwendet werden, da sie fester Bestandteil der jeweiligen Komponente sind.
-    * Formulare können primär nur von berechtigten Nutzern blanco oder vorausgefüllt exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen.
-    * Externe Dokumente werden gelenkt und erhalten die Angabe der Einrichtung, des regulatorischen Zusammenhangs, einer möglichen Außerbetriebnahme und des jeweils letzten bearbeitenden Mitarbeiters.
-    * siehe [Formulare](#formulare), [Dateien](#dateien)
-* ISO 13485 4.2.5 Lenkung von Aufzeichnungen
-    * Aufzeichnungen laufen zusammen und sind innerhalb der Anwendung nicht löschbar. Jeder Eintrag erhält einen Zeitstempel und den Namen des übermittelnden Nutzers. Zusammenfassungen führen alle Daten zusammen und stellen sie in der Reihenfolge ihrer Übermittlung dar.
-    * Bilder und Dateien für Aufzeichnungen werden nicht gelöscht. Ihren Dateinamen wird der Identifikator und Zeitstempel der Übermittlung beigefügt.
-    * Aufzeichnungen können jederzeit exportiert werden falls eine zusätzliche Revisionssicherheit gewünscht wird oder die Daten mit dritten Parteien geteilt werden müssen.
-    * Der Zugriff auf die Inhalte der Anwendung inklusive vertraulicher personenbezogener Patientendaten erfordert eine persönliche Anmeldung registrierter Nutzer.
-    * siehe [Nutzer](#nutzer), [Aufzeichnungen](#aufzeichnungen)
-* ISO 13485 5.5.1 Verantwortung und Befugnis
-    * Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.
-    * Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.
-    * Nutzer können eine PIN erhalten um Bestellungen freizugeben.
-    * Das Nutzerverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.
-    * siehe [Nutzer](#nutzer), [Verzeichnis](#verzeichnis), [Laufzeitvariablen](#laufzeitvariablen)
-* ISO 13485 5.5.3 Interne Kommunikation
-    * Die Anwendung hat einen internen [Nachrichtendienst](#unterhaltungen). Dieser Dienst wird von internen Modulen genutzt um eine zielführende Datenübermittlung sicherzustellen, z.B. für
-        * die Benachrichtigung von Nutzergruppen für die Freigabe von Formularen und deren Komponenten
-        * die Benachrichtigung von Nutzergruppen über zurückgewiesene Bestellungen und geänderten Bestellstati
-        * Benachrichtigungen zu zusätzlich erforderlichen Rechechen zu einer Bestellung an den Besteller
-        * Benachrichtigung von Nutzergruppen zu geplanten Ereignissen
-        * Benachrichtigungen über länger unbearbeitete Vorgänge
-    * Die Anwendung hat einen integrierten Kalender. Dieser soll die Aufgabenplanung und Bearbeitung zeitkritischer wiederkehrender Ereignisse wie Kalibrationsmaßnahmen und dergleichen unterstützen.
-    * Die Anwendung hat ein Bestellmodul. Bestellungen können vorbereitet und freigegeben werden. Der Einkauf hat alle erforderlichen Daten aus der Lieferantenpreisliste vorliegen um die Bestellung bearbeiten zu können; die Markierung des Bestellstatus erlaubt eine zeitnahe Rückmeldung an den Besteller.
-    * Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, welche die Möglichkeiten des Nachrichtendienstes übersteigen.
-    * Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offener Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.
-    * Formulare können auf andere Formulare verweisen. Dabei können diese nur angezeigt werden (z.B. Verfahrens- oder Arbeitsanweisungen) oder mit Übernahme des Identifikators für einen reibungslosen Transfer sorgen.
-    * siehe [Unterhaltungen](#unterhaltungen), [Kalender](#kalender), [Bestellung](#bestellung), [Dateien](#dateien), [Werkzeuge](#werkzeuge)
-* ISO 13485 6.2 Personelle Ressourcen
-    * innerhalb der Nutzerverwaltung können Schulungen, deren Ablaufdaten, Erfahrungspunkte und anhängende Dokumente hinzugefügt werden.
-    * Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.
-    * Eine Übersicht über die Schulungen und Fähigkeiten ist im Audit-Modul einsehbar.
-    * Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Eine Übersicht kann im Audit-Modul exportiert werden.
-    * Schulungen können durch berechtigte Nutzer durch ein eigenes Formular bewertet werden. Fällige Bewertungen werden in den Kalender eingetragen.
-    * siehe [Nutzer](#nutzer), [Anpassung](#anpassung), [Werkzeuge](#werkzeuge)
-* ISO 13485 7.4.1 Beschaffungsprozess
-    * Die Beschaffung wird durch die Anwendung begleitet. Lieferanten und Produkte können zur Datenbank hinzugefügt werden.
-    * Lieferanteneinträge können durch Dokumente, Zertifikate und deren Gültigkeitsdaten ergänzt werden. Die Gültigkeit von Zertifikaten können angezeigt und im Audit-Modul exportiert werden. Lieferanten können als inaktiv markiert, jedoch nicht gelöscht werden. Produkte, die deaktiviert werden sind über das Bestellmodul nicht erreichbar.
-    * Produkte können mit Dokumenten ergänzt werden, welche nicht gelöscht werden. Den Dateinamen werden der Lieferantenname, der Zeitstempel der Übermittlung und die Artikelnummer angefügt.
-    * Produkte sollen eingeführt werden. Produkteinführungen können durch berechtigte Nutzer freigegeben, verwehrt oder entzogen werden. Alle Nutzer (außer Gruppen) sammeln zuvor die erforderlichen Informationen. Produkteinführungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt.
-    * Produkte werden im Falle einer Preislistenaktualisierung automatisch gelöscht, es sei denn
-        * es fand eine Produkteinführung statt
-        * es wurde eine Stichprobenprüfung durchgeführt
-        * es wurde ein Dokument beigefügt
-        * es wurde ein Alias festgelegt
-        * es wurde schon einmal bestellt
-    * Änderungen an Produkteinträgen ist nur für berechtigte Nutzer möglich.
-    * Eine Lieferantenbewertung ist in der Lieferantenverwaltung durch einschlägige Formulare entsprechenden Kontexts implementiert und wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt.
-    * siehe [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Werkzeuge](#werkzeuge)
-* ISO 13485 7.4.3 Verifizierung von beschafften Produkten
-    * Die Stichprobenprüfung nach MDR §14 erbittet eine Prüfung für jedes [als Handelsware definierte](#importierung-von-lieferantenpreislisten) Produkt, sofern die letzte zurückliegende Prüfung innerhalb des Sortiments dieses Lieferanten die mdr14_sample_interval-Zeitspanne überschreitet, z.B. einmal jährlich. Dies betrifft alle Produkte welche nicht innerhalb der mdr14_sample_reusable-Zeitspanne liegen, welche ebenfalls für jeden Lieferanten individuell festgelegt werden kann, wenn es das Sortiment erfordert. Beide Werte erhalten durch die [config.ini](#laufzeitvariablen) einen Standardwert.
-    * Stichprobenprüfungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt. Alle Nutzer (außer Gruppen) sammeln die erforderlichen Informationen.
-    * Stichprobenprüfungen können durch berechtigte Nutzer zurückgezogen werden.
-    * siehe [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung)
-* ISO 13485 7.5.1 Lenkung der Produktion und Dienstleistungserbringung
-    * Entsprechende Formulare zeichnen die Schritte der Fertigung auf. Mit dem Zugriff auf die Dokumentationen ist der aktuelle Status erkennbar. Ist beispielsweise eine Aufzeichnung für einen Fertigungsabschnitt vorhanden, bei dem die Arbeitsschritte festgelegt werden, kann das Formular auch ein Auswahlfeld für die Erledigung beinhalten. In einem ersten Dokumentationsschritt können die Schritte festgelegt werden, in einem folgenden kann das Formular erneut verwendet und das Auswahlfeld markiert werden. Damit wird der Zeitpunkt und eintragende Nutzer aufgezeichnet.
-    * Formular-Kontexte erlauben eine Zuordnung als Verfahrens- oder Arbeitsanweisungen.
-    * Der integrierte Kalender unterstützt bei der Planung von Arbeiten.
-    * siehe [Formulare](#formulare), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender)
-* ISO 13485 7.5.8 Identifizierung
-    * Aufzeichnungen erfordern einen Identifikator. Dieser Identifikator ist derzeit als QR-Code implementiert, welcher exportiert und ausgedruckt, sowie mit dem integrierten Scanner ausgelesen werden kann. Aufkleberbögen mit dem Code können auch zur Kennzeichnung von Produkten und Komponenten während der Herstellung verwendet werden.
-    * siehe [Aufzeichnungen](#aufzeichnungen-1)
-* ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln
-    * Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugeteilt bekommen.
-    * Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren.
-* ISO 13485 8.2.2 Reklamationsbearbeitung
-    * Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt. Eine Übersicht kann im Audit-Modul angezeigt werden.
-    * Das als abgeschlossen Kennzeichnen von Aufzeichnungen, die eine Reklamation beinhalten erfordert eine Aktion aller definierter Rollen.
-    * siehe [Werkzeuge](#werkzeuge)
-* ISO 13485 8.2.4 Internes Audit
-    * Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für
-        * Aufzeichnungen über Produkteinführungen. Sofern aktuell bestellte Artikel nicht berücksichtigt sind erfolgt ein Hinweis.
-        * Aufzeichnungen über Stichprobenprüfungen. Sofern aktuell Lieferanten für eine Prüfung fällig sind erfolgt ein Hinweis.
-        * eine Übersicht über die aktuell gültigen Formulare und deren Komponenten.
-        * Fähigkeiten und Schulungen der Mitarbeiter mit ggf. markierten Ablaufdaten.
-        * Lieferantenlisten mit den jeweiligen letzten Preislistenaktualisierungen, der letzten Stichprobenprüfung und Details zu Zertifikaten sofern bereitgestellt.
-        * Bestellstatistiken.
-        * Reklamationen.
-        * die Berücksichtung regulatorischer Anforderungen durch verwendete Formulare und Dokumente.
-        * Risikoanalysen.
-    * siehe [Werkzeuge](#werkzeuge)
-* ISO 13485 8.4 Datenanalyse
-    * Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten.
-    * siehe [Bestellung](#bestellung), [Werkzeuge](#werkzeuge)
-
-[Übersicht](#übersicht)
-
-## Integrierte regulatorische Unterstützung
-* MPDG §83
-    * Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt.
-    * siehe [Nutzer](#nutzer)
-* ISO 14971 Anwendung des Risikomanagements auf Medizinprodukte
-    * Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.
-    * Anhang E ist für die Nutzung standardmäßig verbereitet.
-    * siehe [Risikomanagement](#risikomanagement) 
-
-[Übersicht](#übersicht)
-
-## Extras
-* Textempfehlungen
-    * Standard- und anpassbare [Textvorschläge](#textvorschläge) können definiert werden um eine durchgängige Sprachregelung zu unterstützen.
-* Zeiterfassung
-    * Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. in den [Kalender](#kalender) eintragen. Die Einträge können unter Berücksichtigung von Arbeitszeitgesetzen als Dokumentation exportiert werden.
-* Dateiverteilung
-    * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien und einen [STL-Betrachter](#werkzeuge) um vereinfacht Informationen austauschen zu können.
-* CSV-Filterung
-    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
-
-[Übersicht](#übersicht)
-
 ## Erforderliche Infrastruktur 
 Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Formularen oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
 
@@ -191,6 +64,110 @@ Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb
 
 Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Bereiche jederzeit und zudem nach Ablauf einer definierten Zeit nach Auslieferung gelöscht werden. Dieses Modul dient in erster Linie der internen Kommunikation und nicht einer dauerhaften Dokumentation.
 
+## Vorgesehene regulatorische Zielsetzungen
+Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selbst aufgestellt werden. Die meisten regulatorischen Anforderungen werden durch Formulare erfüllt. Auf diese Weise wird eine zuverlässige Versionskontrolle und Freigabe, sowie eine Prüfung der Erfüllung der Anforderungen innerhalb des [Audit-Moduls](#werkzeuge) sichergestellt.
+
+Anwendungsunterstützung Legende:
+* ja: die Anwendung unterstützt alle Anforderungen des Kapitels
+* teilweise: die Anwendung bietet Funktionen um Teilen der Anforderungen des Kapitels zu entsprechen
+* strukturell: die Anforderungen können durch entsprechende Dokumente erfüllt werden
+
+| Regulatorische Anforderung | Anwendungsunterstützung | Methode | Verweis |
+| ---- | ---- | ---- | ---- |
+| ISO 13485 4.1.1 Allgemeine Anforderungen an das Qualitätsmanagementsystem | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 4.1.2 Prozessfestlegung | teilweise, strukturell | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Risikomanagement](#risikomanagement) |
+| ISO 13485 4.1.3 Prozessüberwachung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 4.1.4 Prozesslenkung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 4.1.5 Ausgegliederte Prozesse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 4.1.6 Validierung der Anwendung von Computersoftware | structural | &bull; Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Software kann ebenfalls einen individuellen Identifikator zugeteilt bekommen.<br/>&bull; Computersoftware und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel (7.6) betrachtet werden.<br/>&bull; *Aufzeichnung über Formulare mit "Überwachung von Arbeitsmitteln"-Kontext* | |
+| ISO 13485 4.2.1 Allgemeine Anforderungen an Dokumentation | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 4.2.2 Qualitätsmanagementhandbuch | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 4.2.3 Medizinproduktakte | strukturell | &bull; Alle Aufzeichnungen für Versorgungen laufen zusammen. Exporte beinhalten diese Daten und erreichen damit eine vollständige Dokumentation der Maßnahmen.<br/>&bull; Aufzeichnungen für Versorgungen erfordern einen Identifikator um eine Zuordnung sicherzustellen. | [Aufzeichnungen](#aufzeichnungen) |
+| ISO 13485 4.2.4 Lenkung von Dokumenten | ja | &bull; Die Anwendung ermöglicht es wiederverwendbare Formulare und deren Komponenten zu gestalten.<br/>&bull; Nur die jüngsten freigegebenen Komponenten und Formulare sind für Nutzer erreichbar [so lange eine Netzwerkverbindung besteht](#handhabe-der-netzwerkverbindung).<br/>&bull; Die Erstellung von Komponenten, Formularen, Formular-Paketen und Textvorschlägen ist nur berechtigten Nutzern vorbehalten.<br/>&bull; Formulare und deren Komponenten müssen von [berechtigten Nutzern](#nutzer) freigegeben werden. Die jeweiligen Nutzergruppen werden mit dem Speichern neuer Elemente vom System benachrichtigt. Jedes Mitglied der Gruppen kann die Freigabe erteilen, da davon ausgegangen wird, dass sich diese ihrer Verantwortung bewusst sind. Eine nutzerspezifische Zuordnung wird hinsichtlich einer Wiederverwendung von Elementen vermieden. Nicht freigegebene Komponenten werden nicht angezeigt, selbst wenn das Formular selbst freigegeben wurde.<br/>&bull; Neue Formulare, deren Komponenten, Formular-Pakete und Textvorschläge werden als neuer Eintrag in die Datenbank gelegt. Jeder Eintrag erhält dabei einen Zeitstempel und die Angabe des erstellenden Nutzers. Innerhalb der jeweiligen Verwaltung wird primär eine der jüngsten freigegebenen Versionen ausgewählt. Eine erweiterte Auswahl ermöglicht aber den Zugriff auf eine beliebige vorherige Version. Komponenten und Formulare können nach einer vollständigen Freigabe nicht mehr gelöscht werden. Nicht freigegebene Komponenten und Formulare sind für eine Verwendung nicht erreichbar.<br/>&bull; Bilder für Komponenten können nach einer Freigabe nicht mehr gelöscht werden. Ihrem Dateinamen wird der Name der Komponenten und ein Zeitstempel beigefügt. Sie sind dauerhaft auch für ältere Versionen verfügbar, können aber nicht wiederverwendet werden, da sie fester Bestandteil der jeweiligen Komponente sind.<br/>&bull; Formulare können primär nur von berechtigten Nutzern blanco oder vorausgefüllt exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden. Ersteller der Formulare können jedoch eine allgemeine Erlaubnis erteilen.<br/>&bull; Externe Dokumente werden gelenkt und erhalten die Angabe der Einrichtung, des regulatorischen Zusammenhangs, einer möglichen Außerbetriebnahme und des jeweils letzten bearbeitenden Mitarbeiters. | [Formulare](#formulare), [Dateien](#dateien) |
+| ISO 13485 4.2.5 Lenkung von Aufzeichnungen | ja | &bull; Aufzeichnungen laufen zusammen und sind innerhalb der Anwendung nicht löschbar. Jeder Eintrag erhält einen Zeitstempel und den Namen des übermittelnden Nutzers. Zusammenfassungen führen alle Daten zusammen und stellen sie in der Reihenfolge ihrer Übermittlung dar.<br/>&bull; Bilder und Dateien für Aufzeichnungen werden nicht gelöscht. Ihren Dateinamen wird der Identifikator und Zeitstempel der Übermittlung beigefügt.<br/>&bull; Aufzeichnungen können jederzeit exportiert werden falls eine zusätzliche Revisionssicherheit gewünscht wird oder die Daten mit dritten Parteien geteilt werden müssen.<br/>&bull; Der Zugriff auf die Inhalte der Anwendung inklusive vertraulicher personenbezogener Patientendaten erfordert eine persönliche Anmeldung registrierter Nutzer. | [Nutzer](#nutzer), [Aufzeichnungen](#aufzeichnungen) |
+| ISO 13485 5.1 Verantwortung der Leitung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 5.2 Kundenorientierung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 5.3 Qualitätspolitik | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 5.4.1 Qualitätsziele | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 5.4.2 Planung des Qualitätsmanagementsystems | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 5.5.1 Verantwortung und Befugnis | strukturell | &bull; Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.<br/>&bull; Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.<br/>&bull; Nutzer können eine PIN erhalten um Bestellungen freizugeben.<br/>&bull; Das Nutzerverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Verzeichnis](#verzeichnis), [Laufzeitvariablen](#laufzeitvariablen) |
+| ISO 13485 5.5.2 Beauftragter der Leitung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 5.5.3 Interne Kommunikation | ja, strukturell | &bull; Die Anwendung hat einen internen [Nachrichtendienst](#unterhaltungen). Dieser Dienst wird von internen Modulen genutzt um eine zielführende Datenübermittlung sicherzustellen, z.B. für die Benachrichtigung von Nutzergruppen für die Freigabe von Formularen und deren Komponenten, die Benachrichtigung von Nutzergruppen über zurückgewiesene Bestellungen und geänderten Bestellstati, Benachrichtigungen zu zusätzlich erforderlichen Rechechen zu einer Bestellung an den Besteller, Benachrichtigung von Nutzergruppen zu geplanten Ereignissen, Benachrichtigungen über länger unbearbeitete Vorgänge<br/>&bull; Die Anwendung hat einen integrierten Kalender. Dieser soll die Aufgabenplanung und Bearbeitung zeitkritischer wiederkehrender Ereignisse wie Kalibrationsmaßnahmen und dergleichen unterstützen.<br/>&bull; Die Anwendung hat ein Bestellmodul. Bestellungen können vorbereitet und freigegeben werden. Der Einkauf hat alle erforderlichen Daten aus der Lieferantenpreisliste vorliegen um die Bestellung bearbeiten zu können; die Markierung des Bestellstatus erlaubt eine zeitnahe Rückmeldung an den Besteller.<br/>&bull; Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, welche die Möglichkeiten des Nachrichtendienstes übersteigen.<br/>&bull; Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offener Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.<br/>&bull; Formulare können auf andere Formulare verweisen. Dabei können diese nur angezeigt werden (z.B. Verfahrens- oder Arbeitsanweisungen) oder mit Übernahme des Identifikators für einen reibungslosen Transfer sorgen.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Unterhaltungen](#unterhaltungen), [Kalender](#kalender), [Bestellung](#bestellung), [Dateien](#dateien), [Werkzeuge](#werkzeuge) |
+| ISO 13485 5.6.1 Allgemeine Anforderung an Managementbewertung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 5.6.2 Eingaben für die Bewertung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 5.6.3 Ergebnisse der Bewertung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 6.1 Bereitstellung von Ressourcen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 6.2 Personelle Ressourcen | ja, strukturell | &bull; innerhalb der Nutzerverwaltung können Schulungen, deren Ablaufdaten, Erfahrungspunkte und anhängende Dokumente hinzugefügt werden.<br/>&bull; Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.<br/>&bull; Eine Übersicht über die Schulungen und Fähigkeiten ist im Audit-Modul einsehbar.<br/>&bull; Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Eine Übersicht kann im Audit-Modul exportiert werden.<br/>&bull; Schulungen können durch berechtigte Nutzer durch ein eigenes Formular bewertet werden. Fällige Bewertungen werden in den Kalender eingetragen.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Anpassung](#anpassung), [Werkzeuge](#werkzeuge) |
+| ISO 13485 6.3 Infrastruktur | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Allgemeine Dokumentation"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Überwachung von Arbeitsmitteln"-Kontext* | |
+| ISO 13485 6.4.1 Arbeitsumgebung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 6.4.2 Lenkung der Kontamination | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 7.1 Planung der Produktrealisierung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| ISO 13485 7.2.1 Ermittlung der Anforderungen bzgl. des Produkts | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| ISO 13485 7.2.2 Bewertung der Anforderungen bzgl. des Produkts | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| ISO 13485 7.2.3 Kommunikation mit Kunden | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| ISO 13485 7.3.1 Allgemeine Anforderungen an Entwicklung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 7.3.2 Entwicklungsplanung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.3 Entwicklungseingaben | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.4 Entwicklungsergebnisse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.5 Entwicklungsbewertung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.6 Entwicklungsverifizierung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.7 Entwicklungsvalidierung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.8 Übertragung der Entwicklung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.9 Lenkung von Entwicklungsänderungen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.3.10 Entwicklungsakten | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.4.1 Beschaffungsprozess | ja, strukturell | &bull; Die Beschaffung wird durch die Anwendung begleitet. Lieferanten und Produkte können zur Datenbank hinzugefügt werden.<br/>&bull; Eine Lieferantenbewertung ist in der Lieferantenverwaltung durch einschlägige Formulare entsprechenden Kontexts implementiert und wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt.<br/>&bull; Lieferanteneinträge können durch Dokumente, Zertifikate und deren Gültigkeitsdaten ergänzt werden. Die Gültigkeit von Zertifikaten können angezeigt und im Audit-Modul exportiert werden. Lieferanten können als inaktiv markiert, jedoch nicht gelöscht werden. Produkte, die deaktiviert werden sind über das Bestellmodul nicht erreichbar.<br/>&bull; Produkte können mit Dokumenten ergänzt werden, welche nicht gelöscht werden. Den Dateinamen werden der Lieferantenname, der Zeitstempel der Übermittlung und die Artikelnummer angefügt.<br/>&bull; Produkte sollen eingeführt werden. Produkteinführungen können durch berechtigte Nutzer freigegeben, verwehrt oder entzogen werden. Alle Nutzer (außer Gruppen) sammeln zuvor die erforderlichen Informationen. Produkteinführungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt.<br/>&bull; Produkte werden im Falle einer Preislistenaktualisierung automatisch gelöscht, es sei denn es fand eine Produkteinführung statt, es wurde eine Stichprobenprüfung durchgeführt, es wurde ein Dokument beigefügt, es wurde ein Alias festgelegt, es wurde schon einmal bestellt<br/>&bull; Änderungen an Produkteinträgen ist nur für berechtigte Nutzer möglich. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Werkzeuge](#werkzeuge) |
+| ISO 13485 7.4.2 Beschaffungsangaben | teilweise | &bull; Bestellungen nutzen bevorzugt die Angaben der herstellereigenen Preislisten.<br/>&bull; Aufzeichnungen über Bestellungen muss jedoch über eine Drittsoftware (ERP) umgesetzt werden. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung) |
+| ISO 13485 7.4.3 Verifizierung von beschafften Produkten | ja, strukturell | &bull; Die Stichprobenprüfung nach MDR §14 erbittet eine Prüfung für jedes [als Handelsware definierte](#importierung-von-lieferantenpreislisten) Produkt, sofern die letzte zurückliegende Prüfung innerhalb des Sortiments dieses Lieferanten die mdr14_sample_interval-Zeitspanne überschreitet, z.B. einmal jährlich. Dies betrifft alle Produkte welche nicht innerhalb der mdr14_sample_reusable-Zeitspanne liegen, welche ebenfalls für jeden Lieferanten individuell festgelegt werden kann, wenn es das Sortiment erfordert. Beide Werte erhalten durch die [config.ini](#laufzeitvariablen) einen Standardwert.<br/>&bull; Stichprobenprüfungen werden durch eigene Formulare mit dem entsprechenden Kontext umgesetzt. Alle Nutzer (außer Gruppen) sammeln die erforderlichen Informationen.<br/>&bull; Stichprobenprüfungen können durch berechtigte Nutzer zurückgezogen werden.<br/>&bull; *Bereitstellung von Formularen mit "MDR §14 Stichprobenprüfung"- und "Produkteinführung"-Kontext* | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung) |
+| ISO 13485 7.5.1 Lenkung der Produktion und Dienstleistungserbringung | teilweise, strukturell | &bull; Entsprechende Formulare zeichnen die Schritte der Fertigung auf. Mit dem Zugriff auf die Dokumentationen ist der aktuelle Status erkennbar. Ist beispielsweise eine Aufzeichnung für einen Fertigungsabschnitt vorhanden, bei dem die Arbeitsschritte festgelegt werden, kann das Formular auch ein Auswahlfeld für die Erledigung beinhalten. In einem ersten Dokumentationsschritt können die Schritte festgelegt werden, in einem folgenden kann das Formular erneut verwendet und das Auswahlfeld markiert werden. Damit wird der Zeitpunkt und eintragende Nutzer aufgezeichnet.<br/>&bull; Formular-Kontexte erlauben eine Zuordnung als Verfahrens- oder Arbeitsanweisungen.<br/>&bull; Der integrierte Kalender unterstützt bei der Planung von Arbeiten. | [Formulare](#formulare), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender) |
+| ISO 13485 7.5.2 Sauberkeit von Produkten | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 7.5.3 Tätigkeiten bei der Installation | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.5.4 Tätigkeiten zur Instandhaltung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.5.5 Anforderungen für sterile Medizinprodukte | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 7.5.6 Validierung der Prozesse zur Produktion und Dienstleistungerbringung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.5.7 Validierung von Sterilisationsprozessen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"- oder Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 7.5.8 Identifizierung | structural | &bull; Aufzeichnungen erfordern einen Identifikator. Dieser Identifikator ist derzeit als QR-Code implementiert, welcher exportiert und ausgedruckt, sowie mit dem integrierten Scanner ausgelesen werden kann. Aufkleberbögen mit dem Code können auch zur Kennzeichnung von Produkten und Komponenten während der Herstellung verwendet werden. | [Aufzeichnungen](#aufzeichnungen-1) |
+| ISO 13485 7.5.9 Rückverfolgbarkeit | strukturell | &bull; Wenn die Branchensoftware in der Lage ist Barcodes für Waren zu erzeugen, können Mehrfach-Scannerfelder innerhalb der Vorgangsdokumentation eine Rückverfolgung unterstützen. | |
+| ISO 13485 7.5.10 Eigentum des Kunden | | | |
+| ISO 13485 7.5.11 Produkterhaltung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 7.6 Lenkung von Überwachungs- und Messmitteln | strukturell | &bull; Entsprechende Formulare erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Messmittel können ebenfalls einen individuellen Identifikator zugeteilt bekommen.<br/>&bull; Eine Berücksichtigung eines Kalendereintrags innerhalb dieser Formulare kann dabei unterstützen zukünftige Ereignisse zu planen und Mitarbeiter zu informieren. | [Formulare](#formulare), [Aufzeichnungen](#aufzeichnungen-1), [Kalender](#kalender) |
+| ISO 13485 8.1 Allgemeine Überwachungs-, Mess-, Analyse- und Verbesserungsprozesse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.2.1 Rückmeldungen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.2.2 Reklamationsbearbeitung | strukturell | &bull; Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Reklamation erfolgen. Betroffene Aufzeichnungen werden in der Übersicht markiert und der Zeitstempel der jeweiligen Einträge um einen entsprechenden Kommentar ergänzt. Eine Übersicht kann im Audit-Modul angezeigt werden.<br/&bull;> Das als abgeschlossen Kennzeichnen von Aufzeichnungen, die eine Reklamation beinhalten erfordert eine Aktion aller definierter Rollen. | [Aufzeichnungen](#aufzeichnungen-1), [Werkzeuge](#werkzeuge) |
+| ISO 13485 8.2.3 Berichterstattung an Regulierungsbehörden | structural | &bull; Innerhalb der Formulare für die Vorkommnisaufzeichnungen können Links z.B. zu den [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) eingefügt werden um die erforderlichen Codes zu finden.<br/>&bull; *Aufzeichnung über Formulare mit "Vorkommnis"-Kontext* | |
+| ISO 13485 8.2.4 Internes Audit | teilweise, strukturell | Das Audit-Modul sammelt Daten aus der Anwendung und ist in der Lage Exporte zur Verfügung zu stellen für<br/&bull;> Aufzeichnungen über Produkteinführungen. Sofern aktuell bestellte Artikel nicht berücksichtigt sind erfolgt ein Hinweis.<br/&bull;> Aufzeichnungen über Stichprobenprüfungen. Sofern aktuell Lieferanten für eine Prüfung fällig sind erfolgt ein Hinweis.<br/&bull;> eine Übersicht über die aktuell gültigen Formulare und deren Komponenten.<br/&bull;> Fähigkeiten und Schulungen der Mitarbeiter mit ggf. markierten Ablaufdaten.<br/&bull;> Lieferantenlisten mit den jeweiligen letzten Preislistenaktualisierungen, der letzten Stichprobenprüfung und Details zu Zertifikaten sofern bereitgestellt.<br/&bull;> Bestellstatistiken.<br/&bull;> Reklamationen.<br/&bull;> die Berücksichtung regulatorischer Anforderungen durch verwendete Formulare und Dokumente.<br/&bull;> Risikoanalysen. | [Werkzeuge](#werkzeuge) |
+| ISO 13485 8.2.5 Überwachung und Messung von Prozessen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.2.6 Überwachung und Messung des Produkts | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Formulare](#formulare), [Aufzeichnungen](#aufzeichnungen-1) |
+| ISO 13485 8.3.1 Lenkung nichtkonformer Produkte | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.3.2 Maßnahmen als Reaktion auf vor der Auslieferung festgestellte nichtkonforme Produkte | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.3.3 Maßnahmen als Reaktion auf nach der Auslieferung festgestellte nichtkonforme Produkte | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.3.4 Nacharbeit | ja | &bull; Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Nacharbeit erfolgen. Formulare unterscheiden sich jedoch primär nicht, daher folgt die Dokumentation von Maßnahmen den selben Aufzeichnungsprozessen wie eine übliche Versorgungsdokumentation. | [Aufzeichnungen](#aufzeichnungen-1) |
+| ISO 13485 8.4 Datenanalyse | teilweise, strukturell | &bull; Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen im Audit-Modul unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten. | [Bestellung](#bestellung), [Werkzeuge](#werkzeuge) |
+| ISO 13485 8.5.1 Verbesserung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.5.2 Korrekturmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.5.3 Vorbeugungsmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| MPDG §83 | ja | &bull; Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt. | [Nutzer](#nutzer) |
+| ISO 14971 | teilweise | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; Anhang E ist für die Nutzung standardmäßig verbereitet. | [Risikomanagement](#risikomanagement) |
+| SGB 5 §33 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MDR Art 83 Nachbeobachtung | strukturell | &bull; Die Überwachung nach dem Inverkehrbringen ist kein direkter Bestandteil der Anwendung. Die regulatorische Anforderung Patienten zur Hilfsmittelkontrolle einzubestellen ist nicht integriert, da eine konsequente Erfassung von Kontaktdaten die Arbeitsbelastung vergrößern würde und redundant wäre, da eine zusätzliche ERP-Software ohnehin erforderlich ist. Statt dessen können deren Datenexporte von Kundendaten genutzt und ein CSV-Filter mit individuellen Regeln erstellt werden um eine Liste passender Empfänger für Serienbriefe zu erhalten. Die Speicherung dieser Liste kann als Nachweis der Erfüllung der regulatorischen Anforderung genutzt werden. | [Werkzeuge](#werkzeuge), [CSV-Filter](#csv-prozessor) |
+| MDR annex 1 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MDR annex 6 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MDR annex 7 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MDR annex 13 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| ArbSchG §3 / BAG Az. 1 ABR 22/21 | ja | &bull; Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. erfasse. Die Einträge können unter Berücksichtigung von Arbeitszeitgesetzen als Dokumentation exportiert werden. | [Kalender](#kalender) |
+
+
+[Übersicht](#übersicht)
+
+## Extras
+* Textempfehlungen
+    * Standard- und anpassbare [Textvorschläge](#textvorschläge) können definiert werden um eine durchgängige Sprachregelung zu unterstützen.
+* Dateiverteilung
+    * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien und einen [STL-Betrachter](#werkzeuge) um vereinfacht Informationen austauschen zu können.
+* CSV-Filterung
+    * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
+
+[Übersicht](#übersicht)
+
 ## Datenintegrität
 Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
 
@@ -200,39 +177,7 @@ Formulare können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beac
 
 [Übersicht](#übersicht)
 
-## Empfehlungen zur Umsetzung regulatorischer Anforderungen
-Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selbst aufgestellt werden. Die meisten regulatorischen Anforderungen werden durch Formulare erfüllt. Auf diese Weise wird eine zuverlässige Versionskontrolle und Freigabe, sowie eine Prüfung der Erfüllung der Anforderungen innerhalb des [Audit-Moduls](#werkzeuge) sichergestellt.
-* Es können Formulare für die Beschreibung von Prozessen erstellt werden und mit dem Kontext *Verfahrens- oder Arbeitsanweisung* und passendem regulatorischen Zusammenhang versehen werden.
-    * ISO 13485 alle Kapitel sollten berücksichtigt werden
-    * Es kann auf diese Dokumentation und die oben genannten [Ziele](#ziele) verwiesen werden.
-* Es können Formulare erstellt werden die ebenfalls für eine schriftliche Form exportierbar sind und mit dem Kontext *Allgemeine Dokumentation* und passendem regulatorischen Zusammenhang versehen werden.
-    * ISO 13485 4.1.5
-* Es können Formulare erstellt und mit dem Kontext *Allgemeine Dokumentation* und passendem regulatorischen Zusammenhang versehen werden.
-    * Alle allgemeinen Aufzeichnungen, besonders aber nicht beschränkt auf:
-    * ISO 13485 6.2
-    * ISO 13485 6.3
-    * ISO 13485 8.2, 8.2.3, 8.2.4
-    * Ausbildungsverordnungen
-* Es können Formulare erstellt und mit dem Kontext *Vorkommnis* und passendem regulatorischen Zusammenhang versehen werden.
-    * ISO 13485 8.2.3
-* Es können Formulare erstellt und mit dem Kontext *Vorgangsdokumentation* und passendem regulatorischen Zusammenhang versehen werden.
-    * ISO 13485 7.2, 7.2.1
-    * ISO 13485 7.3, 7.3.3, 7.3.4, 7.3.5, 7.3.6, 7.3.7, 7.3.8, 7.3.9, 7.3.10
-    * ISO 13483 7.5, 7.5.1, 7.5.3, 7.5.4, 7.5.6
-    * Datenschutzhinweise
-    * SGB 5 §33
-    * MDR annex 1
-    * MDR annex 6
-    * MDR annex 7
-    * MDR annex 13
-* Es können Formulare erstellt und mit dem Kontext *MDR §14 Stichprobenprüfung* und/oder *Produkteinführung* und passendem regulatorischen Zusammenhang versehen werden.
-    * ISO 13485 7.4, 7.4.3
-* Es können Formulare erstellt und mit dem Kontext *Überwachung von Arbeitsmitteln* und passendem regulatorischen Zusammenhang versehen werden.
-    * Computersoftware und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel betrachtet werden.
-    * ISO 13485 4.1.6, 7.6
-    * MPBetreibV
-
-### Tips
+## Tips
 * Ein Kalender-Element kann in die Überwachungs-Formulare eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
 * Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden.
 * Wenn die Branchensoftware in der Lage ist Barcodes für Waren zu erzeugen, können Mehrfach-Scannerfelder innerhalb der Vorgangsdokumentation eine Rückverfolgung unterstützen.
