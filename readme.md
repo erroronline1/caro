@@ -254,10 +254,6 @@ Forms can contain a digital signature pad. Please note this is not legally docum
 ![sample application menu](http://toh.erroronline.one/caro/application%20menu.png)
 
 ### Users
-On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
-
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
-
 The application provides a dedicated role management for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
 
 Some permissions/restrictions are default set though:
@@ -285,6 +281,10 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
     * assign only to trusted, preferably administative staff members
 
 Users can have multiple assigned organizational units and permissions.
+
+On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
+
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
 ![user screenshot](http://toh.erroronline.one/caro/user.png)
 
@@ -324,7 +324,7 @@ graph TD;
 
 ### Manual
 
-Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others.
+Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others. On installation a default manual will be inserted in the [default language](#runtime-variables).
 
 ## Communication
 
@@ -419,7 +419,7 @@ Components can be rearranged via [drag and drop editor](#miscellaneous). Forms c
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options, identifiers, links and buttons are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collecting within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form), while in the latter case any searchability and quick overviews suffer.
+Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Upload-options, identifiers, links and buttons are dropped by default though. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form), while in the latter case any searchability and quick overviews suffer.
 
 Forms can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
 
@@ -526,6 +526,8 @@ Checking for completeness of form bundles can be applied on display of a record 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
 Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
 
+Case documentations allow a setting of the current case state (like reimbursement granted, production tasked, etc.). Records within the overview can be filtered according to case states.
+
 If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
 Records can be assigned a new identifier, e.g. on typing errors or accidentally duplicate creation. In the latter case if the new identifier is already in use all records will be merged with the existing one. This action as well as assigning a new identifier will be recorded as well.
 
@@ -533,7 +535,7 @@ If records contain data from restricted forms, summaries will only contain these
 * On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
 * on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
-All alterings on records (reidentification, retyping) are recorded as well. Since these are system side actions, records will be stored in the user set language. This may result in a mixed language record!
+All alterings on records (reidentification, retyping, case state) are recorded as well. Since these are system side actions, records will be stored in the user set language. This may result in a mixed language record!
 
 ![record screenshot](http://toh.erroronline.one/caro/records.png)
 
@@ -709,7 +711,7 @@ Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to di
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose files can not be deleted, only set unavailable.
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable.
 
 ![files screenshot](http://toh.erroronline.one/caro/files.png)
 
@@ -729,7 +731,7 @@ Defined authorized users (e.g. *purchase assistant*) can edit the alias definiti
 Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
->Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
+> Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
 
 While editing products, one can edit the
 * *trading good*-setting,
@@ -811,8 +813,9 @@ graph TD;
 
 ### Order
 The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
-Products are intended to be selected from the database populated by pricelist imports. Manual ordering is possible though. But only products within the database can store additional information:
+Products are intended to be selected from the database populated by pricelist imports. Manual ordering is possible though. But only products within the database can provide additional information:
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.
+Manual orders allow a quick import to the products database.
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
 
@@ -1661,11 +1664,11 @@ Planning & Feasability
 
 Specification
 * User Needs List: [Stakeholder requirements](#stakeholder-requirements)
-* User Needs Checklist
+* User Needs Checklist: [Stakeholder requirements](#stakeholder-requirements)
 * Software Requirements List: [Intended regulatory goals](#intended-regulatory-goals), [Extras](#extras)
 * List of Hazard-Related Use Scenarios: **not applicable**
 * Risk Table: [Risk assessment](#risk-assessment)
-* Software Requirements Checklist
+* Software Requirements Checklist: [Intended regulatory goals](#intended-regulatory-goals)
 * Software Test Plan: [Integration test](#integration-test), [Stress test and performance](#stress-test-and-performance)
 * Usability Test Plan
 
@@ -1676,7 +1679,7 @@ Development
 Verification and Validation
 * Software Test Results
 * List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
-* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations)
+* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en / _install.default.de
 * Usability Test Protocol
 * Usability Test Report
 * Clinical Evaluation Report: **not applicable**
@@ -3963,15 +3966,15 @@ I welcome any constructive input on this topic.
 
 | Risk | Probability | Impact | Measure | Statement |
 | ---- | ---- | ---- | ---- | ---- |
-| Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source software | Responsibility delegated to operator of infrastructure |
-| Infrastructure outdated | Medium | High (application unstable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source software | Responsibility delegated to operator of infrastructure |
+| Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
+| Infrastructure outdated | Medium | High (application unstable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
 | Data loss | Low | High (regulatory penalties) | Database backups | Responsibility delegated to operator of infrastructure |
 
 ## Software risks
 | Risk | Probability | Impact | Measures | Statement |
 | ---- | ---- | ---- | ---- | ---- |
 | Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within closed network | none |
-| Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed readability | [Encryption statement](#encryption-statement) |
+| Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed availability | [Encryption statement](#encryption-statement) |
 | Unencrypted data access | Medium | High (regulatory penalties) | Use within closed network | Bears the same risk as accessing confidential data on personal network drives |
 | Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | Single token only as a tradeoff regarding usability |
 | Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
