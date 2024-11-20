@@ -1282,42 +1282,45 @@ class RECORD extends API {
 		
 				$return['render']['content'] = $body;
 
-				$typeaction = '';
-				if (PERMISSION::permissionFor('recordsretyping')){
-					$options = [];
-					foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
-						$options[$description] = ['value' => $record_type];
-					}						
-					$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
-						[[
-							'type' => 'radio',
+				IF ($content['record_type']) {
+					$typeaction = '';
+					if (PERMISSION::permissionFor('recordsretyping')){
+						$options = [];
+						foreach (LANGUAGEFILE['record']['record_type'] as $record_type => $description){
+							$options[$description] = ['value' => $record_type];
+						}						
+						$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
+							[[
+								'type' => 'radio',
+								'attributes' => [
+									'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
+								],
+								'content' => $options
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => 'entry_id',
+									'value' => $content['identifier']
+								]
+							]]
+						) . "'), options:{".
+						"'" . LANG::GET('general.cancel_button') . "': false,".
+						"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+						"}}).then(response => { if (response) api.record('post', 'retype', null, _client.application.dialogToFormdata(response))})"
+						. "\">" . LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . '</a>';
+					}
+					$return['render']['content'][] = [
+						[
+							'type' => 'textsection',
 							'attributes' => [
-								'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
+								'name' => LANGUAGEFILE['record']['record_type'][$content['record_type']],
 							],
-							'content' => $options
-						], [
-							'type' => 'hidden',
-							'attributes' => [
-								'name' => 'entry_id',
-								'value' => $content['identifier']
-							]
-						]]
-					) . "'), options:{".
-					"'" . LANG::GET('general.cancel_button') . "': false,".
-					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => { if (response) api.record('post', 'retype', null, _client.application.dialogToFormdata(response))})"
-					. "\">" . LANG::GET('record.record_retype_header', [':type' => LANGUAGEFILE['record']['record_type'][$content['record_type']]]) . '</a>';
+							'linkedcontent' => $typeaction
+						]
+					];
+					$last_element = count($return['render']['content'])-1;
 				}
-				$return['render']['content'][] = [
-					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => LANGUAGEFILE['record']['record_type'][$content['record_type']],
-						],
-						'linkedcontent' => $typeaction
-					]
-				];
-				$last_element = count($return['render']['content'])-1;
+				else $last_element = count($return['render']['content']);
 				if (PERMISSION::permissionFor('recordsclosing')){
 					// similar dialog on similarity check within reidentify method
 					$return['render']['content'][$last_element][] = 
