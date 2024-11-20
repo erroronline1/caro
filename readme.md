@@ -95,7 +95,6 @@
 ## development
 
 #### purchase considerations
-* if $product && !$this->_requestedID check similarity and suggest updating alias if any
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?

@@ -732,7 +732,7 @@ class CONSUMABLES extends API {
 				$options = [LANG::GET('consumables.edit_product_vendor_select_default') => []];
 				$datalist_unit = [];
 				$result = [];
-				$vendors=[];
+				$vendors = [];
 
 				// select single product based on id or name
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
@@ -812,6 +812,7 @@ class CONSUMABLES extends API {
 					$options[$row['name']] = [];
 					if ($row['name'] === $product['vendor_name']) $options[$row['name']]['selected'] = true;
 					$vendors[$row['name']] = ['value' => $row['id']];
+					if ($row['name'] === $product['vendor_name']) $product['vendor_id'] = $row['id']; 
 				}
 
 				// prepare existing unit lists
@@ -1070,6 +1071,15 @@ class CONSUMABLES extends API {
 								]
 							],
 						];
+						if ($product['vendor_name']) $result['render']['content'][count($result['render']['content']) - 1] = [
+							[
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => LANG::GET('consumables.edit_product_similar_count', [':number' => count($similarproducts)]) . ($product['vendor_name'] && !$product['vendor_id'] ? ".\n" . LANG::GET('consumables.error_vendor_not_found', [':name' => $product['vendor_name']]) : '')
+								]
+							],
+							...$result['render']['content'][count($result['render']['content']) - 1]
+						];	
 						$result['render']['content'][] = [
 							[
 								'type' => 'file',
