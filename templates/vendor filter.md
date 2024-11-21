@@ -712,12 +712,11 @@ add article_no header
 [content](#content)
 
 ### caroli
-delete first two columns and rows
 ```json
 {
 	"filesetting": {
-		"headerrowindex": 0,
-		"columns": ["NeueArtikelNummer", "Bezeichnung", "GTIN"]
+		"headerrowindex": 8,
+		"columns": ["Artikelnummer", "Bezeichnung", "GTIN"]
 	},
 	"modify": {
 		"add": {
