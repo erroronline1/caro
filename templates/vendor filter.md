@@ -692,7 +692,13 @@ add article_no header
 		"columns": ["article_no", "Bezeichnung", "Einheit"],
 		"headerrowindex": 14
 	},
+	"add": {
+		"special_attention": 0
+	},
 	"modify": {
+		"conditional_or": [
+			["special_attention", "1", ["Bezeichnung", "Ziegen-Narbenleder, macanta"]]
+		],
 		"rewrite": [{
 			"article_no": ["article_no"],
 			"article_name": ["Bezeichnung"],
@@ -1502,10 +1508,14 @@ join tables
 	],
 	"modify": {
 		"add": {
-			"trading_good": "0"
+			"trading_good": "0",
+			"special_attention": "0",
+			"expiry_date": "0"
 		},
 		"conditional_or": [
-			["trading_good", "1", ["name", "Compression|Weste|Peronäusschiene|Stax|liner"]]
+			["trading_good", "1", ["Matchcode", "Compression|Weste|Peronäusschiene|Stax|liner"]]
+			["special_attention", "1", ["Matchcode", "prosil"]]
+			["expiry_date", "1", ["Matchcode", "prosil"]]
 		],
 		"remove": ["Menge"],
 		"rewrite": [{
