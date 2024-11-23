@@ -510,6 +510,13 @@ Available elements for forms are:
 Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
 Form fields declared as multiple will only show up in form exports if they have a value. Their name will be extended by a numeration in parentheses.
 
+Screen form
+
+![screen form](http://toh.erroronline.one/caro/form%20screen.png)
+
+Exported form
+
+![exported form](http://toh.erroronline.one/caro/form%20export.png)
 
 [Content](#content)
 
@@ -538,7 +545,7 @@ If records contain data from restricted forms, summaries will only contain these
 
 All alterings on records (reidentification, retyping, case state) are recorded as well. Since these are system side actions, records will be stored in the user set language. This may result in a mixed language record!
 
-![record screenshot](http://toh.erroronline.one/caro/records.png)
+![screen record summary](http://toh.erroronline.one/caro/record%20screen.png)
 
 ```mermaid
 graph TD;
@@ -595,6 +602,14 @@ graph TD;
     record_db-..->|"unclosed,
     last record x days ago"|message(message to units users);
 ```
+
+Exported full record summary
+
+![exported full record](http://toh.erroronline.one/caro/record%20full%20summary.png)
+
+Exported reduced record summary
+
+![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary.png)
 
 [Content](#content)
 
