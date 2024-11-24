@@ -389,7 +389,7 @@ class AUDIT extends API {
 							], [
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => 'form_id',
+									'name' => '_form_id',
 									'value' => $form['id']
 								]
 							]
