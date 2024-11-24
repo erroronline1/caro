@@ -1307,7 +1307,7 @@ class AUDIT extends API {
 				$training[':evaluation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
 					'user' => $_SESSION['user']['name'],
 					'date' => $this->_currentdate->format('Y-m-d H:i'),
-					'content' => [LANG::PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
+					'content' => [LANG::PROPERTY('user.edit_add_training_evaluation', [], true) => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
 				]): null;
 
 				foreach ($users as $user){

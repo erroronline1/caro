@@ -122,7 +122,7 @@ class RECORD extends API {
 						'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 						'form' => 0,
 						'content' => json_encode([
-							LANG::GET('record.record_pseudoform_' . $case['context']) => LANG::GET($this->_caseStateBoolean === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANGUAGEFILE['casestate'][$case['context']][$this->_caseState]])
+							LANG::GET('record.record_pseudoform_' . $case['context'], [], true) => LANG::GET($this->_caseStateBoolean === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANG::GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
 						])
 					];
 					$records = json_decode($case['content'], true);
@@ -485,7 +485,7 @@ class RECORD extends API {
 			'type' => 'textsection',
 			'attributes' => [
 				'class' => 'orange',
-				'name' => LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formcomposer', true)))])
+				'name' => LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formcomposer', true)))])
 			]
 		]]);
 
@@ -581,7 +581,7 @@ class RECORD extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
+						'name' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
 					]
 				]
 			];
@@ -1282,7 +1282,7 @@ class RECORD extends API {
 		
 				$return['render']['content'] = $body;
 
-				IF ($content['record_type']) {
+				if ($content['record_type']) {
 					$typeaction = '';
 					if (PERMISSION::permissionFor('recordsretyping')){
 						$options = [];
@@ -1809,10 +1809,10 @@ class RECORD extends API {
 				'date' => $this->_currentdate->format('y-m-d H:i'),
 				'form' => 0,
 				'content' => [
-					LANG::GET('record.record_retype_pseudoform_name') => LANG::GET('record.record_retype_content', [
-					':previoustype' => LANGUAGEFILE['record']['record_type'][$original['record_type']],
-					':newtype' => LANGUAGEFILE['record']['record_type'][$record_type]
-				])]
+					LANG::GET('record.record_retype_pseudoform_name', [], true) => LANG::GET('record.record_retype_content', [
+					':previoustype' => LANG::GET('record.record_type.' . $original['record_type'], [], true),
+					':newtype' => LANG::GET('record.record_type.' . $record_type, [], true)
+					], true)]
 			];
 
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [

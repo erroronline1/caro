@@ -74,7 +74,7 @@ class NOTIFICATION extends API {
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
-			$reminders = $calendar->search(LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]));
+			$reminders = $calendar->search(LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
 			$open = false;
 			foreach($reminders as $reminder){
 				if (!$reminder['closed']) $open = true;
@@ -87,7 +87,7 @@ class NOTIFICATION extends API {
 					':author_id' => 1,
 					':affected_user_id' => 1,
 					':organizational_unit' => 'admin,office',
-					':subject' => LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']]),
+					':subject' => LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
 					':misc' => '',
 					':closed' => '',
 					':alert' => 1
@@ -113,7 +113,7 @@ class NOTIFICATION extends API {
 						':training' => $training['name'],
 						':module' => LANG::GET('menu.audit'),
 						':date' => $training['date']
-					]);
+					], true);
 					$reminders = $calendar->search($subject);
 					$open = false;
 					foreach($reminders as $reminder){
@@ -148,7 +148,7 @@ class NOTIFICATION extends API {
 			if ($num > CONFIG['limits']['order_approved_archived']) {
 				$subject = LANG::GET('order.alert_achived_limit', [
 					':max' => CONFIG['limits']['order_approved_archived']
-				]);
+				], true);
 				$reminders = $calendar->search($subject);
 				$open = false;
 				foreach($reminders as $reminder){
@@ -173,7 +173,7 @@ class NOTIFICATION extends API {
 
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']] : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)]) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANG::GET('calendar.timesheet_pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
 		}
 
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
@@ -318,7 +318,7 @@ class NOTIFICATION extends API {
 						['permission' => ['purchase']],
 						LANG::GET('order.alert_unreceived_order', [
 							':days' => $ordered->diff($this->_currentdate)->days,
-							':ordertype' => LANGUAGEFILE['order']['ordertype'][$order['ordertype']],
+							':ordertype' => LANG::GET('order.ordertype.' . $order['ordertype'], [], true),
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => $decoded_order_data['unit_label'],
 							':number' => $decoded_order_data['ordernumber_label'],
@@ -326,7 +326,7 @@ class NOTIFICATION extends API {
 							':vendor' => $decoded_order_data['vendor_label'],
 							':commission' => $decoded_order_data['commission'],
 							':orderer' => $decoded_order_data['orderer']
-						])
+						], true)
 					);
 					$update = true;
 				} else $receive_interval = $order['notified_received'];
@@ -339,7 +339,7 @@ class NOTIFICATION extends API {
 						['unit' => [$order['organizational_unit']]],
 						LANG::GET('order.alert_undelivered_order', [
 							':days' => $received->diff($this->_currentdate)->days,
-							':ordertype' => '<a href="javascript:void(0);" onpointerup="api.purchase(\'get\', \'approved\')"> ' . LANGUAGEFILE['order']['ordertype'][$order['ordertype']] . '</a>',
+							':ordertype' => '<a href="javascript:void(0);" onpointerup="api.purchase(\'get\', \'approved\')"> ' . LANG::GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => $decoded_order_data['unit_label'],
 							':number' => $decoded_order_data['ordernumber_label'],
@@ -347,7 +347,7 @@ class NOTIFICATION extends API {
 							':vendor' => $decoded_order_data['vendor_label'],
 							':commission' => $decoded_order_data['commission'],
 							':receival' => $order['received']
-						])
+						], true)
 					);
 					$update = true;
 				} else $delivery_interval = $order['notified_delivered'];
@@ -395,7 +395,7 @@ class NOTIFICATION extends API {
 				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered form
-					$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
+					$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name', [], true)];
 
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
@@ -404,7 +404,7 @@ class NOTIFICATION extends API {
 							':date' => substr($row['last_touch'], 0, -3),
 							':form' => $lastform['name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
-						])
+						], true)
 					);
 					// prepare alert flags
 					$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
