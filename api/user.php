@@ -251,7 +251,8 @@ class USER extends API {
 						'attributes' => [
 							'name' => LANG::GET('user.settings_language')
 						],
-						'content' => $languages
+						'content' => $languages,
+						'hint' => LANG::GET('user.settings_language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
 					], [
 						'type' => 'radio',
 						'attributes' => [

@@ -1326,6 +1326,7 @@ settings_theme_light = "Hell"
 settings_theme_aurora = "Aurora"
 settings_theme_dark = "Dunkel"
 settings_language = "Sprache"
+settings_language_hint = "Systemstandard ist :lang"
 
 ; Dies sind die Kapitel der ISO 13485
 ; Diese können als Checkliste für die Erfüllung regulatorischer Anforderungen durch Formulare dienen
