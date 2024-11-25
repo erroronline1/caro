@@ -121,7 +121,13 @@ in the output files if it is not possible to edit the following filter according
 			[null, "\"", ""],
 			[null, ";", ","]
 		],
-		"rewrite": [{ "article_no": ["BESTELL_NUMMER"], "article_name": ["BEZEICHNUNG", " ", "Zusatzinformation", " ", "MODELL_NAME", " ", "GROESSEN_NAME", " ", "FARBEN_NAME"], "article_unit": ["BESTELL_EINHEIT"], "article_ean": ["EAN"] }],
+		"rewrite": [
+			{
+				"article_no": ["BESTELL_NUMMER"],
+				"article_name": ["BEZEICHNUNG", " ", "Zusatzinformation", " ", "MODELL_NAME", " ", "GROESSEN_NAME", " ", "FARBEN_NAME"],
+				"article_unit": ["BESTELL_EINHEIT"],
+				"article_ean": ["EAN"]}
+			],
 		"add": {
 			"trading_good": "",
 			"has_expiry_date": "",
@@ -1764,7 +1770,7 @@ delete . from headers, replace specialchars and whitespaces
 		"conditional_or": [
 			["trading_good", "1", ["Bezeichnung", "fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"]],
 			["has_expiry_date", "1", ["Bezeichnung", "silikonspray|sekundenkleber"]],
-			["special_attention", "1", ["Bezeichnung", "kon-gel|varioform|streifydur|streifylast|PET glasklar|streifyflex|drell|jaquard|satine|elastinova|bandagengurt"]]
+			["special_attention", "1", ["Bezeichnung", "kon-gel|varioform|streifydur|streifylast|PET glasklar|streifyflex|drell|jaquard|satine|elastinova|bandagengurt|diabetikermaterial|multiform"]]
 		],
 		"rewrite": [{
 			"article_no": ["Artikelnummer"],
