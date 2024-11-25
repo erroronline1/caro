@@ -1099,6 +1099,9 @@ rewrite pricelist (concat first three columns to article number, paste as values
 		"columns": ["artnr", "name"]
 	},
 	"modify": {
+		"add": {
+			"special_attention": "1"
+		},
 		"rewrite": [{
 			"article_no": ["artnr"],
 			"article_name": ["name"],
