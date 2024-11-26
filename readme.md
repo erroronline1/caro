@@ -101,6 +101,7 @@
 * unittests (frontend)
 
 #### records considerations
+* store (approval-)unit to forms and components for better access by preselection - add component select by unit + edit component/form by unit
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
