@@ -703,7 +703,7 @@ add article_no header
 	},
 	"modify": {
 		"conditional_or": [
-			["special_attention", "1", ["Bezeichnung", "Ziegen-Narbenleder, macanta"]]
+			["special_attention", "1", ["Bezeichnung", "Ziegen-Narbenleder|macanta|liegeschalen|neoprene|nappa|multiform"]]
 		],
 		"rewrite": [{
 			"article_no": ["article_no"],
