@@ -352,7 +352,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'attributes' => [
 							'name' => LANG::GET('calendar.timesheet_pto_exemption'),
-							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === LANG.GET('calendar.timesheet_pto.regular'))"
+							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === 'regular')"
 						],
 						'content' => $ptoselect
 					],[
