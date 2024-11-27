@@ -726,7 +726,8 @@ class CALENDAR extends API {
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => $affected_user_id
+						':id' => $affected_user_id,
+						':name' => ''
 					]
 				])) $affected_user = $affected_user[0];
 		
