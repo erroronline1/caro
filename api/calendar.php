@@ -939,7 +939,7 @@ class CALENDAR extends API {
 					if ($pastEvents) {
 						$uncompleted = [];
 						foreach ($pastEvents as $id => $row){
-							if ($row['type'] !== 'schedule' || !array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']) || $row['closed']) unset($pastEvents[$id]);
+							if ($row['type'] !== 'schedule' || ($row['affected_user_units'] && !array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) || $row['closed']) unset($pastEvents[$id]);
 						}
 						if ($pastEvents){
 							$events = [
