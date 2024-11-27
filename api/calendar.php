@@ -112,8 +112,8 @@ class CALENDAR extends API {
 				break;
 			}
 		}
-		$last = clone $days[count($days) - 1];
 		$days = array_values($days);
+		$last = clone $days[count($days) - 1];
 		
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		// retrieve stats in advance
@@ -142,7 +142,7 @@ class CALENDAR extends API {
 				$stats_month_row = $timesheet_stats_month[$stats_month_row];
 				$stats_all_row = $timesheet_stats_all[array_search($entry['affected_user_id'], array_column($timesheet_stats_all, '_id'))];
 				if (!isset($timesheets[$entry['affected_user_id']])) {
-					$units = array_map(Fn($u)=>LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
+					$units = array_map(Fn($u) => LANGUAGEFILE['units'][$u], explode(',', $entry['affected_user_units']));
 					$pto = [];
 					foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $key => $translation){
 						if (isset($stats_month_row[$key])) $pto[$key] = $stats_month_row[$key];
