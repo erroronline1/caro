@@ -693,7 +693,8 @@ class CALENDARUTILITY {
 				'_leftvacation' => 0,
 				'_projected' => 0,
 				'_performed' => 0,
-				'_overtime' => isset($user['app_settings']['initialovertime']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
+				'_overtime' => 0,
+				'_initialovertime' => isset($user['app_settings']['initialovertime']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
 				'_pto' => []
 			];
 			// prepare occasionally changing contract settings

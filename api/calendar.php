@@ -158,7 +158,7 @@ class CALENDAR extends API {
 						'projected' => $stats_month_row['_projected'],
 						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
 						'leftvacation' => $stats_all_row['_leftvacation'],
-						'overtime' => $stats_all_row['_overtime'],
+						'overtime' => $stats_all_row['_overtime'] - $stats_all_row['_initialovertime'],
 						'monthlyovertime' => $stats_month_row['_overtime']
 					];
 				}
