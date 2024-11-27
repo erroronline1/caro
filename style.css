@@ -941,6 +941,7 @@ article > article {
 	margin: 0.5em;
 	height: max-content;
 	vertical-align: top;
+	overflow:hidden;
 }
 
 .collapsible {
