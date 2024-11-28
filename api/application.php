@@ -273,6 +273,7 @@ class APPLICATION extends API {
 					$options[$row['title']] = ['value' => $row['id']];
 					if ($entry['id'] === $row['id']) $options[$row['title']]['selected'] = true; 
 				}
+				ksort($options);
 
 				$permissions = [];
 				foreach(LANGUAGEFILE['permissions'] as $level => $description){

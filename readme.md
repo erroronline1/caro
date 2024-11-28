@@ -100,7 +100,6 @@
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * alertUserGroup collect recipients method and recipient property to ensure only one message per user will be delivered
-* review select ordering, handle on server side or provide option
 * image resizer and watermarking tool
 
 #### records considerations
@@ -110,6 +109,7 @@
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
+* checkbox2text broken !?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.

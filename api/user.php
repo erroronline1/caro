@@ -634,6 +634,7 @@ class USER extends API {
 					$options[$row['name']] = ($row['name'] === $this->_requestedID) ? ['selected' => true] : [];
 					if ($row['name'] === $this->_requestedID) $this->_requestedID = $row['id'];
 				}
+				ksort($options);
 		
 				// select single user based on id or name
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [

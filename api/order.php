@@ -325,10 +325,11 @@ class ORDER extends API {
 					':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
 				]]);
 
-				$statechange = [];
+				$statechange = ['...' => ['value' => '']];
 				foreach(LANGUAGEFILE['order']['orderstate'] as $value){
 					$statechange[$value] = [];
 				}
+				ksort($statechange);
 
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_unit', [
 					'replacements' => [
@@ -629,6 +630,8 @@ class ORDER extends API {
 					$datalist[] = $row['name'];
 					$vendors[$row['name']] = ['value' => $row['id']];
 				}
+				ksort($vendors);
+
 				// prepare existing unit lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
 				foreach($vendor as $key => $row) {

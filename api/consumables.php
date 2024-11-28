@@ -814,6 +814,8 @@ class CONSUMABLES extends API {
 					$vendors[$row['name']] = ['value' => $row['id']];
 					if ($row['name'] === $product['vendor_name']) $product['vendor_id'] = $row['id']; 
 				}
+				ksort($options);
+				ksort($vendors);
 
 				// prepare existing unit lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
@@ -1613,6 +1615,7 @@ class CONSUMABLES extends API {
 					$options[$row['name']] = [];
 					if ($row['name'] == $vendor['name']) $options[$row['name']]['selected'] = true;
 				}
+				ksort($options);
 				
 				$certificates = [];
 				$documents = [];
