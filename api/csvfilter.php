@@ -184,6 +184,7 @@ class CSVFILTER extends API {
 						$options[$row['name']] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 				}
+				ksort($options);
 
 				$return['render'] = [
 					'content' => [
@@ -369,7 +370,8 @@ class CSVFILTER extends API {
 					}
 					$alloptions[$row['name']. ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
-
+				ksort($options);
+				ksort($alloptions);
 				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'csvfilter',

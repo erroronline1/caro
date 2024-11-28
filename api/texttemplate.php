@@ -154,9 +154,12 @@ class TEXTTEMPLATE extends API {
 					$alloptions[$display . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
+				ksort($options);
+				ksort($alloptions);
 				foreach (LANGUAGEFILE['texttemplate']['system'] as $key => $value){
 					$insertreplacement[$value] = ['value' => ':' . $key];
 				}
+				ksort($insertreplacement);
 
 				$units = [];
 				foreach (LANGUAGEFILE['units'] as $unit => $translation){
@@ -413,6 +416,9 @@ class TEXTTEMPLATE extends API {
 					}
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
+				ksort($options);
+				ksort($alloptions);
+				ksort($insertreplacement);
 
 				$units = [];
 				foreach (LANGUAGEFILE['units'] as $unit => $translation){

@@ -404,6 +404,7 @@ class TOOL extends API {
 		foreach ($files as $path){
 			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => $path];
 		}
+		ksort($options);
 		if (count($options) > 1) {
 			$result['render'] = ['content' => [
 				[

@@ -125,6 +125,7 @@ class RISK extends API {
 					$select[$row['process']][$row['risk'] . ': ' . $row['cause']] = ['value' => $row['id']];
 				}
 
+
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
 					'values' => [
 						':id' => intval($this->_requestedID)
@@ -158,6 +159,7 @@ class RISK extends API {
 
 				$selection = [];
 				foreach ($select as $key => $values){
+					ksort($values);
 					$selection[] = [[
 						'type' => 'select',
 						'attributes' => [

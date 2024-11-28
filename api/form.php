@@ -122,7 +122,8 @@ class FORM extends API {
 						$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 					}
 				}
-
+				ksort($componentselection);
+				ksort($formselection);
 				if ($componentselection) $return['render']['content'][0][] = [
 					'type' => 'select',
 					'attributes' => [
@@ -369,7 +370,8 @@ class FORM extends API {
 						}
 						$alloptions[$row['name'] . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)])] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
-
+				ksort($options);
+				ksort($alloptions);
 				// prepare available forms lists
 				// get latest approved by name
 				$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
@@ -381,6 +383,7 @@ class FORM extends API {
 							$insertform[$row['name']] = ['value' => $row['name'] . "\n"];
 					}
 				}
+				ksort($insertform);
 
 				$return['render'] = [
 					'form' => [
@@ -770,7 +773,8 @@ class FORM extends API {
 			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
-
+		ksort($options);
+		ksort($alloptions);
 		// load approved forms for occasional linking
 		// check for dependencies in forms
 		$approvedforms = $dependedforms = [];
@@ -1195,7 +1199,8 @@ class FORM extends API {
 			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
 			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
-
+		ksort($formoptions);
+		ksort($alloptions);
 		// prepare existing component list of fully approved
 		$cd = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
 		$hidden = [];
@@ -1207,7 +1212,7 @@ class FORM extends API {
 				$componentoptions[$row['name'] . ' - ' . LANG::GET('assemble.approve_approved')] = ['value' => $row['id']];
 			}
 		}
-
+		ksort($componentoptions);
 		// check for bundle dependencies
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
 		$hidden = [];
@@ -1242,6 +1247,7 @@ class FORM extends API {
 				$contextoptions[$display] = $context===$form['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 			}
 		}
+		ksort($contextoptions);
 
 		// prepare unit list for approval
 		$approve = [
