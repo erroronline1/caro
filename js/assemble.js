@@ -30,7 +30,7 @@ export function getNextElementID() {
 }
 
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup"];
-const VOIDVALUES = ['', '...'];
+const VOIDVALUES = ["", "..."];
 
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
@@ -316,24 +316,26 @@ export class Dialog {
 	}
 	select() {
 		const buttons = document.createElement("div");
-		let button, firststring, optgroup, value;
-		Object.keys(this.options)
-			.sort()
-			.forEach((option) => {
-				value = this.options[option];
-				if (Object.entries(this.options).length > 12 && firststring !== option.substring(0, 1)) {
-					firststring = option.substring(0, 1);
-					optgroup = document.createElement("h3");
-					optgroup.classList.add("modaloptgroup");
-					optgroup.append(document.createTextNode(firststring));
-					buttons.append(optgroup);
-				}
-				button = document.createElement("button");
-				button.classList.add("discreetButton");
-				button.append(document.createTextNode(option));
-				button.value = value;
-				buttons.append(button);
-			});
+		let button,
+			firststring,
+			optgroup,
+			value,
+			useoptgroup = JSON.stringify(Object.keys(this.options)) === JSON.stringify(Object.keys(this.options).sort());
+		Object.keys(this.options).forEach((option) => {
+			value = this.options[option];
+			if (Object.entries(this.options).length > 12 && firststring !== option.substring(0, 1) && useoptgroup) {
+				firststring = option.substring(0, 1);
+				optgroup = document.createElement("h3");
+				optgroup.classList.add("modaloptgroup");
+				optgroup.append(document.createTextNode(firststring));
+				buttons.append(optgroup);
+			}
+			button = document.createElement("button");
+			button.classList.add("discreetButton");
+			button.append(document.createTextNode(option));
+			button.value = value;
+			buttons.append(button);
+		});
 		return [buttons];
 	}
 }
@@ -820,7 +822,7 @@ export class Assemble {
 			if (EVENTS.includes(key)) {
 				if (attribute) {
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
-					if (typeof(attribute) === 'function') attribute = attribute.toString();
+					if (typeof attribute === "function") attribute = attribute.toString();
 					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|\t{1,}|\n/gm, " ").slice(0, -1);
 					if (attribute.startsWith("(")) attribute = attribute.replace(/^.*?\{|\t{1,}|\n|\}$/g, " ").slice(0, -1);
 					attribute = attribute.replace(/^\s.?/gm, "");
@@ -1781,28 +1783,38 @@ export class Assemble {
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
 
-		Object.keys(this.currentElement.content)
-			.sort()
-			.forEach((key) => {
-				element = this.currentElement.content[key];
-				if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
-				else groups[key[0]].push([key, element]);
-				selectModal[key] = element.value || key;
-			});
-		Object.keys(groups)
-			.sort()
-			.forEach((group) => {
-				elements = groups[group];
-				let optgroup = document.createElement("optgroup");
-				optgroup.label = group;
-				for (const element of Object.entries(elements)) {
-					let option = document.createElement("option");
-					option = this.apply_attributes(element[1][1], option);
-					option.appendChild(document.createTextNode(element[1][0]));
-					optgroup.appendChild(option);
-				}
-				select.appendChild(optgroup);
-			});
+		if (JSON.stringify(Object.keys(this.currentElement.content)) === JSON.stringify(Object.keys(this.currentElement.content).sort())) {
+			Object.keys(this.currentElement.content)
+				.sort()
+				.forEach((key) => {
+					element = this.currentElement.content[key];
+					if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
+					else groups[key[0]].push([key, element]);
+					selectModal[key] = element.value || key;
+				});
+			Object.keys(groups)
+				.sort()
+				.forEach((group) => {
+					elements = groups[group];
+					let optgroup = document.createElement("optgroup");
+					optgroup.label = group;
+					for (const element of Object.entries(elements)) {
+						let option = document.createElement("option");
+						option = this.apply_attributes(element[1][1], option);
+						option.appendChild(document.createTextNode(element[1][0]));
+						optgroup.appendChild(option);
+					}
+					select.appendChild(optgroup);
+				});
+		} else {
+			for (const [key, attributes] of Object.entries(this.currentElement.content)) {
+				let option = document.createElement("option");
+				option = this.apply_attributes(attributes, option);
+				option.appendChild(document.createTextNode(key));
+				select.appendChild(option);
+				selectModal[key] = attributes.value || key;
+			}
+		}
 
 		select.onpointerdown = (e) => {
 			// arrow function for reference of this.names
