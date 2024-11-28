@@ -888,7 +888,6 @@ alert_orderstate_change = "An order state ""
 :order ""
 ""
 for :unit has been updated by :user."
-orderstate[select] = "select changed order state" ; dynamic named third level array, can be cropped or extended
 orderstate[notdeliverable] = "not deliverable" ; dynamic named third level array, can be cropped or extended
 orderstate[deliverydateannounced] = "delivery date announced" ; dynamic named third level array, can be cropped or extended
 orderstate[deliverydatechanged] = "delivery date changed" ; dynamic named third level array, can be cropped or extended
