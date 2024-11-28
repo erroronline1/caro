@@ -1279,7 +1279,7 @@ export class Assemble {
 					e.dispatchEvent(new Event("change"));
 					e.blur();
 				});
-			}.toString();
+			};
 		}
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
