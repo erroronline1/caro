@@ -736,7 +736,6 @@ const _client = {
 
 				// append orderstatechange
 				if (element.orderstatechange && Object.keys(element.orderstatechange).length && element.organizationalunit) {
-					element.orderstatechange["..."] = {};
 					buttons = {};
 					buttons[LANG.GET("order.add_information_cancel")] = false;
 					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
