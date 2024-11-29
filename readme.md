@@ -103,7 +103,6 @@
 
 #### records considerations
 * store (approval-)unit to forms and components for better access by preselection - add component select by unit + edit component/form by unit
-* inform on approved cases to start production? on case state change ask for message to units
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1651,7 +1650,7 @@ Discussed stakeholder requirements:
 | Order information (textsection) copyable | User, Purchase | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
 | Partial delivery state for orders | User, Purchase | 2024-10-16 | Implemented; 2024-10-26 |
 | Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
-| Message on case state change | User | 2024-11-27 |  |
+| Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
 
 [Content](#content)
 
@@ -2936,7 +2935,7 @@ Sample response
 
 > PUT ./api/api.php/record/casestate/{identifier}/{state}/{bool}
 
-Marks all database entries with passed identifier as closed.
+Sets the passed case state.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2950,9 +2949,23 @@ Sample response
 {"response":{"msg":"Reimbursement granted set","type":"success"}}
 ```
 
+> POST ./api/api.php/record/casestatealert/
+
+Alerts selected users on recent case state setting.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | recipients, identifier, casestate and context |
+
+Sample response
+```
+{"response":{"msg":"Message successfully sent","type":"success"}}
+```
+
 > PUT ./api/api.php/record/close/{identifier}
 
-Marks all database entries with passed identifier as closed.
+Marks database entries with passed identifier as closed.
 
 Parameters
 | Name | Data Type | Required | Description |

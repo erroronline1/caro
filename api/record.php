@@ -175,6 +175,44 @@ class RECORD extends API {
 		}
 	}
 
+	/**
+	 *                       _       _           _         _   
+	 *   ___ ___ ___ ___ ___| |_ ___| |_ ___ ___| |___ ___| |_ 
+	 *  |  _| .'|_ -| -_|_ -|  _| .'|  _| -_| .'| | -_|  _|  _|
+	 *  |___|__,|___|___|___|_| |__,|_| |___|__,|_|___|_| |_|  
+	 *
+	 */
+	public function casestatealert(){
+		if ($identifier = UTILITY::propertySet($this->_payload, 'identifier')) unset($this->_payload->identifier);
+		if ($context = UTILITY::propertySet($this->_payload, 'context')) unset ($this->_payload->context);
+		if ($casestate = UTILITY::propertySet($this->_payload, 'casestate')) unset ($this->_payload->casestate);
+		if ($casestatestate = UTILITY::propertySet($this->_payload, 'casestatestate')) unset ($this->_payload->casestatestate);
+		if ($recipient = UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.record_casestate_change_recipient'))) unset ($this->_payload->{LANG::PROPERTY('record.record_casestate_change_recipient')});
+		$recipient = preg_split('/[,;]\s{0,}/', $recipient ? : '');
+		// remainder of payload are checked units and maybe supervisor_only flag
+		$permission = [];
+		if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('record.record_casestate_change_recipient_supervisor_only', [':supervisor' => LANG::PROPERTY('permissions.supervisor')]))) {
+			$permission = ['supervisor'];
+			unset($this->_payload->{LANG::PROPERTY('record.record_casestate_change_recipient_supervisor_only', [':supervisor' => LANG::PROPERTY('permissions.supervisor')])});
+		}
+		$message = LANG::GET('record.record_casestate_change_message_content', [
+			':user' => $_SESSION['user']['name'],
+			':identifier' => '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
+			':casestate' => LANG::GET($casestatestate === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANG::GET('casestate.' . $context . '.' . $casestate, [], true)], true)
+		], true);
+
+		if ((array_values((array)$this->_payload) || $recipient) && $this->alertUserGroup(['permission' => $permission, 'unit' => array_values((array)$this->_payload), 'user' => $recipient], $message)) $this->response([
+			'response' => [
+				'msg' => LANG::GET('message.send_success'),
+				'type' => 'success'
+			]]);
+		else $this->response([
+			'response' => [
+				'msg' => LANG::GET('message.send_failure', [':number' => '']),
+				'type' => 'error'
+			]]);
+	}
+
 	 /**
 	 *       _
 	 *   ___| |___ ___ ___
@@ -1144,7 +1182,62 @@ class RECORD extends API {
 					]
 				]);
 				$data = $data ? $data[0] : null;
-				if ($casestate = $this->casestate($data['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked)"], $data['case_state'])){
+				$messagedialog = [LANG::GET('record.record_casestate_change_recipient_supervisor_only', [':supervisor' => LANG::GET('permissions.supervisor')]) => []];
+				foreach($data['units'] ? explode(',', $data['units']) : [] as $unit){
+					$messagedialog[LANGUAGEFILE['units'][$unit]] = ['value' => $unit];
+				}
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$datalist = [];
+				foreach($user as $key => $row) {
+					if ($row['id'] > 1 && $row['id'] !== $_SESSION['user']['id']) $datalist[] = $row['name'];
+				}
+
+				if ($casestate = $this->casestate($data['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked);"
+					. " new Dialog({type: 'input', header: '" . LANG::GET('record.record_casestate_change_message') . "', render: JSON.parse('"
+					. json_encode([
+						[
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => LANG::GET('record.record_casestate_change_recipient_unit')
+							],
+							'content' => $messagedialog
+						],
+						[
+							'type' => 'datalist',
+							'attributes' => [
+								'id' => 'rcptlist'
+							],
+							'content' => $datalist
+						],
+						[
+							'type' => 'hidden',
+							'attributes' => [
+								'name' => 'identifier',
+								'value' => $this->_requestedID
+							]
+						],
+						[
+							'type' => 'hidden',
+							'attributes' => [
+								'name' => 'context',
+								'value' => $data['context']
+							]
+						],
+						[
+							'type' => 'text',
+							'attributes' => [
+								'name' => LANG::GET('record.record_casestate_change_recipient'),
+								'list' => 'rcptlist'
+							]
+						]
+					])
+					. "'.replace()), options: JSON.parse('"
+					. json_encode([
+						LANG::GET('general.cancel_button') => false,
+						LANG::GET('general.submit_button') => ['value' => true, 'class'=> 'reducedCTA']
+					])
+					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
+					], $data['case_state'])){
 					$body[] = [$casestate];
 				}
 
@@ -1888,7 +1981,8 @@ class RECORD extends API {
 			'title' => LANG::GET('menu.record_summary'),
 			'date' => $this->_currentdate->format('y-m-d H:i'),
 			'closed' => $data['closed'],
-			'record_type' => $data['record_type']
+			'record_type' => $data['record_type'],
+			'units' => $data['units'] ? explode(',', $data['units']) : []
 		];
 		$accumulatedcontent = [];
 
