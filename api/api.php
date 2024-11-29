@@ -55,6 +55,13 @@ class API {
 	public $_currentdate;
 	
 	/**
+	 * message array for accumulated user messages
+	 * to be populated by message as key and user ids as value array
+	 * see alertUserGroup() and alertUserGroupSubmit()
+	 */
+	private $_messages = [];
+
+	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
@@ -136,7 +143,7 @@ class API {
 	}
 	
 	/**
-	 * posts a system message to a user group
+	 * accumulates system messages to a user or permission group and populates $this->_messages
 	 * @param array $group 'permission'=>[] ||&& 'unit'=>[] reach out for permission holders or unit member or permission holders within units
 	 * @param string $message actual message content
 	 * no return
@@ -167,13 +174,32 @@ class API {
 		if ($unit) $recipients = $unit;
 		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
 		$recipients = array_unique($recipients);
-		foreach($recipients as $rcpnt_id) {
-			$postmessage = [
-				'to_user' => $rcpnt_id,
-				'message' => $message
-			];
-			$statement = $this->_pdo->prepare(SQLQUERY::PREPARE('message_post_system_message'));
-			$statement->execute($postmessage);
+
+		if (!isset($this->_messa_messagesge[$message])) $this->_messages[$message] = [];
+		array_push($this->_messages[$message], ...$recipients);
+	}
+
+	/**
+	 * posts system messages according to $this->_messages
+	 * this avoids multiple messages e.g. to supervisors of a certain unit, that are also ceo, prrc or qmo
+	 * recipient ids will be used uniquely for each message content
+	 */
+	private function alertUserGroupSubmit(){
+		if (!$this->_messages) return;
+		$sqlchunks = [];
+		foreach($this->_messages as $message => $recipients) {
+			$recipients = array_unique($recipients);
+			$insertions = [];
+			foreach($recipients as $rcpnt_id) {
+				$insertions[] = [
+					':to_user' => $rcpnt_id,
+					':message' => $message
+				];
+			}
+			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('message_post_system_message'), $insertions));
+		}
+		foreach ($sqlchunks as $chunk){
+			SQLQUERY::EXECUTE($this->_pdo, $chunk);
 		}
 	}
 
@@ -281,12 +307,14 @@ class API {
 	}
 
 	/**
-	 * api response
+	 * api response and final exiting method executions
 	 * @param array|string $data what should be responded
 	 * @param int $status optional override for error cases
 	 * no return, end of api processing
 	 */
 	public function response($data, $status = 200){
+		$this->alertUserGroupSubmit();
+
 		if(is_array($data)) {
 			$data = json_encode($data);
 			$this->_httpResponse = $status;

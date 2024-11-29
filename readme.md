@@ -99,7 +99,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* alertUserGroup collect recipients method and recipient property to ensure only one message per user will be delivered
 * image resizer and watermarking tool
 
 #### records considerations
