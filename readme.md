@@ -141,7 +141,7 @@ Application support legend:
 
 | Regulatory requirement | Application support | Method | Reference |
 | ---- | ---- | ---- | ---- |
-| ISO 13485 4.1.1 General quality management requirements | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
+| ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified within the audit-module, given form are assigned proper regulatory contexts.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Forms](#forms), [Tools](#tools)|
 | ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Risk management](#risk-management) |
 | ISO 13485 4.1.3 Process monitoring | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
 | ISO 13485 4.1.4 Process control | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
