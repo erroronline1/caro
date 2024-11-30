@@ -26,7 +26,7 @@ address = "Universitätsklinikum Heidelberg, Technische Orthopädie, Schlierbach
 
 ; autorisierungsebenen mit sprachspezifischen werten
 ; erweiterungen sind möglich falls eue module spezifische berechtigungen erfordern
-; die schlüssel sind fest einprogrammiert!
+; die standard-schlüssel sind fest einprogrammiert!
 ; werte DÜRFEN NICHT DIE SELBEN SEIN WIE UNITS!! (feldnamen-verwirrung innerhalb von formulardaten)
 [permissions]
 user = "Mitarbeiter"
@@ -48,7 +48,7 @@ admin = "Programmadministrator"
 ; einmal definierte schlüssel verbleiben in der datenbank und sollten daher nur erweitert werden.
 ; admin und office sind fest einprogrammiert
 [units]
-common = "Allgemein"
+common = "Allgemein" ; schlüssel ist fest einprogrammiert
 orthotics1 = "Orthetik I"
 orthotics2 = "Orthetik II"
 prosthetics1 = "Prothetik I"

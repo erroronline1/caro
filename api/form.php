@@ -740,8 +740,8 @@ class FORM extends API {
 	public function component_editor(){
 		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		$componentdatalist = [];
-		$options = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-		$alloptions = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		$options = [];
+		$alloptions = [];
 		$return = [];
 		
 		// get selected component
@@ -768,21 +768,56 @@ class FORM extends API {
 		}
 		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-		// prepare existing component lists
+		// prepare existing component lists, sorted by units
+		foreach(array_keys(LANGUAGEFILE['units']) as $unit){
+			$options[$unit] = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+			$alloptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		}
+
 		$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
 		$hidden = [];
 		foreach($components as $row) {
+			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($options[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
-				$options[$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				$options[$row['unit']][$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
 			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
 			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$alloptions[$row['unit']][$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
-		ksort($options);
-		ksort($alloptions);
+		// delete empty selections, order the rest and create remaining selections by unit for easier access
+		$options_selection = $alloptions_selection = [];
+		foreach($options as $unit => $components){
+			if (count($components) < 2) {
+				continue;
+			}
+			ksort($components);
+			$options_selection[] = [
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANGUAGEFILE['units'][$unit],
+					'onchange' => "api.form('get', 'component_editor', this.value)"
+				],
+				'content' => $components
+			];
+		}
+		foreach($alloptions as $unit => $components){
+			if (count($components) < 2) {
+				continue;
+			}
+			ksort($components);
+			$alloptions_selection[] = [
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANGUAGEFILE['units'][$unit],
+					'onchange' => "api.form('get', 'component_editor', this.value)"
+				],
+				'content' => $components
+			];
+		}
+
 		// load approved forms for occasional linking
 		// check for dependencies in forms
 		$approvedforms = $dependedforms = [];
@@ -817,14 +852,15 @@ class FORM extends API {
 							'attributes' => [
 								'id' => 'components'
 							]
-						], [
-							'type' => 'select',
+						],
+						[
+							'type' => 'textsection',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_components_select'),
-								'onchange' => "api.form('get', 'component_editor', this.value)"
 							],
-							'content' => $options
-						],[
+						],
+						...$options_selection,
+						[
 							'type' => 'search',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_forms'),
@@ -834,13 +870,12 @@ class FORM extends API {
 						]
 					],[
 						[
-							'type' => 'select',
+							'type' => 'textsection',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_components_all'),
-								'onchange' => "api.form('get', 'component_editor', this.value)"
 							],
-							'content' => $alloptions
 						],
+						...$alloptions_selection
 					]
 				],[
 					[[
@@ -1169,9 +1204,9 @@ class FORM extends API {
 	public function form_editor(){
 		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
 		$formdatalist = $componentdatalist = [];
-		$formoptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-		$alloptions = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-		$componentoptions = ['...' => ['value' => '0']];
+		$formoptions = [];
+		$alloptions = [];
+		$componentoptions = [];
 		$contextoptions = ['...' . LANG::GET('assemble.edit_form_context_default') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$return = [];
 		
@@ -1199,33 +1234,86 @@ class FORM extends API {
 		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-		// prepare existing forms lists
+		// prepare existing forms lists, sorted by units
+		foreach(array_keys(LANGUAGEFILE['units']) as $unit){
+			$formoptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+			$alloptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+			$componentoptions[$unit] = ['...' => ['value' => '']];
+		}
+
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$hidden = [];
 		foreach($fd as $key => $row) {
+			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!isset($formoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($formoptions[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$formdatalist[] = $row['name'];
-				$formoptions[$row['name']] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				$formoptions[$row['unit']][$row['name']] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
 			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
 			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
-			$alloptions[$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$alloptions[$row['unit']][$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
-		ksort($formoptions);
-		ksort($alloptions);
+
 		// prepare existing component list of fully approved
 		$cd = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
 		$hidden = [];
 		foreach($cd as $key => $row) {
+			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!isset($componentoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
-				//$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-				$componentoptions[$row['name'] . ' - ' . LANG::GET('assemble.approve_approved')] = ['value' => $row['id']];
+				$componentoptions[$row['unit']][$row['name'] . ' - ' . LANG::GET('assemble.approve_approved')] = ['value' => $row['id']];
 			}
 		}
-		ksort($componentoptions);
+
+		// delete empty selections, order the rest and create remaining selections by unit for easier access
+		$options_selection = $alloptions_selection = $components_selection = [];
+		foreach($formoptions as $unit => $components){
+			if (count($components) < 2) {
+				continue;
+			}
+			ksort($components);
+			$options_selection[] = [
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANGUAGEFILE['units'][$unit],
+					'onchange' => "api.form('get', 'form_editor', this.value)"
+				],
+				'content' => $components
+			];
+		}
+		foreach($alloptions as $unit => $components){
+			if (count($components) < 2) {
+				continue;
+			}
+			ksort($components);
+			$alloptions_selection[] = [
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANGUAGEFILE['units'][$unit],
+					'onchange' => "api.form('get', 'form_editor', this.value)"
+				],
+				'content' => $components
+			];
+		}
+		foreach($componentoptions as $unit => $components){
+			if (count($components) < 2) {
+				continue;
+			}
+			ksort($components);
+			$components_selection[] = [
+				'type' => 'select',
+				'attributes' => [
+					'name' => LANGUAGEFILE['units'][$unit],
+					'onchange' => "if (this.value) api.form('get', 'component', this.value)"
+				],
+				'content' => $components
+			];
+		}
+
+
+
 		// check for bundle dependencies
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
 		$hidden = [];
@@ -1312,13 +1400,13 @@ class FORM extends API {
 								'id' => 'components'
 							]
 						], [
-							'type' => 'select',
+							'type' => 'textsection',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_forms_select'),
-								'onchange' => "api.form('get', 'form_editor', this.value)"
 							],
-							'content' => $formoptions
-						], [
+						],
+						...$options_selection,
+						[
 							'type' => 'search',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_forms'),
@@ -1328,13 +1416,12 @@ class FORM extends API {
 						]
 					],[
 						[
-							'type' => 'select',
+							'type' => 'textsection',
 							'attributes' => [
 								'name' => LANG::GET('assemble.edit_existing_forms_all'),
-								'onchange' => "api.form('get', 'form_editor', this.value)"
 							],
-							'content' => $alloptions
-						]
+						],
+						...$options_selection
 					]
 				], [
 					[
@@ -1343,14 +1430,9 @@ class FORM extends API {
 							'name' => LANG::GET('assemble.edit_forms_info_description')
 						],
 						'content' => LANG::GET('assemble.edit_forms_info_content')
-					], [
-						'type' => 'select',
-						'attributes' => [
-							'name' => LANG::GET('assemble.edit_add_component_select'),
-							'onchange' => "api.form('get', 'component', this.value)"
-						],
-						'content' => $componentoptions
-					], [
+					], 
+					...$components_selection,
+					[
 						'type' => 'search',
 						'attributes' => [
 							'name' => LANG::GET('assemble.edit_add_component'),

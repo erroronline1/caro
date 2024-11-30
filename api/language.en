@@ -26,7 +26,7 @@ address = "University Hospital Heidelberg, Technische Orthopädie, Schlierbacher
 
 ; autorization levels with language specific value
 ; append if new modules require specific permissions
-; keys are hardcoded!
+; default-keys are hardcoded!
 ; MUST NOT HAVE THE SAME VALUES AS UNITS!! (name confusion within form data)
 [permissions]
 user = "User"
@@ -48,7 +48,7 @@ admin = "Application admin"
 ; once defined keys remain in the database, so it should be appended at best!
 ; admin and office are hardcoded
 [units]
-common = "Common"
+common = "Common" ; key hardcoded within forms
 orthotics1 = "Orthotics I"
 orthotics2 = "Orthotics II"
 prosthetics1 = "Prosthetics I"
