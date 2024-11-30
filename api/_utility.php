@@ -30,57 +30,105 @@ class UTILITY {
 	 *  |__,|_|_| |___|_| |_|_|_|_|__,|_  |___|
 	 *                                |___|
 	 * @param string $file filename
-	 * @param int $maxSize max pixels on longest side
+	 * @param int $maxSize max pixels on longest side, 0 keeps original size
 	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
 	 * @param string|bool $forceOutputType gif|jpeg|png|jpg
+	 * @param string $label written on the image
+	 * @param string $watermark path to image for watermarking
 	 * 
 	 * @return object|null a GdImage ressource or no return
 	 */
-	public static function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false){
+	public static function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = ''){
 		if (is_file($file)){
-			$filetype=getimagesize($file)[2];
+			$filetype = getimagesize($file)[2];
 			switch($filetype){
-				case"1": //gif
-					$image = imagecreatefromgif($file);
+				case "1": //gif
+					$input = imagecreatefromgif($file);
 					break;
 				case "2": //jpeg
-					$image = imagecreatefromjpeg($file);
+					$input = imagecreatefromjpeg($file);
 					break;
 				case "3": //png
-					$image = imagecreatefrompng($file);
+					$input = imagecreatefrompng($file);
 					break;
 			}
 		}
-		else $image = imagecreatefromstring($file); // bytestring
-		if ($image) {
+		else $input = imagecreatefromstring($file); // bytestring
+		if ($input) {
 			$filename = pathinfo($file)['basename'];
-			$owidth = imagesx($image);
-			$oheight = imagesy($image);		
-			if ($owidth >= $oheight && $owidth > $maxSize) $resize = $maxSize/$owidth;
-			elseif ($owidth < $oheight && $oheight > $maxSize) $resize = $maxSize/$oheight;
+			// resizing
+			$src = ['w' => imagesx($input), 'h' => imagesy($input)];
+			if ($maxSize > 0 && $src['w'] >= $src['h'] && $src['w'] > $maxSize) $resize = $maxSize / $src['w'];
+			elseif ($maxSize > 0 && $src['w'] < $src['h'] && $src['h'] > $maxSize) $resize = $maxSize / $src['h'];
 			else $resize = 1;
-			$image2 = imagecreatetruecolor(ceil($owidth * $resize), ceil($oheight * $resize));
-			imagealphablending($image2, false);
-			imagesavealpha($image2, true);
-			$transparent = imagecolorallocatealpha($image2, 255, 255, 255, 127);
-			imagefilledrectangle($image2, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $transparent);
-			imagecopyresampled($image2, $image, 0, 0, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $owidth, $oheight);
-			imagedestroy($image);
+			$new = ['w' => ceil($src['w'] * $resize), 'h' => ceil($src['h'] * $resize)];
+			$output = imagecreatetruecolor($new['w'], $new['h']);
+			imagefill($output, 0, 0, imagecolorallocatealpha($input, 0, 0, 0, 127));
+			imagealphablending($output, false);
+			imagesavealpha($output, true);
+			imagecolortransparent($output, imagecolorallocate($output, 0, 0, 0));
+			imagecopyresampled($output, $input, 0, 0, 0, 0, $new['w'], $new['h'], $src['w'], $src['h']);
+			imagedestroy($input);
 
+			$scale = .15; // of shorter length
+			$opacity = 20; // for watermark
+			// labelling
+			if ($label){
+				if ($new['w'] >= $new['h']) $height = $new['h'] * $scale / 1.5;
+				else $height = $new['w'] * $scale / 1.5;
+				$height = ceil($height);
+				$input = imagecreatetruecolor($new['w'], $height);
+				imagecolortransparent($input, imagecolorallocate($input, 0, 0, 0));
+				$textcolor = imagecolorallocate($input, 1, 1, 1);
+				imagefttext($input, $height / 2, 0, ceil($height / 5), $height - ceil($height / 7), $textcolor, '../media/UbuntuMono-R.ttf', $label);
+				$textcolor = imagecolorallocate($input, 255, 255, 255);
+				imagefttext($input, $height / 2, 0, ceil($height / 6), $height - ceil($height / 6), $textcolor, '../media/UbuntuMono-R.ttf', $label);
+				imagecopymerge($output, $input, 0, $new['h'] - $height, 0, 0, $new['w'], $new['h'], 99);
+				imagedestroy($input);
+				var_dump($height);
+			}
+
+			// watermark on lower right
+			if ($watermark && is_file($watermark)){
+				$filetype = getimagesize($watermark)[2];
+				switch($filetype){
+					case "1": //gif
+						$input = imagecreatefromgif($watermark);
+						break;
+					case "2": //jpeg
+						$input = imagecreatefromjpeg($watermark);
+						break;
+					case "3": //png
+						$input = imagecreatefrompng($watermark);
+						break;
+				}
+				$wm = ['w' => imagesx($input), 'h' => imagesy($input)];
+				if ($new['w'] >= $new['h']) $resize = $new['h'] * $scale / $wm['w'];
+				else $resize = $new['w'] * $scale / $wm['h'];
+				$newwm = ['w' => ceil($wm['w'] * $resize), 'h' => ceil($wm['h'] * $resize)];
+				$stamp = imagecreatetruecolor($newwm['w'], $newwm['h']);
+				imagecolortransparent($stamp, imagecolorallocate($stamp, 0, 0, 0));
+				imagecopyresampled($stamp, $input, 0, 0, 0, 0, $newwm['w'], $newwm['h'], $wm['w'], $wm['h']);
+				imagedestroy($input);
+
+				imagecopymerge($output, $stamp, $new['w'] - $newwm['w'], $new['h'] - $newwm['h'], 0, 0, $newwm['w'], $newwm['h'], $opacity);
+				imagedestroy($stamp);
+			}
+	
 			if ($destination & UTILITY_IMAGE_REPLACE){
 				chmod($file, 0777);
 				switch($filetype){
 					case "1": //gif
-						imagegif($image2, $file);
+						imagegif($output, $file);
 						break;
 					case "2": //jpeg
-						imagejpeg($image2, $file, 100);
+						imagejpeg($output, $file, 100);
 						break;
 					case "3": //png
-						imagepng($image2, $file, 0);
+						imagepng($output, $file, 0);
 						break;
 				}
-				imagedestroy($image2);
+				imagedestroy($output);
 				return;
 			}
 
@@ -100,16 +148,16 @@ class UTILITY {
 			ob_start();	
 			switch($filetype){
 				case "1": //gif
-					imagegif($image2, null);
+					imagegif($output, null);
 					break;
 				case "2": //jpeg
-					imagejpeg($image2, null, 100);
+					imagejpeg($output, null, 100);
 					break;
 				case "3": //png
-					imagepng($image2, null, 6);
+					imagepng($output, null, 6);
 					break;
 			}
-			imagedestroy($image2);
+			imagedestroy($output);
 			if ($destination & UTILITY_IMAGE_STREAM) {
 				ob_flush();
 			}
