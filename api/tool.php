@@ -359,6 +359,91 @@ class TOOL extends API {
 	}
 
 	/**
+	 *   _                   
+	 *  |_|_____ ___ ___ ___ 
+	 *  | |     | .'| . | -_|
+	 *  |_|_|_|_|__,|_  |___|
+	 *              |___|
+	 */
+	public function image(){
+
+		$size = UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.image_size'));
+		$watermark = UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.image_options_watermark'));
+		$label = UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.image_label'));
+
+		$result['render'] = ['form' => [
+			'data-usecase' => 'tool_image',
+			'action' => "javascript:api.tool('post', 'image')"
+		],
+		'content' => [
+			[
+				[
+					'type' => 'file',
+					'attributes' => [
+						'name' => LANG::GET('tool.image_source'),
+						'multiple' => true,
+						'accept' => '.jpg,.jpeg,.png,.gif'
+					]
+				],
+				[
+					'type' => 'br'
+				],
+				[
+					'type' => 'checkbox',
+					'attributes' => [
+						'name' => LANG::GET('tool.image_options')
+					],
+					'content' => [
+						LANG::GET('tool.image_options_watermark') => $watermark ? ['checked' => true] : []
+					]
+				],
+				[
+					'type' => 'text',
+					'attributes' => [
+						'name' => LANG::GET('tool.image_label'),
+						'value' => $label ? : ''
+					]
+				],
+				[
+					'type' => 'select',
+					'attributes' => [
+						'name' => LANG::GET('tool.image_size'),
+					],
+					'content' => [
+						'...' => !$size? ['selected' => true]: [],
+						'800 x 600' => $size === '800 x 600' ? ['selected' => true]: [],
+						'1024 x 768' => $size === '1024 x 768' ? ['selected' => true]: [],
+						'1280 x 1024' => $size === '1280 x 1024' ? ['selected' => true]: [],
+						'1600 x 1200' => $size === '1600 x 1200' ? ['selected' => true]: [],
+						'3200 x 2400' => $size === '3200 x 2400' ? ['selected' => true]: [],
+					]
+				],
+			]
+		]];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (isset($_FILES[LANG::PROPERTY('tool.image_source')]) && $_FILES[LANG::PROPERTY('tool.image_source')]['tmp_name'][0]) {
+					$result['render']['content'][] = [];
+					$images = UTILITY::storeUploadedFiles([LANG::PROPERTY('tool.image_source')], UTILITY::directory('tmp'), [$size]);
+
+					foreach($images as $image){
+						UTILITY::alterImage($image, 0, UTILITY_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
+						$result['render']['content'][count($result['render']['content']) - 1][] = [
+							'type' => 'image',
+							'description' => pathinfo($image)['basename'],
+							'attributes' => [
+								'name' => pathinfo($image)['basename'],
+								'url' => substr($image, 3)
+							]
+						];
+					}
+				}
+		}
+		$this->response($result);
+	}
+
+	/**
 	 *
 	 *   ___ ___ ___ ___ ___ ___ ___
 	 *  |_ -|  _| .'|   |   | -_|  _|

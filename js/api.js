@@ -1405,6 +1405,7 @@ export const api = {
 				calculator: LANG.GET("menu.tools_calculator"),
 				scanner: LANG.GET("menu.tools_scanner"),
 				stlviewer: LANG.GET("menu.tools_stl_viewer"),
+				image: LANG.GET("menu.tools_image"),
 			};
 		switch (method) {
 			case "get":
@@ -1416,6 +1417,9 @@ export const api = {
 						break;
 					case "code":
 						payload = _.getInputs("[data-usecase=tool_create_code]", true);
+						break;
+					case "image":
+						payload = _.getInputs("[data-usecase=tool_image]", true);
 						break;
 				}
 				break;

@@ -100,7 +100,6 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* image resizer and watermarking tool
 
 #### records considerations
 
@@ -940,7 +939,7 @@ Sample checks are added to the records. New checks trigger a sytem message to th
 
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu.png)
 
-Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit) and support recurring calculations.
+Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit), support recurring calculations and image scaling.
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
@@ -1035,6 +1034,7 @@ defaultlanguage = "en" ; default fallback application language: en, de, etc. acc
 issue_mail = "dev@erroronline.one" ; address for application and security issues
 require_record_type_selection = 1 ; 1: yes, 0: no; require selection on records e.g. if this is related to a complaint 
 timezone = "Europe/Berlin" ; timezone for calendar handling
+watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
@@ -3369,7 +3369,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | supported code type (pow, poa, cd) |
-| payload | form data | required | defined fields from previus GET fetch |
+| payload | form data | required | defined fields from previous GET fetch |
 
 Sample response
 ```
@@ -3398,11 +3398,39 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | supported code type (qrcode_text, qrcode_appointment, barcode_code128, barcode_ean13) |
-| payload | form data | required | defined fields from previus GET fetch |
+| payload | form data | required | defined fields from previous GET fetch |
 
 Sample response
 ```
 {"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
+```
+
+> GET ./api/api.php/tool/image
+
+Returns a form to select images and scaling options.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', 'image')"},"content":[[{"type":"file","attributes":{"name":"Bild","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Optionen"},"content":{"Wasserzeichen":[]}},{"type":"text","attributes":{"name":"Beschriftung","value":""}},{"type":"select","attributes":{"name":"Maximale Gr\u00f6\u00dfe"},"content":{"...":{"selected":true},"800 x 600":[],"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}]]}}
+```
+
+> POST ./api/api.php/tool/image
+
+Returns a form to select images and scaling options, prefilled with passed data from payload and an option to download modified images.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | defined fields from previous GET fetch |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', 'image')"},"content":[[{"type":"file","attributes":{"name":"Bild","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Optionen"},"content":{"Wasserzeichen":{"checked":true}}},{"type":"text","attributes":{"name":"Beschriftung","value":"UKHD"}},{"type":"select","attributes":{"name":"Maximale Gr\u00f6\u00dfe"},"content":{"...":[],"800 x 600":{"selected":true},"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}],[{"type":"image","description":"800 x 600_IMG_20231012_0001.jpg","attributes":{"name":"800 x 600_IMG_20231012_0001.jpg","url":"fileserver\/tmp\/800 x 600_IMG_20231012_0001.jpg"}}]]}}
 ```
 
 > GET ./api/api.php/tool/scanner

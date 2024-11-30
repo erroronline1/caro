@@ -874,7 +874,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lös
 
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20de.png)
 
-Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, der Betrachtung von STL-Dateien und der Unterstützung bei wiederkehrenden Berechnungen zur Verfügung.
+Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, der Betrachtung von STL-Dateien, der Unterstützung bei wiederkehrenden Berechnungen und Bildskalierung zur Verfügung.
 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
@@ -970,6 +970,7 @@ defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend v
 issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
 require_complaint_selection = 1 ; 1: ja, 0: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
 timezone = "Europe/Berlin" ; Zeitzone für den Kalender
+watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31" ; Monat-Tag

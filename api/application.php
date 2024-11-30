@@ -397,7 +397,8 @@ class APPLICATION extends API {
 				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
 				LANG::GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
 				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"],
-				LANG::GET('menu.tools_calculator') => ['onpointerup' => "api.tool('get', 'calculator')"]
+				LANG::GET('menu.tools_calculator') => ['onpointerup' => "api.tool('get', 'calculator')"],
+				LANG::GET('menu.tools_image') => ['onpointerup' => "api.tool('get', 'image')"],
 			],
 		];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_bundles')] = ['onpointerup' => "api.record('get', 'bundles')"];

@@ -760,6 +760,7 @@ tools_digital_codes = "Create 2D-codes"
 tools_scanner = "2D-scanner"
 tools_stl_viewer = "STL viewer"
 tools_calculator = "Calculator"
+tools_image = "Image resizing and watermark"
 csvfilter_filter = "CSV filter"
 csvfilter_filter_manager = "Manage CSV filter"
 audit = "Audit"
@@ -1264,6 +1265,13 @@ calculator_cd_diameter = "Diameter"
 calculator_cd_hint = "Distance between holes around a cylinder"
 calculator_cd_bores = "Bores"
 calculator_result = "Result"
+
+image_source = "Image"
+image_size = "Maximum size"
+image_options = "Options"
+image_options_watermark = "Watermark"
+image_label = "Beschriftung"
+image_export = "Export"
 
 ; all keys are hardcoded
 [user]

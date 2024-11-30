@@ -760,6 +760,7 @@ tools_digital_codes = "2D-Codes erstellen"
 tools_scanner = "2D-Scanner"
 tools_stl_viewer = "STL-Betrachter"
 tools_calculator = "Rechner"
+tools_image = "Bildskalierung und Wasserzeichen"
 csvfilter_filter = "CSV-Filter"
 csvfilter_filter_manager = "CSV-Filter verwalten"
 audit = "Audit"
@@ -1264,6 +1265,13 @@ calculator_cd_diameter = "Durchmesser"
 calculator_cd_hint = "Abstand zwischen Löchern um einen Zylinder"
 calculator_cd_bores = "Bohrungen"
 calculator_result = "Ergebnis"
+
+image_source = "Bild"
+image_size = "Maximale Größe"
+image_options = "Optionen"
+image_options_watermark = "Wasserzeichen"
+image_label = "Beschriftung"
+image_export = "Exportiere"
 
 ; alle schlüssel sind fest einprogrammiert
 [user]
