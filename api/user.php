@@ -95,7 +95,7 @@ class USER extends API {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-					UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 				// process settings
@@ -410,7 +410,7 @@ class USER extends API {
 					];
 				}
 				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-				UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+				UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
 				// add user training
@@ -552,7 +552,7 @@ class USER extends API {
 				if (isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-					UTILITY::resizeImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 

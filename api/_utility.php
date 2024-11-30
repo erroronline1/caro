@@ -24,6 +24,102 @@ define("UTILITY_IMAGE_RESOURCE", 0x4);
 class UTILITY {
 
 	/**
+	 *       _ _           _                   
+	 *   ___| | |_ ___ ___|_|_____ ___ ___ ___ 
+	 *  | .'| |  _| -_|  _| |     | .'| . | -_|
+	 *  |__,|_|_| |___|_| |_|_|_|_|__,|_  |___|
+	 *                                |___|
+	 * @param string $file filename
+	 * @param int $maxSize max pixels on longest side
+	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
+	 * @param string|bool $forceOutputType gif|jpeg|png|jpg
+	 * 
+	 * @return object|null a GdImage ressource or no return
+	 */
+	public static function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false){
+		if (is_file($file)){
+			$filetype=getimagesize($file)[2];
+			switch($filetype){
+				case"1": //gif
+					$image = imagecreatefromgif($file);
+					break;
+				case "2": //jpeg
+					$image = imagecreatefromjpeg($file);
+					break;
+				case "3": //png
+					$image = imagecreatefrompng($file);
+					break;
+			}
+		}
+		else $image = imagecreatefromstring($file); // bytestring
+		if ($image) {
+			$filename = pathinfo($file)['basename'];
+			$owidth = imagesx($image);
+			$oheight = imagesy($image);		
+			if ($owidth >= $oheight && $owidth > $maxSize) $resize = $maxSize/$owidth;
+			elseif ($owidth < $oheight && $oheight > $maxSize) $resize = $maxSize/$oheight;
+			else $resize = 1;
+			$image2 = imagecreatetruecolor(ceil($owidth * $resize), ceil($oheight * $resize));
+			imagealphablending($image2, false);
+			imagesavealpha($image2, true);
+			$transparent = imagecolorallocatealpha($image2, 255, 255, 255, 127);
+			imagefilledrectangle($image2, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $transparent);
+			imagecopyresampled($image2, $image, 0, 0, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $owidth, $oheight);
+			imagedestroy($image);
+
+			if ($destination & UTILITY_IMAGE_REPLACE){
+				chmod($file, 0777);
+				switch($filetype){
+					case "1": //gif
+						imagegif($image2, $file);
+						break;
+					case "2": //jpeg
+						imagejpeg($image2, $file, 100);
+						break;
+					case "3": //png
+						imagepng($image2, $file, 0);
+						break;
+				}
+				imagedestroy($image2);
+				return;
+			}
+
+			if ($forceOutputType){
+				$newtype = array_search($forceOutputType, ['gif', 'jpeg', 'png', 'jpg']);
+				if ($newtype !== false){
+					if ($newtype == 3) $newtype = 1;
+					$filetype = $newtype + 1;
+					$filename = pathinfo($file)['filename'] . $forceOutputType;
+				}
+			}
+
+			if ($destination & UTILITY_IMAGE_STREAM) {
+					header("Content-type: application/octet-stream");
+					header("Content-Disposition: attachment; filename=" . $filename);
+			}
+			ob_start();	
+			switch($filetype){
+				case "1": //gif
+					imagegif($image2, null);
+					break;
+				case "2": //jpeg
+					imagejpeg($image2, null, 100);
+					break;
+				case "3": //png
+					imagepng($image2, null, 6);
+					break;
+			}
+			imagedestroy($image2);
+			if ($destination & UTILITY_IMAGE_STREAM) {
+				ob_flush();
+			}
+			$return = ob_get_contents();
+			ob_end_clean(); 
+			return $return;
+		}
+	}
+
+	/**
 	 *       _             _             _
 	 *   ___| |___ ___ ___|_|___ ___ _ _| |_ ___
 	 *  |  _| | -_| .'|   | |   | . | | |  _|_ -|
@@ -313,102 +409,6 @@ class UTILITY {
 	public static function propertySet($object, $property){
 		if (gettype($object) === 'array') return isset($object[$property]) ? $object[$property] : false;
 		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
-	}
-
-	/**
-	 *               _         _
-	 *   ___ ___ ___|_|___ ___|_|_____ ___ ___ ___
-	 *  |  _| -_|_ -| |- _| -_| |     | .'| . | -_|
-	 *  |_| |___|___|_|___|___|_|_|_|_|__,|_  |___|
-	 *                                    |___|
-	 * @param string $file filename
-	 * @param int $maxSize max pixels on longest side
-	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
-	 * @param string|bool $forceOutputType gif|jpeg|png|jpg
-	 * 
-	 * @return object|null a GdImage ressource or no return
-	 */
-	public static function resizeImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false){
-		if (is_file($file)){
-			$filetype=getimagesize($file)[2];
-			switch($filetype){
-				case"1": //gif
-					$image = imagecreatefromgif($file);
-					break;
-				case "2": //jpeg
-					$image = imagecreatefromjpeg($file);
-					break;
-				case "3": //png
-					$image = imagecreatefrompng($file);
-					break;
-			}
-		}
-		else $image = imagecreatefromstring($file); // bytestring
-		if ($image) {
-			$filename = pathinfo($file)['basename'];
-			$owidth = imagesx($image);
-			$oheight = imagesy($image);		
-			if ($owidth >= $oheight && $owidth > $maxSize) $resize = $maxSize/$owidth;
-			elseif ($owidth < $oheight && $oheight > $maxSize) $resize = $maxSize/$oheight;
-			else $resize = 1;
-			$image2 = imagecreatetruecolor(ceil($owidth * $resize), ceil($oheight * $resize));
-			imagealphablending($image2, false);
-			imagesavealpha($image2, true);
-			$transparent = imagecolorallocatealpha($image2, 255, 255, 255, 127);
-			imagefilledrectangle($image2, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $transparent);
-			imagecopyresampled($image2, $image, 0, 0, 0, 0, ceil($owidth * $resize), ceil($oheight * $resize), $owidth, $oheight);
-			imagedestroy($image);
-
-			if ($destination & UTILITY_IMAGE_REPLACE){
-				chmod($file, 0777);
-				switch($filetype){
-					case "1": //gif
-						imagegif($image2, $file);
-						break;
-					case "2": //jpeg
-						imagejpeg($image2, $file, 100);
-						break;
-					case "3": //png
-						imagepng($image2, $file, 0);
-						break;
-				}
-				imagedestroy($image2);
-				return;
-			}
-
-			if ($forceOutputType){
-				$newtype = array_search($forceOutputType, ['gif', 'jpeg', 'png', 'jpg']);
-				if ($newtype !== false){
-					if ($newtype == 3) $newtype = 1;
-					$filetype = $newtype + 1;
-					$filename = pathinfo($file)['filename'] . $forceOutputType;
-				}
-			}
-
-			if ($destination & UTILITY_IMAGE_STREAM) {
-					header("Content-type: application/octet-stream");
-					header("Content-Disposition: attachment; filename=" . $filename);
-			}
-			ob_start();	
-			switch($filetype){
-				case "1": //gif
-					imagegif($image2, null);
-					break;
-				case "2": //jpeg
-					imagejpeg($image2, null, 100);
-					break;
-				case "3": //png
-					imagepng($image2, null, 6);
-					break;
-			}
-			imagedestroy($image2);
-			if ($destination & UTILITY_IMAGE_STREAM) {
-				ob_flush();
-			}
-			$return = ob_get_contents();
-			ob_end_clean(); 
-			return $return;
-		}
 	}
 
 	/**

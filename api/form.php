@@ -517,7 +517,7 @@ class FORM extends API {
 						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
 						$uploaded_files = [];
 						foreach($uploads as $path){
-							UTILITY::resizeImage($path, CONFIG['limits']['form_image'], UTILITY_IMAGE_REPLACE);
+							UTILITY::alterImage($path, CONFIG['limits']['form_image'], UTILITY_IMAGE_REPLACE);
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
 							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
