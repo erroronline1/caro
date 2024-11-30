@@ -261,6 +261,7 @@ class FORM extends API {
 					':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_name')),
 					':alias' => '',
 					':context' => 'bundle',
+					':unit' => null,
 					':author' => $_SESSION['user']['name'],
 					':content' => $content,
 					':regulatory_context' => '',
@@ -287,6 +288,7 @@ class FORM extends API {
 						'values' => [
 							':alias' => $exists['alias'],
 							':context' => $exists['context'],
+							':unit' => $bundle['unit'],
 							':hidden' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_hidden')) === LANG::PROPERTY('assemble.edit_bundle_hidden_hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 							':id' => $exists['id'],
 							':regulatory_context' => '',
@@ -352,6 +354,7 @@ class FORM extends API {
 					'name' => '',
 					'alias' => '',
 					'context' => '',
+					'unit' => '',
 					'date' => '',
 					'author' => '',
 					'content' => '',
@@ -497,7 +500,7 @@ class FORM extends API {
 				unset($component['name']);
 				$component_hidden = intval($component['hidden']);
 				unset($component['hidden']);
-				$component_approve = $component['approve'];
+				$component_approve = array_search($component['approve'], LANGUAGEFILE['units']);
 				unset($component['approve']);
 
 				/**
@@ -579,6 +582,7 @@ class FORM extends API {
 							'values' => [
 								':alias' => '',
 								':context' => 'component',
+								':unit' => $component_approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => json_encode($component),
 								':hidden' => $component_hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
@@ -607,6 +611,7 @@ class FORM extends API {
 							'values' => [
 								':alias' => '',
 								':context' => 'component',
+								':unit' => $component_approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
 								':hidden' => $component_hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
@@ -633,7 +638,7 @@ class FORM extends API {
 				// until here the component has not existed, or the content of an approved component has been changed resulting in a new version
 
 				// if not updated check if approve is set, not earlier
-				if (!($component_approve = array_search($component_approve, LANGUAGEFILE['units']))) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
+				if (!$component_approve) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_not_saved_missing'), 'type' => 'error']]);
 
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
@@ -645,6 +650,7 @@ class FORM extends API {
 						':name' => $component_name,
 						':alias' => '',
 						':context' => 'component',
+						':unit' => $component_approve,
 						':author' => $_SESSION['user']['name'],
 						':content' => json_encode($component),
 						':regulatory_context' => '',
@@ -749,13 +755,15 @@ class FORM extends API {
 			if (!$component) $component = [
 				'id' => '',
 				'name' => '',
-				'approval' => null
+				'approval' => null,
+				'unit' => null
 			];
 		} else {
 			if (!$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID)) $component = [
 				'id' => '',
 				'name' => '',
-				'approval' => null
+				'approval' => null,
+				'unit' => null
 			];
 		}
 		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -795,7 +803,7 @@ class FORM extends API {
 			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
 		];
 		foreach(LANGUAGEFILE['units'] as $key => $value){
-			$approve['content'][$value] = [];
+			$approve['content'][$value] = $component['unit'] === $key ? ['selected' => true] : [];
 		}
 
 		$pending_approvals = PERMISSION::pending('formapproval', $component['approval']);
@@ -1028,6 +1036,8 @@ class FORM extends API {
 				$exists = $exists ? $exists[0] : ['approval' => null];
 				$approved = PERMISSION::fullyapproved('formapproval', $exists['approval']);
 
+				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
+
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, reset approval
@@ -1035,6 +1045,7 @@ class FORM extends API {
 							'values' => [
 								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
 								':context' => $this->_payload->context,
+								':unit' => $this->_payload->approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
 								':hidden' => boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : NULL,
@@ -1063,6 +1074,7 @@ class FORM extends API {
 							'values' => [
 								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
 								':context' => $this->_payload->context,
+								':unit' => $this->_payload->approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
 								':hidden' =>  boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : NULL,
@@ -1089,14 +1101,14 @@ class FORM extends API {
 				// until here the form has not existed, or the content of an approved form has been changed resulting in a new version
 
 				// if not updated check if approve is set, not earlier
-				if (!in_array($this->_payload->approve, LANGUAGEFILE['units'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
-				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
+				if (!$this->_payload->approve) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
 					'values' => [
 						':name' => $this->_payload->name,
 						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): $this->_payload->alias,
 						':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
+						':unit' => $this->_payload->approve,
 						':author' => $_SESSION['user']['name'],
 						':content' => implode(',', $this->_payload->content),
 						':regulatory_context' => implode(',', $regulatory_context),
@@ -1175,10 +1187,11 @@ class FORM extends API {
 			// get latest approved by name
 			$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
 		}
-		if (!$form) $form= [
+		if (!$form) $form = [
 			'name' => '',
 			'alias' => '',
 			'context' => '',
+			'unit' => null,
 			'regulatory_context' => '',
 			'permitted_export' => null,
 			'restricted_access' => null,
@@ -1256,7 +1269,7 @@ class FORM extends API {
 			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
 		];
 		foreach(LANGUAGEFILE['units'] as $key => $value){
-			$approve['content'][$value] = [];
+			$approve['content'][$value] = $form['unit'] === $key ? ['selected' => true] : [];
 		}
 		$regulatory_context = [];
 		$form['regulatory_context'] = explode(',', $form['regulatory_context'] ? : '');

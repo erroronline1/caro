@@ -443,12 +443,12 @@ class SQLQUERY {
 
 
 		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
+			'mysql' => "INSERT INTO caro_form (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
+			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
 		],
 		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
+			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
 		],
 		'form_put_approve' => [
 			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",

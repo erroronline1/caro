@@ -156,6 +156,7 @@ $queries = [
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -391,6 +392,7 @@ $queries = [
 				"	name varchar(MAX) NOT NULL," .
 				"	alias varchar(MAX) NOT NULL," .
 				"	context varchar(MAX) NOT NULL," .
+				"	unit varchar(MAX) NULL DEFAULT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
