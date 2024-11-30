@@ -69,7 +69,9 @@ purchaseedit[permissions] = "ceo,qmo,purchase,prrc"
 
 tool[title] = "Werkzeuge"
 tool[content] = "Du kannst QR-Codes und Barcodes erstellen. Es können dabei spezielle Formate vorbereitet sein. Du kannst solche Codes auch scannen um ihnen ihre Geheimnisse zu entlocken.""
-Der STL-Betrachter zeigt Dateien an, die bereitgestellt wurden oder im Sharepoint liegen."
+Der STL-Betrachter zeigt Dateien an, die bereitgestellt wurden oder im Sharepoint liegen.""
+Es gibt ein paar grundlegende Rechenoptionen für wiederkehrende Aufgaben der Produktion.""
+Bilder können skaliert oder mit einem Wasserzeichen versehen werden, z.B. für Vorträge."
 tool[permissions] = "user,group"
 
 audit[title] = "Audit"

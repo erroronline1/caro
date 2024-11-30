@@ -432,7 +432,7 @@ Verfügbare Elemente für Formulare sind:
 * Verknüpfungen (Links)
 * Mehrfachauswahl
 * Einfachauswahl (Buttons)
-* Einfachauswahl (Liste), optional als Mehrfachauswahl. Einträge werden stets alphabetisch geordnet.
+* Einfachauswahl (Liste), optional als Mehrfachauswahl. Einträge erscheinen in der Reihenfolge wie angegeben. Sollte diese alphabetisch sein (Sonderzeichen, A-Z, a-z) wird die Liste ab 12 Einträgen nach Anfangsbuchstaben gruppiert.
 * Datei-Upload, optional als Mehrfachauswahl
 * Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
 * Unterschriftenfeld
@@ -466,7 +466,7 @@ Bei der Anzeige von Zusammenfassungen kann die Vollständigkeit von Formular-Pak
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.
 An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abständen](#laufzeitvariablen) erinnert. Dies erfolgt über eine Nachricht an alle Nutzer der Bereiche des letzten eintragenden Nutzers.
 
-Versorgunsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden.
+Versorgunsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden. Mitarbeiter, die den Status ändern, haben die Wahl andere Mitarbeiter, Versorgungsbereiche oder deren Bereichsleiter via Nachricht zu informieren.
 
 Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen der Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.
 Aufzeichnungen können einen neuen Identifikator erhalten, z.B. bei Schreibfehlern oder einer versehentlichen doppelten Anlage. Im zweiten Fall werden die Aufzeichnungen mit bestehenden zusammengeführt sobald der neue Identifikator bereits genutzt wird. Diese Änderung sowie die Neuvergabe eines Identifikators werden ebenfalls dokumentiert.
@@ -475,7 +475,7 @@ Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Formularen enthalten
 * Einerseits vereinfacht dies die Übersicht verfügbarer Formulare und Informationen für manche Bereiche, indem beispielsweise administrative Inhalte gegenüber Mitarbeitern ausgeblendet werden,
 * andererseits bedeutet dies mehr Aufmerksamkeit auf die vergebenen Rollen und wer im Falle von Anfragen tatsächlich vollständige Daten exportiert.
 
-Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp, Fallstatus) werden ebenfalls aufgezeichnet. Da es sich hierbei um systemseitige Aktionen handelt werden Aufzeichnungen in der nutzerseitig gewählten Sprache gespeichert. Dies kann zu einer Sprachmischung führen!
+Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp, Fallstatus) werden ebenfalls aufgezeichnet.
 
 ![screen record summary](http://toh.erroronline.one/caro/record%20screen.png)
 
@@ -950,8 +950,8 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
 
 ### Anwendungseinrichtung
-* Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke) z.B. im Verzeichnis media/favicon/
-* Konfiguration von api/config.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade
+* Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
+* Konfiguration von api/config.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Bereichtigungen in _install.default.XX-Dateien.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX und _install.default.XX)
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
@@ -1526,7 +1526,7 @@ Diese Anwendung enthält sensible Daten. Bitte lass das Gerät nicht unbeaufsich
 Diese Anwendung ist Bestandteil des Qualitätsmanagements. Deine Daten sind für die Dokumentation und die Ressourceplanung erforderlich. Deine Daten sind in deinem Profil einsehbar. Manche Daten können nur durch die Leitung bearbeitet werden, andere von dir selbst. Im Falle einer Löschung deines Nutzerprofils verbleiben gesendete Nachrichten und allgemein genutzte Informationen (Bestellungen, Prüfungen, dein Name als Verfasser und Mitarbeiter für die Dokumentation) aufgrund berechtigten Interesses im Sinne einer durchgängigen Dokumentation und operativer Prozesse im System.
 
 ### Berechtigungen
-Die Anwendung erbittet die Berechtigung für den Kamerazugriff und Benachrichtigungen. Kamerazugriff kann für die Erfassung von Fotos für die Dokumentation und dem Scannen von Strich- und QR-Codes erforderlich sein. Letztere Anwendung kann auch durch zusätzliche Geräte erfolgen. Andernfalls kannst du dich nicht anmelden und die Dokumentation nicht im erforderlichen Maße sicherstellen. Benachrichtigungen informieren üder neue Nachrichten innerhalb der Anwendung und verbessern dadurch die Arbeitsbedingungen. Die Berechtigungen können durch die Browsereinstellungen jederzeit entzogen werden.
+Die Anwendung erbittet die Berechtigung für den Kamerazugriff und Benachrichtigungen. Kamerazugriff kann für die Erfassung von Fotos für die Dokumentation und dem Scannen von Strich- und QR-Codes erforderlich sein. Letztere Anwendung kann auch durch zusätzliche Geräte erfolgen. Andernfalls kannst du dich nicht anmelden und die Dokumentation nicht im erforderlichen Maße sicherstellen. Benachrichtigungen informieren über neue Nachrichten innerhalb der Anwendung und verbessern dadurch die Arbeitsbedingungen. Die Berechtigungen können durch die Browsereinstellungen jederzeit entzogen werden.
 
 ### Rückmeldungen
 Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wenden dich umgehend an :issue_mail (*wie in config.ini für application->issue_mail festgelegt*), erläutere die Details und ergänze eine Kontaktmöglichkeit.

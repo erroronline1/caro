@@ -69,7 +69,9 @@ purchaseedit[permissions] = "ceo,qmo,purchase,prrc"
 
 tool[title] = "Tools"
 tool[content] = "You can create qr-codes and barcodes. Some special formats may be prepared. You can also scan these codes to obtain their secret.""
-The stl-viewer dispays any file within the provided files or sharepoint."
+The stl-viewer dispays any file within the provided files or sharepoint.""
+There are some basic calculation options for recurring tasks within production.""
+Images can be resized or embedded a watermark e.g. for speeches."
 tool[permissions] = "user,group"
 
 audit[title] = "Audit"
