@@ -85,7 +85,6 @@ class UTILITY {
 				imagefttext($input, $height / 2, 0, ceil($height / 6), $height - ceil($height / 6), $textcolor, '../media/UbuntuMono-R.ttf', $label);
 				imagecopymerge($output, $input, 0, $new['h'] - $height, 0, 0, $new['w'], $new['h'], 99);
 				imagedestroy($input);
-				var_dump($height);
 			}
 
 			// watermark on lower right
