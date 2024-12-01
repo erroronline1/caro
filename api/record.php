@@ -362,9 +362,15 @@ class RECORD extends API {
 					$content['fillable'] = $subcontent['fillable'];
 				}
 				else {
-					if (in_array($subs['type'], ['identify', 'file', 'photo', 'links', 'calendarbutton', 'formbutton'])) continue;
-					if (in_array($subs['type'], ['image'])) {
+					if (in_array($subs['type'], ['identify'])) continue;
+					if (in_array($subs['type'], ['image', 'links'])) {
 						$name = $subs['description'];
+					}
+					if (in_array($subs['type'], ['formbutton'])) {
+						$name = $subs['attributes']['value'];
+					}
+					if (in_array($subs['type'], ['calendarbutton'])) {
+						$name = LANG::GET('record.form_export_element.' . $subs['type']);
 					}
 					else $name = $subs['attributes']['name'];
 					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
@@ -374,10 +380,11 @@ class RECORD extends API {
 						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
 						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 					}
-					if (!in_array($subs['type'], ['textsection', 'image'])) $content['fillable'] = true;
+					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'formbutton'])) $content['fillable'] = true;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = ['type' => 'selection', 'value' => []];
 						foreach($subs['content'] as $key => $v){
+							if ($key === '...') continue;
 							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
 							$selected = '';
 
@@ -394,24 +401,37 @@ class RECORD extends API {
 							$content['content'][$name]['value'][] = $selected . $key;
 						}
 					}
-					elseif ($subs['type']==='textsection'){
+					elseif ($subs['type'] === 'textsection'){
 						$content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
 					}
-					elseif ($subs['type']==='textarea'){
+					elseif ($subs['type'] === 'textarea'){
 						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
 					}
-					elseif ($subs['type']==='signature'){
+					elseif ($subs['type'] === 'signature'){
 						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
 					}
-					elseif ($subs['type']==='image'){
+					elseif ($subs['type'] === 'image'){
 						$content['content'][$name] = ['type'=> 'image', 'value' => $subs['attributes']['url']];
 						$file = pathinfo($subs['attributes']['url']);
 						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 							$content['images'][] = $subs['attributes']['url'];
 						}
 					}
-					elseif ($subs['type']==='range'){
+					elseif ($subs['type'] === 'range'){
 						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
+					}
+					elseif (in_array($subs['type'], ['photo', 'file'])){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => LANG::GET('record.form_export_element.' . $subs['type'])];
+					}
+					elseif ($subs['type'] === 'links'){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
+						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'] .= $link . "\n";
+					}
+					elseif ($subs['type'] === 'formbutton'){
+						$content['content'][LANG::GET('record.form_export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
+					}
+					elseif ($subs['type'] === 'calendarbutton'){
+						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
 					}
 					else {
 						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
