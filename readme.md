@@ -96,13 +96,16 @@
 ## development
 
 #### purchase considerations
+* consider order->productsearch a global method, refactor borrowed module, maybe pass a parameter
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 
 #### records considerations
-* consider full form export with textsections e.g. regarding manuals (record.php summarizeRecord())
+* consider full form export with textsections e.g. regarding manuals (record->summarizeRecord())
+* consider refactoring of form and record methods for form handling in fact within form-api (bundles, exportform, form, formfilter, forms)
+* consider joining api->contextComponents(), record->latestapprovedname(), audit->latestapprovedcomponent()
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
