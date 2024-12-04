@@ -380,6 +380,17 @@ class RECORD extends API {
 						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
 						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 					}
+					if (isset($subs['attributes']['required'])) $name .= ' *';
+					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
+						foreach($subs['content'] as $key => $attributes) {
+							if (!$attributes) break;
+							if (isset($attributes['required'])) {
+								$name .= ' *';
+								break;
+							}
+						}
+					}
+
 					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'formbutton'])) $content['fillable'] = true;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = ['type' => 'selection', 'value' => []];
@@ -466,7 +477,7 @@ class RECORD extends API {
 				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
 					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
 				}
-				$summary['content'] = array_merge([LANG::GET('record.record_type_description') => $type], $summary['content']);
+				$summary['content'] = array_merge([LANG::GET('record.record_type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
 			}
 			$summary['content'] = array_merge([LANG::GET('record.form_export_by') => [
 				'type' => 'text',
