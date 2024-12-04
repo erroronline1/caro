@@ -479,7 +479,7 @@ class RECORD extends API {
 				}
 				$summary['content'] = array_merge([LANG::GET('record.record_type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
 			}
-			$summary['content'] = array_merge([LANG::GET('record.form_export_by') => [
+			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => LANG::GET('assemble.required_asterisk')], LANG::GET('record.form_export_by') . ' *' => [
 				'type' => 'text',
 				'value' => ''
 			]], $summary['content']);
@@ -634,6 +634,12 @@ class RECORD extends API {
 
 		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
 			$return['render']['content'][] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => LANG::GET('assemble.required_asterisk')
+					]
+				],
 				[
 					'type' => 'button',
 					'hint' => LANG::GET('record.form_export_hint'),
