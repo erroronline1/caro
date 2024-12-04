@@ -682,6 +682,10 @@ input[type="range"],
 	margin-left: 2em;
 }
 
+[data-required]::after{
+ content: ' *';	
+}
+
 .rangedatalist {
 	display: flex;
 	flex-direction: column;

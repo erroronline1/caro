@@ -800,6 +800,16 @@ export class Assemble {
 		header.appendChild(document.createTextNode(this.currentElement.description.replace(/\[\]|DEFAULT_/g, "")));
 		header.dataset.type = this.currentElement.type;
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
+		// required handled by any input on their own but checkbox and radio
+		if (this.currentElement.content && typeof this.currentElement.content === 'object') {
+			for (let [key, attributes] of Object.entries(this.currentElement.content)) {
+				if (!attributes) break;
+				if (attributes.required) {
+					header.dataset.required = true;
+					break;
+				}
+			}
+		}
 		return [header];
 	}
 
@@ -1090,6 +1100,7 @@ export class Assemble {
 		label.dataset.type = "file";
 		label.classList.add("inlinebutton");
 		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
+		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
 		button.onpointerup = () => {
 			let e = document.getElementById(input.id);
@@ -1227,6 +1238,8 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label");
+		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
+
 		if (type === "number") input.step = ".01";
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
@@ -1524,6 +1537,7 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label", "productselection");
+		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
@@ -1664,6 +1678,7 @@ export class Assemble {
 			label.htmlFor = input.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
 			label.classList.add("input-label");
+			if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
 			if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
@@ -1779,6 +1794,7 @@ export class Assemble {
 		label.htmlFor = select.id;
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
 		label.classList.add("input-label");
+		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
@@ -1926,6 +1942,7 @@ export class Assemble {
 			label.htmlFor = textarea.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
 			label.classList.add("textarea-label");
+			if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 		}
 		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
