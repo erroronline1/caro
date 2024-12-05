@@ -866,7 +866,7 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "exportpricelist"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "vendorinformation", "productinformation", "exportpricelist", "productsearch"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,

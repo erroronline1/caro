@@ -23,7 +23,6 @@ class ORDER extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_subMethod = null;
-	private $_borrowedModule = null;
 	private $_subMethodState = null;
 
 	public function __construct(){
@@ -32,7 +31,7 @@ class ORDER extends API {
 
 		$this->_requestedID = isset(REQUEST[2]) ? (REQUEST[2] != 'false' ? REQUEST[2]: null) : null;
 		$this->_subMethod = isset(REQUEST[3]) ? REQUEST[3] : null;
-		$this->_borrowedModule = $this->_subMethodState = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_subMethodState = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -1372,134 +1371,6 @@ class ORDER extends API {
 		$order_data['orderer'] = $_SESSION['user']['name'];
 		if(!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
-	}
-	
-	/**
-	 *                 _         _                       _
-	 *   ___ ___ ___ _| |_ _ ___| |_ ___ ___ ___ ___ ___| |_
-	 *  | . |  _| . | . | | |  _|  _|_ -| -_| .'|  _|  _|   |
-	 *  |  _|_| |___|___|___|___|_| |___|___|__,|_| |___|_|_|
-	 *  |_|
-	 */
-	public function productsearch(){
-		// order to be taken into account in utility.js _client.order.addProduct() method and this->order() method as well!
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'GET':
-				$result = ['render' => []];
-				if (!$this->_subMethod) {
-					$result['render']['content'] = [];
-					break;
-				}
-
-				if ($this->_borrowedModule === 'productselection'){
-					// prepared by assemble.js vendor ids are passed as 'null'-string
-					$vendors = SQLQUERY::EXECUTE($this->_pdo, SQLQUERY::PREPARE('consumables_get_vendor_datalist'));
-					$this->_requestedID = implode('_', array_values(array_column($vendors, 'id')));
-				}
-				$search = SQLQUERY::EXECUTE($this->_pdo, $this->_borrowedModule === 'editconsumables' ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
-					'values' => [
-						':search' => $this->_subMethod
-					],
-					'replacements' => [
-						':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $this->_requestedID))),
-					]
-				]);
-
-				$productsPerSlide = 0;
-				$matches = [[]];
-
-				foreach($search as $key => $row) {
-					foreach($row as $key => $value){
-						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
-					}
-					$article = intval(count($matches) - 1);
-					if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
-						$matches[$article][] = [
-							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
-								],
-							]
-						];
-					}
-					$slide = intval(count($matches[$article]) - 1);
-					switch ($this->_borrowedModule){
-						case 'editconsumables': // consumables.php can make good use of this method!
-							$matches[$article][$slide][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
-								],
-								'content' => [
-									[
-										'type' => 'textsection',
-										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
-									]
-								]
-							];
-							break;
-						case 'productinformation': // consumables.php can make good use of this method!
-							$matches[$article][$slide][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
-								],
-								'content' => [
-									[
-										'type' => 'textsection',
-										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
-									]
-								]
-							];
-							break;
-						case 'productselection': // form.php, record.php, assemble.js can make good use of this method!
-							if (!isset($matches[$article][$slide][1])) $matches[$article][$slide][] = [
-								'type' => 'radio',
-								'attributes' => [
-									'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
-								],
-								'content' => []
-							];
-							$matches[$article][$slide][1]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
-									'onchange' => "if (this.checked) document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
-								];
-							break;
-						default:
-							$incorporationState = '';
-							if ($row['incorporated'] === '') $incorporationState = LANG::GET('order.incorporation_neccessary');
-							else {
-								$row['incorporated'] = json_decode($row['incorporated'], true);
-								if (isset($row['incorporated']['_denied'])) $incorporationState = LANG::GET('order.incorporation_denied');
-								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
-							}
-							$matches[$article][$slide][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . $row['article_name'] . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
-								],
-								'content' => [
-									['type' => 'textsection',
-									'attributes' => [
-										'name' => $incorporationState
-									],
-									'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
-								]
-							];
-					}
-				}
-				if (!$matches[0]) $matches[0][] = [
-					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
-						],
-					]
-				];
-				$result['render']['content'] = $matches;
-				break;
-			}
-		$this->response($result);
 	}
 }
 ?>

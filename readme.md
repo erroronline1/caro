@@ -96,7 +96,6 @@
 ## development
 
 #### purchase considerations
-* consider order->productsearch a global method, refactor borrowed module, maybe pass a parameter
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -2250,6 +2249,22 @@ Sample response
 {"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
+> GET ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{_usecase}
+
+Returns products matching {search} to be inserted into orders. If {_usecase} is set to *editconsumables* the returned elements events lead to consumables editing, *productinformation* to consumables product information.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {vendor_id} | path parameter | required | vendor id in database, _-separated list for all |
+| {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
+| {_usecase} | path parameter | optional | altered events for product management |
+
+Sample response
+```
+{"render": {"content": [[[{"type": "textsection","attributes":{"name": "Add article from 1 matches"}},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "textsection","attributes":{"name": "Incorporation pending"},"content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
+```
+
 > GET ./api/api.php/consumables/vendor/{name|id}
 
 Returns content to create or modify vendor. If path parameter is provided, the form is prefilled according to database entry.
@@ -2902,22 +2917,6 @@ Parameters
 Sample response
 ```
 {"response": {"id": false,"msg": "Approved order can now be processed by the purchase department.","type": "success"}}
-```
-
-> GET ./api/api.php/order/productsearch/{vendor_id}/{search}/{_borrowedModule}
-
-Returns products matching {search} to be inserted into orders. If {_borrowedModule} is set to *editconsumables* the returned elements events lead to consumables editing, *productinformation* to consumables product information.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {vendor_id} | path parameter | required | vendor id in database, _-separated list for all |
-| {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
-| {_borrowedModule} | path parameter | optional | altered events for product management |
-
-Sample response
-```
-{"render": {"content": [[[{"type": "textsection","attributes":{"name": "Add article from 1 matches"}},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "textsection","attributes":{"name": "Incorporation pending"},"content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
 ```
 
 [Content](#content)

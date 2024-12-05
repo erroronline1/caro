@@ -24,6 +24,8 @@ class CONSUMABLES extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_search = '';
+	private $_usecase = '';
 	private $filtersample = <<<'END'
 	{
 		"filesettings": {
@@ -68,6 +70,8 @@ class CONSUMABLES extends API {
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_search = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_usecase = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 	/**
@@ -1238,6 +1242,21 @@ class CONSUMABLES extends API {
 		}
 	}
 	
+	/**
+	 *                 _         _                       _
+	 *   ___ ___ ___ _| |_ _ ___| |_ ___ ___ ___ ___ ___| |_
+	 *  | . |  _| . | . | | |  _|  _|_ -| -_| .'|  _|  _|   |
+	 *  |  _|_| |___|___|___|___|_| |___|___|__,|_| |___|_|_|
+	 *  |_|
+	 */
+	public function productsearch(){
+		include_once('_shared.php');
+		$search = new SHARED($this->_pdo);
+		$result = ['render' => ['content' => $search->productsearch($this->_usecase, ['search' => $this->_search, 'vendors' => $this->_requestedID])]];
+
+		$this->response($result);
+	}
+
 	/**
 	 *           _         _       _       _ _           _ _     _
 	 *   ___ ___| |___ ___| |_ ___|_|_____|_| |___ ___ _| |_|___| |___ ___
