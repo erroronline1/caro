@@ -401,8 +401,8 @@ class APPLICATION extends API {
 				LANG::GET('menu.tools_image') => ['onpointerup' => "api.tool('get', 'image')"],
 			],
 		];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_bundles')] = ['onpointerup' => "api.record('get', 'bundles')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.record('get', 'forms')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_bundles')] = ['onpointerup' => "api.form('get', 'bundles')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.form('get', 'forms')"];
 		// make sure risk management comes after forms 
 		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))

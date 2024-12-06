@@ -395,10 +395,13 @@ edit_bundle_hidden = "Paket verbergen"
 edit_bundle_hidden_visible = "verfügbar"
 edit_bundle_hidden_hidden = "verborgen"
 edit_bundle_hidden_hint = "Verborgene Pakete sind nicht erreichbar."
-edit_bundle_saved = "Verborgene Pakete sind nicht erreichbar"
+edit_bundle_saved = "Paket gespeichert. Verborgene Pakete sind nicht erreichbar"
 edit_bundle_not_saved = "Das Paket konnte nicht gespeichert werden"
 
 edit_hidden_set = "Verborgen am :date von :name"
+
+form_filter = "Filter"
+form_filter_hint = "Name, Alias, Formularfeldnamen, Inhalte oder regulatorischer Zusammenhang"
 
 ; alle schlüssel sind fest einprogrammiert
 [audit]
@@ -941,8 +944,6 @@ create_identifier_hint = "z.B. Name, Geburtsdatum, Vorgangsnummer, Hilfsmittel, 
 create_identifier_error = "Bitte gib Daten ein!"
 create_identifier_proceed = "Öffne den Link, drucke die Datei und verwende sie sinnvoll."
 
-form_filter = "Filter"
-form_filter_hint = "Name, Alias, Formularfeldnamen, Inhalte oder regulatorischer Zusammenhang"
 form_export = "Exportiere das Formular als PDF"
 form_export_hint = "Datei- und Fotouploads werden durch Hinweise ersetzt."
 form_export_identifier = "Aufkleber hier platzieren"

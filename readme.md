@@ -2608,6 +2608,48 @@ Sample response
 {"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
 ```
 
+> POST ./api/api.php/form/bundle
+
+Saves document bundle. Updates availability if name and content remain the same.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | bundle data |
+
+Sample response
+```
+{"response":{"name":"bundle1","msg":"Bundle saved. Hidden bundles are not reachable","type":"success"}}
+```
+
+> GET ./api/api.php/form/bundle/{id}
+
+Returns content to create or modify form bundles.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | bundle database id |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"bundle","action":"javascript:api.form('post', 'bundle')"},"content":[[[{"type":"datalist","content":["bundle1"],"attributes":{"id":"templates"}},{"type":"select","attributes":{"name":"Edit existing latest bundle","onchange":"api.form('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"bundle1":{"value":12}}},{"type":"search","attributes":{"name":"Search by name","list":"templates","onkeypress":"if (event.key === 'Enter') ....
+```
+
+> GET ./api/api.php/form/bundles/{search}
+
+Returns available approved forms grouped by bundles.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | optional | search term to filter results |
+
+Sample response
+```
+{"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'form', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'form', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'form', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'form', 'restricted documentation')"}}}]}}
+```
+
 > DELETE ./api/api.php/form/component/{id}
 
 Deletes an unapproved form component.
@@ -2687,6 +2729,34 @@ Similar to components.
 Returns content to create or modify forms. If path parameter is not int the latest approved form is returned.
 
 Sililar to component_editor.
+
+> GET ./api/api.php/form/formfilter/{search}
+
+Returns ids of available approved forms matching {search} by name or alias, or where the search string is found within the used components.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string |
+
+Sample response
+```
+{"response": {"data": ["26"]}}
+```
+
+> GET ./api/api.php/form/forms
+
+Returns available approved forms grouped by record type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |   |
+
+Sample response
+```
+{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filtered","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.form('get', 'formfilter', this.value); return false;}","onblur": "api.form('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
+```
 
 [Content](#content)
 
@@ -2923,20 +2993,6 @@ Sample response
 
 ### Record endpoints
 
-> GET ./api/api.php/record/bundles/{search}
-
-Returns available approved forms grouped by bundles.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | search term to filter results |
-
-Sample response
-```
-{"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'form', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'form', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'form', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'form', 'restricted documentation')"}}}]}}
-```
-
 > PUT ./api/api.php/record/casestate/{identifier}/{state}/{bool}
 
 Sets the passed case state.
@@ -3023,34 +3079,6 @@ Parameters
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
-```
-
-> GET ./api/api.php/record/formfilter/{search}
-
-Returns ids of available approved forms matching {search} by name or alias, or where the search string is found within the used components.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string |
-
-Sample response
-```
-{"response": {"data": ["26"]}}
-```
-
-> GET ./api/api.php/record/forms
-
-Returns available approved forms grouped by record type.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |   |
-
-Sample response
-```
-{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filtered","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.record('get', 'formfilter', this.value); return false;}","onblur": "api.record('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
 ```
 
 > GET ./api/api.php/record/fullexport/{identifier}

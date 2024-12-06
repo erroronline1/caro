@@ -682,6 +682,8 @@ export const api = {
 				form_editor: LANG.GET("menu.forms_manage_forms"),
 				approval: LANG.GET("menu.forms_manage_approval"),
 				bundle: LANG.GET("menu.forms_manage_bundles"),
+				bundles: LANG.GET("menu.record_bundles"),
+				forms: LANG.GET("menu.record_record"),
 			},
 			composedComponent;
 		switch (method) {
@@ -713,20 +715,6 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
-					case "approval":
-					case "bundle":
-					case "form":
-						api.update_header(title[request[1]]);
-						successFn = function (data) {
-							api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
-							if (data.render) {
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
 					case "form_editor":
 						compose_helper.componentIdentify = 0;
 						compose_helper.componentSignature = 0;
@@ -738,6 +726,31 @@ export const api = {
 								render.processAfterInsertion();
 								if (data.render.components) compose_helper.importForm(data.render.components);
 								api.preventDataloss.start();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+					case "formfilter":
+						api.preventDataloss.monitor = false;
+						successFn = function (data) {
+							if (data.data) {
+								const all = document.querySelectorAll("[data-filtered]"),
+									exceeding = document.querySelectorAll("[data-filtered_max]");
+								for (const element of all) {
+									if (data.filter === undefined || data.filter == "some") element.style.display = data.data.includes(element.dataset.filtered) ? "block" : "none";
+									else element.style.display = data.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
+								}
+							}
+						};
+						break;
+					default:
+						api.update_header(title[request[1]]);
+						successFn = function (data) {
+							api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
+							if (data.render) {
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
@@ -1081,8 +1094,6 @@ export const api = {
 				}
 			},
 			title = {
-				bundles: LANG.GET("menu.record_bundles"),
-				forms: LANG.GET("menu.record_record"),
 				identifier: LANG.GET("menu.record_create_identifier"),
 				record: LANG.GET("menu.record_summary"),
 				records: LANG.GET("menu.record_summary"),
@@ -1090,19 +1101,6 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "formfilter":
-						api.preventDataloss.monitor = false;
-						successFn = function (data) {
-							if (data.data) {
-								const all = document.querySelectorAll("[data-filtered]"),
-									exceeding = document.querySelectorAll("[data-filtered_max]");
-								for (const element of all) {
-									if (data.filter === undefined || data.filter == "some") element.style.display = data.data.includes(element.dataset.filtered) ? "block" : "none";
-									else element.style.display = data.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
-								}
-							}
-						};
-						break;
 					case "import":
 						successFn = function (data) {
 							if (data.data !== undefined) {
