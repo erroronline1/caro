@@ -675,7 +675,18 @@ export const api = {
 	form: (method, ...request) => {
 		request = [...request];
 		request.splice(0, 0, "form");
-		let successFn,
+		let successFn = function (data) {
+				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+				if (data.render !== undefined) {
+					const options = {};
+					options[LANG.GET("general.ok_button")] = false;
+					new Dialog({
+						type: "input",
+						render: data.render,
+						options: options,
+					});
+				}
+			},
 			payload,
 			title = {
 				component_editor: LANG.GET("menu.forms_manage_components"),
@@ -794,6 +805,13 @@ export const api = {
 						};
 						payload = _.getInputs("[data-usecase=bundle]", true);
 						break;
+					case "export":
+						payload = _.getInputs("[data-usecase=record]", true);
+						break;
+				}
+				if (request[3]) {
+					payload = request[3]; // form data object passed by utility.js
+					delete request[3];
 				}
 				break;
 			case "delete":
@@ -803,7 +821,7 @@ export const api = {
 				};
 				break;
 		}
-		api.send(method, request, successFn, null, payload, composedComponent || request[1] === "bundle" || method === "put");
+		api.send(method, request, successFn, null, payload, composedComponent || ["bundle","export"].includes(request[1]) || method === "put");
 	},
 
 	/**

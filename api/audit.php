@@ -371,8 +371,8 @@ class AUDIT extends API {
 				'attributes' => [
 					'type' => 'button',
 					'data-type' => 'download',
-					'value' => LANG::GET('record.form_export'),
-					'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.form_export') . "', render: JSON.parse('" . json_encode(
+					'value' => LANG::GET('assemble.form_export'),
+					'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('assemble.form_export') . "', render: JSON.parse('" . json_encode(
 						[
 							[
 								'type' => 'textsection',
@@ -397,7 +397,7 @@ class AUDIT extends API {
 					) . "'), options:{".
 					"'" . LANG::GET('general.cancel_button') . "': false,".
 					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => {if (response) api.record('post', 'exportform', null, _client.application.dialogToFormdata(response))})"
+					"}}).then(response => {if (response) api.form('post', 'export', null, _client.application.dialogToFormdata(response))})"
 				]
 			];
 		}

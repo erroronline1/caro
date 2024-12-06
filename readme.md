@@ -103,7 +103,6 @@
 
 #### records considerations
 * consider full form export with textsections e.g. regarding manuals (record->summarizeRecord())
-* consider refactoring of form and record methods for form handling in fact within form-api (bundles, exportform, form, formfilter, forms)
 * consider joining api->contextComponents(), record->latestapprovedname(), audit->latestapprovedcomponent()
 
 #### issues
@@ -2706,6 +2705,20 @@ Sample response
 {"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
 ```
 
+> POST ./api/api.php/form/export
+
+Returns a download link to a temporary file with the selected form as editable blank or prefilled pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | according to form |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
+```
+
 > DELETE ./api/api.php/form/form/{id}
 
 Deletes an unapproved form.
@@ -3035,20 +3048,6 @@ Parameters
 Sample response
 ```
 {"response": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
-```
-
-> POST ./api/api.php/record/exportform
-
-Returns a download link to a temporary file with the selected form as editable blank or prefilled pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | according to form |
-
-Sample response
-```
-{"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
 ```
 
 > GET ./api/api.php/record/form/{name}/{identifier}

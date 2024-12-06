@@ -226,228 +226,6 @@ class RECORD extends API {
 	}
 
 	/**
-	 *                       _   ___
-	 *   ___ _ _ ___ ___ ___| |_|  _|___ ___ _____
-	 *  | -_|_'_| . | . |  _|  _|  _| . |  _|     |
-	 *  |___|_,_|  _|___|_| |_| |_| |___|_| |_|_|_|
-	 *          |_|
-	 */
-	public function exportform(){
-		$form_id = $identifier = $context = null;
-		if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->_form_id);
-		if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
-		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_type_description')});
-		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
-		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
-
-		// used by audit for export of outdated forms
-		if ($maxFormTimestamp = UTILITY::propertySet($this->_payload, '_maxFormTimestamp')) unset($this->_payload->_maxFormTimestamp);
-		else $maxFormTimestamp = $this->_currentdate->format('Y-m-d H:i:s');
-
-		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
-			'values' => [
-				':id' => $form_id
-			]
-		]);
-		$form = $form ? $form[0] : null;
-		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
-		if (!$form || $form['date'] >= $maxFormTimestamp) $this->response([], 409);
-
-		$entry_timestamp = $entry_date . ' ' . $entry_time;
-		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$entry_timestamp = $this->_currentdate->format('Y-m-d H:i');
-		}
-
-		foreach($this->_payload as $key => &$value){
-			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
-				$identifier = $value;
-				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
-				unset ($this->_payload->$key);
-				try {
-					
-					$possibledate = substr($identifier, -16);
-					new DateTime($possibledate);
-				}
-				catch (Exception $e){
-					$identifier .= ' ' . $entry_timestamp;
-				}
-			}
-			if (gettype($value) === 'array') $value = trim(implode(' ', $value));
-			/////////////////////////////////////////
-			// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
-			////////////////////////////////////////
-			if (!$value || $value == 'on') unset($this->_payload->$key);
-		}
-		if (!$identifier) $identifier = in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('record.form_export_identifier'): null;
-		$summary = [
-			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
-			'identifier' => $identifier,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => $form['name'],
-			'date' => LANG::GET('record.form_export_exported', [':version' => substr($form['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])
-		];
-
-		function enumerate($name, $enumerate = [], $number = 1){
-			if (isset($enumerate[$name])) $enumerate[$name] += $number;
-			else $enumerate[$name] = $number;	
-			return $enumerate;
-		}
-
-		function printable($element, $payload, $enumerate = []){
-			$content = ['content' => [], 'images' => [], 'fillable' => false];
-			foreach($element as $subs){
-				if (!isset($subs['type'])){
-					$subcontent = printable($subs, $payload, $enumerate);
-					foreach($subcontent['enumerate'] as $name => $number){
-						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
-					}
-					$content['content'] = array_merge($content['content'], $subcontent['content']);
-					$content['images'] = array_merge($content['images'], $subcontent['images']);
-					$content['fillable'] = $subcontent['fillable'];
-				}
-				else {
-					if (in_array($subs['type'], ['identify'])) continue;
-					if (in_array($subs['type'], ['image', 'links'])) {
-						$name = $subs['description'];
-					}
-					if (in_array($subs['type'], ['formbutton'])) {
-						$name = $subs['attributes']['value'];
-					}
-					if (in_array($subs['type'], ['calendarbutton'])) {
-						$name = LANG::GET('record.form_export_element.' . $subs['type']);
-					}
-					else $name = $subs['attributes']['name'];
-					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
-					$originName = $name;
-					$postname = str_replace(' ', '_', $name);
-					if ($enumerate[$name] > 1) {
-						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
-						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
-					}
-					if (isset($subs['attributes']['required'])) $name .= ' *';
-					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
-						foreach($subs['content'] as $key => $attributes) {
-							if (!$attributes) break;
-							if (isset($attributes['required'])) {
-								$name .= ' *';
-								break;
-							}
-						}
-					}
-
-					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'formbutton'])) $content['fillable'] = true;
-					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
-						$content['content'][$name] = ['type' => 'selection', 'value' => []];
-						foreach($subs['content'] as $key => $v){
-							if ($key === '...') continue;
-							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
-							$selected = '';
-
-							// dynamic multiple select
-							$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
-							foreach($dynamicMultiples as $matchkey => $submitted){
-								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
-							}
-	
-							if (UTILITY::propertySet($payload, $postname) && (
-								($subs['type'] !== 'checkbox' && $key == UTILITY::propertySet($payload, $postname)) ||
-								($subs['type'] === 'checkbox' && in_array($key, explode(' | ', UTILITY::propertySet($payload, $postname))))
-								)) $selected = '_____';
-							$content['content'][$name]['value'][] = $selected . $key;
-						}
-					}
-					elseif ($subs['type'] === 'textsection'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
-					}
-					elseif ($subs['type'] === 'textarea'){
-						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
-					}
-					elseif ($subs['type'] === 'signature'){
-						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
-					}
-					elseif ($subs['type'] === 'image'){
-						$content['content'][$name] = ['type'=> 'image', 'value' => $subs['attributes']['url']];
-						$file = pathinfo($subs['attributes']['url']);
-						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-							$content['images'][] = $subs['attributes']['url'];
-						}
-					}
-					elseif ($subs['type'] === 'range'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
-					}
-					elseif (in_array($subs['type'], ['photo', 'file'])){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => LANG::GET('record.form_export_element.' . $subs['type'])];
-					}
-					elseif ($subs['type'] === 'links'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
-						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'] .= $link . "\n";
-					}
-					elseif ($subs['type'] === 'formbutton'){
-						$content['content'][LANG::GET('record.form_export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
-					}
-					elseif ($subs['type'] === 'calendarbutton'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
-					}
-					else {
-						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
-						$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
-						foreach($dynamicMultiples as $matchkey => $submitted){
-							$content['content'][$submitted] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $submitted) ? : ''];
-						}
-					}
-				}
-			}
-			$content['enumerate'] = $enumerate;
-			return $content;
-		};
-
-		$componentscontent = [];
-		$enumerate = [];
-		$fillable = false;
-		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent, $maxFormTimestamp);
-			if (!$component) continue;
-			$component['content'] = json_decode($component['content'], true);
-
-			$printablecontent = printable($component['content']['content'], $this->_payload, $enumerate);
-			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
-			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);
-			$enumerate = $printablecontent['enumerate'];
-			if ($printablecontent['fillable']) $fillable = true;
-		}
-		if ($fillable){
-			if (in_array($form['context'], ['casedocumentation'])) {
-				$type = ['type' => 'selection', 'value' => []];
-				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
-					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
-				}
-				$summary['content'] = array_merge([LANG::GET('record.record_type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
-			}
-			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => LANG::GET('assemble.required_asterisk')], LANG::GET('record.form_export_by') . ' *' => [
-				'type' => 'text',
-				'value' => ''
-			]], $summary['content']);
-		}
-		$summary['content'] = [' ' => $summary['content']];
-		$summary['images'] = [' ' => $summary['images']];
-
-		$downloadfiles[LANG::GET('record.form_export')] = [
-			'href' => PDF::formsPDF($summary)
-		];
-		$this->response([
-			'render' => [
-				[
-					'type' => 'links',
-					'description' =>  LANG::GET('record.form_export_proceed'),
-					'content' => $downloadfiles
-				]
-			],
-		]);
-	}
-	
-	/**
 	 *   ___
 	 *  |  _|___ ___ _____
 	 *  |  _| . |  _|     |
@@ -588,11 +366,11 @@ class RECORD extends API {
 				],
 				[
 					'type' => 'button',
-					'hint' => LANG::GET('record.form_export_hint'),
+					'hint' => LANG::GET('assemble.form_export_hint'),
 					'attributes' => [
 						'type' => 'submit',
-						'value' => LANG::GET('record.form_export'),
-						'formaction' => "javascript:api.record('post', 'exportform')"
+						'value' => LANG::GET('assemble.form_export'),
+						'formaction' => "javascript:api.form('post', 'export')"
 					]
 				]
 			];
@@ -602,7 +380,7 @@ class RECORD extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => LANG::GET('record.form_export_permission', [':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
+						'name' => LANG::GET('assemble.form_export_permission', [':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
 					]
 				]
 			];
