@@ -1097,7 +1097,13 @@ class AUDIT extends API {
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 
-		$evaluationform = $this->contextComponents('training_evaluation_form');
+		include_once('_shared.php');
+		$form = new SHARED($this->_pdo);
+		$evaluationform = $form->recentform('form_form_get_by_context', [
+			'values' => [
+				':context' => 'training_evaluation_form'
+			]]);
+
 		foreach ($users as $user){
 			if (
 				$user['id'] < 2 ||

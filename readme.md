@@ -103,7 +103,6 @@
 
 #### records considerations
 * consider full form export with textsections e.g. regarding manuals (record->summarizeRecord())
-* consider joining api->contextComponents(), record->latestapprovedname(), audit->latestapprovedcomponent()
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

@@ -219,45 +219,6 @@ class API {
 	}
 
 	/**
-	 * retrieves most recent approved form for
-	 * sample check, incorporation, training evaluation
-	 * and returns the components as body response for modal
-	 * @param string $forContext
-	 * @return array form components
-	 */
-	public function contextComponents($forContext){
-		$formBody = [];
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_get_by_context', [
-			'values' => [
-				':context' => $forContext
-			]
-		]);
-		if ($forms){
-			foreach($forms as $form){
-				if (PERMISSION::fullyapproved('formapproval', $form['approval'])) break;
-			}
-			if (!PERMISSION::fullyapproved('formapproval', $form['approval'])) return [];
-			foreach(explode(',', $form['content']) as $usedcomponent) {
-				// get latest approved by name
-				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
-					'values' => [
-						':name' => $usedcomponent
-					]
-				]);
-				foreach ($components as $component){
-					if (!$component['hidden'] && PERMISSION::fullyapproved('formapproval', $component['approval']) && PERMISSION::permissionIn($component['restricted_access'])) break;
-					else $component = [];
-				}
-				if ($component){
-					$component['content'] = json_decode($component['content'], true);
-					array_push($formBody, ...$component['content']['content']);
-				}
-			}
-		}
-		return $formBody;
-	}
-
-	/**
 	 * @return str readable http status message based on $this->_httpResponse
 	 */
 	private function get_status_message(){

@@ -21,10 +21,12 @@
 // import when needed, initialize with pdo and call methods with required parameters
 
 class SHARED {
-    public $_pdo = null;
+    private $_pdo = null;
+	private $_currentdate = null;
 
 	public function __construct($pdo = null){
         $this->_pdo = $pdo;
+		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 	}
 
     /**
@@ -33,6 +35,9 @@ class SHARED {
 	 *  | . |  _| . | . | | |  _|  _|_ -| -_| .'|  _|  _|   |
 	 *  |  _|_| |___|___|___|___|_| |___|___|__,|_| |___|_|_|
 	 *  |_|
+	 * 
+	 * @param string $usecase
+	 * @param array $parameter named array, currently with search string and _-separated vendor ids
 	 */
 	public function productsearch($usecase = '', $parameter = []){
 		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
@@ -153,6 +158,64 @@ class SHARED {
 				break;
 			}
 		return $content;
+	}
+
+	/**
+	 *                       _   ___               
+	 *   ___ ___ ___ ___ ___| |_|  _|___ ___ _____ 
+	 *  |  _| -_|  _| -_|   |  _|  _| . |  _|     |
+	 *  |_| |___|___|___|_|_|_| |_| |___|_| |_|_|_|
+	 *                                             
+	 * retrieves most recent approved form or component
+	 * and returns the content as body response e.g. for modal
+	 * @param string $query _sqlinterface query
+	 * @param array $parameters _ sqlinterface parameters
+	 * @param string $requestedTimestamp Y-m-d H:i:s as optional past delimiter
+	 * 
+	 * @return array form components or form names within bundles
+	 */
+	public function recentform($query = '', $parameters = [], $requestedTimestamp = null){
+		$requestedTimestamp = $requestedTimestamp ? : $this->_currentdate->format('Y-m-d') . ' ' . $this->_currentdate->format('H:i:59');
+
+		$contentBody = [];
+		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
+		if ($contents){
+			foreach($contents as $content){
+				if (PERMISSION::fullyapproved('formapproval', $content['approval'])) break;
+			}
+			if (!PERMISSION::fullyapproved('formapproval', $content['approval']) // failsafe if none are approved
+				|| $content['hidden']
+				|| !PERMISSION::permissionIn($content['restricted_access'])
+				|| $content['date'] > $requestedTimestamp) return [];
+
+			if ($content['context'] === 'component') {
+				$content['content'] = json_decode($content['content'], true);
+				$contentBody = $content['content']['content'];
+			}
+			elseif ($content['context'] === 'bundle') {
+				$contentBody = explode(',', $component['content']);
+			}
+			else {
+				foreach(explode(',', $content['content']) as $usedcomponent) {
+					// get latest approved by name
+					$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
+						'values' => [
+							':name' => $usedcomponent
+						]
+					]);
+					foreach ($components as $component){
+						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
+						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('formapproval', $component['approval'])) break;
+						else $component = [];
+					}
+					if ($component){
+						$component['content'] = json_decode($component['content'], true);
+						array_push($contentBody, ...$component['content']['content']);
+					}
+				}
+			}
+		}
+		return $contentBody;
 	}
 }
 

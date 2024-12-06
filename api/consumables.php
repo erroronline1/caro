@@ -217,8 +217,16 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
-				$incorporationform = $this->contextComponents('product_incorporation_form');
-				if ($product['trading_good']) array_push($incorporationform, ...$this->contextComponents('mdr_sample_check_form'));
+				include_once('_shared.php');
+				$form = new SHARED($this->_pdo);
+				$incorporationform = $form->recentform('form_form_get_by_context', [
+					'values' => [
+						':context' => 'product_incorporation_form'
+					]]);
+				if ($product['trading_good']) array_push($incorporationform, ...$form->recentform('form_form_get_by_context', [
+					'values' => [
+						':context' => 'mdr_sample_check_form'
+					]]));
 
 				// select all products from selected vendor
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -413,6 +421,9 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
+				include_once('_shared.php');
+				$form = new SHARED($this->_pdo);
+
 				$result = ['render' => [
 					'content' => [
 						[
@@ -426,7 +437,10 @@ class CONSUMABLES extends API {
 								]
 							]
 						],
-						...$this->contextComponents('mdr_sample_check_form')
+						...$form->recentform('form_form_get_by_context', [
+							'values' => [
+								':context' => 'mdr_sample_check_form'
+							]])
 					],
 					'options' => [
 						LANG::GET('order.sample_check_cancel') => false,
@@ -1747,7 +1761,13 @@ class CONSUMABLES extends API {
 						return $content;
 					};
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
-					$evaluationform = prefill($this->contextComponents('vendor_evaluation_form'), $vendor['evaluation']);
+
+					include_once('_shared.php');
+					$form = new SHARED($this->_pdo);
+					$evaluationform = prefill($form->recentform('form_form_get_by_context', [
+						'values' => [
+							':context' => 'vendor_evaluation_form'
+						]]), $vendor['evaluation']);
 					if (isset($vendor['evaluation']['_author'])) $evaluationform[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
