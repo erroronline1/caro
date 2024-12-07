@@ -453,7 +453,7 @@ Exportiertes Formular
 [Übersicht](#übersicht)
 
 ### Aufzeichnungen
-Aufzeichnungen speichern alle Eingaben für jedes gewählte Formular. Manche Formular-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter.
+Aufzeichnungen speichern alle Eingaben für jedes gewählte Formular. Manche Formular-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter. Ein weiterer Anwendungsfall sind Gebrauchsanleitungen, deren Inhalt für die Dokumentation gespeichert, aber auch jederzeit für die Anwender inclusive Erläuterungen exportiert werden kann.
 
 Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet sein. Daher können einzelne Dokumente ebenfalls exportiert werden um die Daten in Situationen bereithalten zu können, in denen elektronische Geräte Schaden nehmen könnten.
 

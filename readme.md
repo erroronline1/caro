@@ -102,7 +102,6 @@
 * unittests (frontend)
 
 #### records considerations
-* consider full form export with textsections e.g. regarding manuals (record->summarizeRecord())
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -523,7 +522,7 @@ Exported form
 [Content](#content)
 
 ### Records
-Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. 
+Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime.
 
 Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
