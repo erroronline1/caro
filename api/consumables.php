@@ -222,11 +222,11 @@ class CONSUMABLES extends API {
 				$incorporationform = $form->recentform('form_form_get_by_context', [
 					'values' => [
 						':context' => 'product_incorporation_form'
-					]]);
+					]])['content'];
 				if ($product['trading_good']) array_push($incorporationform, ...$form->recentform('form_form_get_by_context', [
 					'values' => [
 						':context' => 'mdr_sample_check_form'
-					]]));
+					]])['content']);
 
 				// select all products from selected vendor
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -440,7 +440,7 @@ class CONSUMABLES extends API {
 						...$form->recentform('form_form_get_by_context', [
 							'values' => [
 								':context' => 'mdr_sample_check_form'
-							]])
+							]])['content']
 					],
 					'options' => [
 						LANG::GET('order.sample_check_cancel') => false,
@@ -1767,7 +1767,7 @@ class CONSUMABLES extends API {
 					$evaluationform = prefill($form->recentform('form_form_get_by_context', [
 						'values' => [
 							':context' => 'vendor_evaluation_form'
-						]]), $vendor['evaluation']);
+						]])['content'], $vendor['evaluation']);
 					if (isset($vendor['evaluation']['_author'])) $evaluationform[0][] = [
 						'type' => 'textsection',
 						'attributes' => [

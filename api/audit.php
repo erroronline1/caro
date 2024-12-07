@@ -1102,7 +1102,7 @@ class AUDIT extends API {
 		$evaluationform = $form->recentform('form_form_get_by_context', [
 			'values' => [
 				':context' => 'training_evaluation_form'
-			]]);
+			]])['content'];
 
 		foreach ($users as $user){
 			if (

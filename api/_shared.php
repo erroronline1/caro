@@ -177,6 +177,7 @@ class SHARED {
 	public function recentform($query = '', $parameters = [], $requestedTimestamp = null){
 		$requestedTimestamp = $requestedTimestamp ? : $this->_currentdate->format('Y-m-d') . ' ' . $this->_currentdate->format('H:i:59');
 
+		$result = [];
 		$contentBody = [];
 		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
 		if ($contents){
@@ -187,7 +188,7 @@ class SHARED {
 				|| $content['hidden']
 				|| !PERMISSION::permissionIn($content['restricted_access'])
 				|| $content['date'] > $requestedTimestamp) return [];
-
+			$result = $content;
 			if ($content['context'] === 'component') {
 				$content['content'] = json_decode($content['content'], true);
 				$contentBody = $content['content']['content'];
@@ -214,8 +215,9 @@ class SHARED {
 					}
 				}
 			}
+		$result['content'] = $contentBody;
 		}
-		return $contentBody;
+		return $result;
 	}
 }
 
