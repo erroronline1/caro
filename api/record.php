@@ -203,9 +203,9 @@ class RECORD extends API {
 	 *  |___|_,_|  _|___|_| |_|
 	 *          |_|
 	 */
-	private function export($summarize = "full"){
+	private function export($summarize = "full", $export = false){
 		if (!PERMISSION::permissionFor('recordsexport')) $this->response([], 401);
-		$content = $this->summarizeRecord($summarize);
+		$content = $this->summarizeRecord($summarize, false, $export);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
@@ -1574,7 +1574,7 @@ class RECORD extends API {
 	 *              |_|   |___|                                       |_|              
 	 */
 	public function simplifiedformexport(){
-		$this->export('simplifiedform');
+		$this->export('simplifiedform', true);
 	}
 
 	/**
@@ -1588,7 +1588,7 @@ class RECORD extends API {
 	 * @return array $summary
 	 */
 
-	private function summarizeRecord($type = 'full', $retype = false){
+	private function summarizeRecord($type = 'full', $retype = false, $export = false){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 			'values' => [
 				':identifier' => $this->_requestedID
@@ -1618,7 +1618,7 @@ class RECORD extends API {
 			$form = $forms[array_search($record['form'], array_column($forms, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 			if (!PERMISSION::permissionIn($form['restricted_access'])) continue;
 			if (in_array($type, ['form', 'simplifiedform']) && ($form['name'] != $this->_formExport)) continue;
-			if ($record['form'] == 0) { // retype autoform
+			if ($record['form'] == 0) { // retype and casestate autoform
 				if (in_array($type, ['simplified', 'simplifiedform'])) continue;
 				$usedform = LANG::GET('record.record_altering_pseudoform_name');
 			}
@@ -1668,6 +1668,67 @@ class RECORD extends API {
 					}
 				}
 			}
+		}
+
+		if ($export) {
+			// reiterate over form, add textsections and empty form fields
+			include_once('_shared.php');
+			$formfinder = new SHARED($this->_pdo);
+
+			function enumerate($name, $enumerate = [], $number = 1){
+				if (isset($enumerate[$name])) $enumerate[$name] += $number;
+				else $enumerate[$name] = $number;	
+				return $enumerate;
+			}
+	
+			function printable($element, $payload, $enumerate = []){
+				$content = ['content' => []];
+				foreach($element as $subs){
+					if (!isset($subs['type'])){
+						$subcontent = printable($subs, $payload, $enumerate);
+						foreach($subcontent['enumerate'] as $name => $number){
+							$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
+						}
+						$content['content'] = array_merge($content['content'], $subcontent['content']);
+					}
+					else {
+						if (in_array($subs['type'], ['identify', 'formbutton', 'calendarbutton'])) continue;
+						if (in_array($subs['type'], ['image', 'links'])) {
+							$name = $subs['description'];
+						}
+						else $name = $subs['attributes']['name'];
+						$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
+						$originName = $name;
+						if ($enumerate[$name] > 1) {
+							$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
+						}
+
+						if ($subs['type'] === 'textsection'){
+							$value = isset($subs['content']) ? $subs['content'] : '';
+						}
+						elseif (isset($payload[$name])) {
+							$value = $payload[$name];
+						}
+						else $value = '-';
+						$content['content'][$name] = $value;
+						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
+						foreach($dynamicMultiples as $matchkey => $submitted){
+							$content['content'][$submitted] = $payload[$submitted];
+						}
+					}
+				}
+				$content['enumerate'] = $enumerate;
+				return $content;
+			};
+
+			$printablecontent = $enumerate = [];
+			foreach($summary['content'] as $form => $content){
+				if ($usedform = $formfinder->recentform('form_form_get_by_name', [
+					'values' => [
+						':name' => $form
+					]])) $printablecontent[$form . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($usedform['content'], $content, $enumerate)['content'];
+			}
+			$summary['content'] = $printablecontent;
 		}
 		return $summary;
 	}
