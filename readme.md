@@ -1780,6 +1780,8 @@ During developement following outcomes could be noted:
 * 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
+The stresstest also allows for injection of forms and components according to templates/forms.xx.json. Deletion of forms and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing.
+
 [Content](#content)
 
 ## Deployment process

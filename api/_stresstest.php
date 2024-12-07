@@ -43,6 +43,7 @@ class STRESSTEST{
 	public $_caleandarnumber = 20000;
 	public $_recordnumber = 20000;
 	public $_ordernumber = 1000;
+	public $_template = '../templates/forms.de.json';
 
 	public function __construct($method){
 		$options = [
@@ -89,7 +90,7 @@ class STRESSTEST{
 				]
 			]);
 		}
-		echo $i. " schedule entries done, please check the application for performance";
+		echo $i. ' schedule entries done, please check the application for performance';
 	}
 
 	public function deleteCalendarEvents(){
@@ -163,7 +164,7 @@ class STRESSTEST{
 				]
 			]);
 		}
-		echo $i. " records done, please check the application for performance";
+		echo $i. ' records done, please check the application for performance';
 	}
 
 	public function deleteRecords(){
@@ -213,7 +214,7 @@ class STRESSTEST{
 				die();
 			}
 		}
-		echo $i. " orders done, please check the application for performance";
+		echo $i. ' orders done, please check the application for performance';
 	}
 
 	public function deleteOrders(){
@@ -223,6 +224,79 @@ class STRESSTEST{
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
 		echo $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
+	}
+
+	public function installForms(){
+		if (!realpath($this->_template)) {
+			echo $this->_template . ' file not found';
+			return;
+		}
+
+		$parameters = [];
+		$forms = file_get_contents(realpath($this->_template));
+		$forms = json_decode($forms, true);
+		$matches = 0;
+
+		foreach ($forms as $form){
+			if (isset($form['name'])) {
+				if (gettype($form['content']) === 'array') $form['content'] = json_encode($form['content']);
+				SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
+					'values' => [
+						':name' => $form['name'],
+						':alias' => $form['alias'],
+						':context' => $form['context'],
+						':unit' => $form['unit'],
+						':author' => $form['author'],
+						':content' => $form['content'],
+						':regulatory_context' => $form['regulatory_context'],
+						':permitted_export' => $form['permitted_export'],
+						':restricted_access' => $form['restricted_access']
+					]
+				]);
+				$matches++;
+			}
+		}
+		echo $matches . ' components and forms according to template file inserted, please check the application for performance and remember you have to approve each to take effect!';
+	}
+
+	public function deleteForms(){
+		if (!realpath($this->_template)) {
+			echo $this->_template . ' file not found';
+			return;
+		}
+
+		$DBcomponents = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
+		$DBforms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+
+		$forms = file_get_contents(realpath($this->_template));
+		$forms = json_decode($forms, true);
+		$matches = 0;
+		foreach([...$DBcomponents, ...$DBforms, ...$DBbundles] as $dbform){
+			foreach($forms as $form){
+				if (
+					isset($form['name']) &&
+					$dbform['name'] === $form['name'] &&
+					$dbform['alias'] === $form['alias'] &&
+					$dbform['context'] === $form['context'] &&
+					$dbform['unit'] === $form['unit'] &&
+					$dbform['author'] === $form['author'] &&
+					$dbform['regulatory_context'] === $form['regulatory_context'] &&
+					$dbform['permitted_export'] === $form['permitted_export'] &&
+					$dbform['restricted_access'] === $form['restricted_access']
+					// no checking if $dbform['content'] === $form['content'] for db-specific character encoding
+				){
+					SQLQUERY::EXECUTE($this->_pdo, 'form_delete', [
+						'values' => [
+							':id' => $dbform['id']
+						]
+					]);
+					$matches++;
+				}
+			}
+		}
+		echo $matches . ' components and forms according to template file deleted';
+
 	}
 }
 
