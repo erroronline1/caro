@@ -152,9 +152,8 @@ Anwendungsunterstützung Legende:
 | MDR Art. 14 Stichprobenprüfung | ja, strukturell | &bull; Eine Stichprobenprüfung ist implementiert. Ein entsprechendes Formular muss erstellt werden, in Frage kommende Artikel geben sich bei Bestellung zu erkennen. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Formulare](#formulare),[Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten) |
 | MDR Art 83 Nachbeobachtung | strukturell | &bull; Die Überwachung nach dem Inverkehrbringen ist kein direkter Bestandteil der Anwendung. Die regulatorische Anforderung Patienten zur Hilfsmittelkontrolle einzubestellen ist nicht integriert, da eine konsequente Erfassung von Kontaktdaten die Arbeitsbelastung vergrößern würde und redundant wäre, da eine zusätzliche ERP-Software ohnehin erforderlich ist. Statt dessen können deren Datenexporte von Kundendaten genutzt und ein CSV-Filter mit individuellen Regeln erstellt werden um eine Liste passender Empfänger für Serienbriefe zu erhalten. Die Speicherung dieser Liste kann als Nachweis der Erfüllung der regulatorischen Anforderung genutzt werden. | [Werkzeuge](#werkzeuge), [CSV-Filter](#csv-prozessor) |
 | MDR annex 1 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
-| MDR annex 6 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
-| MDR annex 7 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
-| MDR annex 13 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MDR annex 4 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MDR annex 14 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
 | ArbSchG §3 / BAG Az. 1 ABR 22/21 | ja | &bull; Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. erfasse. Die Einträge können unter Berücksichtigung von Arbeitszeitgesetzen als Dokumentation exportiert werden. | [Kalender](#kalender) |
 
 
