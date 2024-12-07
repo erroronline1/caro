@@ -209,7 +209,7 @@ class RECORD extends API {
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => PDF::recordsPDF($content)
+			'href' => $summarize === 'simplifiedform' ? PDF::formsPDF($content): PDF::recordsPDF($content)
 		];
 
 		$body = [];
@@ -1563,7 +1563,7 @@ class RECORD extends API {
 	 *              |_|                           |_|
 	 */
 	public function simplifiedexport(){
-		$this->export('simplified');
+		$this->export('simplified', true);
 	}
 
 	/**
@@ -1681,11 +1681,11 @@ class RECORD extends API {
 				return $enumerate;
 			}
 	
-			function printable($element, $payload, $enumerate = []){
+			function printable($element, $payload, $type, $enumerate = []){
 				$content = ['content' => []];
 				foreach($element as $subs){
 					if (!isset($subs['type'])){
-						$subcontent = printable($subs, $payload, $enumerate);
+						$subcontent = printable($subs, $payload, $type, $enumerate);
 						foreach($subcontent['enumerate'] as $name => $number){
 							$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
 						}
@@ -1704,16 +1704,20 @@ class RECORD extends API {
 						}
 
 						if ($subs['type'] === 'textsection'){
-							$value = isset($subs['content']) ? $subs['content'] : '';
+							$value = isset($subs['content']) ? $subs['content'] : ' ';
 						}
 						elseif (isset($payload[$name])) {
 							$value = $payload[$name];
 						}
 						else $value = '-';
+						if ($type === 'simplifiedform') $value = ['type' => 'textsection', 'value' => $value];
+
 						$content['content'][$name] = $value;
 						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
 						foreach($dynamicMultiples as $matchkey => $submitted){
-							$content['content'][$submitted] = $payload[$submitted];
+							$value = $payload[$submitted];
+							if ($type === 'simplifiedform') $value = ['type' => 'textsection', 'value' => $value];
+							$content['content'][$submitted] = $value;
 						}
 					}
 				}
@@ -1726,9 +1730,14 @@ class RECORD extends API {
 				if ($usedform = $formfinder->recentform('form_form_get_by_name', [
 					'values' => [
 						':name' => $form
-					]])) $printablecontent[$form . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($usedform['content'], $content, $enumerate)['content'];
+					]])) $printablecontent[$form . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($usedform['content'], $content, $type, $enumerate)['content'];
 			}
 			$summary['content'] = $printablecontent;
+			if ($type === 'simplifiedform'){
+				$summary['content'] = [' ' => $printablecontent[$usedform['name'] . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])]];
+				$summary['date'] = LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')]);
+				$summary['title'] = $usedform['name'];
+			}
 		}
 		return $summary;
 	}
