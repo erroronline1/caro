@@ -182,7 +182,7 @@ Export for signature compliance
 		{
 			"type": "checkbox",
 			"attributes": {
-				"name": "Weiterleitung persönlicher Daten and andere Mit-/Weiterversorger"
+				"name": "Weiterleitung persönlicher Daten an andere Mit-/Weiterversorger"
 			},
 			"content": {
 				"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass alle für den Mit-/Weiterversorger meines Hilfsmittels notwendigen personenbezogenen Daten an diesen weitergeleitet werden dürfen.": []
