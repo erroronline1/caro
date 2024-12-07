@@ -112,11 +112,11 @@
 	},
 	{
 		"name": "Basic data",
-		"alias": "",
+		"alias": "customer data",
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "",
+		"regulatory_context": "iso134857_2_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identify,basic"
