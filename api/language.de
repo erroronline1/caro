@@ -1427,9 +1427,9 @@ iso14971 = "ISO 14971 Risikomanagement"
 sgb5_33 = "SGB 5 §33 Zusätzliche Kosten"
 mdr14 = "MDR Art. 14 Stichprobenprüfung"
 mdr83 = "MDR Art. 83 Nachbeobachtung"
-mdr_annex1 = "MDR annex 1 Grundlegende Sicherheits- und Leistungsanforderungen"
-mdr_annex4 = "MDR annex 4 Konformitätserklärung"
-mdr_annex14 = "MDR annex 14 Klinische Bewertung und Nachbeobachtung"
+mdr_annex1 = "MDR Anhang 1 Grundlegende Sicherheits- und Leistungsanforderungen"
+mdr_annex4 = "MDR Anhang 4 Konformitätserklärung"
+mdr_annex14 = "MDR Anhang 14 Klinische Bewertung und Nachbeobachtung"
 [html5_qrcode]
 ; sprach mod für https://github.com/mebjas/html5-qrcode
 error[parse] = "QR Code Auswertungsfehler, Fehler = "
