@@ -209,7 +209,7 @@ class RECORD extends API {
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$downloadfiles[LANG::GET('menu.record_summary')] = [
-			'href' => $summarize === 'simplifiedform' ? PDF::formsPDF($content): PDF::recordsPDF($content)
+			'href' => PDF::recordsPDF($content)
 		];
 
 		$body = [];
@@ -1710,13 +1710,11 @@ class RECORD extends API {
 							$value = $payload[$name];
 						}
 						else $value = '-';
-						if ($type === 'simplifiedform') $value = ['type' => 'textsection', 'value' => $value];
 
 						$content['content'][$name] = $value;
 						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
 						foreach($dynamicMultiples as $matchkey => $submitted){
 							$value = $payload[$submitted];
-							if ($type === 'simplifiedform') $value = ['type' => 'textsection', 'value' => $value];
 							$content['content'][$submitted] = $value;
 						}
 					}
