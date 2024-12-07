@@ -1422,6 +1422,14 @@ iso134858_4 = "13485 8.4 Data analysis"
 iso134858_5_1 = "13485 8.5.1 General Improvement"
 iso134858_5_2 = "13485 8.5.2 Corrective measures"
 iso134858_5_3 = "13485 8.5.3 Preventive measures"
+mpdg_83 = "MPDG §83 Medical Device Consultant"
+iso14971 = "ISO 14971 Risk Management"
+sgb5_33 = "SGB 5 §33 Additional Costs"
+mdr14 = "MDR Art. 14 Sample check"
+mdr83 = "MDR Art. 83 Post-market surveillance system"
+mdr_annex1 = "MDR annex 1 General safety and performance requirements"
+mdr_annex4 = "MDR annex 4 Declaration of conformity"
+mdr_annex14 = "MDR annex 14 Clinical evaluation and post-market surveillance"
 
 [html5_qrcode]
 ; language mod for https://github.com/mebjas/html5-qrcode
