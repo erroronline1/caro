@@ -62,7 +62,7 @@ class STRESSTEST{
 		}
 		else {
 			foreach(get_class_vars(get_class($this)) as $varName => $varValue){
-				if (in_array(gettype($varValue), ['string', 'integer']))
+				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
 			echo '<br />';
