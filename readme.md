@@ -1785,6 +1785,8 @@ During developement following outcomes could be noted:
 
 The stresstest also allows for injection of forms and components according to templates/forms.xx.json. Deletion of forms and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing.
 
+Variables can be adjusted within the class variables in the sourcecode.
+
 [Content](#content)
 
 ## Deployment process
