@@ -44,6 +44,7 @@ class STRESSTEST{
 	public $_recordnumber = 20000;
 	public $_ordernumber = 1000;
 	public $_template = '../templates/forms.de.json';
+	public $_autopermission = true;
 
 	public function __construct($method){
 		$options = [
@@ -237,10 +238,17 @@ class STRESSTEST{
 		$forms = json_decode($forms, true);
 		$matches = 0;
 
+		$permissions = [];
+		foreach (preg_split('/\W+/', CONFIG['permissions']['formapproval']) as $permission){
+			$permissions[$permission] = [
+				'name' => "Caro App",
+				'date' => $this->_currentdate->format("Y-m-d H:i")
+			];
+		}
 		foreach ($forms as $form){
 			if (isset($form['name'])) {
 				if (gettype($form['content']) === 'array') $form['content'] = json_encode($form['content']);
-				SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
 					'values' => [
 						':name' => $form['name'],
 						':alias' => $form['alias'],
@@ -252,8 +260,15 @@ class STRESSTEST{
 						':permitted_export' => $form['permitted_export'],
 						':restricted_access' => $form['restricted_access']
 					]
-				]);
-				$matches++;
+				])){
+					$matches++;
+					if ($this->_autopermission) SQLQUERY::EXECUTE($this->_pdo, 'form_put_approve', [
+						'values' => [
+							':approval' => json_encode($permissions),
+							':id' => $this->_pdo->lastInsertId()
+						]
+						]);
+				}
 			}
 		}
 		echo $matches . ' components and forms according to template file inserted, please check the application for performance and remember you have to approve each to take effect!';
