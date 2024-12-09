@@ -37,14 +37,15 @@ class STRESSTEST{
 	public $_currentdate;
 
 	/**
-	 * identifying prefixes for creation and safe deletion, default numbers
+	 * identifying prefixes for creation and safe deletion, default values
 	 */
 	public $_prefix = 'UVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY';
-	public $_caleandarnumber = 20000;
-	public $_recordnumber = 20000;
-	public $_ordernumber = 1000;
+	public $_caleandarentries = 20000;
+	public $_recordentries = 20000;
+	public $_orderentries = 1000;
 	public $_template = '../templates/forms.de.json';
 	public $_autopermission = true;
+	public $_author = "Caro App";
 
 	public function __construct($method){
 		$options = [
@@ -74,8 +75,8 @@ class STRESSTEST{
 
 	public function createCalendarEvents(){
 		$this->_currentdate->modify('-12 month');
-		for ($i = 0; $i < $this->_caleandarnumber; $i++){
-			if (!($i % intval($this->_caleandarnumber/12/30))) $this->_currentdate->modify('+1 day');
+		for ($i = 0; $i < $this->_caleandarentries; $i++){
+			if (!($i % intval($this->_caleandarentries/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 				'values' => [
 					':type' => 'schedule',
@@ -115,11 +116,11 @@ class STRESSTEST{
 		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 
-		for ($i = 0; $i < $this->_recordnumber; $i++){
-			if (!($i % intval($this->_recordnumber/12/30))) {
+		for ($i = 0; $i < $this->_recordentries; $i++){
+			if (!($i % intval($this->_recordentries/12/30))) {
 				$this->_currentdate->modify('+1 day');
 			}
-			$identifier = 'wolfgang' . $this->_prefix . random_int(1, $this->_recordnumber);
+			$identifier = 'wolfgang' . $this->_prefix . random_int(1, $this->_recordentries);
 
 			$content = [];
 			$names = ['abc','def','ghi','jkl','mno','pqr','stu','vwx','yz'];
@@ -131,7 +132,7 @@ class STRESSTEST{
 			shuffle($forms);
 			foreach($forms as $form){
 				$current_record[] = [
-					'author' => 'error on line 1',
+					'author' => $this->$_author,
 					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 					'form' => $form['id'],
 					'content' => json_encode($content)
@@ -185,7 +186,7 @@ class STRESSTEST{
 			] 
 		]);
 		$orders = [];
-		for ($i = 0; $i < $this->_ordernumber; $i++){
+		for ($i = 0; $i < $this->_orderentries; $i++){
 			$product = $products[array_rand($products)];
 				$orders[] = [
 				':order_data' => json_encode(
@@ -196,8 +197,8 @@ class STRESSTEST{
 						'productname_label' => $product['article_name'],
 						'barcode_label' => $product['article_ean'],
 						'vendor_label' => $product['vendor_name'],
-						'commission' => 'wolfgang' . $this->_prefix . random_int(1, $this->_ordernumber),
-						'orderer' => 'error on line 1'
+						'commission' => 'wolfgang' . $this->_prefix . random_int(1, $this->_orderentries),
+						'orderer' => $this->$_author
 					]
 				),
 				':organizational_unit' => 'prosthetics2',
@@ -241,7 +242,7 @@ class STRESSTEST{
 		$permissions = [];
 		foreach (preg_split('/\W+/', CONFIG['permissions']['formapproval']) as $permission){
 			$permissions[$permission] = [
-				'name' => "Caro App",
+				'name' => $this->$_author,
 				'date' => $this->_currentdate->format("Y-m-d H:i")
 			];
 		}
