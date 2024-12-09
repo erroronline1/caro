@@ -96,7 +96,6 @@
 ## development
 * review pan-system linebreaks within templates \\n
 * failsafe on unfound component names on form assembly (backend)
-* allow multiline checkbox/radio content keys within composer
 
 #### purchase considerations
 
