@@ -813,6 +813,7 @@ export class Assemble {
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		// required handled by any input on their own but checkbox and radio
 		if (this.currentElement.content && typeof this.currentElement.content === "object") {
+			if (this.currentElement.attributes && this.currentElement.attributes.required) header.dataset.required = true;
 			for (let [key, attributes] of Object.entries(this.currentElement.content)) {
 				if (!attributes) break;
 				if (attributes.required) {
@@ -990,6 +991,7 @@ export class Assemble {
 			input.id = getNextElementID();
 			if (radio) {
 				label.classList.add("radio");
+				input = this.apply_attributes(this.currentElement.attributes, input); // e.g. for required
 				input.type = "radio";
 				input.name = radioname;
 				input.value = checkbox;
