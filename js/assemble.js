@@ -266,6 +266,17 @@ export class Dialog {
 		dialog.close();
 	}
 
+	linebreak(string) {
+		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
+			result = [];
+		for (const match of content) {
+			if (!match[1].length) continue;
+			result.push(document.createTextNode(match[1]));
+			result.push(document.createElement("br"));
+		}
+		return result;
+	}
+
 	alert() {
 		const button = document.createElement("button");
 		button.value = true;
@@ -332,7 +343,7 @@ export class Dialog {
 			}
 			button = document.createElement("button");
 			button.classList.add("discreetButton");
-			button.append(document.createTextNode(option));
+			button.append(...this.linebreak(option));
 			button.value = value;
 			buttons.append(button);
 		});
@@ -801,7 +812,7 @@ export class Assemble {
 		header.dataset.type = this.currentElement.type;
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		// required handled by any input on their own but checkbox and radio
-		if (this.currentElement.content && typeof this.currentElement.content === 'object') {
+		if (this.currentElement.content && typeof this.currentElement.content === "object") {
 			for (let [key, attributes] of Object.entries(this.currentElement.content)) {
 				if (!attributes) break;
 				if (attributes.required) {
@@ -850,6 +861,17 @@ export class Assemble {
 		return node;
 	}
 
+	linebreak(string) {
+		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
+			result = [];
+		for (const match of content) {
+			if (!match[1].length) continue;
+			result.push(document.createTextNode(match[1]));
+			result.push(document.createElement("br"));
+		}
+		return result;
+	}
+
 	names_numerator(name, dontnumerate = undefined) {
 		// consider record.php exportform-method too on changing
 		if (dontnumerate || [...name.matchAll(/\[\]/g)].length) return name;
@@ -886,7 +908,7 @@ export class Assemble {
 		let button = document.createElement("button");
 		button.id = getNextElementID();
 		if (this.currentElement.attributes.value !== undefined) {
-			button.appendChild(document.createTextNode(this.currentElement.attributes.value));
+			button.append(...this.linebreak(this.currentElement.attributes.value));
 			delete this.currentElement.attributes.value;
 		}
 		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
@@ -977,7 +999,7 @@ export class Assemble {
 				input.dataset.grouped = this.currentElement.description;
 				input.name = this.names_numerator(checkbox);
 			}
-			label.append(document.createTextNode(checkbox.replace(/\[\]|DEFAULT_/g, "")));
+			label.append(...this.linebreak(checkbox.replace(/\[\]|DEFAULT_/g, "")));
 			input = this.apply_attributes(attributes, input);
 			label.htmlFor = input.id;
 			if (input.dataset.filtered) label.dataset.filtered = input.dataset.filtered;
@@ -1998,13 +2020,8 @@ export class Assemble {
 			delete this.currentElement.attributes.name;
 		}
 		if (this.currentElement.content) {
-			content = this.currentElement.content.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
 			p = document.createElement("p");
-			for (const part of content) {
-				if (!part[1].length) continue;
-				p.append(document.createTextNode(part[1]));
-				p.append(document.createElement("br"));
-			}
+			p.append(...this.linebreak(this.currentElement.content));
 			result.push(p);
 		}
 		if (this.currentElement.linkedcontent) {
@@ -2044,7 +2061,6 @@ export class Assemble {
 				}
 				p.append(document.createElement("br"));
 			}
-
 			result.push(p);
 		}
 
