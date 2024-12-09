@@ -96,6 +96,8 @@
 ## development
 * review pan-system linebreaks within templates \\n
 * failsafe on unfound component names on form assembly (backend)
+* linebreaks within pdf exports
+* selections linebreak (split ' | ') for record exports
 
 #### purchase considerations
 
