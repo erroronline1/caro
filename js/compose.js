@@ -1337,11 +1337,13 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "text",
 			attributes: {
+				rows: 3,
 				name: LANG.GET("assemble.compose_multilist_add_item") + "[]",
 				required: true,
 			},
 		};
-		result = result.concat(...this.text());
+		if (type.type==="links") result = result.concat(...this.text());
+		else result = result.concat(...this.textarea());
 		this.currentElement = {
 			attributes: {
 				value: LANG.GET("assemble.compose_multilist_add_item_button"),
