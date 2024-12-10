@@ -298,7 +298,7 @@ class STRESSTEST{
 					$dbform['unit'] === $form['unit'] &&
 					$dbform['author'] === $form['author'] &&
 					$dbform['regulatory_context'] === $form['regulatory_context'] &&
-					$dbform['permitted_export'] === $form['permitted_export'] &&
+					$dbform['permitted_export'] == $form['permitted_export'] &&
 					$dbform['restricted_access'] === $form['restricted_access']
 					// no checking if $dbform['content'] === $form['content'] for db-specific character encoding
 				){
