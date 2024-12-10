@@ -218,11 +218,13 @@ Application support legend:
 | ISO 14971 | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Items of appedix E are prepared for use by default. | [Risk management](#risk-management) |
 | SGB 5 §33 | structural | &bull; *describe within forms with the "Case documentation"-context* | |
 | MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective form, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Forms](#forms), [Importing vendor pricelists](#importing-vendor-pricelists) |
+| MDR Art. 61 Clinical evaluation | structural | &bull; *describe within forms with the "Case documentation"-context* | |
 | MDR Art. 83 Post-market surveillance system | structural | &bull; Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a csv-filter with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments. | [Tools](#tools), [CSV processor](#csv-processor) |
-| MDR annex 1 | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| MDR annex 4 | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| MDR annex 14 | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br />&bull; These inputs can be exported for documentation regarding labour laws| [Calendar](#calendar) |
+| MDR annex 1 General safety and performance requirements | structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| MDR annex 4 EU Declaration of conformity | structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| MDR annex 13 Procedure for custom-made devices | structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| MDR annex 14 Clinical evaluation and post-market clinical follow-up| structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br />&bull; These inputs can be exported for documentation regarding labour laws | [Calendar](#calendar) |
 
 [Content](#content)
 
