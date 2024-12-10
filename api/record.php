@@ -1628,6 +1628,8 @@ class RECORD extends API {
 			if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 			foreach($record['content'] as $key => $value){
 				$key = str_replace('_', ' ', $key);
+				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
+				$value = str_replace('\n', "\n", $value); // format linebreaks
 				if (!isset($accumulatedcontent[$usedform][$key])) $accumulatedcontent[$usedform][$key] = [];
 				$accumulatedcontent[$usedform][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
 			}
@@ -1704,7 +1706,8 @@ class RECORD extends API {
 						}
 
 						if ($subs['type'] === 'textsection'){
-							$value = isset($subs['content']) ? $subs['content'] : ' ';
+							$value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
+							 : ' ';
 						}
 						elseif (isset($payload[$name])) {
 							$value = $payload[$name];

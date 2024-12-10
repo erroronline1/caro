@@ -96,8 +96,7 @@
 ## development
 * review pan-system linebreaks within templates \\n
 * failsafe on unfound component names on form assembly (backend)
-* linebreaks within pdf exports
-* selections linebreak (split ' | ') for record exports
+* message unit users on newly approved forms and components, all if common
 
 #### purchase considerations
 
@@ -1787,7 +1786,6 @@ During developement following outcomes could be noted:
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
 The stresstest also allows for injection of forms and components according to templates/forms.xx.json. Deletion of forms and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing.
-
 Variables can be adjusted within the class variables in the sourcecode.
 
 [Content](#content)
