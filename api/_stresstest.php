@@ -132,7 +132,7 @@ class STRESSTEST{
 			shuffle($forms);
 			foreach($forms as $form){
 				$current_record[] = [
-					'author' => $this->$_author,
+					'author' => $this->_author,
 					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 					'form' => $form['id'],
 					'content' => json_encode($content)
@@ -198,7 +198,7 @@ class STRESSTEST{
 						'barcode_label' => $product['article_ean'],
 						'vendor_label' => $product['vendor_name'],
 						'commission' => 'wolfgang' . $this->_prefix . random_int(1, $this->_orderentries),
-						'orderer' => $this->$_author
+						'orderer' => $this->_author
 					]
 				),
 				':organizational_unit' => 'prosthetics2',
@@ -242,7 +242,7 @@ class STRESSTEST{
 		$permissions = [];
 		foreach (preg_split('/\W+/', CONFIG['permissions']['formapproval']) as $permission){
 			$permissions[$permission] = [
-				'name' => $this->$_author,
+				'name' => $this->_author,
 				'date' => $this->_currentdate->format("Y-m-d H:i")
 			];
 		}
