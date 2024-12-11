@@ -1739,6 +1739,7 @@ class RECORD extends API {
 				$summary['content'] = [' ' => $printablecontent[$usedform['name'] . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])]];
 				$summary['date'] = LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')]);
 				$summary['title'] = $usedform['name'];
+				$summary['images'] = [' ' => $summary['images'][$usedform['name']]];
 			}
 		}
 		return $summary;
