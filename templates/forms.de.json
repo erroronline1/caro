@@ -3511,5 +3511,17 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,konformitätserklärung,gebrauchsanweisung allgemein,gebrauchsanweisung warnungen einsatzbereich prothetik ii,gebrauchsanweisung handhabung,gebrauchsanweisung beschreibung komponenten prothetik ii,gebrauchsanweisung medizinische aspekte prothetik ii,gebrauchsanweisung körperpflege,gebrauchsanweisung reinigung,gebrauchsanweisung instandhaltung,gebrauchsanweisung entsorgung,gebrauchsanweisung therapeuteninformation"
+	},
+	{
+		"name": "Versorgungsdokumentation Prothetik II",
+		"alias": "",
+		"context": "bundle",
+		"unit": "",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik II,Maßblatt Prothetik II,Versorgungsplanung Prothetik II,Kunststofffertigungsauftrag Prothetik II,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik II,Abgabeprotokoll Prothetik II,Gebrauchsanweisung Prothetik II,Empfangsbestätigung"
+
 	}
 ]
