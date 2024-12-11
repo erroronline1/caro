@@ -369,6 +369,7 @@ class RECORD extends API {
 					'hint' => LANG::GET('assemble.form_export_hint'),
 					'attributes' => [
 						'type' => 'submit',
+						'formnovalidate' => true,
 						'value' => LANG::GET('assemble.form_export'),
 						'formaction' => "javascript:api.form('post', 'export')"
 					]
