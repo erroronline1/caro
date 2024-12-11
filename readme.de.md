@@ -44,6 +44,8 @@
 * [Bibliotheken](#bibliotheken)
 * [Lizenz](#lizenz)
 
+Die aktuellste Dokumentation ist verfügbar auf [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
+
 # Ziele
 Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 13485 und der internen Kommunikation unterstützen. Sie wird als Web-Anwendung auf einem Server verwendet. Datensicherheitsmaßnahmen sind auf die Nutzung innerhalb eines geschlossenen Netzwerks ausgelegt. Die Ausgestaltung ermöglicht es der Belegschaft Daten abzurufen und bereitzustellen wo andere Branchensoftware aufgrund ihrer Lizenzmodelle nur eingeschränkt verwendet werden kann.
 
@@ -146,9 +148,9 @@ Anwendungsunterstützung Legende:
 | ISO 13485 8.5.1 Verbesserung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 8.5.2 Korrekturmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 8.5.3 Vorbeugungsmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
-| MPDG §83 | ja | &bull; Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt. | [Nutzer](#nutzer) |
-| ISO 14971 | teilweise | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; Anhang E ist für die Nutzung standardmäßig verbereitet. | [Risikomanagement](#risikomanagement) |
-| SGB 5 §33 | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
+| MPDG §83 Medizinprodukteberater | ja | &bull; Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt. | [Nutzer](#nutzer) |
+| ISO 14971 Risikomanagement | teilweise | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; Anhang E ist für die Nutzung standardmäßig verbereitet. | [Risikomanagement](#risikomanagement) |
+| SGB 5 §33 Zusätzliche Kosten | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
 | MDR Art. 14 Stichprobenprüfung | ja, strukturell | &bull; Eine Stichprobenprüfung ist implementiert. Ein entsprechendes Formular muss erstellt werden, in Frage kommende Artikel geben sich bei Bestellung zu erkennen. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Formulare](#formulare),[Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten) |
 | MDR Art. 61 Klinische Bewertung | strukturell | &bull; *Aufzeichnung über Formulare mit "Vorgangsdokumentation"-Kontext* | |
 | MDR Art. 83 Nachbeobachtung | strukturell | &bull; Die Überwachung nach dem Inverkehrbringen ist kein direkter Bestandteil der Anwendung. Die regulatorische Anforderung Patienten zur Hilfsmittelkontrolle einzubestellen ist nicht integriert, da eine konsequente Erfassung von Kontaktdaten die Arbeitsbelastung vergrößern würde und redundant wäre, da eine zusätzliche ERP-Software ohnehin erforderlich ist. Statt dessen können deren Datenexporte von Kundendaten genutzt und ein CSV-Filter mit individuellen Regeln erstellt werden um eine Liste passender Empfänger für Serienbriefe zu erhalten. Die Speicherung dieser Liste kann als Nachweis der Erfüllung der regulatorischen Anforderung genutzt werden. | [Werkzeuge](#werkzeuge), [CSV-Filter](#csv-prozessor) |
@@ -191,7 +193,6 @@ Formulare können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beac
 # Module
 
 ## Anwendung
-
 ![sample application menu](http://toh.erroronline.one/caro/application%20menu%20de.png)
 
 ### Nutzer
@@ -266,11 +267,9 @@ graph TD;
 [Übersicht](#übersicht)
 
 ### Anleitung
-
 Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht auf der Startseite für alle anderen auszublenden. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt.
 
 ## Kommunikation
-
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20de.png)
 
 ### Unterhaltungen
@@ -281,7 +280,6 @@ Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und 
 [Übersicht](#übersicht)
 
 ### Verzeichnis
-
 Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern und ganzen Bereichen und Berechtigungsgruppen können direkt von dort aus Nachrichten zugesandt werden.
 
 [Übersicht](#übersicht)
@@ -350,7 +348,6 @@ graph TD;
 [Übersicht](#übersicht)
 
 ## Aufzeichnungen
-
 ![sample records menu](http://toh.erroronline.one/caro/records%20menu%20de.png)
 
 ### Formulare
@@ -555,7 +552,6 @@ Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#audit
 [Übersicht](#übersicht)
 
 ## Kalender
-
 ![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu%20de.png)
 
 Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
@@ -649,7 +645,6 @@ graph TD;
 [Übersicht](#übersicht)
 
 ## Dateien
-
 ![sample files menu](http://toh.erroronline.one/caro/files%20menu%20de.png)
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
@@ -665,7 +660,6 @@ Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werd
 [Übersicht](#übersicht)
 
 ## Einkauf
-
 ![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20de.png)
 
 ### Lieferanten- und Artikelverwaltung
@@ -872,7 +866,6 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lös
 [Übersicht](#übersicht)
 
 ## Werkzeuge
-
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20de.png)
 
 Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, der Betrachtung von STL-Dateien, der Unterstützung bei wiederkehrenden Berechnungen und Bildskalierung zur Verfügung.
@@ -880,7 +873,6 @@ Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
 ## Audit
-
 Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte
 * Stichprobenprüfungen gemäß MDR §14
@@ -1111,7 +1103,7 @@ products_per_slide = 6
 
 ### Verschiedenes
 * Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der config.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
-* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Menge an Drittbibliotheken zu reduzieren und aufgrund [mangelnder implementierung im Safari-Browser](https://caniuse.com/push-api) zum Zeitpunkt der Erstellung.
+* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden.
 * Das Ziehen von Formularelementen für die Sortierung in der Formularverwaltung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Formulare und deren Komponenten müssen daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen um den Quelltext nicht unnötig zu vergrößern. Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig.
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
@@ -1500,7 +1492,7 @@ Ein beliebiges Beispiel:
 [Übersicht](#übersicht)
 
 # Regulatorische Anforderungen an die Software
-Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenRegulatory](https://github.com/openregulatory/templates) liegen der englischsprachigen Beschreibung vor.
+Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
 
 [Übersicht](#übersicht)
 
@@ -1545,25 +1537,17 @@ Eine Auflistung der verwendeten Bibliotheken liegt in der englischsprachigen Bes
 [Übersicht](#übersicht)
 
 # Lizenz
+[CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
 
-CARO - Cloud Assisted Records and Operations
 Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or any later version.
+Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU Affero General Public License.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+Sie sollten ein Exemplar der GNU Affero General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>.
 
-# The team
-
+# Das Team
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
 | --------------- | -------------- | ------------- | ----------------------------- |
 | error 'i have the say here' on line 1 | error on line 1 | error 'fancypants' on line 1 | error 'can you do anything right?' on line 1|
