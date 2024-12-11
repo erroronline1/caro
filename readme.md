@@ -41,7 +41,7 @@
     * [General](#general)
     * [Information security](#information-security)
     * [Performance evaluation](#performance-evaluation)
-    * [Tec doc](#tech-doc)
+    * [Tech doc](#tech-doc)
 * [Code design patterns](#code-design-patterns)
     * [Frontend design](#frontend-design)
     * [Backend design](#backend-design)
@@ -68,11 +68,36 @@
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
     * [Terms of service for using the application](#terms-of-service-for-using-the-application)
     * [Web Application](#web-application)
+        * [3.1.1 Prüfaspekt (1): Anwendungszweck](#311-prüfaspekt-1-anwendungszweck)
+        * [3.1.2 Prüfaspekt (2): Architektur](#312-prüfaspekt-2-architektur)
+        * [3.1.3 Prüfaspekt (3): Quellcode](#313-prüfaspekt-3-quellcode)
+        * [3.1.4 Prüfaspekt (4): Drittanbieter-Software](#314-prüfaspekt-4-drittanbieter-software)
+        * [3.1.5 Prüfaspekt (5): Kryptographische Umsetzung](#315-prüfaspekt-5-kryptographische-umsetzung)
+        * [3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung](#315-prüfaspekt-5-kryptographische-umsetzung)
+        * [3.1.6.1 Authentifizierung über Passwort](#3161-authentifizierung-über-passwort)
+        * [3.1.7 Prüfaspekt (7): Datensicherheit](#317-prüfaspekt-7-datensicherheit)
+        * [3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen](#318-prüfaspekt-8-kostenpflichtige-ressourcen)
+        * [3.1.9 Prüfaspekt (9): Netzwerkkommunikation](#319-prüfaspekt-9-netzwerkkommunikation)
+        * [3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen](#3110-prüfaspekt-10-plattformspezifische-interaktionen)
+        * [3.1.11 Prüfaspekt (11): Resilienz](#3111-prüfaspekt-11-resilienz)
     * [Backend](#backend)
+        * [3.1.1 Prüfaspekt (1): Anwendungszweck](#311-prc3bcfaspekt-1-anwendungszweck-1)
+        * [3.1.2 Prüfaspekt (2): Architektur](#312-prc3bcfaspekt-2-architektur-1)
+        * [3.1.3 Prüfaspekt (3): Quellcode](#313-prc3bcfaspekt-3-quellcode-1)
+        * [3.1.4 Prüfaspekt (4): Drittanbieter-Software](#314-prc3bcfaspekt-4-drittanbieter-software-1)
+        * [3.1.5 Prüfaspekt (5): Kryptographische Umsetzung](#315-prc3bcfaspekt-5-kryptographische-umsetzung-1)
+        * [3.1.5.1 Zufallszahlen](#3151-zufallszahlen)
+        * [3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung](#316-prc3bcfaspekt-6-authentisierung-und-authentifizierung-1)
+        * [3.1.6.1 Authentifizierung über Passwort](#3161-authentifizierung-c3bcber-passwort-1)
+        * [3.1.7 Prüfaspekt (7): Datensicherheit](#317-prc3bcfaspekt-7-datensicherheit-1)
+        * [3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen](#318-prc3bcfaspekt-8-kostenpflichtige-ressourcen-1)
+        * [3.1.9 Prüfaspekt (9): Netzwerkkommunikation](#319-prc3bcfaspekt-9-netzwerkkommunikation-1)
+        * [3.1.10 Prüfaspekt (10): Organisatorische Sicherheit](#3110-prüfaspekt-10-organisatorische-sicherheit)
 * [Risk assessment](#risk-assessment)
 * [Ressources](#ressources)
 * [License](#license)
 
+The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
 
 ## discussion
 
@@ -103,6 +128,21 @@
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
+* global search on landing page, results as tiles?
+    * users with units and permissions displayed
+    * forms
+    * bundles
+    * text recommendations
+    * risk management
+    * schedules
+    * files and external documents
+    * prepared orders
+    * orders by commission
+    * record identifiers link record
+    * products link product
+    * vendors link vendor
+    * conversations
+    * possible shared search methods?
 
 #### records considerations
 * gather most recent date from record within summary to pass it on shared->recentForm to ensure a form version on record entry even if the form is hidden after that
@@ -214,9 +254,9 @@ Application support legend:
 | ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| MPDG §83 | yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register.| [Users](#users) |
-| ISO 14971 | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Items of appedix E are prepared for use by default. | [Risk management](#risk-management) |
-| SGB 5 §33 | structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
+| ISO 14971 Risk Management | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Items of appedix E are prepared for use by default. | [Risk management](#risk-management) |
+| SGB 5 §33 Additional Costs | structural | &bull; *describe within forms with the "Case documentation"-context* | |
 | MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective form, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Forms](#forms), [Importing vendor pricelists](#importing-vendor-pricelists) |
 | MDR Art. 61 Clinical evaluation | structural | &bull; *describe within forms with the "Case documentation"-context* | |
 | MDR Art. 83 Post-market surveillance system | structural | &bull; Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a csv-filter with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments. | [Tools](#tools), [CSV processor](#csv-processor) |
@@ -258,7 +298,6 @@ Forms can contain a digital signature pad. Please note this is not legally docum
 # Modules
 
 ## Application
-
 ![sample application menu](http://toh.erroronline.one/caro/application%20menu.png)
 
 ### Users
@@ -331,11 +370,9 @@ graph TD;
 [Content](#content)
 
 ### Manual
-
 Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others. On installation a default manual will be inserted in the [default language](#runtime-variables).
 
 ## Communication
-
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu.png)
 
 ### Conversations
@@ -346,7 +383,6 @@ This is for internal communication and system alerts only and has no record aspe
 [Content](#content)
 
 ### Register
-
 The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users and whole units and permission groups can be sent a message directly from here.
 
 [Content](#content)
@@ -413,7 +449,6 @@ graph TD;
 [Content](#content)
 
 ## Records
-
 ![sample records menu](http://toh.erroronline.one/caro/records%20menu.png)
 
 ### Forms
@@ -632,7 +667,6 @@ Entries are not persistent but can be exported if desired through the [audit mod
 [Content](#content)
 
 ## Calendar
-
 ![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu.png)
 
 Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
@@ -725,7 +759,6 @@ graph TD;
 [Content](#content)
 
 ## Files
-
 ![sample files menu](http://toh.erroronline.one/caro/files%20menu.png)
 
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
@@ -741,7 +774,6 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 [Content](#content)
 
 ## Purchase
-
 ![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu.png)
 
 ### Vendor and product management
@@ -942,7 +974,6 @@ Sample checks are added to the records. New checks trigger a sytem message to th
 [Content](#content)
 
 ## Tools
-
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu.png)
 
 Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit), support recurring calculations and image scaling.
@@ -1180,7 +1211,7 @@ products_per_slide = 6
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push api to avoid third party usage and for [lack of full safari support](https://caniuse.com/push-api) as time of writing.
+* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services.
 * Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
@@ -1613,11 +1644,10 @@ Evidences of conformity according to the documents described above:
 * System Test Report: [Stress test and performance](#stress-test-and-performance)
 * Technical and Organizational Measures: [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
 * UDI Label: **not applicable**
-* Usability Evaluation Report
-* User Manual: [this document](#caro---cloud-assisted-records-and-operations)
+* Usability Evaluation Report: [Stakeholder requirements](#stakeholder-requirements)
+* User Manual: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en / _install.default.de
 
 ### Stakeholder requirements
-
 Stakeholder identification:
 * User (regular Employees)
 * CEO (Chief executive officer)
@@ -1661,6 +1691,16 @@ Discussed stakeholder requirements:
 
 [Content](#content)
 
+### Usability test plan
+| Stage | Measure | Expected results | Result handling |
+| ----- | ------- | ---------------- | --------------- |
+| Development | Regular meetings to match requirements | Gain required functionality | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible |
+| Development | Arrange meetings with specific users, particularly less tech savvy, supervisors, ceo and qmo | Gain required functionality, assess frontend usability | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
+| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual forms<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; stl-viewer<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; audit | Assess frontend usability | Adapt structure, styling and assemble-framework |
+| Full deployment | Enable all modules, register personal accounts | Assess frontend usability | Adapt structure, styling and assemble-framework |
+
+[Content](#content)
+
 ## Information security
 according to [OpenRegulatory information security requirements](https://github.com/openregulatory/templates/tree/master/templates/information_security)
 * see [data protection](#data-protection)
@@ -1696,7 +1736,7 @@ Specification
 * Risk Table: [Risk assessment](#risk-assessment)
 * Software Requirements Checklist: [Intended regulatory goals](#intended-regulatory-goals)
 * Software Test Plan: [Integration test](#integration-test), [Stress test and performance](#stress-test-and-performance)
-* Usability Test Plan
+* Usability Test Plan: [Usability test plan](#usability-test-plan)
 
 Development
 * SOUP List: [Ressources](#ressources)
@@ -1707,14 +1747,14 @@ Verification and Validation
 * List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
 * Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en / _install.default.de
 * Usability Test Protocol
-* Usability Test Report
+* Usability Test Report: [Stakeholder requirements](#stakeholder-requirements)
 * Clinical Evaluation Report: **not applicable**
 * Risk Management Report: [Risk assessment](#risk-assessment)
 
 Product Release
 * GSPR List: **not applicable**
 * PMS (/PMCF) Plan: **not applicable**
-* Software Release Checklist
+* Software Release Checklist: [Installation](#installation)
 * Release Notes
 * Declaration of Conformity: **not applicable**
 
@@ -1757,7 +1797,7 @@ There is as SQLQUERY class handling
 
 Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
 
-Helper modules start with _, only endpoints do not.
+Helper modules start with _, only endpoints do not. Helper modules are supposed to work without being reliant on other modules and expected formatted output. _shared.php is an exception.
 
 All requests have to be executed through the api ensuring
 * responses for logged in users only
@@ -1778,15 +1818,16 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
 
 ## Stress test and performance
-Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. The script still should be removed from the production server once being tested.
+Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. **The script still should be removed from the production server once being tested.**
 
-During developement following outcomes could be noted:
+During development following outcomes could be noted:
 * 100k distributed records perform well, landing page loads in about 3s.
-* 100k calendar events perform well, landing page loads in about 3s.
+* 100k calendar events perform well, landing page still loads in about 3s.
 * 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
-The stresstest also allows for injection of forms and components according to templates/forms.xx.json. Deletion of forms and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing.
+The stresstest also allows for injection of forms and components according to templates/forms.xx.json. Deletion of forms and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing. **Deleting forms and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested.**
+
 Variables can be adjusted within the class variables in the sourcecode.
 
 [Content](#content)
@@ -1813,7 +1854,6 @@ Response properties are
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS compose_helper-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
 ## Request flow
-
 ```mermaid
 graph TD;
     request((request))-->api_js(api.js);
@@ -3610,6 +3650,8 @@ This application requests permission to use a camera and send notifications. Cam
 ### Feedback
 If you experience any issues with data security or application usage contact :issue_mail (*as defined within config.ini for application->issue_mail*) immidiately providing details and a response address.
 
+[Content](#content)
+
 ### Encryption statement
 > **Unfortunately there appears to be no reasonable way to encrypt data by the application architecture considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for all interchangeable staff members is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures either have to depend on unreachability for the network from outside where frontend and backend are supposed to run within a closed network (LAN, restricted WiFi, VPN), or Transparent Data Encryption / Disk Level Encryption on the server and client side which both are a matter of responsibility of the operator of the infrastructure. Data in transit is encrypted for the application relies on an SSL-connection at all times.**
 
@@ -3638,6 +3680,8 @@ graph TD;
 
 I welcome any constructive input on this topic.
 
+[Content](#content)
+
 ## Web Application
 [according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
 
@@ -3661,6 +3705,8 @@ I welcome any constructive input on this topic.
 * O.Purp_9 Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer dies ist für den primären Zweck der Anwendung erforderlich.
     > Sensitive data is displayed only on intended and active user request.
 
+[Content](#content)
+
 ### 3.1.2 Prüfaspekt (2): Architektur
 * O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus‘ für die gesamte Web-Anwendung und das Hintergrundsystem sein.
     > User login and permissions have been mandatory from the early stages on.
@@ -3680,6 +3726,8 @@ I welcome any constructive input on this topic.
     > The operator of the infrastructure is responsible for browser actuality. How is that supposed to work anyway?
 * O.Arch_9 Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und X-Frame-Options.
     > [Prerequisites](#prerequisites)
+
+[Content](#content)
 
 ### 3.1.3 Prüfaspekt (3): Quellcode
 * O.Source_1 Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
@@ -3705,6 +3753,8 @@ I welcome any constructive input on this topic.
 * O.Source_11 Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten.
     > Sensitive data is always handled as PUT or POST. [API documentation](#api-documentation)
 
+[Content](#content)
+
 ### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
 * O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen.
     > [List of third party software](#ressources)
@@ -3723,6 +3773,8 @@ I welcome any constructive input on this topic.
 * O.TrdP_8 Drittanbieter-Software, die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
     > [List of third party software](#ressources)
 
+[Content](#content)
+
 ### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
 > [Encryption statement](#encryption-statement)
 
@@ -3736,6 +3788,8 @@ I welcome any constructive input on this topic.
     > Encrypted data uses a server-side SHA-encrypted key for user validation.
 * O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
     > Encryption, where applicable, uses SHA-256 algorithm for encryption.
+
+[Content](#content)
 
 ### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
 * O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden einer Anwendungssitzung dokumentieren.
@@ -3773,6 +3827,8 @@ I welcome any constructive input on this topic.
 * O.Auth_17 Der Nutzer MUSS in den Nutzungsbedingungen der Web-Anwendung auf das Restrisiko hingewiesen werden, welches mit der Speicherung der Login-Credentials im WebBrowser oder auch einem anderen externen Programm für einen komfortableren Anmeldevorgang verbunden ist.
     > The input form for the login token is set to one-time-code and can not be stored.
 
+[Content](#content)
+
 ### 3.1.6.1 Authentifizierung über Passwort
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
     > Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters.
@@ -3784,6 +3840,8 @@ I welcome any constructive input on this topic.
     > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
 * O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
     > The frontend does not store passwords.
+
+[Content](#content)
 
 ### 3.1.7 Prüfaspekt (7): Datensicherheit
 * O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
@@ -3825,11 +3883,15 @@ I welcome any constructive input on this topic.
 * O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
     > Only a session cookie is created, IndexedDB has same-origin principle by default.
 
+[Content](#content)
+
 ### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 > Not applicable, as there are no paid ressources.
 
 ### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
 > The operator of the infrastructure is responsible for fulfilling these requirements. Caro App [requires SSL](#prerequisites) consistently though.
+
+[Content](#content)
 
 ### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
 * O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken aufklären.
@@ -3848,6 +3910,8 @@ I welcome any constructive input on this topic.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Plat_8 Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch den Nutzer umsetzbar sind. 
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+[Content](#content)
 
 ### 3.1.11 Prüfaspekt (11): Resilienz
 * O.Resi_1 Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
@@ -3876,6 +3940,8 @@ I welcome any constructive input on this topic.
 * O.Purp_7 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
     > [List of third party software](#ressources)
 
+[Content](#content)
+
 ### 3.1.2 Prüfaspekt (2): Architektur 
 * O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für die gesamte Anwendung sein.
     > User login and permissions have been mandatory from the early stages on.
@@ -3902,6 +3968,8 @@ I welcome any constructive input on this topic.
 * O.Arch_12 Das Hintergrundsystem MUSS die Anwendung über sicherheitsrelevante Updates informieren und nach einer Übergangsfrist (Grace Period) die Benutzung einer veralteten Anwendung unterbinden. 
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 
+[Content](#content)
+
 ### 3.1.3 Prüfaspekt (3): Quellcode 
 * O.Source_1 Das Hintergrundsystem MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
     > Inputs are masked as strings by the backend by default.
@@ -3926,6 +3994,8 @@ I welcome any constructive input on this topic.
 * O.Source_11 Für die Entwicklung des Hintergrundsystems SOLLEN Werkzeuge zur statischen Codeanalyse eingesetzt werden.
     > [Code design patterns](#code-design-patterns)
 
+[Content](#content)
+
 ### 3.1.4 Prüfaspekt (4): Drittanbieter-Software 
 * O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen. 
     > [List of third party software](#ressources)
@@ -3948,6 +4018,8 @@ I welcome any constructive input on this topic.
 * O.TrdP_10 Schnittstellen zwischen Hintergrundsystemen des Herstellers und externen Diensten müssen gemäß O.Arch_5 geschützt werden. 
     > Data sharing does not occur.
 
+[Content](#content)
+
 ### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung 
 > [Encryption statement](#encryption-statement), also see [cryptographic measures for frontend](#315-prüfaspekt-5-kryptographische-umsetzung)
 
@@ -3960,9 +4032,13 @@ I welcome any constructive input on this topic.
 * O.Cryp_7 Alle kryptographischen Operationen SOLLEN in einer vor Manipulation und Offenlegung geschützten Umgebung stattfinden.
 * O.Cryp_8 Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen DÜRFEN NICHT aufgebaut werden.
 
+[Content](#content)
+
 ### 3.1.5.1 Zufallszahlen
 * O.Rand_1 Alle Zufallswerte MÜSSEN über einen starken kryptographischen Zufallszahlengenerator erzeugt werden, welcher mit ausreichend Entropie geseedet wurde (vgl. [TR02102-1]).
     > Random values for tokens are created by PHPs random_int() and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
+
+[Content](#content)
 
 ### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
 * O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau (vgl. [TR03107-1]), zur Autorisierung (Rollenkonzept) und zum Beenden von Sitzungen dokumentieren. Das Konzept MUSS hierbei auch Kommunikationsverbindungen innerhalb eines Hintergrundsystem-Netzwerkes berücksichtigen.
@@ -4008,6 +4084,8 @@ I welcome any constructive input on this topic.
 * O.Auth_21 Authentisierungstoken MÜSSEN mit einem geeigneten Verfahren signiert werden (vgl. [TR02102-1]). Das Hintergrundsystem MUSS die Signatur des Authentisierungstokens prüfen. Dabei ist darauf zu achten, dass der Signaturtyp nicht none sein darf und das Hintergrundsystem Anfragen mit einem ungültigen oder abgelaufenen Authentifizierungstoken ablehnt.
     > This is not reasonable for the application used within a closed environment.
 
+[Content](#content)
+
 ### 3.1.6.1 Authentifizierung über Passwort
 * O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
     > Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
@@ -4019,6 +4097,8 @@ I welcome any constructive input on this topic.
     > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
 * O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
     > As per the [encryption statement](#encryption-statement), sensitive data is not suitable for encryption in the described use case. It is not sensible to apply this to passwords for the risk of data breaches remains the same.
+
+[Content](#content)
 
 ### 3.1.7 Prüfaspekt (7): Datensicherheit 
 * O.Data_1 Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder entschlüsselt werden können.
@@ -4036,6 +4116,8 @@ I welcome any constructive input on this topic.
     > The operator of the infrastructure is responsible for fulfilling this requirement.
 * O.Data_8 Um dem Missbrauch von sensiblen Daten nach einem Geräteverlust entgegenzuwirken, KANN die Anwendung einen Kill-Switch realisieren, d.h. ein absichtliches, sicheres Überschreiben von Nutzerdaten im Gerät auf Applikationsebene, ausgelöst durch das Hintergrundsystem. Der Hersteller MUSS die Auslösung des Kill-Switches durch den Anwender über das Hintergrundsystem durch erneute Authentifizierung vor missbräuchlicher Nutzung schützen.
     > This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access.
+
+[Content](#content)
 
 ### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
 > Not applicable, as there are no paid ressources.
@@ -4094,21 +4176,23 @@ I welcome any constructive input on this topic.
 [Content](#content)
 
 # Ressources
+
 ## External libraries
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
     * v2.3.8
-    * \> 4k stars
-    * \> 900 forks
+    * \> 5k stars
+    * \> 950 forks
     * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en, language.de or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
-    * v5.0.1
+    * v5.0.4
     * \> 10k stars
     * \> 2k forks
+    * [https://www.jsdelivr.com/package/npm/signature_pad](https://www.jsdelivr.com/package/npm/signature_pad) slightly modified for easier import, comment out UMD module wrapper and define export default class SignaturePad
 * [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
     * creates qr codes on the client side
-    * \> 150 stars
+    * \> 200 stars
     * \> 20 forks
 * [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
     * creates barcodes on the client side
@@ -4118,13 +4202,13 @@ I welcome any constructive input on this topic.
 * [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
     * renders stl files on the client side
     * v1.13
-    * \> 150 stars
+    * \> 200 stars
     * \> 40 forks
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
     * creates XLSX-files on the server side
     * v0.39
     * \> 1k stars
-    * \> 600 forks
+    * \> 650 forks
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
     * creates PDF-files on the server side
     * \> 4k stars
@@ -4133,7 +4217,7 @@ I welcome any constructive input on this topic.
     * SVG ui-icon files, not executable
     * author has professional license
 
-All libraries are embedded locally, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
+All libraries are embedded locally to avoid web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
 ## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
@@ -4148,25 +4232,17 @@ All libraries are embedded locally, do not request outside ressources and do not
 [Content](#content)
 
 # License
+[CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
 
-CARO - Cloud Assisted Records and Operations
 Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation,  either version 3 of the License, or any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 # The team
-
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
 | --------------- | -------------- | ------------- | ----------------------------- |
 | error 'i have the say here' on line 1 | error on line 1 | error 'fancypants' on line 1 | error 'can you do anything right?' on line 1|
