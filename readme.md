@@ -110,8 +110,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 #### purchase considerations
 * general orders select workshop storage number
-* overview orders by commission/justification / vendor
-* batch identifier (product and delivery note number) for ordered items
 
 #### records considerations
 * linked files on separate external path, input type convert to link
@@ -124,6 +122,13 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * message unit users on newly approved forms and components, all if common
 
 #### purchase considerations
+* export a label for articles, e.g. traceable due to special_attention
+    * only purchase members for processed articles
+    * order number onclick with dialog like commission
+    * copy order number + dialog with entering delivery note number / consecuting number, vendor and article number hidden, passed to post like POST ./api/api.php/record/identifier/{appendDate}
+    * chain vendor, article-number and the above to a qr-code with readable option
+    * config.ini pdf label dimensions (35x85 dymo portrait mode)
+* order cancelling and deletion not allowed for group accounts
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -3163,7 +3168,7 @@ Returns a download link to a temporary file with identifier label sheet.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {appendDate} | path parameter | optional | if provided a passed identifier will be checked for a timestamp at the end and appened one if not found |
+| {appendDate} | path parameter | optional | if provided a passed identifier will be checked for a timestamp at the end and appended one if not found |
 | payload | form data | required | identifier to be converted to a qr-code |
 
 Sample response
