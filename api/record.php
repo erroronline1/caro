@@ -802,14 +802,20 @@ class RECORD extends API {
 							'name' => LANG::GET('record.create_identifier')
 						],
 						'content' => $this->_requestedID
-					], [
-						'type' => 'button',
-						'attributes' => [
-							'value' => LANG::GET('menu.record_create_identifier'),
-							'onpointerup' => "_client.application.postLabelSheet('" . $this->_requestedID . "')"
-						]
 					]
 				];
+
+				foreach(CONFIG['label'] as $type => $setting){
+					$body[count($body) -1][] = [
+						'type' => 'button',
+						'attributes' => [
+							'type' => 'button',
+							'onpointerup' => "_client.application.postLabelSheet('" . $this->_requestedID . "', null, {_type:'" . $type . "'});",
+							'value' => LANG::GET('record.create_identifier_type', [':format' => $setting['format']])
+						]
+					];
+				}
+				
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 					'values' => [
 						':identifier' => $this->_requestedID
