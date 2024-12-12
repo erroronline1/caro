@@ -1077,10 +1077,21 @@ vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
 ; Seiteneinstellungen für PDF-Dateien
 [pdf]
 labelsheet[format] = 'A4'
+labelsheet[orientation] = 'portrait' ; portrait or landscape
 labelsheet[rows] = 11
 labelsheet[columns] = 5
 labelsheet[margintop] = 0 ; in mm
 labelsheet[marginbottom] = 10 ; in mm
+labelsheet[fontsize] = 10
+label[format] = '85, 35' ; Breite und Höhe in mm
+label[orientation] = 'landscape' ; portrait oder landscape: Hochformat oder Querformat
+label[rows] = 1
+label[colums] = 1
+label[margintop] = 2 ; in mm
+label[marginright] = 2 ; in mm
+label[marginbottom] = 2 ; in mm
+label[marginleft] = 1 ; in mm
+label[fontsize] = 12
 record[format] = 'A4'
 record[margintop] = 30 ; in mm
 record[marginright] = 15 ; in mm

@@ -125,7 +125,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * export a label for articles, e.g. traceable due to special_attention
     * only purchase members for processed articles
     * order number onclick with dialog like commission
-    * copy order number + dialog with entering delivery note number / consecuting number, vendor and article number hidden, passed to post like POST ./api/api.php/record/identifier/{appendDate}
+    * copy order number + dialog with entering delivery note number / consecuting number, date, vendor and article number hidden, passed to post like POST ./api/api.php/record/identifier/{appendDate}
     * chain vendor, article-number and the above to a qr-code with readable option
     * config.ini pdf label dimensions (35x85 dymo portrait mode)
 * order cancelling and deletion not allowed for group accounts
@@ -1191,10 +1191,21 @@ vendors = "ceo, qmo, purchase, prrc" ; add and edit vendors
 ; page settings for pdf
 [pdf]
 labelsheet[format] = 'A4'
+labelsheet[orientation] = 'portrait' ; portrait or landscape
 labelsheet[rows] = 11
 labelsheet[columns] = 5
 labelsheet[margintop] = 0 ; in mm
 labelsheet[marginbottom] = 10 ; in mm
+labelsheet[fontsize] = 10
+label[format] = '85, 35' ; width and height in mm
+label[orientation] = 'landscape' ; portrait or landscape
+label[rows] = 1
+label[colums] = 1
+label[margintop] = 2 ; in mm
+label[marginright] = 2 ; in mm
+label[marginbottom] = 2 ; in mm
+label[marginleft] = 1 ; in mm
+label[fontsize] = 12
 record[format] = 'A4'
 record[margintop] = 30 ; in mm
 record[marginright] = 15 ; in mm
