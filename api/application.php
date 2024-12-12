@@ -62,7 +62,10 @@ class APPLICATION extends API {
 				$this->response(['user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
-					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
+					'cached_identity' => hash('sha256', $_SESSION['user']['id']),
+					'permissions' => [
+						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+					]
 				],
 				'config' => [
 					'lifespan' => [
@@ -70,7 +73,8 @@ class APPLICATION extends API {
 					],
 					'limits' => [
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-					]
+					],
+					'label' => CONFIG['label']
 				]]);
 			}
 			// select single user based on token
@@ -87,7 +91,10 @@ class APPLICATION extends API {
 				$this->response(['user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
-					'cached_identity' => hash('sha256', $_SESSION['user']['id'])
+					'cached_identity' => hash('sha256', $_SESSION['user']['id']),
+					'permissions' => [
+						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+					]
 					],
 					'config' => [
 						'lifespan' => [
@@ -95,7 +102,8 @@ class APPLICATION extends API {
 						],
 						'limits' => [
 							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-						]
+						],
+						'label' => CONFIG['label']
 					]]);
 			}
 		}
