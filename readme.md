@@ -143,6 +143,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * vendors link vendor
     * conversations
     * possible shared search methods?
+* welcome message for new users?
 
 #### records considerations
 * gather most recent date from record within summary to pass it on shared->recentForm to ensure a form version on record entry even if the form is hidden after that
