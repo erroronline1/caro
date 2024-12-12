@@ -117,17 +117,10 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * material tracing within documentation
 
 ## development
-* review pan-system linebreaks within templates \\n
 * failsafe on unfound component names on form assembly (backend)
 * message unit users on newly approved forms and components, all if common
 
 #### purchase considerations
-* export a label for articles, e.g. traceable due to special_attention
-    * only purchase members for processed articles
-    * order number onclick with dialog like commission
-    * copy order number + dialog with entering delivery note number / consecuting number, date, vendor and article number hidden, passed to post like POST ./api/api.php/record/identifier/{appendDate}
-    * chain vendor, article-number and the above to a qr-code with readable option
-    * config.ini pdf label dimensions (35x85 dymo portrait mode)
 * order cancelling and deletion not allowed for group accounts
 
 #### application considerations
@@ -241,7 +234,7 @@ Application support legend:
 | ISO 13485 7.5.6 Validation of production and service | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
 | ISO 13485 7.5.7 Validation of sterilization processes and systems | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.5.8 Product indentification | structural | &bull; Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production. | [Records](#records) |
-| ISO 13485 7.5.9 Traceability | structural | &bull; If your third party erp-software is capable of creating barcodes for ordered consumables, consider a multiple scanner field within your case documentation for easier material tracing. | |
+| ISO 13485 7.5.9 Traceability | structural | &bull; Mmultiple scanner field within your case documentation allow for easier material tracing.<br/>Prerequisites are either<br/>&bull; codes from your ERP-Software that allow traceability, or<br/>&bull; creation of labels for orders products from the order module | [Forms](#forms), [Order](#order) |
 | ISO 13485 7.5.10 Customer property | | | |
 | ISO 13485 7.5.11 Product conservation | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
 | ISO 13485 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.<br/>&bull; <br/>&bull; *record with forms with the "Equipment Surveillance"-context* | [Forms](#forms), [Records](#records), [Calendar](#calendar) |
@@ -885,7 +878,9 @@ Approved orders can be marked as *ordered*, *received*, *delivered* and *archive
 Information can be added anytime.
 Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.
 All actions offer to append a message.
-A label sheet can be created directly from the commission field to support allocation of products during internal delivery.
+A label can be created directly from the commission field to support allocation of products during internal delivery.
+
+A label can be created directly from the article number field supplemented by a suitable batch or delivery note number to create a scannable code for material traceability.
 
 Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#audit) and used for vendor evaluation.
 
