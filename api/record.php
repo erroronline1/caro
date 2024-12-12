@@ -435,7 +435,7 @@ class RECORD extends API {
 				if ($content){
 					$downloadfiles = [];
 					$downloadfiles[LANG::GET('record.create_identifier')] = [
-						'href' => PDF::identifierPDF($content)//, 'label')
+						'href' => PDF::identifierPDF($content, 'label')
 					];
 					$body = [
 						[

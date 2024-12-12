@@ -26,53 +26,40 @@ class PDF{
 		// or label for label printer as selected
 
 		$setup = [
-			'sheet' => [
-				'orientation' => CONFIG['pdf']['labelsheet']['orientation'],
-				'format' => CONFIG['pdf']['labelsheet']['format'],
-				'title' => LANG::GET('record.create_identifier'),
-				'margin' => [
-					'top' => isset(CONFIG['pdf']['labelsheet']['margintop']) ? CONFIG['pdf']['labelsheet']['margintop'] : 0,
-					'right' => isset(CONFIG['pdf']['labelsheet']['marginright']) ? CONFIG['pdf']['labelsheet']['marginright'] : 0,
-					'bottom' => isset(CONFIG['pdf']['labelsheet']['marginbottom']) ? CONFIG['pdf']['labelsheet']['marginbottom'] : 0 ,
-					'left' => isset(CONFIG['pdf']['labelsheet']['marginleft']) ? CONFIG['pdf']['labelsheet']['marginleft'] : 0,
-				],
-				'rows' => CONFIG['pdf']['labelsheet']['rows'],
-				'columns' => CONFIG['pdf']['labelsheet']['columns'],
-				'fontsize' => CONFIG['pdf']['labelsheet']['fontsize'],
-				'codesizeoffset' => 10
+			'orientation' => isset(CONFIG['label'][$type]['orientation']) ? CONFIG['label'][$type]['orientation'] : 'portrait',
+			'format' => isset(CONFIG['label'][$type]['format']) ? CONFIG['label'][$type]['format'] : 'A4',
+			'title' => LANG::GET('record.create_identifier'),
+			'margin' => [
+				'top' => isset(CONFIG['label'][$type]['margintop']) ? CONFIG['label'][$type]['margintop'] : 0,
+				'right' => isset(CONFIG['label'][$type]['marginright']) ? CONFIG['label'][$type]['marginright'] : 0,
+				'bottom' => isset(CONFIG['label'][$type]['marginbottom']) ? CONFIG['label'][$type]['marginbottom'] : 0 ,
+				'left' => isset(CONFIG['label'][$type]['marginleft']) ? CONFIG['label'][$type]['marginleft'] : 0,
 			],
-			'label' => [
-				'orientation' => CONFIG['pdf']['label']['orientation'],
-				'format' => preg_split('/\D{1,}/', CONFIG['pdf']['label']['format']),
-				'title' => LANG::GET('record.create_identifier'),
-				'margin' => [
-					'top' => isset(CONFIG['pdf']['label']['margintop']) ? CONFIG['pdf']['label']['margintop'] : 0,
-					'right' => isset(CONFIG['pdf']['label']['marginright']) ? CONFIG['pdf']['label']['marginright'] : 0,
-					'bottom' => isset(CONFIG['pdf']['label']['marginbottom']) ? CONFIG['pdf']['label']['marginbottom'] : 0 ,
-					'left' => isset(CONFIG['pdf']['label']['marginleft']) ? CONFIG['pdf']['label']['marginleft'] : 0,
-				],
-				'rows' => CONFIG['pdf']['label']['rows'],
-				'columns' => CONFIG['pdf']['label']['rows'],
-				'fontsize' => CONFIG['pdf']['labelsheet']['fontsize'],
-				'codesizeoffset' => 0
-			]
+			'rows' => isset(CONFIG['label'][$type]['rows']) ? CONFIG['label'][$type]['rows'] : 1,
+			'columns' => isset(CONFIG['label'][$type]['columns']) ? CONFIG['label'][$type]['columns'] : 1,
+			'fontsize' => isset(CONFIG['label'][$type]['fontsize']) ? CONFIG['label'][$type]['fontsize'] : 10,
+			'codesizeoffset' => isset(CONFIG['label'][$type]['codesizeoffset']) ? CONFIG['label'][$type]['codesizeoffset'] :0
 		];
+		$customsetup = preg_split('/\D{1,}/', $setup['format']);
+		if (count($customsetup) > 1){
+			$setup['format'] = [$customsetup[0], $customsetup[1]];
+		}
 
 		// create new PDF document
-		$pdf = new TCPDF($setup[$type]['orientation'], PDF_UNIT, $setup[$type]['format'], true, 'UTF-8', false);
+		$pdf = new TCPDF($setup['orientation'], PDF_UNIT, $setup['format'], true, 'UTF-8', false);
 
 		// set document information
 		$pdf->SetCreator(CONFIG['system']['caroapp']);
 		$pdf->SetAuthor($_SESSION['user']['name']);
-		$pdf->SetTitle($setup[$type]['title']);
+		$pdf->SetTitle($setup['title']);
 		$pdf->setPrintHeader(false);
 		$pdf->setPrintFooter(false);
 		// set margins
-		$pdf->SetMargins($setup[$type]['margin']['left'], $setup[$type]['margin']['top'], $setup[$type]['margin']['right'], true);
+		$pdf->SetMargins($setup['margin']['left'], $setup['margin']['top'], $setup['margin']['right'], true);
 		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, $setup[$type]['margin']['bottom']); // margin bottom
+		$pdf->SetAutoPageBreak(TRUE, $setup['margin']['bottom']); // margin bottom
 		// set font
-		$pdf->SetFont('helvetica', '', $setup[$type]['fontsize']); // font size
+		$pdf->SetFont('helvetica', '', $setup['fontsize']); // font size
 		// add a page
 		$pdf->AddPage();
 		// set cell padding
@@ -84,11 +71,11 @@ class PDF{
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$format = [$pdf->getPageWidth(), $pdf->getPageheight()];
-		$columnwidth = ($format[0] - ($setup[$type]['margin']['left'] + $setup[$type]['margin']['right'])) / $setup[$type]['columns'];
-		$rowheight = ($format[1] - ($setup[$type]['margin']['top'] + $setup[$type]['margin']['bottom'])) / $setup[$type]['rows'];
+		$columnwidth = ($format[0] - ($setup['margin']['left'] + $setup['margin']['right'])) / $setup['columns'];
+		$rowheight = ($format[1] - ($setup['margin']['top'] + $setup['margin']['bottom'])) / $setup['rows'];
 
 		//var_dump($columnwidth, $rowheight);
-		$codesize = min($columnwidth, $rowheight) - $setup[$type]['codesizeoffset'];
+		$codesize = min($columnwidth, $rowheight) - $setup['codesizeoffset'];
 		$style = array(
 			'border' => 0,
 			'vpadding' => 'auto',
@@ -99,10 +86,10 @@ class PDF{
 			'module_height' => 1 // height of a single module in points
 		);
 
-		for ($row = 0; $row < $setup[$type]['rows']; $row++){
-			for ($column = 0; $column < $setup[$type]['columns']; $column++){
-				$pdf->write2DBarcode($content, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup[$type]['margin']['left'], $row * $rowheight + $setup[$type]['margin']['top'], $codesize, $codesize, $style, 'N');
-				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === $setup[$type]['columns'] - 1), $column * $columnwidth + $codesize + $setup[$type]['margin']['left'], $row * $rowheight + $setup[$type]['margin']['top'], true, 0, false, true, 24, 'T', true);
+		for ($row = 0; $row < $setup['rows']; $row++){
+			for ($column = 0; $column < $setup['columns']; $column++){
+				$pdf->write2DBarcode($content, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], $codesize, $codesize, $style, 'N');
+				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === $setup['columns'] - 1), $column * $columnwidth + $codesize + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], true, 0, false, true, 24, 'T', true);
 			}
 		}
 		// move pointer to last page

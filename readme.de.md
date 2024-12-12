@@ -1074,17 +1074,20 @@ trainingevaluation = "ceo, supervisor" ; Schulungsbewertungen
 users = "ceo, qmo" ; Nutzer anlegen, bearbeiten und löschen
 vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
 
-; Seiteneinstellungen für PDF-Dateien
-[pdf]
-labelsheet[format] = 'A4'
-labelsheet[orientation] = 'portrait' ; portrait or landscape
-labelsheet[rows] = 11
-labelsheet[columns] = 5
-labelsheet[margintop] = 0 ; in mm
-labelsheet[marginbottom] = 10 ; in mm
-labelsheet[fontsize] = 10
-label[format] = '85, 35' ; Breite und Höhe in mm
-label[orientation] = 'landscape' ; portrait oder landscape: Hochformat oder Querformat
+; Seiteneinstellungen für Klebeetiketten in unterschiedlichen Formaten
+; Nach Belieben zu erweitern
+[label]
+sheet[format] = 'A4'
+sheet[orientation] = 'portrait' ; portrait oder landscape
+sheet[rows] = 11
+sheet[columns] = 5
+sheet[margintop] = 0 ; in mm
+sheet[marginbottom] = 10 ; in mm
+sheet[fontsize] = 10
+sheet[codesizeoffset] = 10
+
+label[format] = '85 x 35 Dymo' ; Breite und Höhe in mm, ggf Bezeichnung
+label[orientation] = 'landscape' ; portrait oder landscape
 label[rows] = 1
 label[colums] = 1
 label[margintop] = 2 ; in mm
@@ -1092,6 +1095,9 @@ label[marginright] = 2 ; in mm
 label[marginbottom] = 2 ; in mm
 label[marginleft] = 1 ; in mm
 label[fontsize] = 12
+
+; Seiteneinstellungen für PDF-Aufzeichnungen
+[pdf]
 record[format] = 'A4'
 record[margintop] = 30 ; in mm
 record[marginright] = 15 ; in mm
