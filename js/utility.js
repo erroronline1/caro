@@ -459,7 +459,7 @@ const _client = {
 					buttons = {};
 					buttons[LANG.GET("general.ok_button")] = true;
 					labels = [];
-					if (api._settings.user.permissions.orderprocessing) {
+					if (api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true") {
 						labels = [
 							{
 								type: "hidden",
@@ -528,7 +528,7 @@ const _client = {
 								.toString()
 								._replaceArray(["labels", "element.ordernumber", "element.name", "element.vendor", "buttons"], [JSON.stringify(labels), element.ordernumber, element.name, element.vendor, JSON.stringify(buttons)]),
 						},
-						hint: api._settings.user.permissions.orderprocessing ? LANG.GET("order.copy_or_labelsheet") : LANG.GET("order.copy_value"),
+						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? LANG.GET("order.copy_or_labelsheet") : LANG.GET("order.copy_value"),
 					});
 				}
 
