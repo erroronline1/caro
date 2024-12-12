@@ -955,6 +955,7 @@ create_identifier = "Identifying data"
 create_identifier_hint = "e.g. name, DOB, casenumber, aid / asset id, name etc. Ending with a timestamp, this will be reused instead of being appended."
 create_identifier_error = "Please provide some data!"
 create_identifier_proceed = "Open the link, print the identifiers and use them where applicable."
+create_identifier_type = "Label(s) in format :format"
 
 record_date = "Date of record"
 record_time = "Time of record"

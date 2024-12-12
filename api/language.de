@@ -955,6 +955,7 @@ create_identifier = "identifizierende Angaben"
 create_identifier_hint = "z.B. Name, Geburtsdatum, Vorgangsnummer, Hilfsmittel, Inventarnummer. Ein Zeitstempel am Ende wird übernommen."
 create_identifier_error = "Bitte gib Daten ein!"
 create_identifier_proceed = "Öffne den Link, drucke die Datei und verwende sie sinnvoll."
+create_identifier_type = "Etikett(en) im Format :format"
 
 record_date = "Datum des Eintrags"
 record_time = "Zeitpunkt des Eintrags"

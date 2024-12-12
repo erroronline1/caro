@@ -435,7 +435,7 @@ class RECORD extends API {
 				if ($content){
 					$downloadfiles = [];
 					$downloadfiles[LANG::GET('record.create_identifier')] = [
-						'href' => PDF::identifierPDF($content, 'label')
+						'href' => PDF::identifierPDF($content, UTILITY::propertySet($this->_payload, '_type') ? : 'A4')
 					];
 					$body = [
 						[
@@ -456,9 +456,6 @@ class RECORD extends API {
 			case 'GET':
 				$result = ['render' =>
 				[
-					'form' => [
-						'data-usecase' => 'record',
-						'action' => "javascript:api.record('post', 'identifier', 'appendDate')"],
 					'content'=>[
 						[
 							[
@@ -471,12 +468,23 @@ class RECORD extends API {
 								'hint' => LANG::GET('record.create_identifier_hint'),
 								'attributes' => [
 									'name' => LANG::GET('record.create_identifier'),
-									'maxlength' => CONFIG['limits']['identifier']
+									'maxlength' => CONFIG['limits']['identifier'],
+									'id' => '_identifier'
 								]
 							]
 						]
 					]
 				]];
+				foreach(CONFIG['label'] as $type => $setting){
+					$result['render']['content'][] = [
+						'type' => 'button',
+						'attributes' => [
+							'type' => 'button',
+							'onpointerup' => "_client.application.postLabelSheet(document.getElementById('_identifier').value, 'appendDate', {_type:'" . $type . "'});",
+							'value' => LANG::GET('record.create_identifier_type', [':format' => $setting['format']])
+						]
+					];
+				}
 				$this->response($result);
 				break;
 		}

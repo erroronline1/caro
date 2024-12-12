@@ -157,9 +157,12 @@ const _client = {
 			}
 			return formdata;
 		},
-		postLabelSheet: (value, appendDate = null) => {
+		postLabelSheet: (value, appendDate = null, othervalues = {}) => {
 			const formdata = new FormData();
 			formdata.append(LANG.GET("record.create_identifier"), value);
+			for (const [key, val] of Object.entries(othervalues)) {
+				formdata.append(key, val);
+			}
 			api.record("post", "identifier", appendDate, formdata);
 		},
 		toClipboard: (node) => {
