@@ -1762,13 +1762,15 @@ export class Assemble {
 			};
 			result.push(button);
 
-			button = document.createElement("button");
-			button.appendChild(document.createTextNode(LANG.GET("menu.record_create_identifier")));
-			button.type = "button";
-			button.onpointerup = function () {
-				if (document.getElementById(inputid).value) _client.application.postLabelSheet(document.getElementById(inputid).value, true);
-			};
-			result.push(button);
+			for (const [label, setting] of Object.entries(api._settings.config.label)) {
+				button = document.createElement("button");
+				button.appendChild(document.createTextNode(LANG.GET("record.create_identifier_type", { ":format": setting.format })));
+				button.type = "button";
+				button.onpointerup = function () {
+					if (document.getElementById(inputid).value) _client.application.postLabelSheet(document.getElementById(inputid).value, true, { _type: label });
+				};
+				result.push(button);
+			}
 		}
 		return result;
 	}
