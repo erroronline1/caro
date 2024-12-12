@@ -355,7 +355,8 @@ const _client = {
 				order = [],
 				collapsible = [],
 				buttons = {},
-				links = {};
+				links = {},
+				labels = [];
 			filter[LANG.GET("order.order.unprocessed")] = { checked: true, onchange: "_client.order.filter()" };
 			filter[LANG.GET("order.order.ordered")] = { onchange: '_client.order.filter("ordered")' };
 			filter[LANG.GET("order.order.partially_received")] = { onchange: '_client.order.filter("partially_received")' };
@@ -407,6 +408,17 @@ const _client = {
 				if (element.commission) {
 					buttons = {};
 					buttons[LANG.GET("general.ok_button")] = true;
+					labels = [];
+					for (const [label, setting] of Object.entries(api._settings.config.label)) {
+						labels.push({
+							type: "button",
+							attributes: {
+								value: LANG.GET("record.create_identifier_type", { ":format": setting.format }),
+								onpointerup: `_client.application.postLabelSheet('element.commission', null, {_type: '${label}'});`,
+							},
+						});
+					}
+
 					collapsible.push({
 						type: "text_copy",
 						attributes: {
@@ -429,22 +441,14 @@ const _client = {
 												},
 												hint: LANG.GET("order.copy_value"),
 											},
-											{
-												type: "button",
-												attributes: {
-													value: LANG.GET("menu.record_create_identifier"),
-													onpointerup: function () {
-														_client.application.postLabelSheet("element.commission");
-													},
-												},
-											},
+											...labels,
 										],
 									],
 									options: buttons,
 								});
 							}
 								.toString()
-								._replaceArray(["element.commission", "buttons"], [element.commission, JSON.stringify(buttons)]),
+								._replaceArray(["labels", "element.commission", "buttons"], [JSON.stringify(labels), element.commission, JSON.stringify(buttons)]),
 						},
 						hint: LANG.GET("order.copy_or_labelsheet"),
 					});
@@ -452,15 +456,79 @@ const _client = {
 
 				// append order number
 				if (element.ordernumber) {
+					buttons = {};
+					buttons[LANG.GET("general.ok_button")] = true;
+					labels = [];
+					if (api._settings.user.permissions.orderprocessing) {
+						labels = [
+							{
+								type: "hidden",
+								attributes: {
+									id: "_vendor",
+									value: "element.vendor",
+								},
+							},
+							{
+								type: "hidden",
+								attributes: {
+									id: "_name",
+									value: "element.name",
+								},
+							},
+							{
+								type: "text",
+								attributes: {
+									name: LANG.GET("order.trace_label"),
+									id: "_trace",
+								},
+								hint: LANG.GET("order.trace_label_hint"),
+							},
+						];
+						for (const [label, setting] of Object.entries(api._settings.config.label)) {
+							labels.push({
+								type: "button",
+								attributes: {
+									value: LANG.GET("record.create_identifier_type", { ":format": setting.format }),
+									onpointerup:
+										`let _ordernumber = document.getElementById('_ordernumber').value, _name = document.getElementById('_name').value, _vendor = document.getElementById('_vendor').value, _trace = document.getElementById('_trace').value;` +
+										` _client.application.postLabelSheet(_ordernumber + ' - ' + _name.substring(0, 64) + ' - ' + _vendor + ' - ' + _trace, true, {_type: '${label}'});`,
+								},
+							});
+						}
+					}
 					collapsible.push({
 						type: "text_copy",
 						attributes: {
 							value: element.ordernumber,
 							name: LANG.GET("order.ordernumber_label"),
 							readonly: true,
-							onpointerup: "_client.application.toClipboard(this)",
+							onpointerup: function () {
+								new Dialog({
+									type: "input",
+									header: LANG.GET("order.ordernumber_label"),
+									render: [
+										[
+											{
+												type: "text",
+												attributes: {
+													value: "element.ordernumber",
+													name: LANG.GET("order.ordernumber_label"),
+													id: "_ordernumber",
+													readonly: true,
+													onpointerup: "_client.application.toClipboard(this)",
+												},
+												hint: LANG.GET("order.copy_value"),
+											},
+											...labels,
+										],
+									],
+									options: buttons,
+								});
+							}
+								.toString()
+								._replaceArray(["labels", "element.ordernumber", "element.name", "element.vendor", "buttons"], [JSON.stringify(labels), element.ordernumber, element.name, element.vendor, JSON.stringify(buttons)]),
 						},
-						hint: LANG.GET("order.copy_value"),
+						hint: api._settings.user.permissions.orderprocessing ? LANG.GET("order.copy_or_labelsheet") : LANG.GET("order.copy_value"),
 					});
 				}
 
