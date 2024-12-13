@@ -26,13 +26,14 @@ class APPLICATION extends API {
     public $_requestedMethod = REQUEST[1];
     private $_requestedLogout = null;
     private $_requestedManual = null;
+    private $_search = null;
 
 	/**
 	 * init parent class and set private requests
 	 */
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedLogout = $this->_requestedManual = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedLogout = $this->_requestedManual = $this->_search = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -584,6 +585,79 @@ class APPLICATION extends API {
 			];
 		}
 		if (count($tiles)) $result['render']['content'][] = $tiles;
+
+		$searchelements = [
+			[
+				'type' => 'search',
+				'attributes' => [
+					'name' => LANG::GET('application.search'),
+					'value' => $this->_search,
+					'onkeypress' => "if (event.key === 'Enter') {api.application('get', 'start', this.value); return false;}",
+				]
+			]
+		];
+		if ($this->_search) {
+			require_once('_shared.php');
+			$search = new SHARED($this->_pdo);
+			if ($records = $search->recordsearch(['search' => $this->_search])){
+				$matches = [];
+				foreach ($records as $contextkey => $context){
+					foreach($context as $record){
+						$display = LANG::GET('record.record_list_touched', [
+							':identifier' => $record['identifier'],
+							':date' => $record['last_touch'],
+							':form' => $record['last_form']
+						]);
+						$matches[$display] = [
+								'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
+							];
+						foreach($record['case_state'] as $case => $state){
+							$matches[$display]['data-' . $case] = $state;
+						}
+						if ($record['complaint']) $matches[$display]['class'] = 'orange';
+						if ($record['closed'])  $matches[$display]['class'] = 'green';
+					}
+					$searchelements[] = [
+						'type' => 'links',
+						'description' => LANG::GET('formcontext.' . $contextkey),
+						'content' => $matches
+					];
+				}
+			}
+
+			if ($forms = $search->formsearch(['search' => $this->_search,])){
+				$matches = [];
+				foreach ($forms as $form){
+					$matches[$form['name']] = ['href' => 'javascript:void(0);', 'onpointerup' => "api.record('get', 'form', '" . $form['name'] . "')"];
+				}
+				$searchelements[] = [
+					'type' => 'links',
+					'description' => LANG::GET('menu.record_record'),
+					'content' => $matches
+				];
+			}
+
+			if ($files = $search->filesearch(['search' => $this->_search, 'folder' => 'all'])){
+				$matches = [];
+				foreach ($files as $file){
+					$matches[preg_replace('/.+fileserver\//','', $file)] = ['href' => substr($file, 1), 'target' => '_blank'];
+				}
+				$searchelements[] = [
+					'type' => 'links',
+					'description' => LANG::GET('menu.files_header'),
+					'content' => $matches
+				];
+			}
+
+			if (count($searchelements) < 2) $searchelements[] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => LANG::GET('application.search_empty'),
+					'class' => 'orange'
+				]
+			];
+		}
+		$result['render']['content'][] = $searchelements;
 
 		// calendar scheduled events
 		$overview = [];

@@ -156,6 +156,9 @@ month[12] = 'Dezember'
 
 ; alle schlüssel sind fest einprogrammiert
 [application]
+search = "Suche nach Dokumenten, Aufzeichnungen und Dateien"
+search_empty = "Es wurde nichts passendes gefunden..."
+
 edit_select_manual_topic = "Thema wählen"
 edit_new_manual_topic = "Neues Thema"
 edit_manual_title = "Title"

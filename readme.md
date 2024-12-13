@@ -126,15 +126,15 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (frontend)
 * global search on landing page, results as tiles?
     * users with units and permissions displayed
-    * forms
+    * ~~forms~~
     * bundles
     * text recommendations
     * risk management
     * schedules
-    * files and external documents
+    * ~~files and external documents~~
     * prepared orders
     * orders by commission
-    * record identifiers link record
+    * ~~record identifiers link record~~
     * products link product
     * vendors link vendor
     * conversations
@@ -145,6 +145,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
+* file filtering for external documents
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1940,14 +1941,19 @@ Sample response
 {"render":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'text')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
 ```
 
-> GET ./api/api.php/application/start
+> GET ./api/api.php/application/start/{search}
 
 Returns the landing page with overview and manual.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none | | | |
+| {search} | path parameter | optional | search phrase for forms, records and files |
+
+Samble response
+```
+{"user":"error on line 1","render":{"content":[[{"type":"tile","attributes":{"onpointerup":"api.purchase('get', 'approved')"},"content":[{"type":"textsection","content":"There are 4 orders awaiting processing","attributes":{"data-type":"purchase","name":"Approved orders"}}]},{"type":"tile","attributes":{"onpointerup":"api.record('get', 'records')"},"content":[{"type":"textsection","content":"There are 1 open cases for your assigned units","attributes":{"data-type":"record","name":"Records"}}]}],[{"type":"calendar","description":"Week 50 2024","content":[{"date":"2024-12-09","display":"Mon 9","today":false,"selected":false,"holiday":false},{"date":"2024-12-10","display":"Tue 10","today":false,"selected":false,"holiday":false},....
+```
 
 [Content](#content)
 
