@@ -1635,21 +1635,22 @@ class RECORD extends API {
 				$usedform = LANG::GET('record.record_altering_pseudoform_name');
 			}
 			else $usedform = $form['name'];
-			if (!isset($accumulatedcontent[$usedform])) $accumulatedcontent[$usedform] = [];
+			if (!isset($accumulatedcontent[$usedform])) $accumulatedcontent[$usedform] = ['last_record' => null, 'content' => []];
 
 			if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 			foreach($record['content'] as $key => $value){
 				$key = str_replace('_', ' ', $key);
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
-				if (!isset($accumulatedcontent[$usedform][$key])) $accumulatedcontent[$usedform][$key] = [];
-				$accumulatedcontent[$usedform][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
+				if (!isset($accumulatedcontent[$usedform]['content'][$key])) $accumulatedcontent[$usedform]['content'][$key] = [];
+				$accumulatedcontent[$usedform]['content'][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
+				if (!$accumulatedcontent[$usedform]['last_record'] || $accumulatedcontent[$usedform]['last_record'] > substr($record['date'], 0, -3)) $accumulatedcontent[$usedform]['last_record'] = $record['date'];
 			}
 		} 
 
 		foreach($accumulatedcontent as $form => $entries){
 			$summary['content'][$form] = [];
-			foreach($entries as $key => $data){
+			foreach($entries['content'] as $key => $data){
 				$summary['content'][$form][$key] = '';
 				$value = '';
 				foreach($data as $entry){
@@ -1743,7 +1744,7 @@ class RECORD extends API {
 				if ($usedform = $formfinder->recentform('form_form_get_by_name', [
 					'values' => [
 						':name' => $form
-					]])) $printablecontent[$form . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($usedform['content'], $content, $type, $enumerate)['content'];
+					]], [], $accumulatedcontent[$form]['last_record'])) $printablecontent[$form . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($usedform['content'], $content, $type, $enumerate)['content'];
 			}
 			$summary['content'] = $printablecontent;
 			if ($type === 'simplifiedform'){
