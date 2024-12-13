@@ -19,7 +19,7 @@
 
  // audit overview and export
 require_once('./_pdf.php');
-include_once("../libraries/xlsxwriter.class.php");
+require_once("../libraries/xlsxwriter.class.php");
 
 class AUDIT extends API {
 	/**
@@ -1097,7 +1097,7 @@ class AUDIT extends API {
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 
-		include_once('_shared.php');
+		require_once('_shared.php');
 		$form = new SHARED($this->_pdo);
 		$evaluationform = $form->recentform('form_form_get_by_context', [
 			'values' => [

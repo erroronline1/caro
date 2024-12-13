@@ -1687,7 +1687,7 @@ class RECORD extends API {
 
 		if ($export) {
 			// reiterate over form, add textsections and empty form fields
-			include_once('_shared.php');
+			require_once('_shared.php');
 			$formfinder = new SHARED($this->_pdo);
 
 			function enumerate($name, $enumerate = [], $number = 1){

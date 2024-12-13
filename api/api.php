@@ -28,9 +28,9 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 define ('CONFIG', parse_ini_file('config.ini', true));
 define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
-include_once('_sqlinterface.php');
-include_once('_language.php');
-include_once('_utility.php'); // general unities
+require_once('_sqlinterface.php');
+require_once('_language.php');
+require_once('_utility.php'); // general unities
 
 
 class API {

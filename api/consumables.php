@@ -18,7 +18,7 @@
  */
 
 // add, edit and delete vendors and products
-include_once('./_csvprocessor.php');
+require_once('./_csvprocessor.php');
 
 class CONSUMABLES extends API {
     // processed parameters for readability
@@ -217,7 +217,7 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
-				include_once('_shared.php');
+				require_once('_shared.php');
 				$form = new SHARED($this->_pdo);
 				$incorporationform = $form->recentform('form_form_get_by_context', [
 					'values' => [
@@ -421,7 +421,7 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				include_once('_shared.php');
+				require_once('_shared.php');
 				$form = new SHARED($this->_pdo);
 
 				$result = ['render' => [
@@ -1264,7 +1264,7 @@ class CONSUMABLES extends API {
 	 *  |_|
 	 */
 	public function productsearch(){
-		include_once('_shared.php');
+		require_once('_shared.php');
 		$search = new SHARED($this->_pdo);
 		$result = ['render' => ['content' => $search->productsearch($this->_usecase, ['search' => $this->_search, 'vendors' => $this->_requestedID])]];
 
@@ -1762,7 +1762,7 @@ class CONSUMABLES extends API {
 					};
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 
-					include_once('_shared.php');
+					require_once('_shared.php');
 					$form = new SHARED($this->_pdo);
 					$evaluationform = prefill($form->recentform('form_form_get_by_context', [
 						'values' => [

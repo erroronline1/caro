@@ -18,8 +18,8 @@
  */
 
 // add filters and filter csv-files
-include_once('./_csvprocessor.php');
-include_once("../libraries/xlsxwriter.class.php");
+require_once('./_csvprocessor.php');
+require_once("../libraries/xlsxwriter.class.php");
 
 class CSVFILTER extends API {
     // processed parameters for readability
