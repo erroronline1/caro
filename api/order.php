@@ -338,7 +338,7 @@ class ORDER extends API {
 				// request permissions once, avoiding repetitive comparisons within loop
 				$permission = [
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
-					'ordercancel' => PERMISSION::permissionFor('ordercancel'),
+					'ordercancel' => PERMISSION::permissionFor('ordercancel') && !in_array('group', $_SESSION['user']['permissions']),
 					'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 				];
 				// create array with reusable images to reduce payload 
@@ -375,10 +375,10 @@ class ORDER extends API {
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
 						'state' => [],
 						'disapprove' => (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])),
-						'cancel' => ($row['ordered'] && !($row['received'] || $row['delivered']) && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
+						'cancel' => !in_array('group', $_SESSION['user']['permissions']) && ($row['ordered'] && !($row['received'] || $row['delivered']) && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
 						'return' => (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
 						'attachments' => [],
-						'delete' => $permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']),
+						'delete' => !in_array('group', $_SESSION['user']['permissions']) && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])),
 						'autodelete' => null,
 						'incorporation' => [],
 						'samplecheck' => [],
@@ -482,7 +482,7 @@ class ORDER extends API {
 				]);
 				$row = $row ? $row[0] : null;
 				
-				if ($row && $this->delete_approved_order($row)) {
+				if ($row && !in_array('group', $_SESSION['user']['permissions']) && $this->delete_approved_order($row)) {
 					$result = [
 					'response' => [
 						'id' => false,

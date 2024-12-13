@@ -121,7 +121,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * message unit users on newly approved forms and components, all if common
 
 #### purchase considerations
-* order cancelling and deletion not allowed for group accounts
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
