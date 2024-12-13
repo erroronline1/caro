@@ -396,9 +396,9 @@ class CONSUMABLES extends API {
 						]
 					])) {
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
-						LANG::GET('order.sample_check_alert',[
+						LANG::GET('order.sample_check_alert', [
 							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . LANG::GET('menu.audit') . '</a>'
-						]) . $content);
+						], true) . $content);
 						$this->response([
 						'response' => [
 							'msg' => LANG::GET('order.sample_check_success'),

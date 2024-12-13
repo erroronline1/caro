@@ -150,7 +150,7 @@ class ORDER extends API {
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
-					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . LANG::GET('order.approved_on') . ': ' . $order['approved'];
+					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . LANG::GET('order.approved_on', [], true) . ': ' . $order['approved'];
 					// clear unused keys
 					foreach ($prepared as $key => $value) {
 						if (!$value) unset($prepared[$key]);
@@ -182,9 +182,9 @@ class ORDER extends API {
 							}
 							$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
 							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order', [
-								':order' => LANG::GET('order.message', $messagepayload),
-								':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
-								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload) . ',' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+								':order' => LANG::GET('order.message', $messagepayload, true),
+								':unit' => LANG::GET('units.' . $prepared['organizational_unit'], [], true),
+								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
 							])) . "\n \n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')));
 							break;
 						case 'addinformation':
@@ -211,8 +211,8 @@ class ORDER extends API {
 								}
 								$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
 								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_orderstate_change', [
-									':order' => LANG::GET('order.message', $messagepayload),
-									':unit' => LANG::GET('units.' . $prepared['organizational_unit']),
+									':order' => LANG::GET('order.message', $messagepayload, true),
+									':unit' => LANG::GET('units.' . $prepared['organizational_unit'], [], true),
 									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ',LANG::GET('order.message', $messagepayload)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 								])));
 							}
@@ -222,7 +222,7 @@ class ORDER extends API {
 								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							}
 							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on', [], true) . ': ' . $order['approved'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
 								'values' => [
@@ -230,16 +230,16 @@ class ORDER extends API {
 									':id' => intval($this->_requestedID)
 								]
 							]);
-							$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
+							$this->alertUserGroup(['permission' => ['purchase']], LANG::GET('order.alert_purchase', [], true));		
 							break;
 						case 'return':
 							if (isset($decoded_order_data['additional_info'])){
 								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
 							}
 							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on') . ': ' . $order['approved'];
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.received') . ': ' . $order['received'];
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.delivered') . ': ' . $order['delivered'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on', [], true) . ': ' . $order['approved'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.received', [], true) . ': ' . $order['received'];
+							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 
 							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
@@ -257,7 +257,7 @@ class ORDER extends API {
 									'msg' => LANG::GET('order.saved'),
 									'type' => 'success'
 								]];
-								$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));
+								$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase', [], true));
 							}
 							else $result = [
 								'response' => [
@@ -1080,7 +1080,7 @@ class ORDER extends API {
 				'msg' => LANG::GET('order.saved'),
 				'type' => 'success'
 			]];
-			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase'));		
+			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase', [], true));		
 		}
 		else $result = [
 			'response' => [
@@ -1312,7 +1312,7 @@ class ORDER extends API {
 			]);
 			$result = $result ? $result[0] : null;
 			if ($result){
-				$approval = $result['name'] . LANG::GET('order.orderauth_verified');
+				$approval = $result['name'] . LANG::GET('order.orderauth_verified', [], true);
 			}
 			unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
 		}

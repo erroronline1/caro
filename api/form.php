@@ -743,7 +743,7 @@ class FORM extends API {
 					]
 				])) {
 						$component_id = $this->_pdo->lastInsertId();
-						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.form(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>']);
+						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.form(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
 						foreach(PERMISSION::permissionFor('formapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
@@ -1458,7 +1458,7 @@ class FORM extends API {
 					]
 				])) {
 						$form_id = $this->_pdo->lastInsertId();
-						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.form(\'get\', \'approval\', ' . $form_id . ')"> ' . $this->_payload->name . '</a>']);
+						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.form(\'get\', \'approval\', ' . $form_id . ')"> ' . $this->_payload->name . '</a>'], true);
 						foreach(PERMISSION::permissionFor('formapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
