@@ -86,6 +86,8 @@ class APPLICATION extends API {
 			if ($query && UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.terms_of_service_accepted'))){
 				$result = $query[0];
 				$_SESSION['user'] = $result;
+				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
+				$_SESSION['user']['units'] = explode(',', $result['units']);
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
 				$this->response(['user' => [
