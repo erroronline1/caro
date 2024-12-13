@@ -1207,76 +1207,42 @@ class RECORD extends API {
 	 */
 	public function records(){
 		$return = ['render' => ['content' => []]];
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+
+		require_once('_shared.php');
+		$search = new SHARED($this->_pdo);
+		$data = $search->recordsearch(['search' => $this->_requestedID === 'null' ? null : $this->_requestedID]);
+
 		if (!$data) {
 			$result['render']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
 			$this->response($result);
 		}
+
 		$recorddatalist = $contexts = $available_units = [];
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$this->_requestedID = $this->_requestedID==='null' ? null : $this->_requestedID;
+		foreach($data as $contextkey => $context){
+			foreach($context as $record){
+				// prefilter record datalist for performance reasons
+				preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $record['identifier'], $simplified_identifier);
+				if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
+				
+				// append units of available records 
+				if ($record['units']) array_push($available_units, ...$record['units']);
+				else $available_units[] = null;
 
-		foreach($data as $row){
-			$row['units'] = $row['units'] ? explode(',', $row['units']) : null;
-
-			// limit search to similarity
-			if ($this->_requestedID){
-				similar_text($this->_requestedID, $row['identifier'], $percent);
-				if ($percent < CONFIG['likeliness']['records_search_similarity']) continue;
+				// add to result
+				$linkdisplay = LANG::GET('record.record_list_touched', [
+					':identifier' => $record['identifier'],
+					':date' => $record['last_touch'],
+					':form' => $record['last_form']
+					]);
+				$contexts[$contextkey][$linkdisplay] = [
+					'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
+				];
+				foreach($record['case_state'] as $case => $state){
+					$matches[$display]['data-' . $case] = $state;
+				}
+				if ($record['complaint']) $matches[$display]['class'] = 'orange';
+				if ($record['closed'])  $matches[$display]['class'] = 'green';
 			}
-
-			// prefilter record datalist for performance reasons
-			preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $row['identifier'], $simplified_identifier);
-			if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
-			
-			// continue if record has been closed unless explicitly searched for
-			if (!$this->_requestedID && (($row['record_type'] !== 'complaint' && $row['closed']) ||
-				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
-			) continue;
-
-			// append units of available records 
-			if ($row['units']) array_push($available_units, ...$row['units']);
-			else $available_units[] = null;
-
-			// continue if record does not match selected (or blank) unit
-			if ($row['units']){
-				if ((!$this->_unit && !array_intersect($row['units'], $_SESSION['user']['units'])) ||
-					($this->_unit && !in_array($this->_unit, $row['units']))
-				) continue;
-			}
-			else if ($this->_unit !== '_unassigned') continue;
-
-
-			foreach(LANGUAGEFILE['formcontext'] as $key => $subkeys){
-				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
-			}
-			if (isset($contexts[$row['context']])) {
-				// limit results per context to max_records
-				if (count($contexts[$row['context']]) > CONFIG['limits']['max_records']) continue;
-			}
-			else $contexts[$row['context']] = [];
-
-			// add to result
-			$linkdisplay = LANG::GET('record.record_list_touched', [
-				':identifier' => $row['identifier'],
-				':date' => substr($row['last_touch'], 0, -3),
-				':form' => $row['last_form'] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')]
-				]);
-			$contexts[$row['context']][$linkdisplay] = [
-				'href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"
-			];
-
-			// apply case state if applicable
-			$case_state = json_decode($row['case_state'] ? : '', true) ? : [];
-			foreach($case_state as $case => $state){
-				$contexts[$row['context']][$linkdisplay]['data-' . $case] = $state;
-			}
-			// highlight complaints
-			if ($row['record_type'] === 'complaint') $contexts[$row['context']][$linkdisplay]['class'] = 'orange';
-			// highlight closed records if passed using filter
-			if ($row['closed'] && ($row['record_type'] !== 'complaint' ||
-				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
-			) $contexts[$row['context']][$linkdisplay]['class'] = 'green';
 		}
 
 		$organizational_units = [];
@@ -1319,7 +1285,7 @@ class RECORD extends API {
 						'list' => 'records',
 						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}",
 						'onblur' => "api.record('get', 'records', this.value); return false;",
-						'value' => $this->_requestedID ? : ''
+						'value' => $this->_requestedID && $this->_requestedID !== 'null' ? : ''
 						]
 				]
 			],

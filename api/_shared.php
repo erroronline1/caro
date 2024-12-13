@@ -29,6 +29,168 @@ class SHARED {
 		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 	}
 
+	/**
+	 *   ___ _ _                         _   
+	 *  |  _|_| |___ ___ ___ ___ ___ ___| |_ 
+	 *  |  _| | | -_|_ -| -_| .'|  _|  _|   |
+	 *  |_| |_|_|___|___|___|__,|_| |___|_|_|
+	 * 
+	 *
+	 */
+	public function filesearch($parameter = []){
+		$files = [];
+		if (isset($parameter['folder']) && in_array($parameter['folder'], ['sharepoint', 'all'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc'));
+		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['all'])){
+			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+			foreach ($folders as $folder) {
+				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
+			}
+		}
+		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['all'])) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path'));
+		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
+		
+		if (!$parameter['search']) return $files;
+		
+		$matches = [];
+		foreach ($files as $file){
+			similar_text($parameter['search'], pathinfo($file)['filename'], $percent);
+			if ($percent >= CONFIG['likeliness']['file_search_similarity']) $matches[] = $file;
+		}
+		return $matches;
+	}
+
+	/**
+	 *   ___                                   _   
+	 *  |  _|___ ___ _____ ___ ___ ___ ___ ___| |_ 
+	 *  |  _| . |  _|     |_ -| -_| .'|  _|  _|   |
+	 *  |_| |___|_| |_|_|_|___|___|__,|_| |___|_|_|
+	 *
+	 * 
+	 */
+	public function formsearch($parameter = []){
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$hidden = $matches = [];
+
+		function findInComponent($element, $search){
+			$found = false;
+			foreach($element as $subs){
+				if (!isset($subs['type'])){
+					if ($found = findInComponent($subs, $search)) return true;
+				}
+				else {
+					$comparisons = [];
+					foreach (['description', 'content', 'hint'] as $property){
+						if (isset($subs[$property])){
+							if (is_array($subs[$property])){ // links, checkboxes, etc
+								foreach(array_keys($subs[$property]) as $key) $comparisons[] = $key;
+							}
+							else $comparisons[] = $subs[$property];
+						}
+					}
+					if (isset($subs['attributes'])){
+						foreach (['name', 'value'] as $property){
+							if (isset($subs['attributes'][$property])) $comparisons[] = $subs['attributes'][$property];
+						}
+					}
+					foreach($comparisons as $term) {
+						similar_text($search, $term, $percent);
+						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity']) return true;
+					}
+				}
+			}
+			return $found;
+		};
+
+		foreach($fd as $row) {
+			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $hidden)) {
+				$terms = [$row['name']];
+				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
+				foreach ($terms as $term){
+					similar_text($parameter['search'], $term, $percent);
+					if (($percent >= CONFIG['likeliness']['file_search_similarity'])) {
+						$matches[] = $row;
+						break;
+					}
+				}
+				if (in_array($row, $matches)) continue;
+
+				foreach(explode(',', $row['regulatory_context']) as $context) {
+					if (stristr(LANG::GET('regulatory.' . $context), $parameter['search']) !== false) {
+						$matches[] = $row;
+						break;	
+					}
+				}
+				if (in_array($row, $matches)) continue;
+
+				$form = $this->recentform('form_form_get_by_name', [
+					'values' => [
+						':name' => $row['name']
+					]]);
+				if (findInComponent($form['content'], $parameter['search'])) {
+					$matches[] = $row;
+				}
+			}
+		}
+		return $matches;
+	}
+
+	/**
+	 *                         _                     _   
+	 *   ___ ___ ___ ___ ___ _| |___ ___ ___ ___ ___| |_ 
+	 *  |  _| -_|  _| . |  _| . |_ -| -_| .'|  _|  _|   |
+	 *  |_| |___|___|___|_| |___|___|___|__,|_| |___|_|_|
+	 * 
+	 * 
+	 */
+	public function recordsearch($parameter = []){
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+
+		$contexts = [];
+
+		foreach($data as $row){
+			// limit search to similarity
+			if ($parameter['search']){
+				similar_text($parameter['search'], $row['identifier'], $percent);
+				if ($percent < CONFIG['likeliness']['records_search_similarity']) continue;
+			}
+
+			// continue if record has been closed unless explicitly searched for
+			if (!$parameter['search'] && (($row['record_type'] !== 'complaint' && $row['closed']) ||
+				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
+			) continue;
+
+			$row['units'] = $row['units'] ? explode(',', $row['units']) : [];
+			// continue if record does not match selected (or blank) unit
+			if ($row['units']){
+				if (((!isset($parameter['unit']) || !$parameter['unit']) && !array_intersect($row['units'], $_SESSION['user']['units'])) ||
+					(isset($parameter['unit']) && $parameter['unit'] && !in_array($parameter['unit'], $row['units']))
+				) continue;
+			}
+			elseif ($parameter['unit'] !== '_unassigned') continue;
+
+			foreach(LANGUAGEFILE['formcontext'] as $key => $subkeys){
+				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
+			}
+			if (isset($contexts[$row['context']])) {
+				// limit results per context to max_records
+				if (count($contexts[$row['context']]) > CONFIG['limits']['max_records']) continue;
+			}
+			else $contexts[$row['context']] = [];
+
+			$contexts[$row['context']][] = [
+				'identifier' => $row['identifier'],
+				'last_touch' => substr($row['last_touch'], 0, -3),
+				'last_form' => $row['last_form'] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')],
+				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
+				'complaint' => $row['record_type'] === 'complaint',
+				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
+				'units' => $row['units']
+			];
+			return $contexts;
+		}
+	}
+	
     /**
 	 *                 _         _                       _
 	 *   ___ ___ ___ _| |_ _ ___| |_ ___ ___ ___ ___ ___| |_
@@ -134,7 +296,7 @@ class SHARED {
 							$matches[$article][$slide][] = [
 								'type' => 'tile',
 								'attributes' => [
-									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . $row['article_no'] . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
 								],
 								'content' => [
 									['type' => 'textsection',

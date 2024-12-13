@@ -430,8 +430,8 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => LANG::GET('file.file_filter_label'),
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'null', this.value); return false;}",
-								'onblur' => "api.file('get', 'filter', 'null', this.value); return false;",
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external', this.value); return false;}",
+								'onblur' => "api.file('get', 'filter', 'external', this.value); return false;",
 								'id' => 'filefilter'
 							]
 						]
@@ -771,19 +771,13 @@ class FILE extends API {
 	 * responds with paths matching request
 	 */
 	public function filter(){
-		if ($this->_requestedFolder && $this->_requestedFolder == 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
-		else {
-			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-			$files = [];
-			foreach ($folders as $folder) {
-				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
-			}
-			$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
-		}
+		require_once('_shared.php');
+		$search = new SHARED($this->_pdo);
 		$matches = [];
-		foreach ($files as $file){
-			similar_text($this->_requestedFile, pathinfo($file)['filename'], $percent);
-			if ($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedFile) $matches[] = substr($file, 1);
+		if ($files = $search->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
+			foreach ($files as $file){
+				$matches[] = substr($file, 1);
+			}
 		}
 		$this->response([
 			'data' => $matches

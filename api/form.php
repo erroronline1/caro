@@ -1816,70 +1816,11 @@ class FORM extends API {
 	 *
 	 */
 	public function formfilter(){
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = $matches = [];
-
-		function findInComponent($element, $search){
-			$found = false;
-			foreach($element as $subs){
-				if (!isset($subs['type'])){
-					if ($found = findInComponent($subs, $search)) return true;
-				}
-				else {
-					$comparisons = [];
-					foreach (['description', 'content', 'hint'] as $property){
-						if (isset($subs[$property])){
-							if (is_array($subs[$property])){ // links, checkboxes, etc
-								foreach(array_keys($subs[$property]) as $key) $comparisons[] = $key;
-							}
-							else $comparisons[] = $subs[$property];
-						}
-					}
-					if (isset($subs['attributes'])){
-						foreach (['name', 'value'] as $property){
-							if (isset($subs['attributes'][$property])) $comparisons[] = $subs['attributes'][$property];
-						}
-					}
-					foreach($comparisons as $term) {
-						similar_text($search, $term, $percent);
-						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity']) return true;
-					}
-				}
-			}
-			return $found;
-		};
-
-		foreach($fd as $row) {
-			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['id'], $matches) && !in_array($row['name'], $hidden)) {
-				$terms = [$row['name']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
-				foreach ($terms as $term){
-					similar_text($this->_requestedID, $term, $percent);
-					if (($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedID) && !in_array($row['id'], $matches)) {
-						$matches[] = strval($row['id']);
-						break;
-					}
-				}
-				foreach(explode(',', $row['regulatory_context']) as $context) {
-					if (stristr(LANG::GET('regulatory.' . $context), $this->_requestedID) !== false) {
-						$matches[] = strval($row['id']);
-						break;	
-					}
-				}
-				foreach(explode(',', $row['content']) as $usedcomponent) {
-					if ($component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent)){
-						$component['content'] = json_decode($component['content'], true);
-						if (findInComponent($component['content']['content'], $this->_requestedID)) {
-							$matches[] = strval($row['id']);
-							break;
-						}
-					}
-				}
-			}
-		}
+		require_once('_shared.php');
+		$search = new SHARED($this->_pdo);
+		$forms = $search->formsearch(['search' => $this->_requestedID]);
 		$this->response([
-			'data' => array_values(array_unique($matches))
+			'data' => $forms ? array_map(fn($v)=> strval($v), array_column($forms, 'id')) : null
 		]);
 	}
 	
