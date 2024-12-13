@@ -117,8 +117,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * material tracing within documentation
 
 ## development
-* failsafe on unfound component names on form assembly (backend)
-* message unit users on newly approved forms and components, all if common
+* failsafe on unfound component names on form assembly (backend). is this real production thread?
 
 #### purchase considerations
 
@@ -451,7 +450,7 @@ Several other pieces of software claim to handle your documents and speak of ver
 
 To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by defined authorized users to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
 
-An approvement request for forms and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. 
+An approvement request for forms and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. All registered users get a message on document updates.
 
 Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
 

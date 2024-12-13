@@ -79,13 +79,39 @@ class FORM extends API {
 						':id' => $approve['id'],
 						':approval' => json_encode($approve['approval']) ? : ''
 					]
-				])) $this->response([
+				]) !== false) {
+					if (!$pending_approvals){
+						$documents = [];
+						if (in_array($approve['context'], [...array_keys(LANGUAGEFILE['formcontext']['identify']), ...array_keys(LANGUAGEFILE['formcontext']['anonymous'])])) {
+							$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'form\', \'' . $approve['name'] . '\')">' . $approve['name'] . '</a>';
+						}
+						elseif ($approve['context'] === 'component') {
+							// check for dependencies in forms
+							$dependedforms = [];
+							$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+							$hidden = [];
+							foreach($fd as $row) {
+								if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+								if (isset($component['content']) && !in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+									$dependedforms[] = $row['name'];
+									$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'form\', \'' . $row['name'] . '\')">' . $row['name'] . '</a>';
+								}
+							}
+
+						}
+						if ($documents){
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$this->alertUserGroup(['user' => array_column($users, 'name')], preg_replace(['/\r/'], [''], LANG::GET('assemble.approve_alert', [':documents' => implode("\n", $documents)], true)));
+						}
+					}
+					$this->response([
 						'response' => [
 							'msg' => LANG::GET('assemble.approve_saved') . "<br />". ($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')),
 							'type' => 'success',
 							'reload' => 'approval',
 						],
 						'data' => ['form_approval' => $notifications->forms()]]);
+					}
 				else $this->response([
 					'response' => [
 						'msg' => LANG::GET('assemble.approve_not_saved'),
