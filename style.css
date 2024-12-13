@@ -1044,6 +1044,12 @@ article > article {
 		padding: 0 0.25em;
 		border-radius: 3px;
 	}
+	p{
+		a::before{
+			margin: 0 0.2em !important;
+	}
+}
+
 }
 .message.conversation {
 	padding: 0 5em 0 0;
