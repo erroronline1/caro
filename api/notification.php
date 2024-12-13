@@ -320,10 +320,10 @@ class NOTIFICATION extends API {
 							':days' => $ordered->diff($this->_currentdate)->days,
 							':ordertype' => LANG::GET('order.ordertype.' . $order['ordertype'], [], true),
 							':quantity' => $decoded_order_data['quantity_label'],
-							':unit' => $decoded_order_data['unit_label'],
-							':number' => $decoded_order_data['ordernumber_label'],
-							':name' => $decoded_order_data['productname_label'],
-							':vendor' => $decoded_order_data['vendor_label'],
+							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
+							':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
+							':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
+							':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
 							':commission' => $decoded_order_data['commission'],
 							':orderer' => $decoded_order_data['orderer']
 						], true)
@@ -341,10 +341,10 @@ class NOTIFICATION extends API {
 							':days' => $received->diff($this->_currentdate)->days,
 							':ordertype' => '<a href="javascript:void(0);" onpointerup="api.purchase(\'get\', \'approved\')"> ' . LANG::GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 							':quantity' => $decoded_order_data['quantity_label'],
-							':unit' => $decoded_order_data['unit_label'],
-							':number' => $decoded_order_data['ordernumber_label'],
-							':name' => $decoded_order_data['productname_label'],
-							':vendor' => $decoded_order_data['vendor_label'],
+							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
+							':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
+							':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
+							':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
 							':commission' => $decoded_order_data['commission'],
 							':receival' => $order['received']
 						], true)
