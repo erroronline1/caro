@@ -76,7 +76,7 @@ class MESSAGE extends API {
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
 								//inline system links won't work otherwise
 								'ICON_onpointerup' => "_client.message.newMessage('". LANG::GET('message.forward') ."', '', '" . 
-									preg_replace(["/\r/","/\n/"], ["\\r", "\\n"], LANG::GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
+									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], LANG::GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')"
 							]
 						];
