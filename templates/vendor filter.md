@@ -1352,6 +1352,7 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 ```json
 {
 	"filesetting": {
+		"headerrowindex": 6,
 		"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
 	},
 	"filter": [
@@ -1369,11 +1370,13 @@ line end is mandatory on gloves particular article_no, otherwise the filter matc
 	"modify": {
 		"add": {
 			"trading_good": "0",
-			"has_expiry_date": "0"
+			"has_expiry_date": "0",
+			"special_attention": "0"
 		},
 		"conditional_or": [
-			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer"]],
-			["has_expiry_date", "1", ["Bezeichnung", "neofast"]]
+			["trading_good", "1", ["Bezeichnung", "liner|kniekappe|strumpf|wilmer|fersenkissen|tobisil|gelenksorthese|schuh|peroneusschiene|walker|kniebandage|knieorthese|lagerungsschiene|rotationsorthese|spreizhose|daumenorthese|handgelenksorthese|immobilisations|immobilisierung|ellenbogen.*bandage|ellenbogenorthese|schulterbandage|humerusorthese|cervicalorthese|rippengürtel|mieder|lumbalbandage|lumbalorthese|elite pro|rumpforthese|extensionsorthese|rückenorthese|"]],
+			["has_expiry_date", "1", ["Bezeichnung", "neofast"]],
+			["special_attention", "1", ["Bezeichnung", "extrasoft|plastazote|multisoft|lunairmed|evazote|lunalastik|lunasoft|orthosoft|lunacell|neopren|syncrosoft|htv silikon|silikonfarbe|polyethylen|polypropylen|ppc|laminierharz|gießharz|drell|plex|cat-flex"]]
 		],
 		"replace":[
 			["Art.Nr.", "(501[BDKJ].+)(L$)", "L1", "L1-2", "L2", "L2-3", "L3", "L3-4", "L4", "L4-5", "L5", "L5-6", "L6", "L6-7", "L7", "L7-8", "L8", "L8-9", "L9", "LC0", "LC0-C1", "LC1", "LC1-C2", "LC2", "LC2-C3", "LC3", "LC3-C4", "LC4", "LC4-C5", "LC5", "LA1", "LA1-A2", "LA2", "LA2-A3", "LA3", "LA3-A4", "LA4"],
