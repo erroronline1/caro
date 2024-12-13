@@ -1350,6 +1350,16 @@ settings_theme_dark = "Dunkel"
 settings_language = "Sprache"
 settings_language_hint = "Systemstandard ist :lang"
 
+welcome_message = "Hallo :name,""
+willkommen in der :appname. Hier eine kurze Zusammenfassung:""
+Deine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo und bei der Produktsicherheit unterstützt dich :prrc. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register""
+""
+Bei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.""
+Wenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.""
+""
+Bei Fragen zur App kannst Du dich gerne an :admin wenden.""
+Ich hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
+
 ; Dies sind die Kapitel der ISO 13485
 ; Diese können als Checkliste für die Erfüllung regulatorischer Anforderungen durch Formulare dienen
 ; Sie können während der Laufzeit angepasst und um andere notwendige regulatorische Aspekte ergänzt werden

@@ -1350,6 +1350,16 @@ settings_theme_dark = "Dark"
 settings_language = "Language"
 settings_language_hint = "System standard is :lang"
 
+welcome_message = "Hello :name,""
+welcome to the :appname. A brief summary:""
+Your contact persons for your units are :supervisor, regarding QM :qmo and in questions of product safety you'll get support by :prrc. A detailed list is available at :register""
+""
+On :landingpage you will find a compact manual for your available functions.""
+In case you want to know which settings apply to you, check out :profile. You can set some own options too.""
+""
+If you have questions regarding the app, please contact :admin.""
+I hope the app does make things easier at work, good luck!"
+
 ; these are the chapters of the ISO 13845
 ; they serve as a checklist for fulfillment regarding form assignment
 ; can be adjusted during runtime and extended by necessary regulatory aspects

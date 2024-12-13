@@ -120,12 +120,14 @@ class USER extends API {
 						':app_settings' => json_encode($user['app_settings']),
 						':skills' => $user['skills']
 					]
-				]) !== false) $this->response([
+				]) !== false) {
+					$this->response([
 					'response' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'id' => $user['id'],
@@ -446,12 +448,54 @@ class USER extends API {
 						':app_settings' => json_encode($user['app_settings']),
 						':skills' => implode(',', $user['skills'])
 					]
-				])) $this->response([
+				])) {
+					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+					$appname = 'Caro App';
+					$roles = [
+						'supervisor' => [],
+						'qmo' => [],
+						'prrc' => [],
+						'admin' => [],						
+					];
+					foreach ($users as $registered){
+						if ($registered['id'] < 2){
+							$appname = $registered['name'];
+							continue;
+						}
+						$registered['permissions'] = explode(',', $registered['permissions']);
+						$registered['units'] = explode(',', $registered['units']);
+						foreach($roles as $key => &$values){
+							if (in_array($key, $registered['permissions'])) {
+								if ($key !== 'supervisor' || ($key === 'supervisor' && array_intersect($units, $registered['units'])))
+									$values[] = $registered['name'];
+							}
+						}
+					}
+					foreach($roles as $key => &$values){
+						$values = array_unique($values);
+						$values = array_map(fn($v) => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\''. LANG::GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
+					}
+
+					$message = [
+						':name' => $user['name'],
+						':appname' => $appname,
+						':supervisor' => implode(', ', $roles['supervisor']),
+						':qmo' => implode(', ', $roles['qmo']),
+						':prrc' => implode(', ', $roles['prrc']),
+						':register' => '<a href="javascript:void(0);" onpointerup="api.message(\'get\', \'register\')">' . LANG::GET('menu.message_register', [], true) . '</a>',
+						':landingpage' => '<a href="javascript:void(0);" onpointerup="api.application(\'get\', \'start\')">' . LANG::GET('menu.application_start', [], true) . '</a>',
+						':profile' => '<a href="javascript:void(0);" onpointerup="api.user(\'get\', \'profile\')">' . LANG::GET('menu.application_user_profile', [], true) . '</a>',
+						':admin' => implode(', ', $roles['admin'])
+					];
+					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], LANG::GET('user.welcome_message', $message, true)));
+					
+					$this->response([
 					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'id' => false,
@@ -608,12 +652,14 @@ class USER extends API {
 						':app_settings' => json_encode($user['app_settings']),
 						':skills' => implode(',', $user['skills'])
 					]
-				]) !== false) $this->response([
+				]) !== false) {
+					$this->response([
 					'response' => [
 						'id' => $user['id'],
 						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'id' => $user['id'],
