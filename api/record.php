@@ -82,7 +82,7 @@ class RECORD extends API {
 							':record_type' => $case['record_type'] ? : null,
 							':identifier' => $this->_requestedID,
 							':last_user' => $_SESSION['user']['id'],
-							':last_form' => 0,
+							':last_form' => null,
 							':content' => json_encode($records),
 							':id' => $case['id']
 						]
@@ -635,10 +635,12 @@ class RECORD extends API {
 			case 'POST':
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-				$context = $form_name = $form_id = null;
+				$context = $form_name = null;
 				$identifier = '';
 				if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
 				if ($form_name = UTILITY::propertySet($this->_payload, '_form_name')) unset($this->_payload->_form_name);
+				// form id is stored to the entry that the content remains hidden if the form has restricted access
+				// used in summarizeRecord() and not easier to check with the name 
 				if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->_form_id);
 				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
@@ -723,7 +725,7 @@ class RECORD extends API {
 								':record_type' => $case['record_type'] ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
-								':last_form' => $form_id,
+								':last_form' => $form_name,
 								':content' => json_encode($records),
 								':id' => $case['id']
 							]
@@ -736,7 +738,7 @@ class RECORD extends API {
 								':record_type' => $record_type ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
-								':last_form' => $form_id,
+								':last_form' => $form_name,
 								':content' => json_encode([$current_record]),
 							]
 						]);
@@ -1254,14 +1256,11 @@ class RECORD extends API {
 			}
 			else $contexts[$row['context']] = [];
 
-			// get last considered form
-			$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')];
-
 			// add to result
 			$linkdisplay = LANG::GET('record.record_list_touched', [
 				':identifier' => $row['identifier'],
 				':date' => substr($row['last_touch'], 0, -3),
-				':form' => $lastform['name']
+				':form' => $row['last_form'] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')]
 				]);
 			$contexts[$row['context']][$linkdisplay] = [
 				'href' => "javascript:api.record('get', 'record', '" . $row['identifier'] . "')"
@@ -1488,9 +1487,6 @@ class RECORD extends API {
 			}
 			usort($original['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
 
-			// get last considered form, offset -1 because pseudoform has been added before by default
-			$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-			$lastform = $forms[array_search($original['content'][count($original['content']) - 2]['form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')];
 	
 			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 				'values' => [
@@ -1498,7 +1494,8 @@ class RECORD extends API {
 					':record_type' => $original['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
-					':last_form' => $lastform['name'],
+					// get last considered form, offset -1 because pseudoform has been added before by default
+					':last_form' => $original['content'][count($original['content']) - 2]['form'] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')],
 					':content' => json_encode($original['content']),
 					':id' => $original['id']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
