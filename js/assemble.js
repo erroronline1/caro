@@ -1346,7 +1346,7 @@ export class Assemble {
 			data-filtered: any
 		}*/
 		let result = [...this.header()];
-		if (this.currentElement.attributes !== undefined) result.push(this.hidden()); // applying data-filtered for css rules
+		if (this.currentElement.attributes !== undefined) result.push(...this.hidden()); // applying data-filtered for css rules
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			let a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);
