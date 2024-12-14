@@ -801,7 +801,10 @@ export class Assemble {
 		const br = document.createElement("br"),
 			span = document.createElement("span");
 		span.dataset.type = this.currentElement.type;
-		if (this.currentElement.attributes && this.currentElement.attributes.multiple) span.dataset.multiple = "multiple";
+		if (this.currentElement.attributes){
+			if (this.currentElement.attributes.multiple) span.dataset.multiple = "multiple";
+			if (this.currentElement.attributes['data-filtered']) span.dataset.filtered = this.currentElement.attributes['data-filtered'];
+		}
 		return [br, span];
 	}
 
@@ -1262,7 +1265,10 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label");
-		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
+		if (this.currentElement.attributes){
+			if (this.currentElement.attributes.required) label.dataset.required = true;
+			if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+		}
 
 		if (type === "number") input.step = ".01";
 
@@ -1561,7 +1567,10 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label", "productselection");
-		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
+		if (this.currentElement.attributes){
+			if (this.currentElement.attributes.required) label.dataset.required = true;
+			if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+		}
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
@@ -1702,8 +1711,11 @@ export class Assemble {
 			label.htmlFor = input.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
 			label.classList.add("input-label");
-			if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
-
+			if (this.currentElement.attributes){
+				if (this.currentElement.attributes.required) label.dataset.required = true;
+				if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+			}
+	
 			if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
 
@@ -1820,7 +1832,10 @@ export class Assemble {
 		label.htmlFor = select.id;
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
 		label.classList.add("input-label");
-		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
+		if (this.currentElement.attributes){
+			if (this.currentElement.attributes.required) label.dataset.required = true;
+			if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+		}
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
