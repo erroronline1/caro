@@ -637,7 +637,8 @@ class FILE extends API {
 										'description' => $filedate->format('Y-m-d H:i'),
 										'content' => [
 											$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
-										]
+										],
+										'data-filtered' => $file['path']
 									],
 									[
 										'type' => 'button',
@@ -646,7 +647,8 @@ class FILE extends API {
 											'type' => 'button',
 											'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
 											'class' => 'inlinebutton',
-											'data-type' => 'copy'
+											'data-type' => 'copy',
+											'data-filtered' => $file['path']
 										]
 									],
 									[
