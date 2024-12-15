@@ -306,7 +306,7 @@ export function rendertest(element) {
 						},
 					},
 					{
-						type: "formbutton",
+						type: "documentbutton",
 						attributes: {
 							value: "Display SILLY FORM",
 						},
@@ -314,7 +314,7 @@ export function rendertest(element) {
 				],
 			],
 		},
-		forms_de: {
+		documents_de: {
 			content: [
 				[
 					{
@@ -467,7 +467,7 @@ export function rendertest(element) {
 						},
 					},
 					{
-						type: "formbutton",
+						type: "documentbutton",
 						attributes: {
 							value: "Zeige TOLLES FORMULAR an",
 						},
@@ -504,7 +504,7 @@ export function rendertest(element) {
 						attributes: {
 							name: "Selected modal checkbox names are chained comma separated, onblur",
 						},
-						hint: "Makes selections comprehensible while providing a single payload object. As seen in form manager.",
+						hint: "Makes selections comprehensible while providing a single payload object. As seen in document manager.",
 						content: {
 							One: { value: "1" },
 							Two: { value: 2 },

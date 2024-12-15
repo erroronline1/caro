@@ -43,7 +43,7 @@ class NOTIFICATION extends API {
 		$result = [
 			'calendar_uncompletedevents' => $this->calendar(),
 			'consumables_pendingincorporation' => $this->consumables(),
-			'form_approval' => $this->forms(),
+			'document_approval' => $this->documents(),
 			'order_unprocessed' => $this->order(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen()
@@ -229,24 +229,24 @@ class NOTIFICATION extends API {
 	}
 
 	/**
-	 *   ___
-	 *  |  _|___ ___ _____ ___
-	 *  |  _| . |  _|     |_ -|
-	 *  |_| |___|_| |_|_|_|___|
-	 *
-	 * alerts eligible users about forms and components having to be approved
+	 *     _                           _       
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ 
+	 *  | . | . |  _| | |     | -_|   |  _|_ -|
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|
+	 * 
+	 * alerts eligible users about documents and components having to be approved
 	 */
-	public function forms(){
+	public function documents(){
 		// prepare all unapproved elements
-		$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$unapproved = 0;
 		$hidden = [];
-		foreach(array_merge($components, $forms) as $element){
+		foreach(array_merge($components, $documents) as $element){
 			if ($element['context'] === 'bundle') continue;
 			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($element['context'] . $element['name'], $hidden)){
-				if (PERMISSION::pending('formapproval', $element['approval'])) $unapproved++;
+				if (PERMISSION::pending('documentapproval', $element['approval'])) $unapproved++;
 				$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 			}
 		}
@@ -382,7 +382,7 @@ class NOTIFICATION extends API {
 	 */
 	public function records(){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$number = 0;
 		$alerts = [];
 		foreach ($data as $row){
@@ -394,15 +394,15 @@ class NOTIFICATION extends API {
 				$last = new DateTime($row['last_touch'], new DateTimeZone(CONFIG['application']['timezone']));
 				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
-					// get last considered form
-					$lastform = $forms[array_search($row['last_form'], array_column($forms, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name', [], true)];
+					// get last considered document
+					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudodocument_name', [], true)];
 
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
 						LANG::GET('record.record_reminder_message', [
 							':days' => $last->diff($this->_currentdate)->days,
 							':date' => substr($row['last_touch'], 0, -3),
-							':form' => $lastform['name'],			
+							':document' => $lastdocument['name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 						], true)
 					);

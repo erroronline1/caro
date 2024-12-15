@@ -73,7 +73,7 @@ class AUDIT extends API {
 				}
 				foreach([
 					'incorporation', // incorporated products
-					'forms', // forms and components
+					'documents', // documents and components
 					'userskills', // user skills and certificates
 					'skillfulfilment', // skill fulfilment
 					'userexperience', // experience points per user and year
@@ -176,7 +176,7 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('auditsoperation')) $this->response([], 401);
 		$static = [
 			'incorporation',
-			'forms',
+			'documents',
 			'userskills',
 			'skillfulfilment',
 			'userexperience',
@@ -246,10 +246,10 @@ class AUDIT extends API {
 	 *  |  _| . |  _|     |_ -|
 	 *  |_| |___|_| |_|_|_|___|
 	 *
-	 * returns all current approved forms with their respective components and approvement notes in alphabetical order
-	 * also form bundles and available external documents
+	 * returns all current approved documents with their respective components and approvement notes in alphabetical order
+	 * also documents bundles and available external documents
 	 */
-	private function forms(){
+	private function documents(){
 		$content = [];
 
 		$this->_requestedDate = $this->_requestedDate ? : $this->_currentdate->format('Y-m-d');
@@ -260,7 +260,7 @@ class AUDIT extends API {
 			// get latest approved by name
 			$named_components = array_filter($components, Fn($component) => $component['name'] === $name);
 			foreach ($named_components as $component){
-				if (PERMISSION::fullyapproved('formapproval', $component['approval']) && 
+				if (PERMISSION::fullyapproved('documentapproval', $component['approval']) && 
 					$component['date'] <= $requestedTimestamp) {
 						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
 						if (!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp) return $component;
@@ -270,49 +270,49 @@ class AUDIT extends API {
 			return false;
 		}
 
-		// get all current approved forms older than given timestamp
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$hidden = $currentforms = [];
-		foreach($forms as $form){
-			if (!PERMISSION::fullyapproved('formapproval', $form['approval']) || $form['date'] >= $this->_requestedDate . ' ' . $this->_requestedTime) continue;
-			if ($form['hidden']) $hidden[] = $form['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($form['name'], array_column($currentforms, 'name')) && !in_array($form['name'], $hidden)) $currentforms[] = $form;
+		// get all current approved document older than given timestamp
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$hidden = $currentdocuments = [];
+		foreach($documents as $document){
+			if (!PERMISSION::fullyapproved('documentapproval', $document['approval']) || $document['date'] >= $this->_requestedDate . ' ' . $this->_requestedTime) continue;
+			if ($document['hidden']) $hidden[] = $document['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($document['name'], array_column($currentdocuments, 'name')) && !in_array($document['name'], $hidden)) $currentdocuments[] = $document;
 		}
 	
 		// get all components
-		$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
+		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 
 		// get all current bundles
-		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $currentbundles = [];
 		foreach($bundles as &$bundle){
 			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
 		}
 
-		$formscontent = [
+		$documentcontent = [
 			[
 				'type' => 'date',
 				'attributes' => [
-					'name' => LANG::GET('audit.forms_date'),
+					'name' => LANG::GET('audit.documents_date'),
 					'value' => $this->_requestedDate,
-					'id' => '_forms_date'
+					'id' => '_documents_date'
 				]
 			],
 			[
 				'type' => 'time',
 				'attributes' => [
-					'name' => LANG::GET('audit.forms_time'),
+					'name' => LANG::GET('audit.documents_time'),
 					'value' => $this->_requestedTime,
-					'id' => '_forms_time' 
+					'id' => '_documents_time' 
 				]
 			],
 			[
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
-					'value' => LANG::GET('audit.forms_update_button'),
-					'onpointerup' => "api.audit('get', 'checks', 'forms', document.getElementById('_forms_date').value, document.getElementById('_forms_time').value)"
+					'value' => LANG::GET('audit.documents_update_button'),
+					'onpointerup' => "api.audit('get', 'checks', 'documents', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
 				]
 			],
 			[
@@ -320,15 +320,15 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => LANG::GET('audit.documents_in_use_documents')
 				],
-				'content' => LANG::GET('audit.forms_export_timestamp', [':timestamp' => $this->_requestedDate . ' ' . $this->_requestedTime])
+				'content' => LANG::GET('audit.documents_export_timestamp', [':timestamp' => $this->_requestedDate . ' ' . $this->_requestedTime])
 			]
 		];
 
-		// iterate over forms an their respective components
-		foreach($currentforms as $form){
+		// iterate over documents an their respective components
+		foreach($currentdocuments as $document){
 			$entry = '';
-			// display form approval
-			foreach(json_decode($form['approval'], true) as $position => $data){
+			// display document approval
+			foreach(json_decode($document['approval'], true) as $position => $data){
 				$entry .= LANG::GET('audit.documents_in_use_approved', [
 					':permission' => LANG::GET('permissions.' . $position),
 					':name' => $data['name'],
@@ -337,7 +337,7 @@ class AUDIT extends API {
 			}
 			// display component approval
 			$has_components = false;
-			foreach(explode(',', $form['content'] ? : '') as $used_component_name){
+			foreach(explode(',', $document['content'] ? : '') as $used_component_name){
 				if ($cmpnnt = latestApprovedComponent($components, $this->_requestedDate . ' ' . $this->_requestedTime, $used_component_name)){
 					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
@@ -351,53 +351,53 @@ class AUDIT extends API {
 					}
 				}
 			}
-			foreach(explode(',', $form['regulatory_context'] ? : '') as $context){
+			foreach(explode(',', $document['regulatory_context'] ? : '') as $context){
 				if (isset(LANGUAGEFILE['regulatory'][$context])) $entry .= "\n" . LANGUAGEFILE['regulatory'][$context];
 			}
 
-			$formscontent[] = [
+			$documentscontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']])
+					'name' => $document['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $document['author'], ':date' => $document['date']])
 				],
 				'content' => $entry
 			];
 			if (!$has_components) {
-				$formscontent[count($formscontent) - 1]['attributes']['class'] = 'orange';
-				$formscontent[count($formscontent) - 1]['content'] .="\n \n" . LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formcomposer', true)))]);
+				$documentscontent[count($documentscontent) - 1]['attributes']['class'] = 'orange';
+				$documentscontent[count($documentscontent) - 1]['content'] .="\n \n" . LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
 			}
-			$formscontent[] = [
+			$documentscontent[] = [
 				'type' => 'button',
 				'attributes' => [
 					'type' => 'button',
 					'data-type' => 'download',
-					'value' => LANG::GET('assemble.form_export'),
-					'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('assemble.form_export') . "', render: JSON.parse('" . json_encode(
+					'value' => LANG::GET('assemble.document_export'),
+					'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('assemble.document_export') . "', render: JSON.parse('" . json_encode(
 						[
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $form['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => $form['date']])
+									'name' => $document['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $document['author'], ':date' => $document['date']])
 								],
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => '_maxFormTimestamp',
+									'name' => '_maxDocumentTimestamp',
 									'value' => $this->_requestedDate . ' ' . $this->_requestedTime
 								]
 							], [
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => '_form_id',
-									'value' => $form['id']
+									'name' => '_document_id',
+									'value' => $document['id']
 								]
 							]
 						]
 					) . "'), options:{".
 					"'" . LANG::GET('general.cancel_button') . "': false,".
 					"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => {if (response) api.form('post', 'export', null, _client.application.dialogToFormdata(response))})"
+					"}}).then(response => {if (response) api.document('post', 'export', null, _client.application.dialogToFormdata(response))})"
 				]
 			];
 		}
@@ -434,14 +434,14 @@ class AUDIT extends API {
 			]
 		];
 		foreach($currentbundles as $bundle){
-			$formslist = explode(',', $bundle['content'] ? : '');
-			natsort($formslist);
+			$documentslist = explode(',', $bundle['content'] ? : '');
+			natsort($documentslist);
 			$bundlescontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => $bundle['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']])
 				],
-				'content' => implode("\n", $formslist)
+				'content' => implode("\n", $documentslist)
 			];
 		}
 
@@ -451,23 +451,23 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => LANG::GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_forms_date').value, document.getElementById('_forms_time').value)",
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
 			]
 		];
 		
-		$content[] = $formscontent;
+		$content[] = $documentscontent;
 		$content[] = $externalcontent;
 		$content[] = $bundlescontent;
 		return $content;
 	}
 
 	/**
-	 * creates and returns a download link to the export file for forms and form bundles
-	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 * creates and returns a download link to the export file for documents and document bundles
+	 * processes the result of $this->documents() and translates the body object into more simple strings
 	 */
-	private function exportforms(){
+	private function exportdocuments(){
 		$summary = [
 			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', LANG::GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
@@ -478,10 +478,10 @@ class AUDIT extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i')
 		];
 
-		$forms = $this->forms();
+		$documents = $this->documents();
 
-		for($i = 1; $i<count($forms); $i++){
-			foreach($forms[$i] as $item){
+		for($i = 1; $i<count($documents); $i++){
+			foreach($documents[$i] as $item){
 				if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];	
 			}
 		}
@@ -584,8 +584,8 @@ class AUDIT extends API {
 		return $content;
 	}
 	/**
-	 * creates and returns a download link to the export file for forms and form bundles
-	 * processes the result of $this->forms() and translates the body object into more simple strings
+	 * creates and returns a download link to the export file incorporations
+	 * processes the result of $this->incorporation() and translates the body object into more simple strings
 	 */
 	private function exportincorporation(){
 		$summary = [
@@ -598,10 +598,10 @@ class AUDIT extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i')
 		];
 
-		$forms = $this->incorporation();
+		$documents = $this->incorporation();
 
-		for($i = 1; $i<count($forms); $i++){
-			foreach($forms[$i] as $item){
+		for($i = 1; $i<count($documents); $i++){
+			foreach($documents[$i] as $item){
 				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])) $summary['content'][$item['attributes']['name']] = $item['content'];	
 			}
 		}
@@ -846,19 +846,19 @@ class AUDIT extends API {
 	 *  |  _| -_| . | | | | .'|  _| . |  _| | |
 	 *  |_| |___|_  |___|_|__,|_| |___|_| |_  |
 	 *          |___|                     |___|
-	 * returns regulatory items according to language.xx.ini and matches current assigned forms
+	 * returns regulatory items according to language.xx.ini and matches current assigned documents
 	 */
 	private function regulatory(){
 		$content = $issues = [];
-		// prepare existing forms lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		// prepare existing document lists
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $regulatory = [];
 		foreach($fd as $key => $row) {
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
+			if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
-					$regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')"];
+					$regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
 				}
 			}
 		}
@@ -1098,10 +1098,10 @@ class AUDIT extends API {
 		$trainings = $trainings ? array_values($trainings) : [];
 
 		require_once('_shared.php');
-		$form = new SHARED($this->_pdo);
-		$evaluationform = $form->recentform('form_form_get_by_context', [
+		$document = new SHARED($this->_pdo);
+		$evaluationdocument = $document->recentform('document_document_get_by_context', [
 			'values' => [
-				':context' => 'training_evaluation_form'
+				':context' => 'training_evaluation_document'
 			]])['content'];
 
 		foreach ($users as $user){
@@ -1152,7 +1152,7 @@ class AUDIT extends API {
 							'type' => 'button',
 							'value' => LANG::GET('audit.checks_type.trainingevaluation'),
 							'onpointerup' => "new Dialog({type: 'input', header: '" . LANG::GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . json_encode(
-								$evaluationform
+								$evaluationdocument
 							) . "'), options:{".
 							"'" . LANG::GET('general.cancel_button') . "': false,".
 							"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".

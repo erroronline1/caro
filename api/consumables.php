@@ -181,7 +181,7 @@ class CONSUMABLES extends API {
 				$approve = ['_check' => $denied ? $denied[0] : $this->_payload->content];
 				if ($denied) $approve['_denied'] = true;
 
-				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('formapproval', true)];
+				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('documentapproval', true)];
 				$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (in_array($permission, $_SESSION['user']['permissions'])){
@@ -218,14 +218,14 @@ class CONSUMABLES extends API {
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				require_once('_shared.php');
-				$form = new SHARED($this->_pdo);
-				$incorporationform = $form->recentform('form_form_get_by_context', [
+				$document = new SHARED($this->_pdo);
+				$incorporationdocument = $document->recentdocument('document_document_get_by_context', [
 					'values' => [
-						':context' => 'product_incorporation_form'
+						':context' => 'product_incorporation_document'
 					]])['content'];
-				if ($product['trading_good']) array_push($incorporationform, ...$form->recentform('form_form_get_by_context', [
+				if ($product['trading_good']) array_push($incorporationdocument, ...$document->recentdocument('document_document_get_by_context', [
 					'values' => [
-						':context' => 'mdr_sample_check_form'
+						':context' => 'mdr_sample_check_document'
 					]])['content']);
 
 				// select all products from selected vendor
@@ -243,7 +243,7 @@ class CONSUMABLES extends API {
 					}
 				}
 				if ($similarproducts){
-					$incorporationform[] = [
+					$incorporationdocument[] = [
 						'type' => 'button',
 						'content' => $similarproducts,
 						'attributes' => [
@@ -252,7 +252,7 @@ class CONSUMABLES extends API {
 							'onpointerup' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
 						]
 					];
-					$incorporationform[] = [
+					$incorporationdocument[] = [
 						'type' => 'hidden',
 						'attributes' => [
 							'id' => '_batchupdate',
@@ -271,7 +271,7 @@ class CONSUMABLES extends API {
 									$product['article_name'] ? : '',
 									$product['vendor_name'] ? : ''])
 							]
-						], ...$incorporationform
+						], ...$incorporationdocument
 					],
 					'options' => [
 							LANG::GET('order.incorporation_cancel') => false,
@@ -422,7 +422,7 @@ class CONSUMABLES extends API {
 				if (!$product) $result['response'] = ['msg' => LANG::GET('consumables.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				require_once('_shared.php');
-				$form = new SHARED($this->_pdo);
+				$document = new SHARED($this->_pdo);
 
 				$result = ['render' => [
 					'content' => [
@@ -437,9 +437,9 @@ class CONSUMABLES extends API {
 								]
 							]
 						],
-						...$form->recentform('form_form_get_by_context', [
+						...$document->recentdocument('document_document_get_by_context', [
 							'values' => [
-								':context' => 'mdr_sample_check_form'
+								':context' => 'mdr_sample_check_document'
 							]])['content']
 					],
 					'options' => [
@@ -1763,12 +1763,12 @@ class CONSUMABLES extends API {
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 
 					require_once('_shared.php');
-					$form = new SHARED($this->_pdo);
-					$evaluationform = prefill($form->recentform('form_form_get_by_context', [
+					$document = new SHARED($this->_pdo);
+					$evaluationdocument = prefill($document->recentdocument('document_document_get_by_context', [
 						'values' => [
-							':context' => 'vendor_evaluation_form'
+							':context' => 'vendor_evaluation_document'
 						]])['content'], $vendor['evaluation']);
-					if (isset($vendor['evaluation']['_author'])) $evaluationform[0][] = [
+					if (isset($vendor['evaluation']['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => LANG::GET('consumables.edit_vendor_last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']])
@@ -1857,7 +1857,7 @@ class CONSUMABLES extends API {
 									]
 								]
 							],
-							...$evaluationform,
+							...$evaluationdocument,
 						], [
 							[
 								[

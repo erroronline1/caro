@@ -514,10 +514,10 @@ class TEXTTEMPLATE extends API {
 										LANG::GET("texttemplate.edit_template_save") .
 										"', options:{" .
 										"'" .
-										LANG::GET("assemble.compose_form_cancel") .
+										LANG::GET("assemble.compose_document_cancel") .
 										"': false," .
 										"'" .
-										LANG::GET("assemble.compose_form_confirm") .
+										LANG::GET("assemble.compose_document_confirm") .
 										"': {value: true, class: 'reducedCTA'}," .
 										"}}).then(confirmation => {if (confirmation) api.texttemplate('post', 'template')})",
 						

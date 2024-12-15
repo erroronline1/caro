@@ -454,7 +454,7 @@ export const api = {
 				break;
 			case "post":
 				if (3 in request && request[3] && typeof request[3] === "object") {
-					//passed formdata
+					// passed formdata
 					payload = request[3];
 					delete request[3];
 					successFn = function (data) {
@@ -470,7 +470,7 @@ export const api = {
 				break;
 			case "put":
 				if (4 in request && request[4] && typeof request[4] === "object") {
-					//passed formdata
+					// passed formdata
 					payload = request[4];
 					delete request[4];
 					successFn = function (data) {
@@ -686,20 +686,20 @@ export const api = {
 	},
 
 	/**
-	 *   ___
-	 *  |  _|___ ___ _____
-	 *  |  _| . |  _|     |
-	 *  |_| |___|_| |_|_|_|
+	 *     _                           _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_|  
 	 *
-	 * form component and form management with creation, editing and approval
+	 * document component and document management with creation, editing and approval
 	 *
 	 * @param {string} method get|post|put|delete
 	 * @param  {array} request api method, name|id
 	 * @returns request
 	 */
-	form: (method, ...request) => {
+	document: (method, ...request) => {
 		request = [...request];
-		request.splice(0, 0, "form");
+		request.splice(0, 0, "document");
 		let successFn = function (data) {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 				if (data.render !== undefined) {
@@ -714,12 +714,12 @@ export const api = {
 			},
 			payload,
 			title = {
-				component_editor: LANG.GET("menu.forms_manage_components"),
-				form_editor: LANG.GET("menu.forms_manage_forms"),
-				approval: LANG.GET("menu.forms_manage_approval"),
-				bundle: LANG.GET("menu.forms_manage_bundles"),
+				component_editor: LANG.GET("menu.documents_manage_components"),
+				document_editor: LANG.GET("menu.documents_manage_documents"),
+				approval: LANG.GET("menu.documents_manage_approval"),
+				bundle: LANG.GET("menu.documents_manage_bundles"),
 				bundles: LANG.GET("menu.record_bundles"),
-				forms: LANG.GET("menu.record_record"),
+				documents: LANG.GET("menu.record_record"),
 			},
 			composedComponent;
 		switch (method) {
@@ -729,7 +729,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.render) {
 								data.render.content.name = data.render.name;
-								if (data.render.content) compose_helper.importForm([data.render.content]);
+								if (data.render.content) compose_helper.importDocument([data.render.content]);
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
@@ -751,7 +751,7 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
-					case "form_editor":
+					case "document_editor":
 						compose_helper.componentIdentify = 0;
 						compose_helper.componentSignature = 0;
 						successFn = function (data) {
@@ -760,13 +760,13 @@ export const api = {
 								const render = new Compose(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
-								if (data.render.components) compose_helper.importForm(data.render.components);
+								if (data.render.components) compose_helper.importDocument(data.render.components);
 								api.preventDataloss.start();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
-					case "formfilter":
+					case "documentfilter":
 						api.preventDataloss.monitor = false;
 						successFn = function (data) {
 							if (data.data) {
@@ -798,8 +798,8 @@ export const api = {
 					case "approval":
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response !== undefined && data.response.reload !== undefined) api.form("get", data.response.reload);
-							if (data.data) _serviceWorker.notif.form_approval(data.data);
+							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
+							if (data.data) _serviceWorker.notif.document_approval(data.data);
 						};
 						payload = _.getInputs("[data-usecase=approval]", true);
 						break;
@@ -810,19 +810,19 @@ export const api = {
 					case "component":
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response !== undefined && data.response.reload !== undefined) api.form("get", data.response.reload);
+							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
 						};
 						composedComponent = compose_helper.composeNewComponent();
 						if (!composedComponent) return;
 						compose_helper.addComponentStructureToComponentForm(composedComponent);
 						payload = _.getInputs("[data-usecase=component_editor_form]", true);
 						break;
-					case "form":
+					case "document":
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.response !== undefined && data.response.reload !== undefined) api.form("get", data.response.reload);
+							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
 						};
-						if (!(payload = compose_helper.composeNewForm())) return;
+						if (!(payload = compose_helper.composeNewDocument())) return;
 						break;
 					case "bundle":
 						successFn = function (data) {
@@ -842,7 +842,7 @@ export const api = {
 			case "delete":
 				successFn = function (data) {
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (data.response !== undefined && data.response.reload !== undefined) api.form("get", data.response.reload);
+					if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
 				};
 				break;
 		}
@@ -894,7 +894,7 @@ export const api = {
 				break;
 			case "post":
 				if (2 in request && request[2] && typeof request[2] === "object") {
-					//passed formdata
+					// passed formdata
 					payload = request[2];
 					delete request[2];
 				} else payload = _.getInputs("[data-usecase=message]", true);
@@ -1244,7 +1244,7 @@ export const api = {
 						payload = { IDENTIFY_BY_: request[2] };
 						break;
 					case "displayonly":
-						// for linked forms within forms
+						// for linked documents within documents
 						successFn = function (data) {
 							if (data.render) {
 								const options = {};
@@ -1253,12 +1253,12 @@ export const api = {
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
-						request[1] = "form";
+						request[1] = "document";
 						break;
 					case "fullexport":
 					case "simplifiedexport":
-					case "formexport": // sorry. exports a form with records, not so paperless after all
-					case "simplifiedformexport": // sorry. exports a form with records, not so paperless after all
+					case "documentexport": // sorry. exports a document with records, not so paperless after all
+					case "simplifieddocumentexport": // sorry. exports a document with records, not so paperless after all
 					case "matchbundles":
 						//prevent default successFn
 						break;

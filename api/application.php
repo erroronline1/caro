@@ -412,19 +412,19 @@ class APPLICATION extends API {
 				LANG::GET('menu.tools_image') => ['onpointerup' => "api.tool('get', 'image')"],
 			],
 		];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_bundles')] = ['onpointerup' => "api.form('get', 'bundles')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.form('get', 'forms')"];
-		// make sure risk management comes after forms 
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.document('get', 'documents')"];
+		// make sure risk management comes after documents 
 		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
 			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
 
 		if (PERMISSION::permissionFor('files')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
 		if (PERMISSION::permissionFor('externaldocuments')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
-		if (PERMISSION::permissionFor('formcomposer')){
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_components')] = ['onpointerup' => "api.form('get', 'component_editor')"];
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_forms')] = ['onpointerup' => "api.form('get', 'form_editor')"];
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_bundles')] = ['onpointerup' => "api.form('get', 'bundle')"];
+		if (PERMISSION::permissionFor('documentcomposer')){
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_components')] = ['onpointerup' => "api.document('get', 'component_editor')"];
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_documents')] = ['onpointerup' => "api.document('get', 'document_editor')"];
+			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_bundles')] = ['onpointerup' => "api.document('get', 'bundle')"];
 		}
 		if (PERMISSION::permissionFor('filebundles')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
 		if (PERMISSION::permissionFor('users')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
@@ -434,7 +434,7 @@ class APPLICATION extends API {
 		}
 		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
-		if (PERMISSION::permissionFor('formapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.forms_manage_approval')] = ['onpointerup' => "api.form('get', 'approval')"];
+		if (PERMISSION::permissionFor('documentapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 		if (PERMISSION::permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
 		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
@@ -522,13 +522,13 @@ class APPLICATION extends API {
 			];
 		}
 
-		// unapproved forms and components
-		$unapproved = $notifications->forms();
+		// unapproved documents and components
+		$unapproved = $notifications->documents();
 		if ($unapproved){
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.form('get', 'approval')",
+					'onpointerup' => "api.document('get', 'approval')",
 				],
 				'content' => [
 					[
@@ -536,7 +536,7 @@ class APPLICATION extends API {
 						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
 						'attributes' => [
 							'data-type' => 'record',
-							'name' => LANG::GET('menu.forms_manage_approval')
+							'name' => LANG::GET('menu.documents_manage_approval')
 						]
 					]
 				]
@@ -606,7 +606,7 @@ class APPLICATION extends API {
 						$display = LANG::GET('record.record_list_touched', [
 							':identifier' => $record['identifier'],
 							':date' => $record['last_touch'],
-							':form' => $record['last_form']
+							':document' => $record['last_document']
 						]);
 						$matches[$display] = [
 								'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
@@ -619,16 +619,16 @@ class APPLICATION extends API {
 					}
 					$searchelements[] = [
 						'type' => 'links',
-						'description' => LANG::GET('formcontext.' . $contextkey),
+						'description' => LANG::GET('documentcontext.' . $contextkey),
 						'content' => $matches
 					];
 				}
 			}
 
-			if ($forms = $search->formsearch(['search' => $this->_search,])){
+			if ($documents = $search->documentsearch(['search' => $this->_search])){
 				$matches = [];
-				foreach ($forms as $form){
-					$matches[$form['name']] = ['href' => 'javascript:void(0);', 'onpointerup' => "api.record('get', 'form', '" . $form['name'] . "')"];
+				foreach ($documents as $document){
+					$matches[$document['name']] = ['href' => 'javascript:void(0);', 'onpointerup' => "api.record('get', 'document', '" . $document['name'] . "')"];
 				}
 				$searchelements[] = [
 					'type' => 'links',

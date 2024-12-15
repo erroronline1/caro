@@ -60,15 +60,15 @@ class SHARED {
 	}
 
 	/**
-	 *   ___                                   _   
-	 *  |  _|___ ___ _____ ___ ___ ___ ___ ___| |_ 
-	 *  |  _| . |  _|     |_ -| -_| .'|  _|  _|   |
-	 *  |_| |___|_| |_|_|_|___|___|__,|_| |___|_|_|
-	 *
+	 *     _                           _                       _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ ___ ___ ___ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _|_ -| -_| .'|  _|  _|   |
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|___|__,|_| |___|_|_|
+	 * 
 	 * 
 	 */
-	public function formsearch($parameter = []){
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+	public function documentsearch($parameter = []){
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
 
 		function findInComponent($element, $search){
@@ -123,11 +123,11 @@ class SHARED {
 				}
 				if (in_array($row, $matches)) continue;
 
-				$form = $this->recentform('form_form_get_by_name', [
+				$document = $this->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $row['name']
 					]]);
-				if (findInComponent($form['content'], $parameter['search'])) {
+				if (findInComponent($document['content'], $parameter['search'])) {
 					$matches[] = $row;
 				}
 			}
@@ -169,7 +169,7 @@ class SHARED {
 			}
 			elseif ($parameter['unit'] !== '_unassigned') continue;
 
-			foreach(LANGUAGEFILE['formcontext'] as $key => $subkeys){
+			foreach(LANGUAGEFILE['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
 			if (isset($contexts[$row['context']])) {
@@ -181,7 +181,7 @@ class SHARED {
 			$contexts[$row['context']][] = [
 				'identifier' => $row['identifier'],
 				'last_touch' => substr($row['last_touch'], 0, -3),
-				'last_form' => $row['last_form'] ? : ['name' => LANG::GET('record.record_altering_pseudoform_name')],
+				'last_document' => $row['last_document'] ? : ['name' => LANG::GET('record.record_altering_pseudodocument_name')],
 				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
@@ -273,7 +273,7 @@ class SHARED {
 								]
 							];
 							break;
-						case 'productselection': // form.php, record.php, assemble.js can make good use of this method!
+						case 'productselection': // document.php, record.php, assemble.js can make good use of this method!
 							if (!isset($matches[$article][$slide][1])) $matches[$article][$slide][] = [
 								'type' => 'radio',
 								'attributes' => [
@@ -323,20 +323,20 @@ class SHARED {
 	}
 
 	/**
-	 *                       _   ___               
-	 *   ___ ___ ___ ___ ___| |_|  _|___ ___ _____ 
-	 *  |  _| -_|  _| -_|   |  _|  _| . |  _|     |
-	 *  |_| |___|___|___|_|_|_| |_| |___|_| |_|_|_|
+	 *                       _     _                           _   
+	 *   ___ ___ ___ ___ ___| |_ _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  |  _| -_|  _| -_|   |  _| . | . |  _| | |     | -_|   |  _|
+	 *  |_| |___|___|___|_|_|_| |___|___|___|___|_|_|_|___|_|_|_|  
 	 *                                             
-	 * retrieves most recent approved form or component
+	 * retrieves most recent approved document or component
 	 * and returns the content as body response e.g. for modal
 	 * @param string $query _sqlinterface query
 	 * @param array $parameters _ sqlinterface parameters
 	 * @param string $requestedTimestamp Y-m-d H:i:s as optional past delimiter
 	 * 
-	 * @return array form components or form names within bundles
+	 * @return array document components or document names within bundles
 	 */
-	public function recentform($query = '', $parameters = [], $requestedTimestamp = null){
+	public function recentdocument($query = '', $parameters = [], $requestedTimestamp = null){
 		$requestedTimestamp = $requestedTimestamp ? : $this->_currentdate->format('Y-m-d') . ' ' . $this->_currentdate->format('H:i:59');
 
 		$result = [];
@@ -344,9 +344,9 @@ class SHARED {
 		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
 		if ($contents){
 			foreach($contents as $content){
-				if (PERMISSION::fullyapproved('formapproval', $content['approval'])) break;
+				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
 			}
-			if (!PERMISSION::fullyapproved('formapproval', $content['approval']) // failsafe if none are approved
+			if (!PERMISSION::fullyapproved('documentapproval', $content['approval']) // failsafe if none are approved
 				|| $content['hidden']
 				|| !PERMISSION::permissionIn($content['restricted_access'])
 				|| $content['date'] > $requestedTimestamp) return [];
@@ -361,14 +361,14 @@ class SHARED {
 			else {
 				foreach(explode(',', $content['content']) as $usedcomponent) {
 					// get latest approved by name
-					$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
+					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
 						'values' => [
 							':name' => $usedcomponent
 						]
 					]);
 					foreach ($components as $component){
 						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
-						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('formapproval', $component['approval'])) break;
+						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('documentapproval', $component['approval'])) break;
 						else $component = [];
 					}
 					if ($component){

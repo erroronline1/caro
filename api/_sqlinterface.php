@@ -442,53 +442,53 @@ class SQLQUERY {
 
 
 
-		'form_post' => [
-			'mysql' => "INSERT INTO caro_form (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
-			'sqlsrv' => "INSERT INTO caro_form (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
+		'document_post' => [
+			'mysql' => "INSERT INTO caro_document (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
+			'sqlsrv' => "INSERT INTO caro_document (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
 		],
-		'form_put' => [
-			'mysql' => "UPDATE caro_form SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
+		'document_put' => [
+			'mysql' => "UPDATE caro_document SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_document SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
 		],
-		'form_put_approve' => [
-			'mysql' => "UPDATE caro_form SET approval = :approval WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_form SET approval = :approval WHERE id = :id"
+		'document_put_approve' => [
+			'mysql' => "UPDATE caro_document SET approval = :approval WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_document SET approval = :approval WHERE id = :id"
 		],
-		'form_form_datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
+		'document_document_datalist' => [
+			'mysql' => "SELECT * FROM caro_document WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
 		],
-		'form_component_datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'component' ORDER BY name ASC, date DESC"
+		'document_component_datalist' => [
+			'mysql' => "SELECT * FROM caro_document WHERE context = 'component' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE context = 'component' ORDER BY name ASC, date DESC"
 		],
-		'form_bundle_datalist' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = 'bundle' ORDER BY name ASC, date DESC"
+		'document_bundle_datalist' => [
+			'mysql' => "SELECT * FROM caro_document WHERE context = 'bundle' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE context = 'bundle' ORDER BY name ASC, date DESC"
 		],
-		'form_form_get_by_name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
+		'document_document_get_by_name' => [
+			'mysql' => "SELECT * FROM caro_document WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
 		],
-		'form_form_get_by_context' => [
-			'mysql' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE context = :context ORDER BY id DESC"
+		'document_document_get_by_context' => [
+			'mysql' => "SELECT * FROM caro_document WHERE context = :context ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE context = :context ORDER BY id DESC"
 		],
-		'form_component_get_by_name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context = 'component' ORDER BY id DESC"
+		'document_component_get_by_name' => [
+			'mysql' => "SELECT * FROM caro_document WHERE name = :name AND context = 'component' ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE name = :name AND context = 'component' ORDER BY id DESC"
 		],
-		'form_bundle_get_by_name' => [
-			'mysql' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE name = :name AND context = 'bundle' ORDER BY id DESC"
+		'document_bundle_get_by_name' => [
+			'mysql' => "SELECT * FROM caro_document WHERE name = :name AND context = 'bundle' ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE name = :name AND context = 'bundle' ORDER BY id DESC"
 		],
-		'form_get' => [
-			'mysql' => "SELECT * FROM caro_form WHERE id = :id ",
-			'sqlsrv' => "SELECT * FROM caro_form WHERE id = :id"
+		'document_get' => [
+			'mysql' => "SELECT * FROM caro_document WHERE id = :id ",
+			'sqlsrv' => "SELECT * FROM caro_document WHERE id = :id"
 		],
-		'form_delete' => [
-			'mysql' => "DELETE FROM caro_form WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_form WHERE id = :id"
+		'document_delete' => [
+			'mysql' => "DELETE FROM caro_document WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_document WHERE id = :id"
 		],
 
 
@@ -659,12 +659,12 @@ class SQLQUERY {
 
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_form, content, closed, notified) VALUES (NULL, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_form, :content, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_records (context, case_state, record_type, identifier, last_user, last_touch, last_form, content, closed, notified) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_form, :content, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified) VALUES (NULL, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_records (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL)"
 		],
 		'records_put' => [
-			'mysql' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_form = :last_form, content = :content, closed = NULL WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_form = :last_form, content = :content, closed = NULL WHERE id = :id"
+			'mysql' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL WHERE id = :id"
 		],
 		'records_get_all' => [
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id",

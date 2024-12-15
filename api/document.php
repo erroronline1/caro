@@ -17,10 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// add and edit form components and forms
+// add and edit document components and documents
 require_once('./_pdf.php');
 
-class FORM extends API {
+class DOCUMENT extends API {
    // processed parameters for readability
    public $_requestedMethod = REQUEST[1];
    private $_requestedID = null;
@@ -40,7 +40,7 @@ class FORM extends API {
 	 *      |_| |_|
 	 */
 	public function approval(){
-		if (!PERMISSION::permissionFor('formapproval')) $this->response([], 401); // hardcoded for database structure
+		if (!PERMISSION::permissionFor('documentapproval')) $this->response([], 401); // hardcoded for database structure
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approveas = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.approve_as_select'));
@@ -51,7 +51,7 @@ class FORM extends API {
 					]]);
 				$approveas = explode(' | ', $approveas);
 
-				$approve = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+				$approve = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
@@ -60,7 +60,7 @@ class FORM extends API {
 				if (!$approve) $this->response([], 404);
 
 				$approve['approval'] = $approve['approval'] ? json_decode($approve['approval'], true) : []; 
-				$tobeapprovedby = PERMISSION::permissionFor('formapproval', true);
+				$tobeapprovedby = PERMISSION::permissionFor('documentapproval', true);
 				$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach($tobeapprovedby as $permission){
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array(LANG::GET('permissions.' . $permission), $approveas)){
@@ -73,8 +73,8 @@ class FORM extends API {
 				require_once('notification.php');
 				$notifications = new NOTIFICATION;
 
-				$pending_approvals = PERMISSION::pending('formapproval', $approve['approval']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_put_approve', [
+				$pending_approvals = PERMISSION::pending('documentapproval', $approve['approval']);
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
 					'values' => [
 						':id' => $approve['id'],
 						':approval' => json_encode($approve['approval']) ? : ''
@@ -82,19 +82,19 @@ class FORM extends API {
 				]) !== false) {
 					if (!$pending_approvals){
 						$documents = [];
-						if (in_array($approve['context'], [...array_keys(LANGUAGEFILE['formcontext']['identify']), ...array_keys(LANGUAGEFILE['formcontext']['anonymous'])])) {
-							$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'form\', \'' . $approve['name'] . '\')">' . $approve['name'] . '</a>';
+						if (in_array($approve['context'], [...array_keys(LANGUAGEFILE['documentcontext']['identify']), ...array_keys(LANGUAGEFILE['documentcontext']['anonymous'])])) {
+							$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'document\', \'' . $approve['name'] . '\')">' . $approve['name'] . '</a>';
 						}
 						elseif ($approve['context'] === 'component') {
-							// check for dependencies in forms
-							$dependedforms = [];
-							$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+							// check for dependencies in documents
+							$dependeddocuments = [];
+							$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 							$hidden = [];
 							foreach($fd as $row) {
 								if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-								if (isset($component['content']) && !in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
-									$dependedforms[] = $row['name'];
-									$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'form\', \'' . $row['name'] . '\')">' . $row['name'] . '</a>';
+								if (isset($component['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+									$dependeddocuments[] = $row['name'];
+									$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'document\', \'' . $row['name'] . '\')">' . $row['name'] . '</a>';
 								}
 							}
 
@@ -110,7 +110,7 @@ class FORM extends API {
 							'type' => 'success',
 							'reload' => 'approval',
 						],
-						'data' => ['form_approval' => $notifications->forms()]]);
+						'data' => ['document_approval' => $notifications->documents()]]);
 					}
 				else $this->response([
 					'response' => [
@@ -122,26 +122,26 @@ class FORM extends API {
 				$componentselection = $formselection = $approvalposition = [];
 
 				// prepare all unapproved elements
-				$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
-				$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+				$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 				$unapproved = ['forms' => [], 'components' => []];
 				$return = ['render'=> ['content' => [[]]]]; // default first nesting
 				$hidden = [];
-				foreach(array_merge($components, $forms) as $element){
+				foreach(array_merge($components, $documents) as $element){
 					if ($element['context'] === 'bundle') continue;
 					if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($element['context'] . $element['name'], $hidden)){
-						if (!PERMISSION::fullyapproved('formapproval', $element['approval'])) {
+						if (!PERMISSION::fullyapproved('documentapproval', $element['approval'])) {
 							switch ($element['context']){
 								case 'component':
 									$sort = ['unapproved' => 'components', 'selection' => 'componentselection'];
 									break;
 								default:
-								$sort = ['unapproved' => 'forms', 'selection' => 'formselection'];
+								$sort = ['unapproved' => 'documents', 'selection' => 'documentselection'];
 							}						
 							if (!in_array($element['name'], array_keys($unapproved[$sort['unapproved']]))){
 								$unapproved[$sort['unapproved']][$element['name']] = $element['content'];
-								if (PERMISSION::pending('formapproval', $element['approval'])){
+								if (PERMISSION::pending('documentapproval', $element['approval'])){
 									${$sort['selection']}[$element['name']] = $this->_requestedID === $element['id'] ? ['value' => $element['id'], 'selected' => true] : ['value' => $element['id']];
 								}
 							}
@@ -150,25 +150,25 @@ class FORM extends API {
 					}
 				}
 				ksort($componentselection);
-				ksort($formselection);
+				ksort($documentselection);
 				if ($componentselection) $return['render']['content'][0][] = [
 					'type' => 'select',
 					'attributes' => [
 						'name' => LANG::GET('assemble.approve_component_select'),
-						'onchange' => "api.form('get', 'approval', this.value)"
+						'onchange' => "api.document('get', 'approval', this.value)"
 					],
 					'content' => $componentselection
 				];
-				if ($formselection) $return['render']['content'][0][] =
+				if ($documentselection) $return['render']['content'][0][] =
 				[
 					'type' => 'select',
 					'attributes' => [
-						'name' => LANG::GET('assemble.approve_form_select'),
-						'onchange' => "api.form('get', 'approval', this.value)"
+						'name' => LANG::GET('assemble.approve_document_select'),
+						'onchange' => "api.document('get', 'approval', this.value)"
 					],
-					'content' => $formselection
+					'content' => $documentselection
 				];
-				if ($componentselection || $formselection) $return['render']['content'][] = [
+				if ($componentselection || $documentselection) $return['render']['content'][] = [
 					[
 						'type' => 'hr'
 					]
@@ -194,14 +194,14 @@ class FORM extends API {
 						return [$result];
 					}
 
-					$approve = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+					$approve = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 						'values' => [
 							':id' => $this->_requestedID
 						]
 					]);
 					$approve = $approve ? $approve[0] : null;
 					if (!$approve) $this->response([], 404);
-					foreach(PERMISSION::pending('formapproval', $approve['approval']) as $position){
+					foreach(PERMISSION::pending('documentapproval', $approve['approval']) as $position){
 						$approvalposition[LANG::GET('permissions.' . $position)] = [];
 					}
 					if ($approve['context'] === 'component'){
@@ -210,10 +210,10 @@ class FORM extends API {
 					else {
 						foreach(explode(',', $approve['content']) as $component){
 							// get latest approved by name
-							$cmpnnt = $this->latestApprovedName('form_component_get_by_name', $component);
+							$cmpnnt = $this->latestApprovedName('document_component_get_by_name', $component);
 							if ($cmpnnt) {
-								if (!PERMISSION::fullyapproved('formapproval', $cmpnnt['approval'])){
-									$alert .= LANG::GET('assemble.approve_form_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
+								if (!PERMISSION::fullyapproved('documentapproval', $cmpnnt['approval'])){
+									$alert .= LANG::GET('assemble.approve_document_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
 								}
 								array_push($return['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
 							}
@@ -221,11 +221,11 @@ class FORM extends API {
 						if ($alert) $return['response'] = ['msg' => $alert, 'type' => 'info'];
 					}
 
-					$formproperties = LANG::GET('assemble.compose_component_author', [':author' => $approve['author'], ':date' => substr($approve['date'], 1, -3)]);
-					if ($approve['alias']) $formproperties .= "\n" . LANG::GET('assemble.edit_form_alias') . ': ' . $approve['alias'];
-					if ($approve['regulatory_context']) $formproperties .= "\n" . LANG::GET('assemble.compose_form_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => LANGUAGEFILE['regulatory'][$context], explode(',', $approve['regulatory_context'])));
-					if ($approve['restricted_access']) $formproperties .= "\n" . LANG::GET('assemble.edit_form_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => LANGUAGEFILE['permissions'][$context], explode(',', $approve['restricted_access'])));
-					if ($approve['permitted_export']) $formproperties .= "\n" . LANG::GET('assemble.edit_form_permitted_export');
+					$documentproperties = LANG::GET('assemble.compose_component_author', [':author' => $approve['author'], ':date' => substr($approve['date'], 1, -3)]);
+					if ($approve['alias']) $documentproperties .= "\n" . LANG::GET('assemble.edit_document_alias') . ': ' . $approve['alias'];
+					if ($approve['regulatory_context']) $documentproperties .= "\n" . LANG::GET('assemble.compose_document_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => LANGUAGEFILE['regulatory'][$context], explode(',', $approve['regulatory_context'])));
+					if ($approve['restricted_access']) $documentproperties .= "\n" . LANG::GET('assemble.edit_document_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => LANGUAGEFILE['permissions'][$context], explode(',', $approve['restricted_access'])));
+					if ($approve['permitted_export']) $documentproperties .= "\n" . LANG::GET('assemble.edit_document_permitted_export');
 
 					array_push($return['render']['content'], 
 						[
@@ -235,7 +235,7 @@ class FORM extends API {
 						], [
 							[
 								'type' => 'textsection',
-								'content' => $formproperties
+								'content' => $documentproperties
 							],							
 							[
 								'type' => 'checkbox',
@@ -246,14 +246,14 @@ class FORM extends API {
 							]
 						]
 					);
-					if (PERMISSION::permissionFor('formcomposer')) {
+					if (PERMISSION::permissionFor('documentcomposer')) {
 						array_push($return['render']['content'][count($return['render']['content']) -1], [
 							[
 								'type' => 'button',
 								'attributes' => [
 									'value' => LANG::GET('assemble.edit_existing'),
 									'type' => 'button',
-									'onpointerup' => "api.form('get', '" . ($approve['context'] === 'component' ? 'component' : 'form') . "_editor', " . $approve['id'] . ")"
+									'onpointerup' => "api.document('get', '" . ($approve['context'] === 'component' ? 'component' : 'document') . "_editor', " . $approve['id'] . ")"
 								]
 							]
 						]);
@@ -261,7 +261,7 @@ class FORM extends API {
 
 					$return['render']['form'] = [
 						'data-usecase' => 'approval',
-						'action' => "javascript: api.form('put', 'approval', " . $this->_requestedID . ")",
+						'action' => "javascript: api.document('put', 'approval', " . $this->_requestedID . ")",
 						'data-confirm' => true
 					];
 					if ($approve['name']) $return['header'] = $approve['name'];
@@ -279,7 +279,7 @@ class FORM extends API {
 	 *
 	 */
 	public function bundle(){
-		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('documentcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content = UTILITY::propertySet($this->_payload, LANG::PROPERTY('assemble.edit_bundle_content'))) $content = implode(',', preg_split('/[\n\r]{1,}/', $content));
@@ -301,16 +301,16 @@ class FORM extends API {
 				// put hidden attribute if anything else remains the same
 				// get latest by name
 				$exists = [];
-				$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_get_by_name', [
+				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_get_by_name', [
 					'values' => [
 						':name' => $bundle[':name']
 					]
 				]);
-				foreach ($forms as $exists){
+				foreach ($documents as $exists){
 					break;
 				}
 				if ($exists && $exists['content'] === $bundle[':content']) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+					if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 						'values' => [
 							':alias' => $exists['alias'],
 							':context' => $exists['context'],
@@ -336,7 +336,7 @@ class FORM extends API {
 					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => $bundle
 				])) $this->response([
 						'response' => [
@@ -355,12 +355,12 @@ class FORM extends API {
 				$bundledatalist = [];
 				$options = ['...' . LANG::GET('assemble.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$alloptions = ['...' . LANG::GET('assemble.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$insertform = ['...' . LANG::GET('assemble.edit_bundle_insert_default') => ['value' => ' ']];
+				$insertdocument = ['...' . LANG::GET('assemble.edit_bundle_insert_default') => ['value' => ' ']];
 				$return = [];
 
 				// get selected bundle
 				if (intval($this->_requestedID)){
-					$bundle = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+					$bundle = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 						'values' => [
 							':id' => $this->_requestedID
 						]
@@ -369,12 +369,12 @@ class FORM extends API {
 				} else {
 					// get latest by name
 					$bundle = [];
-					$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_get_by_name', [
+					$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_get_by_name', [
 						'values' => [
 							':name' => $this->_requestedID
 						]
 					]);
-					foreach ($forms as $bundle){
+					foreach ($documents as $bundle){
 						break;
 					}
 				}
@@ -392,7 +392,7 @@ class FORM extends API {
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('texttemplate.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing bundle lists
-				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = [];
 				foreach($bundles as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -404,23 +404,23 @@ class FORM extends API {
 				}
 				ksort($options);
 				ksort($alloptions);
-				// prepare available forms lists
+				// prepare available documents lists
 				// get latest approved by name
-				$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 				$hidden = [];
-				foreach($forms as $key => $row) {
-					if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
+				foreach($documents as $key => $row) {
+					if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($row['name'], $hidden)) {
-							$insertform[$row['name']] = ['value' => $row['name'] . "\n"];
+							$insertdocument[$row['name']] = ['value' => $row['name'] . "\n"];
 					}
 				}
-				ksort($insertform);
+				ksort($insertdocument);
 
 				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'bundle',
-						'action' => "javascript:api.form('post', 'bundle')"],
+						'action' => "javascript:api.document('post', 'bundle')"],
 					'content' => [
 						[
 							[
@@ -434,7 +434,7 @@ class FORM extends API {
 									'type' => 'select',
 									'attributes' => [
 										'name' => LANG::GET('assemble.edit_existing_bundle_select'),
-										'onchange' => "api.form('get', 'bundle', this.value)"
+										'onchange' => "api.document('get', 'bundle', this.value)"
 									],
 									'content' => $options
 								], [
@@ -442,7 +442,7 @@ class FORM extends API {
 									'attributes' => [
 										'name' => LANG::GET('assemble.edit_existing_bundle'),
 										'list' => 'templates',
-										'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'bundle', this.value); return false;}"
+										'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"
 									]
 								]
 							], [
@@ -450,7 +450,7 @@ class FORM extends API {
 									'type' => 'select',
 									'attributes' => [
 										'name' => LANG::GET('assemble.edit_existing_bundle_all'),
-										'onchange' => "api.form('get', 'bundle', this.value)"
+										'onchange' => "api.document('get', 'bundle', this.value)"
 									],
 									'content' => $alloptions
 								]
@@ -472,7 +472,7 @@ class FORM extends API {
 									'name' => LANG::GET('assemble.edit_bundle_insert_name'),
 									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
 								],
-								'content' => $insertform
+								'content' => $insertdocument
 							], [
 								'type' => 'textarea',
 								'hint' => LANG::GET('assemble.edit_bundle_content_hint'),
@@ -521,18 +521,18 @@ class FORM extends API {
 	 * 
 	 */
 	public function bundles(){
-		$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $bundles = [];
 		foreach($bd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if ($this->_requestedID) similar_text($this->_requestedID, $row['name'], $percent);
 			if (!in_array($row['name'], $hidden) && (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity'])) {
-				if (($forms = $row['content'] ? explode(',', $row['content']) : false) !== false){
+				if (($documents = $row['content'] ? explode(',', $row['content']) : false) !== false){
 					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
-					foreach ($forms as $key => $formname){
+					foreach ($documents as $key => $documentname){
 						// recurring queries to make sure linked forms are permitted
-						if ($form = $this->latestApprovedName('form_form_get_by_name', $formname))
-							$bundles[$row['name']][$form['name']] = ['href' => "javascript:api.record('get', 'form', '" . $form['name'] . "')", 'data-filtered' => $row['id']];
+						if ($document = $this->latestApprovedName('document_document_get_by_name', $documentname))
+							$bundles[$row['name']][$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "')", 'data-filtered' => $row['id']];
 					}
 				}
 			}
@@ -549,10 +549,10 @@ class FORM extends API {
 				], [
 					'type' => 'filtered',
 					'attributes' => [
-						'name' => LANG::GET('assemble.form_filter'),
+						'name' => LANG::GET('assemble.document_filter'),
 						'list' => 'bundles',
-						'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'bundles', this.value); return false;}",
-						'onblur' => "api.form('get', 'bundles', this.value); return false;",
+						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value); return false;}",
+						'onblur' => "api.document('get', 'bundles', this.value); return false;",
 						'value' => $this->_requestedID ? : ''
 					]
 				]
@@ -576,7 +576,7 @@ class FORM extends API {
 	 *                |_|
 	 */
 	public function component(){
-		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('documentcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$component = json_decode($this->_payload->composedComponent, true);
@@ -601,7 +601,7 @@ class FORM extends API {
 						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
 						$uploaded_files = [];
 						foreach($uploads as $path){
-							UTILITY::alterImage($path, CONFIG['limits']['form_image'], UTILITY_IMAGE_REPLACE);
+							UTILITY::alterImage($path, CONFIG['limits']['document_image'], UTILITY_IMAGE_REPLACE);
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
 							$filename = implode('_', array_slice(explode('_', pathinfo($path)['basename']) , 2));
@@ -644,14 +644,14 @@ class FORM extends API {
 					return $result;
 				}
 				
-				// select latest form by name
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'form_component_get_by_name', [
+				// select latest document by name
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
 					'values' => [
 						':name' => $component_name
 					]
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
-				$approved = PERMISSION::fullyapproved('formapproval', $exists['approval']);
+				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
 
 				if (isset($exists['id'])){ 
 					if (!$approved) {
@@ -691,7 +691,7 @@ class FORM extends API {
 					}
 					if ($approved && json_decode($exists['content'], true) == $component) {
 						// update component properties as long as the content remains unchanged
-						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 							'values' => [
 								':alias' => '',
 								':context' => 'component',
@@ -729,7 +729,7 @@ class FORM extends API {
 				}
 
 				$component['content'] = fileupload($component['content'], $component_name, $this->_currentdate->format('YmdHis'));
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
 						':name' => $component_name,
 						':alias' => '',
@@ -743,8 +743,8 @@ class FORM extends API {
 					]
 				])) {
 						$component_id = $this->_pdo->lastInsertId();
-						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.form(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
-						foreach(PERMISSION::permissionFor('formapproval', true) as $permission){
+						$message = LANG::GET('assemble.approve_component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
+						foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
 						}
@@ -765,7 +765,7 @@ class FORM extends API {
 				break;
 			case 'GET':
 				if (intval($this->_requestedID)){
-					$component = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+					$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 						'values' => [
 							':id' => $this->_requestedID
 						]
@@ -773,7 +773,7 @@ class FORM extends API {
 					$component = $component ? $component[0] : null;
 				} else {
 					// get latest approved by name
-					$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID);
+					$component = $this->latestApprovedName('document_component_get_by_name', $this->_requestedID);
 				}
 				if ($component){
 					$component['content'] = json_decode($component['content']);
@@ -782,13 +782,13 @@ class FORM extends API {
 				$this->response(['response' => ['msg' => LANG::GET('assemble.error_component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 				break;
 			case 'DELETE':
-				$component = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+				$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
 				]);
 				$component = $component ? $component[0] : null;
-				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
+				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_component_delete_failure'), 'type' => 'error']]);
 				// recursively delete images
 				function deleteImages($element){
 					foreach($element as $sub){
@@ -801,7 +801,7 @@ class FORM extends API {
 					}
 				}
 				deleteImages(json_decode($component['content'], true)['content']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_delete', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
@@ -822,7 +822,7 @@ class FORM extends API {
 	 *                |_|                     |_____|                      
 	 */
 	public function component_editor(){
-		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('documentcomposer')) $this->response([], 401);
 		$componentdatalist = [];
 		$options = [];
 		$alloptions = [];
@@ -830,7 +830,7 @@ class FORM extends API {
 		
 		// get selected component
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
-			$component = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+			$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 				'values' => [
 					':id' => $this->_requestedID
 				]
@@ -843,7 +843,7 @@ class FORM extends API {
 				'unit' => null
 			];
 		} else {
-			if (!$component = $this->latestApprovedName('form_component_get_by_name', $this->_requestedID)) $component = [
+			if (!$component = $this->latestApprovedName('document_component_get_by_name', $this->_requestedID)) $component = [
 				'id' => '',
 				'name' => '',
 				'approval' => null,
@@ -858,17 +858,17 @@ class FORM extends API {
 			$alloptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		}
 
-		$components = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
+		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 		$hidden = [];
 		foreach($components as $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!isset($options[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($options[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
 				$options[$row['unit']][$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
+			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_document_hidden_hidden') : '';
 			$alloptions[$row['unit']][$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 		// delete empty selections, order the rest and create remaining selections by unit for easier access
@@ -882,7 +882,7 @@ class FORM extends API {
 				'type' => 'select',
 				'attributes' => [
 					'name' => LANGUAGEFILE['units'][$unit],
-					'onchange' => "api.form('get', 'component_editor', this.value)"
+					'onchange' => "api.document('get', 'component_editor', this.value)"
 				],
 				'content' => $components
 			];
@@ -896,28 +896,28 @@ class FORM extends API {
 				'type' => 'select',
 				'attributes' => [
 					'name' => LANGUAGEFILE['units'][$unit],
-					'onchange' => "api.form('get', 'component_editor', this.value)"
+					'onchange' => "api.document('get', 'component_editor', this.value)"
 				],
 				'content' => $components
 			];
 		}
 
-		// load approved forms for occasional linking
-		// check for dependencies in forms
-		$approvedforms = $dependedforms = [];
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		// load approved documents for occasional linking
+		// check for dependencies in documents
+		$approveddocuments = $dependeddocuments = [];
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = [];
 		foreach($fd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['name'], $hidden)) $approvedforms[$row['name']] = []; // prepare for selection
-			if (isset($component['content']) && !in_array($row['name'], $dependedforms) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
-				$dependedforms[] = $row['name'];
+			if (!in_array($row['name'], $hidden)) $approveddocuments[$row['name']] = []; // prepare for selection
+			if (isset($component['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+				$dependeddocuments[] = $row['name'];
 			}
 		}
 
 		// prepare unit list for approval
 		$approve = [
-			'hint' => LANG::GET('assemble.compose_component_approve_hint', [':roles' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formapproval', true)))]),
+			'hint' => LANG::GET('assemble.compose_component_approve_hint', [':roles' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('documentapproval', true)))]),
 			'name' => LANG::GET('assemble.compose_component_approve'),
 			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
 		];
@@ -925,7 +925,7 @@ class FORM extends API {
 			$approve['content'][$value] = $component['unit'] === $key ? ['selected' => true] : [];
 		}
 
-		$pending_approvals = PERMISSION::pending('formapproval', $component['approval']);
+		$pending_approvals = PERMISSION::pending('documentapproval', $component['approval']);
 		$return['render'] = [
 			'content' => [
 				[
@@ -947,9 +947,9 @@ class FORM extends API {
 						[
 							'type' => 'search',
 							'attributes' => [
-								'name' => LANG::GET('assemble.edit_existing_forms'),
+								'name' => LANG::GET('assemble.edit_existing_documents'),
 								'list' => 'components',
-								'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component_editor', this.value); return false;}"
+								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component_editor', this.value); return false;}"
 							]
 						]
 					],[
@@ -1046,9 +1046,9 @@ class FORM extends API {
 						'description' => LANG::GET('assemble.compose_calendarbutton')
 					]], [[
 						'form' => true,
-						'type' => 'compose_formbutton',
-						'description' => LANG::GET('assemble.compose_link_form'),
-						'content' => $approvedforms
+						'type' => 'compose_documentbutton',
+						'description' => LANG::GET('assemble.compose_link_document'),
+						'content' => $approveddocuments
 					]]
 				],
 				[[
@@ -1056,7 +1056,7 @@ class FORM extends API {
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
 						($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')) . '\n \n' .
-						($dependedforms ? LANG::GET('assemble.compose_component_form_dependencies', [':forms' => implode(',', $dependedforms)]) : ''),
+						($dependeddocuments ? LANG::GET('assemble.compose_component_document_dependencies', [':documents' => implode(',', $dependeddocuments)]) : ''),
 					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
 					'approve' => $approve
 				]],
@@ -1073,13 +1073,13 @@ class FORM extends API {
 				'description' => LANG::GET('assemble.compose_raw')
 			]];
 		}
-		if ($component['name'] && (!PERMISSION::fullyapproved('formapproval', $component['approval'])))
+		if ($component['name'] && (!PERMISSION::fullyapproved('documentapproval', $component['approval'])))
 			$return['render']['content'][count($return['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => LANG::GET('assemble.edit_component_delete'),
-						'onpointerup' => "api.form('delete', 'component', " . $component['id'] . ")" 
+						'onpointerup' => "api.document('delete', 'component', " . $component['id'] . ")" 
 					]
 				]
 			];
@@ -1097,25 +1097,25 @@ class FORM extends API {
 	 *          |_|
 	 */
 	public function export(){
-		$form_id = $identifier = $context = null;
-		if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->_form_id);
+		$document_id = $identifier = $context = null;
+		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
 		if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
 		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_type_description')});
 		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
 
-		// used by audit for export of outdated forms
-		if ($maxFormTimestamp = UTILITY::propertySet($this->_payload, '_maxFormTimestamp')) unset($this->_payload->_maxFormTimestamp);
-		else $maxFormTimestamp = $this->_currentdate->format('Y-m-d H:i:s');
+		// used by audit for export of outdated documents
+		if ($maxDocumentTimestamp = UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp')) unset($this->_payload->_maxDocumentTimestamp);
+		else $maxDocumentTimestamp = $this->_currentdate->format('Y-m-d H:i:s');
 
-		$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 			'values' => [
-				':id' => $form_id
+				':id' => $document_id
 			]
 		]);
-		$form = $form ? $form[0] : null;
-		if (!PERMISSION::permissionFor('formexport') && !$form['permitted_export'] && !PERMISSION::permissionIn($form['restricted_access'])) $this->response([], 401);
-		if (!$form || $form['date'] >= $maxFormTimestamp) $this->response([], 409);
+		$document = $document ? $document[0] : null;
+		if (!PERMISSION::permissionFor('documentexport') && !$document['permitted_export'] && !PERMISSION::permissionIn($document['restricted_access'])) $this->response([], 401);
+		if (!$document || $document['date'] >= $maxDocumentTimestamp) $this->response([], 409);
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
@@ -1142,15 +1142,15 @@ class FORM extends API {
 			////////////////////////////////////////
 			if (!$value || $value == 'on') unset($this->_payload->$key);
 		}
-		if (!$identifier) $identifier = in_array($form['context'], array_keys(LANGUAGEFILE['formcontext']['identify'])) ? LANG::GET('assemble.form_export_identifier'): null;
+		if (!$identifier) $identifier = in_array($document['context'], array_keys(LANGUAGEFILE['documentcontext']['identify'])) ? LANG::GET('assemble.document_export_identifier'): null;
 		$summary = [
-			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $form['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => $form['name'],
-			'date' => LANG::GET('assemble.form_export_exported', [':version' => substr($form['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])
+			'title' => $document['name'],
+			'date' => LANG::GET('assemble.document_export_exported', [':version' => substr($document['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
@@ -1176,11 +1176,11 @@ class FORM extends API {
 					if (in_array($subs['type'], ['image', 'links'])) {
 						$name = $subs['description'];
 					}
-					if (in_array($subs['type'], ['formbutton'])) {
+					if (in_array($subs['type'], ['documentbutton'])) {
 						$name = $subs['attributes']['value'];
 					}
 					if (in_array($subs['type'], ['calendarbutton'])) {
-						$name = LANG::GET('assemble.form_export_element.' . $subs['type']);
+						$name = LANG::GET('assemble.document_export_element.' . $subs['type']);
 					}
 					else $name = $subs['attributes']['name'];
 					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
@@ -1201,7 +1201,7 @@ class FORM extends API {
 						}
 					}
 
-					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'formbutton'])) $content['fillable'] = true;
+					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'documentbutton'])) $content['fillable'] = true;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = ['type' => 'selection', 'value' => []];
 						foreach($subs['content'] as $key => $v){
@@ -1242,14 +1242,14 @@ class FORM extends API {
 						$content['content'][$name] = ['type' => 'textsection', 'value' => '(' . (isset($subs['attributes']['min']) ? $subs['attributes']['min'] : 0) . ' - ' . (isset($subs['attributes']['min']) ? $subs['attributes']['max'] : 100) . ') ' . (UTILITY::propertySet($payload, $postname) ? : '')];
 					}
 					elseif (in_array($subs['type'], ['photo', 'file'])){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => LANG::GET('assemble.form_export_element.' . $subs['type'])];
+						$content['content'][$name] = ['type' => 'textsection', 'value' => LANG::GET('assemble.document_export_element.' . $subs['type'])];
 					}
 					elseif ($subs['type'] === 'links'){
 						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
 						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'] .= $link . "\n";
 					}
-					elseif ($subs['type'] === 'formbutton'){
-						$content['content'][LANG::GET('assemble.form_export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
+					elseif ($subs['type'] === 'documentbutton'){
+						$content['content'][LANG::GET('assemble.document_export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
 					}
 					elseif ($subs['type'] === 'calendarbutton'){
 						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
@@ -1270,8 +1270,8 @@ class FORM extends API {
 		$componentscontent = [];
 		$enumerate = [];
 		$fillable = false;
-		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent, $maxFormTimestamp);
+		foreach(explode(',', $document['content']) as $usedcomponent) {
+			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent, $maxDocumentTimestamp);
 			if (!$component) continue;
 			$component['content'] = json_decode($component['content'], true);
 
@@ -1282,14 +1282,14 @@ class FORM extends API {
 			if ($printablecontent['fillable']) $fillable = true;
 		}
 		if ($fillable){
-			if (in_array($form['context'], ['casedocumentation'])) {
+			if (in_array($document['context'], ['casedocumentation'])) {
 				$type = ['type' => 'selection', 'value' => []];
 				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
 					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
 				}
 				$summary['content'] = array_merge([LANG::GET('record.record_type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
 			}
-			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => LANG::GET('assemble.required_asterisk')], LANG::GET('assemble.form_export_by') . ' *' => [
+			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => LANG::GET('assemble.required_asterisk')], LANG::GET('assemble.document_export_by') . ' *' => [
 				'type' => 'text',
 				'value' => ''
 			]], $summary['content']);
@@ -1297,14 +1297,14 @@ class FORM extends API {
 		$summary['content'] = [' ' => $summary['content']];
 		$summary['images'] = [' ' => $summary['images']];
 
-		$downloadfiles[LANG::GET('assemble.form_export')] = [
-			'href' => PDF::formsPDF($summary)
+		$downloadfiles[LANG::GET('assemble.document_export')] = [
+			'href' => PDF::documentsPDF($summary)
 		];
 		$this->response([
 			'render' => [
 				[
 					'type' => 'links',
-					'description' =>  LANG::GET('assemble.form_export_proceed'),
+					'description' =>  LANG::GET('assemble.document_export_proceed'),
 					'content' => $downloadfiles
 				]
 			],
@@ -1312,17 +1312,17 @@ class FORM extends API {
 	}
 	
 	/**
-	 *   ___
-	 *  |  _|___ ___ _____
-	 *  |  _| . |  _|     |
-	 *  |_| |___|_| |_|_|_|
+	 *     _                           _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_|  
 	 *
 	 */
-	public function form(){
-		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
+	public function document(){
+		if (!PERMISSION::permissionFor('documentcomposer')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (!$this->_payload->context) $this->response(['response' => ['msg' => LANG::GET("assemble.edit_form_not_saved_missing"), 'type' => 'error']]);
+				if (!$this->_payload->context) $this->response(['response' => ['msg' => LANG::GET("assemble.edit_document_not_saved_missing"), 'type' => 'error']]);
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['response' => ['msg' => LANG::GET('assemble.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 				}
@@ -1342,11 +1342,11 @@ class FORM extends API {
 				// check for identifier if context makes it mandatory
 				// do this in advance of updating in case of selecting such a context
 				$this->_payload->context = substr($this->_payload->context, -2) === ' *' ? substr($this->_payload->context, 0, -2) : $this->_payload->context; // unset marking
-				if (in_array($this->_payload->context, array_keys(LANGUAGEFILE['formcontext']['identify']))){
+				if (in_array($this->_payload->context, array_keys(LANGUAGEFILE['documentcontext']['identify']))){
 					$hasidentifier = false;
 					foreach($this->_payload->content as $component){
 						// get latest approved by name
-						$latestcomponent = $this->latestApprovedName('form_component_get_by_name', $component);
+						$latestcomponent = $this->latestApprovedName('document_component_get_by_name', $component);
 						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasidentifier = true;
 					}
 					if (!$hasidentifier) $this->response(['response' => ['msg' => LANG::GET('assemble.compose_context_missing_identifier'), 'type' => 'error']]);
@@ -1368,21 +1368,21 @@ class FORM extends API {
 					}
 				}
 				
-				// select latest form by name
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'form_form_get_by_name', [
+				// select latest document by name
+				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_document_get_by_name', [
 					'values' => [
 						':name' => $this->_payload->name
 					]
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
-				$approved = PERMISSION::fullyapproved('formapproval', $exists['approval']);
+				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
 
 				$this->_payload->approve = array_search($this->_payload->approve, LANGUAGEFILE['units']);
 
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, reset approval
-						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 							'values' => [
 								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
 								':context' => $this->_payload->context,
@@ -1399,19 +1399,19 @@ class FORM extends API {
 						])) $this->response([
 								'response' => [
 									'name' => $this->_payload->name,
-									'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+									'msg' => LANG::GET('assemble.edit_document_saved', [':name' => $this->_payload->name]),
 									'type' => 'success'
 								]]);
 						else $this->response([
 							'response' => [
 								'name' => false,
-								'msg' => LANG::GET('assemble.edit_form_not_saved'),
+								'msg' => LANG::GET('assemble.edit_document_not_saved'),
 								'type' => 'error'
 							]]);
 					}
 					if ($approved && $exists['content'] == implode(',', $this->_payload->content)) {
-						// update form properties as long as the content remains unchanged
-						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+						// update document properties as long as the content remains unchanged
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 							'values' => [
 								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
 								':context' => $this->_payload->context,
@@ -1428,23 +1428,23 @@ class FORM extends API {
 						])) $this->response([
 								'response' => [
 									'name' => $this->_payload->name,
-									'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
+									'msg' => LANG::GET('assemble.edit_document_saved', [':name' => $this->_payload->name]),
 									'type' => 'success'
 								]]);
 						else $this->response([
 							'response' => [
 								'name' => false,
-								'msg' => LANG::GET('assemble.edit_form_not_saved'),
+								'msg' => LANG::GET('assemble.edit_document_not_saved'),
 								'type' => 'error'
 							]]);
 					}
 				}
-				// until here the form has not existed, or the content of an approved form has been changed resulting in a new version
+				// until here the document has not existed, or the content of an approved document has been changed resulting in a new version
 
 				// if not updated check if approve is set, not earlier
-				if (!$this->_payload->approve) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_not_saved_missing'), 'type' => 'error']]);
+				if (!$this->_payload->approve) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_document_not_saved_missing'), 'type' => 'error']]);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
 						':name' => $this->_payload->name,
 						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): $this->_payload->alias,
@@ -1457,79 +1457,79 @@ class FORM extends API {
 						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
 					]
 				])) {
-						$form_id = $this->_pdo->lastInsertId();
-						$message = LANG::GET('assemble.approve_form_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.form(\'get\', \'approval\', ' . $form_id . ')"> ' . $this->_payload->name . '</a>'], true);
-						foreach(PERMISSION::permissionFor('formapproval', true) as $permission){
+						$document_id = $this->_pdo->lastInsertId();
+						$message = LANG::GET('assemble.approve_document_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
+						foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
 						}
 						$this->response([
 						'response' => [
 							'name' => $this->_payload->name,
-							'msg' => LANG::GET('assemble.edit_form_saved', [':name' => $this->_payload->name]),
-							'reload' => 'form_editor',
+							'msg' => LANG::GET('assemble.edit_document_saved', [':name' => $this->_payload->name]),
+							'reload' => 'document_editor',
 							'type' => 'success'
 						]]);
 				}
 				else $this->response([
 					'response' => [
 						'name' => false,
-						'msg' => LANG::GET('assemble.edit_form_not_saved'),
+						'msg' => LANG::GET('assemble.edit_document_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'DELETE':
-				$component = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+				$component = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
 				]);
 				$component = $component ? $component[0] : null;
-				if (!$component || PERMISSION::fullyapproved('formapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_form_delete_failure'), 'type' => 'error']]);
+				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => LANG::GET('assemble.edit_document_delete_failure'), 'type' => 'error']]);
 				
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_delete', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
 				])) $this->response(['response' => [
-					'msg' => LANG::GET('assemble.edit_form_delete_success'),
+					'msg' => LANG::GET('assemble.edit_document_delete_success'),
 					'type' => 'success',
-					'reload' => 'form_editor',
+					'reload' => 'document_editor',
 					]]);
 				break;
 		}
 	}
 	
 	/**
-	 *   ___                           _ _ _           
-	 *  |  _|___ ___ _____       ___ _| |_| |_ ___ ___ 
-	 *  |  _| . |  _|     |     | -_| . | |  _| . |  _|
-	 *  |_| |___|_| |_|_|_|_____|___|___|_|_| |___|_|  
-	 *                    |_____|                      
+	 *     _                           _               _ _ _           
+	 *   _| |___ ___ _ _ _____ ___ ___| |_       ___ _| |_| |_ ___ ___ 
+	 *  | . | . |  _| | |     | -_|   |  _|     | -_| . | |  _| . |  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_|  _____|___|___|_|_| |___|_|  
+	 *                                    |_____|                     
 	 *
 	 */
-	public function form_editor(){
-		if (!PERMISSION::permissionFor('formcomposer')) $this->response([], 401);
-		$formdatalist = $componentdatalist = [];
-		$formoptions = [];
+	public function document_editor(){
+		if (!PERMISSION::permissionFor('documentcomposer')) $this->response([], 401);
+		$documentdatalist = $componentdatalist = [];
+		$documentoptions = [];
 		$alloptions = [];
 		$componentoptions = [];
-		$contextoptions = ['...' . LANG::GET('assemble.edit_form_context_default') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+		$contextoptions = ['...' . LANG::GET('assemble.edit_document_context_default') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		$return = [];
 		
-		// get selected form
+		// get selected document
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
-			$form = SQLQUERY::EXECUTE($this->_pdo, 'form_get', [
+			$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 				'values' => [
 					':id' => $this->_requestedID
 				]
 			]);
-			$form = $form ? $form[0] : null;
+			$document = $document ? $document[0] : null;
 		} else{
 			// get latest approved by name
-			$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
+			$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
 		}
-		if (!$form) $form = [
+		if (!$document) $document = [
 			'name' => '',
 			'alias' => '',
 			'context' => '',
@@ -1539,36 +1539,36 @@ class FORM extends API {
 			'restricted_access' => null,
 			'approval' => null
 		];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$form['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if($this->_requestedID && $this->_requestedID !== 'false' && !$document['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => LANG::GET('assemble.error_document_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-		// prepare existing forms lists, sorted by units
+		// prepare existing documents lists, sorted by units
 		foreach(array_keys(LANGUAGEFILE['units']) as $unit){
-			$formoptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-			$alloptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_forms_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+			$documentoptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_documents_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+			$alloptions[$unit] = ['...' . LANG::GET('assemble.edit_existing_documents_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 			$componentoptions[$unit] = ['...' => ['value' => '']];
 		}
 
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = [];
 		foreach($fd as $key => $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!isset($formoptions[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
-				$formdatalist[] = $row['name'];
-				$formoptions[$row['unit']][$row['name']] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			if (!isset($documentoptions[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
+				$documentdatalist[] = $row['name'];
+				$documentoptions[$row['unit']][$row['name']] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = PERMISSION::fullyapproved('formapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
-			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_form_hidden_hidden') : '';
-			$alloptions[$row['unit']][$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $form['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? LANG::GET('assemble.approve_approved') : LANG::GET('assemble.approve_unapproved');
+			$hidden_set = $row['hidden'] ? ' - ' . LANG::GET('assemble.edit_component_document_hidden_hidden') : '';
+			$alloptions[$row['unit']][$row['name'] . ' ' . LANG::GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		// prepare existing component list of fully approved
-		$cd = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
+		$cd = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 		$hidden = [];
 		foreach($cd as $key => $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!isset($componentoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('formapproval', $row['approval'])) {
+			if (!isset($componentoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
 				$componentoptions[$row['unit']][$row['name'] . ' - ' . LANG::GET('assemble.approve_approved')] = ['value' => $row['id']];
 			}
@@ -1576,7 +1576,7 @@ class FORM extends API {
 
 		// delete empty selections, order the rest and create remaining selections by unit for easier access
 		$options_selection = $alloptions_selection = $components_selection = [];
-		foreach($formoptions as $unit => $components){
+		foreach($documentoptions as $unit => $components){
 			if (count($components) < 2) {
 				continue;
 			}
@@ -1585,7 +1585,7 @@ class FORM extends API {
 				'type' => 'select',
 				'attributes' => [
 					'name' => LANGUAGEFILE['units'][$unit],
-					'onchange' => "api.form('get', 'form_editor', this.value)"
+					'onchange' => "api.document('get', 'document_editor', this.value)"
 				],
 				'content' => $components
 			];
@@ -1599,7 +1599,7 @@ class FORM extends API {
 				'type' => 'select',
 				'attributes' => [
 					'name' => LANGUAGEFILE['units'][$unit],
-					'onchange' => "api.form('get', 'form_editor', this.value)"
+					'onchange' => "api.document('get', 'document_editor', this.value)"
 				],
 				'content' => $components
 			];
@@ -1613,7 +1613,7 @@ class FORM extends API {
 				'type' => 'select',
 				'attributes' => [
 					'name' => LANGUAGEFILE['units'][$unit],
-					'onchange' => "if (this.value) api.form('get', 'component', this.value)"
+					'onchange' => "if (this.value) api.document('get', 'component', this.value)"
 				],
 				'content' => $components
 			];
@@ -1622,83 +1622,83 @@ class FORM extends API {
 
 
 		// check for bundle dependencies
-		$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = [];
 		$dependedbundles = [];
 		foreach($bd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden) && 
-			in_array($form['name'], explode(',', $row['content'])) && 
-			!in_array($form['name'], $dependedbundles)) $dependedbundles[] = $row['name']; 
+			in_array($document['name'], explode(',', $row['content'])) && 
+			!in_array($document['name'], $dependedbundles)) $dependedbundles[] = $row['name']; 
 		}
 
-		// check for dependencies in approved components (linked forms)
+		// check for dependencies in approved components (linked documents)
 		$dependedcomponents = [];
-		if ($form['name']){
-			$cd = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
+		if ($document['name']){
+			$cd = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 			$hidden = [];
 			foreach($cd as $row) {
 				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-				if (!PERMISSION::fullyapproved('formapproval', $row['approval'])) continue;
+				if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 				if (!in_array($row['name'], $dependedcomponents) && !in_array($row['name'], $hidden)) {
 					// don't bother disassembling content, just look for an expression
-					if (stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_display_button', [':form' => $form['name']]) . '"')
-						|| stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_form_continue_button', [':form' => $form['name']]) . '"')) $dependedcomponents[] = $row['name'];
+					if (stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_document_display_button', [':document' => $document['name']]) . '"')
+						|| stristr($row['content'], '"value":"' . LANG::GET('assemble.compose_link_document_continue_button', [':document' => $document['name']]) . '"')) $dependedcomponents[] = $row['name'];
 				}
 			}
 		}		
 
 		// prepare existing context list
-		foreach(LANGUAGEFILE['formcontext'] as $type => $contexts){
+		foreach(LANGUAGEFILE['documentcontext'] as $type => $contexts){
 			foreach($contexts as $context => $display){
 				if ($type === 'identify') $display .= ' *';
-				$contextoptions[$display] = $context===$form['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
+				$contextoptions[$display] = $context===$document['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 			}
 		}
 		ksort($contextoptions);
 
 		// prepare unit list for approval
 		$approve = [
-			'hint' => LANG::GET('assemble.compose_component_approve_hint', [':roles' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formapproval', true)))]),
+			'hint' => LANG::GET('assemble.compose_component_approve_hint', [':roles' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('documentapproval', true)))]),
 			'name' => LANG::GET('assemble.compose_component_approve'),
 			'content' => ['...' . LANG::GET('assemble.compose_component_approve_select_default') => ['value' => '0']]
 		];
 		foreach(LANGUAGEFILE['units'] as $key => $value){
-			$approve['content'][$value] = $form['unit'] === $key ? ['selected' => true] : [];
+			$approve['content'][$value] = $document['unit'] === $key ? ['selected' => true] : [];
 		}
 		$regulatory_context = [];
-		$form['regulatory_context'] = explode(',', $form['regulatory_context'] ? : '');
+		$document['regulatory_context'] = explode(',', $document['regulatory_context'] ? : '');
 		foreach(LANGUAGEFILE['regulatory'] as $key => $value){
 			$regulatory_context[$value] = ['value' => $key];
-			if (in_array($key, $form['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
+			if (in_array($key, $document['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 		}
 		$permitted_export = [
-			'hint' => LANG::GET('assemble.edit_form_permitted_export_hint', [':permissions' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))]),
+			'hint' => LANG::GET('assemble.edit_document_permitted_export_hint', [':permissions' => implode(', ', array_map(Fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('documentexport', true)))]),
 			'content' => [
-				LANG::GET('assemble.edit_form_permitted_export') => $form['permitted_export'] ? ['checked' => true]: []
+				LANG::GET('assemble.edit_document_permitted_export') => $document['permitted_export'] ? ['checked' => true]: []
 			]
 		];
 		$restricted_access = [
-			'description' => LANG::GET('assemble.edit_form_restricted_access'),
-			'hint' => LANG::GET('assemble.edit_form_restricted_access_hint'),
+			'description' => LANG::GET('assemble.edit_document_restricted_access'),
+			'hint' => LANG::GET('assemble.edit_document_restricted_access_hint'),
 			'content' => []
 		];
-		$form['restricted_access'] = explode(',', strval($form['restricted_access']));
+		$document['restricted_access'] = explode(',', strval($document['restricted_access']));
 		foreach(LANGUAGEFILE['permissions'] as $value => $translation){
 			$restricted_access['content'][$translation] = ['value' => $value];
-			if (in_array($value, $form['restricted_access'])) $restricted_access['content'][$translation]['checked'] = true;
+			if (in_array($value, $document['restricted_access'])) $restricted_access['content'][$translation]['checked'] = true;
 		}
 
-		$pending_approvals = PERMISSION::pending('formapproval', $form['approval']);
+		$pending_approvals = PERMISSION::pending('documentapproval', $document['approval']);
 		$return['render'] = [
 			'content' => [
 				[
 					[
 						[
 							'type' => 'datalist',
-							'content' => array_values(array_unique($formdatalist)),
+							'content' => array_values(array_unique($documentdatalist)),
 							'attributes' => [
-								'id' => 'forms'
+								'id' => 'documents'
 							]
 						], [
 							'type' => 'datalist',
@@ -1709,23 +1709,23 @@ class FORM extends API {
 						], [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => LANG::GET('assemble.edit_existing_forms_select'),
+								'name' => LANG::GET('assemble.edit_existing_documents_select'),
 							],
 						],
 						...$options_selection,
 						[
 							'type' => 'search',
 							'attributes' => [
-								'name' => LANG::GET('assemble.edit_existing_forms'),
-								'list' => 'forms',
-								'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'form_editor', this.value); return false;}"
+								'name' => LANG::GET('assemble.edit_existing_documents'),
+								'list' => 'documents',
+								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'document_editor', this.value); return false;}"
 							]
 						]
 					],[
 						[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => LANG::GET('assemble.edit_existing_forms_all'),
+								'name' => LANG::GET('assemble.edit_existing_documents_all'),
 							],
 						],
 						...$options_selection
@@ -1734,9 +1734,9 @@ class FORM extends API {
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => LANG::GET('assemble.edit_forms_info_description')
+							'name' => LANG::GET('assemble.edit_documents_info_description')
 						],
-						'content' => LANG::GET('assemble.edit_forms_info_content')
+						'content' => LANG::GET('assemble.edit_documents_info_content')
 					], 
 					...$components_selection,
 					[
@@ -1744,28 +1744,28 @@ class FORM extends API {
 						'attributes' => [
 							'name' => LANG::GET('assemble.edit_add_component'),
 							'list' => 'components',
-							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'component', this.value); return false;}"
+							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component', this.value); return false;}"
 						]
 					]
 				], [
 					[
-						'type' => 'compose_form',
-						'value' => $form['name'] ? : '',
+						'type' => 'compose_document',
+						'value' => $document['name'] ? : '',
 						'alias' => [
-							'name' => LANG::GET('assemble.edit_form_alias'),
-							'value' => $form['alias'] ? : ''
+							'name' => LANG::GET('assemble.edit_document_alias'),
+							'value' => $document['alias'] ? : ''
 						],
 						'context' => [
-							'name' => LANG::GET('assemble.edit_form_context'),
+							'name' => LANG::GET('assemble.edit_document_context'),
 							'content' => $contextoptions,
-							'hint' => LANG::GET('assemble.edit_form_context_hint')
+							'hint' => LANG::GET('assemble.edit_document_context_hint')
 						],
-						'hint' => ($form['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $form['author'], ':date' => substr($form['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
+						'hint' => ($document['name'] ? LANG::GET('assemble.compose_component_author', [':author' => $document['author'], ':date' => substr($document['date'], 0, -3)]) . '\n' : LANG::GET('assemble.compose_component_name_hint')) .
 						($pending_approvals ? LANG::GET('assemble.approve_pending', [':approvals' => implode(', ', array_map(Fn($permission) => LANGUAGEFILE['permissions'][$permission], $pending_approvals))]) : LANG::GET('assemble.approve_completed')) . '\n \n' .
-						($dependedbundles ? LANG::GET('assemble.compose_form_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
-						($dependedcomponents ? LANG::GET('assemble.compose_form_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
+						($dependedbundles ? LANG::GET('assemble.compose_document_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
+						($dependedcomponents ? LANG::GET('assemble.compose_document_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
 						,
-						'hidden' => $form['name'] ? json_decode($form['hidden'] ? : '', true) : null,
+						'hidden' => $document['name'] ? json_decode($document['hidden'] ? : '', true) : null,
 						'approve' => $approve,
 						'regulatory_context' => $regulatory_context ? : ' ',
 						'permitted_export' => $permitted_export,
@@ -1779,23 +1779,23 @@ class FORM extends API {
 				]
 			]
 		];
-		if ($form['name'] && (!PERMISSION::fullyapproved('formapproval', $form['approval'])))
+		if ($document['name'] && (!PERMISSION::fullyapproved('documentapproval', $document['approval'])))
 			$return['render']['content'][count($return['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
-						'value' => LANG::GET('assemble.edit_form_delete'),
-						'onpointerup' => "api.form('delete', 'form', " . $form['id'] . ")" 
+						'value' => LANG::GET('assemble.edit_document_delete'),
+						'onpointerup' => "api.document('delete', 'document', " . $document['id'] . ")" 
 					]
 				]
 			];
 
 		// add used components to response
-		if (isset($form['content'])) {
+		if (isset($document['content'])) {
 			$return['render']['components'] = [];
-			foreach(explode(',', $form['content']) as $usedcomponent) {
+			foreach(explode(',', $document['content']) as $usedcomponent) {
 				// get latest approved by name
-				$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
+				$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent);
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
 					$component['content']['name'] = $usedcomponent;
@@ -1804,47 +1804,47 @@ class FORM extends API {
 				}
 			}
 		}
-		if ($form['name']) $return['header'] = $form['name'];
+		if ($document['name']) $return['header'] = $document['name'];
 		$this->response($return);
 	}
 	
 	/**
-	 *   ___               ___ _ _ _
-	 *  |  _|___ ___ _____|  _|_| | |_ ___ ___
-	 *  |  _| . |  _|     |  _| | |  _| -_|  _|
-	 *  |_| |___|_| |_|_|_|_| |_|_|_| |___|_|
-	 *
+	 *     _                           _         ___ _ _ _           
+	 *   _| |___ ___ _ _ _____ ___ ___| |_      |  _|_| | |_ ___ ___ 
+	 *  | . | . |  _| | |     | -_|   |  _|     |  _| | |  _| -_|  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_|  _____|_| |_|_|_| |___|_|  
+	 *                                    |_____|   
 	 */
-	public function formfilter(){
+	public function documentfilter(){
 		require_once('_shared.php');
 		$search = new SHARED($this->_pdo);
-		$forms = $search->formsearch(['search' => $this->_requestedID]);
+		$documents = $search->documentsearch(['search' => $this->_requestedID]);
 		$this->response([
-			'data' => $forms ? array_map(fn($v)=> strval($v), array_column($forms, 'id')) : null
+			'data' => $documents ? array_map(fn($v)=> strval($v), array_column($documents, 'id')) : null
 		]);
 	}
 	
 	/**
-	 *   ___                   
-	 *  |  _|___ ___ _____ ___ 
-	 *  |  _| . |  _|     |_ -|
-	 *  |_| |___|_| |_|_|_|___|
-	 *   
+	 *     _                           _       
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ 
+	 *  | . | . |  _| | |     | -_|   |  _|_ -|
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|
+	 *  
 	 */
-	public function forms(){
-		$formdatalist = $forms = [];
+	public function documents(){
+		$documentdatalist = $documents = [];
 		$return = [];
 
-		// prepare existing forms lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		// prepare existing documents lists
+		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = [];
 		foreach($fd as $key => $row) {
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
-			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['name'], $formdatalist) && !in_array($row['name'], $hidden)) {
-				$formdatalist[] = $row['name'];
-				$forms[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'form', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $formdatalist[] = $alias;
+			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
+			if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['documentcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (!in_array($row['name'], $documentdatalist) && !in_array($row['name'], $hidden)) {
+				$documentdatalist[] = $row['name'];
+				$documents[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
+				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $documentdatalist[] = $alias;
 			}
 		}
 		$return['render'] = [
@@ -1852,25 +1852,25 @@ class FORM extends API {
 				[
 					[
 						'type' => 'datalist',
-						'content' => array_values(array_unique($formdatalist)),
+						'content' => array_values(array_unique($documentdatalist)),
 						'attributes' => [
-							'id' => 'forms'
+							'id' => 'documents'
 						]
 					], [
 						'type' => 'filtered',
 						'attributes' => [
-							'name' => LANG::GET('assemble.form_filter'),
-							'list' => 'forms',
-							'onkeypress' => "if (event.key === 'Enter') {api.form('get', 'formfilter', this.value); return false;}",
-							'onblur' => "api.form('get', 'formfilter', this.value); return false;",
+							'name' => LANG::GET('assemble.document_filter'),
+							'list' => 'documents',
+							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}",
+							'onblur' => "api.document('get', 'documentfilter', this.value); return false;",
 						],
-						'hint' => LANG::GET('assemble.form_filter_hint')
+						'hint' => LANG::GET('assemble.document_filter_hint')
 					]
 				]
 			]];
-		foreach ($forms as $context => $list){
+		foreach ($documents as $context => $list){
 			$contexttranslation = '';
-			foreach (LANGUAGEFILE['formcontext'] as $formcontext => $contexts){
+			foreach (LANGUAGEFILE['documentcontext'] as $documentcontext => $contexts){
 				if (isset($contexts[$context])){
 					$contexttranslation = $contexts[$context];
 					break;
@@ -1891,7 +1891,7 @@ class FORM extends API {
 	 *  | | .'|  _| -_|_ -|  _| .'| . | . |  _| . | | | -_| . |   | .'|     | -_|
 	 *  |_|__,|_| |___|___|_| |__,|  _|  _|_| |___|\_/|___|___|_|_|__,|_|_|_|___|
 	 *                            |_| |_|
-	 * returns the latest approved form, component by name from query
+	 * returns the latest approved document, component by name from query
 	 * @param string $query as defined within sqlinterface
 	 * @param string $name
 	 * @return array|bool either query row or false
@@ -1905,7 +1905,7 @@ class FORM extends API {
 			]
 		]);
 		foreach ($elements as $element){
-			if (PERMISSION::fullyapproved('formapproval', $element['approval'])) return $element;
+			if (PERMISSION::fullyapproved('documentapproval', $element['approval'])) return $element;
 		}
 		return false;
 	}

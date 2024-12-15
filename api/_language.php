@@ -62,7 +62,7 @@ class LANG {
 	 */
 	public static function GETALL(){
 		$return = LANGUAGEFILE;
-		foreach(['skills', 'formcontext', 'risk', 'regulatory'] as $unset) {
+		foreach(['skills', 'documentcontext', 'risk', 'regulatory'] as $unset) {
 			unset($return[$unset]);
 		}
 		return $return;

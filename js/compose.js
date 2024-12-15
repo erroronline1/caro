@@ -17,7 +17,7 @@
  */
 
 /*
-this module helps to compose and edit forms according to the passed simplified object notation. it makes use of the assemble library.
+this module helps to compose and edit documents according to the passed simplified object notation. it makes use of the assemble library.
 */
 import { getNextElementID, Assemble } from "./assemble.js";
 
@@ -58,15 +58,15 @@ export const compose_helper = {
 		}
 		return elements;
 	},
-	newFormComponents: {},
-	newFormElements: new Set(),
+	newDocumentComponents: {},
+	newDocumentElements: new Set(),
 	newTextElements: {},
 	componentIdentify: 0,
 	componentSignature: 0,
 	getNextElementID: getNextElementID,
 
 	/**
-	 * create widget from composer and append to view and newFormComponents
+	 * create widget from composer and append to view and newDocumentComponents
 	 * @param {object} parent
 	 * @returns none
 	 */
@@ -143,8 +143,8 @@ export const compose_helper = {
 				if (elementName === LANG.GET("assemble.compose_textsection_content") && value) {
 					element.content = value;
 				}
-			} else if (["formbutton"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_link_form_select")) {
+			} else if (["documentbutton"].includes(element.type)) {
+				if (elementName === LANG.GET("assemble.compose_link_document_select")) {
 					if (value) element.attributes.value = value;
 					else return;
 				}
@@ -189,13 +189,13 @@ export const compose_helper = {
 			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
 			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
-			if (elementName === LANG.GET("assemble.compose_link_form_choice") && value === LANG.GET("assemble.compose_link_form_display") && sibling.checked) {
+			if (elementName === LANG.GET("assemble.compose_link_document_choice") && value === LANG.GET("assemble.compose_link_document_display") && sibling.checked) {
 				element.attributes.onpointerup = "api.record('get','displayonly', '" + element.attributes.value + "')";
-				element.attributes.value = LANG.GET("assemble.compose_link_form_display_button", { ":form": element.attributes.value });
+				element.attributes.value = LANG.GET("assemble.compose_link_document_display_button", { ":document": element.attributes.value });
 			}
-			if (elementName === LANG.GET("assemble.compose_link_form_choice") && value === LANG.GET("assemble.compose_link_form_continue") && sibling.checked) {
-				element.attributes.onpointerup = "api.record('get','form', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
-				element.attributes.value = LANG.GET("assemble.compose_link_form_continue_button", { ":form": element.attributes.value });
+			if (elementName === LANG.GET("assemble.compose_link_document_choice") && value === LANG.GET("assemble.compose_link_document_continue") && sibling.checked) {
+				element.attributes.onpointerup = "api.record('get','document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
+				element.attributes.value = LANG.GET("assemble.compose_link_document_continue_button", { ":document": element.attributes.value });
 			}
 			sibling = sibling.nextSibling;
 		} while (sibling);
@@ -208,7 +208,7 @@ export const compose_helper = {
 			});
 			document.getElementById("main").append(...newElement.initializeSection());
 			newElement.processAfterInsertion();
-			compose_helper.newFormComponents[newElement.generatedElementIDs[0]] = element;
+			compose_helper.newDocumentComponents[newElement.generatedElementIDs[0]] = element;
 		}
 	},
 
@@ -249,7 +249,7 @@ export const compose_helper = {
 		document.getElementById("main").insertAdjacentElement("afterbegin", form);
 	},
 	/**
-	 * appends or updates a hidden form fiels with the components json structure to the editor form. used by api.js
+	 * appends or updates a hidden form fields with the components json structure to the editor form. used by api.js
 	 * @param {object} composedComponent
 	 * @returns none
 	 */
@@ -267,7 +267,7 @@ export const compose_helper = {
 	},
 
 	/**
-	 * creates a component by comparing the contents of newFormComponents and the actual order from view (after reordering/dragging)
+	 * creates a component by comparing the contents of newDocumentComponents and the actual order from view (after reordering/dragging)
 	 * @returns object|null
 	 */
 	composeNewComponent: function (raw_import = false) {
@@ -288,10 +288,10 @@ export const compose_helper = {
 						if (container.firstChild.localName === "section") content.push(nodechildren(container.firstChild));
 						else content.push(nodechildren(container));
 					} else {
-						if (node.id in compose_helper.newFormComponents) {
-							if (compose_helper.newFormComponents[node.id].attributes != undefined) delete compose_helper.newFormComponents[node.id].attributes["placeholder"];
-							content.push(compose_helper.newFormComponents[node.id]);
-							if (!["text", "links", "image"].includes(compose_helper.newFormComponents[node.id].type)) isForm = true;
+						if (node.id in compose_helper.newDocumentComponents) {
+							if (compose_helper.newDocumentComponents[node.id].attributes != undefined) delete compose_helper.newDocumentComponents[node.id].attributes["placeholder"];
+							content.push(compose_helper.newDocumentComponents[node.id]);
+							if (!["text", "links", "image"].includes(compose_helper.newDocumentComponents[node.id].type)) isForm = true;
 						}
 					}
 				}
@@ -312,10 +312,10 @@ export const compose_helper = {
 	},
 
 	/**
-	 * creates a form fetching the actual order of components (names) from view
+	 * creates a document fetching the actual order of components (names) from view
 	 * @returns object|null
 	 */
-	composeNewForm: function () {
+	composeNewDocument: function () {
 		// set dragged/dropped order of elements
 		const nodes = document.getElementById("main").children,
 			name = document.getElementById("ComponentName").value,
@@ -342,7 +342,7 @@ export const compose_helper = {
 				permitted_export: permitted_export,
 				restricted_access: restricted_access,
 			};
-		new Toast(LANG.GET("assemble.edit_form_not_saved_missing"), "error");
+		new Toast(LANG.GET("assemble.edit_document_not_saved_missing"), "error");
 		return null;
 	},
 
@@ -387,18 +387,18 @@ export const compose_helper = {
 	},
 
 	/**
-	 * appends a component to view and newFormComponents after being fetched by api.js
-	 * @param {object} form
+	 * appends a component to view and newDocumentComponents after being fetched by api.js
+	 * @param {object} content
 	 */
-	importComponent: function (form) {
-		compose_helper.newFormComponents = {};
+	importComponent: function (content) {
+		compose_helper.newDocumentComponents = {};
 		const newElements = new Compose({
 			draggable: true,
-			content: structuredClone(form.content),
+			content: structuredClone(content.content),
 		});
 		document.getElementById("main").append(...newElements.initializeSection());
 		newElements.processAfterInsertion();
-		// recursive function to assign created ids to form content elements in order of appearance
+		// recursive function to assign created ids to document content elements in order of appearance
 		const elementIDs = newElements.generatedElementIDs;
 		let i = 0;
 
@@ -407,19 +407,19 @@ export const compose_helper = {
 				if (container.constructor.name === "Array") {
 					assignIDs(container);
 				} else {
-					compose_helper.newFormComponents[elementIDs[i]] = container;
+					compose_helper.newDocumentComponents[elementIDs[i]] = container;
 					i++;
 				}
 			}
 		}
-		assignIDs(form.content);
+		assignIDs(content.content);
 	},
 
 	/**
-	 * appends components to view and newFormElements after being fetched by api.js
-	 * @param {object} form
+	 * appends components to view and newDocumentElements after being fetched by api.js
+	 * @param {object} content
 	 */
-	importForm: function (components) {
+	importDocument: function (content) {
 		function lookupIdentify(element) {
 			for (const container of element) {
 				if (container.constructor.name === "Array") {
@@ -430,21 +430,21 @@ export const compose_helper = {
 				}
 			}
 		}
-		for (const component of components) {
+		for (const component of content) {
 			component.draggable = true;
 			let current = new MetaCompose(component);
 			document.getElementById("main").append(current.initializeSection());
 			current.processAfterInsertion2();
-			compose_helper.newFormElements.add(component.name);
+			compose_helper.newDocumentElements.add(component.name);
 			lookupIdentify(current.content);
 		}
-		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_form_multiple_identify"), "error");
-		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_form_multiple_signature"), "error");
+		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_document_multiple_identify"), "error");
+		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_document_multiple_signature"), "error");
 	},
 
 	/**
 	 * appends text chunks to view and newTextElements after being fetched by api.js
-	 * @param {object} form
+	 * @param {object} chunks
 	 */
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};
@@ -489,8 +489,8 @@ export const compose_helper = {
 				targetClone;
 			// determine target:
 			// target is element
-			if (evnt.target.classList.contains("draggableFormElement")) target = evnt.target; // draggable element container
-			else if (evnt.target.parentNode.classList.contains("draggableFormElement")) target = evnt.target.parentNode; // draggable element container content
+			if (evnt.target.classList.contains("draggableDocumentElement")) target = evnt.target; // draggable element container
+			else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) target = evnt.target.parentNode; // draggable element container content
 			// target is container
 			else if (["main", "section"].includes(evnt.target.parentNode.localName)) target = evnt.target; // draggable div container
 			else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) target = evnt.target.parentNode; // draggable div container content
@@ -602,9 +602,9 @@ export const compose_helper = {
 			if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
 
 			// dragging single element
-			if (draggedElement.classList.contains("draggableFormElement")) {
+			if (draggedElement.classList.contains("draggableDocumentElement")) {
 				// dropping on single element
-				if (droppedUpon.classList.contains("draggableFormElement")) {
+				if (droppedUpon.classList.contains("draggableDocumentElement")) {
 					droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
 				}
 				// dropping on hr creating a new article
@@ -657,8 +657,8 @@ export const compose_helper = {
 				!(draggedElement.children.item(1).firstChild && draggedElement.children.item(1).firstChild.localName === "section") &&
 				!(droppedUpon.children.item(1).firstChild && droppedUpon.children.item(1).firstChild.localName === "section") &&
 				!(droppedUpon.parentNode.localName === "section") &&
-				!draggedElement.classList.contains("draggableFormElement") &&
-				!droppedUpon.classList.contains("draggableFormElement")
+				!draggedElement.classList.contains("draggableDocumentElement") &&
+				!droppedUpon.classList.contains("draggableDocumentElement")
 			) {
 				// avoid recursive multiples
 				// create a multiple article tile if dropped on a tile
@@ -808,9 +808,9 @@ export const compose_helper = {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableFormElementHover')");
-		element.setAttribute("ondragleave", "this.classList.remove('draggableFormElementHover')");
-		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableFormElementHover')");
+		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableDocumentElementHover')");
+		element.setAttribute("ondragleave", "this.classList.remove('draggableDocumentElementHover')");
+		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableDocumentElementHover')");
 		element.setAttribute("oncontextmenu", "compose_helper.dragNdrop.contextMenu(event)");
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
@@ -826,7 +826,7 @@ export const compose_helper = {
 		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
 		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_delete(event)");
 	},
-	composer_component_form_reimportable: function (element) {
+	composer_component_document_reimportable: function (element) {
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
 		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
 		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_reimport(event)");
@@ -873,7 +873,7 @@ export class Compose extends Assemble {
 					// composer creation form for adding elements
 					if (element[0].form) {
 						const form = document.createElement("form");
-						compose_helper.composer_component_form_reimportable(form);
+						compose_helper.composer_component_document_reimportable(form);
 						form.onsubmit = () => {
 							compose_helper.composeNewElementCallback(form);
 						};
@@ -917,7 +917,7 @@ export class Compose extends Assemble {
 			// actual element created
 			else {
 				let frame = document.createElement("div");
-				frame.classList.add("draggableFormElement");
+				frame.classList.add("draggableDocumentElement");
 				frame.append(...this[this.currentElement.type]());
 				frame = compose_helper.create_draggable(frame, false, this.allowSections);
 				this.generatedElementIDs.push(frame.id);
@@ -1010,7 +1010,7 @@ export class Compose extends Assemble {
 				"'" +
 				LANG.GET("assemble.compose_component_confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
-				"}}).then(confirmation => {if (confirmation) api.form('post', 'component')})",
+				"}}).then(confirmation => {if (confirmation) api.document('post', 'component')})",
 			hidden: {
 				name: LANG.GET("assemble.edit_component_hidden"),
 				hint: LANG.GET("assemble.edit_component_hidden_hint"),
@@ -1078,7 +1078,7 @@ export class Compose extends Assemble {
 				type: "checkbox2text",
 				content: restricted_access.content,
 				attributes: {
-					name: LANG.GET("assemble.edit_form_restricted_access"),
+					name: LANG.GET("assemble.edit_document_restricted_access"),
 					id: "ComponentRestrictedAccess",
 				},
 				hint: restricted_access.hint,
@@ -1090,7 +1090,7 @@ export class Compose extends Assemble {
 				type: "checkbox2text",
 				content: regulatory_context,
 				attributes: {
-					name: LANG.GET("assemble.compose_form_regulatory_context"),
+					name: LANG.GET("assemble.compose_document_regulatory_context"),
 					id: "ComponentRegulatoryContext",
 				},
 			};
@@ -1111,12 +1111,12 @@ export class Compose extends Assemble {
 		}
 		if (prefilled) {
 			const options = {};
-			options[LANG.GET("assemble.edit_component_form_hidden_visible")] = !(hidden && Object.keys(hidden).length)
+			options[LANG.GET("assemble.edit_component_document_hidden_visible")] = !(hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 				  }
 				: {};
-			options[LANG.GET("assemble.edit_component_form_hidden_hidden")] = (hidden && Object.keys(hidden).length)
+			options[LANG.GET("assemble.edit_component_document_hidden_hidden")] = (hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 						"data-hiddenradio": "ComponentHidden",
@@ -1174,38 +1174,38 @@ export class Compose extends Assemble {
 		});
 	}
 
-	compose_form() {
+	compose_document() {
 		return this.compose_component({
-			name: LANG.GET("assemble.compose_form_label"),
-			description: LANG.GET("assemble.compose_form"),
-			list: "forms",
+			name: LANG.GET("assemble.compose_document_label"),
+			description: LANG.GET("assemble.compose_document"),
+			list: "documents",
 			action:
 				"new Dialog({type: 'confirm', header: '" +
-				LANG.GET("assemble.compose_form") +
+				LANG.GET("assemble.compose_document") +
 				"', options:{" +
 				"'" +
-				LANG.GET("assemble.compose_form_cancel") +
+				LANG.GET("assemble.compose_document_cancel") +
 				"': false," +
 				"'" +
-				LANG.GET("assemble.compose_form_confirm") +
+				LANG.GET("assemble.compose_document_confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
-				"}}).then(confirmation => {if (confirmation) api.form('post', 'form')})",
+				"}}).then(confirmation => {if (confirmation) api.document('post', 'document')})",
 			hidden: {
-				name: LANG.GET("assemble.edit_form_hidden"),
-				hint: LANG.GET("assemble.edit_form_hidden_hint"),
+				name: LANG.GET("assemble.edit_document_hidden"),
+				hint: LANG.GET("assemble.edit_document_hidden_hint"),
 			},
 		});
 	}
 
-	compose_formbutton() {
+	compose_documentbutton() {
 		let result = [...this.br()],
-			forms = this.currentElement.content;
+		document = this.currentElement.content;
 
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
-				"data-type": "formbutton",
-				name: LANG.GET("assemble.compose_link_form"),
+				"data-type": "documentbutton",
+				name: LANG.GET("assemble.compose_link_document"),
 			},
 		};
 		result = result.concat(...this.textsection());
@@ -1213,28 +1213,28 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "select",
 			attributes: {
-				name: LANG.GET("assemble.compose_link_form_select"),
+				name: LANG.GET("assemble.compose_link_document_select"),
 			},
-			content: forms,
+			content: document,
 		};
 		result = result.concat(...this.select());
 
 		this.currentElement = {
 			type: "radio",
-			attributes: { name: LANG.GET("assemble.compose_link_form_choice") },
+			attributes: { name: LANG.GET("assemble.compose_link_document_choice") },
 			content: {},
 		};
-		this.currentElement.content[LANG.GET("assemble.compose_link_form_display")] = {
+		this.currentElement.content[LANG.GET("assemble.compose_link_document_display")] = {
 			required: true,
 		};
-		this.currentElement.content[LANG.GET("assemble.compose_link_form_continue")] = {
+		this.currentElement.content[LANG.GET("assemble.compose_link_document_continue")] = {
 			required: true,
 		};
 		result = result.concat(...this.br(), ...this.radio());
 
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_link_form"),
+				value: LANG.GET("assemble.compose_link_document"),
 				"data-type": "addblock",
 			},
 		};

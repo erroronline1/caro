@@ -43,7 +43,7 @@ class STRESSTEST{
 	public $_caleandarentries = 20000;
 	public $_recordentries = 20000;
 	public $_orderentries = 1000;
-	public $_template = '../templates/forms.de.json';
+	public $_template = '../templates/documents.de.json';
 	public $_autopermission = true;
 	public $_author = "Caro App";
 
@@ -113,7 +113,7 @@ class STRESSTEST{
 
 	public function createRecords(){
 		$this->_currentdate->modify('-12 month');
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 
 		for ($i = 0; $i < $this->_recordentries; $i++){
@@ -129,12 +129,12 @@ class STRESSTEST{
 			}
 
 			$current_record = [];
-			shuffle($forms);
-			foreach($forms as $form){
+			shuffle($documents);
+			foreach($documents as $document){
 				$current_record[] = [
 					'author' => $this->_author,
 					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
-					'form' => $form['id'],
+					'document' => $document['id'],
 					'content' => json_encode($content)
 				];
 
@@ -149,7 +149,7 @@ class STRESSTEST{
 						':record_type' => $exists['record_type'] ? : null,
 						':identifier' => $identifier,
 						':last_user' => 2,
-						':last_form' => $form['id'],
+						':last_document' => $document['name'],
 						':content' => json_encode($records),
 						':id' => $exists['id']
 					]
@@ -161,7 +161,7 @@ class STRESSTEST{
 					':record_type' => 'treatment',
 					':identifier' => $identifier,
 					':last_user' => 2,
-					':last_form' => $form['id'],
+					':last_document' => $document['name'],
 					':content' => json_encode($current_record),
 				]
 			]);
@@ -228,42 +228,42 @@ class STRESSTEST{
 		echo $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
 	}
 
-	public function installForms(){
+	public function installDocuments(){
 		if (!realpath($this->_template)) {
 			echo $this->_template . ' file not found';
 			return;
 		}
 
 		$parameters = [];
-		$forms = file_get_contents(realpath($this->_template));
-		$forms = json_decode($forms, true);
+		$documents = file_get_contents(realpath($this->_template));
+		$documents = json_decode($documents, true);
 		$matches = 0;
 
 		$permissions = [];
-		foreach (preg_split('/\W+/', CONFIG['permissions']['formapproval']) as $permission){
+		foreach (preg_split('/\W+/', CONFIG['permissions']['documentapproval']) as $permission){
 			$permissions[$permission] = [
 				'name' => $this->_author,
 				'date' => $this->_currentdate->format("Y-m-d H:i")
 			];
 		}
-		foreach ($forms as $form){
-			if (isset($form['name'])) {
-				if (gettype($form['content']) === 'array') $form['content'] = json_encode($form['content']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'form_post', [
+		foreach ($documents as $document){
+			if (isset($document['name'])) {
+				if (gettype($document['content']) === 'array') $document['content'] = json_encode($document['content']);
+				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
-						':name' => $form['name'],
-						':alias' => $form['alias'],
-						':context' => $form['context'],
-						':unit' => $form['unit'],
-						':author' => $form['author'],
-						':content' => $form['content'],
-						':regulatory_context' => $form['regulatory_context'],
-						':permitted_export' => $form['permitted_export'],
-						':restricted_access' => $form['restricted_access']
+						':name' => $document['name'],
+						':alias' => $document['alias'],
+						':context' => $document['context'],
+						':unit' => $document['unit'],
+						':author' => $document['author'],
+						':content' => $document['content'],
+						':regulatory_context' => $document['regulatory_context'],
+						':permitted_export' => $document['permitted_export'],
+						':restricted_access' => $document['restricted_access']
 					]
 				])){
 					$matches++;
-					if ($this->_autopermission) SQLQUERY::EXECUTE($this->_pdo, 'form_put_approve', [
+					if ($this->_autopermission) SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
 						'values' => [
 							':approval' => json_encode($permissions),
 							':id' => $this->_pdo->lastInsertId()
@@ -272,47 +272,46 @@ class STRESSTEST{
 				}
 			}
 		}
-		echo $matches . ' components and forms according to template file inserted, please check the application for performance and remember you have to approve each to take effect!';
+		echo $matches . ' components and documents according to template file inserted, please check the application for performance and remember you have to approve each to take effect!';
 	}
 
-	public function deleteForms(){
+	public function deleteDocuments(){
 		if (!realpath($this->_template)) {
 			echo $this->_template . ' file not found';
 			return;
 		}
 
-		$DBcomponents = SQLQUERY::EXECUTE($this->_pdo, 'form_component_datalist');
-		$DBforms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+		$DBcomponents = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+		$DBdocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 
-		$forms = file_get_contents(realpath($this->_template));
-		$forms = json_decode($forms, true);
+		$documents = file_get_contents(realpath($this->_template));
+		$documents = json_decode($documents, true);
 		$matches = 0;
-		foreach([...$DBcomponents, ...$DBforms, ...$DBbundles] as $dbform){
-			foreach($forms as $form){
+		foreach([...$DBcomponents, ...$DBdocuments, ...$DBbundles] as $dbdocument){
+			foreach($documents as $document){
 				if (
-					isset($form['name']) &&
-					$dbform['name'] === $form['name'] &&
-					$dbform['alias'] === $form['alias'] &&
-					$dbform['context'] === $form['context'] &&
-					$dbform['unit'] === $form['unit'] &&
-					$dbform['author'] === $form['author'] &&
-					$dbform['regulatory_context'] === $form['regulatory_context'] &&
-					$dbform['permitted_export'] == $form['permitted_export'] &&
-					$dbform['restricted_access'] === $form['restricted_access']
-					// no checking if $dbform['content'] === $form['content'] for db-specific character encoding
+					isset($document['name']) &&
+					$dbdocument['name'] === $document['name'] &&
+					$dbdocument['alias'] === $document['alias'] &&
+					$dbdocument['context'] === $document['context'] &&
+					$dbdocument['unit'] === $document['unit'] &&
+					$dbdocument['author'] === $document['author'] &&
+					$dbdocument['regulatory_context'] === $document['regulatory_context'] &&
+					$dbdocument['permitted_export'] == $document['permitted_export'] &&
+					$dbdocument['restricted_access'] === $document['restricted_access']
+					// no checking if $dbdocument['content'] === $document['content'] for db-specific character encoding
 				){
-					SQLQUERY::EXECUTE($this->_pdo, 'form_delete', [
+					SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
 						'values' => [
-							':id' => $dbform['id']
+							':id' => $dbdocument['id']
 						]
 					]);
 					$matches++;
 				}
 			}
 		}
-		echo $matches . ' components and forms according to template file deleted';
-
+		echo $matches . ' components and documents according to template file deleted';
 	}
 }
 

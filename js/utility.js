@@ -29,13 +29,13 @@ const _serviceWorker = {
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
-		form_approval: function (data) {
+		document_approval: function (data) {
 			let notif;
-			if ("form_approval" in data) {
+			if ("document_approval" in data) {
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.form_approval);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.forms_manage_approval").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.form_approval);
+				if (notif) notif.setAttribute("data-notification", data.document_approval);
+				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.documents_manage_approval").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.document_approval);
 			}
 		},
 		interval: null,
@@ -89,7 +89,7 @@ const _serviceWorker = {
 		this.notif.message_unseen(data);
 		this.notif.order_unprocessed_consumables_pendingincorporation(data);
 		this.notif.calendar_uncompletedevents(data);
-		this.notif.form_approval(data);
+		this.notif.document_approval(data);
 	},
 	onPostCache: function () {
 		const buttons = document.querySelectorAll("[type=submit]");

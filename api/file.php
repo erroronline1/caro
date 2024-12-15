@@ -480,7 +480,7 @@ class FILE extends API {
 									'type' => 'checkbox2text',
 									'content' => $regulatory_context,
 									'attributes' => [
-										'name' => LANG::GET('assemble.compose_form_regulatory_context'),
+										'name' => LANG::GET('assemble.compose_document_regulatory_context'),
 										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
 										'data-filtered' => $file['path']
 									],

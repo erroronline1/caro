@@ -18,7 +18,7 @@
         * [Register](#register)
         * [Text recommendations](#text-recommendations)
     * [Records](#records)
-        * [Forms](#forms)
+        * [Documents](#documents)
         * [Records](#records-1)
         * [Risk management](#risk-management)
     * [Calendar](#calendar)
@@ -55,8 +55,8 @@
     * [Calendar endpoints](#calendar-endpoints)
     * [Consumables endpoints](#consumables-endpoints)
     * [CSV filter endpoints](#csv-filter-endpoints)
+    * [Document endpoints](#document-endpoints)
     * [File endpoints](#file-endpoints)
-    * [Form endpoints](#form-endpoints)
     * [Message endpoints](#message-endpoints)
     * [Notification endpoints](#notification-endpoints)
     * [Order endpoints](#order-endpoints)
@@ -126,7 +126,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (frontend)
 * global search on landing page, results as tiles?
     * users with units and permissions displayed
-    * ~~forms~~
+    * ~~documents~~
     * bundles
     * text recommendations
     * risk management
@@ -168,7 +168,7 @@ The application does not replace an ERP system. Procurement data is solely acces
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
 
 ## Intended regulatory goals
-Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by forms. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#audit).
+Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by documents. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#audit).
 
 Application support legend:
 * yes: the applications functionality supports all of the chapters requirements
@@ -177,87 +177,87 @@ Application support legend:
 
 | Regulatory requirement | Application support | Method | Reference |
 | ---- | ---- | ---- | ---- |
-| ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified within the audit-module, given form are assigned proper regulatory contexts.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Forms](#forms), [Audit](#audit)|
-| ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Risk management](#risk-management) |
-| ISO 13485 4.1.3 Process monitoring | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 4.1.4 Process control | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 4.1.5 Process outsourcing | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 4.1.6 Validating use of software | structural | &bull; Dedicated forms make use of an identifier, like production forms. Software may each have assigned their distinct identifier.<br/>&bull; computer software and their version tracking on terminal devices may be seen as equipment (7.6) as well.<br/>&bull; *record with forms with the "Equipment Surveillance"-context* | |
-| ISO 13485 4.2.1 General record requirements | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 4.2.2 Quality management manual | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 4.2.3 Medical device file | structural | &bull; All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.<br/>&bull; Case documentation forms require a case identifier to ensure respective data is allocated correctly. | [Records](#records) |
-| ISO 13485 4.2.4 Document control | yes | &bull; The application enables you to design reusable form components and forms.<br/>&bull; Only the most recent approved components and forms are accessible for use [as long as there is a network connection](#network-connection-handling).<br/>&bull; Creation of new components, forms, form bundles, text chunks and text templates is permitted to defined authorized users only.<br/>&bull; Form components and forms need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any restricted assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the form is approved.<br/>&bull; New components, forms, form bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and forms can not be deleted after being approved. Unapproved components and forms are not accessible for use.<br/>&bull; Images for form components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component. <br/>&bull; Forms can be exported blank or digitally prefilled by defined authorized users to limit distribution of outdated versions. Authorized form creators can decide for general permission though.<br/>&bull; Forms can be recreated by any validity date through authorized users to identify changes. <br/>&bull; External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting. | [Forms](#forms), [Files](#files) |
+| ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified within the audit-module, given documents are assigned proper regulatory contexts.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Audit](#audit)|
+| ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Risk management](#risk-management) |
+| ISO 13485 4.1.3 Process monitoring | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 4.1.4 Process control | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 4.1.5 Process outsourcing | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 4.1.6 Validating use of software | structural | &bull; Dedicated documents make use of an identifier, like production documents. Software may each have assigned their distinct identifier.<br/>&bull; computer software and their version tracking on terminal devices may be seen as equipment (7.6) as well.<br/>&bull; *record with documents with the "Equipment Surveillance"-context* | |
+| ISO 13485 4.2.1 General record requirements | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 4.2.2 Quality management manual | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 4.2.3 Medical device file | structural | &bull; All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.<br/>&bull; Case documentation documents require a case identifier to ensure respective data is allocated correctly. | [Records](#records) |
+| ISO 13485 4.2.4 Document control | yes | &bull; The application enables you to design reusable document components and documents.<br/>&bull; Only the most recent approved components and documents are accessible for use [as long as there is a network connection](#network-connection-handling).<br/>&bull; Creation of new components, documents, document bundles, text chunks and text templates is permitted to defined authorized users only.<br/>&bull; Form components and documents need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any restricted assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the document is approved.<br/>&bull; New components, documents, document bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and documents can not be deleted after being approved. Unapproved components and documents are not accessible for use.<br/>&bull; Images for document components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component. <br/>&bull; Documents can be exported blank or digitally prefilled by defined authorized users to limit distribution of outdated versions. Authorized document creators can decide for general permission though.<br/>&bull; Documents can be recreated by any validity date through authorized users to identify changes. <br/>&bull; External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting. | [Documents](#documents), [Files](#files) |
 | ISO 13485 4.2.5 Record control | yes | &bull; All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.<br/>&bull; Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.<br/>&bull; Not only records per se but any changes to record types will be stored as well.<br/>&bull; Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.<br/>&bull; Accessing any content from the application including confidential personal information of customers requires a personal login from registered users. | [Users](#users), [Records](#records) |
-| ISO 13485 5.1 Management commitment | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 5.2 Customer orientation | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 5.3 Quality policy | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 5.4.1 Quality goals | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A user register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables) |
-| ISO 13485 5.5.2 Management representative | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new form components and forms, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Forms can link to other forms being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Audit](#audit) |
-| ISO 13485 5.6.1 General management assessment | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 5.6.2 Rating input | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 5.6.3 Rating results | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context* | |
-| ISO 13485 6.1 Provision of resources | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed within the audit module.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated form. Due evaluations will be added to schedules.<br/>&bull; *describe within forms with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Audit](#audit) |
-| ISO 13485 6.3 Infrastructure | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "General company record"-context*<br/>&bull; *record with forms with the "Equipment surveillance"-context* | |
-| ISO 13485 6.4.1 Working environment | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 6.4.2 Contamination control | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 7.1 Planning of product realization | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"-context* | |
-| ISO 13485 7.2.1 Determination of product requirements | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"-context* | |
-| ISO 13485 7.2.2 Evaluation of product requirements | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"-context* | |
-| ISO 13485 7.2.3 Customer communication | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"-context* | |
-| ISO 13485 7.3.1 General development requirements | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 7.3.2 Development planning | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.3 Development input | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.4 Development results | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.5 Development assessment | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.6 Development verification | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.7 Development validation | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.8 Development transfer | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.9 Controlling development changes | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.3.10 Development files | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable forms with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated form with the respective context.<br/>&bull; Products are deleted by default on update of the pricelist unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.<br/>&bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *prepare forms with the "Vendor evaluation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Audit](#audit) |
+| ISO 13485 5.1 Management commitment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 5.2 Customer orientation | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 5.3 Quality policy | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 5.4.1 Quality goals | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A user register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables) |
+| ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Audit](#audit) |
+| ISO 13485 5.6.1 General management assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 5.6.2 Rating input | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 5.6.3 Rating results | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 6.1 Provision of resources | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed within the audit module.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Audit](#audit) |
+| ISO 13485 6.3 Infrastructure | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context*<br/>&bull; *record with documents with the "Equipment surveillance"-context* | |
+| ISO 13485 6.4.1 Working environment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 6.4.2 Contamination control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 7.1 Planning of product realization | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"-context* | |
+| ISO 13485 7.2.1 Determination of product requirements | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"-context* | |
+| ISO 13485 7.2.2 Evaluation of product requirements | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"-context* | |
+| ISO 13485 7.2.3 Customer communication | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"-context* | |
+| ISO 13485 7.3.1 General development requirements | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 7.3.2 Development planning | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.3 Development input | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.4 Development results | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.5 Development assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.6 Development verification | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.7 Development validation | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.8 Development transfer | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.9 Controlling development changes | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.3.10 Development files | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable documents with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated document with the respective context.<br/>&bull; Products are deleted by default on update of the pricelist unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *prepare documents with the "Vendor evaluation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Audit](#audit) |
 | ISO 13485 7.4.2 Procurement data | partially | &bull; Orders preferably make use of the vendors own pricelists<br/>&bull; recording procurement data does have to take place in a third party software though (ERP) | [Vendor and product management](#vendor-and-product-management), [Order](#order) |
-| ISO 13485 7.4.3 Verification of procured products | yes, structural | &bull; MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.<br/>&bull; Sample check information is to be enriched through a dedicated form with the respective context. All users (except groups) can gather the required information and commit the check.<br/>&bull; Sample checks can be revoked by authorized users.&bull; *prepare forms with the "MDR §14 Sample Check"- or "Product incorporation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Forms](#forms) |
-| ISO 13485 7.5.1 Control of production and service | partial, structural | &bull; Dedicated forms are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the form, ticking the checkbox, adding this content with username and date to the record.<br/>&bull; Form contexts allow the definition as process or work instructions.<br/>&bull; The inbuilt calendar assists in scheduling operations. | [Forms](#forms), [Records](#records), [Calendar](#calendar) |
-| ISO 13485 7.5.2 Product cleanliness | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 7.5.3 Product installation | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.5.4 Product maintainance | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.5.5 Sterile devices requirements | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 7.5.6 Validation of production and service | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 7.5.7 Validation of sterilization processes and systems | structural | &bull; *describe within forms with the "Process or work instruction"-context*<br/>&bull; *record with forms with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.4.3 Verification of procured products | yes, structural | &bull; MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.<br/>&bull; Sample check information is to be enriched through a dedicated document with the respective context. All users (except groups) can gather the required information and commit the check.<br/>&bull; Sample checks can be revoked by authorized users.&bull; *prepare documents with the "MDR §14 Sample Check"- or "Product incorporation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents) |
+| ISO 13485 7.5.1 Control of production and service | partial, structural | &bull; Dedicated documents are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the document, ticking the checkbox, adding this content with username and date to the record.<br/>&bull; Form contexts allow the definition as process or work instructions.<br/>&bull; The inbuilt calendar assists in scheduling operations. | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
+| ISO 13485 7.5.2 Product cleanliness | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 7.5.3 Product installation | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.5.4 Product maintainance | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
+| ISO 13485 7.5.5 Sterile devices requirements | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 7.5.6 Validation of production and service | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 7.5.7 Validation of sterilization processes and systems | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.5.8 Product indentification | structural | &bull; Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production. | [Records](#records) |
-| ISO 13485 7.5.9 Traceability | structural | &bull; Mmultiple scanner field within your case documentation allow for easier material tracing.<br/>Prerequisites are either<br/>&bull; codes from your ERP-Software that allow traceability, or<br/>&bull; creation of labels for orders products from the order module | [Forms](#forms), [Order](#order) |
+| ISO 13485 7.5.9 Traceability | structural | &bull; Mmultiple scanner field within your case documentation allow for easier material tracing.<br/>Prerequisites are either<br/>&bull; codes from your ERP-Software that allow traceability, or<br/>&bull; creation of labels for orders products from the order module | [Documents](#documents), [Order](#order) |
 | ISO 13485 7.5.10 Customer property | | | |
-| ISO 13485 7.5.11 Product conservation | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated forms make use of an identifier, like production forms. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a form component to address scheduling helps with future events that will show up and alert user groups where reasonable.<br/>&bull; <br/>&bull; *record with forms with the "Equipment Surveillance"-context* | [Forms](#forms), [Records](#records), [Calendar](#calendar) |
-| ISO 13485 8.1 General assessment, analysis and improvement processes | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.2.1 Feedback | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
+| ISO 13485 7.5.11 Product conservation | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated documents make use of an identifier, like production documents. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a document component to address scheduling helps with future events that will show up and alert user groups where reasonable.<br/>&bull; <br/>&bull; *record with documents with the "Equipment Surveillance"-context* | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
+| ISO 13485 8.1 General assessment, analysis and improvement processes | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.2.1 Feedback | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.2.2 Complaint handling | structural | &bull; Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed within the audit module.<br/>&bull; Closing records containing a complaint requires action from all defined roles. | [Records](#records), [Audit](#audit) |
-| ISO 13485 8.2.3 Regulatory authorities coverage | structural | &bull; Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident forms to access the terminology codes for report forms to the authorities<br/>&bull; *record with forms with the "Incident"-context*| |
-| ISO 13485 8.2.4 Internal audit | partial, structural | The audit module aquires data from the application and is partially able to export<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (forms and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by forms.<br/>&bull; risk analyses. | [Audit](#audit) |
-| ISO 13485 8.2.5 Process surveillance and assessment | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.2.6 Product surveillance and assessment | structural | &bull; *describe within forms with the "Process or work instruction"-context* | [Forms](#forms), [Records](#records) |
-| ISO 13485 8.3.1 General non-compliant products control | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.3.2 Measures on identified non-compliant products in advance of delivery | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Forms do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
+| ISO 13485 8.2.3 Regulatory authorities coverage | structural | &bull; Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident documents to access the terminology codes for report documents to the authorities<br/>&bull; *record with documents with the "Incident"-context*| |
+| ISO 13485 8.2.4 Internal audit | partial, structural | The audit module aquires data from the application and is partially able to export<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (documents and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by documents.<br/>&bull; risk analyses. | [Audit](#audit) |
+| ISO 13485 8.2.5 Process surveillance and assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.2.6 Product surveillance and assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Records](#records) |
+| ISO 13485 8.3.1 General non-compliant products control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.3.2 Measures on identified non-compliant products in advance of delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Documents do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
 | ISO 13485 8.4 Data analysis | partial, structural | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though. | [Order](#order), [Audit](#audit) |
-| ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
-| ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within forms with the "Process or work instruction"-context* | |
+| ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
 | ISO 14971 Risk Management | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Items of appedix E are prepared for use by default. | [Risk management](#risk-management) |
-| SGB 5 §33 Additional Costs | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective form, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Forms](#forms), [Importing vendor pricelists](#importing-vendor-pricelists) |
-| MDR Art. 61 Clinical evaluation | structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
+| MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor pricelists](#importing-vendor-pricelists) |
+| MDR Art. 61 Clinical evaluation | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR Art. 83 Post-market surveillance system | structural | &bull; Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a csv-filter with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments. | [Tools](#tools), [CSV processor](#csv-processor) |
-| MDR annex 1 General safety and performance requirements | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| MDR annex 4 EU Declaration of conformity | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| MDR annex 13 Procedure for custom-made devices | structural | &bull; *describe within forms with the "Case documentation"-context* | |
-| MDR annex 14 Clinical evaluation and post-market clinical follow-up| structural | &bull; *describe within forms with the "Case documentation"-context* | |
+| MDR annex 1 General safety and performance requirements | structural | &bull; *describe within documents with the "Case documentation"-context* | |
+| MDR annex 4 EU Declaration of conformity | structural | &bull; *describe within documents with the "Case documentation"-context* | |
+| MDR annex 13 Procedure for custom-made devices | structural | &bull; *describe within documents with the "Case documentation"-context* | |
+| MDR annex 14 Clinical evaluation and post-market clinical follow-up| structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br />&bull; These inputs can be exported for documentation regarding labour laws | [Calendar](#calendar) |
 
 [Content](#content)
@@ -277,15 +277,15 @@ As records intend to save the submitting users name, group accounts are unrecomm
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
-Forms can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
+Documents can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
 
 [Content](#content)
 
 ## Tips
-* Use a calendar-button within surveillance forms to immediately set the next due date while handling the current documentation.
-* Add an option of grandfathering to product incorporation forms to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
+* Use a calendar-button within surveillance documents to immediately set the next due date while handling the current documentation.
+* Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 
-![sample form screenshot](http://toh.erroronline.one/caro/sample%20form.png)
+![sample document screenshot](http://toh.erroronline.one/caro/sample%20form.png)
 
 [Content](#content)
 
@@ -445,83 +445,83 @@ graph TD;
 ## Records
 ![sample records menu](http://toh.erroronline.one/caro/records%20menu.png)
 
-### Forms
+### Documents
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be suitable enough; documents can still be exported as editable or prefilled PDFs within boundaries though.
 
-To create tracked and versioned forms and documents, create reusable form components and assemble forms from components. Components and forms have to be approved by defined authorized users to take effect. Furthermore forms can be grouped to form bundles. This way anyone can check if all necessary forms have been taken into account for defined use cases.
+To create tracked and versioned documents and documents, create reusable document components and assemble documents from components. Components and documents have to be approved by defined authorized users to take effect. Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases.
 
-An approvement request for forms and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. All registered users get a message on document updates.
+An approvement request for documents and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. All registered users get a message on document updates.
 
-Components can be rearranged via [drag and drop editor](#miscellaneous). Forms can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
+Components can be rearranged via [drag and drop editor](#miscellaneous). Documents can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Forms can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized form creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable form), while in the latter case any searchability and quick overviews suffer.
+Documents can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized document creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable document), while in the latter case any searchability and quick overviews suffer.
 
-Forms can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
+Documents can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
 
-![form composer screenshot](http://toh.erroronline.one/caro/forms.png)
+![document composer screenshot](http://toh.erroronline.one/caro/documents.png)
 
 ```mermaid
 graph TD;
     manage_components(("manage
     components"))===>select["select recent
     component by name"];
-    select==>forms_database[("forms database
+    select==>documents_database[("documents database
     with components,
-    forms, bundles")];
+    documents, bundles")];
     manage_components==>select2["select any
     component"];
-    select2==>forms_database;
+    select2==>documents_database;
     manage_components==>|"new
     component"|edit_component["edit content,
     add widgets,
     reorder"];
-    forms_database==>|"existing
+    documents_database==>|"existing
     component
     from database"|edit_component;
     edit_component==>save[save];
     save===>|"new version,
-    message with approval request"|forms_database;
+    message with approval request"|documents_database;
 
-    manage_forms(("manage
-    forms"))--->select3["select recent
-    form by name"];
-    select3-->forms_database;
-    manage_forms-->select4["select any
-    form"];
-    select4-->forms_database;
-    manage_forms-->|new form|edit_form["edit form,
+    manage_documents(("manage
+    documents"))--->select3["select recent
+    document by name"];
+    select3-->documents_database;
+    manage_documents-->select4["select any
+    document"];
+    select4-->documents_database;
+    manage_documents-->|new document|edit_document["edit document,
     add, reorder components"];
-    forms_database-->|"existing
-    form
-    from database"|edit_form;
-    edit_form-->save;
+    documents_database-->|"existing
+    document
+    from database"|edit_document;
+    edit_document-->save;
     save--->|"new version,
-    message with approval request"|forms_database;
+    message with approval request"|documents_database;
     
     manage_bundles(("manage
     bundles"))-..->select5["select recent
     bundle by name"];
-    select5-.->forms_database;
+    select5-.->documents_database;
     manage_bundles-.->select6["select any
     bundle"];
-    select6-->forms_database;
+    select6-->documents_database;
     manage_bundles-.->|new bundle|edit_bundle["edit bundle,
-    add, reorder forms"];
-    forms_database-.->|"existing
+    add, reorder documents"];
+    documents_database-.->|"existing
     bundle
     from database"|edit_bundle;
     edit_bundle-..->save;
     save-..->|"new version,
-    message with approval request"|forms_database;
+    message with approval request"|documents_database;
 
-    forms_database o----oreturns("returns only latest dataset on request
+    documents_database o----oreturns("returns only latest dataset on request
     if named item is not hidden,
     approved and permissions match")
 ```
 
-Available elements for forms are:
+Available elements for documents are:
 * scanner field, optional as multiple and context identifier
 * text section for information purpose without input
 * image for including e.g. infographics
@@ -541,31 +541,31 @@ Available elements for forms are:
 * photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
 * signature field
 * calendar button
-* form link, just for display or to continue transferring identifier
+* document link, just for display or to continue transferring identifier
 
 Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
-Form fields declared as multiple will only show up in form exports if they have a value. Their name will be extended by a numeration in parentheses.
+Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
 
-Screen form
+Screen document
 
-![screen form](http://toh.erroronline.one/caro/form%20screen.png)
+![screen document](http://toh.erroronline.one/caro/form%20screen.png)
 
-Exported form
+Exported document
 
-![exported form](http://toh.erroronline.one/caro/form%20export.png)
+![exported document](http://toh.erroronline.one/caro/form%20export.png)
 
 [Content](#content)
 
 ### Records
-Records store all inputs for any selected form. Some form contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime.
+Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime.
 
 Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
-The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported forms, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
+The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported documents, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
 
 ![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code.png)
 
-Checking for completeness of form bundles can be applied on display of a record summary.
+Checking for completeness of document bundles can be applied on display of a record summary.
 
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
 Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
@@ -575,8 +575,8 @@ Case documentations allow a setting of the current case state (like reimbursemen
 If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
 Records can be assigned a new identifier, e.g. on typing errors or accidentally duplicate creation. In the latter case if the new identifier is already in use all records will be merged with the existing one. This action as well as assigning a new identifier will be recorded as well.
 
-If records contain data from restricted forms, summaries will only contain these data if the requesting user has the permission to handle the form as well. It is up to you if it is reasonable to handle form bundles this way:
-* On one hand this may declutter available forms and information for some units, e.g. hiding administrative content from the workforce,
+If records contain data from restricted documents, summaries will only contain these data if the requesting user has the permission to handle the document as well. It is up to you if it is reasonable to handle document bundles this way:
+* On one hand this may declutter available documents and information for some units, e.g. hiding administrative content from the workforce,
 * on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
 All alterings on records (reidentification, retyping, case state) are recorded as well.
@@ -592,21 +592,21 @@ graph TD;
     input-->|generate|print("print sheet,
     handout to workmates");
 
-    fillform((fill out form))=========>selectform[select form];
-    selectform==>form_db[("form
+    filldocument((fill out document))=========>selectdocument[select document];
+    selectdocument==>document_db[("document
     database")];
-    form_db==>|"get recent by name
-    if permissions match"|displayform[display form];
-    displayform==>inputdata[add data];
+    document_db==>|"get recent by name
+    if permissions match"|displaydocument[display document];
+    displaydocument==>inputdata[add data];
     inputdata==>|"input new dataset
-    with form name"|record_db[("record
+    with document name"|record_db[("record
     database")];
 
-    displayform==>idimport[import by identifier];
+    displaydocument==>idimport[import by identifier];
     idimport==>record_db;
     record_db==>selectbyid[retrieve all with identifier];
     selectbyid==>|render last appended data|inputdata;
-    displayform===>|permission to export|exportform[export fillable pdf]
+    displaydocument===>|permission to export|exportdocument[export fillable pdf]
 
     print o-.-o idimport;
 
@@ -626,10 +626,10 @@ graph TD;
     summary-->export[export];
     export-->pdf("summary as pdf,
     attached files");
-    summary-->matchbundles[match with form bundles];
-    matchbundles-->missing{missing form};
-    missing==>|yes|appenddata[append form];
-    appenddata==>displayform;
+    summary-->matchbundles[match with document bundles];
+    matchbundles-->missing{missing document};
+    missing==>|yes|appenddata[append document];
+    appenddata==>displaydocument;
     missing-->|no|nonemissing(status message);
     summary-->retype[reassign record type];
     retype-->record_db;
@@ -1007,7 +1007,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
 
 Tested server environments:
-* Apache [Uniform Server Zero XV](https://uniformserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
+* Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
 * Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
 * Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
 
@@ -1103,7 +1103,7 @@ names[] = "^.{0,3}$" ; less than 4 characters
 names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[] = "^_" ; names must not start with _
 names[] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|form|form_name|form_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
+names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
 
 [lifespan]
 idle = 2700 ; SECONDS after which a session expires without intermittend request
@@ -1129,7 +1129,7 @@ record_reidentify_similarity = 50 ; percent, warning on low identifier similarit
 records_search_similarity = 20 ; percent
 
 [limits]
-form_image = 2048 ; max pixels on longer side
+document_image = 2048 ; max pixels on longer side
 identifier =  128 ; characters for identifiers, the longer, the more complex and error-prone the qr code becomes. 17 characters will be appended by default for a timestamp
 max_records = 1024 ; display of record summaries, more than that will be hidden, still being displayed if filtered
 order_approvalsignature_image = 2048 ; max pixels on longer side
@@ -1157,9 +1157,9 @@ csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 filebundles = "ceo, qmo" ; create file bundles
 files = "office, ceo, qmo" ; upload and delete files
-formapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve forms and components
-formcomposer = "ceo, qmo" ; compose forms
-formexport = "ceo, qmo, supervisor" ; export forms as printable pdf
+'documentapproval' = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
+documentcomposer = "ceo, qmo" ; compose documents
+documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
 incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
 mdrsamplecheck = "ceo, qmo, prrc"; must have access to audit as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
@@ -1225,7 +1225,7 @@ products_per_slide = 6
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
 * Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services.
-* Dragging form elements for reordering within the form-editors doesn't work on handhelds because touch-events do not include this function. Constructing form components and forms will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
+* Dragging document elements for reordering within the document-editors doesn't work on handhelds because touch-events do not include this function. Constructing document components and documents will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
@@ -1238,7 +1238,7 @@ products_per_slide = 6
     * [permissions] (has no effect without consideration in role management within config.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
-    * [formcontext][anonymous]
+    * [documentcontext][anonymous]
     * [calendar][timesheet_pto]
     * [calendar][timesheet_signature]
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
@@ -1246,7 +1246,7 @@ products_per_slide = 6
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning. During development altering tables [can be enabled if disabled by default](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
-* See available frontend render options importing unittest.js and calling `rendertest('forms')` or `rendertest('app')` from the console.
+* See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 
 [Content](#content)
 
@@ -1680,10 +1680,10 @@ Discussed stakeholder requirements:
 | IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | Support for multiple SQL dialects; 2023-12-23 |
 | Nah, this looks bad | CEO | 2024-01 | CSS restyling initial draft 2023-01-20 |
 | Text recommendations | User | 2024-03-27 | Already satisfied with text recommendations draft; 2024-02-23 |
-| Prefill forms | User | 2024-03-27 | Already satisfied with records draft; 2024-03-02 |
+| Prefill documents | User | 2024-03-27 | Already satisfied with records draft; 2024-03-02 |
 | Proper article list | User | 2024-03-27 | Already satisfied with consumables pricelist import draft; 2023-11-10 |
 | Optional record export without user name and entry date | Supervisor, Office | 2024-03-27 | Implemented as simplified export; 2024-03-29 |
-| Optional record export by document | Supervisor, User | 2024-03-27 | Implemented as formwise record export; 2024-03-29 |
+| Optional record export by document | Supervisor, User | 2024-03-27 | Implemented as documentwise record export; 2024-03-29 |
 | Current state of treatments (draft lists) | Supervisor | 2024-03-27 | Implemented as last edit information on records; 2024-08-18 |
 | Weekly schedule | Supervisor | 2024-03-27 | Early calendar draft; 2024-04-30 |
 | Time tracking | User | 2024-03-27 | Early timesheet draft; 2024-05-13 |
@@ -1709,7 +1709,7 @@ Discussed stakeholder requirements:
 | ----- | ------- | ---------------- | --------------- |
 | Development | Regular meetings to match requirements | Gain required functionality | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible |
 | Development | Arrange meetings with specific users, particularly less tech savvy, supervisors, ceo and qmo | Gain required functionality, assess frontend usability | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
-| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual forms<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; stl-viewer<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; audit | Assess frontend usability | Adapt structure, styling and assemble-framework |
+| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; stl-viewer<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; audit | Assess frontend usability | Adapt structure, styling and assemble-framework |
 | Full deployment | Enable all modules, register personal accounts | Assess frontend usability | Adapt structure, styling and assemble-framework |
 
 [Content](#content)
@@ -1839,7 +1839,7 @@ During development following outcomes could be noted:
 * 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
-The stresstest also allows for injection of forms and components according to templates/forms.xx.json. Deletion of forms and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing. **Deleting forms and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested.**
+The stresstest also allows for injection of documents and components according to templates/documents.xx.json. Deletion of documents and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing. **Deleting documents and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested.**
 
 Variables can be adjusted within the class variables in the sourcecode.
 
@@ -1947,7 +1947,7 @@ Returns the landing page with overview and manual.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | search phrase for forms, records and files |
+| {search} | path parameter | optional | search phrase for documents, records and files |
 
 Samble response
 ```
@@ -1969,7 +1969,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"forms"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by forms and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},"Skill fulfilment":{"value":"skillfulfilment"},"User skills and trainings":{"value":"userskills","selected":true},"Vendor list":{"value":"vendors"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}],{"type":"textsection","attributes":{"name":"Some defined skills are not matched!"},....
+{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},"Skill fulfilment":{"value":"skillfulfilment"},"User skills and trainings":{"value":"userskills","selected":true},"Vendor list":{"value":"vendors"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}],{"type":"textsection","attributes":{"name":"Some defined skills are not matched!"},....
 ```
 
 > DELETE ./api/api.php/audit/checks/{type}
@@ -1994,12 +1994,12 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | optional | adds contents based on given type to response |
-| {date} | path parameter | optional | e.g. forms validity limited to date/time |
-| {time} | path parameter | optional | e.g. forms validity limited to date/time |
+| {date} | path parameter | optional | e.g. documents validity limited to date/time |
+| {time} | path parameter | optional | e.g. documents validity limited to date/time |
 
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"forms"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by forms and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
+{"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"documents"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by documents and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
 > GET ./api/api.php/audit/export/{type}/{date}/{time}
@@ -2010,8 +2010,8 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | defines the response, none if omitted |
-| {date} | path parameter | optional | e.g. forms validity limited to date/time |
-| {time} | path parameter | optional | e.g. forms validity limited to date/time |
+| {date} | path parameter | optional | e.g. documents validity limited to date/time |
+| {time} | path parameter | optional | e.g. documents validity limited to date/time |
 
 Sample response
 ```
@@ -2030,7 +2030,7 @@ Parameters
  
 Sample response
 ```
-{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"forms"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by forms and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
 ```
 
 > GET ./api/api.php/audit/trainingevaluation
@@ -2187,7 +2187,7 @@ Similar to schedules.
 
 > GET ./api/api.php/consumables/exportpricelist/{id}
 
-Returns the current form for a sample check.
+Returns the current document for a sample check.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2207,7 +2207,7 @@ Similar to mdrsamplecheck.
 
 > POST ./api/api.php/consumables/incorporation
 
-Returns the current form for an incorporation.
+Returns the current document for an incorporation.
 
 Similar to mdrsamplecheck
 
@@ -2227,7 +2227,7 @@ Sample response
 
 > GET ./api/api.php/consumables/mdrsamplecheck/{id}
 
-Returns the current form for a sample check.
+Returns the current document for a sample check.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2438,6 +2438,203 @@ Sample response
 
 [Content](#content)
 
+### Document endpoints
+
+> GET ./api/api.php/document/approval/{id}
+
+Returns selection of components and documents pending approval, selected element if {id} is provided and unsatisfied approvals per role.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | int id of unapproved component |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select component to approve","onchange":"api.document('get','approval', this.value)"},"content":{"signature1":{"value":"43","selected": true },"signature2":{"value":"44"}}},{"type":"select","attributes":{"name":"Select document to approve","onchange":"api.document('get','approval', this.value)"},"content":{"testform":{"value":"51"}}}],....
+```
+
+> PUT ./api/api.php/document/approval/{id}
+
+Updates approvals for documents and components.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | int id of unapproved component |
+| payload | form data | optional | approval checkboxes |
+
+Sample response
+```
+{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
+```
+
+> POST ./api/api.php/document/bundle
+
+Saves document bundle. Updates availability if name and content remain the same.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | bundle data |
+
+Sample response
+```
+{"response":{"name":"bundle1","msg":"Bundle saved. Hidden bundles are not reachable","type":"success"}}
+```
+
+> GET ./api/api.php/document/bundle/{id}
+
+Returns content to create or modify form bundles.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | bundle database id |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"bundle","action":"javascript:api.document('post', 'bundle')"},"content":[[[{"type":"datalist","content":["bundle1"],"attributes":{"id":"templates"}},{"type":"select","attributes":{"name":"Edit existing latest bundle","onchange":"api.document('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"bundle1":{"value":12}}},{"type":"search","attributes":{"name":"Search by name","list":"templates","onkeypress":"if (event.key === 'Enter') ....
+```
+
+> GET ./api/api.php/document/bundles/{search}
+
+Returns available approved documents grouped by bundles.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | optional | search term to filter results |
+
+Sample response
+```
+{"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'document', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'document', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'document', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'document', 'restricted documentation')"}}}]}}
+```
+
+> DELETE ./api/api.php/document/component/{id}
+
+Deletes an unapproved document component.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | int id of unapproved component |
+
+Sample response
+```
+{"response":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
+```
+
+> GET ./api/api.php/document/component/{name|id}
+
+Returns database content of selected component. If path parameter is not int the latest approved component is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | required | string or int |
+
+Sample response
+```
+{"render":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","attributes":{"name":"incorporation"},"hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
+```
+
+> POST ./api/api.php/document/component
+
+Stores a new component to the database or updates the *hidden*-setting.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | contents and setting for respective component |
+
+Sample response
+```
+{"name":"adddocuments","msg":"Component adddocuments has been saved","reload":"component_editor","type":"success"}
+```
+
+> GET ./api/api.php/document/component_editor/{name|id}
+
+Returns content to create or modify document components. If path parameter is not int the latest approved component is returned.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {name/id} | path parameter | optional | string or int |
+
+Sample response
+```
+{"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.document('get','component_editor', this.value)"},....
+```
+
+> POST ./api/api.php/document/export
+
+Returns a download link to a temporary file with the selected document as editable blank or prefilled pdf.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | according to form |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Open the link and print the document.","content":{"Export empty document as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
+```
+
+> DELETE ./api/api.php/document/document/{id}
+
+Deletes an unapproved document.
+
+Similar to components.
+
+> GET ./api/api.php/document/document/{name|id}
+
+Returns database content of selected document. If path parameter is not int the latest approved document is returned.
+
+Similar to components.
+
+> POST ./api/api.php/document/document
+
+Stores a new document to the database or updates the following uncritical settings: *alias*, *context*, *hidden*, *regulatory_context*, *permitted_export*
+
+Similar to components.
+
+> GET ./api/api.php/document/document_editor/{name|id}
+
+Returns content to create or modify documents. If path parameter is not int the latest approved document is returned.
+
+Sililar to component_editor.
+
+> GET ./api/api.php/document/documentfilter/{search}
+
+Returns ids of available approved documents matching {search} by name or alias, or where the search string is found within the used components.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search string |
+
+Sample response
+```
+{"response": {"data": ["26"]}}
+```
+
+> GET ./api/api.php/document/documents
+
+Returns available approved documents grouped by record type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |   |
+
+Sample response
+```
+{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "documents"}},{"type": "filtered","attributes": {"name": "Filter","list": "documents","onkeypress": "if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}","onblur": "api.document('get', 'documentfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
+```
+
+[Content](#content)
+
 ### File endpoints
 
 > GET ./api/api.php/file/bundle
@@ -2641,203 +2838,6 @@ Sample response
 
 [Content](#content)
 
-### Form endpoints
-
-> GET ./api/api.php/form/approval/{id}
-
-Returns selection of components and forms pending approval, selected element if {id} is provided and unsatisfied approvals per role.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | int id of unapproved component |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select component to approve","onchange":"api.form('get','approval', this.value)"},"content":{"signature1":{"value":"43","selected": true },"signature2":{"value":"44"}}},{"type":"select","attributes":{"name":"Select form to approve","onchange":"api.form('get','approval', this.value)"},"content":{"testform":{"value":"51"}}}],....
-```
-
-> PUT ./api/api.php/form/approval/{id}
-
-Updates approvals for forms and components.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | int id of unapproved component |
-| payload | form data | optional | approval checkboxes |
-
-Sample response
-```
-{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
-```
-
-> POST ./api/api.php/form/bundle
-
-Saves document bundle. Updates availability if name and content remain the same.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | bundle data |
-
-Sample response
-```
-{"response":{"name":"bundle1","msg":"Bundle saved. Hidden bundles are not reachable","type":"success"}}
-```
-
-> GET ./api/api.php/form/bundle/{id}
-
-Returns content to create or modify form bundles.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | bundle database id |
-
-Sample response
-```
-{"render":{"form":{"data-usecase":"bundle","action":"javascript:api.form('post', 'bundle')"},"content":[[[{"type":"datalist","content":["bundle1"],"attributes":{"id":"templates"}},{"type":"select","attributes":{"name":"Edit existing latest bundle","onchange":"api.form('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"bundle1":{"value":12}}},{"type":"search","attributes":{"name":"Search by name","list":"templates","onkeypress":"if (event.key === 'Enter') ....
-```
-
-> GET ./api/api.php/form/bundles/{search}
-
-Returns available approved forms grouped by bundles.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | search term to filter results |
-
-Sample response
-```
-{"render":{"content":[{"type":"links","description":"testbundle","content":{"testform":{"href":"javascript:api.record('get', 'form', 'testform')"},"identify yourself":{"href":"javascript:api.record('get', 'form', 'identify yourself')"},"record testform photo":{"href":"javascript:api.record('get', 'form', 'record testform photo')"},"restricted documentation":{"href":"javascript:api.record('get', 'form', 'restricted documentation')"}}}]}}
-```
-
-> DELETE ./api/api.php/form/component/{id}
-
-Deletes an unapproved form component.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | int id of unapproved component |
-
-Sample response
-```
-{"response":{"msg":"Component deleted","type":"success","reload":"component_editor"}}
-```
-
-> GET ./api/api.php/form/component/{name|id}
-
-Returns database content of selected component. If path parameter is not int the latest approved component is returned.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name/id} | path parameter | required | string or int |
-
-Sample response
-```
-{"render":{"id":4,"name":"incorporation component","alias":"","context":"component","date":"2024-06-02 00:18:00","author":"error on line 1","content":{"content":[[{"attributes":[],"type":"checkbox","attributes":{"name":"incorporation"},"hint":"check applicable items","content":{"good":[],"cheap":[],"reasonable":[]}}]],"form":[]},"hidden":0,"approval":"{\"ceo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"qmo\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"},\"supervisor\":{\"name\":\"error on line 1\",\"date\":\"2024-06-02 00:18\"}}","regulatory_context":"","permitted_export":null}}
-```
-
-> POST ./api/api.php/form/component
-
-Stores a new component to the database or updates the *hidden*-setting.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | contents and setting for respective component |
-
-Sample response
-```
-{"name":"adddocuments","msg":"Component adddocuments has been saved","reload":"component_editor","type":"success"}
-```
-
-> GET ./api/api.php/form/component_editor/{name|id}
-
-Returns content to create or modify form components. If path parameter is not int the latest approved component is returned.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {name/id} | path parameter | optional | string or int |
-
-Sample response
-```
-{"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.form('get','component_editor', this.value)"},....
-```
-
-> POST ./api/api.php/form/export
-
-Returns a download link to a temporary file with the selected form as editable blank or prefilled pdf.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | according to form |
-
-Sample response
-```
-{"render":[{"type":"links","description":"Open the link and print the form.","content":{"Export empty form as PDF":{"href":".\/fileserver\/tmp\/identifyyourself_202406132018.pdf"}}}]}
-```
-
-> DELETE ./api/api.php/form/form/{id}
-
-Deletes an unapproved form.
-
-Similar to components.
-
-> GET ./api/api.php/form/form/{name|id}
-
-Returns database content of selected form. If path parameter is not int the latest approved form is returned.
-
-Similar to components.
-
-> POST ./api/api.php/form/form
-
-Stores a new form to the database or updates the following uncritical settings: *alias*, *context*, *hidden*, *regulatory_context*, *permitted_export*
-
-Similar to components.
-
-> GET ./api/api.php/form/form_editor/{name|id}
-
-Returns content to create or modify forms. If path parameter is not int the latest approved form is returned.
-
-Sililar to component_editor.
-
-> GET ./api/api.php/form/formfilter/{search}
-
-Returns ids of available approved forms matching {search} by name or alias, or where the search string is found within the used components.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string |
-
-Sample response
-```
-{"response": {"data": ["26"]}}
-```
-
-> GET ./api/api.php/form/forms
-
-Returns available approved forms grouped by record type.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |   |
-
-Sample response
-```
-{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "forms"}},{"type": "filtered","attributes": {"name": "Filter","list": "forms","onkeypress": "if (event.key === 'Enter') {api.form('get', 'formfilter', this.value); return false;}","onblur": "api.form('get', 'formfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
-```
-
-[Content](#content)
-
 ### Message endpoints
 
 > DELETE ./api/api.php/message/conversation/{user id}
@@ -2902,7 +2902,7 @@ Sample response
 
 > GET ./api/api.php/notification/notifs
 
-Returns notifications on number of 	*calendar_uncompletedevents*, *consumables_pendingincorporation*, *form_approval*, *order_unprocessed*, *message_unnotified*, *message_unseen* to display on menu, checks for systems expiry dates, contributes to calendar and alerts eligible users.
+Returns notifications on number of 	*calendar_uncompletedevents*, *consumables_pendingincorporation*, *document_approval*, *order_unprocessed*, *message_unnotified*, *message_unseen* to display on menu, checks for systems expiry dates, contributes to calendar and alerts eligible users.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2911,7 +2911,7 @@ Parameters
 
 Sample response
 ```
-{"calendar_uncompletedevents": 2,"consumables_pendingincorporation": 13,"form_approval": 2,"order_unprocessed": "5","message_unnotified": "0","message_unseen": "1"}
+{"calendar_uncompletedevents": 2,"consumables_pendingincorporation": 13,"document_approval": 2,"order_unprocessed": "5","message_unnotified": "0","message_unseen": "1"}
 ```
 
 [Content](#content)
@@ -3115,9 +3115,9 @@ Sample response
 {"response": {"msg": "The record will not show up in the overview, however it will still be found using the filter.","type": "success"}}
 ```
 
-> GET ./api/api.php/record/form/{name}/{identifier}
+> GET ./api/api.php/record/document/{name}/{identifier}
 
-Returns latest available approved form by {name}. Prefills identifier field if passed.
+Returns latest available approved document by {name}. Prefills identifier field if passed.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3130,15 +3130,15 @@ Sample response
 {"title": "Kontakt","render": {"form": {"data-usecase": "record","action": "javascript:api.record('post', 'record')","data-confirm": true},"content": [[{"attributes": {"name": "Identifikator","required": true,"multiple": false,"value": ""},"type": "identify"},{"type": "hidden","attributes": {"name": "context","value": "casedocumentation"}},{"type": "hidden","attributes": {"name": "form_name","value": "Kontakt"}},....
 ```
 
-> GET ./api/api.php/record/formexport/{identifier}/{name}
+> GET ./api/api.php/record/documentexport/{identifier}/{name}
 
-Returns a download link to a temporary file with all records for a given form as a pdf.
+Returns a download link to a temporary file with all records for a given document as a pdf.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {identifier} | path parameter | optional | identifier for records |
-| {name} | path parameter | required | form name |
+| {name} | path parameter | required | document name |
 
 Sample response
 ```
@@ -3204,7 +3204,7 @@ Sample response
 
 > GET ./api/api.php/record/matchbundles/{bundle}/{identifier}
 
-Returns links to forms that are not considered at least once for the selected bundle and identifier.
+Returns links to documents that are not considered at least once for the selected bundle and identifier.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3214,12 +3214,12 @@ Parameters
 
 Sample response
 ```
-{"render": [{"type": "links","description": "Some forms seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'form', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'form', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
+{"render": [{"type": "links","description": "Some documents seem not be be taken into account. Append missing data now:","content": {"Versorgungsbegründung": {"href": "javascript:api.record('get', 'document', 'Versorgungsbegründung', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"},"Anamnese Prothetik": {"href": "javascript:api.record('get', 'document', 'Anamnese Prothetik', 'Testpatient, Günther *18.03.1960 Unterschenkelcarbonorthese 2024-03-18 12:33')"}}}]}
 ```
 
 > GET ./api/api.php/record/record/{identifier}
 
-Returns all database entries for identifier grouped by forms.
+Returns all database entries for identifier grouped by documents.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3228,7 +3228,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"textsection","attributes":{"name":"Identifying data","content":"testpatient2"}}],[{"type":"textsection","attributes":{"name":"Form identify yourself version 2024-06-13 21:54:47"}},{"type":"textsection","attributes":{"name":"text "},"content":"yxcv (error on line 1 on 2024-06-13 22:05:48)\n"},{"type":"button","attributes":{"value":"Export records from this form only","onpointerup":"api.record('get', 'formexport', 'testpatient2', 'Form identify yourself version 2024-06-13 21:54:47')"}}],....
+{"render":{"content":[[{"type":"textsection","attributes":{"name":"Identifying data","content":"testpatient2"}}],[{"type":"textsection","attributes":{"name":"Form identify yourself version 2024-06-13 21:54:47"}},{"type":"textsection","attributes":{"name":"text "},"content":"yxcv (error on line 1 on 2024-06-13 22:05:48)\n"},{"type":"button","attributes":{"value":"Export records from this document only","onpointerup":"api.record('get', 'documentexport', 'testpatient2', 'Form identify yourself version 2024-06-13 21:54:47')"}}],....
 ```
 
 > POST ./api/api.php/record/record
@@ -3238,7 +3238,7 @@ Stores record to database.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | required | according to form |
+| payload | form data | required | according to document |
 
 Sample response
 ```
@@ -3295,22 +3295,22 @@ Returns a download link to a temporary file with the most recent records as a pd
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id for form |
+| {id} | path parameter | required | database id for document |
 
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/testpatient2_202406132022.pdf"}}}]}
 ```
 
-> GET ./api/api.php/record/simplifiedformexport/{identifier}/{name}
+> GET ./api/api.php/record/simplifieddocumentexport/{identifier}/{name}
 
-Returns a download link to a temporary file with the most recent records for a given form as a pdf.
+Returns a download link to a temporary file with the most recent records for a given document as a pdf.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {identifier} | path parameter | optional | identifier for records |
-| {name} | path parameter | required | form name |
+| {name} | path parameter | required | document name |
 
 Sample response
 ```
@@ -3337,7 +3337,7 @@ Sample response
 
 > GET ./api/api.php/risk/risk/{id}
 
-Returns a form to add or edit a text chunk.
+Returns a form to add or edit a risk.
 
 Parameters
 | Name | Data Type | Required | Description |

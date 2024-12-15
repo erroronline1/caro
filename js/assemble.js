@@ -17,7 +17,7 @@
  */
 
 /*
-this module helps to assemble forms according to the passed simplified object notation.
+this module helps to assemble content according to the passed simplified object notation.
 */
 import SignaturePad from "../libraries/signature_pad.umd.js";
 import QrCreator from "../libraries/qr-creator.js";
@@ -399,7 +399,7 @@ export class Toast {
 
 export class Assemble {
 	/* 
-	assembles forms and screen elements.
+	assembled forms and screen elements.
 	deepest nesting of input object is three levels
 	form:null or {attributes} / nothing creates just a div e.g. just for text and links
 	content:[ see this.processContent() ]
@@ -730,9 +730,9 @@ export class Assemble {
 				return;
 			}
 			const options = {};
-			options[LANG.GET("assemble.compose_form_cancel")] = false;
-			options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_form"), options: options }).then((confirmation) => {
+			options[LANG.GET("assemble.compose_document_cancel")] = false;
+			options[LANG.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_document"), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
 		} else new Toast(LANG.GET("general.missing_form_data"), "error");
@@ -877,7 +877,7 @@ export class Assemble {
 	}
 
 	names_numerator(name, dontnumerate = undefined) {
-		// consider record.php exportform-method too on changing
+		// consider record.php exportdocument-method too on changing
 		if (dontnumerate || [...name.matchAll(/\[\]/g)].length) return name;
 		if (name in this.names) {
 			this.names[name] += 1;
@@ -1146,9 +1146,9 @@ export class Assemble {
 		return this.input("search");
 	}
 
-	formbutton() {
+	documentbutton() {
 		// to style it properly by adding data-type to article container
-		this.currentElement.attributes["data-type"] = "formbutton";
+		this.currentElement.attributes["data-type"] = "documentbutton";
 		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return [...this.br(), ...this.button()];
 	}
@@ -1300,8 +1300,8 @@ export class Assemble {
 			let currentElement = this.currentElement;
 			input.onpointerup = function () {
 				const options = {};
-				options[LANG.GET("assemble.compose_form_cancel")] = false;
-				options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
+				options[LANG.GET("assemble.compose_document_cancel")] = false;
+				options[LANG.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
 				new Dialog({
 					type: "input",
 					header: currentElement.attributes.name.replace(/\[\]/g, ""),
@@ -1593,8 +1593,8 @@ export class Assemble {
 		button.dataset.type = "search";
 		button.onpointerup = function () {
 			const options = {};
-			options[LANG.GET("assemble.compose_form_cancel")] = false;
-			options[LANG.GET("assemble.compose_form_confirm")] = { value: true, class: "reducedCTA" };
+			options[LANG.GET("assemble.compose_document_cancel")] = false;
+			options[LANG.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
 				header: LANG.GET("consumables.edit_product_search"),

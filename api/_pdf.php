@@ -135,9 +135,9 @@ class PDF{
 			'font' => 10,
 		];
 
-		foreach($content['content'] as $form => $entries){
+		foreach($content['content'] as $document => $entries){
 			$pdf->SetFont('helvetica', '', $height['font'] + 2); // font size
-			$pdf->MultiCell(140, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			foreach($entries as $key => $value){
 				// name column
 				$pdf->SetFont('helvetica', 'B', $height['font']); // font size
@@ -151,9 +151,9 @@ class PDF{
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 				$pdf->Ln(($offset - 1) * $height['font'] / 2);
 			}
-			if (array_key_exists($form, $content['images'])){
+			if (array_key_exists($document, $content['images'])){
 				$ln = 0;
-				foreach ($content['images'][$form] as $image){
+				foreach ($content['images'][$document] as $image){
 					$imagedata = pathinfo($image);
 					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
 					$pdf->SetFont('helvetica', 'B', $height['font']); // font size
@@ -175,8 +175,8 @@ class PDF{
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
 
-	public static function formsPDF($content){
-		// create a pdf for a form export
+	public static function documentsPDF($content){
+		// create a pdf for a document export
 		// create new PDF document
 		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
 		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
@@ -213,9 +213,9 @@ class PDF{
 			'default' => 5
 		];
 
-		foreach($content['content'] as $form => $entries){
+		foreach($content['content'] as $document => $entries){
 			$pdf->SetFont('helvetica', '', $height['font'] + 2); // font size
-			$pdf->MultiCell(145, 4, $form, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			$pdf->MultiCell(145, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			$keyY = $pdf->GetY();
 			foreach($entries as $key => $value){
 				// make sure to write on next page if multiline textfield would reach into footer
@@ -237,7 +237,7 @@ class PDF{
 						$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 						break;
 					case 'image':
-						if (array_key_exists($form, $content['images']) && in_array($value['value'], $content['images'][$form])) {
+						if (array_key_exists($document, $content['images']) && in_array($value['value'], $content['images'][$document])) {
 							$imagedata = pathinfo($value['value']);
 							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
 							$pdf->SetFont('helvetica', 'B', $height['font']); // font size

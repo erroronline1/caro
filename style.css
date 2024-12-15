@@ -1153,12 +1153,12 @@ span.nocontent {
 	cursor: grabbing;
 }
 
-.draggableFormElement {
+.draggableDocumentElement {
 	border: 1px solid var(--cta);
 	border-radius: 0.5em;
 }
 
-.draggableFormElementHover {
+.draggableDocumentElementHover {
 	border-color: var(--green);
 }
 
@@ -1407,12 +1407,12 @@ button[data-type="photo"]::before {
 }
 
 [data-type="record"]::before,
-[data-type="formbutton"]::before {
+[data-type="documentbutton"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/file-signature.svg");
 	mask-image: url("./media/file-signature.svg");
 }
-button[data-type="formbutton"]::before {
+button[data-type="documentbutton"]::before {
 	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url("./media/file-signature.svg");

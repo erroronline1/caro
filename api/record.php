@@ -29,7 +29,7 @@ class RECORD extends API {
 	private $_requestedID = null;
 	private $_appendDate = null;
 	private $_passedIdentify = null;
-	private $_formExport = null;
+	private $_documentExport = null;
 	private $_caseState = null;
 	private $_unit = null;
 	private $_caseStateBoolean = null;
@@ -39,7 +39,7 @@ class RECORD extends API {
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = $this->_appendDate = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_passedIdentify = $this->_formExport = $this->_caseState = $this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
+		$this->_passedIdentify = $this->_documentExport = $this->_caseState = $this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
 		$this->_caseStateBoolean = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
@@ -66,9 +66,9 @@ class RECORD extends API {
 					$current_record = [
 						'author' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i:s'),
-						'form' => 0,
+						'document' => 0,
 						'content' => json_encode([
-							LANG::GET('record.record_pseudoform_' . $case['context'], [], true) => LANG::GET($this->_caseStateBoolean === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANG::GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
+							LANG::GET('record.record_pseudodocument_' . $case['context'], [], true) => LANG::GET($this->_caseStateBoolean === 'true' ? 'record.record_casestate_set' : 'record.record_casestate_revoked', [':casestate' => LANG::GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
 						])
 					];
 					$records = json_decode($case['content'], true);
@@ -82,7 +82,7 @@ class RECORD extends API {
 							':record_type' => $case['record_type'] ? : null,
 							':identifier' => $this->_requestedID,
 							':last_user' => $_SESSION['user']['id'],
-							':last_form' => null,
+							':last_document' => null,
 							':content' => json_encode($records),
 							':id' => $case['id']
 						]
@@ -114,7 +114,7 @@ class RECORD extends API {
 				return [
 					'type' => $type,
 					'attributes' => [
-						'name' => LANG::GET('record.record_pseudoform_' . $context)
+						'name' => LANG::GET('record.record_pseudodocument_' . $context)
 					],
 					'content' => $content
 				];
@@ -197,6 +197,172 @@ class RECORD extends API {
 	}
 
 	/**
+	 *     _                           _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_|  
+	 * 
+	 */
+	public function document(){
+		// prepare existing documents lists
+		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
+		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access'])) $this->response(['response' => ['msg' => LANG::GET('assemble.error_document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+
+		$return = ['title'=> $document['name'], 'render' => [
+			'content' => []
+		]];
+
+		// prefill identify if passed, prepare calendar button if part of the document
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		function setidentifier($element, $identify, $calendar){
+			$content = [];
+			foreach($element as $subs){
+				if (!isset($subs['type'])){
+					$content[] = setidentifier($subs, $identify, $calendar);
+				}
+				else {
+					if ($subs['type'] === 'identify'){
+						$subs['attributes']['value'] = $identify;
+					}
+					if ($subs['type'] === 'calendarbutton'){
+						$subs['attributes']['value'] = LANG::GET('calendar.event_new');
+						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
+					}
+					if (in_array($subs['type'], ['textarea', 'scanner', 'text', 'number', 'date', 'time'])){
+						$subs['attributes']['data-loss'] = 'prevent';
+					}
+					$content[] = $subs;
+				}
+			}
+			return $content;
+		};
+		$has_components = false;
+		foreach(explode(',', $document['content']) as $usedcomponent) {
+			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent);
+			if ($component){
+				$has_components = true;
+				$component['content'] = json_decode($component['content'], true);
+				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
+			}
+		}
+		if (!$has_components) array_push($return['render']['content'], [[
+			'type' => 'textsection',
+			'attributes' => [
+				'class' => 'orange',
+				'name' => LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))])
+			]
+		]]);
+
+		// check if a submit button is applicable
+		function saveable($element){
+			$saveable = false;
+			foreach($element as $subs){
+				if (!isset($subs['type'])){
+					if ($saveable = saveable($subs)) return true;
+				}
+				else {
+					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'hidden', 'button'])) return true;
+				}
+			}
+			return $saveable;
+		}
+		if (saveable($return['render']['content'])) $return['render']['form'] = [
+			'data-usecase' => 'record',
+			'action' => "javascript:api.record('post', 'record')",
+			'data-confirm' => true];
+
+		$context = [
+			[
+				'type' => 'hidden',
+				'attributes' => [
+					'name' => '_context',
+					'value' => $document['context']
+				]
+			], [
+				'type' => 'hidden',
+				'attributes' => [
+					'name' => '_document_name',
+					'value' => $document['name']
+				]
+			], [
+				'type' => 'hidden',
+				'attributes' => [
+					'name' => '_document_id',
+					'value' => $document['id']
+				]
+			]
+		];
+
+		if (isset($return['render']['form'])) {
+			$defaults = [
+				[
+					'type' => 'date',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_date'),
+						'value' => $this->_currentdate->format('Y-m-d'),
+						'required' => true
+					]
+				], [
+					'type' => 'time',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_time'),
+						'value' => $this->_currentdate->format('H:i'),
+						'required' => true
+					]
+				]
+			];
+			if (in_array($document['context'], ['casedocumentation'])) {
+				$options = [];
+				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
+					$options[$value] = boolval(CONFIG['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
+				}
+				$defaults[] = [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
+					],
+					'content' => $options
+				];
+			}
+			$return['render']['content'][] = $defaults;
+		}
+
+		if (PERMISSION::permissionFor('documentexport') || $document['permitted_export']){
+			$return['render']['content'][] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => LANG::GET('assemble.required_asterisk')
+					]
+				],
+				[
+					'type' => 'button',
+					'hint' => LANG::GET('assemble.document_export_hint'),
+					'attributes' => [
+						'type' => 'submit',
+						'formnovalidate' => true,
+						'value' => LANG::GET('assemble.document_export'),
+						'formaction' => "javascript:api.document('post', 'export')"
+					]
+				]
+			];
+		}
+		else {
+			$return['render']['content'][] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => LANG::GET('assemble.document_export_permission', [':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('documentexport', true)))])
+					]
+				]
+			];
+		}
+		if (isset($return['render']['content'][0][0]['type'])) array_push($return['render']['content'][0], ...$context);
+		else array_push($return['render']['content'][0][0], ...$context);
+		$this->response($return);
+	}
+	
+	/**
 	 *                       _
 	 *   ___ _ _ ___ ___ ___| |_
 	 *  | -_|_'_| . | . |  _|  _|
@@ -226,180 +392,14 @@ class RECORD extends API {
 	}
 
 	/**
-	 *   ___
-	 *  |  _|___ ___ _____
-	 *  |  _| . |  _|     |
-	 *  |_| |___|_| |_|_|_|
-	 *
-	 */
-	public function form(){
-		// prepare existing forms lists
-		$form = $this->latestApprovedName('form_form_get_by_name', $this->_requestedID);
-		if (!$form || $form['hidden'] || !PERMISSION::permissionIn($form['restricted_access'])) $this->response(['response' => ['msg' => LANG::GET('assemble.error_form_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
-
-		$return = ['title'=> $form['name'], 'render' => [
-			'content' => []
-		]];
-
-		// prefill identify if passed, prepare calendar button if part of the form
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		function setidentifier($element, $identify, $calendar){
-			$content = [];
-			foreach($element as $subs){
-				if (!isset($subs['type'])){
-					$content[] = setidentifier($subs, $identify, $calendar);
-				}
-				else {
-					if ($subs['type'] === 'identify'){
-						$subs['attributes']['value'] = $identify;
-					}
-					if ($subs['type'] === 'calendarbutton'){
-						$subs['attributes']['value'] = LANG::GET('calendar.event_new');
-						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
-					}
-					if (in_array($subs['type'], ['textarea', 'scanner', 'text', 'number', 'date', 'time'])){
-						$subs['attributes']['data-loss'] = 'prevent';
-					}
-					$content[] = $subs;
-				}
-			}
-			return $content;
-		};
-		$has_components = false;
-		foreach(explode(',', $form['content']) as $usedcomponent) {
-			$component = $this->latestApprovedName('form_component_get_by_name', $usedcomponent);
-			if ($component){
-				$has_components = true;
-				$component['content'] = json_decode($component['content'], true);
-				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
-			}
-		}
-		if (!$has_components) array_push($return['render']['content'], [[
-			'type' => 'textsection',
-			'attributes' => [
-				'class' => 'orange',
-				'name' => LANG::GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formcomposer', true)))])
-			]
-		]]);
-
-		// check if a submit button is applicable
-		function saveable($element){
-			$saveable = false;
-			foreach($element as $subs){
-				if (!isset($subs['type'])){
-					if ($saveable = saveable($subs)) return true;
-				}
-				else {
-					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'hidden', 'button'])) return true;
-				}
-			}
-			return $saveable;
-		}
-		if (saveable($return['render']['content'])) $return['render']['form'] = [
-			'data-usecase' => 'record',
-			'action' => "javascript:api.record('post', 'record')",
-			'data-confirm' => true];
-
-		$context = [
-			[
-				'type' => 'hidden',
-				'attributes' => [
-					'name' => '_context',
-					'value' => $form['context']
-				]
-			], [
-				'type' => 'hidden',
-				'attributes' => [
-					'name' => '_form_name',
-					'value' => $form['name']
-				]
-			], [
-				'type' => 'hidden',
-				'attributes' => [
-					'name' => '_form_id',
-					'value' => $form['id']
-				]
-			]
-		];
-
-		if (isset($return['render']['form'])) {
-			$defaults = [
-				[
-					'type' => 'date',
-					'attributes' => [
-						'name' => 'DEFAULT_' . LANG::GET('record.record_date'),
-						'value' => $this->_currentdate->format('Y-m-d'),
-						'required' => true
-					]
-				], [
-					'type' => 'time',
-					'attributes' => [
-						'name' => 'DEFAULT_' . LANG::GET('record.record_time'),
-						'value' => $this->_currentdate->format('H:i'),
-						'required' => true
-					]
-				]
-			];
-			if (in_array($form['context'], ['casedocumentation'])) {
-				$options = [];
-				foreach (LANGUAGEFILE['record']['record_type'] as $key => $value){
-					$options[$value] = boolval(CONFIG['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
-				}
-				$defaults[] = [
-					'type' => 'radio',
-					'attributes' => [
-						'name' => 'DEFAULT_' . LANG::GET('record.record_type_description')
-					],
-					'content' => $options
-				];
-			}
-			$return['render']['content'][] = $defaults;
-		}
-
-		if (PERMISSION::permissionFor('formexport') || $form['permitted_export']){
-			$return['render']['content'][] = [
-				[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => LANG::GET('assemble.required_asterisk')
-					]
-				],
-				[
-					'type' => 'button',
-					'hint' => LANG::GET('assemble.form_export_hint'),
-					'attributes' => [
-						'type' => 'submit',
-						'formnovalidate' => true,
-						'value' => LANG::GET('assemble.form_export'),
-						'formaction' => "javascript:api.form('post', 'export')"
-					]
-				]
-			];
-		}
-		else {
-			$return['render']['content'][] = [
-				[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => LANG::GET('assemble.form_export_permission', [':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], PERMISSION::permissionFor('formexport', true)))])
-					]
-				]
-			];
-		}
-		if (isset($return['render']['content'][0][0]['type'])) array_push($return['render']['content'][0], ...$context);
-		else array_push($return['render']['content'][0][0], ...$context);
-		$this->response($return);
-	}
-	
-	/**
 	 *   ___                                   _
 	 *  |  _|___ ___ _____ ___ _ _ ___ ___ ___| |_
 	 *  |  _| . |  _|     | -_|_'_| . | . |  _|  _|
 	 *  |_| |___|_| |_|_|_|___|_,_|  _|___|_| |_|
 	 *                            |_|
 	 */
-	public function formexport(){
-		$this->export('form');
+	public function documentexport(){
+		$this->export('document');
 	}
 	
 	/**
@@ -507,13 +507,13 @@ class RECORD extends API {
 
 		if ($data) {
 			$result = [];
-			$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+			$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 			$records = json_decode($data['content'], true);
 			foreach($records as $record){
-				$form = $forms[array_search($record['form'], array_column($forms, 'id'))] ? : ['name' => null, 'restricted_access' => null];
-				if (!PERMISSION::permissionIn($form['restricted_access'])) continue;
-				if ($record['form'] == 0) continue;
+				$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
+				if (!PERMISSION::permissionIn($document['restricted_access'])) continue;
+				if ($record['document'] == 0) continue;
 				if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 				foreach($record['content'] as $key => $value){
 					$result[$key] = $value;
@@ -541,7 +541,7 @@ class RECORD extends API {
 	 *  | | .'|  _| -_|_ -|  _| .'| . | . |  _| . | | | -_| . |   | .'|     | -_|
 	 *  |_|__,|_| |___|___|_| |__,|  _|  _|_| |___|\_/|___|___|_|_|__,|_|_|_|___|
 	 *                            |_| |_|
-	 * returns the latest approved form, component by name from query
+	 * returns the latest approved document, component by name from query
 	 * @param string $query as defined within sqlinterface
 	 * @param string $name
 	 * @return array|bool either query row or false
@@ -558,7 +558,7 @@ class RECORD extends API {
 		]);
 		foreach ($elements as $element){
 			if (!$element['hidden'] && in_array($element['context'], ['bundle'])) return $element;
-			if (PERMISSION::fullyapproved('formapproval', $element['approval']) && 
+			if (PERMISSION::fullyapproved('documentapproval', $element['approval']) && 
 				PERMISSION::permissionIn($element['restricted_access']) && 
 				$element['date'] <= $requestedTimestamp) {
 					$element['hidden'] = json_decode($element['hidden'] ? : '', true); 
@@ -577,19 +577,19 @@ class RECORD extends API {
 	 *
 	 */
 	public function matchbundles(){
-		$forms = [];
+		$documents = [];
 		$return = [];
 
 		// prepare existing bundle lists
-		$bundle = $this->latestApprovedName('form_bundle_get_by_name', $this->_requestedID);
+		$bundle = $this->latestApprovedName('document_bundle_get_by_name', $this->_requestedID);
 		if(!$bundle) $bundle = ['content' => []];
-		$necessaryforms = $bundle['content'] ? explode(',', $bundle['content']) : [];
+		$necessarydocuments = $bundle['content'] ? explode(',', $bundle['content']) : [];
 
-		// unset hidden forms from bundle presets
-		$allforms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
-		foreach($allforms as $row){
-			if (!PERMISSION::fullyapproved('formapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
-			if ($row['hidden'] && ($key = array_search($row['name'], $necessaryforms)) !== false) unset($necessaryforms[$key]);
+		// unset hidden documents from bundle presets
+		$alldocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		foreach($alldocuments as $row){
+			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
+			if ($row['hidden'] && ($key = array_search($row['name'], $necessarydocuments)) !== false) unset($necessarydocuments[$key]);
 		}
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 			'values' => [
@@ -599,25 +599,25 @@ class RECORD extends API {
 		$considered = [];
 		foreach($data as $row){
 			foreach (json_decode($row['content'], true) as $record){
-				if (($formIndex = array_search($record['form'], array_column($allforms, 'id'))) !== false)
-					$considered[] = $allforms[$formIndex]['name'];
+				if (($documentIndex = array_search($record['document'], array_column($alldocuments, 'id'))) !== false)
+					$considered[] = $alldocuments[$documentIndex]['name'];
 			}
 		}
-		foreach(array_diff($necessaryforms, $considered) as $needed){
-			$forms[$needed] = ['href' => "javascript:api.record('get', 'form', '" . $needed . "', '" . $this->_passedIdentify . "')"];
+		foreach(array_diff($necessarydocuments, $considered) as $needed){
+			$documents[$needed] = ['href' => "javascript:api.record('get', 'document', '" . $needed . "', '" . $this->_passedIdentify . "')"];
 		}
 
-		if ($forms) $return['render'] = [
+		if ($documents) $return['render'] = [
 			[
 				'type' => 'links',
-				'description' => LANG::GET('record.record_append_missing_form'),
-				'content' => $forms
+				'description' => LANG::GET('record.record_append_missing_document'),
+				'content' => $documents
 			]
 		];
 		else $return['render'] =[
 			[
 				'type' => 'textsection',
-				'content' => LANG::GET('record.record_append_missing_form_unneccessary'),
+				'content' => LANG::GET('record.record_append_missing_document_unneccessary'),
 			]
 		];
 		$this->response($return);
@@ -635,13 +635,13 @@ class RECORD extends API {
 			case 'POST':
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-				$context = $form_name = null;
+				$context = $document_name = null;
 				$identifier = '';
 				if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
-				if ($form_name = UTILITY::propertySet($this->_payload, '_form_name')) unset($this->_payload->_form_name);
-				// form id is stored to the entry that the content remains hidden if the form has restricted access
+				if ($document_name = UTILITY::propertySet($this->_payload, '_document_name')) unset($this->_payload->_document_name);
+				// document id is stored to the entry that the content remains hidden if the document has restricted access
 				// used in summarizeRecord() and not easier to check with the name 
-				if ($form_id = UTILITY::propertySet($this->_payload, '_form_id')) unset($this->_payload->_form_id);
+				if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
 				if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_date')});
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_time')});
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . LANG::PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . LANG::PROPERTY('record.record_type_description')});
@@ -672,7 +672,7 @@ class RECORD extends API {
 					if ($value === "...") unset($this->_payload->$key); // e.g. empty selections
 				}
 				if (!$identifier) {
-					if (!in_array($context, array_keys(LANGUAGEFILE['formcontext']['identify']))) $identifier = $form_name . ' ' . $entry_timestamp;
+					if (!in_array($context, array_keys(LANGUAGEFILE['documentcontext']['identify']))) $identifier = $document_name . ' ' . $entry_timestamp;
 					else $this->response([
 						'response' => [
 							'msg' => LANG::GET('record.record_error'),
@@ -706,7 +706,7 @@ class RECORD extends API {
 				$current_record = [
 					'author' => $_SESSION['user']['name'],
 					'date' => $entry_timestamp,
-					'form' => $form_id,
+					'document' => $document_id,
 					'content' => json_encode($this->_payload)
 				];
 				if (boolval((array) $this->_payload)){
@@ -725,7 +725,7 @@ class RECORD extends API {
 								':record_type' => $case['record_type'] ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
-								':last_form' => $form_name,
+								':last_document' => $document_name,
 								':content' => json_encode($records),
 								':id' => $case['id']
 							]
@@ -738,24 +738,24 @@ class RECORD extends API {
 								':record_type' => $record_type ? : null,
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
-								':last_form' => $form_name,
+								':last_document' => $document_name,
 								':content' => json_encode([$current_record]),
 							]
 						]);
 					}
 					if ($success){
-						// get form recommendations
-						$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+						// get document recommendations
+						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
 						foreach($bd as $key => $row) {
 							if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 							if (!in_array($row['name'], $hidden)) {
-								$necessaryforms = $row['content'] ? explode(',', $row['content']) : [];
-								if ($necessaryforms && ($formindex = array_search($form_name, $necessaryforms)) !== false) {
-									if (isset($necessaryforms[++$formindex])) {
-										// recurring queries to make sure linked forms are permitted
-										if ($form = $this->latestApprovedName('form_form_get_by_name', $necessaryforms[$formindex]))
-											$recommended[$form['name']] = ['href' => "javascript:api.record('get', 'form', '" . $form['name'] . "', '" . $identifier . "')"];
+								$necessarydocuments = $row['content'] ? explode(',', $row['content']) : [];
+								if ($necessarydocuments && ($documentindex = array_search($document_name, $necessarydocuments)) !== false) {
+									if (isset($necessarydocuments[++$documentindex])) {
+										// recurring queries to make sure linked documents are permitted
+										if ($document = $this->latestApprovedName('document_document_get_by_name', $necessarydocuments[$documentindex]))
+											$recommended[$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "', '" . $identifier . "')"];
 									}
 								}
 							}
@@ -883,8 +883,8 @@ class RECORD extends API {
 					$body[] = [$casestate];
 				}
 
-				// get form recommendations
-				$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+				// get document recommendations
+				$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = $bundles = [];
 				foreach($bd as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -893,27 +893,27 @@ class RECORD extends API {
 					}
 				}
 				ksort($bundles);
-				$includedForms = array_keys($content['content']);
+				$includedDocuments = array_keys($content['content']);
 
-				// prepare available forms to control appending button
-				$validForms = [];
-				$fd = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+				// prepare available documents to control appending button
+				$validDocuments = [];
+				$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 				$hidden = [];
 				foreach($fd as $key => $row) {
-					if (!PERMISSION::fullyapproved('formapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
-					if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['formcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!in_array($row['name'], $validForms) && !in_array($row['name'], $hidden)) {
-						$validForms[] = $row['name'];
+					if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
+					if ($row['hidden'] || in_array($row['context'], array_keys(LANGUAGEFILE['documentcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!in_array($row['name'], $validDocuments) && !in_array($row['name'], $hidden)) {
+						$validDocuments[] = $row['name'];
 					}
 				}
 
-				foreach($content['content'] as $form => $entries){
-					if ($form === LANG::GET('record.record_altering_pseudoform_name')) continue;
+				foreach($content['content'] as $document => $entries){
+					if ($document === LANG::GET('record.record_altering_pseudodocument_name')) continue;
 					$body[] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $form
+								'name' => $document
 							]
 						]
 					];
@@ -927,8 +927,8 @@ class RECORD extends API {
 								'linkedcontent' => $value
 							]); 
 					}
-					if (isset($content['images'][$form])){
-						foreach ($content['images'][$form] as $image){
+					if (isset($content['images'][$document])){
+						foreach ($content['images'][$document] as $image){
 							$imagedata = pathinfo($image);
 							array_push($body[count($body) -1],
 							[
@@ -941,21 +941,21 @@ class RECORD extends API {
 							]); 
 						}
 					}
-					if (isset($content['files'][$form])){
+					if (isset($content['files'][$document])){
 						array_push($body[count($body) -1],
 						[
 							'type' => 'links',
 							'description' => LANG::GET('record.record_file_attachments'),
-							'content' => $content['files'][$form]
+							'content' => $content['files'][$document]
 						]); 
 					}
 					
-					if ($form != LANG::GET('record.record_altering_pseudoform_name') && PERMISSION::permissionFor('recordsexport')){
-						if (in_array($form, $includedForms) && in_array($form, $validForms) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
+					if ($document != LANG::GET('record.record_altering_pseudodocument_name') && PERMISSION::permissionFor('recordsexport')){
+						if (in_array($document, $includedDocuments) && in_array($document, $validDocuments) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
-								'title' => LANG::GET('record.record_append_form'),
-								'onpointerup' => "api.record('get', 'form', '" . $form . "', '" . $this->_requestedID . "')",
+								'title' => LANG::GET('record.record_append_document'),
+								'onpointerup' => "api.record('get', 'document', '" . $document . "', '" . $this->_requestedID . "')",
 								'data-type' => 'additem',
 								'class' => 'inlinebutton'
 							]
@@ -967,39 +967,39 @@ class RECORD extends API {
 								'data-type' => 'download',
 								'class' => 'inlinebutton',
 								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('record.record_export') . "', render: [" . 
-								"{type:'button', attributes:{value: LANG.GET('record.record_full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'formexport\', \'" . $this->_requestedID . "\', \'" . $form . "\')'}},".
-								"{type:'button', attributes:{value: LANG.GET('record.record_simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedformexport\', \'" . $this->_requestedID . "\', \'" . $form . "\')'}}".
+								"{type:'button', attributes:{value: LANG.GET('record.record_full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
+								"{type:'button', attributes:{value: LANG.GET('record.record_simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
 								"], options:{'" . LANG::GET('general.cancel_button') . "': false}})"
 							]
 						]);
 					}
 					$recommended = [];
-					// append next recommendations inline -> caveat, missing first forms will not be displayed inline
-					if (in_array($form, $includedForms)) foreach($bundles as $bundle => $necessaryforms){
-						if (($formindex = array_search($form, $necessaryforms)) !== false){ // this form is part of the current bundle
-							if (isset($necessaryforms[++$formindex])) { // there is a form defined in bundle coming afterwards 
-								if (array_search($necessaryforms[$formindex], $includedForms) === false) { // the following form has not been taken into account
-									// recurring queries to make sure linked forms are permitted
-									if ($approvedform = $this->latestApprovedName('form_form_get_by_name', $necessaryforms[$formindex])) // form is permitted
-										$recommended[LANG::GET('record.record_append_missing_form_of_bundle', [':form' => $approvedform['name'], ':bundle' => $bundle])] = ['href' => "javascript:api.record('get', 'form', '" . $approvedform['name'] . "', '" . $this->_requestedID . "')"];
+					// append next recommendations inline -> caveat, missing first documents will not be displayed inline
+					if (in_array($document, $includedDocuments)) foreach($bundles as $bundle => $necessarydocuments){
+						if (($documentindex = array_search($document, $necessarydocuments)) !== false){ // this document is part of the current bundle
+							if (isset($necessarydocuments[++$documentindex])) { // there is a document defined in bundle coming afterwards 
+								if (array_search($necessarydocuments[$documentindex], $includedDocuments) === false) { // the following document has not been taken into account
+									// recurring queries to make sure linked documents are permitted
+									if ($approveddocument = $this->latestApprovedName('document_document_get_by_name', $necessarydocuments[$documentindex])) // document is permitted
+										$recommended[LANG::GET('record.record_append_missing_document_of_bundle', [':document' => $approveddocument['name'], ':bundle' => $bundle])] = ['href' => "javascript:api.record('get', 'document', '" . $approveddocument['name'] . "', '" . $this->_requestedID . "')"];
 								}
 							}
 						}
 					}
 					if ($recommended) $body[]= [[
 							'type' => 'links',
-							'description' => LANG::GET('record.record_append_missing_form'),
+							'description' => LANG::GET('record.record_append_missing_document'),
 							'content' => $recommended
 						]];
 				}
-				// append record_retype_pseudoform
-				if (isset($content['content'][LANG::GET('record.record_altering_pseudoform_name')])){
-					$entries = $content['content'][LANG::GET('record.record_altering_pseudoform_name')];
+				// append record_retype_pseudodocument
+				if (isset($content['content'][LANG::GET('record.record_altering_pseudodocument_name')])){
+					$entries = $content['content'][LANG::GET('record.record_altering_pseudodocument_name')];
 					$body[] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => LANG::GET('record.record_altering_pseudoform_name')
+								'name' => LANG::GET('record.record_altering_pseudodocument_name')
 							]
 						]
 					];
@@ -1108,11 +1108,11 @@ class RECORD extends API {
 
 				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
 					$last_element = count($return['render']['content'])-1;
-					// simple groups are not allowed to append to form
+					// simple groups are not allowed to append to document
 					$bundles = ['...' . LANG::GET('record.record_match_bundles_default') => ['value' => '0']];
 					// match against bundles
 					// prepare existing bundle lists
-					$bd = SQLQUERY::EXECUTE($this->_pdo, 'form_bundle_datalist');
+					$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 					$hidden = [];
 					foreach($bd as $key => $row) {
 						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
@@ -1232,7 +1232,7 @@ class RECORD extends API {
 				$linkdisplay = LANG::GET('record.record_list_touched', [
 					':identifier' => $record['identifier'],
 					':date' => $record['last_touch'],
-					':form' => $record['last_form']
+					':document' => $record['last_document']
 					]);
 				$contexts[$contextkey][$linkdisplay] = [
 					'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
@@ -1305,7 +1305,7 @@ class RECORD extends API {
 				array_push($content, [
 					[
 						'type' => 'links',
-						'description' => LANG::GET('formcontext.' . $context),
+						'description' => LANG::GET('documentcontext.' . $context),
 						'content' => $links
 					]
 				]);
@@ -1423,9 +1423,9 @@ class RECORD extends API {
 		$merge['content'][] = [
 			'author' => $_SESSION['user']['name'],
 			'date' => $this->_currentdate->format('y-m-d H:i:s'),
-			'form' => 0,
+			'document' => 0,
 			'content' => [
-				LANG::GET('record.record_reidentify_pseudoform_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
+				LANG::GET('record.record_reidentify_pseudodocument_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
 			]
 		];
 
@@ -1437,7 +1437,7 @@ class RECORD extends API {
 					':record_type' => $merge['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
-					':last_form' => $merge['last_form'],
+					':last_document' => $merge['last_document'],
 					':content' => json_encode($merge['content']),
 					':id' => $merge['id']
 			]])) $this->response([
@@ -1460,8 +1460,8 @@ class RECORD extends API {
 					':record_type' => $original['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
-					// get last considered form, offset -1 because pseudoform has been added before by default
-					':last_form' => $original['content'][count($original['content']) - 2]['form'] ? : ['name' => LANG::GET('record.record_retype_pseudoform_name')],
+					// get last considered document, offset -1 because pseudodocument has been added before by default
+					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : ['name' => LANG::GET('record.record_retype_pseudodocument_name')],
 					':content' => json_encode($original['content']),
 					':id' => $original['id']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
@@ -1503,9 +1503,9 @@ class RECORD extends API {
 			$original['content'][] = [
 				'author' => $_SESSION['user']['name'],
 				'date' => $this->_currentdate->format('y-m-d H:i'),
-				'form' => 0,
+				'document' => 0,
 				'content' => [
-					LANG::GET('record.record_retype_pseudoform_name', [], true) => LANG::GET('record.record_retype_content', [
+					LANG::GET('record.record_retype_pseudodocument_name', [], true) => LANG::GET('record.record_retype_content', [
 					':previoustype' => LANG::GET('record.record_type.' . $original['record_type'], [], true),
 					':newtype' => LANG::GET('record.record_type.' . $record_type, [], true)
 					], true)]
@@ -1517,7 +1517,7 @@ class RECORD extends API {
 					':record_type' => $record_type,
 					':identifier' => $original['identifier'],
 					':last_user' => $_SESSION['user']['id'],
-					':last_form' => $original['last_form'],
+					':last_document' => $original['last_document'],
 					':content' => json_encode($original['content']),
 					':id' => $original['id']
 			]])) $this->response([
@@ -1551,8 +1551,8 @@ class RECORD extends API {
 	 *  |___|_|_|_|_|  _|_|_  |_| |_|___|___|_| |___|_| |_|_|_|___|_,_|  _|___|_| |_|  
 	 *              |_|   |___|                                       |_|              
 	 */
-	public function simplifiedformexport(){
-		$this->export('simplifiedform', true);
+	public function simplifieddocumentexport(){
+		$this->export('simplifieddocument', true);
 	}
 
 	/**
@@ -1561,7 +1561,7 @@ class RECORD extends API {
 	 *  |_ -| | |     |     | .'|  _| |- _| -_|  _| -_|  _| . |  _| . |
 	 *  |___|___|_|_|_|_|_|_|__,|_| |_|___|___|_| |___|___|___|_| |___|
 	 *
-	 * @param str $type full, simplified, form
+	 * @param str $type full, simplified, document
 	 * @param bool $retype based on view and permission link to retype or not
 	 * @return array $summary
 	 */
@@ -1589,35 +1589,35 @@ class RECORD extends API {
 		];
 		$accumulatedcontent = [];
 
-		$forms = SQLQUERY::EXECUTE($this->_pdo, 'form_form_datalist');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 		$records = json_decode($data['content'], true);
 		foreach($records as $record){
-			$form = $forms[array_search($record['form'], array_column($forms, 'id'))] ? : ['name' => null, 'restricted_access' => null];
-			if (!PERMISSION::permissionIn($form['restricted_access'])) continue;
-			if (in_array($type, ['form', 'simplifiedform']) && ($form['name'] != $this->_formExport)) continue;
-			if ($record['form'] == 0) { // retype and casestate autoform
-				if (in_array($type, ['simplified', 'simplifiedform'])) continue;
-				$usedform = LANG::GET('record.record_altering_pseudoform_name');
+			$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
+			if (!PERMISSION::permissionIn($document['restricted_access'])) continue;
+			if (in_array($type, ['document', 'simplifieddocument']) && ($document['name'] != $this->_documentExport)) continue;
+			if ($record['document'] == 0) { // retype and casestate autodocument
+				if (in_array($type, ['simplified', 'simplifieddocument'])) continue;
+				$useddocument = LANG::GET('record.record_altering_pseudodocument_name');
 			}
-			else $usedform = $form['name'];
-			if (!isset($accumulatedcontent[$usedform])) $accumulatedcontent[$usedform] = ['last_record' => null, 'content' => []];
+			else $useddocument = $document['name'];
+			if (!isset($accumulatedcontent[$useddocument])) $accumulatedcontent[$useddocument] = ['last_record' => null, 'content' => []];
 
 			if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 			foreach($record['content'] as $key => $value){
 				$key = str_replace('_', ' ', $key);
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
-				if (!isset($accumulatedcontent[$usedform]['content'][$key])) $accumulatedcontent[$usedform]['content'][$key] = [];
-				$accumulatedcontent[$usedform]['content'][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
-				if (!$accumulatedcontent[$usedform]['last_record'] || $accumulatedcontent[$usedform]['last_record'] > substr($record['date'], 0, -3)) $accumulatedcontent[$usedform]['last_record'] = $record['date'];
+				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
+				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
+				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > substr($record['date'], 0, -3)) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
 			}
 		} 
 
-		foreach($accumulatedcontent as $form => $entries){
-			$summary['content'][$form] = [];
+		foreach($accumulatedcontent as $document => $entries){
+			$summary['content'][$document] = [];
 			foreach($entries['content'] as $key => $data){
-				$summary['content'][$form][$key] = '';
+				$summary['content'][$document][$key] = '';
 				$value = '';
 				foreach($data as $entry){
 					if ($entry['value'] !== $value){
@@ -1626,23 +1626,23 @@ class RECORD extends API {
 						if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
 							$file = pathinfo($entry['value']);
 							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-								if (!isset($summary['images'][$form])) $summary['images'][$form] = [];
-								$summary['images'][$form][] = $entry['value'];
+								if (!isset($summary['images'][$document])) $summary['images'][$document] = [];
+								$summary['images'][$document][] = $entry['value'];
 							}
 							else {
-								if (!isset($summary['files'][$form])) $summary['files'][$form] = [];
-								$summary['files'][$form][$file['basename']] = ['href' => $entry['value']];
+								if (!isset($summary['files'][$document])) $summary['files'][$document] = [];
+								$summary['files'][$document][$file['basename']] = ['href' => $entry['value']];
 							}
 							$displayvalue = $file['basename'];
 						}
 						switch ($type){
-							case 'form':
+							case 'document':
 							case 'full':
-								$summary['content'][$form][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
+								$summary['content'][$document][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
 								break;
 							case 'simplified':
-							case 'simplifiedform':
-								$summary['content'][$form][$key] = $displayvalue . "\n";
+							case 'simplifieddocument':
+								$summary['content'][$document][$key] = $displayvalue . "\n";
 								break;
 						}
 						$value = $entry['value'];
@@ -1652,9 +1652,9 @@ class RECORD extends API {
 		}
 
 		if ($export) {
-			// reiterate over form, add textsections and empty form fields
+			// reiterate over document, add textsections and empty document fields
 			require_once('_shared.php');
-			$formfinder = new SHARED($this->_pdo);
+			$documentfinder = new SHARED($this->_pdo);
 
 			function enumerate($name, $enumerate = [], $number = 1){
 				if (isset($enumerate[$name])) $enumerate[$name] += $number;
@@ -1673,7 +1673,7 @@ class RECORD extends API {
 						$content['content'] = array_merge($content['content'], $subcontent['content']);
 					}
 					else {
-						if (in_array($subs['type'], ['identify', 'formbutton', 'calendarbutton'])) continue;
+						if (in_array($subs['type'], ['identify', 'documentbutton', 'calendarbutton'])) continue;
 						if (in_array($subs['type'], ['image', 'links'])) {
 							$name = $subs['description'];
 						}
@@ -1706,26 +1706,21 @@ class RECORD extends API {
 			};
 
 			$printablecontent = $enumerate = [];
-			foreach($summary['content'] as $form => $content){
-				if ($usedform = $formfinder->recentform('form_form_get_by_name', [
+			foreach($summary['content'] as $document => $content){
+				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
-						':name' => $form
-					]], [], $accumulatedcontent[$form]['last_record'])) $printablecontent[$form . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($usedform['content'], $content, $type, $enumerate)['content'];
+						':name' => $document
+					]], [], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . LANG::GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
 			}
 			$summary['content'] = $printablecontent;
-			if ($type === 'simplifiedform'){
-				$summary['content'] = [' ' => $printablecontent[$usedform['name'] . ' ' . LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])]];
-				$summary['date'] = LANG::GET('assemble.form_export_exported', [':version' => substr($usedform['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')]);
-				$summary['title'] = $usedform['name'];
-				$summary['images'] = [' ' => $summary['images'][$usedform['name']]];
+			if ($type === 'simplifieddocument'){
+				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . LANG::GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])]];
+				$summary['date'] = LANG::GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')]);
+				$summary['title'] = $useddocument['name'];
+				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}
 		}
 		return $summary;
 	}
 }
-
-$api = new RECORD();
-$api->processApi();
-
-exit;
 ?>

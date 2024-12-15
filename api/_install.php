@@ -151,7 +151,7 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
-				"CREATE TABLE IF NOT EXISTS `caro_form` (" .
+				"CREATE TABLE IF NOT EXISTS `caro_document` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -196,7 +196,7 @@ $queries = [
 				"	`identifier` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`last_user` int NOT NULL," .
 				"	`last_touch` datetime NOT NULL," .
-				"	`last_form` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`last_document` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`notified` int NULL DEFAULT NULL," .
@@ -386,8 +386,8 @@ $queries = [
 				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"
 				,
-				"IF OBJECT_ID(N'caro_form', N'U') IS NULL " .
-				"CREATE TABLE caro_form (" .
+				"IF OBJECT_ID(N'caro_document', N'U') IS NULL " .
+				"CREATE TABLE caro_document (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
 				"	alias varchar(MAX) NOT NULL," .
@@ -432,7 +432,7 @@ $queries = [
 				"	identifier varchar(MAX) NOT NULL," .
 				"	last_user int NOT NULL," .
 				"	last_touch smalldatetime NOT NULL," .
-				"	last_form varchar(MAX) NULL," .
+				"	last_document varchar(MAX) NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL" .
