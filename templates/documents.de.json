@@ -1285,7 +1285,7 @@
 	{
 		"name": "Produkteinführung",
 		"alias": "",
-		"context": "product_incorporation_form",
+		"context": "product_incorporation_document",
 		"unit": "common",
 		"author": "Caro App",
 		"regulatory_context": "iso134857_4_1,iso134857_4_2,iso134857_4_3",
@@ -1296,7 +1296,7 @@
 	{
 		"name": "Stichprobenprüfung",
 		"alias": "",
-		"context": "mdr_sample_check_form",
+		"context": "mdr_sample_check_document",
 		"unit": "common",
 		"author": "Caro App",
 		"regulatory_context": "iso134857_4_3,mdr14",
@@ -1307,7 +1307,7 @@
 	{
 		"name": "Schulungsbewertung",
 		"alias": "",
-		"context": "training_evaluation_form",
+		"context": "training_evaluation_document",
 		"unit": "common",
 		"author": "Caro App",
 		"regulatory_context": "iso134856_2",
@@ -1318,7 +1318,7 @@
 	{
 		"name": "Lieferantenbewertung",
 		"alias": "",
-		"context": "vendor_evaluation_form",
+		"context": "vendor_evaluation_document",
 		"unit": "common",
 		"author": "Caro App",
 		"regulatory_context": "iso134857_4_1,iso134854_1_3,iso134855_6_1,iso134855_6_2",
