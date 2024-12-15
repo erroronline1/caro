@@ -230,6 +230,31 @@ export const api = {
 	},
 
 	/**
+	 *   ___ _ _ _
+	 *  |  _|_| | |_ ___ ___
+	 *  |  _| | |  _| -_|  _|
+	 *  |_| |_|_|_| |___|_|
+	 *
+	 * @param {string} tag
+	 * @returns string css display property
+	 */
+	filter: (tag) => {
+		switch (tag) {
+			case "div":
+			case "article":
+			case "a":
+			case "header":
+				return "block";
+			case "label":
+			case "span":
+				return "initial";
+			default:
+				// input, span,
+				return "inline-block";
+		}
+	},
+
+	/**
 	 *               _ _         _   _
 	 *   ___ ___ ___| |_|___ ___| |_|_|___ ___
 	 *  | .'| . | . | | |  _| .'|  _| | . |   |
@@ -628,8 +653,8 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]");
 								for (const file of all) {
 									if (request[1] === "bundle") {
-										file.parentNode.style.display = data.data.includes(file.dataset.filtered) ? "block" : "none";
-									} else file.style.display = data.data.includes(file.dataset.filtered) ? "block" : "none";
+										file.parentNode.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.parentNode.localName) : "none";
+									} else file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
 								}
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -641,7 +666,7 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]");
 								for (const list of all) {
 									if (isNaN(list.dataset.filtered)) continue;
-									list.parentNode.style.display = data.data.includes(list.dataset.filtered) ? "block" : "none";
+									list.parentNode.style.display = data.data.includes(list.dataset.filtered) ? api.filter(list.parentNode.localName) : "none";
 								}
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -748,8 +773,8 @@ export const api = {
 								const all = document.querySelectorAll("[data-filtered]"),
 									exceeding = document.querySelectorAll("[data-filtered_max]");
 								for (const element of all) {
-									if (data.filter === undefined || data.filter == "some") element.style.display = data.data.includes(element.dataset.filtered) ? "block" : "none";
-									else element.style.display = data.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? "block" : "none";
+									if (data.filter === undefined || data.filter == "some") element.style.display = data.data.includes(element.dataset.filtered) ? api.filter(element.localName) : "none";
+									else element.style.display = data.data.includes(element.dataset.filtered) && ![...exceeding].includes(element) ? api.filter(element.localName) : "none";
 								}
 							}
 						};
@@ -821,7 +846,7 @@ export const api = {
 				};
 				break;
 		}
-		api.send(method, request, successFn, null, payload, composedComponent || ["bundle","export"].includes(request[1]) || method === "put");
+		api.send(method, request, successFn, null, payload, composedComponent || ["bundle", "export"].includes(request[1]) || method === "put");
 	},
 
 	/**
@@ -962,7 +987,7 @@ export const api = {
 							if (data.data) {
 								const all = document.querySelectorAll("[data-filtered]");
 								for (const order of all) {
-									order.parentNode.parentNode.style.display = data.data.includes(order.dataset.filtered) ? "block" : "none";
+									order.parentNode.parentNode.style.display = data.data.includes(order.dataset.filtered) ? api.filter(order.parentNode.parentNode.localName) : "none";
 								}
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
