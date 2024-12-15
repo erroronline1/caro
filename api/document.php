@@ -119,7 +119,7 @@ class DOCUMENT extends API {
 					]]);
 				break;
 			case 'GET':
-				$componentselection = $formselection = $approvalposition = [];
+				$componentselection = $documentselection = $approvalposition = [];
 
 				// prepare all unapproved elements
 				$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
