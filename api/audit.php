@@ -241,11 +241,11 @@ class AUDIT extends API {
 	}
 
 	/**
-	 *   ___
-	 *  |  _|___ ___ _____ ___
-	 *  |  _| . |  _|     |_ -|
-	 *  |_| |___|_| |_|_|_|___|
-	 *
+	 *     _                           _       
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ 
+	 *  | . | . |  _| | |     | -_|   |  _|_ -|
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|
+	 *  
 	 * returns all current approved documents with their respective components and approvement notes in alphabetical order
 	 * also documents bundles and available external documents
 	 */
