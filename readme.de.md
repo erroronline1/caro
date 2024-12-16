@@ -8,7 +8,7 @@
     * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
     * [Extras](#extras)
     * [Datenintegrität](#datenintegrität)
-    * [Tips](#tips)mpty
+    * [Tips](#tips)
 
 * [Module](#module)
     * [Anwendung](#anwendung)
