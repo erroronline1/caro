@@ -45,11 +45,9 @@ export const api = {
 		},
 		start: function () {
 			document.addEventListener("input", api.preventDataloss.event);
-			document.addEventListener("textarea", api.preventDataloss.event);
 		},
 		stop: function () {
 			document.removeEventListener("input", api.preventDataloss.event);
-			document.removeEventListener("textarea", api.preventDataloss.event);
 			api.preventDataloss.monitor = false;
 		},
 		proceedAnyway: async function (method) {
@@ -1270,9 +1268,9 @@ export const api = {
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
-								api.preventDataloss.start();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							api.preventDataloss.start();
 						};
 				}
 				break;

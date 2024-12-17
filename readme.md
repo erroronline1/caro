@@ -141,7 +141,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * possible shared search methods?
 
 #### records considerations
-review preventDataloss for records
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

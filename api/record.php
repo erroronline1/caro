@@ -228,7 +228,21 @@ class RECORD extends API {
 						$subs['attributes']['value'] = LANG::GET('calendar.event_new');
 						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
 					}
-					if (in_array($subs['type'], ['textarea', 'scanner', 'text', 'number', 'date', 'time'])){
+					if (in_array($subs['type'], [
+							'checkbox',
+							'date',
+							'email',
+							'number',
+							'productselection',
+							'radio',
+							'range',
+							'scanner',
+							'select',
+							'tel',
+							'text',
+							'textarea',
+							'time',
+							])){
 						$subs['attributes']['data-loss'] = 'prevent';
 					}
 					$content[] = $subs;
