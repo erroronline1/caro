@@ -172,6 +172,7 @@ edit_manual_saved = "Das Thema ':name' der Anleitung wurde gespeichert"
 edit_manual_not_saved = "Das Thema konnte nicht gespeichert werden"
 edit_manual_forbidden_name ="Der Titel :name ist nicht zulässig, bitte wähle einen anderen..."
 overview_messages = "Du hast :number ungelesene Nachricht(en)"
+overview_preparedorders = ":number vorbereitete Bestellungen zur Freigabe"
 overview_orders = ":number Bestellungen zur Bearbeitung"
 overview_cases = ":number offene Vorgänge für deine zugeordneten Bereiche"
 

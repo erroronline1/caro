@@ -172,6 +172,7 @@ edit_manual_saved = "The manual topic ':name' has been saved"
 edit_manual_not_saved = "The topic could not be saved"
 edit_manual_forbidden_name ="The title :name is not allowed, please use another..."
 overview_messages = "You have :number unread message(s)"
+overview_preparedorders = ":number prepared orders awaiting authorization"
 overview_orders = "There are :number orders awaiting processing"
 overview_cases = "There are :number open cases for your assigned units"
 

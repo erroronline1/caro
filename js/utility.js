@@ -50,9 +50,15 @@ const _serviceWorker = {
 		},
 		order_unprocessed_consumables_pendingincorporation: function (data) {
 			let notif;
-			if ("order_unprocessed" in data || "consumables_pendingincorporation" in data) {
-				let order_unprocessed = 0,
+			if ("order_prepared" in data || "order_unprocessed" in data || "consumables_pendingincorporation" in data) {
+				let order_prepared = 0,
+					order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
+				if ("order_prepared" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_prepared_orders").replace(" ", "_") + "]");
+					if (notif) notif.setAttribute("data-notification", data.order_prepared);
+					order_prepared = data.order_prepared;
+				}
 				if ("order_unprocessed" in data) {
 					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
@@ -64,7 +70,7 @@ const _serviceWorker = {
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
 				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
+				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 			}
 		},
 	},

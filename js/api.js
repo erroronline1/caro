@@ -686,10 +686,10 @@ export const api = {
 	},
 
 	/**
-	 *     _                           _   
-	 *   _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *     _                           _
+	 *   _| |___ ___ _ _ _____ ___ ___| |_
 	 *  | . | . |  _| | |     | -_|   |  _|
-	 *  |___|___|___|___|_|_|_|___|_|_|_|  
+	 *  |___|___|___|___|_|_|_|___|_|_|_|
 	 *
 	 * document component and document management with creation, editing and approval
 	 *
@@ -1087,6 +1087,7 @@ export const api = {
 				if (request[1] == "prepared") {
 					successFn = function (data) {
 						new Toast(data.response.msg, data.response.type);
+						if (data.data) _serviceWorker.notif.order_unprocessed_consumables_pendingincorporation(data.data);
 						api.purchase("get", "prepared");
 					};
 				}

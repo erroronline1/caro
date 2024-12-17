@@ -501,6 +501,29 @@ class APPLICATION extends API {
 			}
 		}
 
+		// prepared orders
+		if ($_SESSION['user']['orderauth']){
+			$prepared = $notifications->preparedorders();
+			if ($prepared) {
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onpointerup' => "api.purchase('get', 'prepared')",
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => LANG::GET('application.overview_preparedorders', [':number' => $prepared]),
+							'attributes' => [
+								'data-type' => 'purchase',
+								'name' => LANG::GET('menu.purchase_prepared_orders')
+							]
+						]
+					]
+				];
+			}
+		}
+
 		// unclosed case documentation for own unit
 		$number = $notifications->records();
 		if ($number){

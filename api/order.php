@@ -67,7 +67,7 @@ class ORDER extends API {
 										'msg' => LANG::GET('order.deleted'),
 										'type' => 'success'
 									],
-									'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
+									'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 								}
 								else $result = [
 									'response' => [
@@ -273,7 +273,7 @@ class ORDER extends API {
 						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? LANG::GET('order.order.' . $this->_subMethod) : LANG::GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => LANG::GET('order.order.' . $this->_subMethod)]),
 						'type' => 'info'
 					],
-					'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
 				];
 
 				$this->orderStatistics($this->_requestedID, ($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved');
@@ -489,7 +489,7 @@ class ORDER extends API {
 						'msg' => LANG::GET('order.deleted'),
 						'type' => 'success'
 					],
-					'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
+					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 				}
 				else $result = [
 					'response' => [
@@ -566,6 +566,8 @@ class ORDER extends API {
 	 *
 	 */
 	public function order(){
+		require_once('notification.php');
+		$notifications = new NOTIFICATION;
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$processedOrderData = $this->processOrderForm();
@@ -581,7 +583,9 @@ class ORDER extends API {
 							'id' => $this->_pdo->lastInsertId(),
 							'msg' => LANG::GET('order.saved_to_prepared'),
 							'type' => 'info'
-						]];
+						],
+						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+					];
 					break;
 				}
 				
@@ -602,7 +606,8 @@ class ORDER extends API {
 							'id' => $this->_requestedID,
 							'msg' => LANG::GET('order.saved_to_prepared'),
 							'type' => 'info'
-						]];
+						]
+					];
 					break;
 				}
 				
@@ -614,6 +619,7 @@ class ORDER extends API {
 							':id' => intval($this->_requestedID)
 						]
 					]);
+					$result['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
 				break;
 			case 'GET':
@@ -1075,11 +1081,12 @@ class ORDER extends API {
 		}
 		if (SQLQUERY::EXECUTE($this->_pdo, $query)) {
 			$result = [
-			'response' => [
-				'id' => false,
-				'msg' => LANG::GET('order.saved'),
-				'type' => 'success'
-			]];
+				'response' => [
+					'id' => false,
+					'msg' => LANG::GET('order.saved'),
+					'type' => 'success'
+				]
+			];
 			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase', [], true));		
 		}
 		else $result = [
@@ -1151,6 +1158,9 @@ class ORDER extends API {
 							':id' => implode(",", array_map(fn($id) => intval($id), $approvedIDs))
 						]
 					]);
+					require_once('notification.php');
+					$notifications = new NOTIFICATION;
+					$result['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
 				break;
 			case 'GET':

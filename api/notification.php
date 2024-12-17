@@ -45,6 +45,7 @@ class NOTIFICATION extends API {
 			'consumables_pendingincorporation' => $this->consumables(),
 			'document_approval' => $this->documents(),
 			'order_unprocessed' => $this->order(),
+			'order_prepared' => $this->preparedorders(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen()
 		];
@@ -370,6 +371,30 @@ class NOTIFICATION extends API {
 			$unprocessed = $unprocessed ? intval($unprocessed[0]['num']) : 0;
 		}
 		return $unprocessed;
+	}
+
+	/**
+	 *                                 _           _
+	 *   ___ ___ ___ ___ ___ ___ ___ _| |___ ___ _| |___ ___ ___
+	 *  | . |  _| -_| . | .'|  _| -_| . | . |  _| . | -_|  _|_ -|
+	 *  |  _|_| |___|  _|__,|_| |___|___|___|_| |___|___|_| |___|
+	 *  |_|         |_|
+	 * 
+	 * number of prepared orders for assigned units
+	 */
+	public function preparedorders(){
+		if (!$_SESSION['user']['orderauth']) return 0;
+		$prepared = 0;
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
+		$units = $_SESSION['user']['units']; // see only orders for own units
+		$organizational_orders = [];
+		foreach($orders as $key => $row) {
+			$order_data = json_decode($row['order_data'], true);
+			if (array_intersect([$order_data['organizational_unit']], $units)) {
+				$prepared++;
+			}
+		}
+		return $prepared;
 	}
 
 	/**
