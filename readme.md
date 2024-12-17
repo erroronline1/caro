@@ -120,7 +120,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * failsafe on unfound component names on form assembly (backend). is this real production thread?
 
 #### purchase considerations
-* review order denial missing information (commission, order type)
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?

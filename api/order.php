@@ -146,7 +146,7 @@ class ORDER extends API {
 					];
 					// fill possible keys
 					foreach ($decoded_order_data as $key => $value){
-						if (isset($prepared[$key])) $prepared[$key] = $value;
+						if (array_key_exists($key, $prepared)) $prepared[$key] = $value;
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
