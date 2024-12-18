@@ -1241,7 +1241,6 @@ class RECORD extends API {
 				// append units of available records 
 				if ($record['units']) array_push($available_units, ...$record['units']);
 				else $available_units[] = null;
-
 				// add to result
 				$linkdisplay = LANG::GET('record.record_list_touched', [
 					':identifier' => $record['identifier'],
@@ -1252,10 +1251,10 @@ class RECORD extends API {
 					'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
 				];
 				foreach($record['case_state'] as $case => $state){
-					$matches[$display]['data-' . $case] = $state;
+					$contexts[$contextkey][$linkdisplay]['data-' . $case] = $state;
 				}
-				if ($record['complaint']) $matches[$display]['class'] = 'orange';
-				if ($record['closed'])  $matches[$display]['class'] = 'green';
+				if ($record['complaint']) $contexts[$contextkey][$linkdisplay]['class'] = 'orange';
+				if ($record['closed']) $contexts[$contextkey][$linkdisplay]['class'] = 'green';
 			}
 		}
 
@@ -1475,7 +1474,7 @@ class RECORD extends API {
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
 					// get last considered document, offset -1 because pseudodocument has been added before by default
-					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : ['name' => LANG::GET('record.record_retype_pseudodocument_name')],
+					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : LANG::GET('record.record_retype_pseudodocument_name', [], true),
 					':content' => json_encode($original['content']),
 					':id' => $original['id']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
