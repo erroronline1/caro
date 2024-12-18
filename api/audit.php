@@ -275,7 +275,11 @@ class AUDIT extends API {
 		$hidden = $currentdocuments = [];
 		foreach($documents as $document){
 			if (!PERMISSION::fullyapproved('documentapproval', $document['approval']) || $document['date'] >= $this->_requestedDate . ' ' . $this->_requestedTime) continue;
-			if ($document['hidden']) $hidden[] = $document['name']; // since ordered by recent, older items will be skipped
+			if ($document['hidden']) {
+				$document['hidden'] = json_decode($document['hidden'], true);
+				if ($document['hidden']['date'] <= $this->_requestedDate . ' ' . $this->_requestedTime)
+					$hidden[] = $document['name']; // since ordered by recent, older items will be skipped
+			}
 			if (!in_array($document['name'], array_column($currentdocuments, 'name')) && !in_array($document['name'], $hidden)) $currentdocuments[] = $document;
 		}
 	
@@ -290,7 +294,7 @@ class AUDIT extends API {
 			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
 		}
 
-		$documentcontent = [
+		$documentscontent = [
 			[
 				'type' => 'date',
 				'attributes' => [
