@@ -1623,7 +1623,7 @@ class RECORD extends API {
 				$value = str_replace('\n', "\n", $value); // format linebreaks
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
 				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
-				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > substr($record['date'], 0, -3)) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
+				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
 			}
 		} 
 
@@ -1723,7 +1723,7 @@ class RECORD extends API {
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $document
-					]], [], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . LANG::GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
+					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . LANG::GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
 			}
 			$summary['content'] = $printablecontent;
 			if ($type === 'simplifieddocument'){
