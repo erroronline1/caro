@@ -922,7 +922,7 @@ class RECORD extends API {
 				}
 
 				foreach($content['content'] as $document => $entries){
-					if ($document === LANG::GET('record.record_altering_pseudodocument_name')) continue;
+					if ($document === LANG::GET('record.record_altering_pseudodocument_name', [], true)) continue;
 					$body[] = [
 						[
 							'type' => 'textsection',
@@ -964,7 +964,7 @@ class RECORD extends API {
 						]); 
 					}
 					
-					if ($document != LANG::GET('record.record_altering_pseudodocument_name') && PERMISSION::permissionFor('recordsexport')){
+					if ($document != LANG::GET('record.record_altering_pseudodocument_name', [], true) && PERMISSION::permissionFor('recordsexport')){
 						if (in_array($document, $includedDocuments) && in_array($document, $validDocuments) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
 							'attributes' => [
@@ -1007,8 +1007,8 @@ class RECORD extends API {
 						]];
 				}
 				// append record_retype_pseudodocument
-				if (isset($content['content'][LANG::GET('record.record_altering_pseudodocument_name')])){
-					$entries = $content['content'][LANG::GET('record.record_altering_pseudodocument_name')];
+				if (isset($content['content'][LANG::GET('record.record_altering_pseudodocument_name', [], true)])){
+					$entries = $content['content'][LANG::GET('record.record_altering_pseudodocument_name', [], true)];
 					$body[] = [
 						[
 							'type' => 'textsection',
@@ -1438,7 +1438,7 @@ class RECORD extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i:s'),
 			'document' => 0,
 			'content' => [
-				LANG::GET('record.record_reidentify_pseudodocument_name') => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id]) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id]))
+				LANG::GET('record.record_reidentify_pseudodocument_name', [], true) => ($original ? LANG::GET('record.record_reidentify_merge_content', [':identifier' => $entry_id], true) : LANG::GET('record.record_reidentify_identify_content', [':identifier' => $entry_id], true))
 			]
 		];
 
@@ -1611,7 +1611,7 @@ class RECORD extends API {
 			if (in_array($type, ['document', 'simplifieddocument']) && ($document['name'] != $this->_documentExport)) continue;
 			if ($record['document'] == 0) { // retype and casestate autodocument
 				if (in_array($type, ['simplified', 'simplifieddocument'])) continue;
-				$useddocument = LANG::GET('record.record_altering_pseudodocument_name');
+				$useddocument = LANG::GET('record.record_altering_pseudodocument_name', [], true);
 			}
 			else $useddocument = $document['name'];
 			if (!isset($accumulatedcontent[$useddocument])) $accumulatedcontent[$useddocument] = ['last_record' => null, 'content' => []];
