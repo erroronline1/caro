@@ -346,10 +346,11 @@ class SHARED {
 			foreach($contents as $content){
 				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
 			}
+			$content['hidden'] = json_decode($content['hidden'] ? : '', true); 
 			if (!PERMISSION::fullyapproved('documentapproval', $content['approval']) // failsafe if none are approved
-				|| $content['hidden']
-				|| !PERMISSION::permissionIn($content['restricted_access'])
-				|| $content['date'] > $requestedTimestamp) return [];
+				|| ($content['hidden'] && (!$requestedTimestamp || $content['hidden'] <= $requestedTimestamp)) // if hidden and content younger than hidden date
+				|| !PERMISSION::permissionIn($content['restricted_access']) // user lacks permission to restricted
+				|| $content['date'] > $requestedTimestamp) return []; // document date is younger than requested
 			$result = $content;
 			if ($content['context'] === 'component') {
 				$content['content'] = json_decode($content['content'], true);
