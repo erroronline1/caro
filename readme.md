@@ -1025,6 +1025,7 @@ Tested devices:
 * Win11 Firefox-browser (until 2024-05-30)
 * Linux Mint 21.3 Firefox-Browser (from 2024-05-30)
 * Android12 Firefox-browser
+* Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a weird interpretation of special characters on default installation on Win10)
 
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 Technically the application is being usable on any webserver but this is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).

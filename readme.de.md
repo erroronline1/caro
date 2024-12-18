@@ -915,6 +915,7 @@ Getestete Geräte
 * Win11 Firefox-Browser (bis 2024-05-30)
 * Linux Mint 21.3 Firefox-Browser (seit 2024-05-30)
 * Android12 Firefox-Browser
+* Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit einer eigenartigen Interpretation von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
 
 Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenlisten bei Eingaben eine Vorschau, welche die Auswahl verfügbarer Optionen (z.B. Wahl von Nechrichtenempfängern) vereinfacht. Andere Browser wurden nicht getestet.
 Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert, können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist diese Verwendung ausdrücklich **nicht empfohlen**.
