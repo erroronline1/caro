@@ -118,8 +118,15 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * failsafe on unfound component names on form assembly (backend). is this real production thread?
+* verify osx safari compatibility
 
 #### purchase considerations
+* reinstall token scan for order approval, match with present orderauth
+* display order number as qr-code if no ean is given
+* qr-code for commission
+* display alternative articles on ordersearch with matching name? modal before actual import to select from.
+* verify usb-scanner results
+* translation mask for erp dumps of orders - currently missing identifier matching
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -141,6 +148,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * possible shared search methods?
 
 #### records considerations
+* user setting for preferred initial case state filter
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1701,6 +1709,10 @@ Discussed stakeholder requirements:
 | Partial delivery state for orders | User, Purchase | 2024-10-16 | Implemented; 2024-10-26 |
 | Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
 | Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
+| Personal token as order approval an option after all | CEO | 2024-12-12 | |
+| Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | |
+| Commission qr-code within orders | CEO, Purchase | 2024-12-12 | |
+| Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | |
 
 [Content](#content)
 
