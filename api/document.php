@@ -532,7 +532,7 @@ class DOCUMENT extends API {
 					foreach ($documents as $key => $documentname){
 						// recurring queries to make sure linked forms are permitted
 						if ($document = $this->latestApprovedName('document_document_get_by_name', $documentname))
-							$bundles[$row['name']][$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "')", 'data-filtered' => $row['id']];
+							if (!$document['hidden']) $bundles[$row['name']][$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "')", 'data-filtered' => $row['id']];
 					}
 				}
 			}
@@ -1728,7 +1728,7 @@ class DOCUMENT extends API {
 								'name' => LANG::GET('assemble.edit_existing_documents_all'),
 							],
 						],
-						...$options_selection
+						...$alloptions_selection
 					]
 				], [
 					[
@@ -1896,7 +1896,7 @@ class DOCUMENT extends API {
 	 * @param string $name
 	 * @return array|bool either query row or false
 	 */
-	private function latestApprovedName($query = '', $name = ''){
+	private function latestApprovedName($query = '', $name = '', $maxtimestamp = ''){
 		// get latest approved by name
 		$element = [];
 		$elements = SQLQUERY::EXECUTE($this->_pdo, $query, [
@@ -1905,7 +1905,9 @@ class DOCUMENT extends API {
 			]
 		]);
 		foreach ($elements as $element){
-			if (PERMISSION::fullyapproved('documentapproval', $element['approval'])) return $element;
+			if (PERMISSION::fullyapproved('documentapproval', $element['approval'])
+				&& (!$maxtimestamp || $element['date']<= $maxtimestamp)
+			) return $element;
 		}
 		return false;
 	}
