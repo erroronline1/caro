@@ -127,6 +127,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * verify usb-scanner results
 * translation mask for erp dumps of orders - currently missing identifier matching
+* add commission by default to order label export
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
