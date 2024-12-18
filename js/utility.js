@@ -491,6 +491,7 @@ const _client = {
 							},
 						];
 						for (const [label, setting] of Object.entries(api._settings.config.label)) {
+							// receival date is not passed to label because it is not possible to determine if the label is for partial or remaining deliveries
 							labels.push({
 								type: "button",
 								attributes: {
