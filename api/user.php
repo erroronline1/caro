@@ -107,6 +107,12 @@ class USER extends API {
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
 				}
+				if ($primaryRecordState = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_recordstate'))){
+					if ($primaryRecordState === LANG::GET('record.record_casestate_filter_all'))
+						unset($user['app_settings']['primaryRecordState']);
+					else
+						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, LANGUAGEFILE['casestate']['casedocumentation']);
+				}
 				
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
 					'values' => [
@@ -166,6 +172,13 @@ class USER extends API {
 					$units[] = LANG::GET('units.' . $unit);
 				}
 				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[LANG::GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
+
+				$primary_casestates = [LANG::GET('record.record_casestate_filter_all') => ['name' => LANG::PROPERTY('user.settings_primary_recordstate')]];
+				foreach(LANGUAGEFILE['casestate']['casedocumentation'] as $state => $translation){
+					$primary_casestates[$translation] = ['name' => LANG::PROPERTY('user.settings_primary_recordstate')];
+				}
+				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[LANG::GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
+				else $primary_casestates[LANG::GET('record.record_casestate_filter_all')]['checked'] = true;
 
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = '';
@@ -273,10 +286,18 @@ class USER extends API {
 						'attributes' => [
 							'name' => LANG::GET('user.settings_primary_unit')
 						],
-						'hint' => LANG::GET('user.settings_hint'),
 						'content' => $primary_unit
 					];
 				}
+				$result['render']['content'][count($result['render']['content'])-1][] = [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => LANG::GET('user.settings_primary_recordstate')
+					],
+					'hint' => LANG::GET('user.settings_hint'),
+					'content' => $primary_casestates
+				];
+
 
 				if (isset($user['app_settings']['forceDesktop'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
 				if (isset($user['app_settings']['homeoffice'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];

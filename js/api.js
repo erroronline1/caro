@@ -1261,6 +1261,18 @@ export const api = {
 					case "matchbundles":
 						//prevent default successFn
 						break;
+					case "records":
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]] || data.title);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+								_client.record.casestatefilter(api._settings.user.app_settings.primaryRecordState);
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
 					default:
 						successFn = function (data) {
 							if (data.render) {

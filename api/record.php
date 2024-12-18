@@ -102,13 +102,14 @@ class RECORD extends API {
 				if (!isset(LANGUAGEFILE['casestate'][$context])) return;
 				$content = [];
 				$checked = json_decode($checked ? : '', true);
-				if ($type==='radio'){
+				if ($type === 'radio'){
 					$content[LANG::GET('record.record_casestate_filter_all')] = ['onchange' => "_client.record.casestatefilter(undefined)"];
 				}
 				foreach(LANGUAGEFILE['casestate'][$context] as $state => $translation){
 					$content[$translation] = $action;
 					$content[$translation]['data-casestate'] = $state;
 					if (isset($checked[$state])) $content[$translation]['checked'] = true;
+					if($type === 'radio' && isset($_SESSION['user']['app_settings']['primaryRecordState']) && $state === $_SESSION['user']['app_settings']['primaryRecordState']) $content[$translation]['checked'] = true;
 					if (!PERMISSION::permissionFor('recordscasestate') && $type === 'checkbox') $content[$translation]['disabled'] = true;
 				}
 				return [
