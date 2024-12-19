@@ -909,14 +909,27 @@ export class Assemble {
 				onpointerdown: 'alert("hello")'
 			}
 		}*/
-		let button = document.createElement("button");
+		let button = document.createElement("button"),
+		imagealigned=false;
 		button.id = getNextElementID();
 		if (this.currentElement.attributes.value !== undefined) {
 			button.append(...this.linebreak(this.currentElement.attributes.value));
 			delete this.currentElement.attributes.value;
 		}
-		if (this.currentElement.attributes !== undefined) button = this.apply_attributes(this.currentElement.attributes, button);
+		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+				imagealigned = true;
+				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+			}
+			button = this.apply_attributes(this.currentElement.attributes, button);
+		}
 		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
+		if (imagealigned){
+			const container = document.createElement('div');
+			container.classList.add("imagealigned");
+			container.append(button, ...this.hint());
+			return [container];
+		}
 		return [button, ...this.hint()];
 	}
 
@@ -1197,6 +1210,7 @@ export class Assemble {
 		let disabled = true;
 		canvas.id = getNextElementID();
 		canvas.classList.add("imagecanvas");
+		if (this.currentElement.attributes.class) canvas.classList.add(this.currentElement.attributes.class);
 		if (typeof this.currentElement.attributes.imageonly === "object") {
 			for (const [key, value] of Object.entries(this.currentElement.attributes.imageonly)) {
 				canvas.style[key] = value;
@@ -1255,7 +1269,8 @@ export class Assemble {
 		}*/
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
-			hint = this.hint();
+			hint = this.hint(),
+			imagealigned=false;
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
@@ -1287,7 +1302,15 @@ export class Assemble {
 				}
 			};
 		}
-		input = this.apply_attributes(this.currentElement.attributes, input);
+
+		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+				imagealigned = true;
+				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+			}
+			input = this.apply_attributes(this.currentElement.attributes, input);
+		}
+
 		if (type === "email") input.multiple = true;
 
 		if (type === "checkbox2text") {
@@ -1326,6 +1349,22 @@ export class Assemble {
 		}
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
+
+		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+				imagealigned = true;
+				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+			}
+			input = this.apply_attributes(this.currentElement.attributes, input);
+		}
+
+		if (imagealigned){
+			const container = document.createElement('div');
+			container.classList.add("imagealigned");
+			container.append(...this.icon(), input, label, ...hint);
+			return [container];
+		}
+
 		return [...this.icon(), input, label, ...hint];
 	}
 
@@ -2032,7 +2071,9 @@ export class Assemble {
 		}*/
 		let result = [],
 			p,
-			content;
+			content,
+			imagealigned=false;
+			;
 		if (this.currentElement.attributes && this.currentElement.attributes.name) {
 			this.currentElement.description = this.currentElement.attributes.name;
 			result = result.concat(this.header());
@@ -2084,9 +2125,22 @@ export class Assemble {
 		}
 
 		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+				imagealigned = true;
+				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+			}
 			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
 		}
+
 		result = result.concat(this.hint());
+
+		if (imagealigned){
+			const container = document.createElement('div');
+			container.classList.add("imagealigned");
+			container.append(...result);
+			return [container];
+		}
+
 		return result;
 	}
 

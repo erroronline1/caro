@@ -977,6 +977,17 @@ article > article {
 	}
 }
 
+.order2dcode {
+	width:15em !important;
+	height:5em !important;
+	float:inline-end !important;
+}
+
+.imagealigned {
+	width: calc(98% - 15em);
+	float:inline-start;
+}
+
 .sectionindicator {
 	text-align: center;
 	width: 100%;
