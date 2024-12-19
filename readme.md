@@ -125,7 +125,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * display order number as qr-code if no ean is given
 * qr-code for commission
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
-* verify usb-scanner results
 * translation mask for erp dumps of orders - currently missing identifier matching
 * add commission by default to order label export
 
@@ -149,7 +148,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * possible shared search methods?
 
 #### records considerations
-* user setting for preferred initial case state filter
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -238,7 +236,7 @@ Application support legend:
 | ISO 13485 7.5.6 Validation of production and service | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 7.5.7 Validation of sterilization processes and systems | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.5.8 Product indentification | structural | &bull; Records partially relay on an identifier. This identifier is currently implemented as a QR-code that can be exported, printed and read with the integrated scanner. Sticky identifier labels can be used to mark any components of a product during production. | [Records](#records) |
-| ISO 13485 7.5.9 Traceability | structural | &bull; Mmultiple scanner field within your case documentation allow for easier material tracing.<br/>Prerequisites are either<br/>&bull; codes from your ERP-Software that allow traceability, or<br/>&bull; creation of labels for orders products from the order module | [Documents](#documents), [Order](#order) |
+| ISO 13485 7.5.9 Traceability | structural | &bull; Multiple scanner field within your case documentation allow for easier material tracing.<br/>Prerequisites are either<br/>&bull; codes from your ERP-Software that allow traceability, or<br/>&bull; creation of labels for orders products from the order module | [Documents](#documents), [Order](#order) |
 | ISO 13485 7.5.10 Customer property | | | |
 | ISO 13485 7.5.11 Product conservation | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated documents make use of an identifier, like production documents. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a document component to address scheduling helps with future events that will show up and alert user groups where reasonable.<br/>&bull; <br/>&bull; *record with documents with the "Equipment Surveillance"-context* | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
@@ -1027,7 +1025,10 @@ Tested devices:
 * Android12 Firefox-browser
 * Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a weird interpretation of special characters on default installation on Win10)
 
+External scanners must be able to scan 2D-Codes and read UTF-8 character encoding.
+
 Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
+
 Technically the application is being usable on any webserver but this is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
 
 [Content](#content)
