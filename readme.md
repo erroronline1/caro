@@ -124,7 +124,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * reinstall token scan for order approval, match with present orderauth
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * translation mask for erp dumps of orders - currently missing identifier matching
-* add commission by default to order label export
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?

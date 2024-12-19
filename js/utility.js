@@ -513,6 +513,13 @@ const _client = {
 								},
 							},
 							{
+								type: "hidden",
+								attributes: {
+									id: "_commission",
+									value: "element.commission",
+								},
+							},
+							{
 								type: "text",
 								attributes: {
 									name: LANG.GET("order.trace_label"),
@@ -528,8 +535,8 @@ const _client = {
 								attributes: {
 									value: LANG.GET("record.create_identifier_type", { ":format": setting.format }),
 									onpointerup:
-										`let _ordernumber = document.getElementById('_ordernumber').value, _name = document.getElementById('_name').value, _vendor = document.getElementById('_vendor').value, _trace = document.getElementById('_trace').value;` +
-										` _client.application.postLabelSheet(_ordernumber + ' - ' + _name.substring(0, 64) + ' - ' + _vendor + ' - ' + _trace, true, {_type: '${label}'});`,
+										`let _ordernumber = document.getElementById('_ordernumber').value, _name = document.getElementById('_name').value, _commission = document.getElementById('_commission').value, _vendor = document.getElementById('_vendor').value, _trace = document.getElementById('_trace').value;` +
+										` _client.application.postLabelSheet(_ordernumber + ' - ' + _name.substring(0, 64) + ' - ' + _vendor + ' - ' + _commission + ' - ' + _trace, true, {_type: '${label}'});`,
 								},
 							});
 						}
@@ -566,7 +573,10 @@ const _client = {
 								});
 							}
 								.toString()
-								._replaceArray(["labels", "element.ordernumber", "element.name", "element.vendor", "buttons"], [JSON.stringify(labels), element.ordernumber, element.name, element.vendor, JSON.stringify(buttons)]),
+								._replaceArray(
+									["labels", "element.ordernumber", "element.name", "element.commission", "element.vendor", "buttons"],
+									[JSON.stringify(labels), element.ordernumber, element.name, element.commission, element.vendor, JSON.stringify(buttons)]
+								),
 						},
 						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? LANG.GET("order.copy_or_labelsheet") : LANG.GET("order.copy_value"),
 					});
