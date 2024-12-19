@@ -122,8 +122,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 #### purchase considerations
 * reinstall token scan for order approval, match with present orderauth
-* display order number as qr-code if no ean is given
-* qr-code for commission
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * translation mask for erp dumps of orders - currently missing identifier matching
 * add commission by default to order label export
@@ -1079,6 +1077,7 @@ issue_mail = "dev@erroronline.one" ; address for application and security issues
 require_record_type_selection = 1 ; 1: yes, 0: no; require selection on records e.g. if this is related to a complaint 
 timezone = "Europe/Berlin" ; timezone for calendar handling
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
+order_gtin_barcode = 1 ; 1: yes, 0: no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
@@ -1713,8 +1712,8 @@ Discussed stakeholder requirements:
 | Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
 | Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
 | Personal token as order approval an option after all | CEO | 2024-12-12 | |
-| Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | |
-| Commission qr-code within orders | CEO, Purchase | 2024-12-12 | |
+| Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
+| Commission qr-code within orders | CEO, Purchase | 2024-12-12 |  Implemented; 2024-12-19 |
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | |
 
 [Content](#content)

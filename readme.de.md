@@ -971,6 +971,7 @@ issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf 
 require_complaint_selection = 1 ; 1: ja, 0: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
 timezone = "Europe/Berlin" ; Zeitzone für den Kalender
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
+order_gtin_barcode = 1 ; 1: ja, 0: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31" ; Monat-Tag
