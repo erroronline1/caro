@@ -60,7 +60,8 @@ class APPLICATION extends API {
 	public function login(){
 		if (!$this->_requestedLogout){
 			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && isset($_SESSION['user'])){
-				$this->response(['user' => [
+				$this->response([
+					'user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id']),
@@ -69,6 +70,9 @@ class APPLICATION extends API {
 					]
 				],
 				'config' => [
+					'application' => [
+						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
+					],
 					'lifespan' => [
 						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
 					],
@@ -91,23 +95,27 @@ class APPLICATION extends API {
 				$_SESSION['user']['units'] = explode(',', $result['units']);
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
-				$this->response(['user' => [
+				$this->response([
+					'user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'cached_identity' => hash('sha256', $_SESSION['user']['id']),
 					'permissions' => [
 						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 					]
+				],
+				'config' => [
+					'application' => [
+						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
 					],
-					'config' => [
-						'lifespan' => [
-							'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
-						],
-						'limits' => [
-							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-						],
-						'label' => CONFIG['label']
-					]]);
+					'lifespan' => [
+						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+					],
+					'limits' => [
+						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+					],
+					'label' => CONFIG['label']
+				]]);
 			}
 		}
 		session_unset();
