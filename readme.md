@@ -119,6 +119,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 #### purchase considerations
 * reinstall token scan for order approval, match with present orderauth
+    * select available auth methods from config flags order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
+    * don't forget to match passed auth with config methods (post order, put prepared)
+    * adjust [order](#order) documentation
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * translation mask for erp dumps of orders - currently missing identifier matching
 
