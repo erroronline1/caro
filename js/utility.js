@@ -407,7 +407,24 @@ const _client = {
 					attributes: {
 						name: LANG.GET("order.ordertype." + element.ordertype),
 						"data-type": element.ordertype,
+						class: "imagealigned",
 					},
+				});
+
+				// display approval signature
+				if (element.approval != null)
+					collapsible.push({
+						type: "image",
+						attributes: {
+							imageonly: {},
+							name: LANG.GET("order.approval_image"),
+							url: data.approval[element.approval],
+							class: "order2dcode",
+						},
+					});
+
+				collapsible.push({
+					type: "br",
 				});
 
 				// append commission
@@ -431,6 +448,7 @@ const _client = {
 							value: element.commission,
 							name: LANG.GET("order.commission"),
 							readonly: true,
+							class: "imagealigned",
 							onpointerup: function () {
 								new Dialog({
 									type: "input",
@@ -459,6 +477,19 @@ const _client = {
 						hint: LANG.GET("order.copy_or_labelsheet"),
 					});
 				}
+				// display qrcode
+				collapsible.push({
+					type: "image",
+					attributes: {
+						imageonly: {},
+						qrcode: element.commission,
+						class: "order2dcode",
+					},
+				});
+
+				collapsible.push({
+					type: "br",
+				});
 
 				// append order number
 				if (element.ordernumber) {
@@ -503,12 +534,14 @@ const _client = {
 							});
 						}
 					}
+
 					collapsible.push({
 						type: "text_copy",
 						attributes: {
 							value: element.ordernumber,
 							name: LANG.GET("order.ordernumber_label"),
 							readonly: true,
+							class: "imagealigned",
 							onpointerup: function () {
 								new Dialog({
 									type: "input",
@@ -536,6 +569,30 @@ const _client = {
 								._replaceArray(["labels", "element.ordernumber", "element.name", "element.vendor", "buttons"], [JSON.stringify(labels), element.ordernumber, element.name, element.vendor, JSON.stringify(buttons)]),
 						},
 						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? LANG.GET("order.copy_or_labelsheet") : LANG.GET("order.copy_value"),
+					});
+
+					// display barcode
+					if (element.barcode && Boolean(Number(api._settings.config.application.order_gtin_barcode)))
+						collapsible.push({
+							type: "image",
+							attributes: {
+								imageonly: {},
+								barcode: { value: element.barcode },
+								class: "order2dcode",
+							},
+						});
+					else
+						collapsible.push({
+							type: "image",
+							attributes: {
+								imageonly: {},
+								qrcode: element.ordernumber,
+								class: "order2dcode",
+							},
+						});
+
+					collapsible.push({
+						type: "br",
 					});
 				}
 
@@ -586,27 +643,6 @@ const _client = {
 						},
 					});
 				}
-
-				// display barcode
-				if (element.barcode)
-					collapsible.push({
-						type: "image",
-						attributes: {
-							imageonly: { width: "15em", height: "6em" },
-							barcode: { value: element.barcode },
-						},
-					});
-
-				// display approval signature
-				if (element.approval != null)
-					collapsible.push({
-						type: "image",
-						attributes: {
-							imageonly: { width: "15em", height: "6em" },
-							name: LANG.GET("order.approval_image"),
-							url: data.approval[element.approval],
-						},
-					});
 
 				// append orderer and message option
 				if (element.orderer) {
