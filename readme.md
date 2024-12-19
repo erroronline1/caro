@@ -109,16 +109,13 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * statistics on documentation entries
 
 #### purchase considerations
-* general orders select workshop storage number
 
 #### records considerations
 * linked files on separate external path, input type convert to link
-* purchase: batch identifier (product and delivery note number) for...
-* material tracing within documentation
 
 ## development
-* failsafe on unfound component names on form assembly (backend). is this real production thread?
 * verify osx safari compatibility
+* assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations
 * reinstall token scan for order approval, match with present orderauth
@@ -1712,7 +1709,7 @@ Discussed stakeholder requirements:
 | Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
 | Personal token as order approval an option after all | CEO | 2024-12-12 | |
 | Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
-| Commission qr-code within orders | CEO, Purchase | 2024-12-12 |  Implemented; 2024-12-19 |
+| Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | |
 
 [Content](#content)
