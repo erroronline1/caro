@@ -491,7 +491,7 @@ export class Assemble {
 						ecLevel: api._settings.config.limits && api._settings.config.limits.qr_errorlevel ? api._settings.config.limits.qr_errorlevel : "M",
 						background: null,
 						fill: "#000000",
-						radius: 1,
+						radius: 0,
 					},
 					document.getElementById(image.id)
 				);
