@@ -33,6 +33,7 @@ class AUDIT extends API {
 	private $_requestedType = null;
 	private $_requestedDate = null;
 	private $_requestedID = null;
+	private $_requestedOption = null;
 	private $_requestedTime = null;
 
 	/**
@@ -43,7 +44,7 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('audits')) $this->response([], 401);
 
 		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_requestedDate = $this->_requestedID = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_requestedDate = $this->_requestedID = $this->_requestedOption = isset(REQUEST[3]) ? REQUEST[3] : null;
 		$this->_requestedTime = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
@@ -1101,9 +1102,24 @@ class AUDIT extends API {
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 
+		$options = [
+			LANG::GET('audit.userskills_training_evaluation_pending') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation')"],
+			LANG::GET('audit.userskills_training_evaluation_closed') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation', 'closed')"],
+			LANG::GET('audit.userskills_training_evaluation_all') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation', 'all')"],
+		];
+		if (!$this->_requestedOption) $options[LANG::GET('audit.userskills_training_evaluation_pending')]['checked'] = true;
+		if ($this->_requestedOption === 'closed') $options[LANG::GET('audit.userskills_training_evaluation_closed')]['checked'] = true;
+		if ($this->_requestedOption === 'all') $options[LANG::GET('audit.userskills_training_evaluation_all')]['checked'] = true;
+		$content[] = [
+			'type' => 'radio',
+			'attributes' => [
+				'name' => LANG::GET('audit.userskills_training_evaluation_display')
+			],
+			'content' => $options
+		];
 		require_once('_shared.php');
-		$document = new SHARED($this->_pdo);
-		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
+		$sharedfunction = new SHARED($this->_pdo);
+		$evaluationdocument = $sharedfunction->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'training_evaluation_document'
 			]])['content'];
@@ -1129,7 +1145,10 @@ class AUDIT extends API {
 				return $row['user_id'] === $user_id;
 			})){
 				foreach ($usertrainings as $row){
-					if ($row['evaluation']) continue;
+					if (!$this->_requestedOption && $row['evaluation']) continue;
+					if ($this->_requestedOption === 'closed' && !$row['evaluation']) continue;
+
+					$row['evaluation'] = json_decode($row['evaluation'] ? : '', true);
 					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
@@ -1139,9 +1158,16 @@ class AUDIT extends API {
 							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
 						}
 					}
+
+					$evaluation = $row['evaluation'] ? "\n\n" . LANG::GET('audit.userskills_training_evaluation', [
+						':user' => $row['evaluation']['user'],
+						':date' => $row['evaluation']['date'],
+						':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
+					]) : '';
+
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'] . $evaluation,
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [
@@ -1150,13 +1176,14 @@ class AUDIT extends API {
 							$row['file_path'] => ['href' => $row['file_path']]
 						]
 					];
+
 					$content[count($content) - 1][] = [
 						'type' => 'button',
 						'attributes' => [
 							'type' => 'button',
 							'value' => LANG::GET('audit.checks_type.trainingevaluation'),
 							'onpointerup' => "new Dialog({type: 'input', header: '" . LANG::GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . json_encode(
-								$evaluationdocument
+								$sharedfunction->populatedocument($evaluationdocument, $row['evaluation'] ? $row['evaluation']['content'] : [])
 							) . "'), options:{".
 							"'" . LANG::GET('general.cancel_button') . "': false,".
 							"'" . LANG::GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".

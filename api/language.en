@@ -477,7 +477,10 @@ userskills_bulk_training = "Apply training to multiple employees"
 userskills_bulk_user = "Employee"
 userskills_training_evaluation = ":user evaluated this training on :date ""
 :evaluation"
+userskills_training_evaluation_display = "Display"
 userskills_training_evaluation_pending = "Evaluation pending"
+userskills_training_evaluation_closed = "Closed"
+userskills_training_evaluation_all = "All"
 userskills_notification_message = "The users :user training for :training on :date is due for evaluation. Please check :module-module or delegate."
 
 ; all keys are hardcoded

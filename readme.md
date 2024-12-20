@@ -148,7 +148,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * vendors link vendor
     * conversations
     * possible shared search methods?
-* option to revoke training evaluation or reevaluate trainings, e.g. audit->trainingevaluation() display all, evaluated, pending
 
 #### records considerations
 
@@ -994,11 +993,13 @@ The audit module gathers data from the application in regards of proofing lists 
 * user skills and trainings
 * skill fulfilment
 * vendor list
-* order statistics
 * complaints
 * regulatory issues
 * risks
-* training evaluation
+
+The module provides a structured Excel-export of order statistics to support vendor evaluation based on delivery data.
+
+Furthermore the module contains the option for training evaluation. Evaluations can be edited.
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 

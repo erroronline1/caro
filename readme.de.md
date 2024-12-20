@@ -883,11 +883,13 @@ Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Lis
 * Mitarbeiterqualifikationen und Schulungen
 * Qualifikationserfüllung
 * Lieferantenverzeichnis
-* Bestellstatistiken
 * Reklamationen
 * regulatorische Anforderungen
 * Risiken
-* Schulungsbewertungen
+
+Das Modul stellt einen strukturierten Excel-Export der Bestellstatistiken zur Verfügung um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen. 
+
+Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen können angepasst werden.
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 
