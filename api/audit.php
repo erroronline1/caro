@@ -1103,7 +1103,7 @@ class AUDIT extends API {
 
 		require_once('_shared.php');
 		$document = new SHARED($this->_pdo);
-		$evaluationdocument = $document->recentform('document_document_get_by_context', [
+		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'training_evaluation_document'
 			]])['content'];
@@ -1405,8 +1405,7 @@ class AUDIT extends API {
 							':date' => $row['evaluation']['date'],
 							':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
 						]);
-					} else $evaluation =LANG::GET('audit.userskills_training_evaluation_pending');
-
+					} else $evaluation = LANG::GET('audit.userskills_training_evaluation_pending');
 
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
