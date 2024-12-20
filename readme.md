@@ -143,6 +143,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * vendors link vendor
     * conversations
     * possible shared search methods?
+* option to revoke training evaluation or reevaluate trainings, e.g. audit->trainingevaluation() display all, evaluated, pending
 
 #### records considerations
 
