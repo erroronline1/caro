@@ -1471,6 +1471,7 @@ class CONSUMABLES extends API {
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+					// unsetting ... is not recommended in this case to rise awareness for respective settings of vendor evaluation
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 					else $evaluation[$key] = $value;
@@ -1574,6 +1575,7 @@ class CONSUMABLES extends API {
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
+					// unsetting ... is not recommended in this case to rise awareness for respective settings of vendor evaluation
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 					else $evaluation[$key] = $value;
