@@ -323,6 +323,41 @@ class SHARED {
 	}
 
 	/**
+	 *                   _     _         _                           _   
+	 *   ___ ___ ___ _ _| |___| |_ ___ _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  | . | . | . | | | | .'|  _| -_| . | . |  _| | |     | -_|   |  _|
+	 *  |  _|___|  _|___|_|__,|_| |___|___|___|___|___|_|_|_|___|_|_|_|  
+	 *  |_|     |_| 
+	 * populate a document with passed payload
+	 * @param array $element document structure
+	 * @param array $values payload
+	 * @return array prefilled document structure
+	 */
+	public function populatedocument($element, $values){
+		$content = [];
+		foreach($element as $subs){
+			if (!isset($subs['type'])){
+				$content[] = self::populatedocument($subs, $values);
+			}
+			else {
+				$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+				if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
+					$settings = explode(' | ', $values[$underscored_name]);
+					foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+						if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
+						else $subs['content'][$key]['checked'] = true;
+					}
+				}
+				elseif (isset($values[$underscored_name])){
+					$subs['attributes']['value'] = $values[$underscored_name];
+				}
+				$content[] = $subs;
+			}
+		}
+		return $content;
+	}
+
+	/**
 	 *                     _       _         _                 _           _ 
 	 *   _ _ ___ _____ ___| |_ ___| |_ ___ _| |___ ___ ___ _ _|_|___ ___ _| |
 	 *  | | |   |     | .'|  _|  _|   | -_| . |  _| -_| . | | | |  _| -_| . |
@@ -333,7 +368,7 @@ class SHARED {
 	 * @param array $values payload
 	 * @return array of unmatched document names
 	 */
-	function unmatchedrequired($element, $values){
+	public function unmatchedrequired($element, $values){
 		$content = [];
 		foreach($element as $subs){
 			if (!isset($subs['type'])){

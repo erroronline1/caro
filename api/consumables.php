@@ -1429,31 +1429,6 @@ class CONSUMABLES extends API {
 			]]);
 		$evaluationdocument = $evaluationdocument ? $evaluationdocument['content'] : [];
 
-		// prefill evaluation data into valid form on editing vendors
-		function prefill($element, $values){
-			$content = [];
-			foreach($element as $subs){
-				if (!isset($subs['type'])){
-					$content[] = prefill($subs, $values);
-				}
-				else {
-					$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
-						$settings = explode(' | ', $values[$underscored_name]);
-						foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
-							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
-							else $subs['content'][$key]['checked'] = true;
-						}
-					}
-					elseif (isset($values[$underscored_name])){
-						$subs['attributes']['value'] = $values[$underscored_name];
-					}
-					$content[] = $subs;
-				}
-			}
-			return $content;
-		};
-		
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
@@ -1789,7 +1764,7 @@ class CONSUMABLES extends API {
 					// display form for adding a new or edit a current vendor
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 
-					$evaluationdocument = prefill($evaluationdocument, $vendor['evaluation']);
+					$evaluationdocument = $sharedfunction->populatedocument($evaluationdocument, $vendor['evaluation']);
 					if (isset($vendor['evaluation']['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
