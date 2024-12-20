@@ -1421,6 +1421,8 @@ class CONSUMABLES extends API {
 			'sales_representative' => 'consumables.edit_vendor_sales_representative',
 			'customer_id' => 'consumables.edit_vendor_customer_id',
 		];
+		require_once('_shared.php');
+		$evaluationdocument = new SHARED($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
@@ -1752,7 +1754,10 @@ class CONSUMABLES extends API {
 								$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
 								if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
 									$settings = explode(' | ', $values[$underscored_name]);
-									foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) $subs['content'][$key]['checked'] = true;
+									foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+										if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
+										else $subs['content'][$key]['checked'] = true;
+									}
 								}
 								elseif (isset($values[$underscored_name])){
 									$subs['attributes']['value'] = $values[$underscored_name];
@@ -1764,9 +1769,7 @@ class CONSUMABLES extends API {
 					};
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 
-					require_once('_shared.php');
-					$document = new SHARED($this->_pdo);
-					$evaluationdocument = prefill($document->recentdocument('document_document_get_by_context', [
+					$evaluationdocument = prefill($evaluationdocument->recentdocument('document_document_get_by_context', [
 						'values' => [
 							':context' => 'vendor_evaluation_document'
 						]])['content'], $vendor['evaluation']);
