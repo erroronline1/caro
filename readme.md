@@ -123,6 +123,11 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * don't forget to match passed auth with config methods (post order, put prepared)
     * adjust [order](#order) documentation
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
+* OR aut idem option for articles
+    * changes in db structure, aud idem field neccessary
+    * changes in prepared order array neccessary
+    * option for purchase to change ordered article, then append original order to infomation, otherwise incorporation and sample check would mess up
+    * but this might be a more seamless solution ux-wise
 * translation mask for erp dumps of orders - currently missing identifier matching
 * vendor evaluation document check for required evaluation form elements and return error if missing on post/put vendor
 
