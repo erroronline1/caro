@@ -124,6 +124,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * adjust [order](#order) documentation
 * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * translation mask for erp dumps of orders - currently missing identifier matching
+* vendor evaluation document check for required evaluation form elements and return error if missing on post/put vendor
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
