@@ -154,7 +154,7 @@ const oldform2 = {
 
 export function rendertest(element) {
 	let tests = {
-		forms: {
+		documents: {
 			content: [
 				[
 					{
@@ -200,8 +200,9 @@ export function rendertest(element) {
 						type: "text",
 						attributes: {
 							name: "A simple text input",
+							required: true
 						},
-						hint: "Clarify with hints",
+						hint: "Clarify with hints, required fields are makred with an asterisk",
 					},
 					{
 						type: "textarea",
@@ -358,8 +359,9 @@ export function rendertest(element) {
 						type: "text",
 						attributes: {
 							name: "Eine einfache Texteingabe",
+							required: true
 						},
-						hint: "Erläutere mit Hinweisen",
+						hint: "Erläutere mit Hinweisen, erforderliche Felder werden mit einem Sternchen gekennzeichnet",
 					},
 					{
 						type: "textarea",
