@@ -875,7 +875,7 @@ Products are intended to be selected from the database populated by pricelist im
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.
 Manual orders allow a quick import to the products database.
 
-Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin.
+Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin, personal access token or signature, based on [configuration settings](#runtime-variables).
 
 Approved orders can be marked as *ordered*, *received*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.
 
@@ -1080,10 +1080,11 @@ Some variables can be edited during runtime. This applies for all *values* of la
 [application]
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX files; user can customize within profile
 issue_mail = "dev@erroronline.one" ; address for application and security issues
+order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
+order_gtin_barcode = 0 ; 1: yes, 0: no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 require_record_type_selection = 1 ; 1: yes, 0: no; require selection on records e.g. if this is related to a complaint 
 timezone = "Europe/Berlin" ; timezone for calendar handling
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
-order_gtin_barcode = 1 ; 1: yes, 0: no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 
 [calendar]
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"

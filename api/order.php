@@ -675,6 +675,35 @@ class ORDER extends API {
 					if (isset($order['order_type']) && $order['order_type'] == $key) $order_type[$description]['selected'] = true;
 				}
 
+				$authorize = [
+					[
+						[
+							'type' => 'number',
+							'attributes' => [
+								'name' => LANG::GET('user.edit_order_authorization'),
+								'type' => 'password'
+							]
+						]
+					]
+				];
+				if (preg_match('/token/i', CONFIG['application']['order_auth'])) $authorize[] = [
+					[
+						'type' => 'scanner',
+						'attributes' => [
+							'name' => LANG::GET('user.edit_token'),
+							'type' => 'password'
+						]
+					]
+				];
+				if (preg_match('/signature/i', CONFIG['application']['order_auth'])) $authorize[] = [
+					[
+						'type' => 'signature',
+						'attributes' => [
+							'name' => LANG::GET('order.add_approval_signature')
+						]
+					]
+				];
+
 				$result['render'] = ['form' => [
 					'data-usecase'=> 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
@@ -819,25 +848,7 @@ class ORDER extends API {
 							]
 						]
 					],
-					[
-						[
-							[
-								'type' => 'number',
-								'attributes' => [
-									'name' => LANG::GET('user.edit_order_authorization'),
-									'type' => 'password'
-								]
-							]
-						],
-						[
-							[
-								'type' => 'signature',
-								'attributes' => [
-									'name' => LANG::GET('order.add_approval_signature')
-								]
-							]
-						]
-					],
+					$authorize,
 				]];
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
 					array_splice($result['render']['content'][2], 1, 0, [[
@@ -1112,7 +1123,7 @@ class ORDER extends API {
 				if ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
 					$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
 						'values' => [
-							':orderauth' => orderauth
+							':orderauth' => $orderauth
 						]
 					]);
 					$result = $result ? $result[0] : null;
@@ -1120,7 +1131,18 @@ class ORDER extends API {
 						$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 					}
 				}
-				if (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
+				elseif ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_token'))){
+					$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+						'values' => [
+							':token' => $orderauth
+						]
+					]);
+					$result = $result ? $result[0] : null;
+					if ($result && $result['orderauth']){
+						$approval = $result['name'] . LANG::GET('order.token_verified');
+					}
+				}
+				elseif (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
 					$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
 					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 				}
@@ -1271,7 +1293,7 @@ class ORDER extends API {
 						}
 					}
 					if ($_SESSION['user']['orderauth'] && count($organizational_orders)) {
-						array_push($result['render']['content'], [
+						$authorize = [
 							[
 								[
 									'type' => 'number',
@@ -1280,16 +1302,27 @@ class ORDER extends API {
 										'type' => 'password'
 									]
 								]
-							],
+							]
+						];
+						if (preg_match('/token/i', CONFIG['application']['order_auth'])) $authorize[] = [
 							[
-								[
-									'type' => 'signature',
-									'attributes' => [
-										'name' => LANG::GET('order.add_approval_signature')
-									]
+								'type' => 'scanner',
+								'attributes' => [
+									'name' => LANG::GET('user.edit_token'),
+									'type' => 'password'
 								]
 							]
-						]);
+						];
+						if (preg_match('/signature/i', CONFIG['application']['order_auth'])) $authorize[] = [
+							[
+								'type' => 'signature',
+								'attributes' => [
+									'name' => LANG::GET('order.add_approval_signature')
+								]
+							]
+						];
+		
+						array_push($result['render']['content'], $authorize);
 						$result['render']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
 					}
 				}
@@ -1322,10 +1355,23 @@ class ORDER extends API {
 			]);
 			$result = $result ? $result[0] : null;
 			if ($result){
-				$approval = $result['name'] . LANG::GET('order.orderauth_verified', [], true);
+				$approval = $result['name'] . LANG::GET('order.orderauth_verified');
 			}
-			unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
 		}
+		elseif ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_token'))){
+			$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+				'values' => [
+					':token' => $orderauth
+				]
+			]);
+			$result = $result ? $result[0] : null;
+			if ($result && $result['orderauth']){
+				$approval = $result['name'] . LANG::GET('order.token_verified');
+			}
+		}
+		unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
+		unset ($this->_payload->{LANG::PROPERTY('user.edit_token')});
+
 		if (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
