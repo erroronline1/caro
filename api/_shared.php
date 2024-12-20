@@ -340,7 +340,8 @@ class SHARED {
 				$content[] = self::populatedocument($subs, $values);
 			}
 			else {
-				$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+				if (!isset($values[$subs['attributes']['name']])) $underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+				else $underscored_name = $subs['attributes']['name'];
 				if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
 					$settings = explode(' | ', $values[$underscored_name]);
 					foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
