@@ -129,7 +129,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * option for purchase to change ordered article, then append original order to infomation, otherwise incorporation and sample check would mess up
     * but this might be a more seamless solution ux-wise
 * translation mask for erp dumps of orders - currently missing identifier matching
-* vendor evaluation document check for required evaluation form elements and return error if missing on post/put vendor
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?

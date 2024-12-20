@@ -1422,7 +1422,38 @@ class CONSUMABLES extends API {
 			'customer_id' => 'consumables.edit_vendor_customer_id',
 		];
 		require_once('_shared.php');
-		$evaluationdocument = new SHARED($this->_pdo);
+		$sharedfunction = new SHARED($this->_pdo);
+		$evaluationdocument = $sharedfunction->recentdocument('document_document_get_by_context', [
+			'values' => [
+				':context' => 'vendor_evaluation_document'
+			]]);
+		$evaluationdocument = $evaluationdocument ? $evaluationdocument['content'] : [];
+
+		// prefill evaluation data into valid form on editing vendors
+		function prefill($element, $values){
+			$content = [];
+			foreach($element as $subs){
+				if (!isset($subs['type'])){
+					$content[] = prefill($subs, $values);
+				}
+				else {
+					$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
+						$settings = explode(' | ', $values[$underscored_name]);
+						foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
+							else $subs['content'][$key]['checked'] = true;
+						}
+					}
+					elseif (isset($values[$underscored_name])){
+						$subs['attributes']['value'] = $values[$underscored_name];
+					}
+					$content[] = $subs;
+				}
+			}
+			return $content;
+		};
+		
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
@@ -1473,10 +1504,17 @@ class CONSUMABLES extends API {
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
-					// unsetting ... is not recommended in this case to rise awareness for respective settings of vendor evaluation
 					////////////////////////////////////////
-					if (!$value || $value == 'on') unset($this->_payload->$key);
+					if (!$value || $value === 'on' || $value === '...') unset($this->_payload->$key);
 					else $evaluation[$key] = $value;
+				}
+				if ($missing = $sharedfunction->unmatchedrequired($evaluationdocument, $evaluation)) {
+					$this->response([
+						'response' => [
+							'id' => $vendor['id'],
+							'msg' => LANG::GET('general.missing_form_data') . "\n". implode("\n- ", $missing),
+							'type' => 'error'
+						]]);
 				}
 				$vendor['evaluation'] = $evaluation;
 				$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
@@ -1577,10 +1615,17 @@ class CONSUMABLES extends API {
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
-					// unsetting ... is not recommended in this case to rise awareness for respective settings of vendor evaluation
 					////////////////////////////////////////
-					if (!$value || $value == 'on') unset($this->_payload->$key);
+					if (!$value || $value === 'on' || $value === '...') unset($this->_payload->$key);
 					else $evaluation[$key] = $value;
+				}
+				if ($missing = $sharedfunction->unmatchedrequired($evaluationdocument, $evaluation)) {
+					$this->response([
+						'response' => [
+							'id' => $vendor['id'],
+							'msg' => LANG::GET('general.missing_form_data') . "\n". implode("\n- ", $missing),
+							'type' => 'error'
+						]]);
 				}
 				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 				$vendor_evaluation_copy = $vendor['evaluation'];
@@ -1742,37 +1787,9 @@ class CONSUMABLES extends API {
 				}
 				else {
 					// display form for adding a new or edit a current vendor
-
-					// prefill evaluation data into valid form
-					function prefill($element, $values){
-						$content = [];
-						foreach($element as $subs){
-							if (!isset($subs['type'])){
-								$content[] = prefill($subs, $values);
-							}
-							else {
-								$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-								if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
-									$settings = explode(' | ', $values[$underscored_name]);
-									foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
-										if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
-										else $subs['content'][$key]['checked'] = true;
-									}
-								}
-								elseif (isset($values[$underscored_name])){
-									$subs['attributes']['value'] = $values[$underscored_name];
-								}
-								$content[] = $subs;
-							}
-						}
-						return $content;
-					};
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 
-					$evaluationdocument = prefill($evaluationdocument->recentdocument('document_document_get_by_context', [
-						'values' => [
-							':context' => 'vendor_evaluation_document'
-						]])['content'], $vendor['evaluation']);
+					$evaluationdocument = prefill($evaluationdocument, $vendor['evaluation']);
 					if (isset($vendor['evaluation']['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
