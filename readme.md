@@ -1073,7 +1073,7 @@ Technically the application is being usable on any webserver but this is **not r
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.XX files and some settings in config.ini
+Some variables can be edited during runtime. This applies for all *values* of language.XX files and some settings in config.ini. These options are mostly considered critical for the applications stability, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
 
 ```
 ; general application settings
