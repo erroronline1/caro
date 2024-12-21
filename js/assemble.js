@@ -987,6 +987,7 @@ export class Assemble {
 			attributes:{
 				name: 'checkboxes or radio', // grouping name for checkboxes, formerly description
 			}
+			inline: boolean, // displays only the inputs, can be omitted
 			numeration: anything resulting in true to prevent enumeration
 			content: {
 				'Checkbox 1': {
@@ -999,8 +1000,9 @@ export class Assemble {
 			hint: 'this selection is for...'
 		}*/
 		this.currentElement.description = this.currentElement.attributes && this.currentElement.attributes.name ? this.currentElement.attributes.name.replace(/\[\]/g, "") : null;
-		const result = [...this.header()],
+		const result = [],
 			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
+		if (!this.currentElement.inline) result.push(...this.header());
 		for (const [checkbox, attributes] of Object.entries(this.currentElement.content)) {
 			let label = document.createElement("label"),
 				input = document.createElement("input");
@@ -1024,6 +1026,7 @@ export class Assemble {
 			result.push(input);
 			result.push(label);
 		}
+		if (this.currentElement.inline) return result;
 		return [...result, ...this.hint(), document.createElement("br")];
 	}
 

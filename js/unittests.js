@@ -200,7 +200,7 @@ export function rendertest(element) {
 						type: "text",
 						attributes: {
 							name: "A simple text input",
-							required: true
+							required: true,
 						},
 						hint: "Clarify with hints, required fields are makred with an asterisk",
 					},
@@ -359,7 +359,7 @@ export function rendertest(element) {
 						type: "text",
 						attributes: {
 							name: "Eine einfache Texteingabe",
-							required: true
+							required: true,
 						},
 						hint: "Erläutere mit Hinweisen, erforderliche Felder werden mit einem Sternchen gekennzeichnet",
 					},
@@ -561,6 +561,16 @@ export function rendertest(element) {
 							rows: 3,
 						},
 						hint: "As comparison",
+					},
+					{
+						type: "checkbox",
+						inline: true,
+						content: {
+							these: [],
+							checkboxes: [],
+							"are displayed": [],
+							inline: [],
+						},
 					},
 				],
 				[
@@ -767,6 +777,16 @@ export function rendertest(element) {
 							rows: 3,
 						},
 						hint: "Als Vergleich",
+					},
+					{
+						type: "checkbox",
+						inline: true,
+						content: {
+							"Diese Boxen": [],
+							werden: [],
+							eingereiht: [],
+							angezeigt: [],
+						},
 					},
 				],
 				[
