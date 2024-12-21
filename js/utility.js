@@ -740,7 +740,7 @@ const _client = {
 					states[LANG.GET("order.order." + state)] = {};
 					for (const [attribute, value] of Object.entries(attributes)) states[LANG.GET("order.order." + state)][attribute] = value;
 					if (attributes["data-" + state] === "true") states[LANG.GET("order.order." + state)].checked = true;
-					if (!attributes.disabled) states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+					if (!attributes.disabled && !states[LANG.GET("order.order." + state)].onchange) states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				if (states[LANG.GET("order.order.partially_received")] && !states[LANG.GET("order.order.partially_received")].disabled) {
 					buttons = {};
