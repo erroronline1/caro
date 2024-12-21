@@ -210,4 +210,5 @@
 13.12.24;7:"file-api, form-api, record-api, application-api"
 14.12.24;12;"code-maintainance, development-setup"
 17.12.24;2;"delevopment-setup, records-api"
-18.12.24;2;"user_api, record_api"
+18.12.24;2;"user-api, record-api"
+20.12.24;6;"consumables-api, audit-api, order-api" 
