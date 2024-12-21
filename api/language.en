@@ -854,7 +854,7 @@ attached_files = "Attached files"
 add_approval_signature = "Approval signature"
 
 message_orderer = "Message to :orderer"
-message = ":quantity :unit :number :name :aut_idem by :vendor for :commission\n:info"
+message = ":quantity :unit :number :name by :vendor :aut_idem for :commission\n:info"
 orderauth_verified = " verified by pin"
 token_verified = " verified by token"
 saved_to_prepared = "Order has been saved to prepared orders but has still to be approved."

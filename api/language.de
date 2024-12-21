@@ -854,7 +854,7 @@ attached_files = "Angehängte Dateien"
 add_approval_signature = "Unterschrift zur Freigabe"
 
 message_orderer = "Mitteilung an :orderer"
-message = ":quantity :unit :number :name :aut_idem von :vendor für :commission\n:info"
+message = ":quantity :unit :number :name von :vendor :aut_idem für :commission\n:info"
 orderauth_verified = " mit PIN freigegeben"
 token_verified = " mit Token freigegeben"
 saved_to_prepared = "Die Bestellung wurde zu den vorbereiteten Bestellungen hinzugefügt, muss aber noch freigegeben werden."
