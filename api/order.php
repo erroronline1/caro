@@ -177,6 +177,7 @@ class ORDER extends API {
 								'number' => 'ordernumber_label',
 								'name' => 'productname_label',
 								'vendor' => 'vendor_label',
+								'aut_idem' => 'aut_idem',
 								'commission' => 'commission'] as $key => $value){
 								$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 							}
@@ -364,6 +365,7 @@ class ORDER extends API {
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
 						'name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : null,
 						'vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : null,
+						'aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? : null,
 						'ordernumber' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : null,
 						'commission' => UTILITY::propertySet($decoded_order_data, 'commission') ? : null,
 						'approval' => null,
@@ -948,6 +950,16 @@ class ORDER extends API {
 								]
 							],
 							[
+								'type' => 'checkbox',
+								'inline' => true,
+								'attributes' => [
+									'name' => LANG::GET('order.aut_idem') . '[]'
+								],
+								'content' => [
+									LANG::GET('order.aut_idem') => UTILITY::propertySet($order['items'][$i], 'aut_idem') ? ['checked' => true] : []
+								]
+							],
+							[
 								'type' => 'deletebutton',
 								'attributes' => [
 									'value' => LANG::GET('order.add_delete'),
@@ -1230,7 +1242,8 @@ class ORDER extends API {
 										':unit' => UTILITY::propertySet($item, 'unit_label') ? : '',
 										':number' => UTILITY::propertySet($item, 'ordernumber_label') ? : '',
 										':name' => UTILITY::propertySet($item, 'productname_label') ? : '',
-										':vendor' => UTILITY::propertySet($item, 'vendor_label') ? : ''
+										':vendor' => UTILITY::propertySet($item, 'vendor_label') ? : '',
+										':aut_idem' => UTILITY::propertySet($item, 'aut_idem') ? : ''
 									])."\n";
 								}
 							} else {

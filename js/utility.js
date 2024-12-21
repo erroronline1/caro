@@ -281,6 +281,8 @@ const _client = {
 			// cart-content has a twin within order.php "order"-get method
 			if ([...data].length < 6) data = ["", ...data];
 			else data = [...data];
+			const autidem = {};
+			autidem[LANG.GET('order.aut_idem')] = [];
 			const nodes = document.querySelectorAll("main>form>article"),
 				cart = {
 					content: [
@@ -343,6 +345,14 @@ const _client = {
 								},
 							},
 							{
+								type: 'checkbox',
+								inline: true,
+								attributes: {
+									name: LANG.GET('order.aut_idem') + '[]'
+								},
+								content: autidem
+							},
+							{
 								type: "deletebutton",
 								attributes: {
 									value: LANG.GET("order.add_delete"),
@@ -403,6 +413,7 @@ const _client = {
 							":number": element.ordernumber ? element.ordernumber : "",
 							":name": element.name ? element.name : "",
 							":vendor": element.vendor ? element.vendor : "",
+							":aut_idem": element.aut_idem ? element.aut_idem : "",
 						}) + (element.ordertext ? "\n" + element.ordertext : ""),
 					attributes: {
 						name: LANG.GET("order.ordertype." + element.ordertype),
