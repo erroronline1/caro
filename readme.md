@@ -118,16 +118,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations
-* reinstall token scan for order approval, match with present orderauth
-    * select available auth methods from config flags order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
-    * don't forget to match passed auth with config methods (post order, put prepared)
-    * adjust [order](#order) documentation
-* display alternative articles on ordersearch with matching name? modal before actual import to select from.
-* OR aut idem option for articles
-    * changes in db structure, aud idem field neccessary
-    * changes in prepared order array neccessary
+* aut idem option for articles
     * option for purchase to change ordered article, then append original order to infomation, otherwise incorporation and sample check would mess up
-    * but this might be a more seamless solution ux-wise
+    * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * translation mask for erp dumps of orders - currently missing identifier matching
 
 #### application considerations
@@ -1718,7 +1711,7 @@ Discussed stakeholder requirements:
 | Partial delivery state for orders | User, Purchase | 2024-10-16 | Implemented; 2024-10-26 |
 | Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
 | Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
-| Personal token as order approval an option after all | CEO | 2024-12-12 | |
+| Personal token as order approval an option after all | CEO | 2024-12-12 | Implemented, also configuration option; 2024-12-20 |
 | Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
 | Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | |
