@@ -365,7 +365,7 @@ class ORDER extends API {
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
 						'name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : null,
 						'vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : null,
-						'aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? : null,
+						'aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? LANG::GET('order.aut_idem') : null,
 						'ordernumber' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : null,
 						'commission' => UTILITY::propertySet($decoded_order_data, 'commission') ? : null,
 						'approval' => null,
@@ -1243,7 +1243,7 @@ class ORDER extends API {
 										':number' => UTILITY::propertySet($item, 'ordernumber_label') ? : '',
 										':name' => UTILITY::propertySet($item, 'productname_label') ? : '',
 										':vendor' => UTILITY::propertySet($item, 'vendor_label') ? : '',
-										':aut_idem' => UTILITY::propertySet($item, 'aut_idem') ? : ''
+										':aut_idem' => UTILITY::propertySet($item, 'aut_idem') ? LANG::GET('order.aut_idem') : ''
 									])."\n";
 								}
 							} else {
