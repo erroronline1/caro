@@ -443,52 +443,52 @@ class SQLQUERY {
 
 
 		'document_post' => [
-			'mysql' => "INSERT INTO caro_document (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
-			'sqlsrv' => "INSERT INTO caro_document (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
+			'mysql' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
+			'sqlsrv' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
 		],
 		'document_put' => [
-			'mysql' => "UPDATE caro_document SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_document SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
+			'mysql' => "UPDATE caro_documents SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_documents SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id"
 		],
 		'document_put_approve' => [
-			'mysql' => "UPDATE caro_document SET approval = :approval WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_document SET approval = :approval WHERE id = :id"
+			'mysql' => "UPDATE caro_documents SET approval = :approval WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_documents SET approval = :approval WHERE id = :id"
 		],
 		'document_document_datalist' => [
-			'mysql' => "SELECT * FROM caro_document WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE context NOT IN ('component', 'bundle') ORDER BY name ASC, date DESC"
 		],
 		'document_component_datalist' => [
-			'mysql' => "SELECT * FROM caro_document WHERE context = 'component' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE context = 'component' ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE context = 'component' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE context = 'component' ORDER BY name ASC, date DESC"
 		],
 		'document_bundle_datalist' => [
-			'mysql' => "SELECT * FROM caro_document WHERE context = 'bundle' ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE context = 'bundle' ORDER BY name ASC, date DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE context = 'bundle' ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE context = 'bundle' ORDER BY name ASC, date DESC"
 		],
 		'document_document_get_by_name' => [
-			'mysql' => "SELECT * FROM caro_document WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE name = :name AND context NOT IN ('component', 'bundle') ORDER BY id DESC"
 		],
 		'document_document_get_by_context' => [
-			'mysql' => "SELECT * FROM caro_document WHERE context = :context ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE context = :context ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE context = :context ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE context = :context ORDER BY id DESC"
 		],
 		'document_component_get_by_name' => [
-			'mysql' => "SELECT * FROM caro_document WHERE name = :name AND context = 'component' ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE name = :name AND context = 'component' ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE name = :name AND context = 'component' ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE name = :name AND context = 'component' ORDER BY id DESC"
 		],
 		'document_bundle_get_by_name' => [
-			'mysql' => "SELECT * FROM caro_document WHERE name = :name AND context = 'bundle' ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE name = :name AND context = 'bundle' ORDER BY id DESC"
+			'mysql' => "SELECT * FROM caro_documents WHERE name = :name AND context = 'bundle' ORDER BY id DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE name = :name AND context = 'bundle' ORDER BY id DESC"
 		],
 		'document_get' => [
-			'mysql' => "SELECT * FROM caro_document WHERE id = :id ",
-			'sqlsrv' => "SELECT * FROM caro_document WHERE id = :id"
+			'mysql' => "SELECT * FROM caro_documents WHERE id = :id ",
+			'sqlsrv' => "SELECT * FROM caro_documents WHERE id = :id"
 		],
 		'document_delete' => [
-			'mysql' => "DELETE FROM caro_document WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_document WHERE id = :id"
+			'mysql' => "DELETE FROM caro_documents WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_documents WHERE id = :id"
 		],
 
 

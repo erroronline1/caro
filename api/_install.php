@@ -151,7 +151,7 @@ $queries = [
 				"	PRIMARY KEY (`id`)" .
 				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				,
-				"CREATE TABLE IF NOT EXISTS `caro_document` (" .
+				"CREATE TABLE IF NOT EXISTS `caro_documents` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`alias` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -386,8 +386,8 @@ $queries = [
 				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"
 				,
-				"IF OBJECT_ID(N'caro_document', N'U') IS NULL " .
-				"CREATE TABLE caro_document (" .
+				"IF OBJECT_ID(N'caro_documents', N'U') IS NULL " .
+				"CREATE TABLE caro_documents (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
 				"	alias varchar(MAX) NOT NULL," .
