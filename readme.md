@@ -118,9 +118,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations
-* aut idem option for articles
-    * option for purchase to change ordered article, then append original order to infomation, otherwise incorporation and sample check would mess up
-    * display alternative articles on ordersearch with matching name? modal before actual import to select from.
 * translation mask for erp dumps of orders - currently missing identifier matching
 
 #### application considerations
@@ -868,9 +865,12 @@ Products are intended to be selected from the database populated by pricelist im
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.
 Manual orders allow a quick import to the products database.
 
+Sometimes purchase knows better about favourable terms. If an ordering user doesn't mind about the delivering vendor they can tell purchase to order something similar as well.
+
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin, personal access token or signature, based on [configuration settings](#runtime-variables).
 
 Approved orders can be marked as *ordered*, *received*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.
+If purchase is allowed to order something similar there will be a reminder to update the order for the correct product if necessary, to not mess up the system im terms of incorporation, sample checks or traceability. 
 
 Information can be added anytime.
 Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.

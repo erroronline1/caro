@@ -411,6 +411,15 @@ class ORDER extends API {
 						}
 						switch ($s){
 							case 'ordered':
+								if (!$row['received'] && $data['aut_idem']){
+									$data['state'][$s]['onchange'] =
+										"new Dialog({type:'confirm', header:'" . 
+										LANG::GET('order.aut_idem_order_confirmation', [':user' => $data['orderer'], ':product' => $data['name']]) .
+										"', options:{'" . LANG::GET('general.prevent_dataloss_cancel') . "': false, '" . LANG::GET('general.prevent_dataloss_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {" .
+	 									"if (confirmation) {api.purchase('put', 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
+										"else {this.checked = false; return}" .
+										"});";
+								}
 							case 'received':
 								if (!$permission['orderprocessing']){
 								$data['state'][$s]['disabled'] = true;
