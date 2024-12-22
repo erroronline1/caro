@@ -527,9 +527,9 @@ input[type="checkbox"] {
 .radio,
 .checkbox {
 	display: inline-block;
-	margin: 0.5em -0.5em 0.5em 1.5em;
+	margin: 0.5em 0.25em 0.5em 1.5em;
 	padding: 0.5em 1em;
-	border-radius: 2em;
+	border-radius: 1.3em;
 	background-color: var(--article);
 	width: fit-content;
 	border: 1px solid var(--inputborder);
@@ -537,7 +537,7 @@ input[type="checkbox"] {
 }
 
 .checkbox {
-	padding-left: 1.5em;
+	padding-left: 3em;
 }
 
 .checkbox::before {
@@ -548,11 +548,12 @@ input[type="checkbox"] {
 	width: 0.5em;
 	height: 0.5em;
 	top: 0;
-	left: -0.75em;
+	left: -2.25em;
 	padding: 0.1em 0.6em 0.9em 0.4em;
 	border: 1px solid var(--inputborder);
 	border-radius: 50%;
 	color: transparent;
+	margin-right: 1.6em;
 }
 
 input:checked + .checkbox,
@@ -682,8 +683,8 @@ input[type="range"],
 	margin-left: 2em;
 }
 
-[data-required]::after{
- content: ' *';	
+[data-required]::after {
+	content: " *";
 }
 
 .rangedatalist {
@@ -732,7 +733,7 @@ p {
 p {
 	user-select: all;
 	a {
-		user-select:none;
+		user-select: none;
 	}
 }
 
@@ -945,7 +946,7 @@ article > article {
 	margin: 0.5em;
 	height: max-content;
 	vertical-align: top;
-	overflow:hidden;
+	overflow: hidden;
 }
 
 .collapsible {
@@ -978,14 +979,14 @@ article > article {
 }
 
 .order2dcode {
-	width:15em !important;
-	height:5em !important;
-	float:inline-end !important;
+	width: 15em !important;
+	height: 5em !important;
+	float: inline-end !important;
 }
 
 .imagealigned {
 	width: calc(98% - 15em);
-	float:inline-start;
+	float: inline-start;
 }
 
 .sectionindicator {
@@ -1055,12 +1056,11 @@ article > article {
 		padding: 0 0.25em;
 		border-radius: 3px;
 	}
-	p{
-		a::before{
+	p {
+		a::before {
 			margin: 0 0.2em !important;
+		}
 	}
-}
-
 }
 .message.conversation {
 	padding: 0 5em 0 0;
