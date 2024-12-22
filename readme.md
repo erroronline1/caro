@@ -114,14 +114,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * linked files on separate external path, input type convert to link
 
 ## development
-* verify osx safari compatibility
-    * rendertest PASSED
-    * toast PASSED
-    * dialog PASSED
-    * serviceworker
-    * notifications
-    * scanner
-    * stlviewer
+* verify osx [safari compatibility](#safaris-special-needs), ios compatibility
+    * scanner pending in virtual environment
 * assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations
@@ -130,17 +124,17 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
-* global search on landing page, results as tiles?
-    * users with units and permissions displayed
+* global search on landing page
     * ~~documents~~
+    * ~~files and external documents~~
+    * ~~record identifiers link record~~
+    * users with units and permissions displayed
     * bundles
     * text recommendations
     * risk management
     * schedules
-    * ~~files and external documents~~
     * prepared orders
     * orders by commission
-    * ~~record identifiers link record~~
     * products link product
     * vendors link vendor
     * conversations
@@ -1013,6 +1007,7 @@ Furthermore the module contains the option for training evaluation. Evaluations 
 * Network access for endpoints and a browser
     * Desktop pcs
     * Mobile devices
+    * preferably Firefox, Edge or some other Chromium-Browser, [Safari is not fully compatible](#safaris-special-needs)
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
@@ -1027,7 +1022,7 @@ Tested operating systems, browsers and devices:
 * Win 11 Firefox (until 2024-05-30)
 * Linux Mint 21.3 Firefox 133 (from 2024-05-30)
 * Android 12 Firefox 133
-* MacOS 13 Ventura Safari 18
+* macOS 13 Ventura [Safari 18](#safaris-special-needs), Edge 131, Firefox 133
 * Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a defective recognition of special characters on default installation on Win10)
 
 External scanners must be able to scan 2D-Codes and read UTF-8 character encoding.
@@ -1248,6 +1243,27 @@ products_per_slide = 6
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * Only one timezone is supported.
+
+### Safaris special needs
+as opposed to proper browsers. At least on macOS.
+
+Tests:
+* rendertest **passed**
+* toast **passed**
+* dialog **passed**
+* serviceworker **passed**
+* document composer **passed**
+* notifications **failed on macOS desktop**
+* scanner *pending*
+* stlviewer **failed due to WebGL-implementation bug within WebKit** [1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)
+
+Notes:
+* Notifications in Safari might only work on mobile if the application is added to the home screen as a progressive web app via the *Share*-option.
+* Styling is slightly different because of inconsistent following of web standards
+* WebGL-implementation reportedly seems to have a bug, so the STL-Viewer does not work. [test function](https://get.webgl.org)
+* Disclaimer: it is possible that some restrictions happen because of a self signed certificate for the developer environment SSL-connection. Trust settings were unsuccessful on macOS as well. Also there may be limits due to a virtual test environment.
+
+Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.

@@ -906,6 +906,7 @@ Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen k
 * Netzwerkzugriff für Endgeräte und einen Browser
     * Desktop PCs
     * mobile Geräte
+    * bevorzugt Firefox, Edge oder einen anderen Chromium-Browser, [Safari ist nicht vollständig kompatibel](#safaris-besondere-bedürfnisse)
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
     * Druckerzugang für alle Endgeräte
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
@@ -920,7 +921,7 @@ Getestete Betriebssysteme, Browser und Geräte:
 * Win 11 Firefox (bis 2024-05-30)
 * Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
 * Android 12 Firefox 133
-* MacOS 13 Ventura Safari 18
+* macOS 13 Ventura [Safari 18](#safaris-besondere-bedürfnisse), Edge 131, Firefox 133
 * Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit fehlerhafter Auflösung von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
 
 Externe Scanner müssen 2D-Codes scannen und UTF-8 Zeichencodierung auswerten können.
@@ -1141,6 +1142,27 @@ products_per_slide = 6
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es wird nur eine Zeitzone unterstützt.
+
+### Safaris besondere Bedürfnisse
+im Gegensatz zu richtigen Browsern, zumindest auf macOS.
+
+Tests:
+* rendertest **bestanden**
+* toast **bestanden**
+* dialog **bestanden**
+* serviceworker **bestanden**
+* document composer **bestanden**
+* notifications **fehlgeschlagen auf macOS Desktop**
+* scanner *ausstehend*
+* stlviewer **fehlgeschlagen aufgrund eines WebGL-Implementierungs-Fehlers innerhalb WebKits** [1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)
+
+Anmerkungen:
+* Benachrichtigungen in Safari funktionieren vermutlich nur in der mobilen Variante wenn die Anwendung als PWA über die *Teilen*-Option zum Startbildschirm hinzugefügt wird.
+* Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
+* Da die WebGL-Implementierung Berichten zufolge einen Fehler aufzuweisen scheint funktioniert der STL-Betrachter nicht. [Funktion testen](https://get.webgl.org)
+* Disclaimer: es ist möglich dass einige Einschränkungen aufgrund eines selbst signierten Zertifikats der Entwicklungsumgebung für die SSL-Verbdinung auftreten. Einstellungen der Vertrauenswürdigkeit waren jedoch unter macOS auch nicht erfolgreich. Es können auch Einschränkungen aufgrund einer virtuellen Testumgebung auftreten.
+
+Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 
 ## Anpassung
 * Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei _install.default.XX.ini entsprechend der gewünschten Standardsprache angepasst werden.
