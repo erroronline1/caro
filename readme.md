@@ -115,6 +115,13 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx safari compatibility
+    * rendertest PASSED
+    * toast PASSED
+    * dialog PASSED
+    * serviceworker
+    * notifications
+    * scanner
+    * stlviewer
 * assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations

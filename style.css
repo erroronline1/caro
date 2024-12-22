@@ -189,7 +189,8 @@ dialog {
 		div {
 			left: 0;
 			height: 0.2em;
-			position: fixed;
+			position: relative;
+			margin: 0;
 			background: var(--yellow);
 		}
 	}
@@ -438,6 +439,14 @@ nav {
 	}
 }
 
+html[data-useragent*="safari"] body {
+	/* backdrop filter bug in 12/24 https://discussions.apple.com/thread/255764118?sortBy=rank */
+	& > header,
+	nav {
+		background-color: var(--menu);
+	}
+}
+
 /*************************** input elements and call to action *******************************/
 input,
 textarea,
@@ -556,7 +565,7 @@ input[type="checkbox"] {
 	border: 1px solid var(--inputborder);
 	border-radius: 50%;
 	color: transparent;
-	margin-right: 1.6em;
+	margin-right: -1.6em;
 }
 
 input:checked + .checkbox,
@@ -598,6 +607,21 @@ select + label.input-label {
 	padding: 0 0.5em;
 	opacity: 1;
 	background-color: var(--article);
+}
+
+html[data-useragent*="safari"] body {
+	select {
+		-webkit-appearance: none;
+	}
+
+	input:not(:placeholder-shown) + .input-label,
+	input:not(:placeholder-shown) + button + .input-label,
+	input:focus + .input-label,
+	input:focus + button + .input-label,
+	select + label.input-label {
+		top: -4em;
+		margin: 0 0 0 2.7em;
+	}
 }
 
 .textarea-label {
@@ -967,8 +991,8 @@ article > article {
 .em8 {
 	max-height: 8em;
 }
-.em18 {
-	max-height: 18em;
+.em16 {
+	max-height: 16em;
 }
 
 .collapsible.extended {
