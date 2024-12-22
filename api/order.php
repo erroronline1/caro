@@ -186,7 +186,7 @@ class ORDER extends API {
 								':order' => LANG::GET('order.message', $messagepayload, true),
 								':unit' => LANG::GET('units.' . $prepared['organizational_unit'], [], true),
 								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-							])) . "\n \n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')));
+							], true)) . "\n \n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')));
 							break;
 						case 'addinformation':
 							if (isset($decoded_order_data['additional_info'])){
@@ -214,7 +214,7 @@ class ORDER extends API {
 								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_orderstate_change', [
 									':order' => LANG::GET('order.message', $messagepayload, true),
 									':unit' => LANG::GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ',LANG::GET('order.message', $messagepayload)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 								])));
 							}
 							break;
