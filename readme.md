@@ -1015,16 +1015,17 @@ Tested server environments:
 * Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
 * Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
 
-Tested devices:
-* Win10 Edge-browser
-* Win11 Firefox-browser (until 2024-05-30)
-* Linux Mint 21.3 Firefox-Browser (from 2024-05-30)
-* Android12 Firefox-browser
-* Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a weird interpretation of special characters on default installation on Win10)
+Tested operating systems, browsers and devices:
+* Win 10 Edge 123
+* Win 11 Firefox (until 2024-05-30)
+* Linux Mint 21.3 Firefox 133 (from 2024-05-30)
+* Android 12 Firefox 133
+* MacOS 13 Ventura Safari 18
+* Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a defective recognition of special characters on default installation on Win10)
 
 External scanners must be able to scan 2D-Codes and read UTF-8 character encoding.
 
-Firefox, Edge and most probably any chromium browser have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
+Firefox, Edge and most probably any chromium browser, as well as Safari have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 
 Technically the application is being usable on any webserver but this is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
 
@@ -4221,7 +4222,7 @@ I welcome any constructive input on this topic.
     * v5.0.4
     * \> 10k stars
     * \> 2k forks
-    * [https://www.jsdelivr.com/package/npm/signature_pad](https://www.jsdelivr.com/package/npm/signature_pad) slightly modified for easier import, comment out UMD module wrapper and define export default class SignaturePad
+    * [https://www.jsdelivr.com/package/npm/signature_pad](https://www.jsdelivr.com/package/npm/signature_pad) slightly modified for easier import, comment out UMD module wrapper and define export default class SignaturePad, delete sourceMappingURL (Safari)
 * [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
     * creates qr codes on the client side
     * \> 200 stars

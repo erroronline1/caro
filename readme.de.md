@@ -912,19 +912,20 @@ Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen k
 
 Getestete Serverumgebungen:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
-* Apache (native) mit PHP 8.2, MariaDB 15.1 (seit 2024-05-30)
+* Apache (nativ) mit PHP 8.2, MariaDB 15.1 (seit 2024-05-30)
 * Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 22)
 
-Getestete Geräte
-* Win10 Edge-Browser
-* Win11 Firefox-Browser (bis 2024-05-30)
-* Linux Mint 21.3 Firefox-Browser (seit 2024-05-30)
-* Android12 Firefox-Browser
-* Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit einer eigenartigen Interpretation von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
+Getestete Betriebssysteme, Browser und Geräte:
+* Win 10 Edge 123
+* Win 11 Firefox (bis 2024-05-30)
+* Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
+* Android 12 Firefox 133
+* MacOS 13 Ventura Safari 18
+* Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit fehlerhafter Auflösung von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
 
 Externe Scanner müssen 2D-Codes scannen und UTF-8 Zeichencodierung auswerten können.
 
-Firefox, Edge und vermutlich jeder andere Chromium-Browser haben für Datenlisten bei Eingaben eine Vorschau, welche die Auswahl verfügbarer Optionen (z.B. Wahl von Nachrichtenempfängern) vereinfacht. Andere Browser wurden nicht getestet.
+Firefox, Edge und vermutlich jeder andere Chromium-Browser sowie Safari haben für Datenlisten bei Eingaben eine Vorschau, welche die Auswahl verfügbarer Optionen (z.B. Wahl von Nachrichtenempfängern) vereinfacht. Andere Browser wurden nicht getestet.
 
 Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert, können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist diese Verwendung ausdrücklich **nicht empfohlen**.
 
