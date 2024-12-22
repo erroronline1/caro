@@ -938,7 +938,7 @@ const _client = {
 					{
 						type: "collapsible",
 						attributes: {
-							class: "em18" + (!element.collapsed ? " extended" : ""),
+							class: "em16" + (!element.collapsed ? " extended" : ""),
 						},
 						content: collapsible,
 					},
@@ -1149,8 +1149,14 @@ const _client = {
 	},
 };
 
+// scroll indicator
 window.addEventListener("scroll", function () {
 	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
 	document.querySelector("header>div:last-of-type").style.width = percentScrolled + "%";
 });
+// menu clearing
 window.addEventListener("pointerup", _client.application.clearMenu);
+
+// add useragent to html tag
+if (navigator.userAgent.toLowerCase().includes('safari'))
+	document.documentElement.setAttribute('data-useragent', 'safari');
