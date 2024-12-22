@@ -77,10 +77,10 @@ const _serviceWorker = {
 	onMessage: function (message) {
 		const data = message.data;
 		if (!Object.keys(data).length) {
-			document.querySelector("header>div:nth-of-type(2)").style.display = "block";
+			document.querySelector("header>div:nth-of-type(3)").style.display = "block";
 			return;
 		}
-		document.querySelector("header>div:nth-of-type(2)").style.display = "none";
+		document.querySelector("header>div:nth-of-type(3)").style.display = "none";
 		if ("message_unnotified" in data) {
 			if (parseInt(data.message_unnotified, 10)) {
 				let body =
@@ -179,6 +179,18 @@ const _client = {
 				node.selectionStart = node.selectionEnd;
 			} else navigator.clipboard.writeText(node); // passed string
 			new Toast(LANG.GET("general.copied_to_clipboard"), "info");
+		},
+		toggleFullScreen: () => {
+			let image,
+				imageelement = document.querySelector("header>div:nth-of-type(1)");
+			if (!document.fullscreenElement) {
+				document.documentElement.requestFullscreen();
+				image = "url('./media/compress.svg')";
+			} else if (document.exitFullscreen) {
+				document.exitFullscreen();
+				image = "url('./media/expand.svg')";
+			}
+			imageelement.style["-webkit-mask-image"] = imageelement.style["mask-image"] = image;
 		},
 	},
 	calendar: {
@@ -282,7 +294,7 @@ const _client = {
 			if ([...data].length < 6) data = ["", ...data];
 			else data = [...data];
 			const autidem = {};
-			autidem[LANG.GET('order.aut_idem')] = [];
+			autidem[LANG.GET("order.aut_idem")] = [];
 			const nodes = document.querySelectorAll("main>form>article"),
 				cart = {
 					content: [
@@ -345,12 +357,12 @@ const _client = {
 								},
 							},
 							{
-								type: 'checkbox',
+								type: "checkbox",
 								inline: true,
 								attributes: {
-									name: LANG.GET('order.aut_idem') + '[]'
+									name: LANG.GET("order.aut_idem") + "[]",
 								},
-								content: autidem
+								content: autidem,
 							},
 							{
 								type: "deletebutton",
@@ -740,7 +752,8 @@ const _client = {
 					states[LANG.GET("order.order." + state)] = {};
 					for (const [attribute, value] of Object.entries(attributes)) states[LANG.GET("order.order." + state)][attribute] = value;
 					if (attributes["data-" + state] === "true") states[LANG.GET("order.order." + state)].checked = true;
-					if (!attributes.disabled && !states[LANG.GET("order.order." + state)].onchange) states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+					if (!attributes.disabled && !states[LANG.GET("order.order." + state)].onchange)
+						states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				if (states[LANG.GET("order.order.partially_received")] && !states[LANG.GET("order.order.partially_received")].disabled) {
 					buttons = {};
@@ -1157,6 +1170,5 @@ window.addEventListener("scroll", function () {
 // menu clearing
 window.addEventListener("pointerup", _client.application.clearMenu);
 
-// add useragent to html tag
-if (navigator.userAgent.toLowerCase().includes('safari'))
-	document.documentElement.setAttribute('data-useragent', 'safari');
+// add useragent to html tag to apply specific css attributes
+if (navigator.userAgent.toLowerCase().includes("safari")) document.documentElement.setAttribute("data-useragent", "safari");

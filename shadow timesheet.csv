@@ -212,4 +212,5 @@
 17.12.24;2;"delevopment-setup, records-api"
 18.12.24;2;"user-api, record-api"
 20.12.24;6;"consumables-api, audit-api, order-api" 
-21.12.24;4;"order-api"
+21.12.24;5;"order-api, development-setup"
+22.12.24;15-18, 1930-;"safari-compatibility"

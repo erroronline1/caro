@@ -110,7 +110,7 @@ export const api = {
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {
-				document.querySelector("header>div:nth-of-type(1)").style.display = data.status === 200 ? "none" : "block";
+				document.querySelector("header>div:nth-of-type(2)").style.display = data.status === 200 ? "none" : "block";
 				if (data.status === 203) new Toast(LANG.GET("general.service_worker_get_cache_fallback"), "info");
 				if (data.status === 207) {
 					new Toast(LANG.GET("general.service_worker_post_cache_fallback"), "info");
@@ -202,7 +202,7 @@ export const api = {
 				if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
 				const remaining = api.session_timeout.stop - new Date().getTime();
 				if (api._settings.config.lifespan.idle > 0 && remaining > 0) {
-					document.querySelector("header>div:nth-of-type(2)").style.display = "none";
+					document.querySelector("header>div:nth-of-type(3)").style.display = "none";
 					api.session_timeout.render((100 * remaining) / (api._settings.config.lifespan.idle * 1000), remaining);
 					return;
 				}
@@ -210,7 +210,7 @@ export const api = {
 				clearInterval(api.session_timeout.interval);
 				clearInterval(_serviceWorker.notif.interval);
 				_serviceWorker.notif.interval = null;
-				document.querySelector("header>div:nth-of-type(2)").style.display = "block";
+				document.querySelector("header>div:nth-of-type(3)").style.display = "block";
 			}, 1000);
 		},
 		render: function (percent, remaining = 0) {
