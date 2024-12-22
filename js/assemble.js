@@ -216,6 +216,7 @@ export class Dialog {
 						},
 						rememberLastUsedCamera: true,
 						aspectRatio: 1.0,
+						useBarCodeDetectorIfSupported: true
 					}),
 				};
 
