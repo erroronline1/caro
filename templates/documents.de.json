@@ -905,10 +905,10 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Verordner"
+							"name": "Verordner",
+							"required": true
 						},
-						"hint": "namentlich",
-						"required": true
+						"hint": "namentlich"
 					},
 					{
 						"type": "textsection",
@@ -1055,7 +1055,7 @@
 							"Restrisiken und Nebenwirkungen": [],
 							"Klinischer Nutzen": [],
 							"Leistungsmerkmale": [],
-							"Schulungen oder Qualifikation zur prüfung durch Fachpersonal": [],
+							"Schulungen oder Qualifikation zur Prüfung durch Fachpersonal": [],
 							"Nutzungshinweise für Anwender": [],
 							"Aufbereitungsverfahren sofern zum Wiedereinsatz vorgesehen": [],
 							"Lagerungs- und Handhabungshinweise": []
@@ -1345,8 +1345,7 @@
 					{
 						"type": "radio",
 						"attributes": {
-							"name": "Geschlecht",
-							"required": true
+							"name": "Geschlecht"
 						},
 						"content": {
 							"weiblich": [],
@@ -1552,8 +1551,8 @@
 							"name": "Belastungsfähigkeit"
 						},
 						"content": {
-							"nein": [],
-							"ja": []
+							"ja": [],
+							"nein": []
 						}
 					},
 					{
@@ -2621,6 +2620,7 @@
 							"name": "Schultergelenk"
 						},
 						"content": {
+							"MICO Shoulder TOH": [],
 							"Heidelberger Schultergelenk 4362 AS": [],
 							"Otto Bock MovoShoulder Swing 12S6": [],
 							"exoskelettal FVK-Verbindungssegment 20.0943 KA": []
@@ -3265,7 +3265,7 @@
 							"name": "Kontakt mit Feuchtigkeit zulässig",
 							"required": true
 						},
-						"content": { "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [], "nein": [] }
+						"content": { "nein": [], "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [] }
 					},
 					{
 						"type": "textarea",
