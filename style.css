@@ -612,6 +612,7 @@ select + label.input-label {
 html[data-useragent*="safari"] body {
 	select {
 		-webkit-appearance: none;
+		appearance: initial;
 	}
 
 	input:not(:placeholder-shown) + .input-label,
