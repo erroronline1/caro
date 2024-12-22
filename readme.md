@@ -115,7 +115,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-    * scanner pending in virtual environment
 * assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations
@@ -1254,13 +1253,13 @@ Tests:
 * serviceworker **passed**
 * document composer **passed**
 * notifications **failed on macOS desktop**
-* scanner *pending*
-* stlviewer **failed due to WebGL-implementation bug within WebKit** [1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)
+* scanner **failing on test environment, passing on iPad via https://scanapp.org**
+* stlviewer **failed on test environment, passing on iPad via https://viewstl.com**
 
 Notes:
 * Notifications in Safari might only work on mobile if the application is added to the home screen as a progressive web app via the *Share*-option.
 * Styling is slightly different because of inconsistent following of web standards
-* WebGL-implementation reportedly seems to have a bug, so the STL-Viewer does not work. [test function](https://get.webgl.org)
+* WebGL-implementation reportedly seems to have a bug ([1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)), so the STL-Viewer might not work. [Test function](https://get.webgl.org)
 * Disclaimer: it is possible that some restrictions happen because of a self signed certificate for the developer environment SSL-connection. Trust settings were unsuccessful on macOS as well. Also there may be limits due to a virtual test environment.
 
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
