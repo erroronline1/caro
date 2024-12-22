@@ -387,7 +387,7 @@ export class Toast {
 		} else this.toast.close();
 	}
 	countdown(percent = 100) {
-		const countdowndiv = document.querySelector("#toast>div");
+		const countdowndiv = document.querySelector("#toast > div");
 		countdowndiv.style.width = percent + "%";
 		window.toasttimeout = window.setTimeout(this.countdown.bind(this), this.duration / 1000, percent - 1000 / this.duration);
 		if (percent < 0) {
@@ -801,9 +801,9 @@ export class Assemble {
 		const br = document.createElement("br"),
 			span = document.createElement("span");
 		span.dataset.type = this.currentElement.type;
-		if (this.currentElement.attributes){
+		if (this.currentElement.attributes) {
 			if (this.currentElement.attributes.multiple) span.dataset.multiple = "multiple";
-			if (this.currentElement.attributes['data-filtered']) span.dataset.filtered = this.currentElement.attributes['data-filtered'];
+			if (this.currentElement.attributes["data-filtered"]) span.dataset.filtered = this.currentElement.attributes["data-filtered"];
 		}
 		return [br, span];
 	}
@@ -910,22 +910,22 @@ export class Assemble {
 			}
 		}*/
 		let button = document.createElement("button"),
-		imagealigned=false;
+			imagealigned = false;
 		button.id = getNextElementID();
 		if (this.currentElement.attributes.value !== undefined) {
 			button.append(...this.linebreak(this.currentElement.attributes.value));
 			delete this.currentElement.attributes.value;
 		}
 		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
 				imagealigned = true;
-				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+				this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 			}
 			button = this.apply_attributes(this.currentElement.attributes, button);
 		}
 		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
-		if (imagealigned){
-			const container = document.createElement('div');
+		if (imagealigned) {
+			const container = document.createElement("div");
 			container.classList.add("imagealigned");
 			container.append(button, ...this.hint());
 			return [container];
@@ -1070,16 +1070,37 @@ export class Assemble {
 
 	datalist() {
 		let datalist = document.createElement("datalist");
-		let option;
+		let option, labels, label;
 		datalist.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) datalist = this.apply_attributes(this.currentElement.attributes, datalist);
+		if (this.currentElement.attributes !== undefined) {
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class === "rangedatalist") {
+				labels = document.createElement("div");
+				labels.classList.add("rangedatalist");
+				delete this.currentElement.attributes.class;
+			}
+			datalist = this.apply_attributes(this.currentElement.attributes, datalist);
+		}
 		this.currentElement.content.forEach((key) => {
 			option = document.createElement("option");
-			if (typeof key === "string") option.value = key;
-			else option = this.apply_attributes(key, option);
+			if (typeof key === "string") {
+				option.append(document.createTextNode(key));
+				if (labels) {
+					label = document.createElement("span");
+					label.append(document.createTextNode(key));
+					labels.append(label);
+				}
+			} else {
+				if (labels && Object.keys(key).includes('label')) {
+					label = document.createElement("span");
+					label.append(document.createTextNode(key.label));
+					labels.append(label);
+				}
+				option = this.apply_attributes(key, option);
+			}
 			datalist.appendChild(option);
 		});
-		return datalist;
+		if (labels) return [datalist, labels];
+		return [datalist];
 	}
 
 	date() {
@@ -1273,7 +1294,7 @@ export class Assemble {
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
 			hint = this.hint(),
-			imagealigned=false;
+			imagealigned = false;
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
@@ -1283,9 +1304,9 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label");
-		if (this.currentElement.attributes){
+		if (this.currentElement.attributes) {
 			if (this.currentElement.attributes.required) label.dataset.required = true;
-			if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+			if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 		}
 
 		if (type === "number") input.step = ".01";
@@ -1307,9 +1328,9 @@ export class Assemble {
 		}
 
 		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
 				imagealigned = true;
-				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+				this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 			}
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
@@ -1354,15 +1375,15 @@ export class Assemble {
 		if (this.currentElement.attributes.hidden !== undefined) return input;
 
 		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
 				imagealigned = true;
-				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+				this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 			}
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
 
-		if (imagealigned){
-			const container = document.createElement('div');
+		if (imagealigned) {
+			const container = document.createElement("div");
 			container.classList.add("imagealigned");
 			container.append(...this.icon(), input, label, ...hint);
 			return [container];
@@ -1609,9 +1630,9 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
 		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 		label.classList.add("input-label", "productselection");
-		if (this.currentElement.attributes){
+		if (this.currentElement.attributes) {
 			if (this.currentElement.attributes.required) label.dataset.required = true;
-			if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+			if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 		}
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
@@ -1753,11 +1774,11 @@ export class Assemble {
 			label.htmlFor = input.id;
 			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
 			label.classList.add("input-label");
-			if (this.currentElement.attributes){
+			if (this.currentElement.attributes) {
 				if (this.currentElement.attributes.required) label.dataset.required = true;
-				if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+				if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 			}
-	
+
 			if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
 
@@ -1874,9 +1895,9 @@ export class Assemble {
 		label.htmlFor = select.id;
 		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
 		label.classList.add("input-label");
-		if (this.currentElement.attributes){
+		if (this.currentElement.attributes) {
 			if (this.currentElement.attributes.required) label.dataset.required = true;
-			if (this.currentElement.attributes['data-filtered']) label.dataset.filtered = this.currentElement.attributes['data-filtered'];
+			if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 		}
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
@@ -2075,8 +2096,7 @@ export class Assemble {
 		let result = [],
 			p,
 			content,
-			imagealigned=false;
-			;
+			imagealigned = false;
 		if (this.currentElement.attributes && this.currentElement.attributes.name) {
 			this.currentElement.description = this.currentElement.attributes.name;
 			result = result.concat(this.header());
@@ -2128,17 +2148,17 @@ export class Assemble {
 		}
 
 		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)){
+			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
 				imagealigned = true;
-				this.currentElement.attributes.class=this.currentElement.attributes.class.replace(/imagealigned/, "");
+				this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 			}
 			result[0] = this.apply_attributes(this.currentElement.attributes, result[0]);
 		}
 
 		result = result.concat(this.hint());
 
-		if (imagealigned){
-			const container = document.createElement('div');
+		if (imagealigned) {
+			const container = document.createElement("div");
 			container.classList.add("imagealigned");
 			container.append(...result);
 			return [container];

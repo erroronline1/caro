@@ -529,7 +529,7 @@ export function rendertest(element) {
 							id: "range_datalist",
 							class: "rangedatalist",
 						},
-						content: [{ label: "A" }, { label: "range" }, { label: "with" }, { label: "a" }, { label: "datalist" }],
+						content: ["A", "range", "with", "a", "datalist"],
 						hint: "As seen in user manager.",
 					},
 					{
