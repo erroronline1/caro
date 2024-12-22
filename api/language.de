@@ -870,7 +870,8 @@ failed_delete = "Es trat ein Fehler auf, die Bestellung konnte nicht gelöscht w
 not_found = "Bestellung nicht gefunden, bitte aktualisiere die Ansicht."
 
 prepared_order_item = ":quantity :unit :number :name von :vendor :aut_idem"
-aut_idem_order_confirmation = ":user bestellte :product oder etwas vergleichbares. Bitte bestätige dass du exakt diesen Artikel bearbeitest bevor du fortfährst. Nimm andernfalls bitte Kontakt zu :user auf um den Artikel zu ändern, da diese Bestellung sonst nicht zum gelieferten Produkt passen und das ganze System durcheinanderbringen würde!"
+aut_idem_order_confirmation_header = ":user bestellte :product oder etwas vergleichbares"
+aut_idem_order_confirmation_render = "Bitte bestätige dass du exakt diesen Artikel bearbeitest bevor du fortfährst. Nimm andernfalls bitte Kontakt zu :user auf um den Artikel zu ändern, da diese Bestellung sonst nicht zum gelieferten Produkt passen und das ganze System durcheinanderbringen würde!"
 bulk_approve_order = "Freigeben"
 edit_prepared_order = "Bestellung bearbeiten"
 order[unprocessed] = "unbearbeitet"
