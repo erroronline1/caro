@@ -113,6 +113,9 @@ class USER extends API {
 					else
 						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, LANGUAGEFILE['casestate']['casedocumentation']);
 				}
+				foreach($user['app_settings'] as $key => $value){
+					if (!$value) unset($user['app_settings'][$key]);
+				}
 				
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
 					'values' => [
