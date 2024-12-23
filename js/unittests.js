@@ -293,6 +293,7 @@ export function rendertest(element) {
 						},
 						hint: "This opens a longer list that would otherwise clutter up the screen, optional multiple.",
 						content: {
+							"...": {},
 							"Selection one": {},
 							"Selection two": {},
 							"Selection three": {},
@@ -455,6 +456,7 @@ export function rendertest(element) {
 						},
 						hint: "Hier öffnet sich eine längere Liste die sonst den Bildschirm überfüllen würde",
 						content: {
+							"...": {},
 							"Auswahl eins": {},
 							"Auswahl zwei": {},
 							"Auswahl drei": {},

@@ -216,7 +216,7 @@ export class Dialog {
 						},
 						rememberLastUsedCamera: true,
 						aspectRatio: 1.0,
-						useBarCodeDetectorIfSupported: true
+						useBarCodeDetectorIfSupported: true,
 					}),
 				};
 
@@ -249,7 +249,8 @@ export class Dialog {
 
 				switch (this.type) {
 					case "select":
-						return response.target.returnValue;
+						result = response.target.returnValue;
+						if (!result) return;
 					case "confirm":
 						result = response.target.returnValue;
 						if (result && result == "true") return true;
@@ -1091,7 +1092,7 @@ export class Assemble {
 					labels.append(label);
 				}
 			} else {
-				if (labels && Object.keys(key).includes('label')) {
+				if (labels && Object.keys(key).includes("label")) {
 					label = document.createElement("span");
 					label.append(document.createTextNode(key.label));
 					labels.append(label);
@@ -1946,16 +1947,18 @@ export class Assemble {
 					header: select.title,
 					options: selectModal,
 				}).then((response) => {
-					e.target.value = response;
-					e.target.dispatchEvent(new Event("change"));
-					if (multiple && response && !VOIDVALUES.includes(response)) {
-						selectElementClone.attributes.name = selectElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
-						selectElementClone.attributes.multiple = true;
-						new Assemble({
-							content: [[selectElementClone]],
-							composer: "elementClone",
-							names: this.names,
-						}).initializeSection(null, hint ? hint[0] : label);
+					if (response && response != e.target.value) {
+						e.target.value = response;
+						e.target.dispatchEvent(new Event("change"));
+						if (multiple && !VOIDVALUES.includes(response)) {
+							selectElementClone.attributes.name = selectElementClone.attributes.name.replace(/\(\d+\)$/gm, "");
+							selectElementClone.attributes.multiple = true;
+							new Assemble({
+								content: [[selectElementClone]],
+								composer: "elementClone",
+								names: this.names,
+							}).initializeSection(null, hint ? hint[0] : label);
+						}
 					}
 				});
 		};
