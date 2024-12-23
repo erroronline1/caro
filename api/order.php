@@ -837,7 +837,7 @@ class ORDER extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => LANG::GET('order.additional_info'),
-								'value' => isset($order['additional_info']) ? $order['additional_info'] : '',
+								'value' => isset($order['additional_info']) ? preg_replace('/\\\\n/', "\n", $order['additional_info']) : '',
 								'data-loss' => 'prevent'
 							]
 						]
