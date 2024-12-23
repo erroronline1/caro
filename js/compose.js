@@ -1310,6 +1310,13 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	compose_link() {
+		return this.compose_input({
+			type: "link",
+			description: LANG.GET("assemble.compose_link"),
+		});
+	}
+
 	compose_links() {
 		return this.compose_multilist({
 			type: "links",

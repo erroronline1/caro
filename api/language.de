@@ -243,6 +243,7 @@ compose_number = "Füge ein Nummernfeld hinzu"
 compose_date = "Füge ein Datumsfeld hinzu"
 compose_tel = "Füge ein Telefonnummernfeld hinzu"
 compose_email = "Füge ein eMail-Adressenfeld hinzu"
+compose_link = "Füge ein Verknüpfungsfeld hinzu"
 compose_productselection = "Füge ein Produktauswahlfeld hinzu"
 compose_range = "Füge einen Schieberegler hinzu"
 

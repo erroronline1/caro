@@ -1386,6 +1386,12 @@ button[data-type="import"]::before {
 	mask-image: url("./media/arrow-alt-from-bottom.svg");
 }
 
+[data-type="link"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/external-link-alt.svg");
+	mask-image: url("./media/external-link-alt.svg");
+}
+
 [data-type="links"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/link.svg");

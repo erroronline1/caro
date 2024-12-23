@@ -1394,6 +1394,10 @@ export class Assemble {
 		return [...this.icon(), input, label, ...hint];
 	}
 
+	link() {
+		return this.input("text");
+	}
+
 	links() {
 		/*{
 			type: 'links',

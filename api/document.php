@@ -1006,6 +1006,10 @@ class DOCUMENT extends API {
 						'description' => LANG::GET('assemble.compose_email')
 					]], [[
 						'form' => true,
+						'type' => 'compose_link',
+						'description' => LANG::GET('assemble.compose_link')
+					]], [[
+						'form' => true,
 						'type' => 'compose_productselection',
 						'description' => LANG::GET('assemble.compose_productselection')
 					]], [[
