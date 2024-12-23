@@ -1172,3 +1172,4 @@ window.addEventListener("pointerup", _client.application.clearMenu);
 
 // add useragent to html tag to apply specific css attributes
 if (navigator.userAgent.toLowerCase().includes("safari")) document.documentElement.setAttribute("data-useragent", "safari");
+if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentElement.removeAttribute("data-useragent");

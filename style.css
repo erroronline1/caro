@@ -628,15 +628,6 @@ html[data-useragent*="safari"] body {
 		-webkit-appearance: none;
 		appearance: initial;
 	}
-
-	input:not(:placeholder-shown) + .input-label,
-	input:not(:placeholder-shown) + button + .input-label,
-	input:focus + .input-label,
-	input:focus + button + .input-label,
-	select + label.input-label {
-		top: -4em;
-		margin: 0 0 0 2.7em;
-	}
 }
 
 .textarea-label {
