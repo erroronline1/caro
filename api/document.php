@@ -975,83 +975,63 @@ class DOCUMENT extends API {
 					]], [[
 						'form' => true,
 						'type' => 'compose_textsection',
-						'description' => LANG::GET('assemble.compose_textsection')
 					]], [[
 						'form' => true,
 						'type' => 'compose_image',
-						'description' => LANG::GET('assemble.compose_image')
 					]], [[
 						'form' => true,
 						'type' => 'compose_text',
-						'description' => LANG::GET('assemble.compose_text')
 					]], [[
 						'form' => true,
 						'type' => 'compose_textarea',
-						'description' => LANG::GET('assemble.compose_textarea')
 					]], [[
 						'form' => true,
 						'type' => 'compose_number',
-						'description' => LANG::GET('assemble.compose_number')
 					]], [[
 						'form' => true,
 						'type' => 'compose_date',
-						'description' => LANG::GET('assemble.compose_date')
 					]], [[
 						'form' => true,
 						'type' => 'compose_tel',
-						'description' => LANG::GET('assemble.compose_tel')
 					]], [[
 						'form' => true,
 						'type' => 'compose_email',
-						'description' => LANG::GET('assemble.compose_email')
 					]], [[
 						'form' => true,
 						'type' => 'compose_link',
-						'description' => LANG::GET('assemble.compose_link')
 					]], [[
 						'form' => true,
 						'type' => 'compose_productselection',
-						'description' => LANG::GET('assemble.compose_productselection')
 					]], [[
 						'form' => true,
 						'type' => 'compose_range',
-						'description' => LANG::GET('assemble.compose_range')
 					]], [[
 						'form' => true,
 						'type' => 'compose_links',
-						'description' => LANG::GET('assemble.compose_links')
 					]], [[
 						'form' => true,
 						'type' => 'compose_checkbox',
-						'description' => LANG::GET('assemble.compose_checkbox')
 					]], [[
 						'form' => true,
 						'type' => 'compose_radio',
-						'description' => LANG::GET('assemble.compose_radio')
 					]], [[
 						'form' => true,
 						'type' => 'compose_select',
-						'description' => LANG::GET('assemble.compose_select')
 					]], [[
 						'form' => true,
 						'type' => 'compose_file',
-						'description' => LANG::GET('assemble.compose_file')
 					]], [[
 						'form' => true,
 						'type' => 'compose_photo',
-						'description' => LANG::GET('assemble.compose_photo')
 					]], [[
 						'form' => true,
 						'type' => 'compose_signature',
-						'description' => LANG::GET('assemble.compose_signature')
 					]], [[
 						'form' => true,
 						'type' => 'compose_calendarbutton',
-						'description' => LANG::GET('assemble.compose_calendarbutton')
 					]], [[
 						'form' => true,
 						'type' => 'compose_documentbutton',
-						'description' => LANG::GET('assemble.compose_link_document'),
 						'content' => $approveddocuments
 					]]
 				],
