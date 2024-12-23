@@ -971,7 +971,6 @@ class DOCUMENT extends API {
 					]], [[
 						'form' => true,
 						'type' => 'compose_scanner',
-						'description' => LANG::GET('assemble.compose_scanner')
 					]], [[
 						'form' => true,
 						'type' => 'compose_textsection',
