@@ -1,17 +1,17 @@
 /**
  * CARO - Cloud Assisted Records and Operations
  * Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -26,9 +26,9 @@ String.prototype.contains = function (values) {
 	return _.contains(this, values);
 }; // to use intitive with string
 
-String.prototype._replaceArray = function(find, replace) {
+String.prototype._replaceArray = function (find, replace) {
 	var replaceString = this;
-	var regex; 
+	var regex;
 	for (var i = 0; i < find.length; i++) {
 		regex = new RegExp(find[i], "g");
 		replaceString = replaceString.replace(regex, replace[i]);
@@ -172,6 +172,14 @@ const _ = {
 		let fields;
 		if (form_data && document.querySelector(querySelector)) {
 			fields = new FormData(document.querySelector(querySelector));
+
+			// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
+			for (const input of Object.values(document.querySelector(querySelector))) {
+				if (input.dataset.wrap && input.value) {
+					fields.set(input.name, input.dataset.wrap.replace("___", input.value));
+				}
+			}
+
 			// add special comma separated dataset for checkboxes with data-grouped attribute
 			const grouped = document.querySelectorAll("[data-grouped]"),
 				groups = {};
@@ -199,6 +207,10 @@ const _ = {
 						else if (input.value) fields[sanitizedname] = [input.checked ? input.value : 0];
 					} else fields[sanitizedname] = input.checked ? input.value : 0;
 				} else if (["text", "tel", "time", "date", "number", "hidden", "email"].contains(input.type)) {
+					// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
+					if (input.dataset.wrap && input.value) {
+						input.value = input.dataset.wrap.replace("___", input.value);
+					}
 					if (input.name.contains("[]")) {
 						input.name = input.name.replace("[]", "");
 						if (typeof fields[sanitizedname] === "object" && input.value) fields[sanitizedname].push(input.value);
