@@ -378,6 +378,17 @@ class RECORD extends API {
 	}
 	
 	/**
+	 *     _                           _                       _   
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ _ _ ___ ___ ___| |_ 
+	 *  | . | . |  _| | |     | -_|   |  _| -_|_'_| . | . |  _|  _|
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|_,_|  _|___|_| |_|  
+	 *                                            |_| 
+	 */
+	public function documentexport(){
+		$this->export('document', true);
+	}
+	
+	/**
 	 *                       _
 	 *   ___ _ _ ___ ___ ___| |_
 	 *  | -_|_'_| . | . |  _|  _|
@@ -407,17 +418,6 @@ class RECORD extends API {
 	}
 
 	/**
-	 *   ___                                   _
-	 *  |  _|___ ___ _____ ___ _ _ ___ ___ ___| |_
-	 *  |  _| . |  _|     | -_|_'_| . | . |  _|  _|
-	 *  |_| |___|_| |_|_|_|___|_,_|  _|___|_| |_|
-	 *                            |_|
-	 */
-	public function documentexport(){
-		$this->export('document');
-	}
-	
-	/**
 	 *   ___     _ _                     _
 	 *  |  _|_ _| | |___ _ _ ___ ___ ___| |_
 	 *  |  _| | | | | -_|_'_| . | . |  _|  _|
@@ -425,7 +425,7 @@ class RECORD extends API {
 	 *                      |_|
 	 */
 	public function fullexport(){
-		$this->export('full');
+		$this->export('full', true);
 	}
 
 	/**
@@ -531,6 +531,8 @@ class RECORD extends API {
 				if ($record['document'] == 0) continue;
 				if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 				foreach($record['content'] as $key => $value){
+					preg_match("/(?:href=')(.+?)(?:')/", $value, $link); // link widget value
+					if ($link) $value = $link[1];
 					$result[$key] = $value;
 				}
 				$result['DEFAULT_' . LANG::PROPERTY('record.record_type_description')] = $data['record_type'];
@@ -1622,6 +1624,10 @@ class RECORD extends API {
 				$key = str_replace('_', ' ', $key);
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
+				preg_match("/(?:href=')(.+?)(?:')/", $value, $link); // link widget value
+				if ($link && !$export){
+					$value = '<a href="javascript:void(0);" onpointerup="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
+				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
 				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => LANG::GET('record.record_export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];
 				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];

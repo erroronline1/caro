@@ -146,7 +146,13 @@ class PDF{
 				
 				// values column
 				$pdf->SetFont('helvetica', '', $height['font']); // font size
-				$valueLines = $pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				preg_match("/(?:href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
+				if ($link) {
+					// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+					$valueLines = $pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+				}
+				// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+				else $valueLines = $pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 				
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 				$pdf->Ln(($offset - 1) * $height['font'] / 2);
@@ -275,7 +281,13 @@ class PDF{
 					default:
 						if ($value['value']) { // print value for missing field values on some systems
 							$pdf->SetFont('helvetica', 'I', $height['font']); // font size
-							$pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
+							preg_match("/(?:href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
+							if ($link) {
+								// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+								$pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+							}
+							// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+							else $pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							$pdf->SetFont('helvetica', '', $height['font']); // font size
 							break;
 						}
