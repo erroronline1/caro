@@ -167,7 +167,7 @@ class SHARED {
 					(isset($parameter['unit']) && $parameter['unit'] && !in_array($parameter['unit'], $row['units']))
 				) continue;
 			}
-			elseif ($parameter['unit'] !== '_unassigned') continue;
+			elseif (isset($parameter['unit']) && $parameter['unit'] !== '_unassigned') continue;
 
 			foreach(LANGUAGEFILE['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
@@ -187,8 +187,8 @@ class SHARED {
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
 				'units' => $row['units']
 			];
-			return $contexts;
 		}
+		return $contexts;
 	}
 	
     /**
