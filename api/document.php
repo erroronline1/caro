@@ -149,25 +149,31 @@ class DOCUMENT extends API {
 						$hidden[] = $element['context'] . $element['name']; // hide previous versions at all costs
 					}
 				}
-				ksort($componentselection);
-				ksort($documentselection);
-				if ($componentselection) $return['render']['content'][0][] = [
-					'type' => 'select',
-					'attributes' => [
-						'name' => LANG::GET('assemble.approve_component_select'),
-						'onchange' => "api.document('get', 'approval', this.value)"
-					],
-					'content' => $componentselection
-				];
-				if ($documentselection) $return['render']['content'][0][] =
-				[
-					'type' => 'select',
-					'attributes' => [
-						'name' => LANG::GET('assemble.approve_document_select'),
-						'onchange' => "api.document('get', 'approval', this.value)"
-					],
-					'content' => $documentselection
-				];
+				if ($componentselection) {
+					$componentselection['...'] = [];
+					ksort($componentselection);
+					$return['render']['content'][0][] = [
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('assemble.approve_component_select'),
+							'onchange' => "api.document('get', 'approval', this.value)"
+						],
+						'content' => $componentselection
+					];
+				}
+				if ($documentselection) {
+					$documentselection['...'] = [];
+					ksort($documentselection);
+					$return['render']['content'][0][] =
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => LANG::GET('assemble.approve_document_select'),
+							'onchange' => "api.document('get', 'approval', this.value)"
+						],
+						'content' => $documentselection
+					];
+				}
 				if ($componentselection || $documentselection) $return['render']['content'][] = [
 					[
 						'type' => 'hr'
