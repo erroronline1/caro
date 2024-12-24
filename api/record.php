@@ -1227,7 +1227,7 @@ class RECORD extends API {
 
 		require_once('_shared.php');
 		$search = new SHARED($this->_pdo);
-		$data = $search->recordsearch(['search' => $this->_requestedID === 'null' ? null : $this->_requestedID]);
+		$data = $search->recordsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
 		if (!$data) {
 			$result['render']['content'] = $this->noContentAvailable(LANG::GET('message.no_messages'));
@@ -1301,7 +1301,7 @@ class RECORD extends API {
 						'list' => 'records',
 						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}",
 						'onblur' => "api.record('get', 'records', this.value); return false;",
-						'value' => $this->_requestedID && $this->_requestedID !== 'null' ? : ''
+						'value' => ($this->_requestedID && $this->_requestedID !== 'null') ? $this->_requestedID : ''
 						]
 				]
 			],
