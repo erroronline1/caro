@@ -1314,6 +1314,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "link",
 			description: LANG.GET("assemble.compose_link"),
+			multiple: "optional",
 		});
 	}
 
@@ -1597,6 +1598,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "tel",
 			description: LANG.GET("assemble.compose_tel"),
+			multiple: "optional",
 		});
 	}
 
