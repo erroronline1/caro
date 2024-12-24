@@ -240,6 +240,11 @@ export class Dialog {
 					let result = {};
 					parent.childNodes.forEach((node) => {
 						if (["input", "textarea", "select"].includes(node.localName) && node.value) {
+							// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
+							if (node.dataset.wrap && node.value) {
+								node.value = node.dataset.wrap.replace("___", node.value);
+							}
+		
 							if (["checkbox", "radio"].includes(node.type) && node.checked === true) result[node.name] = node.value;
 							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
 						} else result = { ...result, ...getValues(node) };
@@ -1312,6 +1317,7 @@ export class Assemble {
 		}
 
 		if (type === "number") input.step = ".01";
+		if (this.currentElement.type === "link") input.dataset.wrap = "href='___'";
 
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
