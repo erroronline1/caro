@@ -531,7 +531,7 @@ class RECORD extends API {
 				if ($record['document'] == 0) continue;
 				if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 				foreach($record['content'] as $key => $value){
-					preg_match("/(?:href=')(.+?)(?:')/", $value, $link); // link widget value
+					preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
 					if ($link) $value = $link[1];
 					$result[$key] = $value;
 				}
@@ -1624,7 +1624,7 @@ class RECORD extends API {
 				$key = str_replace('_', ' ', $key);
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
-				preg_match("/(?:href=')(.+?)(?:')/", $value, $link); // link widget value
+				preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
 				if ($link && !$export){
 					$value = '<a href="javascript:void(0);" onpointerup="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
 				}

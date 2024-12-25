@@ -146,7 +146,7 @@ class PDF{
 				
 				// values column
 				$pdf->SetFont('helvetica', '', $height['font']); // font size
-				preg_match("/(?:href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
+				preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
 				if ($link) {
 					// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 					$valueLines = $pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
@@ -281,7 +281,7 @@ class PDF{
 					default:
 						if ($value['value']) { // print value for missing field values on some systems
 							$pdf->SetFont('helvetica', 'I', $height['font']); // font size
-							preg_match("/(?:href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
+							preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
 							if ($link) {
 								// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 								$pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
