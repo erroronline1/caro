@@ -39,18 +39,17 @@ class SHARED {
 	 */
 	public function filesearch($parameter = []){
 		$files = [];
-		if (isset($parameter['folder']) && in_array($parameter['folder'], ['sharepoint', 'all'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc'));
-		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['all']) || !in_array($parameter['folder'], ['sharepoint','external_documents'])){
+		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['sharepoint'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc'));
+		if (!isset($parameter['folder']) || !$parameter['folder'] || !in_array($parameter['folder'], ['sharepoint', 'external_documents'])){
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			foreach ($folders as $folder) {
 				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 			}
 		}
-		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['all'])) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path'));
-		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
+		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path'));
+		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc');
 		
 		if (!$parameter['search']) return $files;
-		
 		$matches = [];
 		foreach ($files as $file){
 			similar_text($parameter['search'], pathinfo($file)['filename'], $percent);

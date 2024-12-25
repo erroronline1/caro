@@ -668,7 +668,7 @@ class APPLICATION extends API {
 				];
 			}
 
-			if ($files = $search->filesearch(['search' => $this->_search, 'folder' => 'all'])){
+			if ($files = $search->filesearch(['search' => $this->_search])){
 				$matches = [];
 				foreach ($files as $file){
 					$matches[preg_replace('/.+fileserver\//','', $file)] = ['href' => substr($file, 1), 'target' => '_blank'];
