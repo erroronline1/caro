@@ -111,14 +111,11 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 #### purchase considerations
 
 #### records considerations
-* linked files on separate external path, input type convert to link
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* assemble type linkinput text to be displayed as _blank link within records. also usable for external documents.
 
 #### purchase considerations
-* translation mask for erp dumps of orders - currently missing identifier matching
 
 #### application considerations
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -530,6 +527,7 @@ Available elements for documents are:
 * date input. Controls appearance of input options
 * phone input. Controls appearance of keypad on mobile devices
 * mail input. Controls appearance of keypad on mobile devices
+* link input. Wraps the value with the specific character pattern *href='{VALUE}'* to be displayed as a link within the application. This works in principle manually for other fields as well, if this kind of value is provided. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
 * product selection input, optional as multiple. Accesses the products database
 * range input, min, max and step optional
 * links
@@ -760,7 +758,7 @@ Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to di
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
-External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable.
+External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable. Regarding interface partners network resources can be linked as a source as well.
 
 ![files screenshot](http://toh.erroronline.one/caro/files.png)
 
@@ -1703,7 +1701,7 @@ Stakeholder identification:
 * Purchase
 * Operator of infrastructure
 
-Discussed stakeholder requirements:
+#### Discussed stakeholder requirements:
 | Requirement / issue | Stakeholder | Time | Implementation |
 | ------------------- | ----------- | ---- | -------------- |
 | It can't go on like this | CEO | 2019 | Development of a digital application to reduce paperbased operations |
@@ -4227,6 +4225,7 @@ I welcome any constructive input on this topic.
 | Insufficient configuration | Medium | High (application unstable) | Documentation of config.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
 | Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
+| Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 
 [Content](#content)
 

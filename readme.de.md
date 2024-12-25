@@ -426,6 +426,7 @@ Verfügbare Elemente für Dokumente sind:
 * Datumsfeld. Steuert das Erscheinungbild der Eingabeoptionen
 * Telefonnummernfeld. Steuert das Erscheinungsbild der Tastatur auf mobilen Geräten
 * eMail-Adressenfeld. Steuert das Erscheinungsbild der Testatur auf mobilen Geräten
+* Verknüpfung-Eingabe. Umschließt automatisch den eingegebenen Wert mit der spezifischen Zeichenfolge *href='{WERT}'* um immerhalb der Anwendung als Verknüpfung angezeigt zu werden. Das funktioniert im Prinzip auch manuell bei anderen Eingabefeldern, sofern ein solcher Wert eingegeben wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
 * Produktauswahlfeld, optional als Mehrfachauswahl. Hat Zugriff auf die Artikeldatenbank
 * Schieberegler, Mindest-, Höchstwert und Schritte optional
 * Verknüpfungen (Links)
@@ -654,7 +655,7 @@ Beide Speicherorte sowie externe Dokumente bestücken den [STL-Betrachter](#werk
 
 Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
-Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden.
+Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden. Insbesondere in Bezug auf Schnittstellen können auch Netzwerkressourcen als Quelle angegeben werden.
 
 ![files screenshot](http://toh.erroronline.one/caro/files.png)
 
