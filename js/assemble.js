@@ -1555,7 +1555,7 @@ export class Assemble {
 			hint = [...this.hint()],
 			multiple;
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
-		if (this.currentElement.attributes.multiple) {
+		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
 			multiple = true;
 			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
 			// delete for input apply_attributes
