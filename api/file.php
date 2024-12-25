@@ -30,7 +30,7 @@ class FILE extends API {
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedFolder = $this->_requestedId = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedFolder = $this->_requestedId = isset(REQUEST[2]) && REQUEST[2] !== 'null' ? REQUEST[2] : null;
 		$this->_requestedFile = $this->_accessible = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
@@ -271,8 +271,11 @@ class FILE extends API {
 				$currentfolder = '';
 				foreach ($files as $folder => $content){
 					foreach ($content as $file){
-						$pathinfo = pathinfo($file);
-						$file = ['path' => substr($file, 1), 'file' => $pathinfo['basename'], 'folder' => $pathinfo['dirname']];
+						if (preg_match('/^\.\.\//', $file)){
+							$file = ['path' => substr($file, 1), 'file' => pathinfo($file)['basename'], 'folder' => $folder];
+						}
+						else $file = ['path' => $file, 'file' => $file, 'folder' => $folder];
+
 						if ($currentfolder != $file['folder']) {
 							$matches[] = [];
 							$currentfolder = $file['folder'];
@@ -351,7 +354,16 @@ class FILE extends API {
 							':path' => $file
 						];
 					}
+					foreach ($this->_payload as $key => $value){
+						if (preg_match("/^".LANG::PROPERTY('file.external_file_link')."/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
+							$insertions[] = [
+								':author' => $_SESSION['user']['name'],
+								':path' => $link[1]
+							];
+						}
+					}
 					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
+					$success = false;
 					foreach ($sqlchunks as $chunk){
 						$success = false;
 						try {
@@ -375,7 +387,7 @@ class FILE extends API {
 				}
 				break;
 			case 'PUT':
-				 switch ($this->_accessible){
+				switch ($this->_accessible){
 					case '0':
 						$prepare = 'file_external_documents_retire';
 						$tokens = [
@@ -404,7 +416,7 @@ class FILE extends API {
 						];
 						$response = LANG::GET('file.external_file_regulatory_context');
 				}
-				if (SQLQUERY::EXECUTE($this->_pdo, $prepare, [
+				if ($this->_requestedId && SQLQUERY::EXECUTE($this->_pdo, $prepare, [
 					'values' => $tokens
 				])) $this->response(['response' => [
 						'msg' => $response,
@@ -430,8 +442,8 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => LANG::GET('file.file_filter_label'),
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external', this.value); return false;}",
-								'onblur' => "api.file('get', 'filter', 'external', this.value); return false;",
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external_documents', this.value); return false;}",
+								'onblur' => "api.file('get', 'filter', 'external_documents', this.value); return false;",
 								'id' => 'filefilter'
 							]
 						]
@@ -439,19 +451,21 @@ class FILE extends API {
 					$result['render']['content'][] = [];
 					foreach ($files as $file){
 						if ($file) {
-							$file['name'] = pathinfo($file['path'])['basename'];
-							$file['path'] = substr($file['path'], 1);
+							if (preg_match('/^\.\.\//', $file['path'])){
+								$file['name'] = pathinfo($file['path'])['basename'];
+								$file['path'] = substr($file['path'], 1);
+							}
+							else $file['name'] = $file['path'];
 							$regulatory_context = [];
 							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
 							foreach(LANGUAGEFILE['regulatory'] as $key => $value){
 								$regulatory_context[$value] = ['value' => $key];
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
-							$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
-									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => $filedate->format('Y-m-d H:i'), ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => $filedate->format('Y-m-d H:i')])),
+									'description' => ($file['retired'] ? LANG::GET('file.external_file_retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => $file['retired']]) : LANG::GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
 									'content' => [
 										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 									],
@@ -471,9 +485,9 @@ class FILE extends API {
 								[
 									'type' => 'checkbox',
 									'content' => [
-										LANG::GET('file.external_file_available') => ($file['retired']
-										? ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
-										: ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
+										LANG::GET('file.external_file_available') => ($file['activated'] && !$file['retired']
+										? ['checked' => true, 'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']]
+										: ['onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.checked ? 1 : 0)", 'data-filtered' => $file['path']])
 									],
 								],
 								[
@@ -492,11 +506,17 @@ class FILE extends API {
 				else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
 				$result['render']['content'][] = [
 					[
+						'type' => 'link',
+						'attributes' => [
+							'name' => LANG::GET('file.external_file_link'),
+							'multiple' => true
+						]
+					],
+					[
 						'type' => 'file',
 						'attributes' => [
 							'name' => LANG::GET('file.manager_new_file'),
-							'multiple' => true,
-							'required' => true
+							'multiple' => true
 						],
 						'hint' => LANG::GET('file.external_file_hint')
 					]
@@ -746,8 +766,13 @@ class FILE extends API {
 			foreach ($files as $folder => $content){
 				$matches = [];
 				foreach ($content as $file){
-					$file=['path' => substr($file,1), 'name' => pathinfo($file)['filename'], 'file' => pathinfo($file)['basename']];
-					$matches[$file['file']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
+					if (preg_match('/^\.\.\//', $file)){
+						$file = ['name' => pathinfo($file)['basename'], 'path' => substr($file, 1)];
+					}
+					else {
+						$file = ['name' => $file, 'path' => $file];
+					}
+					$matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
 				$result['render']['content'][]=
 				[
@@ -778,7 +803,7 @@ class FILE extends API {
 		$matches = [];
 		if ($files = $search->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
 			foreach ($files as $file){
-				$matches[] = substr($file, 1);
+				$matches[] = preg_match('/^\.\.\//', $file) ? substr($file, 1) : $file;
 			}
 		}
 		$this->response([
