@@ -147,6 +147,7 @@ $queries = [
 				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`regulatory_context` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`activated` datetime NULL DEFAULT NULL," .
 				"	`retired` datetime NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -383,6 +384,7 @@ $queries = [
 				"	path varchar(MAX) NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	regulatory_context varchar(MAX) NOT NULL," .
+				"	activated smalldatetime NULL DEFAULT NULL" .
 				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"
 				,

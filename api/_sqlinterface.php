@@ -420,24 +420,24 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"
 		],
 		'file_external_documents_get_active' => [
-			'mysql' => "SELECT * FROM caro_file_external_documents WHERE retired IS NULL ORDER BY path ASC",
-			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE retired IS NULL ORDER BY path ASC"
+			'mysql' => "SELECT * FROM caro_file_external_documents WHERE activated IS NOT NULL AND retired IS NULL ORDER BY path ASC",
+			'sqlsrv' => "SELECT * FROM caro_file_external_documents WHERE activated IS NOT NULL AND retired IS NULL ORDER BY path ASC"
 		],
 		'file_external_documents_retire' => [
 			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'file_external_documents_unretire' => [
-			'mysql' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, retired = NULL WHERE id = :id"
+			'mysql' => "UPDATE caro_file_external_documents SET author = :author, activated = CURRENT_TIMESTAMP, retired = NULL WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_external_documents SET author = :author, activated = CURRENT_TIMESTAMP, retired = NULL WHERE id = :id"
 		],
 		'file_external_documents_context' => [
 			'mysql' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_file_external_documents SET regulatory_context = :regulatory_context WHERE id = :id"
 		],
 		'file_external_documents_post' => [
-			'mysql' => "INSERT INTO caro_file_external_documents (id, path, author, regulatory_context, retired) VALUES (NULL, :path, :author, '', NULL)",
-			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, author, regulatory_context, retired) VALUES (:path, :author, '', NULL)"
+			'mysql' => "INSERT INTO caro_file_external_documents (id, path, author, regulatory_context, activated, retired) VALUES (NULL, :path, :author, '', NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_file_external_documents (path, author, regulatory_context, activated, retired) VALUES (:path, :author, '', NULL, NULL)"
 		],
 
 
