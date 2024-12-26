@@ -42,6 +42,7 @@
     * [Information security](#information-security)
     * [Performance evaluation](#performance-evaluation)
     * [Tech doc](#tech-doc)
+        * [Risk assessment](#risk-assessment)
 * [Code design patterns](#code-design-patterns)
     * [Frontend design](#frontend-design)
     * [Backend design](#backend-design)
@@ -93,7 +94,6 @@
         * [3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen](#318-prc3bcfaspekt-8-kostenpflichtige-ressourcen-1)
         * [3.1.9 Prüfaspekt (9): Netzwerkkommunikation](#319-prc3bcfaspekt-9-netzwerkkommunikation-1)
         * [3.1.10 Prüfaspekt (10): Organisatorische Sicherheit](#3110-prüfaspekt-10-organisatorische-sicherheit)
-* [Risk assessment](#risk-assessment)
 * [Ressources](#ressources)
 * [License](#license)
 
@@ -1691,52 +1691,6 @@ Evidences of conformity according to the documents described above:
 * Usability Evaluation Report: [Stakeholder requirements](#stakeholder-requirements)
 * User Manual: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en / _install.default.de
 
-### Stakeholder requirements
-Stakeholder identification:
-* User (regular Employees)
-* CEO (Chief executive officer)
-* QMO (Quality management officer)
-* Supervisor
-* Office
-* Purchase
-* Operator of infrastructure
-
-#### Discussed stakeholder requirements:
-| Requirement / issue | Stakeholder | Time | Implementation |
-| ------------------- | ----------- | ---- | -------------- |
-| It can't go on like this | CEO | 2019 | Development of a digital application to reduce paperbased operations |
-| No offers obtained | Deputy QMO | late 2023 | Fine, I'll just do it myself, 2023-10-02 |
-| Device interoperability, network access to central data | CEO, QMO | late 2023 | Design as web application; 2023 |
-| Satisfying regulatory requirements (ISO 13485), scalability, supported communication and transparency, role management, maximum possible security, shared information, unintrusive implementation of critical tasks into daily workflow (e.g. sample checks) | QMO | late 2023 | ongoing |
-| IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | Support for multiple SQL dialects; 2023-12-23 |
-| Nah, this looks bad | CEO | 2024-01 | CSS restyling initial draft 2023-01-20 |
-| Text recommendations | User | 2024-03-27 | Already satisfied with text recommendations draft; 2024-02-23 |
-| Prefill documents | User | 2024-03-27 | Already satisfied with records draft; 2024-03-02 |
-| Proper article list | User | 2024-03-27 | Already satisfied with consumables pricelist import draft; 2023-11-10 |
-| Optional record export without user name and entry date | Supervisor, Office | 2024-03-27 | Implemented as simplified export; 2024-03-29 |
-| Optional record export by document | Supervisor, User | 2024-03-27 | Implemented as documentwise record export; 2024-03-29 |
-| Current state of treatments (draft lists) | Supervisor | 2024-03-27 | Implemented as last edit information on records; 2024-08-18 |
-| Weekly schedule | Supervisor | 2024-03-27 | Early calendar draft; 2024-04-30 |
-| Time tracking | User | 2024-03-27 | Early timesheet draft; 2024-05-13 |
-| Reminder of ongoing treatments | Supervisor | 2024-03-27 | Message notification for unclosed records; 2024-08-24|
-| Group accounts | CEO | 2024-03-27 | Implemented as group user permission; 2024-03-27|
-| Editing permission for article alias | Purchase | 2024-03-27 | Implemented purchase_assistant role; 2024-03-27|
-| Return option for orders | Purchase | 2024-04-14 | Implemented order returns; 2024-04-20 |
-| Insight of orders from different units | User | 2024-04-14 | Insight to prepared orders of other units for authorized users; 2024-04-20 |
-| Order cancellation | Purchase | 2024-04-14 | Implemented order cancellation; 2024-04-20 |
-| Order state changes with message | User | 2024-04-14 | Implemented order state change with messages; 2024-04-23 |
-| Record states (office), settable, as filter | Supervisor, Office | 2024-10-16 | Implemented case states with respective permissions; 2024-10-28 |
-| Scheduling with optional user assignment | Supervisor | 2024-10-16 | User assignable; 2024-11-03 |
-| Reminder for orders without receival, purchase to get in touch with vendor | User | 2024-10-16 | Message notification for unreceived orders; 2024-10-26|
-| Order information (textsection) copyable | User, Purchase | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
-| Partial delivery state for orders | User, Purchase | 2024-10-16 | Implemented; 2024-10-26 |
-| Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
-| Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
-| Personal token as order approval an option after all | CEO | 2024-12-12 | Implemented, also configuration option; 2024-12-20 |
-| Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
-| Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
-| Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | |
-
 [Content](#content)
 
 ### Usability test plan
@@ -1806,6 +1760,106 @@ Product Release
 * Release Notes
 * Declaration of Conformity: **not applicable**
 
+### Stakeholder requirements
+Stakeholder identification:
+* User (regular Employees)
+* CEO (Chief executive officer)
+* QMO (Quality management officer)
+* Supervisor
+* Office
+* Purchase
+* Operator of infrastructure
+
+#### Discussed stakeholder requirements:
+| Requirement / issue | Stakeholder | Time | Implementation |
+| ------------------- | ----------- | ---- | -------------- |
+| It can't go on like this | CEO | 2019 | Development of a digital application to reduce paperbased operations |
+| No offers obtained | Deputy QMO | late 2023 | Fine, I'll just do it myself, 2023-10-02 |
+| Device interoperability, network access to central data | CEO, QMO | late 2023 | Design as web application; 2023 |
+| Satisfying regulatory requirements (ISO 13485), scalability, supported communication and transparency, role management, maximum possible security, shared information, unintrusive implementation of critical tasks into daily workflow (e.g. sample checks) | QMO | late 2023 | ongoing |
+| IIS and SQL-Server usage | Operator of infrastructure | 2023-10 | Support for multiple SQL dialects; 2023-12-23 |
+| Nah, this looks bad | CEO | 2024-01 | CSS restyling initial draft 2023-01-20 |
+| Text recommendations | User | 2024-03-27 | Already satisfied with text recommendations draft; 2024-02-23 |
+| Prefill documents | User | 2024-03-27 | Already satisfied with records draft; 2024-03-02 |
+| Proper article list | User | 2024-03-27 | Already satisfied with consumables pricelist import draft; 2023-11-10 |
+| Optional record export without user name and entry date | Supervisor, Office | 2024-03-27 | Implemented as simplified export; 2024-03-29 |
+| Optional record export by document | Supervisor, User | 2024-03-27 | Implemented as documentwise record export; 2024-03-29 |
+| Current state of treatments (draft lists) | Supervisor | 2024-03-27 | Implemented as last edit information on records; 2024-08-18 |
+| Weekly schedule | Supervisor | 2024-03-27 | Early calendar draft; 2024-04-30 |
+| Time tracking | User | 2024-03-27 | Early timesheet draft; 2024-05-13 |
+| Reminder of ongoing treatments | Supervisor | 2024-03-27 | Message notification for unclosed records; 2024-08-24|
+| Group accounts | CEO | 2024-03-27 | Implemented as group user permission; 2024-03-27|
+| Editing permission for article alias | Purchase | 2024-03-27 | Implemented purchase_assistant role; 2024-03-27|
+| Return option for orders | Purchase | 2024-04-14 | Implemented order returns; 2024-04-20 |
+| Insight of orders from different units | User | 2024-04-14 | Insight to prepared orders of other units for authorized users; 2024-04-20 |
+| Order cancellation | Purchase | 2024-04-14 | Implemented order cancellation; 2024-04-20 |
+| Order state changes with message | User | 2024-04-14 | Implemented order state change with messages; 2024-04-23 |
+| Record states (office), settable, as filter | Supervisor, Office | 2024-10-16 | Implemented case states with respective permissions; 2024-10-28 |
+| Scheduling with optional user assignment | Supervisor | 2024-10-16 | User assignable; 2024-11-03 |
+| Reminder for orders without receival, purchase to get in touch with vendor | User | 2024-10-16 | Message notification for unreceived orders; 2024-10-26|
+| Order information (textsection) copyable | User, Purchase | 2024-10-16 | textarea_copy widget, selectable textsections; 2024-10-26|
+| Partial delivery state for orders | User, Purchase | 2024-10-16 | Implemented; 2024-10-26 |
+| Reminder for received, not marked as delivered, orders | Purchase | 2024-10-16 | Implemented; 2024-10-27 |
+| Message on case state change | User | 2024-11-27 | Implemented; 2024-11-29 |
+| Personal token as order approval an option after all | CEO | 2024-12-12 | Implemented, also configuration option; 2024-12-20 |
+| Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
+| Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
+| Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
+
+#### Rejected requirements
+> Translation of ERP order-dump is not satisfiable given the current provided data
+* Current structure of order dump mostly identified (ERP OptaData eva 3/viva)
+* [unidentifiable null] [ERPorderRecordNumber int, orderDate Y-m-d H:i:s.0] [ERPvendorCode int, ERPstorageUnit int] [ERParticleNumber int, ERPitemDescription string] [deliveryDate Y-m-d H:i:s.0] [ERPcustomerNumber int] [orderAmount float] [deliveredAmount float] [openAmount float] [ERPunitCode int] [orderPrice float] [unidentifiable null] [ERPnoticeFlag int > 1, unidentifiable 0]
+* /^\[.+?\]\t\[(\d+),.(.*?)]\t\[(\d{1,}),.(\d{1,})\]\t\[(\d{1,}),.(.*?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?),.(.+?)\]/gms would be able to extract data from copy/pasting the dump
+* while adding the ERPvendorCode to the vendor database might be considered reasonable, it is likely unreliable to keep ERParticleNumbers and ERPunitCodes up to date, unreasonable to link the ERPcustomerNumber to a commissioned order, and most likely impossible to match the ordered article with the dump given a mostly messy data within the erp system and missing article numbers within the dump
+* requirement rejected as this **contradicts simplifying current processes and workloads** as of 2024-12-26
+
+[Content](#content)
+
+### Risk assessment
+
+#### Development riskss
+| Risk | Probability | Impact | Measures | Statement |
+| ---- | ----------- | ------ | -------- | --------- |
+| Developer unavailable | Low | High (currently single developer) | Tech stack with vanilla JS and PHP can be handled by any web agency | Getting used to foreign structure is hard, but still |
+| IDE unavailable | Low | Low | Programming can be done with any text editor | none |
+| Version control unavailable | Low | High (recording changes is crucial) | Git is an established version control running locally | It is *really* unlikely Git will vanish in the near future |
+| Lacking user input | High | High (user requirements not satisfied, lack of compliance) | Regular meetings to match [requirements](#discussed-stakeholder-requirements) | I do the best I can |
+| Insufficient testing | High (currently single developer) | High (application unstable) | Reduce errors by implementing globally reusable methods and a simplified framework, modularize endpoints | none | 
+| Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production, create database backups | At best compensating skipped updates |
+
+#### Software environment risks
+> The operator of the infrastructure is responsible for fulfilling these requirements.
+
+| Risk | Probability | Impact | Measures | Statement |
+| ---- | ----------- | ------ | -------- | --------- |
+| Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
+| Infrastructure outdated | Medium | High (application unstable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
+| Data loss | Low | High (regulatory penalties) | Database backups | Responsibility delegated to operator of infrastructure |
+
+#### Software risks
+| Risk | Probability | Impact | Measures | Statement |
+| ---- | ----------- | ------ | -------- | --------- |
+| Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within closed network | none |
+| Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed availability | [Encryption statement](#encryption-statement) |
+| Unencrypted data access | Medium | High (regulatory penalties) | Use within closed network | Bears the same risk as accessing confidential data on personal network drives |
+| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | Single token only as a tradeoff regarding usability |
+| Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
+| No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
+| User error | High | High (faulty data) | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |
+| Data breach | High | High (regulatory penalties, reputation loss) | Data export for authorized responsible users only, add warning | Personal responsibility remains |
+| Information neglect | High | High (regulatory penalties)| Add system messages, trigger system alert, landing page summaries, notifications | Personal responsibility remains |
+| Malicious inserts | Medium | High (application unstable, corrupted data) | Sanitize input and output, auto delete of public added files, link username to public contributions | Possible insertion of executable code patterns reduced to a minimum |
+| Outdated content | Medium | High (regulatory penalties)| Export permissions, add warning, information about connectivity state | none |
+| Unfulfilled regulatory satisfaction | High | High (regulatory penalties) | Checklist for context | Personal responsibility remains |
+| Performance issues (data transfer) | Medium | Medium (application unresponsive) | Create reduced server data scheme, use clients render capabilities | none |
+| Performance issues (database processing) | Medium | Medium (application unresponsive) | Analyse data, combine queries where possible | none |
+| Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
+| Insufficient configuration | Medium | High (application unstable) | Documentation of config.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
+| Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
+| Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
+| Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
+
 [Content](#content)
 
 # Code design patterns
@@ -1816,7 +1870,7 @@ All requests have to be routed through the api-object to ensure proper result pr
 
 A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
 
-DIALOG-, TOAST- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js)
+Dialog-, Toast- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js), examples of the frontend-syntax can be found importing unittest.js and calling `rendertest('documents')` and `rendertest('app')` from the console.
 
 _client-object handles module specific recurring tasks of form preparations (./js/utility.js)
 
@@ -1837,13 +1891,17 @@ Using these methods is mandatory. (./api/_utility.php) Deviations are allowed on
 * *supervisors* having access to assigned organizational unit content only
 * *groups* not having access to recording
 
-There is as SQLQUERY class handling
+There is an SQLQUERY class handling
 * database connections
 * query preparation
 * masking user input (avoiding injections)
 * support of chunkifying queries for improved performance
 
 Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
+
+There is a SHARED class handling
+* inter-module used search and filter operations
+* inter-module used document and record handling
 
 Helper modules start with _, only endpoints do not. Helper modules are supposed to work without being reliant on other modules and expected formatted output. _shared.php is an exception.
 
@@ -1865,6 +1923,13 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
 
+* erroronline1.js is fundamental as it handles requests and form data processing
+
+Other libraries rely on dynamic data and have to be tested in development runtime
+* viewstl: upload an stl-file and view it within the respective tool-module
+* TCPDF: generate a record and export it as pdf
+* xlsxwriter: generate orders and export the order statistic from the audit-module
+
 ## Stress test and performance
 Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. **The script still should be removed from the production server once being tested.**
 
@@ -1876,19 +1941,19 @@ During development following outcomes could be noted:
 
 The stresstest also allows for injection of documents and components according to templates/documents.xx.json. Deletion of documents and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing. **Deleting documents and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested.**
 
-Variables can be adjusted within the class variables in the sourcecode.
+Variables for the stress test can be adjusted within the top class variables in the sourcecode.
 
 [Content](#content)
 
 ## Deployment process
-* For **installation** see [here](#installation).
-* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Code files are simply to be uploaded to the server to be available. Before altering tables a backup (BACKUP_caro_table) is created. On creation failure the update is supposed to be aborted.
+* For **installation** see [installation](#installation).
+* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Before altering tables a backup (BACKUP_caro_table) is created. On creation failure the update is supposed to be aborted. Code files are simply to be uploaded to the server to be available. 
 * The operator of the infrastructure is responsible for a sufficient **deletion / uninstallation** of the software, especially backend, database and backups.
 
 [Content](#content)
 
 # API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions. Returns 401 Unauthorized if not logged in.
+All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 401 Unauthorized if not logged in.
 Response properties are
 * *render* (for assemble or toast)
 * *title* (dynamic page title updates)
@@ -4180,52 +4245,6 @@ I welcome any constructive input on this topic.
 
 ### 3.1.10 Prüfaspekt (10): Organisatorische Sicherheit 
 > The operator of the infrastructure is responsible for fulfilling these requirements.
-
-[Content](#content)
-
-# Risk assessment
-
-## Development risks
-| Risk | Probability | Impact | Measure | Statement |
-| ---- | ---- | ---- | ---- | ---- |
-| Developer unavailable | Low | High (currently single developer) | Tech stack with vanilla JS and PHP can be handled by any web agency | Getting used to foreign structure is hard, but still |
-| IDE unavailable | Low | Low | Programming can be done with any text editor | none |
-| Version control unavailable | Low | High (recording changes is crucial) | Git is an established version control running locally | It is *really* unlikely Git will vanish in the near future |
-| Lacking user input | High | High (user requirements not satisfied, lack of compliance) | Regular meetings to match requirements | I do the best I can |
-| Insufficient testing | High (currently single developer) | High (application unstable) | Reduce errors by implementing globally reusable methods and a simplified framework, modularize endpoints | none | 
-| Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production, create database backups | At best compensating skipped updates |
-
-## Software environment risks
-> The operator of the infrastructure is responsible for fulfilling these requirements.
-
-| Risk | Probability | Impact | Measure | Statement |
-| ---- | ---- | ---- | ---- | ---- |
-| Infrastructure unavailable | Medium | High (application not usable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
-| Infrastructure outdated | Medium | High (application unstable) | Tech stack is nothing peculiar and can easily be replaced, relies on open source / free software | Responsibility delegated to operator of infrastructure |
-| Data loss | Low | High (regulatory penalties) | Database backups | Responsibility delegated to operator of infrastructure |
-
-## Software risks
-| Risk | Probability | Impact | Measures | Statement |
-| ---- | ---- | ---- | ---- | ---- |
-| Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within closed network | none |
-| Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed availability | [Encryption statement](#encryption-statement) |
-| Unencrypted data access | Medium | High (regulatory penalties) | Use within closed network | Bears the same risk as accessing confidential data on personal network drives |
-| Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | Single token only as a tradeoff regarding usability |
-| Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
-| No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
-| User error | High | High (faulty data) | User training, providing manuals (outside and within application), adding hints to frontend, adhere to best practices for UI, customizeable language | none |
-| Data breach | High | High (regulatory penalties, reputation loss) | Data export for authorized responsible users only, add warning | Personal responsibility remains |
-| Information neglect | High | High (regulatory penalties)| Add system messages, trigger system alert, landing page summaries, notifications | Personal responsibility remains |
-| Malicious inserts | Medium | High (application unstable, corrupted data) | Sanitize input and output, auto delete of public added files, link username to public contributions | Possible insertion of executable code patterns reduced to a minimum |
-| Outdated content | Medium | High (regulatory penalties)| Export permissions, add warning, information about connectivity state | none |
-| Unfulfilled regulatory satisfaction | High | High (regulatory penalties) | Checklist for context | Personal responsibility remains |
-| Performance issues (data transfer) | Medium | Medium (application unresponsive) | Create reduced server data scheme, use clients render capabilities | none |
-| Performance issues (database processing) | Medium | Medium (application unresponsive) | Analyse data, combine queries where possible | none |
-| Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
-| Insufficient configuration | Medium | High (application unstable) | Documentation of config.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
-| Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
-| Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
-| Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 
 [Content](#content)
 

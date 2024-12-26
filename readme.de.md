@@ -37,11 +37,11 @@
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [CSV Processor](#csv-prozessor)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
+    * [Risikoanalyse](#risikoanalyse)
 * [Code Design Vorlagen](#code-design-vorlagen)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
     * [Nutzungsrichtlinien für die Nutzung der Anwendung](#nutzungsrichtlinien-für-die-nutzung-der-anwendung)
-* [Risikoanalyse](#risikoanalyse)
 * [Bibliotheken](#bibliotheken)
 * [Lizenz](#lizenz)
 
@@ -1549,6 +1549,9 @@ Ein beliebiges Beispiel:
 # Regulatorische Anforderungen an die Software
 Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
 
+### Risikoanalyse
+Eine Risikoanalyse liegt in der englischsprachigen Beschreibung vor.
+
 [Übersicht](#übersicht)
 
 # Code Design Vorlagen
@@ -1578,11 +1581,6 @@ Die Anwendung erbittet die Berechtigung für den Kamerazugriff und Benachrichtig
 
 ### Rückmeldungen
 Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wenden dich umgehend an :issue_mail (*wie in config.ini für application->issue_mail festgelegt*), erläutere die Details und ergänze eine Kontaktmöglichkeit.
-
-[Übersicht](#übersicht)
-
-# Risikoanalyse
-Eine Risikoanalyse liegt in der englischsprachigen Beschreibung vor.
 
 [Übersicht](#übersicht)
 
