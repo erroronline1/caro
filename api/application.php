@@ -59,7 +59,7 @@ class APPLICATION extends API {
 	 */
 	public function login(){
 		if (!$this->_requestedLogout){
-			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.login_description')) && isset($_SESSION['user'])){
+			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
 				$this->response([
 					'user' => [
 					'image' => $_SESSION['user']['image'],
@@ -85,7 +85,7 @@ class APPLICATION extends API {
 			// select single user based on token
 			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
-					':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.login_description'))
+					':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login'))
 				]
 			]);
 			if ($query && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.terms_of_service_accepted'))){
@@ -131,7 +131,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'scanner',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.login_description', [], true),
+								'name' => $this->_lang->GET('application.login', [], true),
 								'type' => 'password'
 							]
 						]
@@ -188,13 +188,13 @@ class APPLICATION extends API {
 			case 'POST':
 				$permissions = [];
 				$entry = [
-					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_title')),
-					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_content')),
+					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.title')),
+					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.content')),
 					'permissions' => '',
 				];
 		
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -216,26 +216,26 @@ class APPLICATION extends API {
 				if ($query) $this->response([
 					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => $this->_lang->GET('application.edit_manual_saved', [':name' => $entry['title']]),
+						'msg' => $this->_lang->GET('application.manual.saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'name' => $this->_lang->GET('application.edit_manual_not_saved'),
+						'name' => $this->_lang->GET('application.manual.not_saved'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'PUT':
 				$permissions = [];
 				$entry = [
-					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_title')),
-					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_content')),
+					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.title')),
+					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.content')),
 					'permissions' => '',
 				];
 		
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
@@ -257,13 +257,13 @@ class APPLICATION extends API {
 				if ($query) $this->response([
 					'response' => [
 						'id' => $this->_requestedManual,
-						'msg' => $this->_lang->GET('application.edit_manual_saved', [':name' => $entry['title']]),
+						'msg' => $this->_lang->GET('application.manual.saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'name' => $this->_lang->GET('application.edit_manual_not_saved'),
+						'name' => $this->_lang->GET('application.manual.not_saved'),
 						'type' => 'error'
 					]]);
 
@@ -287,7 +287,7 @@ class APPLICATION extends API {
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
-				$options = ['...' . $this->_lang->GET('application.edit_new_manual_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . $this->_lang->GET('application.edit_new_manual_topic')) ? ['selected' => true] : []];
+				$options = ['...' . $this->_lang->GET('application.manual.new_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . $this->_lang->GET('application.manual.new_topic')) ? ['selected' => true] : []];
 				foreach ($query as $row){
 					$options[$row['title']] = ['value' => $row['id']];
 					if ($entry['id'] === $row['id']) $options[$row['title']]['selected'] = true; 
@@ -304,7 +304,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'select',
 							'attributes' => [
-								'name' => $this->_lang->GET('application.edit_select_manual_topic'),
+								'name' => $this->_lang->GET('application.manual.select_topic'),
 								'onchange' => "api.application('get', 'manual', this.value)"
 							],
 							'content' => $options
@@ -312,7 +312,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'text',
 							'attributes' => [
-								'name' => $this->_lang->GET('application.edit_manual_title'),
+								'name' => $this->_lang->GET('application.manual.title'),
 								'value' => $entry['title'],
 							]
 						],
@@ -320,14 +320,14 @@ class APPLICATION extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'rows' => 8,
-								'name' => $this->_lang->GET('application.edit_manual_content'),
+								'name' => $this->_lang->GET('application.manual.content'),
 								'value' => $entry['content']
 							]
 						],
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('application.edit_manual_permissions')
+								'name' => $this->_lang->GET('application.manual.permissions')
 							],
 							'content' => $permissions
 						]
@@ -337,9 +337,9 @@ class APPLICATION extends API {
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
-								'value' => $this->_lang->GET('application.edit_manual_delete'),
+								'value' => $this->_lang->GET('application.manual.delete'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('application.edit_manual_delete_confirm') ."', options: {".
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
 									"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"
@@ -356,13 +356,13 @@ class APPLICATION extends API {
 				]);
 				if ($query) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('application.edit_manual_deleted'),
+						'msg' => $this->_lang->GET('application.manual.deleted'),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('application.edit_manual_error'),
+						'msg' => $this->_lang->GET('application.manual.error'),
 						'id' => $this->_requestedManual,
 						'type' => 'error'
 					]]);
@@ -476,7 +476,7 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.overview_messages', [':number' => $unseen]),
+						'content' => $this->_lang->GET('application.dashboard.messages', [':number' => $unseen]),
 						'attributes' => [
 							'data-type' => 'message',
 							'name' => $this->_lang->GET('menu.message_conversations')
@@ -498,7 +498,7 @@ class APPLICATION extends API {
 					'content' => [
 						[
 							'type' => 'textsection',
-							'content' => $this->_lang->GET('application.overview_orders', [':number' => $unprocessed]),
+							'content' => $this->_lang->GET('application.dashboard.orders', [':number' => $unprocessed]),
 							'attributes' => [
 								'data-type' => 'purchase',
 								'name' => $this->_lang->GET('menu.purchase_approved_orders')
@@ -521,7 +521,7 @@ class APPLICATION extends API {
 					'content' => [
 						[
 							'type' => 'textsection',
-							'content' => $this->_lang->GET('application.overview_preparedorders', [':number' => $prepared]),
+							'content' => $this->_lang->GET('application.dashboard.preparedorders', [':number' => $prepared]),
 							'attributes' => [
 								'data-type' => 'purchase',
 								'name' => $this->_lang->GET('menu.purchase_prepared_orders')
@@ -543,7 +543,7 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.overview_cases', [':number' => $number]),
+						'content' => $this->_lang->GET('application.dashboard.cases', [':number' => $number]),
 						'attributes' => [
 							'data-type' => 'record',
 							'name' => $this->_lang->GET('menu.record_header')
@@ -564,7 +564,7 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('assemble.approve_landing_page', [':number' => $unapproved]),
+						'content' => $this->_lang->GET('application.dashboard.unapproveddocuments', [':number' => $unapproved]),
 						'attributes' => [
 							'data-type' => 'record',
 							'name' => $this->_lang->GET('menu.documents_manage_approval')
@@ -585,7 +585,7 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('consumables.approve_landing_page', [':number' => $unapproved]),
+						'content' => $this->_lang->GET('application.dashboard.pendingincorporations', [':number' => $unapproved]),
 						'attributes' => [
 							'data-type' => 'purchase',
 							'name' => $this->_lang->GET('menu.purchase_incorporated_pending')
@@ -606,7 +606,7 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('record.record_complaints_landing_page', [':number' => $complaints]),
+						'content' => $this->_lang->GET('application.dashboard.complaints', [':number' => $complaints]),
 						'attributes' => [
 							'data-type' => 'record',
 							'name' => $this->_lang->GET('menu.record_header')

@@ -119,24 +119,7 @@
 		}
 	},
 	"application": {
-		"search": "Suche nach Dokumenten, Aufzeichnungen und Dateien",
-		"search_empty": "Es wurde nichts passendes gefunden...",
-		"edit_select_manual_topic": "Thema wählen",
-		"edit_new_manual_topic": "Neues Thema",
-		"edit_manual_title": "Title",
-		"edit_manual_content": "Inhalt",
-		"edit_manual_permissions": "Relevant für folgende Freigaben",
-		"edit_manual_delete": "Dieses Thema löschen",
-		"edit_manual_delete_confirm": "Sicher dass du dieses Thema löschen willst?",
-		"edit_manual_deleted": "Thema gelöscht",
-		"edit_manual_error": "Es trat ein Fehler auf, bitte versuche es erneut.",
-		"edit_manual_saved": "Das Thema ':name' der Anleitung wurde gespeichert",
-		"edit_manual_not_saved": "Das Thema konnte nicht gespeichert werden",
-		"edit_manual_forbidden_name": "Der Titel :name ist nicht zulässig, bitte wähle einen anderen...",
-		"overview_messages": "Du hast :number ungelesene Nachricht(en)",
-		"overview_preparedorders": ":number vorbereitete Bestellungen zur Freigabe",
-		"overview_orders": ":number Bestellungen zur Bearbeitung",
-		"overview_cases": ":number offene Vorgänge für deine zugeordneten Bereiche",
+		"login": "Anmeldung",
 		"terms_of_service": {
 			"Datenschutz": "Diese Anwendung enthält sensible Daten. Bitte lass das Gerät nicht unbeaufsichtigt während du angemeldet bist um eine unbeabsichtigte Verbeitung der Daten zu vermeiden. Beachte, dass sensible Daten durch Bildschirmaufnahmen und Anwendungswechsel kompromittiert werden können und vermeide die Verbreitung außerhalb der Anwendung. Wenn du sensible Daten aus der Anwendung exportierst bist du selbst für eine sichere Behandlung verantwortlich. Auch bei einer Gerätesperre kann die Anwendung im Hintergrund aktiv sein. Bei Verbdingunsabbrüchen werden sensible Daten auf dem Gerät gespeichert. Bitte stelle schnellstmöglich eine Netzwerkverbindung her, damit die Daten bereinigt und auf dem Server im Sinne der Datensicherheit und durchgängigen Dokumentation verarbeitet werden können. Melde dich ab, wenn du die Anwendung nicht verwendest und lasse das Gerät nicht unbeaufsichtigt. Verwende nur zugelassene Geräte um die Datensicherheit zu gewährleisten. Informiere im Falle eines Verlusts deiner Zugangskennung für eine Neuvergabe unverzüglich einen Mitarbeiter der folgenden Berechtigungsgruppen: :permissions",
 			"Personenbezoge Daten (Nutzer)": "Diese Anwendung ist Bestandteil des Qualitätsmanagements. Deine Daten sind für die Dokumentation und die Ressourceplanung erforderlich. Deine Daten sind in deinem Profil einsehbar. Manche Daten können nur durch die Leitung bearbeitet werden, andere von dir selbst. Im Falle einer Löschung deines Nutzerprofils verbleiben gesendete Nachrichten und allgemein genutzte Informationen (Bestellungen, Prüfungen, dein Name als Verfasser und Mitarbeiter für die Dokumentation) aufgrund berechtigten Interesses im Sinne einer durchgängigen Dokumentation und operativer Prozesse im System.",
@@ -144,6 +127,31 @@
 			"Rückmeldungen": "Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wenden dich umgehend an :issue_mail, erläutere die Details und ergänze eine Kontaktmöglichkeit."
 		},
 		"terms_of_service_accepted": "Ich stimme den Bedingungen zu",
+		"search": "Suche nach Dokumenten, Aufzeichnungen und Dateien",
+		"search_empty": "Es wurde nichts passendes gefunden...",
+		"dashboard": {
+			"messages": "Du hast :number ungelesene Nachricht(en)",
+			"preparedorders": ":number vorbereitete Bestellungen zur Freigabe",
+			"orders": ":number Bestellungen zur Bearbeitung",
+			"cases": ":number offene Vorgänge für deine zugeordneten Bereiche",
+			"unapproveddocuments":":number Komponenten/Dokumente benötigen eine Freigabe",
+			"pendingincorporations":":number laufende Einführungsverfahren",
+			"complaints":":number nicht abgeschlossene Reklamationen"
+		},
+		"manual": {
+			"select_topic": "Thema wählen",
+			"new_topic": "Neues Thema",
+			"title": "Title",
+			"content": "Inhalt",
+			"permissions": "Relevant für folgende Freigaben",
+			"delete": "Dieses Thema löschen",
+			"delete_confirm": "Sicher dass du dieses Thema löschen willst?",
+			"deleted": "Thema gelöscht",
+			"error": "Es trat ein Fehler auf, bitte versuche es erneut.",
+			"saved": "Das Thema ':name' der Anleitung wurde gespeichert",
+			"not_saved": "Das Thema konnte nicht gespeichert werden",
+			"forbidden_name": "Der Titel :name ist nicht zulässig, bitte wähle einen anderen..."
+		},
 		"error_response": {
 			"400": "Fehlerhafte Anfrage",
 			"401": "Nicht authorisiert",
@@ -323,7 +331,6 @@
 		"approve_document_request_alert": "Ein neues Dokument benötgt eine Freigabe. Bitte prüfe :name.",
 		"approve_approved": "freigegeben",
 		"approve_unapproved": "nicht freigegeben",
-		"approve_landing_page": ":number Komponenten/Dokumente benötigen eine Freigabe",
 		"error_component_not_found": "Die Komponente :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 		"error_document_not_found": "Das Dokument :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 		"error_bundle_not_found": "Das Paket :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
@@ -580,7 +587,6 @@
 		"edit_product_deleted": ":name wurde dauerhaft gelöscht",
 		"error_product_not_found": ":name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 		"incorporation_no_approvals": "Produkte mit laufenden Einführungsverfahren",
-		"approve_landing_page": ":number laufende Einführungsverfahren",
 		"information_vendor": "Lieferanten",
 		"information_products_available": ":available verfügbare Produkte in der Datenbank",
 		"similar_name": "und :number mit ähnlichem Namen"
@@ -926,7 +932,6 @@
 		"record_mark_as_closed": "Als abgeschlossen kennzeichnen in deiner Rolle als",
 		"record_mark_as_closed_info": "Die Aufzeichnungen erscheinen nicht mehr in der Übersicht, können aber über den Filter weiterhin erreicht werden.",
 		"record_complaint_mark_as_closed_info": "Die Aufzeichnungen erscheinen nicht mehr in der Übersicht sobald alle erforderlichen Rollen gekennzeichnet haben, können aber über den Filter weiterhin erreicht werden.",
-		"record_complaints_landing_page": ":number nicht abgeschlossene Reklamationen",
 		"record_retype_header": "Dies ist keine :type? Dann wähle neu!",
 		"record_altering_pseudodocument_name": "Änderungen an der Dokumentation",
 		"record_retype_pseudodocument_name": "Dokumentationstyp",
@@ -1160,7 +1165,6 @@
 		"image_export": "Exportiere"
 	},
 	"user": {
-		"login_description": "Anmeldung",
 		"edit_existing_user_select": "Bestehende Nutzer verwalten",
 		"edit_existing_user_new": "Neuer Benutzer",
 		"edit_existing_user": "Nach Namen suchen",
